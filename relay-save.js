@@ -1,5 +1,5 @@
 /* ---------------------------------------------------------------------------
-   relay-save.js — saving for a MISMO tool on tools.mismo.org
+   relay-save.js — saving for a MISMO tool on resources.mismo.org
 
    Drop this in, set PROJECT and RELAY_URL, and call relaySave(). It handles the
    facilitator passcode, the commit, and the case where someone else saved while

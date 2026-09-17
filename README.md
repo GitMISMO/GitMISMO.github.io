@@ -1,8 +1,8 @@
-# tools.mismo.org
+# resources.mismo.org
 
 The organization site for MISMO's internal tools. This repository is the **home page**
-for `tools.mismo.org`; every other tool is its own repository in the GitMISMO
-organization and appears at `tools.mismo.org/<repository-name>/`.
+for `resources.mismo.org`; every other tool is its own repository in the GitMISMO
+organization and appears at `resources.mismo.org/<repository-name>/`.
 
 That inheritance is the whole reason this repo is named `GitMISMO.github.io`. GitHub
 treats a repository named `<org>.github.io` as the organization's own site, and a custom

@@ -1,9 +1,9 @@
-# Adding a tool to tools.mismo.org
+# Adding a tool to resources.mismo.org
 
-Everything under `tools.mismo.org` is a separate GitHub repository in the
+Everything under `resources.mismo.org` is a separate GitHub repository in the
 **GitMISMO** organization, published with GitHub Pages. The path is the
 repository name: a repo called `press-release` is served at
-`tools.mismo.org/press-release/`.
+`resources.mismo.org/press-release/`.
 
 There are two kinds of tool. Read the first section either way; only read the
 second if your tool needs to save.
@@ -20,7 +20,7 @@ No AWS. No tickets. No one else has to do anything.
    renaming it later breaks every link anyone has saved.
 2. Commit your files. `index.html` at the repo root is what loads.
 3. Settings → Pages → Source: *Deploy from a branch*, branch `main`, folder `/`.
-4. Wait a minute. It is live at `tools.mismo.org/<repo-name>/`.
+4. Wait a minute. It is live at `resources.mismo.org/<repo-name>/`.
 
 Then tell whoever maintains the home page to add you to the tree — see section C.
 
@@ -71,7 +71,7 @@ The `PROJECTS` entry looks like this:
 "press-release": {
   "repo": "GitMISMO/press-release",
   "branch": "main",
-  "origin": "https://tools.mismo.org"
+  "origin": "https://resources.mismo.org"
 }
 ```
 
@@ -102,7 +102,7 @@ Limits: 50 files per commit, no path may start with `/` or contain `..`.
 
 ## C. Adding yourself to the home page
 
-The home page at `tools.mismo.org` renders from a single `APPS` array at the top
+The home page at `resources.mismo.org` renders from a single `APPS` array at the top
 of its `index.html`. Add one object:
 
 ```js
@@ -129,7 +129,7 @@ exists, so the tree can show direction without shipping dead links.
 
 Every tool shares one web address, and browsers decide what is "the same site"
 by host name alone — the folder after the slash does not count. So every tool on
-`tools.mismo.org` shares one localStorage, one IndexedDB and one cookie jar.
+`resources.mismo.org` shares one localStorage, one IndexedDB and one cookie jar.
 
 **1. Namespace every browser-storage key as `tools:<your-app>:<name>`.**
 
