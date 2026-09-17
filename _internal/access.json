@@ -2,7 +2,7 @@
   "_comment": [
     "Every person who can sign in to any MISMO tool, listed once.",
     "Signing in is global; what each person may do is set per project below.",
-    "Roles: 'admin' can also manage accounts for that tool; 'facilitator' can save.",
+    "Roles: 'admin' can also manage accounts for that tool; 'staff' can save.",
     "Omit a project to deny access to it. Remove a person entirely to revoke everywhere.",
     "Changes take effect within about 30 seconds, without anyone being signed out.",
     "Generate name/email/hash with key-helper.html in the initiative-hub repository.",
