@@ -12,13 +12,22 @@ under this domain.
 
 ## Files
 
+Anything under `_internal/` is **not published**. GitHub Pages runs Jekyll, which skips
+paths beginning with an underscore, so those files exist in the repository but are not
+fetchable from the website. The save relay reads `projects.json` through the GitHub API,
+not over the web, so it is unaffected by where the file sits.
+
+That is tidiness rather than security — the repository is public either way, so anyone can
+read these on github.com. It just stops the site handing out a map of the estate to anyone
+who fetches one URL.
+
 | File | What it is |
 |---|---|
 | `index.html` | The home page. Self-contained — fonts and both wordmarks are embedded, so it makes no external requests and cannot be broken by a CDN outage. |
 | `assets/` | The two official wordmarks, colour and white, kept as files for use by other tools. |
-| `ADDING-A-TOOL.md` | How to add a new tool to this domain, with and without saving. Start here. |
-| `relay-save.js` | Drop-in saving module for a tool that needs to write back to GitHub. |
-| `projects.json` | The save relay's project list. The Lambda reads this file, so adding a tool that saves is a commit here rather than an AWS change. |
+| `_internal/ADDING-A-TOOL.md` | How to add a new tool to this domain, with and without saving. Start here. |
+| `_internal/relay-save.js` | Drop-in saving module for a tool that needs to write back to GitHub. |
+| `_internal/projects.json` | The save relay's project list. The Lambda reads this file, so adding a tool that saves is a commit here rather than an AWS change. |
 
 ## Editing the home page
 
