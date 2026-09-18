@@ -39,19 +39,35 @@ and rollback for free.
 ### B.1 What you do
 
 1. Everything in section A.
-2. Add `facilitators.json` to the root of your repo. This is the list of people
-   allowed to save, and it holds **hashes**, never passcodes:
+2. Add `_internal/facilitators.json` to your repo. This is the list of people
+   allowed to save, and it holds **hashes**, never passwords:
 
    ```json
    {
-     "admin":        { "name": "Your Name", "hash": "<sha-256 of the passcode>" },
-     "jane-smith":   { "name": "Jane Smith", "hash": "...", "expires": "2027-01-01" }
+     "admins": [
+       { "name": "Your Name", "email": "you@mismo.org", "hash": "pbkdf2$210000$..." }
+     ],
+     "facilitators": [
+       { "name": "Jane Smith", "email": "jane@mismo.org", "hash": "pbkdf2$210000$...",
+         "expires": "2027-01-01" }
+     ]
    }
    ```
 
-   Generate passcodes with `key-helper.html` in the Initiative Hub repo. It runs
-   entirely in your browser and shows each passcode once. Put it in a password
-   manager at that moment; it cannot be recovered, only reset.
+   **The `_internal/` folder matters.** GitHub Pages runs Jekyll, which skips any
+   path starting with an underscore, so the file is in your repo but the website
+   does not serve it. At the repo root it would be downloadable by anyone at
+   `resources.mismo.org/<your-tool>/facilitators.json`, publishing the list of
+   everyone who can edit your tool.
+
+   Admins can manage accounts as well as save; facilitators can only save. An
+   admin's name or email cannot be reused for a facilitator — both lists are
+   searched together, so a duplicate would make the winner depend on ordering.
+
+   Generate passwords with `key-helper.html` in the Initiative Hub repo. It runs
+   entirely in your browser and shows each password once. Put it in a password
+   manager at that moment; only the hash is stored, so it cannot be recovered,
+   only reset.
 3. Copy `relay-save.js` (next to this file) into your project and set `PROJECT`
    to your project key. It is about 60 lines and handles the key prompt, the
    save call, and conflict detection.
@@ -63,9 +79,11 @@ Two edits, both small. Ask early — the AWS one may need IT.
 | Where | What | Why |
 |---|---|---|
 | GitHub → the fine-grained token's settings | add your repo to its repository list | the token only reaches repos it was granted |
-| AWS → Lambda `mismo-save-relay` → Configuration → Environment variables | add one entry to `PROJECTS` | maps your project key to your repo |
+| `GitMISMO.github.io` → `_internal/projects.json` | add one entry | maps your project key to your repo |
 
-The `PROJECTS` entry looks like this:
+This part is **not** an AWS change any more — the relay reads its project list from
+`_internal/projects.json` in the `GitMISMO.github.io` repository, so adding a tool is a
+commit rather than a ticket. The entry looks like this:
 
 ```json
 "press-release": {
@@ -76,8 +94,10 @@ The `PROJECTS` entry looks like this:
 ```
 
 `origin` is the same for every tool now that everything shares a host, so it is
-always exactly that. No new Lambda, no new function, no code change to the
-relay.
+always exactly that. No new Lambda, no new function, no code change to the relay.
+
+Only the token edit needs someone with AWS or GitHub org access; the `projects.json`
+entry is an ordinary pull request.
 
 ### B.3 The save call
 
