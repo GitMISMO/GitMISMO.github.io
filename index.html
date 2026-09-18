@@ -9,7 +9,7 @@
   // the light theme. Tiny and synchronous on purpose.
   (function(){
     try {
-      if (localStorage.getItem('tools:home:theme') === 'dark')
+      if (localStorage.getItem('resources:home:theme') === 'dark')
         document.documentElement.setAttribute('data-theme','dark');
     } catch (e) {}
   })();
@@ -256,7 +256,7 @@ var APPS = [
 /* Sorted here rather than by hand, so a tool added anywhere in APPS still appears in
    the right place. localeCompare so "Émission" would file under E, not after Z. */
 APPS.sort(function(a,b){ return a.name.localeCompare(b.name, 'en'); });
-var STORE = 'tools:home:collapsed';
+var STORE = 'resources:home:collapsed';
 var CHEV = '<svg class="chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>';
 
 function esc(s){ return String(s).replace(/[&<>"]/g, function(c){
@@ -403,7 +403,7 @@ function secHTML(app, isOpen){
     var dark = document.documentElement.getAttribute('data-theme') === 'dark';
     if (dark) document.documentElement.removeAttribute('data-theme');
     else document.documentElement.setAttribute('data-theme','dark');
-    try { localStorage.setItem('tools:home:theme', dark ? 'light' : 'dark'); } catch (e) {}
+    try { localStorage.setItem('resources:home:theme', dark ? 'light' : 'dark'); } catch (e) {}
   });
 })();
 </script>
