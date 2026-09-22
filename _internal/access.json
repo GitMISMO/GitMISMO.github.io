@@ -6,7 +6,10 @@
     "Omit a project to deny access to it. Remove a person entirely to revoke everywhere.",
     "Changes take effect within about 30 seconds, without anyone being signed out.",
     "Generate name/email/hash with key-helper.html in the initiative-hub repository.",
-    "Never put a password here, only the pbkdf2 hash it produces."
+    "Never put a password here, only the pbkdf2 hash it produces.",
+    "platformAdmin: true lets this person change who has access, across every tool.",
+    "It is deliberately separate from being an admin of a tool: without it, an admin of",
+    "one tool could grant themselves admin of another. Keep this list very short."
   ],
   "people": {
     "pwilliams@mba.org": {
@@ -15,7 +18,8 @@
       "access": {
         "hub": "admin",
         "glossary": "admin"
-      }
+      },
+      "platformAdmin": true
     },
     "jcritchley@mismo.org": {
       "name": "Jonna Critchley",
@@ -23,7 +27,8 @@
       "access": {
         "hub": "admin",
         "glossary": "admin"
-      }
+      },
+      "platformAdmin": true
     },
     "ebittenbender@mismo.org": {
       "name": "Erin Bittenbender",
