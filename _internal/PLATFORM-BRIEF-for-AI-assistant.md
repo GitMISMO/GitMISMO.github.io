@@ -41,19 +41,31 @@ to need a credential in the browser, the design is wrong. Route it through the r
 
 **Nothing served by GitHub Pages can be hidden.** There is no such thing as a private
 page here. A login screen on a static page controls what the *interface offers*, not what
-the *server hands over*. If content must not be seen by everyone, it cannot live in the
-page — it has to come from an authenticated API at runtime. Assume anything you commit is
-public forever.
+the *server hands over*. Assume anything committed to a PUBLIC repository is public
+forever.
+
+**But sensitive data has a home: a private repository, read through the relay.** The page
+stays public and holds nothing; after sign-in it asks the relay, which reads the private
+repository on the server and returns only what that person may see. So you gate the data,
+not the page. Files attached to Initiative Hub records already work this way — the
+documents and even their file names live in a private repository, and someone without
+access sees no sign that any exist.
 
 **Never use `localStorage.clear()`.** Every tool shares one origin, so clearing storage
 wipes other tools' data. Namespace every key as `resources:<your-tool>:<name>` and remove
 only your own.
 
-**Git commits whole files.** There is no row-level permission. If a file contains data
-that only some people should see, the *whole file* reaches every browser that loads it —
-hiding rows in JavaScript changes nothing, the data is already there. Confidential data
-cannot live in the repository. That is a property of git, not a limitation to work
-around.
+**Git commits whole files, so a PUBLIC repository cannot hold anything confidential.**
+If a public file contains data only some people should see, the *whole file* reaches every
+browser that loads it — hiding rows in JavaScript changes nothing, the data is already
+there. That is a property of git, not a limitation to work around.
+
+Row-level permission is still possible, but only on the server. When the data sits in a
+private repository, the relay reads the file, filters it, and returns only that person's
+rows; the rest never leaves the server. So one person can see their own hours while
+another sees everyone's rates — as long as the filtering happens in the relay and never in
+the page. Contractor rates, signed agreements and similar all belong here rather than in
+a public repository.
 
 **Pass `parentSha` on every save.** It is the commit your page actually read. If someone
 else saved meanwhile, the relay returns `409` and refuses rather than silently discarding
@@ -81,10 +93,17 @@ saving, even through a mistake in `projects.json`.
 | `GET /{project}/data/{id}` | read a data file |
 | `PUT /{project}/data/{id}` | write one data file |
 | `POST /{project}/commit` | write up to 50 files in one atomic commit |
+| `GET /{project}/file/{path}` | read one file back, base64 — how a private repository reaches a signed-in person |
 | `GET /{project}/facilitators` | list accounts (admin only) |
 | `PUT /{project}/facilitators` | replace the account list (admin only) |
 
-Limits: 50 files per commit; no path may begin with `/` or contain `..`.
+Limits: 50 files per commit; no path may begin with `/` or contain `..`; and each project
+declares in `projects.json` which folders it may write, with `_internal/`, `.github/` and
+`.git/` refused whatever it declares.
+
+A file may carry `encoding: 'base64'` to store a document — Word, Excel, PDF, images —
+byte for byte. Without it the content is treated as text and a document would be
+corrupted. About 4 MB per file, from the relay's request limit.
 
 ---
 
@@ -95,7 +114,7 @@ request as an `X-Facilitator-Key` header. The relay checks it against a PBKDF2 h
 `_internal/facilitators.json` in that tool's repository. The key is kept in
 `localStorage` and does not expire.
 
-**Soon (built, tested, not switched on):** one sign-in across every tool. The person signs
+**Live since September 2026:** one sign-in across every tool. The person signs
 in once, the relay returns a signed token, and the token is sent instead of the password.
 Permissions live in `_internal/access.json` in the `GitMISMO.github.io` repository, per
 person and per tool.
@@ -160,7 +179,8 @@ loudly: two tools sharing a draft key will offer each other's unsaved work.
 ## When to stop and ask
 
 - A design seems to need a secret in the browser.
-- Data should be visible to some people and not others.
+- Data should be visible to some people and not others AND you are tempted to put it in
+  a public repository. In a private one, read through the relay, this is supported.
 - You are about to add a build step, a framework or a package manager.
 - You are about to rename a repository that is already linked from somewhere.
 - Something needs an AWS change — those go through IT and take days, so raise them early.
