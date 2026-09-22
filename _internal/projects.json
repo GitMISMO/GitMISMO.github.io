@@ -15,5 +15,13 @@
       "data/",
       ".console/"
     ]
+  },
+  "hub-files": {
+    "repo": "GitMISMO/hub-files",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "files/"
+    ]
   }
 }

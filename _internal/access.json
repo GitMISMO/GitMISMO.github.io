@@ -17,7 +17,8 @@
       "hash": "pbkdf2$210000$304e0329bf866e46294b79928fb96c54$23fb09c69f91df663c341a9ce6f5d90928c90e8ed8c7b6af5301d428ffcee41e",
       "access": {
         "hub": "admin",
-        "glossary": "admin"
+        "glossary": "admin",
+        "hub-files": "admin"
       },
       "platformAdmin": true
     },
@@ -26,7 +27,8 @@
       "hash": "pbkdf2$210000$c7f711325c80dfdd5b013a297cdc5b34$f373ff22027d23ea58098732816bc980cdda109d1449936d9dcf5fb16d767689",
       "access": {
         "hub": "admin",
-        "glossary": "admin"
+        "glossary": "admin",
+        "hub-files": "admin"
       },
       "platformAdmin": true
     },
@@ -34,7 +36,8 @@
       "name": "Erin Bittenbender",
       "hash": "pbkdf2$210000$5cd66ea150e8aef324ee0acbedea3fa4$b1928fd9b5d8e812f2e46e07b175b4924c40e830bd81675d5e6b81cdc2b85438",
       "access": {
-        "hub": "staff"
+        "hub": "staff",
+        "hub-files": "staff"
       }
     }
   }
