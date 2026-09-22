@@ -2,11 +2,18 @@
   "hub": {
     "repo": "GitMISMO/initiative-hub",
     "branch": "main",
-    "origin": "https://resources.mismo.org"
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
   },
   "glossary": {
     "repo": "GitMISMO/glossary",
     "branch": "main",
-    "origin": "https://resources.mismo.org"
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/",
+      ".console/"
+    ]
   }
 }

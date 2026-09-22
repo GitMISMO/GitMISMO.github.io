@@ -89,9 +89,19 @@ commit rather than a ticket. The entry looks like this:
 "press-release": {
   "repo": "GitMISMO/press-release",
   "branch": "main",
-  "origin": "https://resources.mismo.org"
+  "origin": "https://resources.mismo.org",
+  "writable": ["data/"]
 }
 ```
+
+**`writable` is required if your tool saves more than one file at a time.** It lists
+the folders saving may change. Anything outside them is refused — including your own
+page code, so a leaked password means a bad data edit rather than a changed website.
+List only what your tool genuinely writes. Leave it out and multi-file saving is
+refused entirely, which is the safe default.
+
+Three locations are refused whatever you list: `_internal/`, `.github/` and `.git/`.
+Account lists, CI workflows and git internals can never be changed through saving.
 
 `origin` is the same for every tool now that everything shares a host, so it is
 always exactly that. No new Lambda, no new function, no code change to the relay.

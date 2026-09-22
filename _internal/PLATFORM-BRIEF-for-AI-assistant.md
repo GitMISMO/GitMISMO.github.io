@@ -63,10 +63,18 @@ their work. Omit it and colleagues overwrite each other invisibly.
 
 ## What the relay will and will not write
 
-The relay refuses to write anything outside a small set of paths. This is deliberate: a
-leaked password should mean a bad data edit, not a site takeover. It cannot commit HTML,
-JavaScript, configuration or its own source. Code changes are ordinary pull requests by a
-person.
+The relay only writes where your project has said it may. Each project declares a
+`writable` list of folders in `_internal/projects.json`, and a save touching anything
+outside those folders is refused in full — not partly written. Code changes are ordinary
+pull requests by a person.
+
+This is deliberate: a leaked password should mean a bad data edit, not a changed website.
+So declare only the folders your tool genuinely writes, usually just `data/`. Never list
+the folder containing your page code.
+
+Three locations are refused whatever a project declares: `_internal/`, `.github/` and
+`.git/`. That means account lists, CI workflows and git internals can never be changed by
+saving, even through a mistake in `projects.json`.
 
 | Route | Purpose |
 |---|---|
@@ -124,8 +132,9 @@ guesses a URL.
    Generate them with `key-helper.html` in the Initiative Hub repo, which runs entirely in
    the browser.
 4. Copy `relay-save.js` from `GitMISMO.github.io/_internal/` and set your project key.
-5. Add an entry to `_internal/projects.json` in `GitMISMO.github.io`. This is a pull
-   request, not a ticket.
+5. Add an entry to `_internal/projects.json` in `GitMISMO.github.io`, including a
+   `writable` list of the folders your tool saves to. This is a pull request, not a
+   ticket.
 6. Ask for the repository to be added to the relay's GitHub token. **This is the one step
    that needs someone else**, and the one most often forgotten — the token cannot read a
    repository it was not granted, even a public one.
