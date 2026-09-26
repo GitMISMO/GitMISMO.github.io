@@ -1,16 +1,4 @@
 {
-  "_comment": [
-    "Every person who can sign in to any MISMO tool, listed once.",
-    "Signing in is global; what each person may do is set per project below.",
-    "Roles: 'admin' can also manage accounts for that tool; 'staff' can save.",
-    "Omit a project to deny access to it. Remove a person entirely to revoke everywhere.",
-    "Changes take effect within about 30 seconds, without anyone being signed out.",
-    "Generate name/email/hash with key-helper.html in the initiative-hub repository.",
-    "Never put a password here, only the pbkdf2 hash it produces.",
-    "platformAdmin: true lets this person change who has access, across every tool.",
-    "It is deliberately separate from being an admin of a tool: without it, an admin of",
-    "one tool could grant themselves admin of another. Keep this list very short."
-  ],
   "people": {
     "pwilliams@mba.org": {
       "name": "Perry Williams",
@@ -28,7 +16,9 @@
       "access": {
         "hub": "admin",
         "glossary": "admin",
-        "hub-files": "admin"
+        "hub-files": "admin",
+        "summit-hq": "staff",
+        "sponsorship": "staff"
       },
       "platformAdmin": true
     },
