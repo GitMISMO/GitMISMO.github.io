@@ -25,7 +25,10 @@
    Public API — window.ResourcesSession:
        current()            the session, or null
        token()              the bearer token, or null
-       requireAccess(p,o)   gate a page: resolves with the role, or shows the refusal
+       requireAccess(p,o)   gate a page: resolves with the role, or shows the refusal.
+                            o.toolName names it on screen ("the Sponsorship Portal");
+                            o.gated (default true) sends Cancel/Close back to the home
+                            page, since a gated page has nothing to show without it.
        role(project)        'admin' | 'staff' | 'view' | null for this person
        canEdit(project)     true if they may save changes there (admin or staff)
        isAdmin()            admin on any tool
@@ -98,6 +101,27 @@
     return null;
   }
 
+  /* ---------- does the relay say this person may use this tool? ----------
+     'yes', 'no', 'signed-out' or 'unknown'. It asks for a reserved name on the tool's
+     /data/ route: the relay checks who is asking first, then refuses the name, so the
+     answer is decided without reading anything. The relay's tests pin this behaviour
+     ("the access check session.js relies on"); if they ever fail, this needs a proper
+     route instead. */
+  function confirmAccess(project) {
+    var s = read();
+    if (!s || !s.token) return Promise.resolve('signed-out');
+    return fetch(RELAY_URL + '/' + encodeURIComponent(project) + '/data/facilitators', {
+      method: 'GET', cache: 'no-store', headers: { 'Authorization': 'Bearer ' + s.token }
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (b) {
+        if (r.status === 400 && b.error === 'BAD_ID') return 'yes';
+        if (r.status === 403 && b.error === 'NO_ACCESS') return 'no';
+        if (r.status === 401) return 'signed-out';
+        return 'unknown';
+      });
+    }, function () { return 'unknown'; });
+  }
+
   /* ---------- API ---------- */
   var api = {
     current: function () { return read(); },
@@ -135,19 +159,29 @@
        request. A page that only hid its controls would still be handing out its data. */
     requireAccess: function (project, opts) {
       opts = opts || {};
+      var shown = { toolName: opts.toolName, gated: opts.gated !== false };
+      function again() { return api.requireAccess(project, opts); }
+
+      if (!read()) return openModal(shown).then(again);
       var r = api.role(project);
       if (r) return Promise.resolve(r);
-      var deny = function () {
-        return openModal({ reason: 'no-access', toolName: opts.toolName })
-          .then(function () { return api.role(project) || Promise.reject(new Error('no-access')); },
-                function (e) { return Promise.reject(e); });
-      };
-      if (!read()) {
-        return openModal({ toolName: opts.toolName }).then(function () {
-          return api.role(project) || deny();
-        });
-      }
-      return deny();
+
+      /* The access list in the browser is a copy taken at sign-in. Someone granted this
+         tool since then would be refused by it while the relay would let them in, so the
+         relay is asked before anyone is turned away. */
+      return confirmAccess(project).then(function (answer) {
+        if (answer === 'yes') {
+          return openModal({ reason: 'refresh', toolName: opts.toolName, gated: shown.gated }).then(again);
+        }
+        if (answer === 'signed-out') { write(null); return openModal(shown).then(again); }
+        if (answer === 'no') {
+          return openModal({ reason: 'no-access', toolName: opts.toolName, gated: shown.gated }).then(again);
+        }
+        /* The relay could not be reached. That is not a refusal, and saying "you do not
+           have access" to someone who does would be wrong, so the page is told instead. */
+        var e = new Error('The sign-in service could not be reached.'); e.code = 'OFFLINE';
+        return Promise.reject(e);
+      });
     },
     signOut: function () { write(null); },
     onChange: function (fn) { listeners.push(fn); },
@@ -344,6 +378,10 @@
     var prev = read();
     var expired = opts.reason === 'expired';
     var noAccess = opts.reason === 'no-access';
+    var refresh = opts.reason === 'refresh';
+    /* On a page that shows nothing without signing in, dismissing the window would leave
+       a blank screen, so the way out goes back to the home page instead. */
+    var leave = opts.gated ? 'Back to MISMO Resources' : (noAccess ? 'Close' : 'Cancel');
     var title = expired ? 'Sign in to finish saving'
       : noAccess ? (opts.toolName ? 'You do not have access to ' + opts.toolName : 'You do not have access to this')
       : 'Sign in to MISMO Resources';
@@ -372,7 +410,9 @@
       '<div class="rs-card">' +
         '<div class="rs-chead"><div class="rs-ctitle">' + esc(title) + '</div>' + (sub ? '<div class="rs-csub">' + esc(sub) + '</div>' : '') + '</div>' +
         '<div class="rs-cbody">' +
-          '<div class="rs-banner rs-b-warn' + (expired ? ' on' : '') + '"><span>&#9201;</span><span>Your session expired while you were working. Nothing has been lost &mdash; sign in and your save will go through.</span></div>' +
+          '<div class="rs-banner rs-b-warn' + (expired ? ' on' : '') + '"><span>&#9201;</span><span>Your session expired while you were working. Nothing has been lost. Sign in and your save will go through.</span></div>' +
+          '<div class="rs-banner rs-b-info' + (refresh ? ' on' : '') + '"><span>i</span><span>Your access has changed since you last signed in. ' +
+            'Sign in again to open ' + esc(opts.toolName || 'this') + '.</span></div>' +
           (noAccess ? whoami : '') +
           '<div class="rs-banner rs-b-info' + (noAccess && !prev ? ' on' : '') + '"><span>i</span><span>' +
             'You are not signed in, and this application is not open to everyone.' +
@@ -385,7 +425,7 @@
           '</div>' +
           (noAccess ? '<a class="rs-go rs-golink" href="' + esc(askHref) + '">Ask for access</a>' +
                       '<button type="button" class="rs-quiet" data-rs-switch>Sign in as someone else</button>' : '') +
-          '<button type="button" class="rs-quiet" data-rs-cancel>' + (noAccess ? 'Close' : 'Cancel') + '</button>' +
+          '<button type="button" class="rs-quiet" data-rs-cancel>' + esc(leave) + '</button>' +
           '<div class="rs-note">' + (noAccess
             ? 'Accounts and what each one can reach are managed by a MISMO administrator.'
             : 'Accounts are created by a MISMO administrator. Lost your password? Ask them to reset it.') + '</div>' +
@@ -427,7 +467,7 @@
         /* One message for a wrong password, an unknown email and an expired account —
            the relay deliberately does not say which, and neither does this. */
         if (x.r.status === 401) showErr('That email and password do not match an account.');
-        else if (x.r.status === 502) showErr('Sign-in is briefly unavailable. Your work is safe \u2014 try again in a minute.');
+        else if (x.r.status === 502) showErr('Sign-in is briefly unavailable. Your work is safe. Try again in a minute.');
         else showErr(x.b.message || ('Sign-in failed (' + x.r.status + ').'));
       }).catch(function () {
         showErr('Could not reach the sign-in service. Check your connection and try again.');
@@ -448,8 +488,12 @@
       pending = null;
       openModal({}).then(resolveFn, rejectFn);
     });
-    scrim.querySelector('[data-rs-cancel]').addEventListener('click', function () { close(null, new Error('cancelled')); });
-    scrim.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(null, new Error('cancelled')); });
+    function dismiss() {
+      if (opts.gated) { location.href = '/'; return; }
+      close(null, new Error('cancelled'));
+    }
+    scrim.querySelector('[data-rs-cancel]').addEventListener('click', dismiss);
+    scrim.addEventListener('keydown', function (e) { if (e.key === 'Escape') dismiss(); });
     return promise;
   }
 
