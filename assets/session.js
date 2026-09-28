@@ -55,7 +55,8 @@
   var TOOLS = [
     { key: 'hub',         name: 'Initiative Hub',    path: '/initiative-hub/' },
     { key: 'glossary',    name: 'Business Glossary', path: '/glossary/' },
-    { key: 'summit-hq',   name: 'Summit HQ',         path: '/summit-hq/' }
+    { key: 'summit-hq',   name: 'Summit HQ',         path: '/summit-hq/' },
+    { key: 'sponsorship', name: 'Sponsorship Portal', path: '/sponsorship/' }
   ];
 
   var listeners = [];
