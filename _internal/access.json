@@ -29,6 +29,17 @@
       "access": {
         "hub": "staff"
       }
+    },
+    "amoses@mismo.org": {
+      "name": "Amy Moses",
+      "hash": "pbkdf2$210000$b3ed0c50b86a8ddf70775cb2c3721d0a$dd0d95ecec472501d88761354a23b5ae46722457a9ca4ce16d7042a007bb9de6",
+      "access": {
+        "hub": "staff",
+        "glossary": "view",
+        "hub-files": "view",
+        "summit-hq": "staff",
+        "sponsorship": "staff"
+      }
     }
   }
 }
