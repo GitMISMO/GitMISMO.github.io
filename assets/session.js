@@ -66,10 +66,16 @@
   var expiryTimer = null;
 
   /* ---------- storage ---------- */
+  /* Who was signed in on this page most recently, kept in memory only. An expired session
+     is deleted from storage the moment it is read, and without this the "Your session
+     expired while you were working" window opened with an empty email field, asking the
+     person to type who they are to finish a save they had just started. */
+  var lastKnown = null;
   function read() {
     try {
       var s = JSON.parse(localStorage.getItem(KEY) || 'null');
       if (!s || !s.token || !s.expiresAt) return null;
+      lastKnown = { name: s.name, email: s.email };
       if (Date.parse(s.expiresAt) <= Date.now()) { localStorage.removeItem(KEY); return null; }
       return s;
     } catch (e) { return null; }
@@ -441,7 +447,8 @@
 
     var email = scrim.querySelector('#rs-email'), pass = scrim.querySelector('#rs-pass');
     var go = scrim.querySelector('[data-rs-go]'), err = scrim.querySelector('[data-rs-err]'), errText = scrim.querySelector('[data-rs-errtext]');
-    if (prev && prev.email && email) email.value = prev.email;
+    var known = prev || lastKnown;
+    if (known && known.email && email) email.value = known.email;
     setTimeout(function () { (email && !email.value ? email : pass || go).focus(); }, 30);
 
     function showErr(msg) { errText.textContent = msg; err.classList.add('on'); }
