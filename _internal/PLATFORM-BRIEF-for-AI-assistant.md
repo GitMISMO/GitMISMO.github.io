@@ -119,6 +119,21 @@ in once, the relay returns a signed token, and the token is sent instead of the 
 Permissions live in `_internal/access.json` in the `GitMISMO.github.io` repository, per
 person and per tool.
 
+**Three levels of access per tool:** Edit, View, or none. Edit saves; View reads
+everything and cannot save; none means the tool is not theirs. The relay refuses every
+write from a View account itself, so hiding a button is courtesy, not security.
+
+Use the shared module rather than reading roles yourself:
+
+| Call | Use it for |
+|---|---|
+| `ResourcesSession.requireAccess('your-tool', {toolName:'Your Tool'})` | Gating a whole page. Shows sign-in or the refusal screen as needed; resolves with the role. |
+| `ResourcesSession.canEdit('your-tool')` | Deciding whether to show Save, Add, Remove and similar. |
+| `ResourcesSession.role('your-tool')` | Only if you truly need to tell admin from staff. Returns `'admin'`, `'staff'`, `'view'` or `null`. |
+
+Do not compare role strings in your page. A fourth level added later would silently fall
+through every `role === 'staff'` check, and `canEdit()` changes in one place.
+
 **Design for the second one.** Keep credential handling in one small module rather than
 scattered through the page, so the switch is one file. Do not build anything that assumes
 the password is available on every request.
