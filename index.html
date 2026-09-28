@@ -22,7 +22,7 @@
   :root{
     --ink:#101B33; --ink-soft:#4B5670; --paper:#F1F3F9; --card:#FFFFFF; --line:#E1E4EC;
     --brand:#2A4DFF; --brand-soft:#EAF0FF; --brand-text:#1E3ACC;
-    --teal:#0E9488; --amber:#B45309; --violet:#7C3AED;
+    --teal:#0E9488; --amber:#B45309; --violet:#7C3AED; --rose:#BE123C;
     --slate:#8B94A7; --slate-soft:#EEF0F4; --slate-text:#5B6478;
     --logo-navy:#0D314C; --logo-blue:#74BFEB;
     --wordmark:var(--logo-blue);
@@ -31,7 +31,7 @@
   html[data-theme="dark"]{
     --ink:#E8EAF0; --ink-soft:#A0A8C0; --paper:#0B0F1C; --card:#161C30; --line:#2A3150;
     --brand:#5B85FF; --brand-soft:#1A2745; --brand-text:#9AB8FF;
-    --teal:#14B8A6; --amber:#F59E0B; --violet:#9660F5;
+    --teal:#14B8A6; --amber:#F59E0B; --violet:#9660F5; --rose:#FB7185;
     --slate:#6B7488; --slate-soft:#202536; --slate-text:#A0A8C0;
   }
   *{box-sizing:border-box;}
@@ -256,6 +256,12 @@ var APPS = [
     key:'summit-hq', name:'Summit HQ', base:'/summit-hq', colour:'amber', tag:'gated',
     desc:'Plan a summit: rooms, schedule, workgroup placement and conflicts.',
     home:'Sign in to plan rooms, sessions and workgroup placement'
+  },
+    {
+    key:'service-orders', name:'Service Orders and Agreements', base:'/service-orders', colour:'rose',
+    state:'soon',
+    desc:'FY 2027 service orders and MSA extensions: what each contracting company has been sent, what they have accepted, and the hours logged against each order.',
+    note:'In development. It will be listed here once sign-in is live.'
   },
   {
     key:'sponsorship', name:'Sponsorship Prospectus', base:'/sponsorship', colour:'violet',
