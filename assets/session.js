@@ -44,7 +44,7 @@
   var LOGIN_PROJECT = 'hub';                     // sign-in is global; any project path works
   /* Where "Ask for access" writes to. A person who has been refused cannot be shown the
      administrator list — they cannot read it — so the address is named here instead. */
-  var ACCESS_CONTACT = 'pwilliams@mba.org';
+  var ACCESS_CONTACT = 'info@mismo.org';
   var KEY = 'resources:session';
 
   /* Every tool the menu lists. A tool someone cannot use is still shown, as "No
