@@ -218,7 +218,8 @@
            repository) gives url instead, the full path from the site root, e.g.
            url:'/sponsorship-prospectus/'. Use it only for that; everything inside the
            tool's own folder keeps using href, so a folder rename moves them together.
-   tag     'gated' marks a page that asks for a facilitator passcode.
+   tag     'gated' on a TOOL marks its home page "Sign in". Pages carry no tag (Perry,
+           Sept 28, 2026: the per-page Facilitator tags are gone).
    =================================================================== */
 var APPS = [
   {
@@ -235,14 +236,10 @@ var APPS = [
       { label:'Potential initiatives', pages:[
         { badge:'AI',  name:'Consumer Facing AI Disclosure Language', sub:'Artificial Intelligence, in progress',
           href:'/potential.html?id=consumer-facing-ai-disclosure-language' },
-        { badge:'NEW', name:'Log a potential initiative', sub:'Upload and review', href:'/potential-edit.html', tag:'gated' }
+        { badge:'NEW', name:'Log a potential initiative', sub:'Upload and review', href:'/potential-edit.html' }
       ]},
       { label:'Schedule', pages:[
         { badge:'CAL', name:'Meeting calendar', sub:'Every workgroup, filterable', href:'/calendar.html' }
-      ]},
-      { label:'Facilitator tools', pages:[
-        { badge:'ADM', name:'Admin panel', sub:'Facilitator keys and stakeholder types', href:'/admin.html',      tag:'gated' },
-        { badge:'KEY', name:'Key helper',  sub:'Generate a facilitator passcode',        href:'/key-helper.html', tag:'gated' }
       ]}
     ]
   },
@@ -252,7 +249,7 @@ var APPS = [
     home:'Search and browse every term',
     groups:[
       { label:'Facilitator tools', pages:[
-        { badge:'CON', name:'Glossary console', sub:'Draft, stage and publish changes', href:'/console/', tag:'gated' }
+        { badge:'CON', name:'Glossary console', sub:'Draft, stage and publish changes', href:'/console/' }
       ]}
     ]
   },
@@ -310,7 +307,7 @@ function countPages(app){
 
 function rowHTML(app, page){
   var planned = page.state === 'planned';
-  var tag = page.tag === 'gated' ? '<span class="tag">Facilitator</span>' : '';
+  var tag = '';
   var inner =
     '<span class="b">' + esc(page.badge || '') + '</span>' +
     '<span><span class="n">' + esc(page.name) + '</span>' +
