@@ -7,7 +7,8 @@
         "hub": "admin",
         "glossary": "admin",
         "hub-files": "admin",
-        "summit-hq": "admin"
+        "summit-hq": "admin",
+        "sponsorship": "staff"
       },
       "platformAdmin": true
     },
