@@ -31,5 +31,13 @@
     "writable": [
       "files/"
     ]
+  },
+  "sponsorship": {
+    "repo": "GitMISMO/sponsorship-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
   }
 }
