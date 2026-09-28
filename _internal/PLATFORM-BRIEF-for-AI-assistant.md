@@ -236,6 +236,16 @@ loudly: two tools sharing a draft key will offer each other's unsaved work.
 
 ---
 
+## Facilitator names come from one list
+
+Anywhere a facilitator's name can be edited, it is chosen from a drop-down, never typed.
+The list is kept in the Initiative Hub Admin Panel (Facilitators), which publishes the
+names to `/initiative-hub/data/facilitator-roster.json` as `{"facilitators":[{"name":"…"}]}`.
+Read that file; do not hard-code names. Keep any saved name that is not on the list
+selectable, marked "(not on the list)", so opening a page never changes data. Summit HQ
+also allows a walk-on (someone covering at one summit only), typed in its picker and
+never added to the shared list.
+
 ## When to stop and ask
 
 - A design seems to need a secret in the browser.
