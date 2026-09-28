@@ -431,7 +431,7 @@
           '</span></div>' +
           '<div class="rs-banner rs-b-err" data-rs-err><span>!</span><span data-rs-errtext></span></div>' +
           '<div' + (noAccess ? ' hidden' : '') + '>' +
-            '<div class="rs-fld"><label for="rs-email">MISMO email</label><input id="rs-email" type="email" autocomplete="username" placeholder="you@mismo.org"></div>' +
+            '<div class="rs-fld"><label for="rs-email">Email</label><input id="rs-email" type="email" autocomplete="username" placeholder="name@company.com"></div>' +
             '<div class="rs-fld"><label for="rs-pass">Password</label><input id="rs-pass" type="password" autocomplete="current-password"></div>' +
             '<button type="button" class="rs-go" data-rs-go>' + (expired ? 'Sign in and save' : 'Sign in') + '</button>' +
           '</div>' +
@@ -460,7 +460,7 @@
 
     function submit() {
       var e = (email.value || '').trim().toLowerCase(), p = pass.value || '';
-      if (!e || e.indexOf('@') < 0) return showErr('Enter your MISMO email.');
+      if (!e || e.indexOf('@') < 0) return showErr('Enter your email.');
       if (!p) return showErr('Enter your password.');
       go.disabled = true; go.textContent = 'Signing in\u2026'; err.classList.remove('on');
       fetch(RELAY_URL + '/' + LOGIN_PROJECT + '/auth/login', {
