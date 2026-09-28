@@ -39,5 +39,75 @@
     "writable": [
       "data/"
     ]
-  }
+  },
+    "so-phoenix": {
+    "repo": "GitMISMO/so-phoenix-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/"
+    ],
+    "readable": [
+      "orders/",
+      "agreements/"
+    ]
+  },
+  "so-actualize": {
+    "repo": "GitMISMO/so-actualize-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/"
+    ],
+    "readable": [
+      "orders/",
+      "agreements/"
+    ]
+  },
+  "so-trex": {
+    "repo": "GitMISMO/so-trex-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/"
+    ],
+    "readable": [
+      "orders/",
+      "agreements/"
+    ]
+  },
+  "so-falcon": {
+    "repo": "GitMISMO/so-falcon-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/"
+    ],
+    "readable": [
+      "orders/",
+      "agreements/"
+    ]
+  },
+  "so-trudigital": {
+    "repo": "GitMISMO/so-trudigital-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/"
+    ],
+    "readable": [
+      "orders/",
+      "agreements/"
+    ]
+  },
 }
