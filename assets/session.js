@@ -49,10 +49,13 @@
 
   /* Every tool the menu lists. A tool someone cannot use is still shown, as "No
      access", so a read-only page has an explanation rather than looking broken. */
+  /* Only tools registered in _internal/projects.json belong here. A tool listed before
+     the relay knows it shows a permission that governs nothing. Files (hub-files) is
+     left out on purpose: it is storage behind the Hub, not somewhere you go. */
   var TOOLS = [
     { key: 'hub',         name: 'Initiative Hub',    path: '/initiative-hub/' },
     { key: 'glossary',    name: 'Business Glossary', path: '/glossary/' },
-    { key: 'sponsorship', name: 'Sponsorship',       path: '/sponsorship/' }
+    { key: 'summit-hq',   name: 'Summit HQ',         path: '/summit-hq/' }
   ];
 
   var listeners = [];
