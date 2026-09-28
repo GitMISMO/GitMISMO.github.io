@@ -101,20 +101,24 @@
     return null;
   }
 
-  /* ---------- does the relay say this person may use this tool? ----------
-     'yes', 'no', 'signed-out' or 'unknown'. It asks for a reserved name on the tool's
-     /data/ route: the relay checks who is asking first, then refuses the name, so the
-     answer is decided without reading anything. The relay's tests pin this behaviour
-     ("the access check session.js relies on"); if they ever fail, this needs a proper
-     route instead. */
-  function confirmAccess(project) {
+  /* ---------- what does the relay say this person may do on this tool? ----------
+     'edit', 'view', 'no', 'signed-out' or 'unknown'. It attempts a save to a reserved
+     name on the tool's /data/ route, and the relay turns it away before anything is
+     read or written: no access is refused at sign-in, View is refused by the view-only
+     guard, and Edit gets past both and is refused for the name. So one request gives the
+     person's CURRENT level, whatever the browser's copy says. Admin cannot be told from
+     staff this way; both are Edit, and 'staff' is recorded until the next sign-in.
+     The relay's tests pin all of this ("the access check session.js relies on"). If they
+     ever fail, this needs a proper route instead. */
+  function checkAccess(project) {
     var s = read();
     if (!s || !s.token) return Promise.resolve('signed-out');
     return fetch(RELAY_URL + '/' + encodeURIComponent(project) + '/data/facilitators', {
-      method: 'GET', cache: 'no-store', headers: { 'Authorization': 'Bearer ' + s.token }
+      method: 'PUT', cache: 'no-store', headers: { 'Authorization': 'Bearer ' + s.token }
     }).then(function (r) {
       return r.json().catch(function () { return {}; }).then(function (b) {
-        if (r.status === 400 && b.error === 'BAD_ID') return 'yes';
+        if (r.status === 400 && b.error === 'BAD_ID') return 'edit';
+        if (r.status === 403 && b.error === 'VIEW_ONLY') return 'view';
         if (r.status === 403 && b.error === 'NO_ACCESS') return 'no';
         if (r.status === 401) return 'signed-out';
         return 'unknown';
@@ -168,10 +172,15 @@
 
       /* The access list in the browser is a copy taken at sign-in. Someone granted this
          tool since then would be refused by it while the relay would let them in, so the
-         relay is asked before anyone is turned away. */
-      return confirmAccess(project).then(function (answer) {
-        if (answer === 'yes') {
-          return openModal({ reason: 'refresh', toolName: opts.toolName, gated: shown.gated }).then(again);
+         relay is asked before anyone is turned away. If it says yes, the copy is corrected
+         on the spot and the page opens: no second sign-in for a grant made since. */
+      return checkAccess(project).then(function (answer) {
+        if (answer === 'edit' || answer === 'view') {
+          var cur = read();
+          cur.access = cur.access || {};
+          cur.access[project] = answer === 'edit' ? 'staff' : 'view';
+          write(cur);
+          return cur.access[project];
         }
         if (answer === 'signed-out') { write(null); return openModal(shown).then(again); }
         if (answer === 'no') {
@@ -378,7 +387,6 @@
     var prev = read();
     var expired = opts.reason === 'expired';
     var noAccess = opts.reason === 'no-access';
-    var refresh = opts.reason === 'refresh';
     /* On a page that shows nothing without signing in, dismissing the window would leave
        a blank screen, so the way out goes back to the home page instead. */
     var leave = opts.gated ? 'Back to MISMO Resources' : (noAccess ? 'Close' : 'Cancel');
@@ -411,8 +419,6 @@
         '<div class="rs-chead"><div class="rs-ctitle">' + esc(title) + '</div>' + (sub ? '<div class="rs-csub">' + esc(sub) + '</div>' : '') + '</div>' +
         '<div class="rs-cbody">' +
           '<div class="rs-banner rs-b-warn' + (expired ? ' on' : '') + '"><span>&#9201;</span><span>Your session expired while you were working. Nothing has been lost. Sign in and your save will go through.</span></div>' +
-          '<div class="rs-banner rs-b-info' + (refresh ? ' on' : '') + '"><span>i</span><span>Your access has changed since you last signed in. ' +
-            'Sign in again to open ' + esc(opts.toolName || 'this') + '.</span></div>' +
           (noAccess ? whoami : '') +
           '<div class="rs-banner rs-b-info' + (noAccess && !prev ? ' on' : '') + '"><span>i</span><span>' +
             'You are not signed in, and this application is not open to everyone.' +
