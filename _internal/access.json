@@ -44,7 +44,7 @@
     },
     "sponsorship-mailer@mismo.org": {
       "name": "Sponsorship Mailer",
-      "hash": "pbkdf2$210000$def049fd3ab45f859fc4faa9a266685f$0706fdd6e525a5701a5ecc03ff0de518588b8c5baa783573f70c2aebd34b2a8c",
+      "hash": "pbkdf2$210000$57ebef66b4611b46fc1fa3f46a798076$49f4303762fbfa3a68bb70a76952c218b24ec85cfa46e05f8122a99de55d58e5",
       "access": {
         "hub": "staff"
       }
