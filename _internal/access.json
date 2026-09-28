@@ -6,7 +6,8 @@
       "access": {
         "hub": "admin",
         "glossary": "admin",
-        "hub-files": "admin"
+        "hub-files": "admin",
+        "summit-hq": "admin"
       },
       "platformAdmin": true
     },
@@ -17,7 +18,7 @@
         "hub": "admin",
         "glossary": "admin",
         "hub-files": "admin",
-        "summit-hq": "staff",
+        "summit-hq": "admin",
         "sponsorship": "staff"
       },
       "platformAdmin": true
@@ -27,7 +28,8 @@
       "hash": "pbkdf2$210000$5cd66ea150e8aef324ee0acbedea3fa4$b1928fd9b5d8e812f2e46e07b175b4924c40e830bd81675d5e6b81cdc2b85438",
       "access": {
         "hub": "staff",
-        "hub-files": "staff"
+        "hub-files": "staff",
+        "summit-hq": "staff"
       }
     }
   }

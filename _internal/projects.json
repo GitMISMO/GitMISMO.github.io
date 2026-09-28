@@ -1,9 +1,11 @@
 {
-    "summit-hq": {
+  "summit-hq": {
     "repo": "GitMISMO/summit-hq-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
-    "writable": ["data/"]
+    "writable": [
+      "data/"
+    ]
   },
   "hub": {
     "repo": "GitMISMO/initiative-hub",

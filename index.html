@@ -22,7 +22,7 @@
   :root{
     --ink:#101B33; --ink-soft:#4B5670; --paper:#F1F3F9; --card:#FFFFFF; --line:#E1E4EC;
     --brand:#2A4DFF; --brand-soft:#EAF0FF; --brand-text:#1E3ACC;
-    --teal:#0E9488; --violet:#7C3AED;
+    --teal:#0E9488; --amber:#B45309; --violet:#7C3AED;
     --slate:#8B94A7; --slate-soft:#EEF0F4; --slate-text:#5B6478;
     --logo-navy:#0D314C; --logo-blue:#74BFEB;
     --wordmark:var(--logo-blue);
@@ -31,7 +31,7 @@
   html[data-theme="dark"]{
     --ink:#E8EAF0; --ink-soft:#A0A8C0; --paper:#0B0F1C; --card:#161C30; --line:#2A3150;
     --brand:#5B85FF; --brand-soft:#1A2745; --brand-text:#9AB8FF;
-    --teal:#14B8A6; --violet:#9660F5;
+    --teal:#14B8A6; --amber:#F59E0B; --violet:#9660F5;
     --slate:#6B7488; --slate-soft:#202536; --slate-text:#A0A8C0;
   }
   *{box-sizing:border-box;}
@@ -253,6 +253,11 @@ var APPS = [
     ]
   },
   {
+    key:'summit-hq', name:'Summit HQ', base:'/summit-hq', colour:'amber', tag:'gated',
+    desc:'Plan a summit: rooms, schedule, workgroup placement and conflicts.',
+    home:'Sign in to plan rooms, sessions and workgroup placement'
+  },
+  {
     key:'sponsorship', name:'Sponsorship Prospectus', base:'/sponsorship', colour:'violet',
     state:'soon',
     desc:'Sponsorship tiers, what each one includes, and who currently sponsors MISMO.',
@@ -307,9 +312,12 @@ function rowHTML(app, page){
 var HOME_ICON = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>';
 
 function homeHTML(app){
+  /* A tool whose landing page shows nothing until you sign in says so here, the same way
+     a gated page does. Better than letting someone open it and find it empty. */
+  var tag = app.tag === 'gated' ? '<span class="tag">Sign in</span>' : '';
   return '<a class="row home" href="' + esc(app.base) + '/">' +
     '<span class="b b-home">' + HOME_ICON + '</span>' +
-    '<span><span class="n">Home page</span>' +
+    '<span><span class="n">Home page' + tag + '</span>' +
     '<span class="s">' + esc(app.home) + '</span></span>' +
     '</a>';
 }
