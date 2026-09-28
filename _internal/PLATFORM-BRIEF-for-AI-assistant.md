@@ -71,6 +71,38 @@ a public repository.
 else saved meanwhile, the relay returns `409` and refuses rather than silently discarding
 their work. Omit it and colleagues overwrite each other invisibly.
 
+**Every tool uses the shared sign-in and refusal screens. Never build your own.** Signing
+in, being refused, and signing in again after a session expires all look and behave the
+same in every tool, because they all come from `/assets/session.js`. Decided September
+2026, after four tools had grown four different versions. Concretely:
+
+- **No sign-in form of your own**, no password field, and never `prompt()` for a key.
+- **No "you don't have access" banner of your own.** A page that requires sign-in calls
+  `ResourcesSession.requireAccess('your-tool', {toolName: 'the Your Tool'})` once at the
+  top and does nothing until it resolves. It shows the sign-in window or the standard
+  refusal as needed. If the relay later refuses a request with `NO_ACCESS` (access removed
+  while the page was open), show the same refusal:
+  `ResourcesSession.signIn({reason: 'no-access', toolName: 'the Your Tool', gated: true})`.
+- **Never refuse someone from the browser's copy of their access.** That copy is taken at
+  sign-in and goes stale the moment someone is granted a tool. `requireAccess` asks the
+  relay before refusing and quietly corrects the copy. Checking `role()` yourself and
+  showing a refusal when it is empty turns away people who have access.
+- **A save made after the session has expired must not be lost.** `ResourcesSession.token()`
+  returns null once the four-hour session runs out. Before any write, if there is no token,
+  call `ResourcesSession.signIn({reason: 'expired'})` (the "Sign in to finish saving"
+  window, with the email filled in), then send the same save. If they cancel, say on screen
+  that the change was not saved. Never swallow the failure: a save that fails silently is
+  the worst outcome this platform has.
+- A page that works without an account (the Glossary console keeps drafts locally) shows
+  the refusal with `gated: false`, so Close just closes it.
+
+**Change a tool's current file; never re-upload an older copy over it.** Uploading a whole
+`index.html` replaces everything in it, including fixes other people made since your copy
+was taken. On 28 September 2026 an upload of Summit HQ undid two fixes from an hour
+earlier (the page flashed before sign-in again), and nobody could tell until it was
+reported. Before uploading, download the current file from the repository and work from
+that, or ask whoever last changed it.
+
 ---
 
 ## What the relay will and will not write
@@ -127,7 +159,8 @@ Use the shared module rather than reading roles yourself:
 
 | Call | Use it for |
 |---|---|
-| `ResourcesSession.requireAccess('your-tool', {toolName:'Your Tool'})` | Gating a whole page. Shows sign-in or the refusal screen as needed; resolves with the role. |
+| `ResourcesSession.requireAccess('your-tool', {toolName:'the Your Tool'})` | Gating a whole page. Shows sign-in or the refusal screen as needed, asks the relay before refusing, and resolves with the role. Cancel sends the person back to the home page unless you pass `gated: false`. |
+| `ResourcesSession.signIn({reason:'expired'})` | Before a save when `token()` is null: the "Sign in to finish saving" window. Then send the same save. |
 | `ResourcesSession.canEdit('your-tool')` | Deciding whether to show Save, Add, Remove and similar. |
 | `ResourcesSession.role('your-tool')` | Only if you truly need to tell admin from staff. Returns `'admin'`, `'staff'`, `'view'` or `null`. |
 
