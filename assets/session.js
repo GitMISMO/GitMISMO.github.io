@@ -65,7 +65,7 @@
      left out on purpose: it is storage behind the Hub, not somewhere you go. */
   var TOOLS = [
     { key: 'hub',         name: 'Initiative Hub',    path: '/initiative-hub/' },
-    { key: 'glossary',    name: 'Business Glossary', path: '/glossary/' },
+    { key: 'glossary',    name: 'Business Glossary Console', path: '/glossary/console/' },
     { key: 'summit-hq',   name: 'Summit HQ',         path: '/summit-hq/' },
     { key: 'sponsorship', name: 'Sponsorship Portal', path: '/sponsorship/' }
   ];
