@@ -112,11 +112,16 @@
   var css = [
     ':root{--rs-card:#fff;--rs-paper:#F1F3F9;--rs-ink:#101B33;--rs-soft:#4B5670;--rs-line:#E1E4EC;',
     '--rs-brand:#2A4DFF;--rs-brand-soft:#EAF0FF;--rs-brand-text:#1E3ACC;',
+    /* The account colour is deliberately NOT a theme token: it is the same in light and
+       dark, on every tool. The name needs a deeper shade on a white card, where #94c8e9
+       measures 1.8:1 and all but disappears. */
+    '--rs-acct:#94c8e9;--rs-acct-name:#2C74A6;',
     '--rs-err-bg:#FDECEC;--rs-err:#8A2A2A;--rs-warn-bg:#E7E1F4;--rs-warn:#514080;',
     '--rs-admin-bg:#E3EBFF;--rs-admin:#1B34B8;--rs-admin-bd:#C9D8FB;--rs-staff-bg:#E7EAF1;--rs-staff:#4C5468;--rs-staff-bd:#D3D8E3;',
     '--rs-shadow:0 12px 32px rgba(16,27,51,.14);--rs-scrim:rgba(16,27,51,.42)}',
     'html[data-theme="dark"]{--rs-card:#161C30;--rs-paper:#0B0F1C;--rs-ink:#E8EAF0;--rs-soft:#A0A8C0;--rs-line:#2A3150;',
     '--rs-brand:#5B85FF;--rs-brand-soft:#1A2745;--rs-brand-text:#9AB8FF;',
+    '--rs-acct:#94c8e9;--rs-acct-name:#94c8e9;',
     '--rs-err-bg:#3A1D1D;--rs-err:#F5A9A9;--rs-warn-bg:#251E3D;--rs-warn:#C4A9F5;',
     '--rs-admin-bg:#1A2745;--rs-admin:#9AB8FF;--rs-admin-bd:transparent;--rs-staff-bg:#202536;--rs-staff:#A0A8C0;--rs-staff-bd:transparent;',
     '--rs-shadow:0 12px 32px rgba(0,0,0,.5);--rs-scrim:rgba(0,0,0,.6)}',
@@ -127,9 +132,16 @@
     '.rs-signin:hover{filter:brightness(1.07)}',
     '.rs-who{display:inline-flex;align-items:center;gap:8px;height:40px;box-sizing:border-box;padding:0 12px 0 7px;border-radius:999px;',
     'border:1px solid var(--rs-line);background:var(--rs-card);color:var(--rs-ink);font:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}',
-    '.rs-who:hover{border-color:var(--rs-brand);background:var(--rs-brand-soft)}',
+    '.rs-who:hover{border-color:var(--rs-acct);background:rgba(148,200,233,.22)}',
+    'html[data-theme="dark"] .rs-who:hover{background:rgba(148,200,233,.18)}',
+    '.rs-who .rs-first{color:var(--rs-acct-name)}',
+    /* White initials on this blue measure 1.8:1, which no weight can change. The circle
+       deepens toward the bottom so the letters sit on a darker tone, and a soft shadow
+       holds their edges — the colour still reads as #94c8e9. */
     '.rs-av{width:26px;height:26px;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;',
-    'font-size:10px;font-weight:700;background:var(--rs-brand);color:#fff;letter-spacing:.02em}',
+    'font-size:11px;font-weight:800;color:#fff;letter-spacing:.02em;',
+    'background:linear-gradient(160deg,#a8d4ef 0%,#94c8e9 45%,#6fb2dc 100%);',
+    'text-shadow:0 1px 1.5px rgba(10,45,70,.45)}',
     '.rs-chev{color:var(--rs-soft);font-size:10px}',
     /* Option A: on a narrow screen the first name drops away and the initials remain */
     '@media (max-width:560px){.rs-who .rs-first,.rs-who .rs-chev{display:none}.rs-who{width:40px;padding:0;justify-content:center}}',
