@@ -25,6 +25,7 @@
    Public API — window.ResourcesSession:
        current()            the session, or null
        token()              the bearer token, or null
+       refreshAccess(list)  ask the relay about several tools; correct the saved copy
        requireAccess(p,o)   gate a page: resolves with the role, or shows the refusal.
                             o.toolName names it on screen ("the Sponsorship Portal");
                             o.gated (default true) sends Cancel/Close back to the home
@@ -196,6 +197,32 @@
            have access" to someone who does would be wrong, so the page is told instead. */
         var e = new Error('The sign-in service could not be reached.'); e.code = 'OFFLINE';
         return Promise.reject(e);
+      });
+    },
+    /* For a tool spanning several keys (Service Orders has one per contracting company):
+       ask the relay about each and correct the browser's copy for any it says this person
+       holds. Shows nothing; resolves with the corrected session, or null if signed out.
+       A page calls this before deciding someone has no access, never after refusing. */
+    refreshAccess: function (projects) {
+      var list = (projects || []).slice();
+      return Promise.all(list.map(function (p) {
+        return checkAccess(p).then(function (a) { return { p: p, a: a }; });
+      })).then(function (answers) {
+        /* Not one answer came back: the relay was unreachable. That is not "no access",
+           and a page must not refuse someone on the strength of it. */
+        if (answers.length && answers.every(function (x) { return x.a === 'unknown'; })) {
+          var e = new Error('The sign-in service could not be reached.'); e.code = 'OFFLINE'; throw e;
+        }
+        var cur = read();
+        if (!cur) return null;
+        cur.access = cur.access || {};
+        var changed = false;
+        answers.forEach(function (x) {
+          var level = x.a === 'edit' ? 'staff' : x.a === 'view' ? 'view' : null;
+          if (level && !cur.access[x.p]) { cur.access[x.p] = level; changed = true; }
+        });
+        if (changed) write(cur);
+        return cur;
       });
     },
     signOut: function () { write(null); },
