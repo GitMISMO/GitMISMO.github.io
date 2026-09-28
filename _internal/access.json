@@ -48,6 +48,34 @@
       "access": {
         "sponsorship": "staff"
       }
+    },
+    "kwilliams@mismo.org": {
+      "name": "Kathryn Williams",
+      "hash": "pbkdf2$210000$c5286b2bdf2f6d0c90591e592e3a5271$7261c1d4cfd874b15346d1a88e0183627f708950f1ef159a2bee4475a83a392d",
+      "access": {
+        "hub": "staff"
+      }
+    },
+    "kstoll@mismo.org": {
+      "name": "Kellie Stoll",
+      "hash": "pbkdf2$210000$190d825dc2cfd3cec757390741433ba1$f273870ad0967f3c44a394804f203cd2dd3d5cfd31b45f36b4c651b8e8d65bd8",
+      "access": {
+        "hub": "staff"
+      }
+    },
+    "lwalker@mismo.org": {
+      "name": "Leeann Walker",
+      "hash": "pbkdf2$210000$bb5f7467fce6486bfe1eb276b0429182$1492e046372b54743802722a223692fe54db70e4451a7453c351d460e545e30c",
+      "access": {
+        "hub": "staff"
+      }
+    },
+    "mtidgewell@mismo.org": {
+      "name": "Meghan Tidgewell",
+      "hash": "pbkdf2$210000$0107d886d89531841e9a0e4ccbbc5204$5027da3bac51eb252f716ed1eddda0c3822e67a0cc309b38c6511eedf8002441",
+      "access": {
+        "hub": "staff"
+      }
     }
   }
 }
