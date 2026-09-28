@@ -213,7 +213,11 @@
            step with the title above it. Omit for a tool that is not live yet.
    colour  a CSS variable name; pick an unused one for a new tool.
    state   'soon' renders the tool without links and with no page count.
-   groups  optional headings inside a tool. Omit for a flat list.
+   groups  optional headings inside a tool. Omit for a flat list. A page's href is
+           relative to its tool's base. A page that lives in ANOTHER folder (its own
+           repository) gives url instead, the full path from the site root, e.g.
+           url:'/sponsorship-prospectus/'. Use it only for that; everything inside the
+           tool's own folder keeps using href, so a folder rename moves them together.
    tag     'gated' marks a page that asks for a facilitator passcode.
    =================================================================== */
 var APPS = [
@@ -264,10 +268,17 @@ var APPS = [
     note:'In development. It will be listed here once sign-in is live.'
   },
   {
-    key:'sponsorship', name:'Sponsorship Prospectus', base:'/sponsorship', colour:'violet',
-    state:'soon',
-    desc:'Sponsorship tiers, what each one includes, and who currently sponsors MISMO.',
-    note:'In development. It will be listed here as soon as there is something to open.'
+    key:'sponsorship', name:'Sponsorship', base:'/sponsorship', colour:'violet', tag:'gated',
+    desc:'Summit sponsorship: the prospectus sent to prospective sponsors, and the portal where staff track prospects, commitments and payments.',
+    home:'Sponsorship Portal: pipeline, prospects, inventory and payments',
+    groups:[
+      { label:'For prospective sponsors', pages:[
+        /* Planned until GitHub Pages is switched on for the sponsorship-prospectus
+           repository; today its address returns 404. Remove state to make it a link. */
+        { badge:'PRO', name:'2027 Summit Sponsorship Prospectus', sub:'Tiers, benefits and who attends. Public.',
+          url:'/sponsorship-prospectus/', state:'planned' }
+      ]}
+    ]
   }
 ];
 
@@ -307,7 +318,7 @@ function rowHTML(app, page){
   var attrs = (page.primary ? ' data-t="app"' : '') + (planned ? ' data-state="planned"' : '');
   return planned
     ? '<div class="row"' + attrs + '>' + inner + '</div>'
-    : '<a class="row"' + attrs + ' href="' + esc(app.base + page.href) + '">' + inner + '</a>';
+    : '<a class="row"' + attrs + ' href="' + esc(page.url || (app.base + page.href)) + '">' + inner + '</a>';
 }
 
 /* The landing page of a tool is not one page among several — it is the way in, so it
