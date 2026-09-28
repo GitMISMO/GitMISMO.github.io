@@ -95,6 +95,18 @@ same in every tool, because they all come from `/assets/session.js`. Decided Sep
   the worst outcome this platform has.
 - A page that works without an account (the Glossary console keeps drafts locally) shows
   the refusal with `gated: false`, so Close just closes it.
+- **Every tool shows the shared account bubble in the same place**: the far right of the
+  top bar, after the "Programs &amp; Operations" label. Put `<div id="rs-account"></div>`
+  there and `session.js` fills it automatically; it carries the person's name, their
+  access to each tool, and sign-out. The Sponsorship Portal, Summit HQ and Service Orders
+  use the same top bar, so copy it from any of them:
+
+  ```html
+  <span class="hqtop-r">
+    <span class="eyebrow-m">Programs &amp; Operations</span>
+    <div id="rs-account"></div>
+  </span>
+  ```
 
 **Change a tool's current file; never re-upload an older copy over it.** Uploading a whole
 `index.html` replaces everything in it, including fixes other people made since your copy
