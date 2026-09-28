@@ -30,6 +30,13 @@
                             o.toolName names it on screen ("the Sponsorship Portal");
                             o.gated (default true) sends Cancel/Close back to the home
                             page, since a gated page has nothing to show without it.
+                            A gated screen covers the WHOLE page (layout C, Sept 2026):
+                            navy panel with the logo and the tool's name, the sign-in on
+                            the right, nothing of the tool visible behind it.
+                            o.title / o.eyebrow: the panel's heading and the small line
+                            above it (default: the tool name, and the page's masthead
+                            eyebrow). <html data-rs-gate> on a page hides it until
+                            requireAccess has decided, so nothing flashes first.
        role(project)        'admin' | 'staff' | 'view' | null for this person
        canEdit(project)     true if they may save changes there (admin or staff)
        isAdmin()            admin on any tool
@@ -62,6 +69,20 @@
     { key: 'summit-hq',   name: 'Summit HQ',         path: '/summit-hq/' },
     { key: 'sponsorship', name: 'Sponsorship Portal', path: '/sponsorship/' }
   ];
+
+  /* The MISMO wordmark, for the whole-page sign-in. Inline so the screen draws at once. */
+  var LOGO = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 708 108" role="img" aria-label="MISMO"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="#0f314c"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320 c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20 -297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243 -4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198 0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3 -104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245 -337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17 246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49 203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12 26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57 187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44 -204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288 -20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92 -51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12 -24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297 3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146 -106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0 -356 -14z"/></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="#50a4db"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263 13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19 -16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20 -222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0 46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></svg>';
+
+  /* A page that shows nothing without access marks itself <html data-rs-gate>; it is
+     kept hidden until requireAccess has decided, so the tool never flashes before the
+     sign-in or the refusal covers it. The timer is only a backstop for a page that
+     forgets to call requireAccess: the whole-page screen is opaque anyway. */
+  var root = document.documentElement;
+  if (root.hasAttribute('data-rs-gate')) {
+    root.classList.add('rs-wait');
+    setTimeout(function () { root.classList.remove('rs-wait'); }, 8000);
+  }
+  function unwait() { root.classList.remove('rs-wait'); }
 
   var listeners = [];
   var expiryTimer = null;
@@ -170,12 +191,12 @@
        request. A page that only hid its controls would still be handing out its data. */
     requireAccess: function (project, opts) {
       opts = opts || {};
-      var shown = { toolName: opts.toolName, gated: opts.gated !== false };
+      var shown = { toolName: opts.toolName, title: opts.title, eyebrow: opts.eyebrow, project: project, gated: opts.gated !== false };
       function again() { return api.requireAccess(project, opts); }
 
       if (!read()) return openModal(shown).then(again);
       var r = api.role(project);
-      if (r) return Promise.resolve(r);
+      if (r) { unwait(); return Promise.resolve(r); }
 
       /* The access list in the browser is a copy taken at sign-in. Someone granted this
          tool since then would be refused by it while the relay would let them in, so the
@@ -187,14 +208,16 @@
           cur.access = cur.access || {};
           cur.access[project] = answer === 'edit' ? 'staff' : 'view';
           write(cur);
+          unwait();
           return cur.access[project];
         }
         if (answer === 'signed-out') { write(null); return openModal(shown).then(again); }
         if (answer === 'no') {
-          return openModal({ reason: 'no-access', toolName: opts.toolName, gated: shown.gated }).then(again);
+          return openModal({ reason: 'no-access', toolName: opts.toolName, title: opts.title, eyebrow: opts.eyebrow, project: project, gated: shown.gated }).then(again);
         }
         /* The relay could not be reached. That is not a refusal, and saying "you do not
            have access" to someone who does would be wrong, so the page is told instead. */
+        unwait();
         var e = new Error('The sign-in service could not be reached.'); e.code = 'OFFLINE';
         return Promise.reject(e);
       });
@@ -244,14 +267,14 @@
     /* View is an outline rather than a third fill, so the three levels read as a
        ladder at a glance instead of as three interchangeable badges. */
     '--rs-view:#5A6478;--rs-view-bd:#D3D8E3;',
-    '--rs-shadow:0 12px 32px rgba(16,27,51,.14);--rs-scrim:rgba(16,27,51,.42)}',
+    '--rs-shadow:0 12px 32px rgba(16,27,51,.14);--rs-scrim:rgba(16,27,51,.42);--rs-ground:#F1F6FA}',
     'html[data-theme="dark"]{--rs-card:#161C30;--rs-paper:#0B0F1C;--rs-ink:#E8EAF0;--rs-soft:#A0A8C0;--rs-line:#2A3150;',
     '--rs-brand:#5B85FF;--rs-brand-soft:#1A2745;--rs-brand-text:#9AB8FF;',
     '--rs-acct:#94c8e9;--rs-acct-name:#94c8e9;',
     '--rs-err-bg:#3A1D1D;--rs-err:#F5A9A9;--rs-warn-bg:#251E3D;--rs-warn:#C4A9F5;',
     '--rs-admin-bg:#1A2745;--rs-admin:#9AB8FF;--rs-admin-bd:transparent;--rs-staff-bg:#202536;--rs-staff:#A0A8C0;--rs-staff-bd:transparent;',
     '--rs-view:#8A92A8;--rs-view-bd:#343B52;',
-    '--rs-shadow:0 12px 32px rgba(0,0,0,.5);--rs-scrim:rgba(0,0,0,.6)}',
+    '--rs-shadow:0 12px 32px rgba(0,0,0,.5);--rs-scrim:rgba(0,0,0,.6);--rs-ground:#061722}',
 
     '.rs-wrap{position:relative;display:inline-flex;font-family:"Libre Franklin",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}',
     '.rs-signin{height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--rs-brand);background:var(--rs-brand);color:#fff;',
@@ -325,7 +348,32 @@
     '.rs-banner.on{display:flex}',
     '.rs-b-err{background:var(--rs-err-bg);color:var(--rs-err)}',
     '.rs-b-warn{background:var(--rs-warn-bg);color:var(--rs-warn)}',
-    '.rs-b-info{background:var(--rs-brand-soft);color:var(--rs-brand-text)}'
+    '.rs-b-info{background:var(--rs-brand-soft);color:var(--rs-brand-text)}',
+
+    /* The whole-page version, for a page that shows nothing without access (layout C,
+       chosen Sept 28, 2026). Opaque: someone signed out, or without access, sees the
+       MISMO panel and the sign-in and nothing of the tool behind them. */
+    'html.rs-locked,html.rs-locked body{overflow:hidden}',
+    'html.rs-wait body>*:not(.rs-scrim){visibility:hidden!important}',
+    'html.rs-wait body{background:var(--rs-ground)!important}',
+    '.rs-scrim.rs-full{background:var(--rs-ground);padding:0;display:grid;grid-template-columns:clamp(320px,39vw,500px) minmax(0,1fr);',
+    'align-items:stretch;justify-content:stretch;overflow:auto}',
+    '.rs-side{background:#0f314c;color:#fff;box-sizing:border-box;padding:44px 48px;display:flex;flex-direction:column;justify-content:space-between;gap:32px;',
+    'box-shadow:1px 0 0 rgba(80,164,219,.22);font-family:"IBM Plex Sans","Libre Franklin",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}',
+    '.rs-plate{align-self:flex-start;background:#fff;border-radius:5px;padding:9px 13px;display:flex;line-height:0;box-shadow:0 1px 0 rgba(80,164,219,.35)}',
+    '.rs-plate svg{height:24px;width:auto;display:block}',
+    '.rs-brand{display:flex;flex-direction:column;gap:14px}',
+    '.rs-bar{width:44px;height:3px;border-radius:2px;background:#50a4db}',
+    '.rs-eyebrow{font-size:11px;letter-spacing:.11em;text-transform:uppercase;font-weight:600;color:rgba(255,255,255,.62)}',
+    '.rs-tool{margin:0;font-size:40px;line-height:1.05;font-weight:700;letter-spacing:-.02em;color:#fff;text-wrap:balance}',
+    '.rs-part{font-size:14px;line-height:1.5;color:rgba(255,255,255,.72)}',
+    '.rs-main{display:flex;align-items:center;justify-content:center;padding:24px;min-width:0}',
+    '@media (max-width:760px){',
+    '.rs-scrim.rs-full{grid-template-columns:minmax(0,1fr);grid-template-rows:auto 1fr}',
+    '.rs-side{padding:24px 22px 26px;gap:18px;justify-content:flex-start}',
+    '.rs-plate{padding:7px 10px}.rs-plate svg{height:18px}',
+    '.rs-brand{gap:8px}.rs-bar{width:36px}.rs-eyebrow{font-size:10.5px}.rs-tool{font-size:28px;line-height:1.1}.rs-part{display:none}',
+    '.rs-main{align-items:flex-start;padding:24px 18px}}'
   ].join('\n');
   var styleEl = document.createElement('style');
   styleEl.setAttribute('data-rs', '');
@@ -409,6 +457,28 @@
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenus(); });
 
   /* ---------- the sign-in screen ---------- */
+  /* The navy panel of the whole-page screen: the logo, the tool's name, and the line the
+     page's own masthead carries above it. */
+  function toolTitle(opts) {
+    if (opts.title) return opts.title;
+    var n = String(opts.toolName || '').replace(/^the\s+/i, '');
+    if (n) return n.charAt(0).toUpperCase() + n.slice(1);
+    var hq = document.querySelector('.hqname');
+    if (hq && hq.textContent.trim()) return hq.textContent.trim();
+    var key = opts.project || currentTool();
+    for (var i = 0; i < TOOLS.length; i++) if (TOOLS[i].key === key) return TOOLS[i].name;
+    return 'MISMO Resources';
+  }
+  function sideHTML(opts) {
+    var eb = opts.eyebrow;
+    if (eb == null) { var m = document.querySelector('.eyebrow-m'); eb = m ? m.textContent.trim() : ''; }
+    return '<div class="rs-side"><span class="rs-plate">' + LOGO + '</span>' +
+      '<div class="rs-brand"><span class="rs-bar"></span>' +
+        (eb ? '<div class="rs-eyebrow">' + esc(eb) + '</div>' : '') +
+        '<h1 class="rs-tool">' + esc(toolTitle(opts)) + '</h1>' +
+        '<div class="rs-part">Part of MISMO Resources</div></div></div>';
+  }
+
   var pending = null;   // one screen at a time; a second request joins the first
 
   function openModal(opts) {
@@ -443,11 +513,16 @@
         (prev ? 'My account: ' + prev.email + '\n' : '') +
         'Page: ' + location.href + '\n\nThank you.');
 
+    /* Whole page when the page has nothing to show without access; the smaller window
+       over the page when someone is mid-task (a save that needs signing in again) or the
+       page is public anyway. */
+    var full = !!opts.gated && !expired;
     var scrim = document.createElement('div');
-    scrim.className = 'rs-scrim';
+    scrim.className = 'rs-scrim' + (full ? ' rs-full' : '');
     scrim.setAttribute('role', 'dialog');
     scrim.setAttribute('aria-modal', 'true');
-    scrim.innerHTML =
+    scrim.setAttribute('aria-label', title);
+    scrim.innerHTML = (full ? sideHTML(opts) + '<div class="rs-main">' : '') +
       '<div class="rs-card">' +
         '<div class="rs-chead"><div class="rs-ctitle">' + esc(title) + '</div>' + (sub ? '<div class="rs-csub">' + esc(sub) + '</div>' : '') + '</div>' +
         '<div class="rs-cbody">' +
@@ -469,8 +544,9 @@
             ? 'Accounts and what each one can reach are managed by a MISMO administrator.'
             : 'Accounts are created by a MISMO administrator. Lost your password? Ask them to reset it.') + '</div>' +
         '</div>' +
-      '</div>';
+      '</div>' + (full ? '</div>' : '');
     document.body.appendChild(scrim);
+    if (full) { root.classList.add('rs-locked'); unwait(); }
 
     var email = scrim.querySelector('#rs-email'), pass = scrim.querySelector('#rs-pass');
     var go = scrim.querySelector('[data-rs-go]'), err = scrim.querySelector('[data-rs-err]'), errText = scrim.querySelector('[data-rs-errtext]');
@@ -481,6 +557,7 @@
     function showErr(msg) { errText.textContent = msg; err.classList.add('on'); }
     function close(result, error) {
       if (scrim.parentNode) scrim.parentNode.removeChild(scrim);
+      root.classList.remove('rs-locked');
       pending = null;
       error ? rejectFn(error) : resolveFn(result);
     }
@@ -525,8 +602,9 @@
     if (sw) sw.addEventListener('click', function () {
       write(null);
       if (scrim.parentNode) scrim.parentNode.removeChild(scrim);
+      root.classList.remove('rs-locked');
       pending = null;
-      openModal({}).then(resolveFn, rejectFn);
+      openModal({ gated: opts.gated, toolName: opts.toolName, title: opts.title, eyebrow: opts.eyebrow, project: opts.project }).then(resolveFn, rejectFn);
     });
     function dismiss() {
       if (opts.gated) { location.href = '/'; return; }

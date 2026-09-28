@@ -236,6 +236,15 @@ loudly: two tools sharing a draft key will offer each other's unsaved work.
 
 ---
 
+## Signed out or refused: the whole page, nothing behind it
+
+A tool that shows nothing without access calls `requireAccess(project, {toolName})` and
+puts `data-rs-gate` on its `<html>`. Signed out or without access, session.js covers the
+whole page with the chosen layout (Sept 28, 2026): a navy panel with the MISMO logo and
+the tool's name on the left, the sign-in or refusal on the right. Nothing of the tool is
+visible. Pass `title`/`eyebrow` if the tool name or the masthead's small line need
+saying differently. Do not build a page's own sign-in or refusal screen.
+
 ## Facilitator names come from one list
 
 Anywhere a facilitator's name can be edited, it is chosen from a drop-down, never typed.
