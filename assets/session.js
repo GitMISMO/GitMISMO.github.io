@@ -268,13 +268,13 @@
        ladder at a glance instead of as three interchangeable badges. */
     '--rs-view:#5A6478;--rs-view-bd:#D3D8E3;',
     '--rs-shadow:0 12px 32px rgba(16,27,51,.14);--rs-scrim:rgba(16,27,51,.42);--rs-ground:#F1F6FA}',
-    'html[data-theme="dark"]{--rs-card:#161C30;--rs-paper:#0B0F1C;--rs-ink:#E8EAF0;--rs-soft:#A0A8C0;--rs-line:#2A3150;',
-    '--rs-brand:#5B85FF;--rs-brand-soft:#1A2745;--rs-brand-text:#9AB8FF;',
+    'html[data-theme="dark"]{--rs-card:#112336;--rs-paper:#0B1826;--rs-ink:#EEF3F8;--rs-soft:#B9C8D6;--rs-line:#243E5A;',
+    '--rs-brand:#50A4DB;--rs-brand-soft:#173A57;--rs-brand-text:#A3CDE7;',
     '--rs-acct:#94c8e9;--rs-acct-name:#94c8e9;',
     '--rs-err-bg:#3A1D1D;--rs-err:#F5A9A9;--rs-warn-bg:#251E3D;--rs-warn:#C4A9F5;',
-    '--rs-admin-bg:#1A2745;--rs-admin:#9AB8FF;--rs-admin-bd:transparent;--rs-staff-bg:#202536;--rs-staff:#A0A8C0;--rs-staff-bd:transparent;',
-    '--rs-view:#8A92A8;--rs-view-bd:#343B52;',
-    '--rs-shadow:0 12px 32px rgba(0,0,0,.5);--rs-scrim:rgba(0,0,0,.6);--rs-ground:#061722}',
+    '--rs-admin-bg:#173A57;--rs-admin:#A3CDE7;--rs-admin-bd:transparent;--rs-staff-bg:#172D44;--rs-staff:#B9C8D6;--rs-staff-bd:transparent;',
+    '--rs-view:#8C9FB1;--rs-view-bd:#3A5A7C;',
+    '--rs-shadow:0 12px 32px rgba(0,0,0,.5);--rs-scrim:rgba(0,0,0,.6);--rs-ground:#0B1826}',
 
     '.rs-wrap{position:relative;display:inline-flex;font-family:"Libre Franklin",system-ui,-apple-system,"Segoe UI",Arial,sans-serif}',
     '.rs-signin{height:40px;padding:0 16px;border-radius:999px;border:1px solid var(--rs-brand);background:var(--rs-brand);color:#fff;',
