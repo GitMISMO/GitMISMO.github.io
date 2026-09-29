@@ -76,6 +76,16 @@
       "access": {
         "hub": "staff"
       }
+    },
+    "kbradshaw@mismo.org": {
+      "name": "Kelly Bradshaw",
+      "hash": "pbkdf2$210000$95279a9b173d2856dfb1ec977ca9df2d$69276f07fda20d250afd8ccceba7b219fe271123e8420a63adaba89a4a4cb30e",
+      "access": {
+        "hub": "view",
+        "summit-hq": "view",
+        "sponsorship": "staff",
+        "glossary": "view"
+      }
     }
   }
 }
