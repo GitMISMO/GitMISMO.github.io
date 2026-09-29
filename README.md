@@ -23,7 +23,7 @@ who fetches one URL.
 
 | File | What it is |
 |---|---|
-| `index.html` | The home page. Self-contained — fonts and both wordmarks are embedded, so it makes no external requests and cannot be broken by a CDN outage. |
+| `index.html` | The home page, in the Summit HQ look the admin panel and the glossary console use. The wordmark is inline; the IBM Plex Sans font comes from Google Fonts with a system-font fallback, and the account bubble from `assets/session.js`. |
 | `assets/` | The two official wordmarks, colour and white, kept as files for use by other tools. |
 | `_internal/ADDING-A-TOOL.md` | How to add a new tool to this domain, with and without saving. Start here. |
 | `_internal/relay-save.js` | Drop-in saving module for a tool that needs to write back to GitHub. |
@@ -31,10 +31,11 @@ who fetches one URL.
 
 ## Editing the home page
 
-Everything renders from the `APPS` array at the top of `index.html`. Adding a tool is one
-object — name, folder, colour, description, and its pages. The rail, the page counts and
-the footer all follow from it, and the list sorts itself alphabetically, so a new entry
-lands in the right place wherever it is added.
+Everything renders from the `APPS` array in `index.html`. Adding a tool is one object —
+name, folder, colour, description, its main pages (`entries`, always shown) and any other
+pages (`groups`, shown when the tool is expanded from its heading). The sidebar and the
+page counts follow from it, and the list sorts itself alphabetically, so a new entry lands
+in the right place wherever it is added.
 
 Two conventions the page relies on:
 
