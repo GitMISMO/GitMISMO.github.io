@@ -8,7 +8,12 @@
         "glossary": "admin",
         "hub-files": "admin",
         "summit-hq": "admin",
-        "sponsorship": "staff"
+        "sponsorship": "staff",
+        "so-phoenix": "staff",
+        "so-actualize": "staff",
+        "so-trex": "staff",
+        "so-falcon": "staff",
+        "so-trudigital": "staff"
       },
       "platformAdmin": true
     },
