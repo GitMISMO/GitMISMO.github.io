@@ -87,6 +87,17 @@
         "glossary": "view",
         "hub-files": "view"
       }
+    },
+    "jkearns@mismo.org": {
+      "name": "Jonathan Kearns",
+      "hash": "pbkdf2$210000$41fc6bea72a48fc482e7bfaf6f5c6a3f$7ebc703785cb01392c7f9c168567947dbe48349d286fb0e8ef7187dc949a8c50",
+      "access": {
+        "hub": "staff",
+        "glossary": "staff",
+        "hub-files": "staff",
+        "summit-hq": "view",
+        "sponsorship": "staff"
+      }
     }
   }
 }
