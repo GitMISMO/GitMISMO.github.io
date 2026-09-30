@@ -109,5 +109,11 @@
       "orders/",
       "agreements/"
     ]
+  },
+  "website-migration": {
+    "repo": "GitMISMO/website-migration-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": ["data/"]
   }
 }
