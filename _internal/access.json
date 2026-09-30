@@ -14,7 +14,8 @@
         "so-trex": "admin",
         "so-falcon": "admin",
         "so-trudigital": "admin",
-        "website-migration": "admin"
+        "website-migration": "admin",
+        "qr": "admin", "qr-routes": "admin"
       },
       "platformAdmin": true,
       "group": "staff"
@@ -33,7 +34,8 @@
         "so-trex": "admin",
         "so-falcon": "admin",
         "so-trudigital": "admin",
-        "website-migration": "admin"
+        "website-migration": "admin",
+        "qr": "admin", "qr-routes": "admin"
       },
       "platformAdmin": true,
       "group": "staff"
@@ -55,7 +57,8 @@
         "hub-files": "view",
         "summit-hq": "staff",
         "sponsorship": "staff",
-        "website-migration": "staff"
+        "website-migration": "staff",
+        "qr": "admin", "qr-routes": "admin"
       },
       "group": "staff"
     },
@@ -110,7 +113,8 @@
         "sponsorship": "staff",
         "glossary": "view",
         "hub-files": "view",
-        "website-migration": "view"
+        "website-migration": "view",
+        "qr": "admin", "qr-routes": "admin"
       },
       "group": "staff"
     },
@@ -128,7 +132,8 @@
         "so-trex": "staff",
         "so-falcon": "staff",
         "so-trudigital": "staff",
-        "website-migration": "view"
+        "website-migration": "view",
+        "qr": "admin", "qr-routes": "admin"
       },
       "group": "staff"
     },
