@@ -115,5 +115,17 @@
     "branch": "main",
     "origin": "https://resources.mismo.org",
     "writable": ["data/"]
-  }
+  },
+       "qr": {
+       "repo": "GitMISMO/qr-data",
+       "branch": "main",
+       "origin": "https://resources.mismo.org",
+       "writable": ["data/"]
+     },
+     "qr-routes": {
+       "repo": "GitMISMO/qr",
+       "branch": "main",
+       "origin": "https://resources.mismo.org",
+       "writable": ["data/"]
+     }
 }
