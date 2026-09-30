@@ -63,7 +63,8 @@
       "name": "Sponsorship Mailer",
       "hash": "pbkdf2$210000$57ebef66b4611b46fc1fa3f46a798076$49f4303762fbfa3a68bb70a76952c218b24ec85cfa46e05f8122a99de55d58e5",
       "access": {
-        "sponsorship": "staff"
+        "sponsorship": "staff",
+        "summit-hq": "staff"
       },
       "group": "process"
     },
