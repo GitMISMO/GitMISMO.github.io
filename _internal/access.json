@@ -141,7 +141,8 @@
       "name": "Dillon Tidgewell",
       "hash": "pbkdf2$210000$2932f04fd8ad9e63139e171198dd32af$64d03704f8fc646a9421f8934b4d1e6531b7d9ffd64bbb44fd0810a4a224a06e",
       "access": {
-        "website-migration": "staff"
+        "website-migration": "staff",
+        "hub": "staff"
       },
       "group": "contractor"
     }
