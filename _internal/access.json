@@ -54,7 +54,8 @@
         "glossary": "view",
         "hub-files": "view",
         "summit-hq": "staff",
-        "sponsorship": "staff"
+        "sponsorship": "staff",
+        "website-migration": "staff"
       },
       "group": "staff"
     },
@@ -94,7 +95,8 @@
       "name": "Meghan Tidgewell",
       "hash": "pbkdf2$210000$0107d886d89531841e9a0e4ccbbc5204$5027da3bac51eb252f716ed1eddda0c3822e67a0cc309b38c6511eedf8002441",
       "access": {
-        "hub": "staff"
+        "hub": "staff",
+        "website-migration": "staff"
       },
       "group": "contractor"
     },
@@ -106,7 +108,8 @@
         "summit-hq": "staff",
         "sponsorship": "staff",
         "glossary": "view",
-        "hub-files": "view"
+        "hub-files": "view",
+        "website-migration": "view"
       },
       "group": "staff"
     },
@@ -123,7 +126,8 @@
         "so-actualize": "staff",
         "so-trex": "staff",
         "so-falcon": "staff",
-        "so-trudigital": "staff"
+        "so-trudigital": "staff",
+        "website-migration": "view"
       },
       "group": "staff"
     }
