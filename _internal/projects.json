@@ -127,5 +127,11 @@
        "branch": "main",
        "origin": "https://resources.mismo.org",
        "writable": ["data/"]
-     }
+     },
+  "hub-requests": {
+    "repo": "GitMISMO/initiative-hub-requests",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": ["data/"]
+  }
 }
