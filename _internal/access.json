@@ -117,11 +117,11 @@
         "hub-files": "staff",
         "summit-hq": "view",
         "sponsorship": "staff",
-        "so-phoenix": "view",
-        "so-actualize": "view",
-        "so-trex": "view",
-        "so-falcon": "view",
-        "so-trudigital": "view"
+        "so-phoenix": "staff",
+        "so-actualize": "staff",
+        "so-trex": "staff",
+        "so-falcon": "staff",
+        "so-trudigital": "staff"
       },
       "group": "staff"
     }
