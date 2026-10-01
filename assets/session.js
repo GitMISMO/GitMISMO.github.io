@@ -69,7 +69,6 @@
   var TOOLS = [
     { key: "hub", name: "Initiative Hub", path: "/initiative-hub/", group: "Standards" },
     { key: "glossary", name: "Business Glossary Console", path: "/glossary/console/", group: "Standards" },
-    { key: "hub-files", name: "Initiative Hub Files", path: "", group: "Standards" },
     { key: "hub-requests", name: "Work Requests", path: "/initiative-hub/work-requests.html", group: "Standards" },
     { key: "summit-hq", name: "Summit HQ", path: "/summit-hq/", group: "Events" },
     { key: "sponsorship", name: "Sponsorship Portal", path: "/sponsorship/", group: "Sponsorship" },

@@ -6,7 +6,10 @@
       "label": "Initiative Hub",
       "colour": "#2A4DFF",
       "group": "Standards",
-      "path": "/initiative-hub/"
+      "path": "/initiative-hub/",
+      "also": [
+        "hub-files"
+      ]
     },
     {
       "key": "glossary",
@@ -14,13 +17,6 @@
       "colour": "#0F9D77",
       "group": "Standards",
       "path": "/glossary/console/"
-    },
-    {
-      "key": "hub-files",
-      "label": "Files",
-      "menu": "Initiative Hub Files",
-      "colour": "#7F5AF0",
-      "group": "Standards"
     },
     {
       "key": "hub-requests",
