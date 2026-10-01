@@ -95,7 +95,8 @@
       "access": {
         "hub": "staff",
         "hub-files": "staff",
-        "hub-requests": "staff"
+        "hub-requests": "staff",
+        "glossary": "staff"
       },
       "group": "contractor"
     },
