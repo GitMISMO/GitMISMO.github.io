@@ -67,7 +67,8 @@
     { key: 'hub',         name: 'Initiative Hub',    path: '/initiative-hub/' },
     { key: 'glossary',    name: 'Business Glossary Console', path: '/glossary/console/' },
     { key: 'summit-hq',   name: 'Summit HQ',         path: '/summit-hq/' },
-    { key: 'sponsorship', name: 'Sponsorship Portal', path: '/sponsorship/' }
+    { key: 'sponsorship', name: 'Sponsorship Portal', path: '/sponsorship/' },
+    { key: 'qr',          name: 'QR Code Manager',   path: '/qr/' }
   ];
 
   /* The MISMO wordmark, for the whole-page sign-in. Inline so the screen draws at once. */
@@ -124,8 +125,8 @@
   }
 
   function currentTool() {
-    var p = location.pathname;
-    for (var i = 0; i < TOOLS.length; i++) if (p.indexOf(TOOLS[i].path) === 0) return TOOLS[i].key;
+    var p = location.pathname.toLowerCase();   // /QR/ and /qr/ are the same page
+    for (var i = 0; i < TOOLS.length; i++) if (p.indexOf(TOOLS[i].path.toLowerCase()) === 0) return TOOLS[i].key;
     return null;
   }
 
