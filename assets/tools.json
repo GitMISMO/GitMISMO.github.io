@@ -29,8 +29,15 @@
       "key": "summit-hq",
       "label": "Summit HQ",
       "colour": "#B45309",
-      "group": "Events",
+      "group": "Planning",
       "path": "/summit-hq/"
+    },
+    {
+      "key": "website-migration",
+      "label": "Website Migration HQ",
+      "colour": "#475569",
+      "group": "Planning",
+      "path": "/website-migration/"
     },
     {
       "key": "sponsorship",
@@ -38,13 +45,6 @@
       "colour": "#0EA5E9",
       "group": "Sponsorship",
       "path": "/sponsorship/"
-    },
-    {
-      "key": "website-migration",
-      "label": "Website Migration HQ",
-      "colour": "#475569",
-      "group": "Website",
-      "path": "/website-migration/"
     },
     {
       "key": "qr",
