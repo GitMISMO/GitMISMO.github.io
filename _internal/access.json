@@ -175,6 +175,15 @@
         "website-migration": "staff"
       },
       "group": "contractor"
+    },
+    "qr-scan-log@mismo.org": {
+      "name": "QR Scan Log",
+      "hash": "pbkdf2$210000$5c12ef326f3bbfaa6ee58984d8eff987$4e30315742e0a5868261ac061227f9fcb29fec7a00ae532e7469aac236adb4ce",
+      "access": {
+        "qr": "staff",
+        "qr-routes": "staff"
+      },
+      "group": "process"
     }
   }
 }
