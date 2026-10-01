@@ -346,6 +346,15 @@
     '.rs-wmail{font-size:11.5px;color:var(--rs-soft);display:block}',
     '.rs-banner{display:none;gap:9px;align-items:flex-start;padding:10px 12px;border-radius:9px;font-size:12.5px;line-height:1.5;margin-bottom:14px}',
     '.rs-banner.on{display:flex}',
+    '.rs-b-ok{background:var(--rs-brand-soft);color:var(--rs-brand-text)}',
+    '.rs-forgot{display:block;margin:-4px 0 12px auto;background:none;border:0;padding:2px 0;font:inherit;font-size:12.5px;font-weight:600;color:var(--rs-brand-text);cursor:pointer;text-align:right}',
+    '.rs-forgot:hover{text-decoration:underline}',
+    '.rs-checks{list-style:none;margin:-4px 0 12px;padding:0;font-size:12.5px;line-height:1.5}',
+    '.rs-checks li{display:flex;gap:8px;align-items:flex-start;color:var(--rs-soft)}',
+    '.rs-checks li::before{content:"";flex:0 0 auto;width:12px;height:12px;margin-top:3px;border-radius:50%;border:2px solid var(--rs-line)}',
+    '.rs-checks li.ok{color:var(--rs-ink)}',
+    '.rs-checks li.ok::before{background:var(--rs-brand);border-color:var(--rs-brand)}',
+    '.rs-mpw{width:100%;background:none;border:0;border-bottom:1px solid var(--rs-line);font:inherit;cursor:pointer;text-align:left}',
     '.rs-b-err{background:var(--rs-err-bg);color:var(--rs-err)}',
     '.rs-b-warn{background:var(--rs-warn-bg);color:var(--rs-warn)}',
     '.rs-b-info{background:var(--rs-brand-soft);color:var(--rs-brand-text)}',
@@ -392,6 +401,7 @@
     try { return new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; }
   }
   var GEAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>';
+  var KEY_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4"/><path d="M10.8 12.2L20 3M16 7l3 3M14 9l2 2"/></svg>';
 
   /* ---------- the indicator (Option A) and its menu ---------- */
   function renderAll() {
@@ -418,6 +428,7 @@
     }).join('');
     /* Shown only to admins. Anyone else never sees a way into it, rather than seeing a
        gear that leads to a sign-in they cannot pass. */
+    var pwLink = s.passwords ? '<button type="button" class="rs-mlink rs-mpw">' + KEY_ICON + 'Change password</button>' : '';
     var adminLink = api.isAdmin()
       ? '<a class="rs-mlink" href="/initiative-hub/admin.html">' + GEAR + 'Admin panel</a>' : '';
 
@@ -431,7 +442,7 @@
           '<div class="rs-mhead"><span class="rs-av">' + esc(initials(s.name)) + '</span>' +
             '<div><div class="rs-mname">' + esc(s.name) + '</div><div class="rs-mmail">' + esc(s.email) + '</div></div></div>' +
           '<div class="rs-msec"><div class="rs-mlab">Your access</div>' + rows + '</div>' +
-          adminLink +
+          pwLink + adminLink +
           '<div class="rs-mfoot"><span class="rs-mexp">Signed in until ' + esc(timeOf(s.expiresAt)) + '</span>' +
             '<button type="button" class="rs-mout">Sign out</button></div>' +
         '</div>' +
@@ -446,6 +457,7 @@
       btn.setAttribute('aria-expanded', String(open));
     });
     el.querySelector('.rs-mout').addEventListener('click', function () { api.signOut(); });
+    var mpw = el.querySelector('.rs-mpw'); if (mpw) mpw.addEventListener('click', function () { closeMenus(); openChangePassword(); });
   }
   function closeMenus() {
     var ms = document.querySelectorAll('.rs-menu');
@@ -455,6 +467,70 @@
   }
   document.addEventListener('click', function (e) { if (!e.target.closest || !e.target.closest('.rs-wrap')) closeMenus(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeMenus(); });
+
+  /* ---------- your own password ----------
+     The rules mirror the relay's (which is what actually decides): at least PW_MIN characters,
+     and not containing your name, your email or "MISMO". Breached passwords are caught by the
+     relay when you save. */
+  var PW_MIN = 13;
+  function pwChecks(pw, s, confirm) {
+    var low = String(pw || '').toLowerCase();
+    var parts = [String((s && s.email) || '').split('@')[0]].concat(String((s && s.name) || '').split(/\s+/)).concat(['mismo'])
+      .map(function (t) { return t.toLowerCase(); }).filter(function (t) { return t.length >= 3; });
+    var clean = low.length > 0 && !parts.some(function (t) { return low.indexOf(t) >= 0; });
+    return [
+      { ok: String(pw || '').length >= PW_MIN, text: 'At least ' + PW_MIN + ' characters. A few unrelated words make a strong password that\u2019s easy to remember.' },
+      { ok: clean, text: 'Doesn\u2019t include your name, your email or \u201cMISMO\u201d' },
+      { ok: confirm !== undefined && String(pw || '').length > 0 && confirm === pw, text: 'Both entries match' }
+    ];
+  }
+  function checksHTML(list) { return list.map(function (c) { return '<li class="' + (c.ok ? 'ok' : '') + '">' + esc(c.text) + '</li>'; }).join(''); }
+  function openChangePassword() {
+    var s = read(); if (!s) return openModal({});
+    var scrim = document.createElement('div');
+    scrim.className = 'rs-scrim'; scrim.setAttribute('role', 'dialog'); scrim.setAttribute('aria-modal', 'true'); scrim.setAttribute('aria-label', 'Change your password');
+    scrim.innerHTML = '<div class="rs-card"><div class="rs-chead"><div class="rs-ctitle">Change your password</div><div class="rs-csub">For ' + esc(s.email) + '</div></div>' +
+      '<div class="rs-cbody"><div class="rs-banner rs-b-err" data-rs-err><span>!</span><span data-rs-errtext></span></div>' +
+      '<div class="rs-fld"><label for="rs-pcur">Current password</label><input id="rs-pcur" type="password" autocomplete="current-password"></div>' +
+      '<div class="rs-fld"><label for="rs-pnew">New password</label><input id="rs-pnew" type="password" autocomplete="new-password"></div>' +
+      '<div class="rs-fld"><label for="rs-pnew2">New password again</label><input id="rs-pnew2" type="password" autocomplete="new-password"></div>' +
+      '<ul class="rs-checks" aria-live="polite"></ul>' +
+      '<button type="button" class="rs-go" data-rs-pgo>Change password</button><button type="button" class="rs-quiet" data-rs-pcancel>Cancel</button>' +
+      '<div class="rs-note">Changing it signs you out everywhere else.</div></div></div>';
+    document.body.appendChild(scrim);
+    var cur = scrim.querySelector('#rs-pcur'), nw = scrim.querySelector('#rs-pnew'), nw2 = scrim.querySelector('#rs-pnew2'), checks = scrim.querySelector('.rs-checks');
+    var go = scrim.querySelector('[data-rs-pgo]'), err = scrim.querySelector('[data-rs-err]'), errText = scrim.querySelector('[data-rs-errtext]');
+    function paint() { checks.innerHTML = checksHTML(pwChecks(nw.value, s, nw2.value)); }
+    function say(msg, good) { errText.textContent = msg; err.className = 'rs-banner ' + (good ? 'rs-b-ok' : 'rs-b-err') + ' on'; }
+    function close() { if (scrim.parentNode) scrim.parentNode.removeChild(scrim); }
+    nw.addEventListener('input', paint); nw2.addEventListener('input', paint); paint();
+    scrim.querySelector('[data-rs-pcancel]').addEventListener('click', close);
+    scrim.addEventListener('keydown', function (e) { if (e.key === 'Escape') close(); });
+    go.addEventListener('click', function () {
+      if (!cur.value) return say('Enter your current password.');
+      if (!pwChecks(nw.value, s, nw2.value).every(function (c) { return c.ok; })) return say('The new password doesn\u2019t meet the checks yet.');
+      go.disabled = true; go.textContent = 'Changing\u2026';
+      fetch(RELAY_URL + '/' + LOGIN_PROJECT + '/auth/password', { method: 'POST', cache: 'no-store',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.token }, body: JSON.stringify({ current: cur.value, password: nw.value }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { r: r, b: b }; }); })
+        .then(function (x) {
+          if (x.r.ok && x.b.token) {
+            write({ token: x.b.token, name: x.b.name || s.name, email: x.b.email || s.email, access: x.b.access || s.access, platformAdmin: x.b.platformAdmin === true, passwords: true, expiresAt: x.b.expiresAt });
+            say('Password changed. A confirmation is on its way to your email.', true); go.hidden = true;
+            setTimeout(close, 2200); return;
+          }
+          if (x.r.status === 400 && x.b.problems) return say(x.b.problems.join(' '));
+          if (x.r.status === 401) return say('Your session has ended. Sign in again, then change your password.');
+          if (x.r.status === 503 || x.r.status === 404) return say('Changing your own password isn\u2019t switched on yet. Ask a MISMO administrator to reset it.');
+          say(x.b.message || ('That didn\u2019t work (' + x.r.status + ').'));
+        }, function () { say('Could not reach the sign-in service. Check your connection and try again.'); })
+        .then(function () { if (go.isConnected){ go.disabled = false; go.textContent = 'Change password'; } });
+    });
+    setTimeout(function () { cur.focus(); }, 30);
+  }
+  api.pwChecks = pwChecks; api.checksHTML = checksHTML;   // for /reset-password.html
+  /* The reset page signs the person in with what the relay returned. */
+  api.adopt = function (b) { write({ token: b.token, name: b.name || b.email, email: b.email, access: b.access || {}, platformAdmin: b.platformAdmin === true, passwords: true, expiresAt: b.expiresAt }); };
 
   /* ---------- the sign-in screen ---------- */
   /* The navy panel of the whole-page screen: the logo, the tool's name, and the line the
@@ -535,14 +611,21 @@
           '<div' + (noAccess ? ' hidden' : '') + '>' +
             '<div class="rs-fld"><label for="rs-email">Email</label><input id="rs-email" type="email" autocomplete="username" placeholder="name@company.com"></div>' +
             '<div class="rs-fld"><label for="rs-pass">Password</label><input id="rs-pass" type="password" autocomplete="current-password"></div>' +
+            '<button type="button" class="rs-forgot" data-rs-forgot>Forgot your password?</button>' +
             '<button type="button" class="rs-go" data-rs-go>' + (expired ? 'Sign in and save' : 'Sign in') + '</button>' +
+          '</div>' +
+          '<div data-rs-fview hidden>' +
+            '<p class="rs-note" style="margin:0 0 12px;text-align:left">Enter your email and we\u2019ll send a link to set a new password. It works once, for one hour.</p>' +
+            '<div class="rs-fld"><label for="rs-femail">Email</label><input id="rs-femail" type="email" autocomplete="username" placeholder="name@company.com"></div>' +
+            '<button type="button" class="rs-go" data-rs-fgo>Send reset link</button>' +
+            '<button type="button" class="rs-quiet" data-rs-fback>Back to sign in</button>' +
           '</div>' +
           (noAccess ? '<a class="rs-go rs-golink" href="' + esc(askHref) + '">Ask for access</a>' +
                       '<button type="button" class="rs-quiet" data-rs-switch>Sign in as someone else</button>' : '') +
           '<button type="button" class="rs-quiet" data-rs-cancel>' + esc(leave) + '</button>' +
           '<div class="rs-note">' + (noAccess
             ? 'Accounts and what each one can reach are managed by a MISMO administrator.'
-            : 'Accounts are created by a MISMO administrator. Lost your password? Ask them to reset it.') + '</div>' +
+            : 'Accounts are created by a MISMO administrator.') + '</div>' +
         '</div>' +
       '</div>' + (full ? '</div>' : '');
     document.body.appendChild(scrim);
@@ -554,7 +637,7 @@
     if (known && known.email && email) email.value = known.email;
     setTimeout(function () { (email && !email.value ? email : pass || go).focus(); }, 30);
 
-    function showErr(msg) { errText.textContent = msg; err.classList.add('on'); }
+    function showErr(msg) { errText.textContent = msg; err.className = 'rs-banner rs-b-err on'; }
     function close(result, error) {
       if (scrim.parentNode) scrim.parentNode.removeChild(scrim);
       root.classList.remove('rs-locked');
@@ -576,14 +659,16 @@
         if (x.r.ok && x.b.token) {
           var s = { token: x.b.token, name: x.b.name || e, email: x.b.email || e,
                     access: x.b.access || {}, platformAdmin: x.b.platformAdmin === true,
-                    expiresAt: x.b.expiresAt };
+                    passwords: x.b.passwords === true, expiresAt: x.b.expiresAt };
           write(s);
           close(s);
           return;
         }
         /* One message for a wrong password, an unknown email and an expired account —
-           the relay deliberately does not say which, and neither does this. */
-        if (x.r.status === 401) showErr('That email and password do not match an account.');
+           the relay deliberately does not say which, and neither does this. A relay with
+           self-service passwords adds how many tries are left, and 423 once locked. */
+        if (x.r.status === 423) { showErr(x.b.message || 'This account is locked. Reset your password to unlock it.'); showForgot(true); }
+        else if (x.r.status === 401) showErr(x.b.message || 'That email and password do not match an account.');
         else if (x.r.status === 502) showErr('Sign-in is briefly unavailable. Your work is safe. Try again in a minute.');
         else showErr(x.b.message || ('Sign-in failed (' + x.r.status + ').'));
       }).catch(function () {
@@ -593,6 +678,35 @@
       });
     }
 
+    /* "Forgot your password?": the same card, switched to asking for an email. The answer is
+       the same whether or not there is an account, so it reveals nothing. */
+    var fview = scrim.querySelector('[data-rs-fview]'), fgo = scrim.querySelector('[data-rs-fgo]'), femail = scrim.querySelector('#rs-femail');
+    var signinView = go ? go.parentNode : null;
+    function showForgot(locked) {
+      if (!fview || !signinView) return;
+      if (locked) { var fl = scrim.querySelector('[data-rs-forgot]'); if (fl) { fl.textContent = 'Reset your password'; fl.classList.add('rs-go'); fl.classList.remove('rs-forgot'); } return; }
+      signinView.hidden = true; fview.hidden = false; err.classList.remove('on');
+      femail.value = (email.value || '').trim(); setTimeout(function () { (femail.value ? fgo : femail).focus(); }, 20);
+    }
+    var flink = scrim.querySelector('[data-rs-forgot]');
+    if (flink) flink.addEventListener('click', function () { showForgot(false); });
+    var fback = scrim.querySelector('[data-rs-fback]');
+    if (fback) fback.addEventListener('click', function () { fview.hidden = true; signinView.hidden = false; err.classList.remove('on'); (pass || email).focus(); });
+    function sendReset() {
+      var e = (femail.value || '').trim().toLowerCase();
+      if (!e || e.indexOf('@') < 0) return showErr('Enter your email.');
+      fgo.disabled = true; fgo.textContent = 'Sending\u2026'; err.classList.remove('on');
+      fetch(RELAY_URL + '/' + LOGIN_PROJECT + '/auth/forgot', { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store', body: JSON.stringify({ email: e }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { r: r, b: b }; }); })
+        .then(function (x) {
+          if (x.r.ok) { errText.textContent = 'If there\u2019s an account for ' + e + ', a reset link is on its way. Check your email; it works once, for one hour.'; err.className = 'rs-banner rs-b-ok on'; fgo.hidden = true; return; }
+          if (x.r.status === 503 || x.r.status === 404) return showErr('Resetting your own password isn\u2019t switched on yet. Ask a MISMO administrator to reset it.');
+          showErr(x.b.message || ('That didn\u2019t work (' + x.r.status + '). Try again.'));
+        }, function () { showErr('Could not reach the sign-in service. Check your connection and try again.'); })
+        .then(function () { if (fgo.isConnected){ fgo.disabled = false; fgo.textContent = 'Send reset link'; } });
+    }
+    if (fgo) fgo.addEventListener('click', sendReset);
+    if (femail) femail.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') sendReset(); });
     if (go) go.addEventListener('click', submit);
     if (pass) pass.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
     if (email) email.addEventListener('keydown', function (e) { if (e.key === 'Enter') pass.focus(); });
