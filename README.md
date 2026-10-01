@@ -27,6 +27,7 @@ who fetches one URL.
 | `assets/` | The two official wordmarks, colour and white, kept as files for use by other tools. |
 | `_internal/ADDING-A-TOOL.md` | How to add a new tool to this domain, with and without saving. Start here. |
 | `_internal/relay-save.js` | Drop-in saving module for a tool that needs to write back to GitHub. |
+| `assets/tools.json` | Every tool with its own access. The admin panel's People & Access and every account menu read this one list, so a tool added here appears in both. |
 | `_internal/projects.json` | The save relay's project list. The Lambda reads this file, so adding a tool that saves is a commit here rather than an AWS change. |
 
 ## Editing the home page

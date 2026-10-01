@@ -1,0 +1,109 @@
+{
+  "about": "Every tool on resources.mismo.org that has its own access, in the order the admin panel shows them. The admin panel's People & Access and every account menu read this one list: add a tool here (and to _internal/projects.json for the relay) and both show it. key is the relay project key; also lists keys always given the same access (never shown on their own); path is where the tool lives, for links and for knowing which tool a page belongs to; family marks tools shown together under one heading with an \"every one\" control in the admin panel (the Service Orders companies); menu is the name shown in the account menu when label alone would be unclear.",
+  "tools": [
+    {
+      "key": "hub",
+      "label": "Initiative Hub",
+      "colour": "#2A4DFF",
+      "group": "Standards",
+      "path": "/initiative-hub/"
+    },
+    {
+      "key": "glossary",
+      "label": "Business Glossary Console",
+      "colour": "#0F9D77",
+      "group": "Standards",
+      "path": "/glossary/console/"
+    },
+    {
+      "key": "hub-files",
+      "label": "Files",
+      "menu": "Initiative Hub Files",
+      "colour": "#7F5AF0",
+      "group": "Standards"
+    },
+    {
+      "key": "hub-requests",
+      "label": "Work Requests",
+      "colour": "#14486E",
+      "group": "Standards",
+      "path": "/initiative-hub/work-requests.html"
+    },
+    {
+      "key": "summit-hq",
+      "label": "Summit HQ",
+      "colour": "#B45309",
+      "group": "Events",
+      "path": "/summit-hq/"
+    },
+    {
+      "key": "sponsorship",
+      "label": "Sponsorship Portal",
+      "colour": "#0EA5E9",
+      "group": "Sponsorship",
+      "path": "/sponsorship/"
+    },
+    {
+      "key": "website-migration",
+      "label": "Website Migration HQ",
+      "colour": "#475569",
+      "group": "Website",
+      "path": "/website-migration/"
+    },
+    {
+      "key": "qr",
+      "label": "QR Code Manager",
+      "colour": "#2477B8",
+      "group": "QR Codes",
+      "path": "/QR/",
+      "also": [
+        "qr-routes"
+      ]
+    },
+    {
+      "key": "so-phoenix",
+      "label": "Phoenix Oversight Group LLC",
+      "sum": "Service Orders (Phoenix Oversight Group LLC)",
+      "colour": "#E11D48",
+      "group": "Service Orders and Agreements",
+      "path": "/service-orders/",
+      "family": true
+    },
+    {
+      "key": "so-actualize",
+      "label": "Actualize Consulting LLC",
+      "sum": "Service Orders (Actualize Consulting LLC)",
+      "colour": "#E11D48",
+      "group": "Service Orders and Agreements",
+      "path": "/service-orders/",
+      "family": true
+    },
+    {
+      "key": "so-trex",
+      "label": "Tidgewell Results eXperience LLC",
+      "sum": "Service Orders (Tidgewell Results eXperience LLC)",
+      "colour": "#E11D48",
+      "group": "Service Orders and Agreements",
+      "path": "/service-orders/",
+      "family": true
+    },
+    {
+      "key": "so-falcon",
+      "label": "Falcon Capital Advisors LLC",
+      "sum": "Service Orders (Falcon Capital Advisors LLC)",
+      "colour": "#E11D48",
+      "group": "Service Orders and Agreements",
+      "path": "/service-orders/",
+      "family": true
+    },
+    {
+      "key": "so-trudigital",
+      "label": "TruDigital Mortgage Solutions LLC",
+      "sum": "Service Orders (TruDigital Mortgage Solutions LLC)",
+      "colour": "#E11D48",
+      "group": "Service Orders and Agreements",
+      "path": "/service-orders/",
+      "family": true
+    }
+  ]
+}

@@ -63,13 +63,34 @@
   /* Only tools registered in _internal/projects.json belong here. A tool listed before
      the relay knows it shows a permission that governs nothing. Files (hub-files) is
      left out on purpose: it is storage behind the Hub, not somewhere you go. */
+  /* Every tool with its own access. The real list is /assets/tools.json, which the admin
+     panel's People & Access reads too, so a tool added there appears in both (Perry, 1 Oct
+     2026). This copy is only the fallback for a page that can't read that file. */
   var TOOLS = [
-    { key: 'hub',         name: 'Initiative Hub',    path: '/initiative-hub/' },
-    { key: 'glossary',    name: 'Business Glossary Console', path: '/glossary/console/' },
-    { key: 'summit-hq',   name: 'Summit HQ',         path: '/summit-hq/' },
-    { key: 'sponsorship', name: 'Sponsorship Portal', path: '/sponsorship/' },
-    { key: 'qr',          name: 'QR Code Manager',   path: '/qr/' }
+    { key: "hub", name: "Initiative Hub", path: "/initiative-hub/", group: "Standards" },
+    { key: "glossary", name: "Business Glossary Console", path: "/glossary/console/", group: "Standards" },
+    { key: "hub-files", name: "Initiative Hub Files", path: "", group: "Standards" },
+    { key: "hub-requests", name: "Work Requests", path: "/initiative-hub/work-requests.html", group: "Standards" },
+    { key: "summit-hq", name: "Summit HQ", path: "/summit-hq/", group: "Events" },
+    { key: "sponsorship", name: "Sponsorship Portal", path: "/sponsorship/", group: "Sponsorship" },
+    { key: "website-migration", name: "Website Migration HQ", path: "/website-migration/", group: "Website" },
+    { key: "qr", name: "QR Code Manager", path: "/QR/", group: "QR Codes" },
+    { key: "so-phoenix", name: "Phoenix Oversight Group LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
+    { key: "so-actualize", name: "Actualize Consulting LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
+    { key: "so-trex", name: "Tidgewell Results eXperience LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
+    { key: "so-falcon", name: "Falcon Capital Advisors LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
+    { key: "so-trudigital", name: "TruDigital Mortgage Solutions LLC", path: "/service-orders/", group: "Service Orders and Agreements" }
   ];
+  function useToolList(list) {
+    var ok = (list || []).filter(function (t) { return t && /^[a-z0-9-]{1,40}$/.test(t.key) && t.label && t.group; });
+    if (!ok.length) return;
+    TOOLS = ok.map(function (t) { return { key: t.key, name: t.menu || t.label, path: t.path || '', group: t.group }; });
+    renderAll();
+  }
+  try {
+    fetch('/assets/tools.json', { cache: 'no-cache' }).then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (j) { if (j && j.tools) useToolList(j.tools); }, function () {});
+  } catch (e) {}
 
   /* The MISMO wordmark, for the whole-page sign-in. Inline so the screen draws at once. */
   var LOGO = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 708 108" role="img" aria-label="MISMO"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="#0f314c"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320 c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20 -297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243 -4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198 0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3 -104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245 -337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17 246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49 203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12 26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57 187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44 -204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288 -20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92 -51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12 -24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297 3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146 -106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0 -356 -14z"/></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="#50a4db"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263 13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19 -16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20 -222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0 46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></svg>';
@@ -125,9 +146,15 @@
   }
 
   function currentTool() {
-    var p = location.pathname.toLowerCase();   // /QR/ and /qr/ are the same page
-    for (var i = 0; i < TOOLS.length; i++) if (p.indexOf(TOOLS[i].path.toLowerCase()) === 0) return TOOLS[i].key;
-    return null;
+    var t = currentEntry(); return t ? t.key : null;
+  }
+  function currentEntry() {
+    var p = location.pathname.toLowerCase(), best = null;   // /QR/ and /qr/ are the same page
+    for (var i = 0; i < TOOLS.length; i++) {
+      var tp = String(TOOLS[i].path || '').toLowerCase();
+      if (tp && p.indexOf(tp) === 0 && (!best || tp.length > best.path.length)) best = TOOLS[i];
+    }
+    return best;
   }
 
   /* ---------- what does the relay say this person may do on this tool? ----------
@@ -306,6 +333,12 @@
     '.rs-msec{padding:12px 16px;border-bottom:1px solid var(--rs-line)}',
     '.rs-mlab{font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--rs-soft);margin-bottom:8px}',
     '.rs-mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 0;font-size:13px;color:var(--rs-ink)}',
+    '.rs-mlinkrow{text-decoration:none;border-radius:6px;margin:0 -6px;padding:4px 6px}',
+    '.rs-mlinkrow:hover{background:var(--rs-brand-soft)}',
+    '.rs-mgroup{font-size:11.5px;font-weight:600;color:var(--rs-soft);margin:10px 0 2px;padding-top:8px;border-top:1px solid var(--rs-line)}',
+    '.rs-mlab + .rs-mgroup{border-top:0;padding-top:0;margin-top:0}',
+    '.rs-mnone{color:var(--rs-soft)}',
+    '.rs-msec{max-height:min(52vh,420px);overflow:auto}',
     '.rs-here{font-size:10px;font-weight:700;color:var(--rs-brand-text);margin-left:6px}',
     '.rs-role{font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;border:1px solid transparent}',
     '.rs-r-admin{background:var(--rs-admin-bg);color:var(--rs-admin);border-color:var(--rs-admin-bd)}',
@@ -407,8 +440,41 @@
   /* ---------- the indicator (Option A) and its menu ---------- */
   function renderAll() {
     var els = document.querySelectorAll('[data-rs-mount]');
-    for (var i = 0; i < els.length; i++) renderInto(els[i]);
+    for (var i = 0; i < els.length; i++) {
+      var open = els[i].querySelector('.rs-menu') && !els[i].querySelector('.rs-menu').hidden;
+      renderInto(els[i]);
+      if (open) { var m = els[i].querySelector('.rs-menu'), w = els[i].querySelector('.rs-who'); if (m) m.hidden = false; if (w) w.setAttribute('aria-expanded', 'true'); }
+    }
   }
+  /* What this person may reach, as it is now. The menu otherwise shows what they had when
+     they signed in, so a change made in the admin panel would wait for their next sign-in.
+     Asked when a page loads (at most every two minutes) and when the menu is opened (at most
+     every thirty seconds). Stored and re-drawn only if something changed, and without telling
+     the page, which goes on as it was. A session ended by a password change signs out. */
+  var ME_AT = 'resources:me-at';
+  function refreshMe(minAgeMs) {
+    var s = read(); if (!s) return;
+    var last = 0; try { last = +sessionStorage.getItem(ME_AT) || 0; } catch (e) {}
+    if (Date.now() - last < minAgeMs) return;
+    try { sessionStorage.setItem(ME_AT, String(Date.now())); } catch (e) {}
+    fetch(RELAY_URL + '/' + LOGIN_PROJECT + '/auth/me', { cache: 'no-store', headers: { 'Authorization': 'Bearer ' + s.token } })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { r: r, b: b }; }); })
+      .then(function (x) {
+        var cur = read(); if (!cur || cur.token !== s.token) return;
+        if (x.r.status === 401 && /^(TOKEN_STALE|TOKEN_BAD|NO_ACCOUNT)$/.test(x.b.error || '')) { write(null); return; }
+        if (!x.r.ok || !x.b || typeof x.b.access !== 'object') return;   // an older relay: keep what sign-in gave
+        var next = JSON.parse(JSON.stringify(cur));
+        next.access = x.b.access || {}; next.platformAdmin = x.b.platformAdmin === true;
+        if (x.b.name) next.name = x.b.name;
+        if (typeof x.b.passwords === 'boolean') next.passwords = x.b.passwords;
+        if (JSON.stringify(next) === JSON.stringify(cur)) return;
+        try { localStorage.setItem(KEY, JSON.stringify(next)); } catch (e) {}
+        renderAll();
+      }, function () {});
+  }
+  api.refreshMe = function () { try { sessionStorage.removeItem(ME_AT); } catch (e) {} refreshMe(0); };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function () { refreshMe(120000); });
+  else refreshMe(120000);
 
   function renderInto(el) {
     var s = read();
@@ -417,16 +483,21 @@
       el.querySelector('.rs-signin').addEventListener('click', function () { openModal({}); });
       return;
     }
-    var here = currentTool();
-    var rows = TOOLS.map(function (t) {
+    /* Every tool this person has access to, as the admin panel lists them, and nothing else. */
+    var hereT = currentEntry(), herePath = hereT ? String(hereT.path).toLowerCase() : null;
+    var lastGroup = null, rows = '';
+    TOOLS.forEach(function (t) {
       var r = api.role(t.key);
+      if (!r) return;
+      if (t.group !== lastGroup) { rows += '<div class="rs-mgroup">' + esc(t.group) + '</div>'; lastGroup = t.group; }
       var pill = r === 'admin' ? '<span class="rs-role rs-r-admin">Admin</span>'
                : r === 'staff' ? '<span class="rs-role rs-r-staff">Edit</span>'
-               : r === 'view'  ? '<span class="rs-role rs-r-view">View</span>'
-               : '<span class="rs-role rs-r-none">No access</span>';
-      return '<div class="rs-mrow"><span>' + esc(t.name) + (t.key === here ? '<span class="rs-here">&bull; you are here</span>' : '') +
-             '</span>' + pill + '</div>';
-    }).join('');
+               : '<span class="rs-role rs-r-view">View</span>';
+      var here = herePath && String(t.path || '').toLowerCase() === herePath ? '<span class="rs-here">&bull; you are here</span>' : '';
+      rows += (t.path ? '<a class="rs-mrow rs-mlinkrow" href="' + esc(t.path) + '">' : '<div class="rs-mrow">') +
+              '<span>' + esc(t.name) + here + '</span>' + pill + (t.path ? '</a>' : '</div>');
+    });
+    if (!rows) rows = '<div class="rs-mrow rs-mnone">No tools yet. A MISMO administrator can add them.</div>';
     /* Shown only to admins. Anyone else never sees a way into it, rather than seeing a
        gear that leads to a sign-in they cannot pass. */
     var pwLink = s.passwords ? '<button type="button" class="rs-mlink rs-mpw">' + KEY_ICON + 'Change password</button>' : '';
@@ -456,6 +527,7 @@
       closeMenus();
       menu.hidden = !open;
       btn.setAttribute('aria-expanded', String(open));
+      if (open) refreshMe(30000);
     });
     el.querySelector('.rs-mout').addEventListener('click', function () { api.signOut(); });
     var mpw = el.querySelector('.rs-mpw'); if (mpw) mpw.addEventListener('click', function () { closeMenus(); openChangePassword(); });

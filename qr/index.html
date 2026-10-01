@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QR Code Manager</title>
+<!-- The QR Code Manager's repository is GitMISMO/QR, so GitHub Pages serves it at /QR/.
+     The codes it prints point to /qr/ (lower case). If GitHub matches the two, the tool answers
+     first and this page is never reached. If it doesn't, this sends every visitor on to /QR/
+     with the rest of the address, including a scan's ?c=CODE, so printed codes keep working. -->
+<script>location.replace('/QR/' + location.search + location.hash);</script>
+<meta http-equiv="refresh" content="0; url=/QR/">
+</head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;padding:24px">
+<p><a href="/QR/">Continue to the QR Code Manager</a></p>
+</body>
+</html>
