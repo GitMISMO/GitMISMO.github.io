@@ -111,7 +111,7 @@
     },
     "mtidgewell@mismo.org": {
       "name": "Meghan Tidgewell",
-      "hash": "pbkdf2$210000$0107d886d89531841e9a0e4ccbbc5204$5027da3bac51eb252f716ed1eddda0c3822e67a0cc309b38c6511eedf8002441",
+      "hash": "pbkdf2$210000$c77bc24769c5a1b475cb0fd95bc9f47b$184d97482c236eacf5ff32a84019d09c42b6c45abb6699e31bc22a2d7a9c651f",
       "access": {
         "hub": "staff",
         "website-migration": "staff",
@@ -165,6 +165,14 @@
         "hub": "staff",
         "hub-files": "staff",
         "hub-requests": "staff"
+      },
+      "group": "contractor"
+    },
+    "james@caelumadvisers.com": {
+      "name": "James Duncan",
+      "hash": "pbkdf2$210000$ec268e171130135c933909f2154594d7$6a181a781d81bb93f500e51c6fb1052fe45222e67aa1f5d0f5126aa3a7f86760",
+      "access": {
+        "website-migration": "staff"
       },
       "group": "contractor"
     }
