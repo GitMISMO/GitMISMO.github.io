@@ -40,7 +40,7 @@
       "data/"
     ]
   },
-    "so-phoenix": {
+  "so-phoenix": {
     "repo": "GitMISMO/so-phoenix-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
@@ -48,11 +48,11 @@
       "signatures/",
       "notify/",
       "hours/",
-      "revisions/"
+      "revisions/",
+      "agreements/"
     ],
     "readable": [
-      "orders/",
-      "agreements/"
+      "orders/"
     ]
   },
   "so-actualize": {
@@ -63,11 +63,11 @@
       "signatures/",
       "notify/",
       "hours/",
-      "revisions/"
+      "revisions/",
+      "agreements/"
     ],
     "readable": [
-      "orders/",
-      "agreements/"
+      "orders/"
     ]
   },
   "so-trex": {
@@ -78,11 +78,11 @@
       "signatures/",
       "notify/",
       "hours/",
-      "revisions/"
+      "revisions/",
+      "agreements/"
     ],
     "readable": [
-      "orders/",
-      "agreements/"
+      "orders/"
     ]
   },
   "so-falcon": {
@@ -93,11 +93,11 @@
       "signatures/",
       "notify/",
       "hours/",
-      "revisions/"
+      "revisions/",
+      "agreements/"
     ],
     "readable": [
-      "orders/",
-      "agreements/"
+      "orders/"
     ]
   },
   "so-trudigital": {
@@ -108,35 +108,43 @@
       "signatures/",
       "notify/",
       "hours/",
-      "revisions/"
+      "revisions/",
+      "agreements/"
     ],
     "readable": [
-      "orders/",
-      "agreements/"
+      "orders/"
     ]
   },
   "website-migration": {
     "repo": "GitMISMO/website-migration-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
-    "writable": ["data/"]
+    "writable": [
+      "data/"
+    ]
   },
-       "qr": {
-       "repo": "GitMISMO/qr-data",
-       "branch": "main",
-       "origin": "https://resources.mismo.org",
-       "writable": ["data/"]
-     },
-     "qr-routes": {
-       "repo": "GitMISMO/qr",
-       "branch": "main",
-       "origin": "https://resources.mismo.org",
-       "writable": ["data/"]
-     },
+  "qr": {
+    "repo": "GitMISMO/qr-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "qr-routes": {
+    "repo": "GitMISMO/qr",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
   "hub-requests": {
     "repo": "GitMISMO/GitMISMO-initiative-hub-requests",
     "branch": "main",
     "origin": "https://resources.mismo.org",
-    "writable": ["data/"]
+    "writable": [
+      "data/"
+    ]
   }
 }
