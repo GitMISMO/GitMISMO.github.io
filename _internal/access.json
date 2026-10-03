@@ -210,6 +210,14 @@
         "so-trudigital": "staff"
       },
       "group": "contractor"
+    },
+    "trenner@falconcapitaladvisors.com": {
+      "name": "Tim Renner",
+      "hash": "pbkdf2$210000$ef017e8ad409ffa8643156812c174745$d523a2035427dc0df30d3a9228dd4f44103c762dd412563c579e9e989b6c9bdd",
+      "access": {
+        "so-falcon": "staff"
+      },
+      "group": "contractor"
     }
   }
 }
