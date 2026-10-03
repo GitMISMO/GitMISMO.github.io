@@ -117,7 +117,8 @@
         "hub": "staff",
         "website-migration": "staff",
         "hub-files": "staff",
-        "hub-requests": "staff"
+        "hub-requests": "staff",
+        "so-trex": "staff"
       },
       "group": "contractor"
     },
