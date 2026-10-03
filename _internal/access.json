@@ -185,6 +185,14 @@
         "qr-routes": "staff"
       },
       "group": "process"
+    },
+    "tsantoro@actualizeconsulting.com": {
+      "name": "Theresa Santoro",
+      "hash": "pbkdf2$210000$f7998eb9b71057fb5cebc3bbf15aeda6$f6bdce701d41f067be0e6bfb91482a1434644c3ece5788cf56816cd109b4a406",
+      "access": {
+        "so-actualize": "staff"
+      },
+      "group": "contractor"
     }
   }
 }
