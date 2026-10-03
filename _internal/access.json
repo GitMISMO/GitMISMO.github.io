@@ -50,7 +50,8 @@
       "access": {
         "hub": "staff",
         "hub-files": "staff",
-        "hub-requests": "staff"
+        "hub-requests": "staff",
+        "so-phoenix": "staff"
       },
       "group": "contractor"
     },
