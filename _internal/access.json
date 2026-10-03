@@ -193,6 +193,14 @@
         "so-actualize": "staff"
       },
       "group": "contractor"
+    },
+    "becky.griswold@phoenixoutcomes.com": {
+      "name": "Becky Griswold",
+      "hash": "pbkdf2$210000$7cd9ddaca22d39482d9bd6834ddfb23a$a29159630e14c8217a8d269af65f9b4d542e6c68cf410d57986a56ec845fcc5b",
+      "access": {
+        "so-phoenix": "staff"
+      },
+      "group": "contractor"
     }
   }
 }
