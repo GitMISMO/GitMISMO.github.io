@@ -202,6 +202,14 @@
         "so-phoenix": "staff"
       },
       "group": "contractor"
+    },
+    "chris@trudms.com": {
+      "name": "Chris Trujillo",
+      "hash": "pbkdf2$210000$7b049ebd3823df152131b0ebb7aaaf72$35d7740f48764361545622295634000918d161b9fc431e4e3bf1ba84f0e07267",
+      "access": {
+        "so-trudigital": "staff"
+      },
+      "group": "contractor"
     }
   }
 }
