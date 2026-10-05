@@ -146,5 +146,22 @@
     "writable": [
       "data/"
     ]
+  },
+  "team-hq": {
+      "repo": "GitMISMO/team-hq-data",
+      "branch": "main",
+      "origin": "https://resources.mismo.org",
+      "writable": [
+          "data/",
+          "receipts/"
+      ]
+  },
+  "team-hq-private": {
+      "repo": "GitMISMO/team-hq-private-data",
+      "branch": "main",
+      "origin": "https://resources.mismo.org",
+      "writable": [
+          "data/"
+      ]
   }
 }
