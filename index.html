@@ -4,148 +4,145 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>MISMO Resources</title>
-<script>
-  /* The theme before any CSS paints, so a dark-mode visitor never sees a flash of light. */
-  (function(){ try { if (localStorage.getItem('resources:home:theme') === 'dark') document.documentElement.setAttribute('data-theme','dark'); } catch (e) {} })();
-</script>
+<script>/* The theme before any CSS paints, so a dark-mode visitor never sees a flash of light. */
+(function(){ try { var t = localStorage.getItem('resources:home:theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Libre+Franklin:wght@400;500;600;700&display=swap">
 <style>
   :root{
-    --navy:#0f314c; --navy-deep:#06202f; --navy-mid:#14486e; --sky:#50a4db; --sky-soft:#94c8e9;
-    --paper:#F1F6FA; --surface:#FFFFFF; --sunk:#E9F1F8;
-    --ink:#0f314c; --ink-2:#456179; --ink-3:#546F88;
-    --line:#E5EEF5; --line-2:#D5E2ED; --line-3:#ADC4D6;
-    --accent:#14486E; --accent-soft:#dcedf8;
-    --btn:#0f314c; --btn-ink:#FFFFFF;
+    --paper:#F1F6FA; --surface:#FFFFFF; --sunk:#E9F1F8; --ink:#0F314C; --ink-2:#456179; --ink-3:#546F88;
+    --line:#E5EEF5; --line-2:#D5E2ED; --line-3:#ADC4D6; --accent:#14486E; --accent-soft:#DCEDF8; --sky:#50A4DB;
+    --btn:#0F314C; --btn-ink:#FFFFFF; --pin:#14486E; --pin-soft:#DCEDF8; --admin-bg:#E4E8FF; --admin-ink:#2A3FB8;
     --shadow:0 1px 2px rgba(15,49,76,.06), 0 10px 26px -18px rgba(15,49,76,.45);
-    --font:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    --hq-h:64px; --rail-w:240px;
+    --display:'Archivo','Libre Franklin',sans-serif; --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     color-scheme:light;
   }
-  html[data-theme="dark"]{
-    --paper:#0B1826; --surface:#112336; --sunk:#172D44;
-    --ink:#EEF3F8; --ink-2:#B9C8D6; --ink-3:#8C9FB1;
-    --line:#1A3048; --line-2:#243E5A; --line-3:#3A5A7C;
-    --accent:#50A4DB; --accent-soft:#173A57;
-    --btn:#50A4DB; --btn-ink:#0F314C;
-    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 26px -18px rgba(0,0,0,.9);
-    color-scheme:dark;
+  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+    --paper:#0B1826; --surface:#112336; --sunk:#172D44; --ink:#EEF3F8; --ink-2:#B9C8D6; --ink-3:#8C9FB1;
+    --line:#1A3048; --line-2:#243E5A; --line-3:#3A5A7C; --accent:#8CC6EC; --accent-soft:#173A57;
+    --btn:#50A4DB; --btn-ink:#0F314C; --pin:#8CC6EC; --pin-soft:#173A57; --admin-bg:#23305E; --admin-ink:#B8C4FF;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 26px -18px rgba(0,0,0,.9); color-scheme:dark; } }
+  :root[data-theme="dark"]{
+    --paper:#0B1826; --surface:#112336; --sunk:#172D44; --ink:#EEF3F8; --ink-2:#B9C8D6; --ink-3:#8C9FB1;
+    --line:#1A3048; --line-2:#243E5A; --line-3:#3A5A7C; --accent:#8CC6EC; --accent-soft:#173A57;
+    --btn:#50A4DB; --btn-ink:#0F314C; --pin:#8CC6EC; --pin-soft:#173A57; --admin-bg:#23305E; --admin-ink:#B8C4FF;
+    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 26px -18px rgba(0,0,0,.9); color-scheme:dark;
   }
-  *{box-sizing:border-box}
-  [hidden]{display:none!important}
-  html,body{margin:0}
-  html{scroll-padding-top:calc(var(--hq-h) + 16px)}
-  body{background:var(--paper);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased;
-    padding-top:calc(var(--hq-h) + env(safe-area-inset-top,0px));padding-left:var(--rail-w)}
-  svg.i{fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+  :root{ box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px) }
+  html{ scroll-padding-top:calc(env(safe-area-inset-top,0px) + 80px) }
+  *,*::before,*::after{ box-sizing:inherit }
+  body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--font); font-size:14px; line-height:1.45; -webkit-font-smoothing:antialiased }
+  a{ color:inherit; text-decoration:none }
+  button{ font:inherit; color:inherit }
+  :focus-visible{ outline:2px solid var(--sky); outline-offset:2px; border-radius:6px }
+  svg.i{ width:1em; height:1em; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round }
+  .vh{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap }
 
-  /* the masthead */
-  .hqtop{position:fixed;top:0;left:0;right:0;z-index:30;height:calc(var(--hq-h) + env(safe-area-inset-top,0px));
-    padding:env(safe-area-inset-top,0px) 22px 0;background:var(--navy);color:#fff;display:flex;align-items:center;box-shadow:0 1px 0 rgba(80,164,219,.28)}
-  .logoplate{background:#fff;border-radius:5px;padding:9px 13px;display:flex;align-items:center;line-height:0;flex:0 0 auto;box-shadow:0 1px 0 rgba(80,164,219,.35)}
-  .logoplate svg{height:24px;width:auto;display:block}
-  .mastrule{display:block;width:2px;height:34px;flex:0 0 auto;margin-inline:20px;border-radius:1px;background:var(--sky)}
-  .hqname{font-size:15.5px;font-weight:700;color:var(--sky);white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
-  .hqtop-r{margin-left:auto;display:flex;align-items:center;gap:13px;flex:0 0 auto}
-  .eyebrow-m{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
+  /* top bar: the Resources frame */
+  .top{ position:sticky; top:0; z-index:20; height:64px; padding:0 22px; background:#0f314c; color:#fff; display:flex; align-items:center; box-shadow:0 1px 0 rgba(80,164,219,.28) }
+  .plate{ background:#fff; border-radius:5px; padding:9px 13px; line-height:0 } .plate svg{ height:24px; width:auto }
+  .rule{ width:2px; height:34px; margin:0 20px; border-radius:1px; background:#50a4db }
+  .brand{ font-size:15.5px; font-weight:700; color:#50a4db }
+  .top-r{ margin-left:auto; display:flex; align-items:center; gap:10px; position:relative }
+  .iconbtn{ width:40px; height:40px; border-radius:999px; border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px }
+  .acct{ display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 12px 0 7px; border-radius:999px; border:0; background:#fff; color:#2C74A6; font-weight:600; font-size:13px; cursor:pointer }
+  .acct .av{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; background:linear-gradient(160deg,#a8d4ef,#6fb2dc) }
+  .menu{ position:absolute; right:0; top:52px; width:290px; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:12px; box-shadow:0 18px 40px -18px rgba(6,32,47,.55); padding:8px }
+  .menu p{ margin:4px 8px 8px; font-size:12px; color:var(--ink-3) }
+  .menu button{ display:block; width:100%; text-align:left; background:none; border:0; border-radius:8px; padding:9px 10px; cursor:pointer }
+  .menu button:hover, .menu button[aria-checked="true"]{ background:var(--accent-soft) }
+  .menu b{ display:block; font-size:13.5px } .menu small{ font-size:12px; color:var(--ink-2) }
+  .proto{ max-width:1200px; margin:14px auto 0; padding:8px 14px; border:1px dashed var(--line-3); border-radius:10px; font-size:12.5px; color:var(--ink-2) }
 
-  /* the tools, down the left */
-  .rail{position:fixed;left:0;bottom:0;top:calc(var(--hq-h) + env(safe-area-inset-top,0px));width:var(--rail-w);z-index:20;background:var(--navy);color:#fff;
-    display:flex;flex-direction:column;overflow:hidden auto;box-shadow:1px 0 0 rgba(80,164,219,.22), 4px 0 18px rgba(6,32,47,.14)}
-  .rail-top{display:flex;align-items:center;padding:11px 10px 9px;border-bottom:1px solid rgba(80,164,219,.2)}
-  .rail-lbl{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.55);padding-left:3px}
-  .railfind{position:relative;padding:11px 12px 3px}
-  .railfind svg{position:absolute;left:21px;top:20px;width:14px;height:14px;stroke:rgba(255,255,255,.5);pointer-events:none}
-  .railfind input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:6px;color:#fff;font:inherit;font-size:12.5px;padding:6px 10px 6px 30px}
-  .railfind input::placeholder{color:rgba(255,255,255,.5)}
-  .railfind input:focus{outline:2px solid var(--sky);outline-offset:-1px;background:rgba(255,255,255,.16)}
-  .rail nav{display:flex;flex-direction:column;gap:1px;padding:8px 8px 4px}
-  .rail nav a,.theme-btn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;color:rgba(255,255,255,.76);
-    padding:8px 10px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;text-decoration:none}
-  .rail nav a:hover,.theme-btn:hover{color:#fff;background:rgba(255,255,255,.09)}
-  .rail nav a[aria-current]{color:#fff;font-weight:600;background:var(--navy-mid);box-shadow:inset 3px 0 0 var(--sky)}
-  .rail nav a:focus-visible,.theme-btn:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
-  .rail nav .tdot{width:9px;height:9px;border-radius:3px;background:var(--c);flex:0 0 auto;margin-inline:4px}
-  .rail nav a span.t{overflow:hidden;text-overflow:ellipsis}
-  .rail nav svg,.theme-btn svg{width:17px;height:17px;flex:0 0 auto;opacity:.85}
-  .rail nav .count{margin-left:auto;font-style:normal;font-size:11px;font-weight:600;color:rgba(255,255,255,.6);background:rgba(255,255,255,.1);border-radius:999px;padding:0 7px;line-height:18px}
-  .railgrp{border-top:1px solid rgba(80,164,219,.16);margin-top:4px;padding-top:7px}
-  .railgrp > span{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.52);font-weight:700;padding:4px 20px 0}
-  .rail .foot{margin-top:auto;padding:8px 8px 10px;border-top:1px solid rgba(80,164,219,.2)}
+  main{ max-width:1200px; margin:0 auto; padding:36px 24px 72px }
+  /* the greeting and the box: the first thing anyone sees */
+  .hello{ max-width:760px; margin:0 auto; text-align:center }
+  .date{ font-size:12.5px; font-weight:600; color:var(--ink-3) }
+  h1{ margin:4px 0 0; font-family:var(--display); font-weight:800; font-size:clamp(28px,4vw,36px); letter-spacing:-.02em; line-height:1.1 }
+  .ask{ margin-top:22px; display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--sky); border-radius:16px; padding:0 18px; box-shadow:0 18px 40px -26px rgba(15,49,76,.55) }
+  .ask svg{ color:var(--sky); font-size:22px }
+  .ask input{ flex:1; min-width:0; border:0; outline:0; background:transparent; color:var(--ink); font:inherit; font-size:17px; padding:18px 0 }
+  .ask input::placeholder{ color:var(--ink-3) }
+  .ask input::-webkit-search-cancel-button, .ask input::-webkit-search-decoration{ -webkit-appearance:none; appearance:none; display:none }   /* the page's own clear button only */
+  .ask kbd{ font:600 11px var(--font); color:var(--ink-3); border:1px solid var(--line-2); border-radius:5px; padding:1px 6px }
+  .ask .clear{ border:0; background:var(--sunk); color:var(--ink-2); border-radius:999px; width:26px; height:26px; cursor:pointer }
+  /* results: under the box, ranked, each saying why it matched */
+  .results{ margin-top:14px; text-align:left; background:var(--surface); border:1px solid var(--line-2); border-radius:16px; box-shadow:var(--shadow); overflow:hidden }
+  .best{ display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--accent-soft) }
+  .best .lbl{ font-size:12px; font-weight:700; color:var(--accent) }
+  .best .t{ font-size:17px; font-weight:700 } .best .s{ font-size:13px; color:var(--ink-2) }
+  .best .go{ margin-left:auto; flex:0 0 auto; display:inline-flex; align-items:center; gap:7px; border-radius:8px; padding:9px 15px; font-size:13.5px; font-weight:700; background:var(--btn); color:var(--btn-ink) }
+  .more{ list-style:none; margin:0; padding:4px 0 }
+  .more a{ display:flex; align-items:center; gap:12px; padding:10px 18px }
+  .more a:hover, .more a:focus-visible{ background:var(--sunk); outline-offset:-2px }
+  .more .t{ font-size:14px; font-weight:700 } .more .s{ font-size:12.5px; color:var(--ink-2) }
+  .why{ display:inline-flex; flex-wrap:wrap; gap:4px; margin-top:4px }
+  .why span{ font-size:11.5px; color:var(--ink-3); border:1px solid var(--line-2); border-radius:999px; padding:0 8px }
+  .missing{ display:flex; align-items:center; gap:10px; padding:12px 18px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-2) }
+  .missing b{ color:var(--accent) }
+  .noresults{ padding:16px 18px; font-size:13.5px; color:var(--ink-2) }
+  .grp{ padding:12px 18px 2px; font-size:12px; font-weight:700; color:var(--ink-3); border-top:1px solid var(--line) }
+  .best + .grp{ border-top:0 }
+  .kind{ display:inline-block; vertical-align:2px; margin-left:6px; font-size:11px; font-weight:600; color:var(--ink-3); border:1px solid var(--line-2); border-radius:999px; padding:0 8px }
 
-  /* the page */
-  main{max-width:1180px;padding:22px 24px 48px;display:flex;flex-direction:column;gap:22px;min-width:0}
-  .mast{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:flex-end;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:14px}
-  .mast > div{min-width:0}
-  .eyebrow{font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
-  .mast h1{font-size:clamp(22px,3vw,32px);font-weight:700;letter-spacing:-.02em;line-height:1.05;margin:2px 0 0}
-  .mast .sub{color:var(--ink-2);font-size:14px;max-width:78ch}
-  .stats{display:flex;gap:18px;font-size:12.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
-  .stats b{display:block;font-size:20px;color:var(--ink);line-height:1.1}
+  h2{ margin:0; font-family:var(--display); font-weight:700; font-size:19px; letter-spacing:-.01em }
+  .bar{ display:flex; align-items:baseline; gap:12px; margin:40px 0 12px; flex-wrap:wrap }
+  .bar .hint{ font-size:12.5px; color:var(--ink-3) }
+  .bar .linkbtn{ margin-left:auto; border:0; background:none; font-weight:600; font-size:13px; color:var(--accent); text-decoration:underline; text-underline-offset:3px; cursor:pointer; padding:4px 2px }
 
-  .tool{display:flex;flex-direction:column;gap:8px;min-width:0}
-  .th{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-  .th .tdot{width:12px;height:12px;border-radius:3px;background:var(--c);flex:0 0 auto}
-  .th h2{margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em}
-  .th .path{font-size:12px;color:var(--ink-3)}
-  .expall{font:inherit;font-size:12px;font-weight:600;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-  .card .home+.home{border-top:1px solid var(--line)}
-  .toolsbar{display:flex;align-items:center;gap:12px;font-size:10.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);margin-top:-8px}
-  .toolsbar .expall{margin-left:auto;letter-spacing:0;text-transform:none;font-size:12.5px}
-  .thb{display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%;text-align:left;background:none;border:0;padding:4px 0;font:inherit;color:inherit;cursor:pointer}
-  .thb:focus-visible{outline:2px solid var(--sky);outline-offset:3px;border-radius:3px}
-  .thb .chev{width:18px;height:18px;color:var(--ink-3);transition:transform .15s;flex:0 0 auto;margin-left:-3px}
-  .thb[aria-expanded="true"] .chev{transform:rotate(90deg)}
-  .thb:hover h2{text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px}
-  .thb.nob{cursor:default}
-  .thb .chev.sp{display:inline-block;width:18px;height:18px}
-  .thb .path{font-size:12px;color:var(--ink-3)}
-  .thb .cnt{margin-left:auto;font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums}
-  .tdesc{margin:0;color:var(--ink-2);font-size:13px;max-width:80ch}
+  /* pinned */
+  .pins{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px }
+  .pins.n3{ grid-template-columns:repeat(3,minmax(0,1fr)) } .pins.n2{ grid-template-columns:repeat(2,minmax(0,1fr)) } .pins.n1{ grid-template-columns:minmax(0,420px) }
+  .pcard{ position:relative; background:var(--surface); border:1px solid var(--line-2); border-radius:14px; box-shadow:var(--shadow); padding:18px; display:flex; flex-direction:column; gap:12px }
+  .pcard.dragging{ opacity:.45 } .pcard.over{ outline:2px dashed var(--sky); outline-offset:2px }
+  .pcard .head{ display:flex; align-items:center; gap:10px }
+  .ticon{ flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center }
+  .tag{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--ink-3); min-width:0 }
+  .tag i{ width:8px; height:8px; border-radius:2px; flex:0 0 auto }
+  .pcard .t{ font-size:17px; font-weight:700 } .pcard .s{ font-size:13px; color:var(--ink-2); margin-top:3px }
+  .pcard .go{ align-self:flex-start; margin-top:auto; display:inline-flex; align-items:center; gap:7px; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:700; background:var(--btn); color:var(--btn-ink) }
+  .handle{ margin-left:auto; border:0; background:none; color:var(--ink-3); cursor:grab; padding:4px; border-radius:6px; font-size:16px; display:inline-flex }
+  .handle:active{ cursor:grabbing }
+  .pinbtn{ flex:0 0 auto; width:32px; height:32px; border-radius:8px; border:1px solid var(--line-2); background:transparent; color:var(--ink-3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer }
+  .pinbtn:hover{ border-color:var(--line-3); color:var(--ink) }
+  .pinbtn[aria-pressed="true"]{ background:var(--pin-soft); border-color:var(--pin-soft); color:var(--pin) }
+  .pinbtn[aria-pressed="true"] path{ fill:currentColor }
+  .empty{ border:1px dashed var(--line-3); border-radius:14px; padding:22px; text-align:center; color:var(--ink-2); font-size:13.5px }
 
-  .card{background:var(--surface);border:1px solid var(--line-2);border-radius:4px;box-shadow:var(--shadow);overflow:hidden}
-  .home{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:14px;align-items:center;padding:13px 16px;text-decoration:none;color:inherit;
-    box-shadow:inset 3px 0 0 var(--c)}
-  .home .ic{width:34px;height:34px;border-radius:6px;display:flex;align-items:center;justify-content:center;background:var(--sunk);color:var(--ink)}
-  .home .ic svg{width:18px;height:18px}
-  .home .n{font-weight:600;font-size:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .home .s{font-size:12.5px;color:var(--ink-2)}
-  .home .arr{color:var(--ink-3);font-size:15px}
-  a.home:hover{background:var(--paper)}
-  .home:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
-  .grp{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);background:var(--sunk);padding:7px 16px;border-top:1px solid var(--line)}
-  .pg{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 16px;border-top:1px solid var(--line);text-decoration:none;color:inherit}
-  a.pg:hover{background:var(--paper)}
-  a.pg:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
-  .pg .b{font-size:10.5px;font-weight:700;letter-spacing:.04em;text-align:center;padding:3px 0;border-radius:3px;background:var(--sunk);color:var(--ink-2);border:1px solid var(--line-2)}
-  .pg .n{font-weight:600;font-size:13.5px}
-  .pg .s{font-size:12px;color:var(--ink-3)}
-  .pg .arr{color:var(--ink-3);font-size:14px}
-  .pg.planned{opacity:.7}
-  .pg.planned .arr{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
-  .empty{padding:18px 16px;color:var(--ink-3);font-style:italic}
-  footer{font-size:12px;color:var(--ink-3);padding-top:6px}
-
-  @media (max-width:760px){
-    :root{--hq-h:55px;--rail-w:58px}
-    .hqtop{padding-inline:12px}.logoplate{padding:7px 10px}.logoplate svg{height:18px}
-    .mastrule{height:30px;margin-inline:10px}.hqname{font-size:13px}.eyebrow-m{display:none}
-    .rail-lbl,.railfind,.rail nav a span.t,.rail nav .count,.railgrp > span,.theme-btn span{display:none}
-    .rail-top{justify-content:center;padding-inline:0;min-height:12px}
-    .rail nav{padding-inline:6px;align-items:center}
-    .rail nav a,.theme-btn{justify-content:center;padding:10px 0;width:42px}
-    .rail .foot{display:flex;justify-content:center}
-    main{padding:16px 16px 28px}
-    .home{grid-template-columns:auto minmax(0,1fr)}.home .arr{display:none}
-    .pg{grid-template-columns:44px minmax(0,1fr)}.pg .arr{display:none}
-  }
+  /* everything: section cards that open and close */
+  .sec{ margin-top:14px; background:var(--surface); border:1px solid var(--line-2); border-radius:14px; box-shadow:var(--shadow); overflow:hidden }
+  .sec > button.sh{ width:100%; display:flex; align-items:center; gap:12px; padding:16px 20px; background:none; border:0; cursor:pointer; text-align:left }
+  .sh .dots{ display:inline-flex; gap:4px } .sh .dots i{ width:10px; height:10px; border-radius:3px }
+  .sh .nm{ font-family:var(--display); font-weight:700; font-size:17px }
+  .sh .ct{ font-size:12.5px; color:var(--ink-3) }
+  .sh .chev{ margin-left:auto; color:var(--ink-3); font-size:18px; transition:transform .18s }
+  .sec[data-open="false"] .chev{ transform:rotate(-90deg) }
+  .cols{ display:grid; gap:28px; padding:14px 20px 12px; border-top:1px solid var(--line) }
+  .cols.c1{ grid-template-columns:minmax(0,1fr) } .cols.c2{ grid-template-columns:repeat(2,minmax(0,1fr)) } .cols.c3{ grid-template-columns:repeat(3,minmax(0,1fr)) }
+  .tool .th{ display:flex; align-items:center; gap:10px; margin-bottom:4px }
+  .tool .tn{ flex:1; min-width:0; font-size:14px; font-weight:700 } .tool .tn small{ display:block; font-weight:500; font-size:12px; color:var(--ink-3) }
+  .role{ font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; background:var(--accent-soft); color:var(--accent); white-space:nowrap }
+  .role.admin{ background:var(--admin-bg); color:var(--admin-ink) }
+  .row{ display:flex; align-items:center; gap:12px; padding:9px 0; border-top:1px dotted var(--sky) }
+  .tool .row:first-of-type{ border-top:0 }
+  .row a{ flex:1; min-width:0; display:flex; align-items:center; gap:12px; border-radius:8px }
+  .row a:hover .rt{ text-decoration:underline; text-underline-offset:3px }
+  .rt{ font-size:13.5px; font-weight:700 } .rs{ font-size:12px; color:var(--ink-2) }
+  mark{ background:var(--accent-soft); color:inherit; border-radius:3px; padding:0 1px }
+  .closed{ display:flex; flex-wrap:wrap; gap:8px; padding:0 20px 16px }
+  .tchip{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-2); background:transparent; border-radius:999px; padding:5px 12px 5px 6px; font-size:13px; font-weight:600; cursor:pointer }
+  .tchip:hover{ border-color:var(--line-3) }
+  .askadmin{ margin-top:22px; display:flex; align-items:center; gap:12px; border:1px dashed var(--line-3); border-radius:12px; padding:14px 18px; color:var(--ink-2); font-size:13.5px }
+  .askadmin b{ color:var(--accent) }
+  .toast{ position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(20px); opacity:0; background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:10px; font-size:13.5px; transition:all .2s; pointer-events:none; z-index:50 }
+  .toast.on{ opacity:1; transform:translateX(-50%) translateY(0) }
+  @media (max-width:900px){ .pins, .pins.n3{ grid-template-columns:repeat(2,minmax(0,1fr)) } .cols.c3, .cols.c2{ grid-template-columns:minmax(0,1fr) } }
+  @media (max-width:560px){ .pins, .pins.n2, .pins.n3{ grid-template-columns:minmax(0,1fr) } .top .brand, .rule{ display:none } main{ padding:24px 16px 56px } .sh .ct{ display:none } }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important } }
 </style>
 </head>
 <body>
-<!-- MISMO Resources home page (Sept 29, 2026), in the Summit HQ look the admin panel and the
-     glossary console use: every tool with its main pages; a tool with more expands from its heading. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
 <symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58
@@ -175,182 +172,38 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
 </defs></svg>
-<header class="hqtop">
-  <span class="logoplate"><svg role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
-  <span class="mastrule"></span>
-  <span class="hqname">Resources</span>
-  <span class="hqtop-r"><span class="eyebrow-m">Your MISMO tools</span>
-    <!-- The shared account bubble every tool shows in this spot (session.js fills it). -->
-    <div id="rs-account"></div></span>
+<header class="top">
+  <span class="plate"><svg role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
+  <span class="rule" aria-hidden="true"></span><span class="brand">Resources</span>
+  <span class="top-r">
+    <button type="button" class="iconbtn" id="theme" aria-label="Switch to dark mode"></button>
+    <!-- The shared account button every tool shows in this spot (session.js fills it). -->
+    <div id="rs-account"></div>
+  </span>
 </header>
-
-<aside class="rail">
-  <div class="rail-top"><span class="rail-lbl">Tools</span></div>
-  <div class="railfind">
-    <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
-    <input type="search" id="q" autocomplete="off" spellcheck="false" placeholder="Search pages" aria-label="Search pages">
-  </div>
-  <nav aria-label="Tools" id="railnav">
-    <a href="#top" aria-current="true" title="All tools"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.2"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.2"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.2"/></svg><span class="t">All tools</span><b class="count" id="nAll"></b></a>
-  </nav>
-  <div class="foot"><button class="theme-btn" type="button" id="theme"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 019.5 4a8 8 0 1010.5 10.5z"/></svg><span>Dark Mode</span></button></div>
-</aside>
-
-<main id="top">
-  <header class="mast"><div>
-    <div class="sub">Every MISMO tool you have access to, in one place.</div></div>
-    <div class="stats"><div><b id="sTools"></b>tools</div><div><b id="sPages"></b>pages</div></div></header>
-  <div class="toolsbar"><span>Tools</span><button type="button" class="expall" id="expAll">Expand all</button></div>
-  <div id="tools"></div>
-  <footer>resources.mismo.org · Questions or access: info@mismo.org</footer>
+<main>
+  <section class="hello" aria-labelledby="hi">
+    <div class="date" id="date"></div>
+    <h1 id="hi"></h1>
+    <label class="ask"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14 M20 20l-4-4"/></svg>
+      <span class="vh">Search your tools and pages</span>
+      <input id="q" type="search" placeholder="What do you need to do?" autocomplete="off" aria-describedby="qnote" aria-controls="results">
+      <button type="button" class="clear" id="clear" aria-label="Clear the search" hidden>&times;</button><kbd aria-hidden="true">/</kbd></label>
+    <div class="vh" id="qnote" aria-live="polite"></div>
+    <div class="results" id="results" hidden></div>
+  </section>
+  <section aria-labelledby="pinh">
+    <div class="bar"><h2 id="pinh">Pinned</h2><span class="hint" id="pinhint">Pin anything below to keep it here. Drag to reorder, or use the arrow keys on the handle.</span></div>
+    <div id="pins"></div>
+  </section>
+  <section aria-labelledby="allh">
+    <div class="bar"><h2 id="allh">Everything You Can Do</h2><button type="button" class="linkbtn" id="expall"></button></div>
+    <div id="secs"></div>
+    <div id="askadmin"></div>
+  </section>
 </main>
-<script>
-/* ===================================================================
-   THE ONLY THING TO EDIT WHEN A TOOL IS ADDED, MOVED OR RETIRED.
-
-   base     folder under resources.mismo.org. The path IS the repository name, so
-            changing one means renaming the repo too.
-   c        the tool's colour: the same one it has in the admin panel.
-   entries  the tool's main pages, always shown (a tool's own home page is href '/').
-   groups   its other pages, under headings, shown when the tool is expanded. A page in
-            ANOTHER folder (its own repository) gives url, the full path from the site
-            root, instead of href. planned:true lists a page that is not live yet.
-   The list sorts itself by name, and the sidebar and counts follow from it.
-   =================================================================== */
-var BASE='';
-var APPS=[
-  {key:'glossary',name:'Business Glossary',base:'/glossary',c:'#0F9D77',
-   desc:'Every MISMO business term, its definition and where it is used.',
-   entries:[{name:'Business Glossary',sub:'The public glossary: search and browse every term',href:'/'},
-            {name:'Business Glossary Console',sub:'Draft, stage and publish changes to the glossary',href:'/console/',console:true}]},
-  {key:'hub',name:'Initiative Hub',base:'/initiative-hub',c:'#2A4DFF',
-   desc:'Every initiative by domain, the ones still under consideration, and requests to update a standard.',
-   entries:[{name:'Initiative Hub',sub:'Every initiative, by domain, plus the meeting calendar',href:'/'},
-            {name:'Potential Initiatives',sub:'Initiatives still under consideration',href:'/#potential'},
-            {name:'Work Requests',sub:'Submit and follow requests to update a MISMO standard',href:'/work-requests.html',key:'hub-requests'}]},
-  {key:'service-orders',name:'Service Orders and Agreements',base:'/service-orders',c:'#E11D48',
-   desc:'FY 2027 service orders and MSA extensions: what each contracting company has been sent, what they have accepted, and the hours logged against each order.',
-   entries:[{name:'Service Orders and Agreements',sub:'Review and accept orders, and log hours',href:'/'}]},
-  {key:'sponsorship',name:'Sponsorship',base:'/sponsorship',c:'#0EA5E9',
-   desc:'Summit sponsorship: the prospectus sent to prospective sponsors, and the portal where staff track prospects, commitments and payments.',
-   entries:[{name:'Sponsorship Portal',sub:'Pipeline, prospects, inventory and payments',href:'/'}],
-   groups:[{label:'For prospective sponsors',pages:[{badge:'PRO',name:'2027 Summit Sponsorship Prospectus',sub:'Tiers, benefits and who attends. Public.',url:'/sponsorship-prospectus/',planned:true}]}]},
-  {key:'team-hq',name:'Team HQ',base:'/team-hq',c:'#0D314C',
-   desc:'The Programs & Operations team\u2019s own board: today, plans and their progress, team projects, key dates and the team meeting.',
-   entries:[{name:'Team HQ',sub:'My board, plans, team projects, key dates and the team meeting',href:'/'}]},
-  {key:'summit-hq',name:'Summit HQ',base:'/summit-hq',c:'#B45309',
-   desc:'Plan a summit: rooms, schedule, workgroup placement and conflicts.',
-   entries:[{name:'Summit HQ',sub:'Plan rooms, sessions and workgroup placement',href:'/'}]},
-  {key:'qr',name:'QR Code Manager',base:'/QR',c:'#2477B8',
-   desc:'Every MISMO QR code in one place: where each one leads, when it is live, where it is placed and how often it is scanned.',
-   entries:[{name:'QR Code Manager',sub:'Live codes, codes about to expire, and scans',href:'/'}],
-   groups:[{label:'Shortcuts',pages:[
-     {badge:'NEW',name:'Make a new code',sub:'What it is for, where it leads and how long it lasts',href:'/#new'},
-     {badge:'SCN',name:'Scans',sub:'How often each code is scanned',href:'/#scans'}]}]},
-  {key:'website-migration',name:'Website Migration HQ',base:'/website-migration',c:'#475569',
-   desc:'The tracker for moving mismo.org from Sitefinity to Higher Logic: tasks, pages, key dates, decisions and word rules.',
-   entries:[{name:'Website Migration HQ',sub:'Tasks, pages, key dates, decisions and word rules',href:'/'}]}
-];
-APPS.sort(function(a,b){ return a.name.localeCompare(b.name,'en'); });
-var HOME='<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5L12 3l9 7.5"/><path d="M5.5 9.5V20h13V9.5"/></svg>';
-function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
-function pages(a){return (a.groups||[]).reduce(function(n,g){return n+g.pages.length;},0)+a.entries.length;}
-var q='';
-var VIS=APPS;   // the tools this person has access to; set by applyAccess() below
-/* Tools start collapsed: each shows what it is and its way in; the pages behind it open on
-   request, and the page remembers which ones this reader opened. */
-var STORE='resources:home:open', open=new Set();
-try{ open=new Set(JSON.parse(localStorage.getItem(STORE)||'[]')); }catch(e){}
-function remember(){ try{ localStorage.setItem(STORE,JSON.stringify(Array.from(open))); }catch(e){} }
-var CHEV='<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
-function hit(){ for(var i=0;i<arguments.length;i++) if(String(arguments[i]||'').toLowerCase().indexOf(q)>=0) return true; return !q; }
-var CHV='<svg class="i chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>';
-function entryHTML(a,e){ return '<a class="home" href="'+BASE+a.base+e.href+'"><span class="ic">'+HOME+'</span><span><span class="n">'+esc(e.name)+'</span><span class="s">'+esc(e.sub)+'</span></span><span class="arr">→</span></a>'; }
-function groupsHTML(a,gs){ return gs.map(function(g){return '<div class="grp">'+esc(g.label)+'</div>'+g.pages.map(function(p){
-    var inner='<span class="b">'+esc(p.badge)+'</span><span><span class="n">'+esc(p.name)+'</span><br><span class="s">'+esc(p.sub)+'</span></span>';
-    return p.planned?'<div class="pg planned">'+inner+'<span class="arr">Coming</span></div>'
-      :'<a class="pg" href="'+BASE+(p.url||a.base+p.href)+'">'+inner+'<span class="arr">→</span></a>';}).join('');}).join(''); }
-function render(){
-  var html='';
-  VIS.forEach(function(a){
-    var toolHit=hit(a.name,a.desc);
-    var mine=a.entries.filter(function(e){return !e.key||may(e.key);});
-    var es=mine.filter(function(e){return toolHit||hit(e.name,e.sub);});
-    var gs=(a.groups||[]).filter(function(g){return !g.key||may(g.key);}).map(function(g){return {label:g.label,pages:g.pages.filter(function(p){return toolHit||hit(p.name,p.sub,p.badge,g.label);})};}).filter(function(g){return g.pages.length;});
-    if(q&&!toolHit&&!es.length&&!gs.length) return;
-    if(!es.length) es=mine;
-    var n=pagesOf(a), more=(a.groups||[]).filter(function(g){return !g.key||may(g.key);}).length>0, isOpen=more&&(!!q||open.has(a.key));
-    var head='<span class="tdot" style="width:12px;height:12px;border-radius:3px;background:var(--c)"></span><h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em">'+esc(a.name)+'</h2><span class="path">'+esc(a.base)+'/</span>';
-    html+='<section class="tool" id="'+a.key+'" style="--c:'+a.c+'">'+
-      (more?'<button class="thb" type="button" data-tog="'+a.key+'" aria-expanded="'+isOpen+'" aria-controls="more-'+a.key+'">'+CHV+head+'<span class="cnt">'+(n-a.entries.length)+' more page'+(n-a.entries.length===1?'':'s')+'</span></button>'
-        :'<div class="thb nob"><span class="chev sp"></span>'+head+'</div>')+
-      '<p class="tdesc">'+esc(a.desc)+'</p><div class="card">'+es.map(function(e){return entryHTML(a,e);}).join('')+
-      (more?'<div id="more-'+a.key+'"'+(isOpen?'':' hidden')+'>'+groupsHTML(a,gs)+'</div>':'')+'</div></section>';
-  });
-  var el=document.getElementById('tools');
-  el.innerHTML=html||'<div class="card"><div class="empty">'+(VIS.length?'Nothing matches that search.':'Your account doesn\u2019t have access to any tools yet. A MISMO administrator can add them in People &amp; Access.')+'</div></div>';
-  el.style.cssText='display:flex;flex-direction:column;gap:18px';
-  var all=VIS.filter(function(a){return (a.groups||[]).length;}).every(function(a){return open.has(a.key);});
-  var ex=document.getElementById('expAll'); ex.textContent=all?'Collapse all':'Expand all'; ex.dataset.all=all?'1':'';
-}
-document.getElementById('expAll').onclick=function(){ if(this.dataset.all) open.clear(); else VIS.forEach(function(a){ if((a.groups||[]).length) open.add(a.key);}); remember(); render(); spy(); };
-/* A tool picked in the sidebar opens as well as scrolling into view. */
-document.getElementById('railnav').addEventListener('click',function(e){ var l=e.target.closest('a'); if(!l) return; var k=l.getAttribute('href').slice(1);
-  if(VIS.some(function(a){return a.key===k&&(a.groups||[]).length;})&&!open.has(k)){ open.add(k); remember(); render(); } });
-var nav=document.getElementById('railnav');
-/* What this person may reach. Platform administrators see every tool; everyone else sees the
-   tools their access covers. Service Orders is one tool with a key per company; the Hub's Work
-   Requests group has its own key. Without the sign-in script, everything shows. */
-function may(key){
-  var RS=window.ResourcesSession; if(!RS||!RS.current()) return true;
-  if(RS.isPlatformAdmin&&RS.isPlatformAdmin()) return true;
-  if(key==='service-orders'){ var acc=(RS.current()||{}).access||{}; return Object.keys(acc).some(function(k){return k.indexOf('so-')===0&&acc[k];}); }
-  return !!RS.role(key);
-}
-function pagesOf(a){ return (a.groups||[]).filter(function(g){return !g.key||may(g.key);}).reduce(function(n,g){return n+g.pages.length;},0)+a.entries.filter(function(e){return !e.key||may(e.key);}).length; }
-function buildNav(){
-  nav.querySelectorAll('a[href^="#"]:not([href="#top"])').forEach(function(l){ l.remove(); });
-  VIS.forEach(function(a){ nav.insertAdjacentHTML('beforeend','<a href="#'+a.key+'" title="'+esc(a.name)+'" style="--c:'+a.c+'"><span class="tdot"></span><span class="t">'+esc(a.name)+'</span><b class="count">'+pagesOf(a)+'</b></a>'); });
-  var total=VIS.reduce(function(n,a){return n+pagesOf(a);},0);
-  document.getElementById('nAll').textContent=VIS.length;
-  document.getElementById('sTools').textContent=VIS.length; document.getElementById('sPages').textContent=total;
-}
-function applyAccess(){ VIS=APPS.filter(function(a){return may(a.key);}); buildNav(); render(); spy(); }
-buildNav();
-document.getElementById('tools').addEventListener('click',function(e){
-  var t=e.target.closest('[data-tog]'); if(!t) return;
-  var k=t.dataset.tog; if(open.has(k)) open.delete(k); else open.add(k); remember(); render();
-  var back=document.querySelector('[data-tog="'+k+'"]'); if(back) back.focus();
-});
-document.getElementById('q').addEventListener('input',function(e){ q=e.target.value.trim().toLowerCase(); render(); });
-/* which tool is on screen */
-function spy(){
-  var cur='top'; VIS.forEach(function(a){ var el=document.getElementById(a.key); if(el&&el.getBoundingClientRect().top<140) cur=a.key; });
-  if(VIS.length&&window.scrollY>0&&window.innerHeight+window.scrollY>=document.body.scrollHeight-4) cur=VIS[VIS.length-1].key;
-  nav.querySelectorAll('a').forEach(function(x){ if(x.getAttribute('href')==='#'+cur) x.setAttribute('aria-current','true'); else x.removeAttribute('aria-current'); });
-}
-window.addEventListener('scroll',spy,{passive:true});
-var themeBtn=document.getElementById('theme');
-function themeLabel(){ themeBtn.querySelector('span').textContent=document.documentElement.getAttribute('data-theme')==='dark'?'Light Mode':'Dark Mode'; }
-themeBtn.onclick=function(){ var r=document.documentElement, d=r.getAttribute('data-theme')==='dark';
-  if(d) r.removeAttribute('data-theme'); else r.setAttribute('data-theme','dark');
-  try{ localStorage.setItem('resources:home:theme', d?'light':'dark'); }catch(e){}
-  themeLabel(); };
-themeLabel();
-render(); spy();
-</script>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script src="/assets/session.js"></script>
-<script>
-  /* The home page is behind the sign-in and shows only the tools this person has (Perry,
-     5 Oct 2026). data-rs-gate keeps it hidden until someone is signed in; the list is drawn
-     from their access, and redrawn when it changes. */
-  (function(){
-    var RS=window.ResourcesSession;
-    if(!RS){ document.documentElement.classList.remove('rs-wait'); return; }
-    RS.requireSignIn({ toolName:'MISMO Resources', eyebrow:'Programs & Operations' }).then(applyAccess, function(){ document.documentElement.classList.remove('rs-wait'); });
-    RS.onChange(function(s){ if(!s) location.reload(); else applyAccess(); });
-    document.addEventListener('rs:access', applyAccess);
-  })();
-</script>
+<script src="/assets/home.js"></script>
 </body>
 </html>

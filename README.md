@@ -53,3 +53,26 @@ token decides which it can actually write to, and that grant lives in GitHub und
 org-admin control — so an entry here naming a repository the token cannot reach is simply
 refused. Keep write access to this repository with a small group, and require a pull
 request on `main`.
+
+## Adding a new tool: the checklist (Perry, 5 Oct 2026)
+
+First ask Perry which **section** it belongs in. Then add it to:
+
+1. **The home page** (`index.html`), in that section.
+2. **The admin console**: `assets/tools.json` (its section is `group`) and `_internal/projects.json`.
+3. **Access**: who gets it, set in People & Access (ask Perry).
+4. **Its pages on the home page**: suggest which pages or tasks to show, and let Perry choose.
+
+## The home page (5 Oct 2026)
+
+`index.html` (behind the sign-in) and `assets/home.js`: a greeting and a search box, pinned tasks
+(each person's own, kept per account in their browser), and every tool they have, by section, as
+tasks with the page each opens. The tools, sections and tasks are listed near the top of
+`assets/home.js` (TOOLS, ENTRIES, and CONTEXT for the words people search with): a new tool is
+added there too (see the checklist above).
+
+The search also finds initiatives and workgroups (`assets/home-index.json`, rebuilt with
+`python3 _internal/build-home-index.py ../initiative-hub` when an initiative is added or renamed)
+and potential initiatives (read live from the Hub). Business Glossary terms are deliberately left
+out; the glossary has its own search.
+

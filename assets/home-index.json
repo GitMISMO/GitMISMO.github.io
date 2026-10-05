@@ -1,0 +1,381 @@
+{
+"built": "see _internal/build-home-index.py",
+"items": [
+{
+"t": "Mortgage Compliance Dataset",
+"k": "Initiative",
+"o": "hub",
+"d": "A standard set of loan data fields and delivery file format that mortgage lenders and independent mortgage banks provide to regulators for the…",
+"x": "Mortgage Compliance",
+"h": "/initiative-hub/mcd-dashboard.html"
+},
+{
+"t": "Common Confidence Score",
+"k": "Initiative",
+"o": "hub",
+"d": "A standardized probability score — the estimated likelihood an AVM value falls within ±10% of market value — that lets lenders and investors compare…",
+"x": "Originations Valuation",
+"h": "/initiative-hub/ccs-dashboard.html"
+},
+{
+"t": "Title Order Dataset Specification",
+"k": "Initiative",
+"o": "hub",
+"d": "A standardized dataset for exchanging title order information, so a lender placing a title order sends the same structured set of fields every time…",
+"x": "Title & Closing",
+"h": "/initiative-hub/title-order-dashboard.html"
+},
+{
+"t": "AVM Testing Guidance and Best Practices",
+"k": "Initiative",
+"o": "hub",
+"d": "A best-practice guide for lenders testing the AVMs they rely on, covering both accuracy testing and Common Confidence Score testing — a repeatable…",
+"x": "Valuation",
+"h": "/initiative-hub/avm-testing-dashboard.html"
+},
+{
+"t": "AVM Fairness Testing Guidelines",
+"k": "Initiative",
+"o": "hub",
+"d": "Best-practice guidelines for testing AVMs for discriminatory patterns — disparate treatment and disparate impact — giving small and mid-sized lenders…",
+"x": "Valuation",
+"h": "/initiative-hub/"
+},
+{
+"t": "Property & Valuation Services Procurement Dataset",
+"k": "Initiative",
+"o": "hub",
+"d": "A common framework for exchanging transactional appraisal order information, built around the new terminology introduced by the FHFA's Uniform…",
+"x": "Valuation",
+"h": "/initiative-hub/"
+},
+{
+"t": "MISMO FRAME",
+"k": "Initiative",
+"o": "hub",
+"d": "An AI governance toolkit — five practical artifacts (Governance Policy, AI System Inventory, and System Risk Assessment now available; Performance…",
+"x": "Artificial Intelligence Governance",
+"h": "/initiative-hub/"
+},
+{
+"t": "Tri-Party eNote Bailee Agreement",
+"k": "Initiative",
+"o": "hub",
+"d": "A MISMO-developed, consensus-based industry template for Master Bailee Agreements (MBAs) — the tri-party agreements among lender, warehouse lender,…",
+"x": "eMortgage",
+"h": "/initiative-hub/tpa-dashboard.html"
+},
+{
+"t": "Investor Reporting Dataset",
+"k": "Initiative",
+"o": "hub",
+"d": "A standardized dataset defining what servicers report to investors — GSEs and private-label securitizers — on loan performance, remittance, and…",
+"x": "Servicing",
+"h": "/initiative-hub/"
+},
+{
+"t": "Loan Boarding Dataset",
+"k": "Initiative",
+"o": "hub",
+"d": "A standardized, extensible dataset defining the core information needed to board newly originated loans into servicing systems consistently and…",
+"x": "Servicing",
+"h": "/initiative-hub/lbds-dashboard.html"
+},
+{
+"t": "Commitment File Dataset",
+"k": "Initiative",
+"o": "hub",
+"d": "A standard mapping specification for the Commitment File — the artifact retail lenders include as part of a servicing transfer or loan sale,…",
+"x": "Secondary",
+"h": "/initiative-hub/"
+},
+{
+"t": "Credit Score Implementation Guide",
+"k": "Initiative",
+"o": "hub",
+"d": "Implementation guidance for representing FICO 10T and VantageScore 4.0 credit scores, plus up to 36 months of prior-payment (\"trended\") data, within…",
+"x": "Credit Reporting",
+"h": "/initiative-hub/"
+},
+{
+"t": "MI Claim Submission Dataset",
+"k": "Initiative",
+"o": "hub",
+"d": "A MISMO-backed replacement for the EDI 260 X12 Application for Mortgage Insurance Benefits — the dataset servicers use to file claims with GSEs and…",
+"x": "Mortgage Insurance",
+"h": "/initiative-hub/"
+},
+{
+"t": "AI Community of Practice",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "API Community of Practice",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Architecture Workgroup",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Automated Valuation Model DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Business Glossary CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Business Process Model CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Commercial & Other RE Digital Notes DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Commercial CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Credit Reporting CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Data Governance & Management CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Decision Modeling CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Digital Interoperability CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "eHELOC DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "eMortgage CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "HERO CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Housing Counseling DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Information Management",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Loan Application Data Exchange DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "MI Claim Submission DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Mortgage Compliance Dataset DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Mortgage Insurance CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Origination CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Property & Valuation Services CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Remote Online Notarization DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Reverse Mortgage DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Secondary CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Servicing CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Servicing Transfers DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "TIE (Technology Impact & Enablement) CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Title & Closing CoP",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Title & Closing Docs to Data DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Title Pricing API DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "VA Documents to Data DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+},
+{
+"t": "Verifiable Profile SMART Doc DWG",
+"k": "Workgroup",
+"o": "hub",
+"d": "Meetings on the Initiative Hub calendar",
+"x": "",
+"h": "/initiative-hub/calendar.html"
+}
+]
+}
