@@ -17,7 +17,9 @@
         "website-migration": "admin",
         "qr": "admin",
         "qr-routes": "admin",
-        "hub-requests": "admin"
+        "hub-requests": "admin",
+        "team-hq": "admin",
+        "team-hq-private": "admin"
       },
       "platformAdmin": true,
       "group": "staff"
@@ -39,7 +41,9 @@
         "website-migration": "admin",
         "qr": "admin",
         "qr-routes": "admin",
-        "hub-requests": "admin"
+        "hub-requests": "admin",
+        "team-hq": "admin",
+        "team-hq-private": "admin"
       },
       "platformAdmin": true,
       "group": "staff"
@@ -67,7 +71,8 @@
         "website-migration": "staff",
         "qr": "admin",
         "qr-routes": "admin",
-        "hub-requests": "staff"
+        "hub-requests": "staff",
+        "team-hq": "staff"
       },
       "group": "staff"
     },
@@ -136,7 +141,8 @@
         "website-migration": "view",
         "qr": "admin",
         "qr-routes": "admin",
-        "hub-requests": "staff"
+        "hub-requests": "staff",
+        "team-hq": "staff"
       },
       "group": "staff"
     },
@@ -157,7 +163,8 @@
         "website-migration": "view",
         "qr": "admin",
         "qr-routes": "admin",
-        "hub-requests": "staff"
+        "hub-requests": "staff",
+        "team-hq": "staff"
       },
       "group": "staff"
     },
