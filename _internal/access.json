@@ -227,6 +227,14 @@
         "so-falcon": "staff"
       },
       "group": "contractor"
+    },
+    "richard@trudms.com": {
+      "name": "Richard Creith",
+      "hash": "pbkdf2$210000$9d1c16984fdc1086b0be6c0570424756$7dfc610b1bc3107ac4ca7e2b660332106b5ba1c0e7ebf83cddf6e7bf43f59302",
+      "access": {
+        "hub": "staff"
+      },
+      "group": "contractor"
     }
   }
 }
