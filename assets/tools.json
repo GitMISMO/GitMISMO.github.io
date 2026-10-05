@@ -40,6 +40,19 @@
       "path": "/website-migration/"
     },
     {
+      "key": "team-hq",
+      "label": "Team HQ",
+      "colour": "#0D314C",
+      "group": "Planning",
+      "path": "/team-hq/"
+    },
+    {
+      "key": "team-hq-private",
+      "label": "Team HQ Private Notes",
+      "colour": "#0D314C",
+      "group": "Planning"
+    },
+    {
       "key": "sponsorship",
       "label": "Sponsorship Portal",
       "colour": "#0EA5E9",
