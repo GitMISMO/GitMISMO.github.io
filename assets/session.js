@@ -67,13 +67,13 @@
      panel's People & Access reads too, so a tool added there appears in both (Perry, 1 Oct
      2026). This copy is only the fallback for a page that can't read that file. */
   var TOOLS = [
-    { key: "hub", name: "Initiative Hub", path: "/initiative-hub/", group: "Standards" },
-    { key: "glossary", name: "Business Glossary Console", path: "/glossary/console/", group: "Standards" },
-    { key: "hub-requests", name: "Work Requests", path: "/initiative-hub/work-requests.html", group: "Standards" },
+    { key: "hub", name: "Initiative Hub", path: "/initiative-hub/", group: "Standards & Tools" },
+    { key: "glossary", name: "Business Glossary Console", path: "/glossary/console/", group: "Standards & Tools" },
+    { key: "hub-requests", name: "Work Requests", path: "/initiative-hub/work-requests.html", group: "Standards & Tools" },
+    { key: "qr", name: "QR Code Manager", path: "/QR/", group: "Standards & Tools" },
     { key: "summit-hq", name: "Summit HQ", path: "/summit-hq/", group: "Planning" },
     { key: "website-migration", name: "Website Migration HQ", path: "/website-migration/", group: "Planning" },
     { key: "sponsorship", name: "Sponsorship Portal", path: "/sponsorship/", group: "Sponsorship" },
-    { key: "qr", name: "QR Code Manager", path: "/QR/", group: "QR Codes" },
     { key: "so-phoenix", name: "Phoenix Oversight Group LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
     { key: "so-actualize", name: "Actualize Consulting LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
     { key: "so-trex", name: "Tidgewell Results eXperience LLC", path: "/service-orders/", group: "Service Orders and Agreements" },

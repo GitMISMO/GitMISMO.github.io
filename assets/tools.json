@@ -5,7 +5,7 @@
       "key": "hub",
       "label": "Initiative Hub",
       "colour": "#2A4DFF",
-      "group": "Standards",
+      "group": "Standards & Tools",
       "path": "/initiative-hub/",
       "also": [
         "hub-files"
@@ -15,15 +15,25 @@
       "key": "glossary",
       "label": "Business Glossary Console",
       "colour": "#0F9D77",
-      "group": "Standards",
+      "group": "Standards & Tools",
       "path": "/glossary/console/"
     },
     {
       "key": "hub-requests",
       "label": "Work Requests",
       "colour": "#14486E",
-      "group": "Standards",
+      "group": "Standards & Tools",
       "path": "/initiative-hub/work-requests.html"
+    },
+    {
+      "key": "qr",
+      "label": "QR Code Manager",
+      "colour": "#2477B8",
+      "group": "Standards & Tools",
+      "path": "/QR/",
+      "also": [
+        "qr-routes"
+      ]
     },
     {
       "key": "summit-hq",
@@ -58,16 +68,6 @@
       "colour": "#0EA5E9",
       "group": "Sponsorship",
       "path": "/sponsorship/"
-    },
-    {
-      "key": "qr",
-      "label": "QR Code Manager",
-      "colour": "#2477B8",
-      "group": "QR Codes",
-      "path": "/QR/",
-      "also": [
-        "qr-routes"
-      ]
     },
     {
       "key": "so-phoenix",
