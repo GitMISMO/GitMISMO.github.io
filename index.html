@@ -224,21 +224,10 @@ var APPS=[
    entries:[{name:'Business Glossary',sub:'The public glossary: search and browse every term',href:'/'},
             {name:'Business Glossary Console',sub:'Draft, stage and publish changes to the glossary',href:'/console/',console:true}]},
   {key:'hub',name:'Initiative Hub',base:'/initiative-hub',c:'#2A4DFF',
-   desc:'Workgroup dashboards, the meeting calendar, and initiatives still under consideration.',
-   entries:[{name:'Initiative Hub',sub:'Every initiative, by domain, plus the meeting calendar',href:'/'}],
-   groups:[
-    {label:'Active initiatives',pages:[
-      {badge:'MCD',name:'Mortgage Compliance Dataset',sub:'Workgroup dashboard',href:'/mcd-dashboard.html'},
-      {badge:'LBDS',name:'Loan Boarding Data Segment',sub:'Workgroup dashboard',href:'/lbds-dashboard.html'},
-      {badge:'CCS',name:'Common Confidence Score',sub:'Workgroup dashboard',href:'/ccs-dashboard.html'},
-      {badge:'TPA',name:'Tri-Party eNote Bailee Agreement',sub:'Workgroup dashboard',href:'/tpa-dashboard.html'},
-      {badge:'TOD',name:'Title Order Dataset Specification',sub:'Workgroup dashboard',href:'/title-order-dashboard.html'},
-      {badge:'AVM',name:'AVM Testing Guidance and Best Practices',sub:'Workgroup dashboard',href:'/avm-testing-dashboard.html'}]},
-    {label:'Potential initiatives',pages:[
-      {badge:'AI',name:'Consumer Facing AI Disclosure Language',sub:'Artificial Intelligence, in progress',href:'/potential.html?id=consumer-facing-ai-disclosure-language'},
-      {badge:'NEW',name:'Log a potential initiative',sub:'Upload and review',href:'/potential-edit.html'}]},
-    {label:'Schedule',pages:[{badge:'CAL',name:'Meeting calendar',sub:'Every workgroup, filterable',href:'/calendar.html'}]},
-    {label:'Work requests',key:'hub-requests',pages:[{badge:'WR',name:'Work Requests',sub:'Submit and follow requests to update a MISMO standard',href:'/work-requests.html'}]}]},
+   desc:'Every initiative by domain, the ones still under consideration, and requests to update a standard.',
+   entries:[{name:'Initiative Hub',sub:'Every initiative, by domain, plus the meeting calendar',href:'/'},
+            {name:'Potential Initiatives',sub:'Initiatives still under consideration',href:'/#potential'},
+            {name:'Work Requests',sub:'Submit and follow requests to update a MISMO standard',href:'/work-requests.html',key:'hub-requests'}]},
   {key:'service-orders',name:'Service Orders and Agreements',base:'/service-orders',c:'#E11D48',
    desc:'FY 2027 service orders and MSA extensions: what each contracting company has been sent, what they have accepted, and the hours logged against each order.',
    entries:[{name:'Service Orders and Agreements',sub:'Review and accept orders, and log hours',href:'/'}]},
@@ -285,10 +274,11 @@ function render(){
   var html='';
   VIS.forEach(function(a){
     var toolHit=hit(a.name,a.desc);
-    var es=a.entries.filter(function(e){return toolHit||hit(e.name,e.sub);});
+    var mine=a.entries.filter(function(e){return !e.key||may(e.key);});
+    var es=mine.filter(function(e){return toolHit||hit(e.name,e.sub);});
     var gs=(a.groups||[]).filter(function(g){return !g.key||may(g.key);}).map(function(g){return {label:g.label,pages:g.pages.filter(function(p){return toolHit||hit(p.name,p.sub,p.badge,g.label);})};}).filter(function(g){return g.pages.length;});
     if(q&&!toolHit&&!es.length&&!gs.length) return;
-    if(!es.length) es=a.entries;
+    if(!es.length) es=mine;
     var n=pagesOf(a), more=(a.groups||[]).filter(function(g){return !g.key||may(g.key);}).length>0, isOpen=more&&(!!q||open.has(a.key));
     var head='<span class="tdot" style="width:12px;height:12px;border-radius:3px;background:var(--c)"></span><h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em">'+esc(a.name)+'</h2><span class="path">'+esc(a.base)+'/</span>';
     html+='<section class="tool" id="'+a.key+'" style="--c:'+a.c+'">'+
@@ -317,7 +307,7 @@ function may(key){
   if(key==='service-orders'){ var acc=(RS.current()||{}).access||{}; return Object.keys(acc).some(function(k){return k.indexOf('so-')===0&&acc[k];}); }
   return !!RS.role(key);
 }
-function pagesOf(a){ return (a.groups||[]).filter(function(g){return !g.key||may(g.key);}).reduce(function(n,g){return n+g.pages.length;},0)+a.entries.length; }
+function pagesOf(a){ return (a.groups||[]).filter(function(g){return !g.key||may(g.key);}).reduce(function(n,g){return n+g.pages.length;},0)+a.entries.filter(function(e){return !e.key||may(e.key);}).length; }
 function buildNav(){
   nav.querySelectorAll('a[href^="#"]:not([href="#top"])').forEach(function(l){ l.remove(); });
   VIS.forEach(function(a){ nav.insertAdjacentHTML('beforeend','<a href="#'+a.key+'" title="'+esc(a.name)+'" style="--c:'+a.c+'"><span class="tdot"></span><span class="t">'+esc(a.name)+'</span><b class="count">'+pagesOf(a)+'</b></a>'); });
