@@ -216,6 +216,14 @@
        It gates what the page OFFERS. It is not the gate: every file this page fetches
        comes back through the relay, which checks the same thing server-side on every
        request. A page that only hid its controls would still be handing out its data. */
+    /* For a page that is not a tool, such as the home page: anyone signed in may see it.
+       Shows the full-page sign-in otherwise, and resolves once there is a session. */
+    requireSignIn: function (opts) {
+      opts = opts || {};
+      function again() { return api.requireSignIn(opts); }
+      if (!read()) return openModal({ toolName: opts.toolName || 'MISMO Resources', title: opts.title, eyebrow: opts.eyebrow, gated: true }).then(again);
+      unwait(); return Promise.resolve(read());
+    },
     requireAccess: function (project, opts) {
       opts = opts || {};
       var shown = { toolName: opts.toolName, title: opts.title, eyebrow: opts.eyebrow, project: project, gated: opts.gated !== false };
@@ -469,6 +477,8 @@
         if (JSON.stringify(next) === JSON.stringify(cur)) return;
         try { localStorage.setItem(KEY, JSON.stringify(next)); } catch (e) {}
         renderAll();
+        /* Pages that show things by access (the home page) redraw on this. */
+        try { document.dispatchEvent(new CustomEvent('rs:access')); } catch (e) {}
       }, function () {});
   }
   api.refreshMe = function () { try { sessionStorage.removeItem(ME_AT); } catch (e) {} refreshMe(0); };

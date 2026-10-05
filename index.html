@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-rs-gate>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -179,7 +179,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <span class="logoplate"><svg role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
   <span class="mastrule"></span>
   <span class="hqname">Resources</span>
-  <span class="hqtop-r"><span class="eyebrow-m">Every MISMO tool</span>
+  <span class="hqtop-r"><span class="eyebrow-m">Your MISMO tools</span>
     <!-- The shared account bubble every tool shows in this spot (session.js fills it). -->
     <div id="rs-account"></div></span>
 </header>
@@ -198,7 +198,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
 <main id="top">
   <header class="mast"><div>
-    <div class="sub">Every dashboard, glossary and tool MISMO publishes, in one place.</div></div>
+    <div class="sub">Every MISMO tool you have access to, in one place.</div></div>
     <div class="stats"><div><b id="sTools"></b>tools</div><div><b id="sPages"></b>pages</div></div></header>
   <div class="toolsbar"><span>Tools</span><button type="button" class="expall" id="expAll">Expand all</button></div>
   <div id="tools"></div>
@@ -238,7 +238,7 @@ var APPS=[
       {badge:'AI',name:'Consumer Facing AI Disclosure Language',sub:'Artificial Intelligence, in progress',href:'/potential.html?id=consumer-facing-ai-disclosure-language'},
       {badge:'NEW',name:'Log a potential initiative',sub:'Upload and review',href:'/potential-edit.html'}]},
     {label:'Schedule',pages:[{badge:'CAL',name:'Meeting calendar',sub:'Every workgroup, filterable',href:'/calendar.html'}]},
-    {label:'Work requests',pages:[{badge:'WR',name:'Work Requests',sub:'Submit and follow requests to update a MISMO standard',href:'/work-requests.html'}]}]},
+    {label:'Work requests',key:'hub-requests',pages:[{badge:'WR',name:'Work Requests',sub:'Submit and follow requests to update a MISMO standard',href:'/work-requests.html'}]}]},
   {key:'service-orders',name:'Service Orders and Agreements',base:'/service-orders',c:'#E11D48',
    desc:'FY 2027 service orders and MSA extensions: what each contracting company has been sent, what they have accepted, and the hours logged against each order.',
    entries:[{name:'Service Orders and Agreements',sub:'Review and accept orders, and log hours',href:'/'}]},
@@ -267,6 +267,7 @@ var HOME='<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10.5
 function esc(s){return String(s).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 function pages(a){return (a.groups||[]).reduce(function(n,g){return n+g.pages.length;},0)+a.entries.length;}
 var q='';
+var VIS=APPS;   // the tools this person has access to; set by applyAccess() below
 /* Tools start collapsed: each shows what it is and its way in; the pages behind it open on
    request, and the page remembers which ones this reader opened. */
 var STORE='resources:home:open', open=new Set();
@@ -282,13 +283,13 @@ function groupsHTML(a,gs){ return gs.map(function(g){return '<div class="grp">'+
       :'<a class="pg" href="'+BASE+(p.url||a.base+p.href)+'">'+inner+'<span class="arr">→</span></a>';}).join('');}).join(''); }
 function render(){
   var html='';
-  APPS.forEach(function(a){
+  VIS.forEach(function(a){
     var toolHit=hit(a.name,a.desc);
     var es=a.entries.filter(function(e){return toolHit||hit(e.name,e.sub);});
-    var gs=(a.groups||[]).map(function(g){return {label:g.label,pages:g.pages.filter(function(p){return toolHit||hit(p.name,p.sub,p.badge,g.label);})};}).filter(function(g){return g.pages.length;});
+    var gs=(a.groups||[]).filter(function(g){return !g.key||may(g.key);}).map(function(g){return {label:g.label,pages:g.pages.filter(function(p){return toolHit||hit(p.name,p.sub,p.badge,g.label);})};}).filter(function(g){return g.pages.length;});
     if(q&&!toolHit&&!es.length&&!gs.length) return;
     if(!es.length) es=a.entries;
-    var n=pages(a), more=(a.groups||[]).length>0, isOpen=more&&(!!q||open.has(a.key));
+    var n=pagesOf(a), more=(a.groups||[]).filter(function(g){return !g.key||may(g.key);}).length>0, isOpen=more&&(!!q||open.has(a.key));
     var head='<span class="tdot" style="width:12px;height:12px;border-radius:3px;background:var(--c)"></span><h2 style="margin:0;font-size:17px;font-weight:700;letter-spacing:-.01em">'+esc(a.name)+'</h2><span class="path">'+esc(a.base)+'/</span>';
     html+='<section class="tool" id="'+a.key+'" style="--c:'+a.c+'">'+
       (more?'<button class="thb" type="button" data-tog="'+a.key+'" aria-expanded="'+isOpen+'" aria-controls="more-'+a.key+'">'+CHV+head+'<span class="cnt">'+(n-a.entries.length)+' more page'+(n-a.entries.length===1?'':'s')+'</span></button>'
@@ -297,20 +298,35 @@ function render(){
       (more?'<div id="more-'+a.key+'"'+(isOpen?'':' hidden')+'>'+groupsHTML(a,gs)+'</div>':'')+'</div></section>';
   });
   var el=document.getElementById('tools');
-  el.innerHTML=html||'<div class="card"><div class="empty">Nothing matches that search.</div></div>';
+  el.innerHTML=html||'<div class="card"><div class="empty">'+(VIS.length?'Nothing matches that search.':'Your account doesn\u2019t have access to any tools yet. A MISMO administrator can add them in People &amp; Access.')+'</div></div>';
   el.style.cssText='display:flex;flex-direction:column;gap:18px';
-  var all=APPS.filter(function(a){return (a.groups||[]).length;}).every(function(a){return open.has(a.key);});
+  var all=VIS.filter(function(a){return (a.groups||[]).length;}).every(function(a){return open.has(a.key);});
   var ex=document.getElementById('expAll'); ex.textContent=all?'Collapse all':'Expand all'; ex.dataset.all=all?'1':'';
 }
-document.getElementById('expAll').onclick=function(){ if(this.dataset.all) open.clear(); else APPS.forEach(function(a){ if((a.groups||[]).length) open.add(a.key);}); remember(); render(); spy(); };
+document.getElementById('expAll').onclick=function(){ if(this.dataset.all) open.clear(); else VIS.forEach(function(a){ if((a.groups||[]).length) open.add(a.key);}); remember(); render(); spy(); };
 /* A tool picked in the sidebar opens as well as scrolling into view. */
 document.getElementById('railnav').addEventListener('click',function(e){ var l=e.target.closest('a'); if(!l) return; var k=l.getAttribute('href').slice(1);
-  if(APPS.some(function(a){return a.key===k&&(a.groups||[]).length;})&&!open.has(k)){ open.add(k); remember(); render(); } });
+  if(VIS.some(function(a){return a.key===k&&(a.groups||[]).length;})&&!open.has(k)){ open.add(k); remember(); render(); } });
 var nav=document.getElementById('railnav');
-APPS.forEach(function(a){ nav.insertAdjacentHTML('beforeend','<a href="#'+a.key+'" title="'+esc(a.name)+'" style="--c:'+a.c+'"><span class="tdot"></span><span class="t">'+esc(a.name)+'</span><b class="count">'+pages(a)+'</b></a>'); });
-var total=APPS.reduce(function(n,a){return n+pages(a);},0);
-document.getElementById('nAll').textContent=APPS.length;
-document.getElementById('sTools').textContent=APPS.length; document.getElementById('sPages').textContent=total;
+/* What this person may reach. Platform administrators see every tool; everyone else sees the
+   tools their access covers. Service Orders is one tool with a key per company; the Hub's Work
+   Requests group has its own key. Without the sign-in script, everything shows. */
+function may(key){
+  var RS=window.ResourcesSession; if(!RS||!RS.current()) return true;
+  if(RS.isPlatformAdmin&&RS.isPlatformAdmin()) return true;
+  if(key==='service-orders'){ var acc=(RS.current()||{}).access||{}; return Object.keys(acc).some(function(k){return k.indexOf('so-')===0&&acc[k];}); }
+  return !!RS.role(key);
+}
+function pagesOf(a){ return (a.groups||[]).filter(function(g){return !g.key||may(g.key);}).reduce(function(n,g){return n+g.pages.length;},0)+a.entries.length; }
+function buildNav(){
+  nav.querySelectorAll('a[href^="#"]:not([href="#top"])').forEach(function(l){ l.remove(); });
+  VIS.forEach(function(a){ nav.insertAdjacentHTML('beforeend','<a href="#'+a.key+'" title="'+esc(a.name)+'" style="--c:'+a.c+'"><span class="tdot"></span><span class="t">'+esc(a.name)+'</span><b class="count">'+pagesOf(a)+'</b></a>'); });
+  var total=VIS.reduce(function(n,a){return n+pagesOf(a);},0);
+  document.getElementById('nAll').textContent=VIS.length;
+  document.getElementById('sTools').textContent=VIS.length; document.getElementById('sPages').textContent=total;
+}
+function applyAccess(){ VIS=APPS.filter(function(a){return may(a.key);}); buildNav(); render(); spy(); }
+buildNav();
 document.getElementById('tools').addEventListener('click',function(e){
   var t=e.target.closest('[data-tog]'); if(!t) return;
   var k=t.dataset.tog; if(open.has(k)) open.delete(k); else open.add(k); remember(); render();
@@ -319,8 +335,8 @@ document.getElementById('tools').addEventListener('click',function(e){
 document.getElementById('q').addEventListener('input',function(e){ q=e.target.value.trim().toLowerCase(); render(); });
 /* which tool is on screen */
 function spy(){
-  var cur='top'; APPS.forEach(function(a){ var el=document.getElementById(a.key); if(el&&el.getBoundingClientRect().top<140) cur=a.key; });
-  if(window.scrollY>0&&window.innerHeight+window.scrollY>=document.body.scrollHeight-4) cur=APPS[APPS.length-1].key;
+  var cur='top'; VIS.forEach(function(a){ var el=document.getElementById(a.key); if(el&&el.getBoundingClientRect().top<140) cur=a.key; });
+  if(VIS.length&&window.scrollY>0&&window.innerHeight+window.scrollY>=document.body.scrollHeight-4) cur=VIS[VIS.length-1].key;
   nav.querySelectorAll('a').forEach(function(x){ if(x.getAttribute('href')==='#'+cur) x.setAttribute('aria-current','true'); else x.removeAttribute('aria-current'); });
 }
 window.addEventListener('scroll',spy,{passive:true});
@@ -334,5 +350,17 @@ themeLabel();
 render(); spy();
 </script>
 <script src="/assets/session.js"></script>
+<script>
+  /* The home page is behind the sign-in and shows only the tools this person has (Perry,
+     5 Oct 2026). data-rs-gate keeps it hidden until someone is signed in; the list is drawn
+     from their access, and redrawn when it changes. */
+  (function(){
+    var RS=window.ResourcesSession;
+    if(!RS){ document.documentElement.classList.remove('rs-wait'); return; }
+    RS.requireSignIn({ toolName:'MISMO Resources', eyebrow:'Programs & Operations' }).then(applyAccess, function(){ document.documentElement.classList.remove('rs-wait'); });
+    RS.onChange(function(s){ if(!s) location.reload(); else applyAccess(); });
+    document.addEventListener('rs:access', applyAccess);
+  })();
+</script>
 </body>
 </html>
