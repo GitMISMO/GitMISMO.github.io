@@ -73,6 +73,8 @@ added there too (see the checklist above).
 
 The search also finds initiatives and workgroups (`assets/home-index.json`, rebuilt with
 `python3 _internal/build-home-index.py ../initiative-hub` when an initiative is added or renamed)
-and potential initiatives (read live from the Hub). Business Glossary terms are deliberately left
+and potential initiatives (read live from the Hub). Domain acronyms (the `abbr` on the Hub's domainMeta, such as
+MCD for Mortgage Compliance) are searchable too: an initiative or workgroup in, or naming, that domain
+answers to its acronym. A search of two letters alone is treated as an acronym and matched whole. Business Glossary terms are deliberately left
 out; the glossary has its own search.
 

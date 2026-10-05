@@ -51,7 +51,7 @@ function scoreEntry(e, qWords, typing){
     const w = stem(raw), last = typing && raw === qWords[qWords.length - 1]; let best = 0, reason = '';
     const test = (list, pts, label) => { if (best >= pts) return;
       if (list.includes(w)){ best = pts; reason = label ? raw : ''; return; }
-      if (w.length >= (last ? 2 : 3) && list.some(x => x.startsWith(w) || x.startsWith(raw))){ best = pts * .8; reason = w.length < 3 ? '\u0000short' : ''; return; } };
+      if (w.length >= (last && qWords.length > 1 ? 2 : 3) && list.some(x => x.startsWith(w) || x.startsWith(raw))){ best = pts * .8; reason = w.length < 3 ? '\u0000short' : ''; return; } };
     test(title, 3, ''); test(place, 2, ''); test(ctx, 2, 'ctx');
     if (best < 1.5){ const rel = relatedTo(w); const hitRel = rel.find(r => title.includes(r) || ctx.includes(r) || place.includes(r)); if (hitRel){ best = 1.5; reason = raw + ' \u2192 ' + hitRel; } }
     if (best < 1 && w.length >= 4){ const all = title.concat(ctx, place); const near = all.find(x => x.length >= 4 && lev(w, x) <= 1); if (near){ best = 1; reason = raw + ' \u2192 ' + near; } }
@@ -88,7 +88,7 @@ function scoreItem(c, qWords, phrase, typing){
   let score = 0, strong = 0;
   qWords.forEach((raw, qi) => {
     const w = stem(raw), last = typing && qi === qWords.length - 1; let best = 0, isStrong = false;
-    const minPrefix = last ? 2 : 4;   /* the word still being typed counts as the start of a word */
+    const minPrefix = last ? (qWords.length > 1 ? 2 : 3) : 4;   /* the word still being typed counts as the start of a word; two letters alone are an acronym ("MI"), matched whole */
     if (c.title.includes(w)){ best = 3; isStrong = true; }
     else if (w.length >= minPrefix && c.title.some(x => x.startsWith(raw) || x.startsWith(w))){ best = 2.4; isStrong = true; }   /* a finished short word ("tri") must match whole */
     else if (c.alias.includes(w)){ best = 2.5; isStrong = true; }
@@ -311,10 +311,10 @@ function loadContent(){
   if (contentState !== 'none') return; contentState = 'loading';
   const get = u => fetch(u, { cache:'no-cache' }).then(r => r.ok ? r.json() : null).catch(() => null);
   Promise.all([get('/assets/home-index.json'), get('/initiative-hub/data/potential/index.json')]).then(([idx, pot]) => {
-    const items = (idx && idx.items) || [];
+    const items = (idx && idx.items) || [], abbr = (idx && idx.abbr) || {};   /* domain acronyms, e.g. Mortgage Compliance: MCD */
     const ids = (pot && pot.ids) || [];
     return Promise.all(ids.map(id => get('/initiative-hub/data/potential/' + encodeURIComponent(id) + '.json').then(d => d && ({
-      t: d.name || id, k: 'Potential initiative', o: 'hub', d: (d.summary || '').slice(0, 150), x: d.domain || '', h: '/initiative-hub/potential.html?id=' + encodeURIComponent(id) })))).then(ps => items.concat(ps.filter(Boolean)));
+      t: d.name || id, k: 'Potential initiative', o: 'hub', d: (d.summary || '').slice(0, 150), x: [d.domain || ''].concat(Object.keys(abbr).filter(k => k === d.domain || (d.name || '').toLowerCase().includes(k.toLowerCase())).map(k => abbr[k])).join(' '), h: '/initiative-hub/potential.html?id=' + encodeURIComponent(id) })))).then(ps => items.concat(ps.filter(Boolean)));
   }).then(list => { CONTENT = list; CIDX = null; contentState = 'ready'; if ($('#q').value.trim()) drawResults(); });
 }
 $('#q').addEventListener('focus', loadContent);

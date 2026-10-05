@@ -1,12 +1,17 @@
 {
 "built": "see _internal/build-home-index.py",
+"abbr": {
+"Mortgage Compliance": "MCD",
+"Artificial Intelligence": "AI",
+"Mortgage Insurance": "MI"
+},
 "items": [
 {
 "t": "Mortgage Compliance Dataset",
 "k": "Initiative",
 "o": "hub",
 "d": "A standard set of loan data fields and delivery file format that mortgage lenders and independent mortgage banks provide to regulators for the…",
-"x": "Mortgage Compliance",
+"x": "Mortgage Compliance MCD",
 "h": "/initiative-hub/mcd-dashboard.html"
 },
 {
@@ -54,7 +59,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "An AI governance toolkit — five practical artifacts (Governance Policy, AI System Inventory, and System Risk Assessment now available; Performance…",
-"x": "Artificial Intelligence Governance",
+"x": "Artificial Intelligence Governance AI",
 "h": "/initiative-hub/"
 },
 {
@@ -102,7 +107,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A MISMO-backed replacement for the EDI 260 X12 Application for Mortgage Insurance Benefits — the dataset servicers use to file claims with GSEs and…",
-"x": "Mortgage Insurance",
+"x": "Mortgage Insurance MI",
 "h": "/initiative-hub/"
 },
 {
@@ -262,7 +267,7 @@
 "k": "Workgroup",
 "o": "hub",
 "d": "Meetings on the Initiative Hub calendar",
-"x": "",
+"x": "MCD",
 "h": "/initiative-hub/calendar.html"
 },
 {
@@ -270,7 +275,7 @@
 "k": "Workgroup",
 "o": "hub",
 "d": "Meetings on the Initiative Hub calendar",
-"x": "",
+"x": "MI",
 "h": "/initiative-hub/calendar.html"
 },
 {
