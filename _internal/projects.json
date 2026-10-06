@@ -8,7 +8,7 @@
     ]
   },
   "hub": {
-    "repo": "GitMISMO/initiative-hub",
+    "repo": "GitMISMO/initiative-hub-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
     "writable": [
