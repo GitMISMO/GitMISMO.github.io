@@ -13,6 +13,9 @@
     "origin": "https://resources.mismo.org",
     "writable": [
       "data/"
+    ],
+    "readable": [
+      "stakeholder-types.json"
     ]
   },
   "glossary": {
