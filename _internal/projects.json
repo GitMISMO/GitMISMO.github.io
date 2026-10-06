@@ -148,20 +148,29 @@
     ]
   },
   "team-hq": {
-      "repo": "GitMISMO/team-hq-data",
-      "branch": "main",
-      "origin": "https://resources.mismo.org",
-      "writable": [
-          "data/",
-          "receipts/"
+    "repo": "GitMISMO/team-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/",
+      "receipts/",
+      "attachments/"
+    ],
+    "ask": true,
+    "membersOnly": {
+      "syncs": [],
+      "syncitems": [],
+      "expenses": [
+        "jcritchley@mismo.org"
       ]
+    }
   },
   "team-hq-private": {
-      "repo": "GitMISMO/team-hq-private-data",
-      "branch": "main",
-      "origin": "https://resources.mismo.org",
-      "writable": [
-          "data/"
-      ]
+    "repo": "GitMISMO/team-hq-private-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
   }
 }
