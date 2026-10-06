@@ -55,7 +55,8 @@
         "hub": "staff",
         "hub-files": "staff",
         "hub-requests": "staff",
-        "so-phoenix": "staff"
+        "so-phoenix": "staff",
+        "summit-hq": "view"
       },
       "group": "contractor"
     },
@@ -91,7 +92,8 @@
       "access": {
         "hub": "staff",
         "hub-files": "staff",
-        "hub-requests": "staff"
+        "hub-requests": "staff",
+        "summit-hq": "view"
       },
       "group": "contractor"
     },
@@ -103,7 +105,8 @@
         "hub-files": "staff",
         "hub-requests": "staff",
         "glossary": "staff",
-        "so-phoenix": "staff"
+        "so-phoenix": "staff",
+        "summit-hq": "view"
       },
       "group": "contractor"
     },
@@ -113,7 +116,8 @@
       "access": {
         "hub": "staff",
         "hub-files": "staff",
-        "hub-requests": "staff"
+        "hub-requests": "staff",
+        "summit-hq": "view"
       },
       "group": "contractor"
     },
@@ -125,7 +129,8 @@
         "website-migration": "staff",
         "hub-files": "staff",
         "hub-requests": "staff",
-        "so-trex": "staff"
+        "so-trex": "staff",
+        "summit-hq": "view"
       },
       "group": "contractor"
     },
