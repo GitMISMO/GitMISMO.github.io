@@ -63,6 +63,13 @@
       "group": "Planning"
     },
     {
+      "key": "meeting-trackers",
+      "label": "Meeting Trackers",
+      "colour": "#6D28D9",
+      "group": "Planning",
+      "path": "/meeting-trackers/"
+    },
+    {
       "key": "sponsorship",
       "label": "Sponsorship Portal",
       "colour": "#0EA5E9",

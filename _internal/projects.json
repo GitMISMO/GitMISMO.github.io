@@ -172,5 +172,13 @@
     "writable": [
       "data/"
     ]
+  },
+  "meeting-trackers": {
+    "repo": "GitMISMO/meeting-trackers-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
   }
 }

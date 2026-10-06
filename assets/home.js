@@ -18,6 +18,7 @@ const CONTEXT = {
   'website-migration:Check the migration': 'website site web page pages migration move sitefinity higher logic launch cutover redirects',
   'team-hq:Open my board': 'board tasks task todo to-do plan plans projects priorities today key dates team meeting',
   'team-hq:Jot it down': 'note notes jot quick idea reminder remember capture',
+  'meeting-trackers:Track meeting attendance': 'meeting meetings attendance attend attended attendee attendees tracker trackers workgroup dwg cop roster participation regulars summit session sessions who came member 360 activity',
   'sponsorship:Track a sponsor': 'sponsor sponsors sponsorship exhibitor exhibitors booth prospect prospects pipeline commitment payment payments invoice revenue',
   'sponsorship:Send the prospectus': 'prospectus sponsorship packet brochure tiers benefits levels pricing send share',
   'so:Log hours on a service order': 'hours time timesheet log logging billing bill invoice worked effort contractor service order',
@@ -125,6 +126,7 @@ const P = {
   summit:'M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z M8 3v4 M16 3v4 M3 10h18',
   website:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18 M3 12h18 M12 3c3 3 3 15 0 18 M12 3c-3 3-3 15 0 18',
   team:'M9 11a3.5 3.5 0 1 0 0-7a3.5 3.5 0 1 0 0 7 M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M17 11a3 3 0 1 0 0-6 M21 20c0-2.6-1.7-4.8-4-5.6',
+  tracker:'M9 3h6v3H9z M7 4.5H5V21h14V4.5h-2 M8.5 13.5l2.5 2.5 4.5-5',
   qr:'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h2v2h-2z M18 14h2v2h-2z M14 18h2v2h-2z M18 18h2v2h-2z',
   plus:'M12 5v14 M5 12h14', book:'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z', clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18 M12 7v5l3 2',
   bulb:'M9 18h6 M10 21h4 M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z', edit:'M4 20h4L19 9l-4-4L4 16v4z M13.5 6.5l4 4',
@@ -142,6 +144,7 @@ const TOOLS = [
   { key:'summit-hq', name:'Summit HQ', c:'#B45309', icon:'summit', sec:'Planning' },
   { key:'website-migration', name:'Website Migration HQ', c:'#475569', icon:'website', sec:'Planning' },
   { key:'team-hq', name:'Team HQ', c:'#0D314C', icon:'team', sec:'Planning' },
+  { key:'meeting-trackers', name:'Meeting Trackers', c:'#6D28D9', icon:'tracker', sec:'Planning' },
   { key:'sponsorship', name:'Sponsorship', c:'#0EA5E9', icon:'sponsorship', sec:'Sponsorship' },
   { key:'so', name:'Service Orders and Agreements', c:'#E11D48', icon:'so', sec:'Service Orders and Agreements' },
 ];
@@ -153,11 +156,12 @@ const ENTRIES = {
   'summit-hq': [['Plan the summit', 'Summit HQ', 'summit', '/summit-hq/']],
   'website-migration': [['Check the migration', 'Website Migration HQ', 'website', '/website-migration/']],
   'team-hq': [['Open my board', 'Team HQ', 'team', '/team-hq/'], ['Jot it down', 'Team HQ', 'note', '/team-hq/']],
+  'meeting-trackers': [['Track meeting attendance', 'Meeting Trackers', 'tracker', '/meeting-trackers/']],
   'sponsorship': [['Track a sponsor', 'Sponsorship Portal', 'sponsorship', '/sponsorship/'], ['Send the prospectus', '2027 Summit Sponsorship Prospectus', 'send', '/sponsorship-prospectus/']],
   'so': [['Log hours on a service order', 'Service Orders and Agreements', 'clock', '/service-orders/'], ['Review and accept an order', 'Service Orders and Agreements', 'check', '/service-orders/']],
 };
 /* Which tool's first entry leads, for the chips and the default pins. */
-const LEAD = ['hub', 'glossary', 'so', 'team-hq', 'qr', 'sponsorship', 'summit-hq', 'website-migration'];
+const LEAD = ['hub', 'glossary', 'so', 'team-hq', 'qr', 'sponsorship', 'summit-hq', 'website-migration', 'meeting-trackers'];
 /* The person signed in: their tools and level in each, from the sign-in (session.js). */
 const RS = window.ResourcesSession;
 const ROLE_NAME = { admin:'Admin', staff:'Edit', view:'View' };
