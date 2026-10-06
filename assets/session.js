@@ -374,6 +374,17 @@
     '.rs-fld input{width:100%;box-sizing:border-box;font:inherit;font-size:13.5px;padding:9px 11px;border:1px solid var(--rs-line);',
     'border-radius:9px;background:var(--rs-paper);color:var(--rs-ink)}',
     '.rs-fld input:focus{outline:none;border-color:var(--rs-brand);background:var(--rs-card)}',
+    /* Show-password eye (Perry, 6 Oct 2026): one reliable button in every password box, on the
+       sign-in screen, Change password and /reset-password.html. Edge's own reveal is hidden: it
+       appears only once typing starts and vanishes on blur, which read as glitchy. */
+    '.rs-pw{position:relative;display:block}',
+    '.rs-pw input{padding-right:42px !important}',
+    '.rs-pw input::-ms-reveal,.rs-pw input::-ms-clear{display:none}',
+    '.rs-eye{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:32px;height:32px;padding:0;border:0;border-radius:7px;',
+    'background:transparent;color:var(--rs-soft,#546F88);cursor:pointer;display:inline-flex;align-items:center;justify-content:center}',
+    '.rs-eye:hover{color:var(--rs-ink,#0F314C);background:rgba(127,127,127,.13)}',
+    '.rs-eye:focus-visible{outline:2px solid var(--rs-brand,#2C74A6);outline-offset:1px}',
+    '.rs-eye svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}',
     '.rs-go{width:100%;font:inherit;font-size:13.5px;font-weight:600;cursor:pointer;padding:10px 14px;border-radius:9px;',
     'border:1px solid var(--rs-brand);background:var(--rs-brand);color:#fff}',
     '.rs-go[disabled]{opacity:.6;cursor:default}',
@@ -580,6 +591,7 @@
       '<button type="button" class="rs-go" data-rs-pgo>Change password</button><button type="button" class="rs-quiet" data-rs-pcancel>Cancel</button>' +
       '<div class="rs-note">Changing it signs you out everywhere else.</div></div></div>';
     document.body.appendChild(scrim);
+    passwordEyes(scrim);
     var cur = scrim.querySelector('#rs-pcur'), nw = scrim.querySelector('#rs-pnew'), nw2 = scrim.querySelector('#rs-pnew2'), checks = scrim.querySelector('.rs-checks');
     var go = scrim.querySelector('[data-rs-pgo]'), err = scrim.querySelector('[data-rs-err]'), errText = scrim.querySelector('[data-rs-errtext]');
     function paint() { checks.innerHTML = checksHTML(pwChecks(nw.value, s, nw2.value)); }
@@ -611,6 +623,35 @@
     setTimeout(function () { cur.focus(); }, 30);
   }
   api.pwChecks = pwChecks; api.checksHTML = checksHTML;   // for /reset-password.html
+
+  /* The show-password eye. Wraps each password box under root once; the button keeps the cursor
+     where it was (and the focus in the box), and spell-check stays off while it shows. */
+  var EYE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';
+  var EYE_OFF = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10.6 5.1A10.7 10.7 0 0 1 12 5c6.4 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2 M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a9.9 9.9 0 0 0 5.4-1.6 M9.9 9.9a3 3 0 0 0 4.2 4.2 M3 3l18 18"/></svg>';
+  function passwordEyes(root) {
+    var boxes = (root || document).querySelectorAll('input[type="password"]:not([data-rs-eye])');
+    Array.prototype.forEach.call(boxes, function (box) {
+      box.setAttribute('data-rs-eye', ''); box.spellcheck = false; box.setAttribute('autocapitalize', 'off'); box.setAttribute('autocorrect', 'off');
+      var wrap = document.createElement('span'); wrap.className = 'rs-pw';
+      var mb = window.getComputedStyle(box).marginBottom;                 /* the box's own spacing moves to the wrapper, so the eye centres on the box */
+      if (mb && mb !== '0px') { wrap.style.marginBottom = mb; box.style.marginBottom = '0'; }
+      box.parentNode.insertBefore(wrap, box); wrap.appendChild(box);
+      var btn = document.createElement('button');
+      btn.type = 'button'; btn.className = 'rs-eye'; if (box.id) btn.setAttribute('aria-controls', box.id);
+      function show(on) { btn.innerHTML = on ? EYE_OFF : EYE; btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+        btn.setAttribute('aria-label', on ? 'Hide password' : 'Show password'); btn.title = on ? 'Hide password' : 'Show password'; }
+      show(false);
+      btn.addEventListener('mousedown', function (e) { if (document.activeElement === box) e.preventDefault(); });   /* keep typing where you were */
+      btn.addEventListener('click', function () {
+        var focused = document.activeElement === box, a = box.selectionStart, z = box.selectionEnd, on = box.type === 'password';
+        box.type = on ? 'text' : 'password'; show(on);
+        /* switching the type resets the cursor to the start once the browser has redrawn the box, so it is put back then too */
+        if (focused) { box.focus(); var put = function () { try { box.setSelectionRange(a, z); } catch (e) {} }; put(); setTimeout(put, 0); }
+      });
+      wrap.appendChild(btn);
+    });
+  }
+  api.passwordEyes = passwordEyes;   // for /reset-password.html
   /* The reset page signs the person in with what the relay returned. */
   api.adopt = function (b) { write({ token: b.token, name: b.name || b.email, email: b.email, access: b.access || {}, platformAdmin: b.platformAdmin === true, passwords: true, expiresAt: b.expiresAt }); };
 
@@ -713,6 +754,7 @@
     document.body.appendChild(scrim);
     if (full) { root.classList.add('rs-locked'); unwait(); }
 
+    passwordEyes(scrim);
     var email = scrim.querySelector('#rs-email'), pass = scrim.querySelector('#rs-pass');
     var go = scrim.querySelector('[data-rs-go]'), err = scrim.querySelector('[data-rs-err]'), errText = scrim.querySelector('[data-rs-errtext]');
     var known = prev || lastKnown;
