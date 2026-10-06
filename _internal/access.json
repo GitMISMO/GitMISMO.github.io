@@ -236,6 +236,14 @@
         "so-trudigital": "staff"
       },
       "group": "contractor"
+    },
+    "gcombs@actualizeconsulting.com": {
+      "name": "Geran Combs",
+      "hash": "pbkdf2$210000$ed561014703245b01b8773a86770aa4d$d314b66d05a53ac999b3a174aa282d38505e4d4b64c8d5b4625ad6920a435355",
+      "access": {
+        "so-actualize": "staff"
+      },
+      "group": "contractor"
     }
   }
 }
