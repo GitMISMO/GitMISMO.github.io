@@ -52,7 +52,8 @@
       "notify/",
       "hours/",
       "revisions/",
-      "agreements/"
+      "agreements/",
+      "orders-public/"
     ],
     "readable": [
       "orders/"
@@ -67,7 +68,8 @@
       "notify/",
       "hours/",
       "revisions/",
-      "agreements/"
+      "agreements/",
+      "orders-public/"
     ],
     "readable": [
       "orders/"
@@ -82,7 +84,8 @@
       "notify/",
       "hours/",
       "revisions/",
-      "agreements/"
+      "agreements/",
+      "orders-public/"
     ],
     "readable": [
       "orders/"
@@ -97,7 +100,8 @@
       "notify/",
       "hours/",
       "revisions/",
-      "agreements/"
+      "agreements/",
+      "orders-public/"
     ],
     "readable": [
       "orders/"
@@ -112,7 +116,8 @@
       "notify/",
       "hours/",
       "revisions/",
-      "agreements/"
+      "agreements/",
+      "orders-public/"
     ],
     "readable": [
       "orders/"
@@ -182,6 +187,66 @@
     "origin": "https://resources.mismo.org",
     "writable": [
       "data/"
+    ]
+  },
+  "so-phoenix-hours": {
+    "repo": "GitMISMO/so-phoenix-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-actualize-hours": {
+    "repo": "GitMISMO/so-actualize-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-trex-hours": {
+    "repo": "GitMISMO/so-trex-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-falcon-hours": {
+    "repo": "GitMISMO/so-falcon-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-trudigital-hours": {
+    "repo": "GitMISMO/so-trudigital-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
     ]
   }
 }
