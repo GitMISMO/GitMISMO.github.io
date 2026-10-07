@@ -127,9 +127,19 @@
     try { s ? localStorage.setItem(KEY, JSON.stringify(s)) : localStorage.removeItem(KEY); } catch (e) {}
     changed();
   }
+  /* A gated page locks again the moment its session ends (Perry, 6 Oct 2026). Signing out from the account bubble,
+     a session expiring, or signing out in another tab cleared the session but left what was already on screen (the
+     admin console's accounts, say) readable until the page was reloaded. Saving was already refused; now nothing
+     stays on show: the page reloads, and its gate shows the full sign-in screen. A page the back button restores
+     from the browser's memory after signing out is reloaded the same way. */
+  var gatedPage = false, hadSession = !!read();
+  function relockIfSignedOut() { if (gatedPage && !read()) { location.reload(); return true; } return false; }
+  window.addEventListener('pageshow', function (e) { if (e.persisted) relockIfSignedOut(); });
   function changed() {
     scheduleExpiry();
     var s = read();
+    if (hadSession && !s && relockIfSignedOut()) return;
+    hadSession = !!s;
     listeners.forEach(function (fn) { try { fn(s); } catch (e) {} });
     renderAll();
   }
@@ -219,12 +229,14 @@
     /* For a page that is not a tool, such as the home page: anyone signed in may see it.
        Shows the full-page sign-in otherwise, and resolves once there is a session. */
     requireSignIn: function (opts) {
+      gatedPage = true;
       opts = opts || {};
       function again() { return api.requireSignIn(opts); }
       if (!read()) return openModal({ toolName: opts.toolName || 'MISMO Resources', title: opts.title, eyebrow: opts.eyebrow, gated: true }).then(again);
       unwait(); return Promise.resolve(read());
     },
     requireAccess: function (project, opts) {
+      gatedPage = true;
       opts = opts || {};
       var shown = { toolName: opts.toolName, title: opts.title, eyebrow: opts.eyebrow, project: project, gated: opts.gated !== false };
       function again() { return api.requireAccess(project, opts); }
