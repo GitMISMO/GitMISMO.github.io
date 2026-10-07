@@ -1,5 +1,5 @@
 {
-  "about": "Every tool on resources.mismo.org that has its own access, in the order the admin panel shows them. The admin panel's People & Access and every account menu read this one list: add a tool here (and to _internal/projects.json for the relay) and both show it. key is the relay project key; also lists keys always given the same access (never shown on their own); path is where the tool lives, for links and for knowing which tool a page belongs to; family marks tools shown together under one heading with an \"every one\" control in the admin panel (the Service Orders companies); menu is the name shown in the account menu when label alone would be unclear.",
+  "about": "Every tool on resources.mismo.org that has its own access, in the order the admin panel shows them. The admin panel's People & Access and every account menu read this one list: add a tool here (and to _internal/projects.json for the relay) and both show it. key is the relay project key; also lists keys always given the same access (never shown on their own); path is where the tool lives, for links and for knowing which tool a page belongs to; family marks tools shown together under one heading with an \"every one\" control in the admin panel (the Service Orders companies); menu is the name shown in the account menu when label alone would be unclear. A company's \"— Hours Only\" key is the SAME portal with a different permission: it reads orders-public/, which carries no rate and no fee, and writes only that person's hours. Give a facilitator Edit on the Hours Only row and No access on the company's own row — never both, or they keep the rates.",
   "tools": [
     {
       "key": "hub",
@@ -86,6 +86,15 @@
       "family": true
     },
     {
+      "key": "so-phoenix-hours",
+      "label": "Phoenix Oversight Group LLC — Hours Only",
+      "sum": "Hours Only, No Rates (Phoenix Oversight Group LLC)",
+      "menu": "Phoenix Oversight Group LLC (Hours Only)",
+      "colour": "#0F9D77",
+      "group": "Service Orders — Hours Only (No Rates)",
+      "path": "/service-orders/"
+    },
+    {
       "key": "so-actualize",
       "label": "Actualize Consulting LLC",
       "sum": "Service Orders (Actualize Consulting LLC)",
@@ -93,6 +102,15 @@
       "group": "Service Orders and Agreements",
       "path": "/service-orders/",
       "family": true
+    },
+    {
+      "key": "so-actualize-hours",
+      "label": "Actualize Consulting LLC — Hours Only",
+      "sum": "Hours Only, No Rates (Actualize Consulting LLC)",
+      "menu": "Actualize Consulting LLC (Hours Only)",
+      "colour": "#0F9D77",
+      "group": "Service Orders — Hours Only (No Rates)",
+      "path": "/service-orders/"
     },
     {
       "key": "so-trex",
@@ -104,6 +122,15 @@
       "family": true
     },
     {
+      "key": "so-trex-hours",
+      "label": "Tidgewell Results eXperience LLC — Hours Only",
+      "sum": "Hours Only, No Rates (Tidgewell Results eXperience LLC)",
+      "menu": "Tidgewell Results eXperience LLC (Hours Only)",
+      "colour": "#0F9D77",
+      "group": "Service Orders — Hours Only (No Rates)",
+      "path": "/service-orders/"
+    },
+    {
       "key": "so-falcon",
       "label": "Falcon Capital Advisors LLC",
       "sum": "Service Orders (Falcon Capital Advisors LLC)",
@@ -113,6 +140,15 @@
       "family": true
     },
     {
+      "key": "so-falcon-hours",
+      "label": "Falcon Capital Advisors LLC — Hours Only",
+      "sum": "Hours Only, No Rates (Falcon Capital Advisors LLC)",
+      "menu": "Falcon Capital Advisors LLC (Hours Only)",
+      "colour": "#0F9D77",
+      "group": "Service Orders — Hours Only (No Rates)",
+      "path": "/service-orders/"
+    },
+    {
       "key": "so-trudigital",
       "label": "TruDigital Mortgage Solutions LLC",
       "sum": "Service Orders (TruDigital Mortgage Solutions LLC)",
@@ -120,6 +156,15 @@
       "group": "Service Orders and Agreements",
       "path": "/service-orders/",
       "family": true
+    },
+    {
+      "key": "so-trudigital-hours",
+      "label": "TruDigital Mortgage Solutions LLC — Hours Only",
+      "sum": "Hours Only, No Rates (TruDigital Mortgage Solutions LLC)",
+      "menu": "TruDigital Mortgage Solutions LLC (Hours Only)",
+      "colour": "#0F9D77",
+      "group": "Service Orders — Hours Only (No Rates)",
+      "path": "/service-orders/"
     }
   ]
 }
