@@ -52,6 +52,10 @@
   if (window.ResourcesSession) return;           // loaded twice: keep the first
 
   var RELAY_URL = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws';
+  /* Wake the relay the moment a page starts (Perry, 7 Oct 2026). It is a Lambda function: after a quiet spell its
+     first answer pays a cold start, and every page's first data read waits on it. This request costs nothing to the
+     page (no answer is read, so no CORS is needed) and has the relay warming while the page and its fonts load. */
+  try { fetch(RELAY_URL + '/version', { mode: 'no-cors', cache: 'no-store', keepalive: true }).catch(function () {}); } catch (e) {}
   var LOGIN_PROJECT = 'hub';                     // sign-in is global; any project path works
   /* Where "Ask for access" writes to. A person who has been refused cannot be shown the
      administrator list — they cannot read it — so the address is named here instead. */
