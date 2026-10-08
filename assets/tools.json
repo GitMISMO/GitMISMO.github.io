@@ -30,7 +30,7 @@
       "label": "QR Code Manager",
       "colour": "#2477B8",
       "group": "Standards & Tools",
-      "path": "/QR/",
+      "path": "/qr/",
       "also": [
         "qr-routes"
       ]

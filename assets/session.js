@@ -104,7 +104,7 @@
     { key: "hub", name: "Initiative Hub", path: "/initiative-hub/", group: "Standards & Tools" },
     { key: "glossary", name: "Business Glossary Console", path: "/glossary/console/", group: "Standards & Tools" },
     { key: "hub-requests", name: "Work Requests", path: "/initiative-hub/work-requests.html", group: "Standards & Tools" },
-    { key: "qr", name: "QR Code Manager", path: "/QR/", group: "Standards & Tools" },
+    { key: "qr", name: "QR Code Manager", path: "/qr/", group: "Standards & Tools" },
     { key: "summit-hq", name: "Summit HQ", path: "/summit-hq/", group: "Planning" },
     { key: "website-migration", name: "Website Migration HQ", path: "/website-migration/", group: "Planning" },
     { key: "sponsorship", name: "Sponsorship Portal", path: "/sponsorship/", group: "Sponsorship" },

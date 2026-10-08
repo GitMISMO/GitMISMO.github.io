@@ -152,7 +152,7 @@ const TOOLS = [
 const ENTRIES = {
   'hub': [['Submit a work request', 'Work Requests', 'plus', '/initiative-hub/work-requests.html', 'hub-requests'], ['Browse potential initiatives', 'Potential Initiatives', 'bulb', '/initiative-hub/#potential'], ['Find an initiative', 'Initiative Hub', 'hub', '/initiative-hub/']],
   'glossary': [['Find a glossary term', 'Business Glossary', 'book', '/glossary/'], ['Propose or edit a term', 'Business Glossary Console', 'edit', '/glossary/console/']],
-  'qr': [['See all QR codes', 'QR Code Manager', 'qr', '/QR/'], ['Make a QR code', 'Make a New Code', 'plus', '/QR/#new'], ['See how codes are scanned', 'Scans', 'chart', '/QR/#scans']],
+  'qr': [['See all QR codes', 'QR Code Manager', 'qr', '/qr/'], ['Make a QR code', 'Make a New Code', 'plus', '/qr/#new'], ['See how codes are scanned', 'Scans', 'chart', '/qr/#scans']],
   'summit-hq': [['Plan the summit', 'Summit HQ', 'summit', '/summit-hq/']],
   'website-migration': [['Check the migration', 'Website Migration HQ', 'website', '/website-migration/']],
   'team-hq': [['Open my board', 'Team HQ', 'team', '/team-hq/'], ['Jot it down', 'Team HQ', 'note', '/team-hq/']],
