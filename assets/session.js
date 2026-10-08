@@ -56,6 +56,36 @@
      first answer pays a cold start, and every page's first data read waits on it. This request costs nothing to the
      page (no answer is read, so no CORS is needed) and has the relay warming while the page and its fonts load. */
   try { fetch(RELAY_URL + '/version', { mode: 'no-cors', cache: 'no-store', keepalive: true }).catch(function () {}); } catch (e) {}
+
+  /* The MISMO logo leads home, on every page that loads this file (Perry, 7 Oct 2026). Each tool draws its logo in a
+     plate (.logoplate or .plate); the plate becomes a link to the home page, keeping its classes so it looks exactly
+     the same, and grows a little on hover to show it can be clicked. A plate already inside a link is left alone. */
+  (function () {
+    var css = '[data-rs-home]{text-decoration:none;color:inherit;cursor:pointer;transition:transform .15s ease;transform-origin:left center}' +
+      '[data-rs-home]:hover,[data-rs-home]:focus-visible{transform:scale(1.06)}[data-rs-home]:focus-visible{outline:2px solid #50a4db;outline-offset:3px}';
+    function link() {
+      var plate = Array.prototype.find.call(document.querySelectorAll('.logoplate, .plate'), function (e) {
+        return e.querySelector('svg[aria-label^="MISMO"], img[alt^="MISMO"]'); });
+      if (!plate) return false;
+      if (plate.hasAttribute('data-rs-home')) return true;
+      if (plate.tagName === 'A' || plate.closest('a')) { (plate.tagName === 'A' ? plate : plate.closest('a')).setAttribute('data-rs-home', ''); return true; }
+      var a = document.createElement('a');
+      for (var i = 0; i < plate.attributes.length; i++) a.setAttribute(plate.attributes[i].name, plate.attributes[i].value);
+      a.href = '/'; a.setAttribute('data-rs-home', ''); a.setAttribute('aria-label', 'MISMO Resources home'); a.title = 'MISMO Resources home';
+      while (plate.firstChild) a.appendChild(plate.firstChild);
+      plate.parentNode.replaceChild(a, plate);
+      return true;
+    }
+    function go() {
+      if (!document.getElementById('rs-home-css')) { var st = document.createElement('style'); st.id = 'rs-home-css'; st.textContent = css; (document.head || document.documentElement).appendChild(st); }
+      if (link()) return;
+      /* a few tools draw their header after loading: watch briefly for the plate */
+      var mo = new MutationObserver(function () { if (link()) mo.disconnect(); });
+      mo.observe(document.documentElement, { childList: true, subtree: true });
+      setTimeout(function () { mo.disconnect(); }, 8000);
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
+  })();
   var LOGIN_PROJECT = 'hub';                     // sign-in is global; any project path works
   /* Where "Ask for access" writes to. A person who has been refused cannot be shown the
      administrator list — they cannot read it — so the address is named here instead. */
