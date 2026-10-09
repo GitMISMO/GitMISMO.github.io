@@ -1,6 +1,13 @@
 {
   "about": "Every tool on resources.mismo.org that has its own access, in the order the admin panel shows them. The admin panel's People & Access and every account menu read this one list: add a tool here (and to _internal/projects.json for the relay) and both show it. key is the relay project key; also lists keys always given the same access (never shown on their own); path is where the tool lives, for links and for knowing which tool a page belongs to; family marks tools shown together under one heading with an \"every one\" control in the admin panel (the Service Orders companies); menu is the name shown in the account menu when label alone would be unclear. A company's \"— Hours Only\" key is the SAME portal with a different permission: it reads orders-public/, which carries no rate and no fee, and writes only that person's hours. Give a facilitator Edit on the Hours Only row and No access on the company's own row — never both, or they keep the rates.",
   "tools": [
+             {
+           "key": "member-360",
+           "label": "Member 360",
+           "colour": "#0F7B5C",
+           "group": "Planning",
+           "path": "/member-360/"
+         },
     {
       "key": "hub",
       "label": "Initiative Hub",
