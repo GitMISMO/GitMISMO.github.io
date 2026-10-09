@@ -273,5 +273,13 @@
       "data/",
       "portal-data.json"
     ]
+  },
+  "financials": {
+    "repo": "GitMISMO/financials-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
   }
 }
