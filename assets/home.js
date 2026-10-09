@@ -142,7 +142,7 @@ const P = {
   sun:'M12 7.9a4.1 4.1 0 1 0 0 8.2a4.1 4.1 0 1 0 0-8.2 M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7',
   key:'M8 15a4 4 0 1 0 0 .01 M10.8 12.2L20 3M16 7l3 3' };
 /* The sections and tools, in the admin panel's order (assets/tools.json, 5 Oct 2026). */
-const SECTIONS = ['Standards & Tools', 'Planning', 'Certification', 'Sponsorship', 'Service Orders and Agreements'];
+const SECTIONS = ['Standards & Tools', 'Planning', 'Certification', 'Sponsorship'];   /* Service Orders sits in Certification on the home page (Perry, 9 Oct 2026) */
 const TOOLS = [
   { key:'hub', name:'Initiative Hub', c:'#2A4DFF', icon:'hub', sec:'Standards & Tools' },
   { key:'glossary', name:'Business Glossary', c:'#0F9D77', icon:'glossary', sec:'Standards & Tools' },
@@ -155,7 +155,7 @@ const TOOLS = [
   { key:'member-360', name:'Member 360', c:'#0F7B5C', icon:'member', sec:'Planning' },
   { key:'cms', name:'Certification Management System', c:'#BE123C', icon:'cert', sec:'Certification' },
   { key:'sponsorship', name:'Sponsorship', c:'#0EA5E9', icon:'sponsorship', sec:'Sponsorship' },
-  { key:'so', name:'Service Orders and Agreements', c:'#E11D48', icon:'so', sec:'Service Orders and Agreements' },
+  { key:'so', name:'Service Orders and Agreements', c:'#E11D48', icon:'so', sec:'Certification' },
 ];
 /* Every page the old home page offered, once each, worded as what people come to do. */
 const ENTRIES = {
