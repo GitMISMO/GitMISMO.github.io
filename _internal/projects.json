@@ -248,5 +248,13 @@
     "readable": [
       "orders-public/"
     ]
+  },
+  "iif-hq": {
+    "repo": "GitMISMO/iif-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
   }
 }
