@@ -107,6 +107,7 @@
     { key: "qr", name: "QR Code Manager", path: "/qr/", group: "Standards & Tools" },
     { key: "summit-hq", name: "Summit HQ", path: "/summit-hq/", group: "Planning" },
     { key: "website-migration", name: "Website Migration HQ", path: "/website-migration/", group: "Planning" },
+    { key: "iif-hq", name: "IIF Planning HQ", path: "/iif-hq/", group: "Planning" },
     { key: "sponsorship", name: "Sponsorship Portal", path: "/sponsorship/", group: "Sponsorship" },
     { key: "so-phoenix", name: "Phoenix Oversight Group LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
     { key: "so-actualize", name: "Actualize Consulting LLC", path: "/service-orders/", group: "Service Orders and Agreements" },

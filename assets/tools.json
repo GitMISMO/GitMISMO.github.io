@@ -70,6 +70,13 @@
       "path": "/meeting-trackers/"
     },
     {
+      "key": "iif-hq",
+      "label": "IIF Planning HQ",
+      "colour": "#4D7C0F",
+      "group": "Planning",
+      "path": "/iif-hq/"
+    },
+    {
       "key": "sponsorship",
       "label": "Sponsorship Portal",
       "colour": "#0EA5E9",
