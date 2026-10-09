@@ -179,6 +179,13 @@
       "colour": "#0F9D77",
       "group": "Service Orders — Hours Only (No Rates)",
       "path": "/service-orders/"
+    },
+    {
+      "key": "cms",
+      "label": "Certification Management System",
+      "colour": "#BE123C",
+      "group": "Certification",
+      "path": "/cms/"
     }
   ]
 }

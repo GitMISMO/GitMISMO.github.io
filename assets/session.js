@@ -109,6 +109,7 @@
     { key: "website-migration", name: "Website Migration HQ", path: "/website-migration/", group: "Planning" },
     { key: "iif-hq", name: "IIF Planning HQ", path: "/iif-hq/", group: "Planning" },
     { key: "member-360", name: "Member 360", path: "/member-360/", group: "Planning" },
+    { key: "cms", name: "Certification Management System", path: "/cms/", group: "Certification" },
     { key: "sponsorship", name: "Sponsorship Portal", path: "/sponsorship/", group: "Sponsorship" },
     { key: "so-phoenix", name: "Phoenix Oversight Group LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
     { key: "so-actualize", name: "Actualize Consulting LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
