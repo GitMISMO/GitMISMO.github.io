@@ -234,7 +234,9 @@
        than to the lowest level matters: a role this file does not know about must
        show as no access, so a page cannot offer something the relay will refuse. */
     role: function (project) {
-      var s = read(); if (!s || !s.access) return null;
+      var s = read(); if (!s) return null;
+      if (s.platformAdmin === true) return 'admin';           // administrators have every tool, new ones too (relay request 9)
+      if (!s.access) return null;
       var r = s.access[project];
       if (r === 'facilitator') return 'staff';              // renamed Sept 2026
       return r === 'admin' || r === 'staff' || r === 'view' ? r : null;
