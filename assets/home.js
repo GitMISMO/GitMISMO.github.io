@@ -14,6 +14,7 @@ const CONTEXT = {
   'qr:See all QR codes': 'qr code codes barcode link short link live expiring placed',
   'qr:Make a QR code': 'qr code create new make generate barcode link print flyer poster sign',
   'qr:See how codes are scanned': 'scans scanned scanning qr analytics statistics stats traffic usage count',
+  'member-360:Member 360': 'member members membership 360 renewals renew renewal outreach dues prospects organizations orgs levels specials stats contacts relationship',
   'iif-hq:Plan the IIF cycle': 'iif innovation investment fee fees invoicing invoice invoices collections billing cycle plan tasks key dates decisions risks raid last cycle',
   'summit-hq:Plan the summit': 'summit event conference meeting rooms room session sessions agenda schedule venue placement conflicts',
   'website-migration:Check the migration': 'website site web page pages migration move sitefinity higher logic launch cutover redirects',
@@ -122,6 +123,7 @@ const esc = v => String(v == null ? '' : v).replace(/&/g, '&amp;').replace(/</g,
 const store = { get(k, d){ try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }, set(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} } };
 const I = d => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
 const P = {
+  member:'M12 11.2a2.7 2.7 0 1 0 0-5.4 2.7 2.7 0 0 0 0 5.4 M7.6 17.4c.7-2 2.4-3.2 4.4-3.2s3.7 1.2 4.4 3.2 M20.5 12a8.5 8.5 0 1 1-2.5-6 M18 2.5V6h-3.5',
   iif:'M20.5 12a8.5 8.5 0 1 1-2.5-6 M18 2.5V6h-3.5 M12 7.5v9 M14.5 9.6c-.5-.8-1.4-1.2-2.5-1.2-1.4 0-2.5.8-2.5 1.8s1.1 1.5 2.5 1.8 2.5.8 2.5 1.8-1.1 1.8-2.5 1.8c-1.1 0-2-.4-2.5-1.2',
   hub:'M4 4h7v7H4z M13 4h7v7h-7z M4 13h7v7H4z M13 13h7v7h-7z', glossary:'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z M5 17a3 3 0 0 1 3-3h11',
   so:'M7 3h8l4 4v14H7z M15 3v4h4 M10 13l2 2 4-4', sponsorship:'M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z',
@@ -148,6 +150,7 @@ const TOOLS = [
   { key:'team-hq', name:'Team HQ', c:'#0D314C', icon:'team', sec:'Planning' },
   { key:'meeting-trackers', name:'Meeting Trackers', c:'#6D28D9', icon:'tracker', sec:'Planning' },
   { key:'iif-hq', name:'IIF Planning HQ', c:'#4D7C0F', icon:'iif', sec:'Planning' },
+  { key:'member-360', name:'Member 360', c:'#0F7B5C', icon:'member', sec:'Planning' },
   { key:'sponsorship', name:'Sponsorship', c:'#0EA5E9', icon:'sponsorship', sec:'Sponsorship' },
   { key:'so', name:'Service Orders and Agreements', c:'#E11D48', icon:'so', sec:'Service Orders and Agreements' },
 ];
@@ -161,11 +164,12 @@ const ENTRIES = {
   'team-hq': [['Open my board', 'Team HQ', 'team', '/team-hq/'], ['Jot it down', 'Team HQ', 'note', '/team-hq/']],
   'meeting-trackers': [['Track meeting attendance', 'Meeting Trackers', 'tracker', '/meeting-trackers/']],
   'iif-hq': [['Plan the IIF cycle', 'IIF Planning HQ', 'iif', '/iif-hq/']],
+  'member-360': [['Member 360', 'Member 360', 'member', '/member-360/']],   /* no sub-pages identified: the main page only, named after the tool (Perry, 9 Oct 2026) */
   'sponsorship': [['Track a sponsor', 'Sponsorship Portal', 'sponsorship', '/sponsorship/'], ['Send the prospectus', '2027 Summit Sponsorship Prospectus', 'send', '/sponsorship-prospectus/']],
   'so': [['Log hours on a service order', 'Service Orders and Agreements', 'clock', '/service-orders/'], ['Review and accept an order', 'Service Orders and Agreements', 'check', '/service-orders/']],
 };
 /* Which tool's first entry leads, for the chips and the default pins. */
-const LEAD = ['hub', 'glossary', 'so', 'team-hq', 'qr', 'sponsorship', 'summit-hq', 'website-migration', 'meeting-trackers', 'iif-hq'];
+const LEAD = ['hub', 'glossary', 'so', 'team-hq', 'qr', 'sponsorship', 'summit-hq', 'website-migration', 'meeting-trackers', 'iif-hq', 'member-360'];
 /* The person signed in: their tools and level in each, from the sign-in (session.js). */
 const RS = window.ResourcesSession;
 const ROLE_NAME = { admin:'Admin', staff:'Edit', view:'View' };
