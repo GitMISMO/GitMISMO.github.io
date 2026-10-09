@@ -1,277 +1,277 @@
 {
          "member-360": {
-                  "repo": "GitMISMO/member-360-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "summit-hq": {
-                  "repo": "GitMISMO/summit-hq-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "hub": {
-                  "repo": "GitMISMO/initiative-hub-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ],
-                  "readable": [
-                           "stakeholder-types.json"
-                  ]
-         },
-         "glossary": {
-                  "repo": "GitMISMO/glossary",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/",
-                           ".console/"
-                  ]
-         },
-         "hub-files": {
-                  "repo": "GitMISMO/hub-files",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "files/"
-                  ]
-         },
-         "sponsorship": {
-                  "repo": "GitMISMO/sponsorship-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "so-phoenix": {
-                  "repo": "GitMISMO/so-phoenix-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "signatures/",
-                           "notify/",
-                           "hours/",
-                           "revisions/",
-                           "agreements/",
-                           "orders-public/"
-                  ],
-                  "readable": [
-                           "orders/"
-                  ]
-         },
-         "so-actualize": {
-                  "repo": "GitMISMO/so-actualize-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "signatures/",
-                           "notify/",
-                           "hours/",
-                           "revisions/",
-                           "agreements/",
-                           "orders-public/"
-                  ],
-                  "readable": [
-                           "orders/"
-                  ]
-         },
-         "so-trex": {
-                  "repo": "GitMISMO/so-trex-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "signatures/",
-                           "notify/",
-                           "hours/",
-                           "revisions/",
-                           "agreements/",
-                           "orders-public/"
-                  ],
-                  "readable": [
-                           "orders/"
-                  ]
-         },
-         "so-falcon": {
-                  "repo": "GitMISMO/so-falcon-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "signatures/",
-                           "notify/",
-                           "hours/",
-                           "revisions/",
-                           "agreements/",
-                           "orders-public/"
-                  ],
-                  "readable": [
-                           "orders/"
-                  ]
-         },
-         "so-trudigital": {
-                  "repo": "GitMISMO/so-trudigital-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "signatures/",
-                           "notify/",
-                           "hours/",
-                           "revisions/",
-                           "agreements/",
-                           "orders-public/"
-                  ],
-                  "readable": [
-                           "orders/"
-                  ]
-         },
-         "website-migration": {
-                  "repo": "GitMISMO/website-migration-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "qr": {
-                  "repo": "GitMISMO/qr-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "qr-routes": {
-                  "repo": "GitMISMO/qr",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "hub-requests": {
-                  "repo": "GitMISMO/GitMISMO-initiative-hub-requests",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "team-hq": {
-                  "repo": "GitMISMO/team-hq-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/",
-                           "receipts/",
-                           "attachments/"
-                  ],
-                  "ask": true,
-                  "membersOnly": {
-                           "syncs": [],
-                           "syncitems": [],
-                           "expenses": [
-                                    "jcritchley@mismo.org"
-                           ]
-                  }
-         },
-         "team-hq-private": {
-                  "repo": "GitMISMO/team-hq-private-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "meeting-trackers": {
-                  "repo": "GitMISMO/meeting-trackers-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "so-phoenix-hours": {
-                  "repo": "GitMISMO/so-phoenix-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "hours/",
-                           "notify/"
-                  ],
-                  "readable": [
-                           "orders-public/"
-                  ]
-         },
-         "so-actualize-hours": {
-                  "repo": "GitMISMO/so-actualize-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "hours/",
-                           "notify/"
-                  ],
-                  "readable": [
-                           "orders-public/"
-                  ]
-         },
-         "so-trex-hours": {
-                  "repo": "GitMISMO/so-trex-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "hours/",
-                           "notify/"
-                  ],
-                  "readable": [
-                           "orders-public/"
-                  ]
-         },
-         "so-falcon-hours": {
-                  "repo": "GitMISMO/so-falcon-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "hours/",
-                           "notify/"
-                  ],
-                  "readable": [
-                           "orders-public/"
-                  ]
-         },
-         "so-trudigital-hours": {
-                  "repo": "GitMISMO/so-trudigital-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "hours/",
-                           "notify/"
-                  ],
-                  "readable": [
-                           "orders-public/"
-                  ]
-         },
-         "iif-hq": {
-                  "repo": "GitMISMO/iif-hq-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/"
-                  ]
-         },
-         "cms": {
-                  "repo": "GitMISMO/cms-data",
-                  "branch": "main",
-                  "origin": "https://resources.mismo.org",
-                  "writable": [
-                           "data/",
-                           "portal-data.json"
-                  ]
-         }
+         "repo": "GitMISMO/member-360-data",
+         "branch": "main",
+         "origin": "https://resources.mismo.org",
+         "writable": [
+           "data/"
+         ]
+       },
+  "summit-hq": {
+    "repo": "GitMISMO/summit-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "hub": {
+    "repo": "GitMISMO/initiative-hub-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ],
+    "readable": [
+      "stakeholder-types.json"
+    ]
+  },
+  "glossary": {
+    "repo": "GitMISMO/glossary",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/",
+      ".console/"
+    ]
+  },
+  "hub-files": {
+    "repo": "GitMISMO/hub-files",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "files/"
+    ]
+  },
+  "sponsorship": {
+    "repo": "GitMISMO/sponsorship-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "so-phoenix": {
+    "repo": "GitMISMO/so-phoenix-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/",
+      "revisions/",
+      "agreements/",
+      "orders-public/"
+    ],
+    "readable": [
+      "orders/"
+    ]
+  },
+  "so-actualize": {
+    "repo": "GitMISMO/so-actualize-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/",
+      "revisions/",
+      "agreements/",
+      "orders-public/"
+    ],
+    "readable": [
+      "orders/"
+    ]
+  },
+  "so-trex": {
+    "repo": "GitMISMO/so-trex-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/",
+      "revisions/",
+      "agreements/",
+      "orders-public/"
+    ],
+    "readable": [
+      "orders/"
+    ]
+  },
+  "so-falcon": {
+    "repo": "GitMISMO/so-falcon-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/",
+      "revisions/",
+      "agreements/",
+      "orders-public/"
+    ],
+    "readable": [
+      "orders/"
+    ]
+  },
+  "so-trudigital": {
+    "repo": "GitMISMO/so-trudigital-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/",
+      "revisions/",
+      "agreements/",
+      "orders-public/"
+    ],
+    "readable": [
+      "orders/"
+    ]
+  },
+  "website-migration": {
+    "repo": "GitMISMO/website-migration-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "qr": {
+    "repo": "GitMISMO/qr-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "qr-routes": {
+    "repo": "GitMISMO/qr",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "hub-requests": {
+    "repo": "GitMISMO/GitMISMO-initiative-hub-requests",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "team-hq": {
+    "repo": "GitMISMO/team-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/",
+      "receipts/",
+      "attachments/"
+    ],
+    "ask": true,
+    "membersOnly": {
+      "syncs": [],
+      "syncitems": [],
+      "expenses": [
+        "jcritchley@mismo.org"
+      ]
+    }
+  },
+  "team-hq-private": {
+    "repo": "GitMISMO/team-hq-private-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "meeting-trackers": {
+    "repo": "GitMISMO/meeting-trackers-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "so-phoenix-hours": {
+    "repo": "GitMISMO/so-phoenix-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-actualize-hours": {
+    "repo": "GitMISMO/so-actualize-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-trex-hours": {
+    "repo": "GitMISMO/so-trex-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-falcon-hours": {
+    "repo": "GitMISMO/so-falcon-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-trudigital-hours": {
+    "repo": "GitMISMO/so-trudigital-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "iif-hq": {
+    "repo": "GitMISMO/iif-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "cms": {
+    "repo": "GitMISMO/cms-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/",
+      "portal-data.json"
+    ]
+  }
 }
