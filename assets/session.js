@@ -156,13 +156,34 @@
       var s = JSON.parse(localStorage.getItem(KEY) || 'null');
       if (!s || !s.token || !s.expiresAt) return null;
       lastKnown = { name: s.name, email: s.email };
-      if (Date.parse(s.expiresAt) <= Date.now()) { localStorage.removeItem(KEY); return null; }
+      if (Date.parse(s.expiresAt) <= Date.now()) {
+        if (s.viewAs && localStorage.getItem(OWN)) { restoreOwn(); return read(); }   /* View as ran out: your own session again */
+        localStorage.removeItem(KEY); return null;
+      }
       return s;
     } catch (e) { return null; }
   }
   function write(s) {
+    if (!s) { try { var cur = JSON.parse(localStorage.getItem(KEY) || 'null');
+      if (cur && cur.viewAs && localStorage.getItem(OWN)) { restoreOwn(); location.reload(); return; } } catch (e) {} }
     try { s ? localStorage.setItem(KEY, JSON.stringify(s)) : localStorage.removeItem(KEY); } catch (e) {}
     changed();
+  }
+  /* ---------- View as (relay request 9; Perry, 9 Oct 2026) ----------
+     An administrator sees the site as someone else: read-only (the relay refuses every save), 30 minutes, recorded in
+     Activity. Their own session is set aside under OWN and comes back on Stop, when the 30 minutes end, or if the
+     relay refuses the viewing token. A banner along the bottom of every page says who is being viewed. */
+  var OWN = KEY + ':own';
+  function restoreOwn() { try { var own = localStorage.getItem(OWN); localStorage.removeItem(OWN); if (own) localStorage.setItem(KEY, own); else localStorage.removeItem(KEY); } catch (e) {} }
+  function viewAsBar() {
+    if (!document.body) return;
+    var s = read(), bar = document.getElementById('rs-viewas');
+    if (!s || !s.viewAs) { if (bar) bar.parentNode.removeChild(bar); document.documentElement.classList.remove('rs-viewing'); return; }
+    if (!bar) { bar = document.createElement('div'); bar.id = 'rs-viewas'; bar.setAttribute('role', 'status'); document.body.appendChild(bar); }
+    bar.innerHTML = '<span>Viewing as <b>' + esc(s.name || s.email) + '</b>, read-only, until ' + esc(timeOf(s.expiresAt)) + '. Nothing can be saved.</span>' +
+      '<button type="button" id="rs-viewas-stop">Stop viewing</button>';
+    document.documentElement.classList.add('rs-viewing');
+    bar.querySelector('#rs-viewas-stop').onclick = function () { restoreOwn(); location.reload(); };
   }
   /* A gated page locks again the moment its session ends (Perry, 6 Oct 2026). Signing out from the account bubble,
      a session expiring, or signing out in another tab cleared the session but left what was already on screen (the
@@ -179,9 +200,15 @@
     hadSession = !!s;
     listeners.forEach(function (fn) { try { fn(s); } catch (e) {} });
     renderAll();
+    viewAsBar();
   }
-  /* Signing in or out in another tab updates this one too. */
-  window.addEventListener('storage', function (e) { if (e.key === KEY) changed(); });
+  /* Signing in or out in another tab updates this one too; starting or stopping View as there reloads this one, so
+     nothing seen as someone else stays on screen (or the other way round). */
+  window.addEventListener('storage', function (e) {
+    if (e.key !== KEY) return;
+    if (/"viewAs"/.test(e.oldValue || '') !== /"viewAs"/.test(e.newValue || '')) { location.reload(); return; }
+    changed();
+  });
 
   function scheduleExpiry() {
     if (expiryTimer) clearTimeout(expiryTimer);
@@ -335,6 +362,21 @@
       });
     },
     signOut: function () { write(null); },
+    /* View as: start (administrators; the relay records it), stop, and who is being viewed. */
+    viewAs: function (email) {
+      var s = read();
+      if (!s || s.platformAdmin !== true) return Promise.reject(new Error('Only an administrator can view the site as someone else.'));
+      if (s.viewAs) return Promise.reject(new Error('Stop viewing first.'));
+      return fetch(RELAY_URL + '/hub/auth/view-as', { method: 'POST', cache: 'no-store', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.token }, body: JSON.stringify({ email: email }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) {
+          if (!r.ok || !b.token) { var e = new Error(b.message || b.error || ('HTTP ' + r.status)); e.code = b.error; throw e; }
+          try { localStorage.setItem(OWN, JSON.stringify(s)); } catch (e) {}
+          var until = new Date(typeof b.expiresAt === 'number' ? b.expiresAt : Date.parse(b.expiresAt)).toISOString();   /* the relay sends milliseconds */
+          write({ token: b.token, name: b.name || b.email, email: b.email, access: b.access || {}, platformAdmin: false, expiresAt: until, viewAs: b.viewAs || { by: s.email, until: until } });
+          return b; }); });
+    },
+    stopViewAs: function () { restoreOwn(); changed(); },
+    viewingAs: function () { var s = read(); return s && s.viewAs ? { name: s.name, email: s.email, until: s.expiresAt, by: s.viewAs.by } : null; },
     onChange: function (fn) { listeners.push(fn); },
     mount: function (el) { if (el) { el.setAttribute('data-rs-mount', ''); renderInto(el); } }
   };
@@ -485,7 +527,11 @@
     '.rs-side{padding:24px 22px 26px;gap:18px;justify-content:flex-start}',
     '.rs-plate{padding:7px 10px}.rs-plate svg{height:18px}',
     '.rs-brand{gap:8px}.rs-bar{width:36px}.rs-eyebrow{font-size:10.5px}.rs-tool{font-size:28px;line-height:1.1}.rs-part{display:none}',
-    '.rs-main{align-items:flex-start;padding:24px 18px}}'
+    '.rs-main{align-items:flex-start;padding:24px 18px}}',
+    '#rs-viewas{position:fixed;left:0;right:0;bottom:0;z-index:9200;display:flex;gap:14px;align-items:center;justify-content:center;flex-wrap:wrap;padding:10px 16px;background:#5B3FA6;color:#fff;font:500 14px "Libre Franklin",system-ui,sans-serif;box-shadow:0 -4px 16px rgba(0,0,0,.18)}',
+    '#rs-viewas b{font-weight:800}',
+    '#rs-viewas button{border:0;border-radius:8px;background:#fff;color:#3F2A7A;font:700 13.5px "Libre Franklin",system-ui,sans-serif;padding:7px 14px;cursor:pointer}',
+    'html.rs-viewing body{padding-bottom:56px}'
   ].join('\n');
   var styleEl = document.createElement('style');
   styleEl.setAttribute('data-rs', '');
@@ -907,6 +953,7 @@
   /* ---------- start ---------- */
   function start() {
     scheduleExpiry();
+    viewAsBar();
     var auto = document.getElementById('rs-account');
     if (auto) api.mount(auto);
   }
