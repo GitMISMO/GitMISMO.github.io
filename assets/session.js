@@ -951,9 +951,31 @@
   }
 
   /* ---------- start ---------- */
+  /* ---------- Open a view from the address (Perry, 13 Oct 2026) ----------
+     <tool>/#open=<view> presses the tool's own button for that view ([data-hq], [data-view] or [data-page] = <view>)
+     once it is on screen, so the home page can pin any view. Several tools restore their last view when their data
+     arrives, so it presses again over the next few seconds (choosing the same view twice changes nothing), and stops
+     the moment the person clicks or types anything. Does nothing if the tool has no such view, or it isn't shown. */
+  function openFromAddress() {
+    var m = /^#open=([A-Za-z0-9_-]{1,40})$/.exec(location.hash || ''); if (!m) return;
+    var id = m[1], sel = '[data-hq="' + id + '"],[data-view="' + id + '"],[data-page="' + id + '"]', tries = 0, presses = 0, stop = false;
+    function quit() { stop = true; }
+    ['pointerdown', 'keydown'].forEach(function (ev) { window.addEventListener(ev, function (e) { if (e.isTrusted) quit(); }, { capture: true, once: true }); });
+    function find() { var els = document.querySelectorAll(sel); for (var i = 0; i < els.length; i++) { if (els[i].offsetParent !== null && !els[i].disabled) return els[i]; } return null; }
+    function press() { var el = find(); if (el && !stop) { el.click(); presses++; } return !!el; }
+    var t = setInterval(function () {
+      if (stop || ++tries > 80) { clearInterval(t); return; }
+      if (press()) { clearInterval(t);
+        /* leave the plain #<view>: tools that read the address themselves (Website Migration HQ, QR) open it too */
+        try { history.replaceState(null, '', location.pathname + location.search + '#' + id); } catch (e) {}
+        setTimeout(press, 1500); setTimeout(press, 4000); setTimeout(press, 8000); }
+    }, 250);
+  }
   function start() {
     scheduleExpiry();
     viewAsBar();
+    openFromAddress();
+    window.addEventListener('hashchange', openFromAddress);   /* a #open= link followed from within the same tool */
     var auto = document.getElementById('rs-account');
     if (auto) api.mount(auto);
   }
