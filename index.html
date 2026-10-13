@@ -45,8 +45,8 @@
   .rule{ width:2px; height:34px; margin:0 20px; border-radius:1px; background:#50a4db }
   .brand{ font-size:15.5px; font-weight:700; color:#50a4db }
   .top-r{ margin-left:auto; display:flex; align-items:center; gap:10px; position:relative }
-  .iconbtn{ width:40px; height:40px; border-radius:999px; border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px }
-  .acct{ display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 12px 0 7px; border-radius:999px; border:0; background:#fff; color:#2C74A6; font-weight:600; font-size:13px; cursor:pointer }
+  .iconbtn{ width:40px; height:40px; border-radius:4px; border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px }
+  .acct{ display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 12px 0 7px; border-radius:4px; border:0; background:#fff; color:#2C74A6; font-weight:600; font-size:13px; cursor:pointer }
   .acct .av{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; background:linear-gradient(160deg,#a8d4ef,#6fb2dc) }
   .menu{ position:absolute; right:0; top:52px; width:290px; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:12px; box-shadow:0 18px 40px -18px rgba(6,32,47,.55); padding:8px }
   .menu p{ margin:4px 8px 8px; font-size:12px; color:var(--ink-3) }
@@ -66,7 +66,7 @@
   .ask input::placeholder{ color:var(--ink-3) }
   .ask input::-webkit-search-cancel-button, .ask input::-webkit-search-decoration{ -webkit-appearance:none; appearance:none; display:none }   /* the page's own clear button only */
   .ask kbd{ font:600 11px var(--font); color:var(--ink-3); border:1px solid var(--line-2); border-radius:5px; padding:1px 6px }
-  .ask .clear{ border:0; background:var(--sunk); color:var(--ink-2); border-radius:999px; width:26px; height:26px; cursor:pointer }
+  .ask .clear{ border:0; background:var(--sunk); color:var(--ink-2); border-radius:4px; width:26px; height:26px; cursor:pointer }
   /* results: under the box, ranked, each saying why it matched */
   .results{ margin-top:14px; text-align:left; background:var(--surface); border:1px solid var(--line-2); border-radius:16px; box-shadow:var(--shadow); overflow:hidden }
   .best{ display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--accent-soft) }
@@ -78,13 +78,13 @@
   .more a:hover, .more a:focus-visible{ background:var(--sunk); outline-offset:-2px }
   .more .t{ font-size:14px; font-weight:700 } .more .s{ font-size:12.5px; color:var(--ink-2) }
   .why{ display:inline-flex; flex-wrap:wrap; gap:4px; margin-top:4px }
-  .why span{ font-size:11.5px; color:var(--ink-3); border:1px solid var(--line-2); border-radius:999px; padding:0 8px }
+  .why span{ font-size:11.5px; color:var(--ink-3); border:1px solid var(--line-2); border-radius:4px; padding:0 8px }
   .missing{ display:flex; align-items:center; gap:10px; padding:12px 18px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-2) }
   .missing b{ color:var(--accent) }
   .noresults{ padding:16px 18px; font-size:13.5px; color:var(--ink-2) }
   .grp{ padding:12px 18px 2px; font-size:12px; font-weight:700; color:var(--ink-3); border-top:1px solid var(--line) }
   .best + .grp{ border-top:0 }
-  .kind{ display:inline-block; vertical-align:2px; margin-left:6px; font-size:11px; font-weight:600; color:var(--ink-3); border:1px solid var(--line-2); border-radius:999px; padding:0 8px }
+  .kind{ display:inline-block; vertical-align:2px; margin-left:6px; font-size:11px; font-weight:600; color:var(--ink-3); border:1px solid var(--line-2); border-radius:4px; padding:0 8px }
 
   h2{ margin:0; font-family:var(--display); font-weight:700; font-size:19px; letter-spacing:-.01em }
   .bar{ display:flex; align-items:baseline; gap:12px; margin:40px 0 12px; flex-wrap:wrap }
@@ -122,7 +122,7 @@
   .cols.c1{ grid-template-columns:minmax(0,1fr) } .cols.c2{ grid-template-columns:repeat(2,minmax(0,1fr)) } .cols.c3{ grid-template-columns:repeat(3,minmax(0,1fr)) }
   .tool .th{ display:flex; align-items:center; gap:10px; margin-bottom:4px }
   .tool .tn{ flex:1; min-width:0; font-size:14px; font-weight:700 } .tool .tn small{ display:block; font-weight:500; font-size:12px; color:var(--ink-3) }
-  .role{ font-size:11.5px; font-weight:700; border-radius:999px; padding:2px 9px; background:var(--accent-soft); color:var(--accent); white-space:nowrap }
+  .role{ font-size:11.5px; font-weight:700; border-radius:4px; padding:2px 9px; background:var(--accent-soft); color:var(--accent); white-space:nowrap }
   .role.admin{ background:var(--admin-bg); color:var(--admin-ink) }
   .row{ display:flex; align-items:center; gap:12px; padding:9px 0; border-top:1px dotted var(--sky) }
   .tool .row:first-of-type{ border-top:0 }
@@ -131,7 +131,7 @@
   .rt{ font-size:13.5px; font-weight:700 } .rs{ font-size:12px; color:var(--ink-2) }
   mark{ background:var(--accent-soft); color:inherit; border-radius:3px; padding:0 1px }
   .closed{ display:flex; flex-wrap:wrap; gap:8px; padding:0 20px 16px }
-  .tchip{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-2); background:transparent; border-radius:999px; padding:5px 12px 5px 6px; font-size:13px; font-weight:600; cursor:pointer }
+  .tchip{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-2); background:transparent; border-radius:4px; padding:5px 12px 5px 6px; font-size:13px; font-weight:600; cursor:pointer }
   .tchip:hover{ border-color:var(--line-3) }
   .askadmin{ margin-top:22px; display:flex; align-items:center; gap:12px; border:1px dashed var(--line-3); border-radius:12px; padding:14px 18px; color:var(--ink-2); font-size:13.5px }
   .askadmin b{ color:var(--accent) }
