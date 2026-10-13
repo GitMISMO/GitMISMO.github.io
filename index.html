@@ -140,6 +140,31 @@
   @media (max-width:900px){ .pins, .pins.n3{ grid-template-columns:repeat(2,minmax(0,1fr)) } .cols.c3, .cols.c2{ grid-template-columns:minmax(0,1fr) } }
   @media (max-width:560px){ .pins, .pins.n2, .pins.n3{ grid-template-columns:minmax(0,1fr) } .top .brand, .rule{ display:none } main{ padding:24px 16px 56px } .sh .ct{ display:none } }
   @media (prefers-reduced-motion: reduce){ *{ transition:none !important } }
+
+/* Home page D with pins (Perry, 13 Oct 2026): tool tiles, each with a pin menu */
+.tsec{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.tsec{overflow:visible;position:relative} .tsec:has(.menu-open){z-index:30}   /* the pin menu may overflow its section */
+.sh2 .dots{display:flex;gap:4px} .sh2 .dots i{width:10px;height:10px;border-radius:2px;display:block}
+.sh2{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--line)} .sh2 .nm{font-family:Archivo,sans-serif;font-weight:700;font-size:17px} .sh2 .ct{font-size:12.5px;color:var(--ink-3)}
+.tgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;padding:14px 18px 16px}
+@media (max-width:1100px){.tgrid{grid-template-columns:repeat(4,minmax(0,1fr))}} @media (max-width:760px){.tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.ttile{position:relative;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);min-height:112px;transition:border-color .12s,box-shadow .12s}
+.ttile:hover,.ttile:focus-within,.ttile.menu-open{border-color:var(--sky);box-shadow:0 0 0 3px var(--sunk)}
+.tlink{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px 12px;height:100%;text-decoration:none;color:inherit;border-radius:10px}
+.tlink b{font-size:14px;line-height:1.25;padding-right:30px} .tlink small{font-size:11.5px;color:var(--ink-3)}
+.ttile .tpin{position:absolute;top:12px;right:10px}
+.pmenu{position:absolute;top:50px;left:-1px;z-index:20;width:330px;max-width:calc(100vw - 24px);background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 14px 34px rgba(15,49,76,.22);padding:10px;text-align:left}
+.tgrid .ttile:nth-child(6n) .pmenu,.tgrid .ttile:nth-child(6n-1) .pmenu{left:auto;right:-1px}
+.pttl{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;margin:0 2px 8px} .pttl span{color:var(--ink-3);font-weight:600}
+#pmq{width:100%;height:34px;border:1px solid var(--line-2);border-radius:4px;padding:0 10px;font:inherit;font-size:13px;background:var(--surface);color:var(--ink);margin-bottom:6px}
+#pmq:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px var(--sunk)}
+.plab{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:8px 4px 4px}
+.pmenu{max-height:min(460px,70vh);overflow:auto}
+.prow{display:flex;align-items:center;gap:9px;width:100%;padding:6px;border:0;border-radius:4px;background:none;font:inherit;font-size:13px;color:var(--ink);text-align:left;cursor:pointer}
+.prow:hover,.prow:focus-visible{background:var(--sunk);outline:none} .prow .nm{flex:1;line-height:1.25} .prow small{display:block;color:var(--ink-3);font-size:11px}
+.prow .pinbtn{width:26px;height:26px} .prow .pinbtn.on{background:var(--sunk);border-color:var(--sky);color:var(--accent)}
+.prow mark{background:#FFF1B8;color:inherit;padding:0 1px;border-radius:2px}
+.pfoot{font-size:11.5px;color:var(--ink-3);margin:8px 4px 2px;line-height:1.4}
 </style>
 </head>
 <body>
@@ -193,7 +218,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <div class="results" id="results" hidden></div>
   </section>
   <section aria-labelledby="pinh">
-    <div class="bar"><h2 id="pinh">Pinned</h2><span class="hint" id="pinhint">Pin anything below to keep it here. Drag to reorder, or use the arrow keys on the handle.</span></div>
+    <div class="bar"><h2 id="pinh">Pinned</h2><span class="hint" id="pinhint">Pin a tool, or any page in it, with the pin on its tile. Drag to reorder, or use the arrow keys on the handle.</span></div>
     <div id="pins"></div>
   </section>
   <section aria-labelledby="allh">

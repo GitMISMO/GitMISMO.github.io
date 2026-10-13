@@ -160,7 +160,7 @@ const TOOLS = [
 /* Every page the old home page offered, once each, worded as what people come to do. */
 const ENTRIES = {
   'hub': [['Submit a work request', 'Work Requests', 'plus', '/initiative-hub/work-requests.html', 'hub-requests'], ['Browse potential initiatives', 'Potential Initiatives', 'bulb', '/initiative-hub/#potential'], ['Find an initiative', 'Initiative Hub', 'hub', '/initiative-hub/']],
-  'glossary': [['Find a glossary term', 'Business Glossary', 'book', '/glossary/'], ['Propose or edit a term', 'Business Glossary Console', 'edit', '/glossary/console/']],
+  'glossary': [['Propose or edit a term', 'Business Glossary Console', 'edit', '/glossary/console/'], ['Find a glossary term', 'Public glossary', 'book', '/glossary/']],   /* the console leads (Perry, 13 Oct 2026) */
   'qr': [['See all QR codes', 'QR Code Manager', 'qr', '/qr/'], ['Make a QR code', 'Make a New Code', 'plus', '/qr/#new'], ['See how codes are scanned', 'Scans', 'chart', '/qr/#scans']],
   'summit-hq': [['Plan the summit', 'Summit HQ', 'summit', '/summit-hq/']],
   'website-migration': [['Check the migration', 'Website Migration HQ', 'website', '/website-migration/']],
@@ -171,6 +171,33 @@ const ENTRIES = {
   'cms': [['Certification Management System', 'Certification Management System', 'cert', '/cms/']],   /* one button, named after the tool (Perry, 9 Oct 2026) */
   'sponsorship': [['Track a sponsor', 'Sponsorship Portal', 'sponsorship', '/sponsorship/'], ['Send the prospectus', '2027 Summit Sponsorship Prospectus', 'send', '/sponsorship-prospectus/']],
   'so': [['Log hours on a service order', 'Service Orders and Agreements', 'clock', '/service-orders/'], ['Review and accept an order', 'Service Orders and Agreements', 'check', '/service-orders/']],
+};
+/* Home page D with pins (Perry, 13 Oct 2026): each tool is a tile; its pin opens a menu to pin the whole tool or any
+   page in it. A tool's pages are its own entries that lead somewhere other than its main page, plus these pages that
+   have their own address. */
+const TOOL_PATH = { hub:'/initiative-hub/', glossary:'/glossary/console/', qr:'/qr/', 'summit-hq':'/summit-hq/', 'website-migration':'/website-migration/', 'team-hq':'/team-hq/',
+  'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/service-orders/' };
+const MORE_PAGES = {
+  hub: [['Meeting Calendar', 'Page', 'hub', '/initiative-hub/calendar.html'],
+    ['Mortgage Compliance Dataset (MCD)', 'Overview', 'hub', '/initiative-hub/mcd-dashboard.html'], ['Common Confidence Score (CCS)', 'Overview', 'hub', '/initiative-hub/ccs-dashboard.html'],
+    ['Loan Boarding Data Segment (LBDS)', 'Overview', 'hub', '/initiative-hub/lbds-dashboard.html'], ['Title Order Dataset Specification', 'Overview', 'hub', '/initiative-hub/title-order-dashboard.html'],
+    ['AVM Testing Guidance and Best Practices', 'Overview', 'hub', '/initiative-hub/avm-testing-dashboard.html'], ['Tri-Party eNote Bailee Agreement', 'Overview', 'hub', '/initiative-hub/tpa-dashboard.html']],
+};
+/* Views inside each tool, opened from the address: #open=<view> through the shared sign-in, or the tool's own #<view>
+   where it reads the address itself (Website Migration HQ, QR Code Manager). Setup views (Settings, Migration,
+   Backups & Import) and each tool's default view are left out (Perry, 13 Oct 2026). */
+const NATIVE_HASH = new Set(['website-migration']);
+const VIEWS = {
+  'team-hq': [['Today', 'today'], ['My Board', 'mine'], ['Team Projects', 'rocks'], ['Plans', 'plans'], ['Key Dates', 'dates'], ['Team Meeting', 'agenda'], ['Sync Ups', 'syncs'], ['Expenses', 'expenses']],
+  'iif-hq': [['Tasks', 'tasks'], ['Key Dates', 'dates'], ['Decisions and Risks', 'raid'], ['Automations', 'autos'], ['Last Cycle', 'last']],
+  'member-360': [['Outreach Planner', 'week'], ['Renewals', 'renewals'], ['Membership Stats', 'stats'], ['Monthly Report', 'deals'], ['IIF Cycle', 'iif'], ['Members and Prospects', 'members'], ['Issues Log', 'issues'], ['Playbooks', 'plays']],
+  cms: [['Action Queue', 'queue'], ['Assessor Portal', 'assessors'], ['Invoices', 'invoices'], ['Pricing', 'pricing'], ['Records', 'records'], ['Certified Counts', 'counts'], ['Programs', 'programs'], ['Forms', 'forms'], ['Lifecycle', 'lifecycle'], ['Activity', 'activity']],
+  'summit-hq': [['Schedule', 'grid']],
+  sponsorship: [['Pipeline', 'pipeline'], ['Prospects', 'leads'], ['Inventory', 'stock'], ['Money', 'money']],
+  'meeting-trackers': [['Log Attendance', 'ov'], ['Stats', 'stats'], ['Issues', 'iss']],
+  glossary: [['Terms', 'terms'], ['Staging', 'staging'], ['Needs a Decision', 'issues'], ['Draft & Publish', 'publish'], ['Classifications', 'classes'], ['Versions', 'versions']],
+  'website-migration': [['Tasks', 'tasks'], ['Pages', 'pages'], ['Must-Keep', 'must'], ['Word Rules', 'words'], ['Key Dates', 'dates'], ['Meeting Prep', 'meeting'], ['Backup Plan', 'backup']],
+  qr: [['All Codes', 'codes'], ['What Scanners See', 'scanner']],
 };
 /* Which tool's first entry leads, for the chips and the default pins. */
 const LEAD = ['hub', 'glossary', 'so', 'team-hq', 'qr', 'sponsorship', 'summit-hq', 'website-migration', 'meeting-trackers', 'iif-hq', 'member-360', 'cms'];
@@ -194,12 +221,45 @@ const tool = k => TOOLS.find(t => t.key === k);
 const mine = () => TOOLS.filter(t => me().keys.includes(t.key));
 const entriesOf = t => (ENTRIES[t.key] || []).filter(e => !e[4] || me().keys.includes(e[4])).map(e => ({ id: t.key + ':' + e[0], tool: t, title: e[0], page: e[1], icon: e[2], href: SITE + e[3] }));
 const allEntries = () => mine().flatMap(entriesOf);
-const byId = id => allEntries().find(e => e.id === id);
+const pathOf = h => String(h).split('#')[0].replace(/index\.html$/, '');
+const isMain = (t, e) => pathOf(e.href) === SITE + TOOL_PATH[t.key] && !String(e.href).includes('#');
+const mainOf = t => entriesOf(t).find(e => isMain(t, e));
+const toolItem = t => { const m = mainOf(t); return { id: 'tool:' + t.key, kind: 'tool', tool: t, title: m && m.title !== t.name ? m.title : 'Open ' + t.name,
+  page: t.name, sub: 'Opens ' + t.name, icon: (m && m.icon) || t.icon, href: SITE + (TOOL_PATH[t.key] || (m ? m.href : '/')) }; };
+function pagesOf(t){
+  const seen = new Set(), out = [], add = (name, kind, icon, href) => { if (seen.has(name)) return; seen.add(name);
+    out.push({ id: 'page:' + t.key + ':' + name, kind: 'page', tool: t, title: name, page: name, kindName: kind, sub: kind + ' in ' + t.name, icon, href }); };
+  entriesOf(t).filter(e => !isMain(t, e)).forEach(e => add(e.page, 'Page', e.icon, e.href));
+  (MORE_PAGES[t.key] || []).forEach(([n, k, ic, h]) => add(n, k, ic, SITE + h));
+  (VIEWS[t.key] || []).forEach(([n, v]) => add(n, 'View', t.icon, SITE + TOOL_PATH[t.key] + (NATIVE_HASH.has(t.key) ? '#' + v : '#open=' + v)));
+  return out;
+}
+const pinnables = () => mine().flatMap(t => [toolItem(t), ...pagesOf(t), ...entriesOf(t)]);
+const byId = id => pinnables().find(e => e.id === id);
 const leadEntries = () => LEAD.filter(k => me().keys.includes(k)).map(k => entriesOf(tool(k))[0]).filter(Boolean);
 /* Pins and open sections are kept per person (in this browser, for the prototype). */
 const pinKey = () => 'resources:home:pins:' + me().email, openKey = () => 'resources:home:open:' + me().email;
 const getPins = () => store.get(pinKey(), null) || leadEntries().slice(0, 4).map(e => e.id);
-const setPins = ids => store.set(pinKey(), ids.filter(id => byId(id)));
+const setPins = ids => { const keep = ids.filter(id => byId(id)); store.set(pinKey(), keep); saveAccountPins(keep); };
+/* Pins with the account (relay request 10): read once the page opens; until the relay knows the route (404), pins stay
+   in this browser as before. The first time, pins already in this browser are carried over to the account. */
+const PREFS_URL = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/hub/auth/prefs';
+let acctPins = 'unknown', acctSaveT = null;
+function loadAccountPins(){
+  const s = RS && RS.current && RS.current(); if (!s || !s.token) return;
+  fetch(PREFS_URL, { cache: 'no-store', headers: { 'Authorization': 'Bearer ' + s.token } }).then(r => {
+    if (r.status === 404) { acctPins = 'off'; return null; } if (!r.ok) return null; return r.json(); })
+  .then(b => { if (!b) return; acctPins = 'on';
+    if (b.known) { store.set(pinKey(), (b.prefs.pins || []).map(p => p.id)); drawPins(); drawSecs(); }
+    else { const local = store.get(pinKey(), null); if (local && local.length) saveAccountPins(local); } })
+  .catch(() => {});
+}
+function saveAccountPins(ids){
+  if (acctPins !== 'on') return; clearTimeout(acctSaveT);
+  acctSaveT = setTimeout(() => { const s = RS && RS.current && RS.current(); if (!s || !s.token || s.viewAs) return;
+    const pins = ids.map(byId).filter(Boolean).map(e => ({ kind: e.kind || 'task', key: e.tool.key, id: e.id, title: e.title, page: e.page || '', href: e.href }));
+    fetch(PREFS_URL, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + s.token }, body: JSON.stringify({ prefs: { pins } }) }).catch(() => {}); }, 700);
+}
 function getOpen(){
   const saved = store.get(openKey(), null); if (saved) return saved;
   const secs = SECTIONS.filter(s => mine().some(t => t.sec === s));
@@ -222,38 +282,40 @@ function drawTop(){
 function drawPins(){
   const list = getPins().map(byId).filter(Boolean);
   const box = $('#pins');
-  if (!list.length){ box.innerHTML = `<div class="empty">Nothing pinned. Pin anything below to keep it here.</div>`; return; }
+  if (!list.length){ box.innerHTML = `<div class="empty">Nothing pinned yet. Pin a tool, or any page in it, with the pin on its tile below.</div>`; return; }
   box.innerHTML = `<div class="pins n${Math.min(list.length, 4)}" role="list">${list.map((e, i) => `<div class="pcard" role="listitem" draggable="true" data-card="${esc(e.id)}">
       <div class="head">${ticon(e.tool, e.icon, 44)}
         <button type="button" class="handle" data-move="${esc(e.id)}" aria-label="Move ${esc(e.title)}. Use the left and right arrow keys. Position ${i + 1} of ${list.length}." title="Drag, or use the arrow keys">${I(P.grip)}</button>${pinBtn(e)}</div>
-      <div>${tag(e.tool)}<div class="t" style="margin-top:4px">${esc(e.title)}</div><div class="s">Opens ${esc(e.page)}</div></div>
+      <div>${tag(e.tool)}<div class="t" style="margin-top:4px">${esc(e.title)}</div><div class="s">${esc(e.sub || 'Opens ' + e.page)}</div></div>
       <a class="go" href="${e.href}">Start ${I(P.arrow)}</a></div>`).join('')}</div>`;
 }
+/* Sections: each tool a tile (select it to open the tool); its pin opens the menu to pin the tool or a page in it. */
+let pinMenu = null;   /* { key, q } while a tile's pin menu is open */
 function drawSecs(){
-  const open = getOpen(), s = '';
-  let html = '', shown = 0;
+  const pins = getPins();
+  let html = '';
   for (const sec of SECTIONS){
     const ts = mine().filter(t => t.sec === sec); if (!ts.length) continue;
-    const matches = ts.map(t => ({ t, es: entriesOf(t).filter(e => hit(e, s)) })).filter(x => x.es.length);
-    if (s && !matches.length) continue;
-    const isOpen = s ? true : open.includes(sec);
-    const n = ts.reduce((a, t) => a + entriesOf(t).length, 0);
-    const id = 'sec-' + sec.replace(/\W+/g, '-').toLowerCase();
-    const body = isOpen
-      ? `<div class="cols c${Math.min(3, (s ? matches : ts).length)}" id="${id}">${(s ? matches : ts.map(t => ({ t, es: entriesOf(t) }))).map(({ t, es }) => `<div class="tool">
-          <div class="th">${ticon(t, t.icon, 28, true)}<div class="tn">${hl(t.name)}${t.key === 'so' ? `<small>${esc(me().so)}</small>` : ''}</div>${roleHTML(t)}</div>
-          ${es.map(e => `<div class="row"><a href="${e.href}">${ticon(t, e.icon, 30)}<span style="min-width:0"><span class="rt" style="display:block">${hl(e.title)}</span><span class="rs" style="display:block">Opens ${hl(e.page)}</span></span></a>${pinBtn(e)}</div>`).join('')}</div>`).join('')}</div>`
-      : `<div class="closed" id="${id}">${ts.map(t => `<button type="button" class="tchip" data-opento="${esc(sec)}">${ticon(t, t.icon, 20, true)}${esc(t.name)}</button>`).join('')}</div>`;
-    html += `<div class="sec" data-open="${isOpen}"><button type="button" class="sh" data-sec="${esc(sec)}" aria-expanded="${isOpen}" aria-controls="${id}"${s ? ' disabled' : ''}>
-        <span class="dots" aria-hidden="true">${ts.map(t => `<i style="background:${t.c}"></i>`).join('')}</span><span class="nm">${esc(sec)}</span>
-        <span class="ct">${ts.length} ${ts.length === 1 ? 'tool' : 'tools'}, ${n} ${n === 1 ? 'thing' : 'things'}</span>${s ? '' : `<span class="chev" aria-hidden="true">${I(P.chev)}</span>`}</button>${body}</div>`;
-    shown += s ? matches.reduce((a, m) => a + m.es.length, 0) : 0;
+    html += `<div class="sec tsec"><div class="sh2"><span class="dots" aria-hidden="true">${ts.map(t => `<i style="background:${t.c}"></i>`).join('')}</span><span class="nm">${esc(sec)}</span><span class="ct">${ts.length} ${ts.length === 1 ? 'tool' : 'tools'}</span></div>
+      <div class="tgrid">${ts.map(t => { const it = toolItem(t), any = pins.some(id => id === it.id || id.startsWith('page:' + t.key + ':') || id.startsWith(t.key + ':')), open = pinMenu && pinMenu.key === t.key;
+        return `<div class="ttile${open ? ' menu-open' : ''}" data-tile="${esc(t.key)}"><a class="tlink" href="${it.href}">${ticon(t, t.icon, 36, true)}<b>${esc(t.name)}</b><small>${t.key === 'so' ? esc(me().so) : esc(it.title === 'Open ' + t.name ? 'Open \u203a' : it.title)}</small></a>
+          <button type="button" class="pinbtn tpin" data-pinmenu="${esc(t.key)}" aria-haspopup="dialog" aria-expanded="${!!open}" aria-pressed="${any}" title="Pin ${esc(t.name)}, or a page in it">${I(P.pin)}</button>${open ? menuHTML(t) : ''}</div>`; }).join('')}</div></div>`;
   }
-  $('#secs').innerHTML = html || `<div class="empty">Nothing matches \u201c${esc(q)}\u201d. Try a different word, or clear the search.</div>`;
-  const all = SECTIONS.filter(x => mine().some(t => t.sec === x));
-  $('#expall').hidden = !!s;
-  $('#expall').textContent = all.every(x => open.includes(x)) ? 'Collapse all' : 'Expand all';
+  $('#secs').innerHTML = html;
+  $('#expall').hidden = true;
   $('#askadmin').innerHTML = me().admin ? '' : `<div class="askadmin">${I(P.key)}<span>These are the tools on your account. Need another one? <b>Ask a MISMO administrator.</b></span></div>`;
+  if (pinMenu) { const qi = document.getElementById('pmq'); if (qi && document.activeElement !== qi && pinMenu.focus) { qi.focus(); qi.setSelectionRange(qi.value.length, qi.value.length); } }
+}
+function menuHTML(t){
+  const pins = getPins(), qq = (pinMenu.q || '').trim().toLowerCase(), whole = toolItem(t), pages = pagesOf(t);
+  const mark = text => { if (!qq) return esc(text); const i = text.toLowerCase().indexOf(qq); return i < 0 ? esc(text) : esc(text.slice(0, i)) + '<mark>' + esc(text.slice(i, i + qq.length)) + '</mark>' + esc(text.slice(i + qq.length)); };
+  const row = (e, label, sub) => { const on = pins.includes(e.id); return `<button type="button" class="prow" data-pin="${esc(e.id)}" aria-pressed="${on}"><span class="nm">${label}<small>${esc(sub)}</small></span><span class="pinbtn${on ? ' on' : ''}" aria-hidden="true">${I(P.pin)}</span></button>`; };
+  const hits = pages.filter(e => !qq || e.title.toLowerCase().includes(qq));
+  return `<div class="pmenu" role="dialog" aria-label="Pin to your page: ${esc(t.name)}"><div class="pttl">Pin to your page <span>${esc(t.name)}</span></div>
+    ${pages.length > 3 ? `<input id="pmq" type="search" placeholder="Find a page in ${esc(t.name)}\u2026" value="${esc(pinMenu.q || '')}" autocomplete="off" aria-label="Find a page in ${esc(t.name)}">` : ''}
+    ${qq ? '' : row(whole, `<b>${esc(t.name)}</b>`, 'The whole tool')}
+    ${pages.length ? `<div class="plab">Pages${qq ? '' : ' (' + pages.length + ')'}</div>${hits.map(e => row(e, mark(e.title), e.kindName || 'Page')).join('') || '<div class="pfoot">No page matches.</div>'}` : ''}
+    <div class="pfoot">${pages.length ? 'Select a pin to add it to the top of your page; select it again to unpin.' : 'This tool is one page. Pin it to keep it at the top of your page.'}</div></div>`;
 }
 function drawTheme(){
   const dark = document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
@@ -261,6 +323,8 @@ function drawTheme(){
 }
 function drawAll(){ drawTop(); drawPins(); drawSecs(); drawTheme(); }
 function toast(t){ const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2200); }
+document.addEventListener('input', e => { if (e.target && e.target.id === 'pmq' && pinMenu) { pinMenu.q = e.target.value; pinMenu.focus = true; drawSecs(); } });
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && pinMenu) { const k = pinMenu.key; pinMenu = null; drawSecs(); const b = document.querySelector(`[data-pinmenu="${CSS.escape(k)}"]`); if (b) b.focus(); } });
 function togglePin(id){
   const pins = getPins(), i = pins.indexOf(id), e = byId(id);
   if (i >= 0){ pins.splice(i, 1); toast('Unpinned ' + e.title); } else { pins.push(id); toast('Pinned ' + e.title); }
@@ -275,7 +339,11 @@ function move(id, by){
 
 /* events */
 document.addEventListener('click', e => {
+  if (pinMenu && !e.target.closest('.pmenu') && !e.target.closest('[data-pinmenu]')) { pinMenu = null; drawSecs(); }
   const b = e.target.closest('button'); if (!b) return;
+  if (b.dataset.pinmenu){ const k = b.dataset.pinmenu; pinMenu = pinMenu && pinMenu.key === k ? null : { key: k, q: '', focus: true }; drawSecs();
+    if (!pinMenu) { const again = document.querySelector(`[data-pinmenu="${CSS.escape(k)}"]`); if (again) again.focus(); } else if (!document.getElementById('pmq')) { const f = document.querySelector('.pmenu .prow'); if (f) f.focus(); } return; }
+  if (b.dataset.pin && b.closest('.pmenu')){ const k = pinMenu && pinMenu.key; togglePin(b.dataset.pin); const again = document.querySelector(`.pmenu [data-pin="${CSS.escape(b.dataset.pin)}"]`); if (again) again.focus(); return; }
   if (b.dataset.pin){ togglePin(b.dataset.pin); const again = document.querySelector(`[data-pin="${CSS.escape(b.dataset.pin)}"]`); if (again && document.activeElement === document.body) again.focus(); return; }
   if (b.dataset.sec){ const o = getOpen(), s = b.dataset.sec; setOpen(o.includes(s) ? o.filter(x => x !== s) : o.concat(s)); drawSecs(); const h = document.querySelector(`[data-sec="${CSS.escape(s)}"]`); if (h) h.focus(); return; }
   if (b.dataset.opento){ const s = b.dataset.opento; setOpen(getOpen().concat(s)); drawSecs(); const h = document.querySelector(`[data-sec="${CSS.escape(s)}"]`); if (h) h.focus(); return; }
@@ -363,7 +431,7 @@ document.addEventListener('drop', e => { const c = e.target.closest && e.target.
 document.addEventListener('dragend', () => { dragId = null; document.querySelectorAll('.pcard').forEach(x => x.classList.remove('dragging', 'over')); });
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawTheme);
 fetch('/assets/tools.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : null).then(j => { (j && j.tools || []).forEach(t => { if (t.key.indexOf('so-') === 0) COMPANIES[t.key] = t.label; }); }).catch(() => {});
-function start(){ drawAll(); if ($('#q').value.trim()) drawResults(); }
+function start(){ drawAll(); if ($('#q').value.trim()) drawResults(); loadAccountPins(); }
 if (!RS){ document.documentElement.classList.remove('rs-wait'); }
 else {
   RS.requireSignIn({ toolName:'MISMO Resources', eyebrow:'Programs & Operations' }).then(start, () => document.documentElement.classList.remove('rs-wait'));
