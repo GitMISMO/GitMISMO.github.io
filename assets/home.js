@@ -16,7 +16,7 @@ const CONTEXT = {
   'qr:See how codes are scanned': 'scans scanned scanning qr analytics statistics stats traffic usage count',
   'cms:Certification Management System': 'certification certifications certified cms macts assessor assessors invoices pricing renewals ron eclosing evault frame consultant smartdoc programs lifecycle action queue',
   'member-360:Member 360': 'member members membership 360 renewals renew renewal outreach dues prospects organizations orgs levels specials stats contacts relationship',
-  'iif-hq:Plan the IIF cycle': 'iif innovation investment fee fees invoicing invoice invoices collections billing cycle plan tasks key dates decisions risks raid last cycle',
+  'iif-hq:IIF Planning HQ': 'iif innovation investment fee fees invoicing invoice invoices collections billing cycle plan tasks key dates decisions risks raid last cycle',
   'summit-hq:Plan the summit': 'summit event conference meeting rooms room session sessions agenda schedule venue placement conflicts',
   'website-migration:Check the migration': 'website site web page pages migration move sitefinity higher logic launch cutover redirects',
   'team-hq:Open my board': 'board tasks task todo to-do plan plans projects priorities today key dates team meeting',
@@ -166,7 +166,7 @@ const ENTRIES = {
   'website-migration': [['Check the migration', 'Website Migration HQ', 'website', '/website-migration/']],
   'team-hq': [['Open my board', 'Team HQ', 'team', '/team-hq/'], ['Jot it down', 'Team HQ', 'note', '/team-hq/']],
   'meeting-trackers': [['Track meeting attendance', 'Meeting Trackers', 'tracker', '/meeting-trackers/']],
-  'iif-hq': [['Plan the IIF cycle', 'IIF Planning HQ', 'iif', '/iif-hq/']],
+  'iif-hq': [['IIF Planning HQ', 'IIF Planning HQ', 'iif', '/iif-hq/']],   /* the main page only, named after the tool (Perry, 9 Oct 2026) */
   'member-360': [['Member 360', 'Member 360', 'member', '/member-360/']],   /* no sub-pages identified: the main page only, named after the tool (Perry, 9 Oct 2026) */
   'cms': [['Certification Management System', 'Certification Management System', 'cert', '/cms/']],   /* one button, named after the tool (Perry, 9 Oct 2026) */
   'sponsorship': [['Track a sponsor', 'Sponsorship Portal', 'sponsorship', '/sponsorship/'], ['Send the prospectus', '2027 Summit Sponsorship Prospectus', 'send', '/sponsorship-prospectus/']],
