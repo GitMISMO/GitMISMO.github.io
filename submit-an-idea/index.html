@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="description" content="Share an idea that could help the mortgage industry with MISMO. No account needed.">
+<title>Submit an Idea — MISMO</title>
+<!-- Submit an Idea (Perry, 16 Oct 2026): the public form MISMO's website links to, design B. No sign-in. It sends to the
+     relay's /hub-requests/ideas/submit (relay request 10), which keeps each idea in the private Work Requests repository
+     for the Ideas Inbox and emails the sender a receipt and the administrators an alert. -->
+<script>(function(){ try { if (localStorage.getItem('resources:hub:theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {} })();</script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Libre+Franklin:wght@400;500;600;700;800&display=swap">
+<style>
+  :root{--paper:#F1F6FA;--surface:#FFFFFF;--sunk:#E9F1F8;--ink:#0f314c;--ink-2:#456179;--ink-3:#546F88;--line:#E5EEF5;--line-2:#D5E2ED;--line-3:#ADC4D6;
+    --accent:#14486E;--accent-soft:#dcedf8;--link:#2C74A6;--sky:#50a4db;--good:#0F7B5C;--good-soft:#E1F2EC;--bad:#B3372C;--bad-soft:#FBE9E7;--btn:#0f314c;--btn-ink:#fff;--input-bg:#fff;
+    --font:"Libre Franklin",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--display:"Archivo","Libre Franklin",-apple-system,sans-serif;color-scheme:light}
+  :root[data-theme="dark"]{--paper:#0B1826;--surface:#112336;--sunk:#172D44;--ink:#EEF3F8;--ink-2:#B9C8D6;--ink-3:#8C9FB1;--line:#1A3048;--line-2:#243E5A;--line-3:#3A5A7C;
+    --accent:#50A4DB;--accent-soft:#173A57;--link:#7AB9E1;--good:#72C08E;--good-soft:#1F3328;--bad:#F08579;--bad-soft:#3D2220;--btn:#50A4DB;--btn-ink:#0F314C;--input-bg:#0E1C2C;color-scheme:dark}
+  *{box-sizing:border-box} html,body{margin:0}
+  body{min-height:100vh;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
+  header{background:#0f314c;padding:12px 22px;display:flex;align-items:center;gap:18px;min-height:62px}
+  .plate{background:#fff;border-radius:5px;padding:9px 13px;line-height:0;display:inline-block} .plate svg{height:22px;width:auto;display:block}
+  .rule{width:1px;height:30px;background:rgba(116,191,235,.4)} .tn{color:#74bfeb;font-weight:600;font-size:16px}
+  .staff{margin-left:auto;border:1px solid rgba(255,255,255,.35);border-radius:4px;padding:8px 13px;font-weight:600;font-size:13px;color:#fff;text-decoration:none;white-space:nowrap}
+  .staff:hover{background:rgba(255,255,255,.08)} a:focus-visible,button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  main{max-width:1180px;margin:0 auto;padding:30px 22px 48px;display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:28px;align-items:start}
+  .eyebrow{font-size:12.5px;font-weight:700;color:var(--ink-2)} h1{font-family:var(--display);font-size:34px;line-height:1.15;margin:2px 0 0;letter-spacing:-.01em}
+  .sub{color:var(--ink-2);margin-top:6px} .hr{border-top:2px solid var(--ink);margin:14px 0 16px}
+  .card{background:var(--surface);border:1px solid var(--line-2);border-radius:8px}
+  .side{display:flex;flex-direction:column;gap:16px} .side .card{padding:18px 20px} .side h2{font-family:var(--display);font-size:16px;margin:0 0 6px}
+  .side p{margin:0;color:var(--ink-2);font-size:13.5px;line-height:1.6}
+  .talk{background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:12px 14px;font-size:13.5px;line-height:1.5} .talk a{color:inherit;font-weight:700}
+  form.card,.done{padding:22px 24px;display:flex;flex-direction:column;gap:16px}
+  .fld{display:flex;flex-direction:column;gap:6px;border:0;margin:0;padding:0;min-width:0} .fld>label,.fld>legend{font-weight:700;font-size:13.5px;padding:0} .opt{color:var(--ink-3);font-weight:400;font-size:12.5px}
+  input[type=text],input[type=email],input[type=tel],textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--input-bg);border:1px solid var(--line-3);border-radius:4px;padding:9px 12px}
+  textarea{min-height:92px;resize:vertical;line-height:1.5} input:focus,textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(80,164,219,.25)}
+  [aria-invalid="true"]{border-color:var(--bad)!important}
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font:inherit;border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--ink-2);background:var(--surface);cursor:pointer}
+  .chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)} .chip[aria-pressed="true"]::before{content:"\2713\00a0"}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .about{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:14px} .about h2{font-family:var(--display);font-size:16px;margin:0}
+  .radio{display:flex;flex-wrap:wrap;gap:10px} .radio label{border:1px solid var(--line-2);border-radius:6px;padding:9px 14px;display:flex;gap:8px;align-items:center;font-weight:700;cursor:pointer;background:var(--surface)}
+  .radio input{accent-color:var(--accent);margin:0} .radio label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+  .send{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding-top:14px;flex-wrap:wrap}
+  .btn{font:inherit;font-weight:700;font-size:15px;border-radius:4px;padding:12px 22px;border:1px solid var(--btn);background:var(--btn);color:var(--btn-ink);cursor:pointer;text-decoration:none;display:inline-block}
+  .btn.q{background:var(--surface);color:var(--ink);border-color:var(--line-2);font-size:14px;padding:10px 16px} .btn:disabled{opacity:.6;cursor:default}
+  .fine{color:var(--ink-3);font-size:12.5px}
+  .msg{border-radius:6px;padding:11px 14px;font-size:13.5px;background:var(--bad-soft);color:var(--bad)} .msg[hidden]{display:none} .msg ul{margin:6px 0 0;padding-left:18px}
+  .hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
+  .done[hidden],form[hidden]{display:none}
+  .ok{align-self:flex-start;background:var(--good-soft);color:var(--good);border-radius:4px;padding:4px 10px;font-size:13px;font-weight:700}
+  .done h2{font-family:var(--display);font-size:28px;line-height:1.2;margin:0} .done .sub{font-size:15px}
+  .kv{display:grid;grid-template-columns:130px 1fr;gap:8px 14px} .kv dt{color:var(--ink-2);font-weight:600} .kv dd{margin:0}
+  .acts{display:flex;gap:10px;flex-wrap:wrap}
+  @media (max-width:860px){ main{grid-template-columns:1fr;padding:22px 16px 40px} h1{font-size:28px} }
+  @media (max-width:560px){ .two{grid-template-columns:1fr} .tn,.rule{display:none} header{gap:12px;padding:10px 14px} .staff{padding:7px 10px;font-size:12.5px} form.card,.done{padding:18px 16px} }   /* the page heading says Submit an Idea */
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
+0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58
+355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320
+c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
+-297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243
+-4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198
+0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3
+-104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245
+-337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17
+246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49
+203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12
+26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57
+187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44
+-204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288
+-20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92
+-51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12
+-24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297
+3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146
+-106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0
+-356 -14z"/></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263
+13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19
+-16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20
+-222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0
+46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62
+-220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6
+355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
+52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
+</defs></svg>
+<header><a class="plate" href="https://www.mismo.org/" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO"><use href="#mismo-logo"/></svg></a><span class="rule"></span><span class="tn">Submit an Idea</span><a class="staff" href="/">MISMO staff: sign in</a></header>
+<main>
+  <div class="side">
+    <div><div class="eyebrow">Get Involved</div><h1>Submit an Idea</h1>
+      <div class="sub">Tell us about an idea that could help the mortgage industry. A short description is enough to start a conversation.</div><div class="hr"></div></div>
+    <div class="card"><h2>What happens next</h2><p>A MISMO staff member reaches out within <b>two business days</b>, then helps guide the idea through the right MISMO process. You&rsquo;ll get a receipt by email.</p></div>
+    <div class="talk"><b>Rather talk first?</b> Perry Williams, Standards Program Manager: <a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div>
+  </div>
+  <div>
+    <form class="card" id="form" novalidate>
+      <div class="msg" id="msg" role="alert" hidden></div>
+      <div class="fld"><label for="title">What should we call your idea?</label><input type="text" id="title" maxlength="150" autocomplete="off"></div>
+      <div class="fld"><label for="idea">The idea or opportunity</label><textarea id="idea" maxlength="4000"></textarea></div>
+      <fieldset class="fld"><legend>Who should be involved, or would benefit? <span class="opt">&middot; choose any</span></legend>
+        <div class="chips" id="who"></div>
+        <input type="text" id="whoOther" maxlength="200" placeholder="Who else?" aria-label="Who else" hidden></fieldset>
+      <div class="fld"><label for="why">Why it matters <span class="opt">(optional)</span></label><textarea id="why" maxlength="4000" placeholder="Background, timing, a problem it solves, work already under way&hellip;"></textarea></div>
+      <div class="about"><h2>About you</h2>
+        <div class="two"><div class="fld"><label for="name">Your name</label><input type="text" id="name" maxlength="100" autocomplete="name"></div>
+          <div class="fld"><label for="company">Company <span class="opt">(optional)</span></label><input type="text" id="company" maxlength="150" autocomplete="organization"></div>
+          <div class="fld"><label for="email">Email</label><input type="email" id="email" maxlength="200" autocomplete="email"></div>
+          <div class="fld"><label for="phone">Phone <span class="opt">(optional)</span></label><input type="tel" id="phone" maxlength="40" autocomplete="tel"></div></div>
+        <fieldset class="fld"><legend>Is your company a MISMO member? <span class="opt">(optional)</span></legend>
+          <div class="radio"><label><input type="radio" name="member" value="yes">Yes</label><label><input type="radio" name="member" value="no">No</label><label><input type="radio" name="member" value="unsure">Not sure</label></div></fieldset></div>
+      <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" tabindex="-1" autocomplete="off"></div>
+      <div class="send"><button type="submit" class="btn" id="go">Submit idea</button><span class="fine">No account needed. We use your details only to follow up on this idea.</span></div>
+    </form>
+    <section class="card done" id="done" hidden aria-live="polite">
+      <span class="ok">&#10003; Submitted</span>
+      <h2 id="thanks" tabindex="-1">Thank you. Your idea is with MISMO.</h2>
+      <div class="sub" id="next"></div>
+      <dl class="kv" id="sum"></dl>
+      <div class="acts"><button type="button" class="btn q" id="again">Submit another idea</button><a class="btn q" href="https://www.mismo.org/get-involved/submit_an_idea">Back to mismo.org</a></div>
+    </section>
+  </div>
+</main>
+<script>
+(function () {
+  var SUBMIT = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/hub-requests/ideas/submit';
+  var WHO = ['Lenders', 'Servicers', 'Investors and GSEs', 'Technology providers', 'Settlement and title', 'Appraisal and valuation', 'Government agencies', 'Consumers'];
+  var $ = function (id) { return document.getElementById(id); };
+  var startedAt = Date.now(), chosen = {}, other = false, busy = false;
+  function chips() {
+    $('who').innerHTML = WHO.map(function (w) { return '<button type="button" class="chip" data-who="' + w + '" aria-pressed="' + !!chosen[w] + '">' + w + '</button>'; }).join('') +
+      '<button type="button" class="chip" data-who="" aria-pressed="' + other + '">Other</button>';
+    $('whoOther').hidden = !other;
+  }
+  $('who').addEventListener('click', function (e) { var b = e.target.closest('[data-who]'); if (!b) return; var w = b.dataset.who;
+    if (w) chosen[w] = !chosen[w]; else { other = !other; if (other) setTimeout(function () { $('whoOther').focus(); }, 0); }
+    chips(); var again = $('who').querySelector('[data-who="' + w + '"]'); if (again && w) again.focus(); });
+  chips();
+  function val(id) { return ($(id).value || '').trim(); }
+  function oneLine(s) { return s.replace(/\s+/g, ' ').trim(); }
+  function member() { var r = document.querySelector('input[name=member]:checked'); return r ? r.value : ''; }
+  function say(html) { var m = $('msg'); m.innerHTML = html; m.hidden = false; m.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  /* The same checks the relay makes, so most problems are caught here, in the same words. */
+  function check() {
+    var bad = [], mark = function (id, wrong, text) { $(id).setAttribute('aria-invalid', wrong ? 'true' : 'false'); if (wrong) bad.push([id, text]); };
+    mark('title', oneLine(val('title')).length < 3, 'Give your idea a short name.');
+    mark('idea', val('idea').length < 10, 'Describe the idea in a sentence or two.');
+    mark('name', oneLine(val('name')).length < 2, 'Add your name.');
+    mark('email', !/^[^\s@]{1,64}@[^\s@]+\.[A-Za-z]{2,}$/.test(val('email')), 'Add an email address we can reply to.');
+    return bad;
+  }
+  $('form').addEventListener('submit', function (e) {
+    e.preventDefault(); if (busy) return;
+    var bad = check();
+    if (bad.length) { say('<b>A few things to finish:</b><ul>' + bad.map(function (b) { return '<li>' + esc(b[1]) + '</li>'; }).join('') + '</ul>'); $(bad[0][0]).focus(); return; }
+    var body = { title: oneLine(val('title')), idea: val('idea'), who: WHO.filter(function (w) { return chosen[w]; }), whoOther: other ? oneLine(val('whoOther')) : '',
+      why: val('why'), name: oneLine(val('name')), company: oneLine(val('company')), email: val('email'), phone: oneLine(val('phone')), member: member(),
+      website: $('website').value, startedAt: startedAt };
+    busy = true; $('go').disabled = true; $('go').textContent = 'Sending\u2026'; $('msg').hidden = true;
+    fetch(SUBMIT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store', body: JSON.stringify(body) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { r: r, j: j }; }); })
+      .then(function (x) {
+        if (x.r.ok && x.j.ok) return thanks(body, x.j);
+        if (x.r.status === 400 && x.j.problems) return say('<b>A few things to finish:</b><ul>' + x.j.problems.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>');
+        say(esc(x.j.message || 'Your idea couldn\u2019t be sent just now (' + x.r.status + '). Your answers are still here: please try again in a minute.'));
+      }, function () { say('MISMO couldn\u2019t be reached just now. Check your connection and try again; your answers are still here.'); })
+      .then(function () { busy = false; $('go').disabled = false; $('go').textContent = 'Submit idea'; });
+  });
+  function day(ymd) { var d = new Date(ymd + 'T12:00:00Z'); return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }); }
+  function thanks(b, j) {
+    var first = b.name.split(' ')[0];
+    $('thanks').textContent = 'Thank you, ' + first + '. Your idea is with MISMO.';
+    $('next').innerHTML = 'A MISMO staff member will reach out to <b>' + esc(b.email) + '</b> within two business days' + (j.replyBy ? ', by <b>' + esc(day(j.replyBy)) + '</b>' : '') + '. A receipt is on its way to that address.';
+    var who = b.who.concat(b.whoOther ? [b.whoOther] : []).join(', ');
+    $('sum').innerHTML = (j.reference ? '<dt>Reference</dt><dd>' + esc(j.reference) + '</dd>' : '') + '<dt>Your idea</dt><dd>' + esc(b.title) + '</dd>' + (who ? '<dt>Who&rsquo;s involved</dt><dd>' + esc(who) + '</dd>' : '');
+    $('form').hidden = true; $('done').hidden = false; $('thanks').focus();
+  }
+  $('again').addEventListener('click', function () {
+    ['title', 'idea', 'why', 'whoOther'].forEach(function (id) { $(id).value = ''; $(id).removeAttribute('aria-invalid'); });   /* the sender's own details stay */
+    chosen = {}; other = false; chips(); startedAt = Date.now(); $('done').hidden = true; $('form').hidden = false; $('msg').hidden = true; $('title').focus();
+  });
+})();
+</script>
+</body>
+</html>
