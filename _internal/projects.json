@@ -1,4 +1,12 @@
 {
+  "member-360": {
+    "repo": "GitMISMO/member-360-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
   "summit-hq": {
     "repo": "GitMISMO/summit-hq-data",
     "branch": "main",
@@ -257,6 +265,31 @@
     ],
     "readable": [
       "orders-public/"
+    ]
+  },
+  "iif-hq": {
+    "repo": "GitMISMO/iif-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "cms": {
+    "repo": "GitMISMO/cms-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/",
+      "portal-data.json"
+    ]
+  },
+  "financials": {
+    "repo": "GitMISMO/financials-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
     ]
   }
 }
