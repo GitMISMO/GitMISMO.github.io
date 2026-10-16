@@ -174,6 +174,19 @@
      Activity. Their own session is set aside under OWN and comes back on Stop, when the 30 minutes end, or if the
      relay refuses the viewing token. A banner along the bottom of every page says who is being viewed. */
   var OWN = KEY + ':own';
+  /* Remembered browsers (two-step sign-in, relay request 10; Perry, 16 Oct 2026). After a sign-in code, the relay hands
+     back a token that lets this browser skip the code for 30 days. Kept per email beside the session, and kept on
+     signing out, since that is the point of remembering. The relay decides whether one is still good; this only
+     carries it. At most eight people per browser. */
+  var DEVICES = 'resources:devices';
+  function devices() { try { var d = JSON.parse(localStorage.getItem(DEVICES) || '{}'); return d && typeof d === 'object' ? d : {}; } catch (e) { return {}; } }
+  function deviceFor(email) { var t = devices()[String(email || '').toLowerCase()]; return typeof t === 'string' ? t : ''; }
+  function rememberDevice(email, token) {
+    if (!email || typeof token !== 'string' || !token) return;
+    try { var d = devices(), k = String(email).toLowerCase(); delete d[k]; d[k] = token;
+      var keys = Object.keys(d); keys.slice(0, Math.max(0, keys.length - 8)).forEach(function (x) { delete d[x]; });
+      localStorage.setItem(DEVICES, JSON.stringify(d)); } catch (e) {}
+  }
   function restoreOwn() { try { var own = localStorage.getItem(OWN); localStorage.removeItem(OWN); if (own) localStorage.setItem(KEY, own); else localStorage.removeItem(KEY); } catch (e) {} }
   function viewAsBar() {
     if (!document.body) return;
@@ -707,6 +720,7 @@
         .then(function (x) {
           if (x.r.ok && x.b.token) {
             write({ token: x.b.token, name: x.b.name || s.name, email: x.b.email || s.email, access: x.b.access || s.access, platformAdmin: x.b.platformAdmin === true, passwords: true, expiresAt: x.b.expiresAt });
+            rememberDevice(x.b.email || s.email, x.b.device);   /* this browser stays remembered; the relay forgets the others */
             say('Password changed. A confirmation is on its way to your email.', true); go.hidden = true;
             setTimeout(close, 2200); return;
           }
@@ -750,7 +764,7 @@
   }
   api.passwordEyes = passwordEyes;   // for /reset-password.html
   /* The reset page signs the person in with what the relay returned. */
-  api.adopt = function (b) { write({ token: b.token, name: b.name || b.email, email: b.email, access: b.access || {}, platformAdmin: b.platformAdmin === true, passwords: true, expiresAt: b.expiresAt }); };
+  api.adopt = function (b) { rememberDevice(b.email, b.device); write({ token: b.token, name: b.name || b.email, email: b.email, access: b.access || {}, platformAdmin: b.platformAdmin === true, passwords: true, expiresAt: b.expiresAt }); };
 
   /* ---------- the sign-in screen ---------- */
   /* The navy panel of the whole-page screen: the logo, the tool's name, and the line the
@@ -840,6 +854,13 @@
             '<button type="button" class="rs-go" data-rs-fgo>Send reset link</button>' +
             '<button type="button" class="rs-quiet" data-rs-fback>Back to sign in</button>' +
           '</div>' +
+          '<div data-rs-cview hidden>' +
+            '<p class="rs-note" style="margin:0 0 12px;text-align:left" data-rs-cnote></p>' +
+            '<div class="rs-fld"><label for="rs-code">Sign-in code</label><input id="rs-code" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="9" spellcheck="false" placeholder="123456"></div>' +
+            '<button type="button" class="rs-go" data-rs-cgo>' + (expired ? 'Sign in and save' : 'Sign in') + '</button>' +
+            '<button type="button" class="rs-quiet" data-rs-cnew>Send a new code</button>' +
+            '<button type="button" class="rs-quiet" data-rs-cback>Back to sign in</button>' +
+          '</div>' +
           (noAccess ? '<a class="rs-go rs-golink" href="' + esc(askHref) + '">Ask for access</a>' +
                       '<button type="button" class="rs-quiet" data-rs-switch>Sign in as someone else</button>' : '') +
           '<button type="button" class="rs-quiet" data-rs-cancel>' + esc(leave) + '</button>' +
@@ -873,24 +894,18 @@
       go.disabled = true; go.textContent = 'Signing in\u2026'; err.classList.remove('on');
       fetch(RELAY_URL + '/' + LOGIN_PROJECT + '/auth/login', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
-        body: JSON.stringify({ email: e, password: p })
+        body: JSON.stringify({ email: e, password: p, device: deviceFor(e) || undefined })
       }).then(function (r) {
         return r.json().catch(function () { return {}; }).then(function (b) { return { r: r, b: b }; });
       }).then(function (x) {
-        if (x.r.ok && x.b.token) {
-          var s = { token: x.b.token, name: x.b.name || e, email: x.b.email || e,
-                    access: x.b.access || {}, platformAdmin: x.b.platformAdmin === true,
-                    passwords: x.b.passwords === true, expiresAt: x.b.expiresAt };
-          write(s);
-          close(s);
-          return;
-        }
+        if (x.r.ok && x.b.token) return signedIn(x.b, e);
+        if (x.r.ok && x.b.codeRequired && x.b.ticket) return showCode(e, p, x.b.ticket);   /* two-step sign-in (relay request 10) */
         /* One message for a wrong password, an unknown email and an expired account —
            the relay deliberately does not say which, and neither does this. A relay with
            self-service passwords adds how many tries are left, and 423 once locked. */
         if (x.r.status === 423) { showErr(x.b.message || 'This account is locked. Reset your password to unlock it.'); showForgot(true); }
         else if (x.r.status === 401) showErr(x.b.message || 'That email and password do not match an account.');
-        else if (x.r.status === 502) showErr('Sign-in is briefly unavailable. Your work is safe. Try again in a minute.');
+        else if (x.r.status === 502) showErr(x.b.error === 'CODE_NOT_SENT' && x.b.message ? x.b.message : 'Sign-in is briefly unavailable. Your work is safe. Try again in a minute.');
         else showErr(x.b.message || ('Sign-in failed (' + x.r.status + ').'));
       }).catch(function () {
         showErr('Could not reach the sign-in service. Check your connection and try again.');
@@ -928,6 +943,63 @@
     }
     if (fgo) fgo.addEventListener('click', sendReset);
     if (femail) femail.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') sendReset(); });
+    function signedIn(b, e) {
+      var s = { token: b.token, name: b.name || e, email: b.email || e,
+                access: b.access || {}, platformAdmin: b.platformAdmin === true,
+                passwords: b.passwords === true, expiresAt: b.expiresAt };
+      write(s);
+      rememberDevice(s.email, b.device);
+      close(s);
+    }
+
+    /* The code step (two-step sign-in, relay request 10). After the right password the relay may email a six-digit code
+       instead of signing in. It is entered here; it never submits itself, because two wrong codes lock the account.
+       "Send a new code" repeats the password step with what was typed (kept only while this card is open). */
+    var cview = scrim.querySelector('[data-rs-cview]'), cgo = scrim.querySelector('[data-rs-cgo]'), ccode = scrim.querySelector('#rs-code');
+    var cnote = scrim.querySelector('[data-rs-cnote]'), cnew = scrim.querySelector('[data-rs-cnew]'), cback = scrim.querySelector('[data-rs-cback]');
+    var codeFor = { ticket: null, email: '', password: '' };
+    function showCode(e, p, ticket) {
+      codeFor = { ticket: ticket, email: e, password: p };
+      if (signinView) signinView.hidden = true; if (fview) fview.hidden = true; cview.hidden = false; err.classList.remove('on');
+      cnote.innerHTML = 'We emailed a six-digit code to <b>' + esc(e) + '</b>. It works once, for 10 minutes, and this browser will be remembered for 30 days.';
+      ccode.value = ''; ccode.disabled = false; cgo.disabled = false; cgo.hidden = false; cnew.hidden = false; cnote.hidden = false; ccode.parentNode.style.display = '';
+      setTimeout(function () { ccode.focus(); }, 20);
+    }
+    function sendCode() {
+      var c = (ccode.value || '').replace(/\D/g, '');
+      if (c.length !== 6) return showErr('Enter the six-digit code from your email.');
+      cgo.disabled = true; cgo.textContent = 'Checking\u2026'; err.classList.remove('on');
+      fetch(RELAY_URL + '/' + LOGIN_PROJECT + '/auth/code', { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
+        body: JSON.stringify({ ticket: codeFor.ticket, code: c }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { r: r, b: b }; }); })
+        .then(function (x) {
+          if (x.r.ok && x.b.token) { var em = codeFor.email; codeFor = { ticket: null, email: '', password: '' }; return signedIn(x.b, x.b.email || em); }
+          if (x.r.status === 423) { showErr(x.b.message || 'This account is locked. Check your email for a link to set a new password.');
+            ccode.value = ''; ccode.disabled = true; ccode.parentNode.style.display = 'none'; cnote.hidden = true; cgo.hidden = true; cnew.hidden = true; return; }
+          if (x.b.error === 'OLD_CODE') { showErr(x.b.message); ccode.select(); return; }
+          if (x.b.error === 'WRONG_CODE' || x.b.error === 'CODE_EXPIRED') { showErr(x.b.message || 'That code didn\u2019t work.'); ccode.value = ''; ccode.focus(); return; }
+          showErr(x.b.message || ('That didn\u2019t work (' + x.r.status + '). Try again.'));
+        }, function () { showErr('Could not reach the sign-in service. Check your connection and try again.'); })
+        .then(function () { if (cgo.isConnected) { cgo.disabled = false; cgo.textContent = expired ? 'Sign in and save' : 'Sign in'; } });
+    }
+    function newCode() {
+      cnew.disabled = true; err.classList.remove('on');
+      fetch(RELAY_URL + '/' + LOGIN_PROJECT + '/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store',
+        body: JSON.stringify({ email: codeFor.email, password: codeFor.password }) })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (b) { return { r: r, b: b }; }); })
+        .then(function (x) {
+          if (x.r.ok && x.b.token) return signedIn(x.b, codeFor.email);
+          if (x.r.ok && x.b.ticket) { codeFor.ticket = x.b.ticket; ccode.value = ''; ccode.focus();
+            errText.textContent = 'A new code is on its way. Use the one in your newest email.'; err.className = 'rs-banner rs-b-ok on'; return; }
+          showErr(x.b.message || ('A new code couldn\u2019t be sent (' + x.r.status + '). Try again in a minute.'));
+        }, function () { showErr('Could not reach the sign-in service. Check your connection and try again.'); })
+        .then(function () { if (cnew.isConnected) cnew.disabled = false; });
+    }
+    if (cgo) cgo.addEventListener('click', sendCode);
+    if (ccode) ccode.addEventListener('keydown', function (ev) { if (ev.key === 'Enter') sendCode(); });
+    if (cnew) cnew.addEventListener('click', newCode);
+    if (cback) cback.addEventListener('click', function () { codeFor = { ticket: null, email: '', password: '' }; cview.hidden = true; if (signinView) signinView.hidden = false; err.classList.remove('on'); (pass || email).focus(); });
+
     if (go) go.addEventListener('click', submit);
     if (pass) pass.addEventListener('keydown', function (e) { if (e.key === 'Enter') submit(); });
     if (email) email.addEventListener('keydown', function (e) { if (e.key === 'Enter') pass.focus(); });
