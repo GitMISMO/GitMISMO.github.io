@@ -44,12 +44,17 @@
   .bp{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:14px 24px;font:inherit;font-weight:700;font-size:15.5px;box-shadow:0 6px 22px rgba(35,147,230,.45);text-decoration:none;cursor:pointer;display:inline-block}
   .bp:hover{background:#1c86d6} .bp:disabled{opacity:.6;cursor:default}
   .bs{border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.04);color:#fff;border-radius:6px;padding:13px 24px;font:inherit;font-weight:700;font-size:15.5px;text-decoration:none;display:inline-block;cursor:pointer} .bs:hover{background:rgba(255,255,255,.1)}
-  /* Talk to Us First: who to reach, and two ways to do it */
-  .talkd{border:0;border-radius:14px;padding:30px 30px 26px;max-width:min(480px,calc(100vw - 32px));box-shadow:0 24px 60px rgba(11,30,49,.35);color:var(--ink);font-family:var(--font)}
-  .talkd::backdrop{background:rgba(11,30,49,.55)} .talkd h2{font-weight:800;font-size:26px;margin:6px 0 10px;line-height:1.2} .talkd p{margin:0 0 16px;color:var(--ink-2)}
-  .talkd .x{position:absolute;top:12px;right:14px;all:unset;cursor:pointer;font-size:24px;line-height:1;color:var(--ink-3);padding:4px 8px} .talkd .x:focus-visible{outline:2px solid var(--sky)}
-  .tk{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;margin-bottom:18px} .tk span{color:var(--ink-2);font-size:14px} .tk a{color:#1f7fcc;font-weight:700}
-  .talkd .acts .bp{box-shadow:none;font-size:15px;padding:12px 20px}
+  /* Talk to Us First (design T3, Perry, 18 Oct 2026): a simple white pop-up that says things once. Its own white and ink, so a
+     dark setting in the browser or a viewer never darkens it. */
+  .talkd{color-scheme:light;background:#fff;color:var(--ink);border:0;border-radius:14px;padding:26px 28px 24px;width:min(460px,calc(100vw - 32px));box-shadow:0 24px 60px rgba(5,18,32,.5);font-family:var(--font)}
+  .talkd::backdrop{background:rgba(5,15,26,.62)}
+  .talkd h2{margin:0 0 6px;font-size:24px;font-weight:800;line-height:1.25;padding-right:28px} .talkd p{margin:0 0 18px;color:var(--ink-2);font-size:15px;line-height:1.5}
+  .talkd .x{all:unset;position:absolute;top:12px;right:14px;cursor:pointer;font-size:24px;line-height:1;color:var(--ink-3);padding:4px 8px;border-radius:6px} .talkd .x:hover{background:#f2f6fa} .talkd .x:focus-visible{outline:2px solid var(--sky)}
+  .tk{display:flex;gap:14px;align-items:center;border-top:1px solid #e9eef3;padding-top:16px}
+  .tk .pw{width:44px;height:44px;border-radius:50%;background:linear-gradient(160deg,#a8d4ef,#3f9be0);color:#fff;font-weight:800;font-size:15px;display:flex;align-items:center;justify-content:center;flex:none}
+  .tk b{display:block;font-size:16px} .tk span.t{display:block;color:var(--ink-2);font-size:14px} .tk a{color:#1f7fcc;font-weight:700;font-size:14.5px}
+  .talkd .acts{margin-top:18px;align-items:center} .talkd .acts .bp{box-shadow:none;font-size:15px;padding:11px 20px}
+  .copy{all:unset;cursor:pointer;color:#1f7fcc;font-weight:700;font-size:15px;padding:10px 6px;border-radius:6px} .copy:focus-visible{outline:2px solid var(--sky)}
   .words{position:absolute;right:120px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;padding-left:30px;border-left:1px solid rgba(255,255,255,.18)}
   .words b{font-size:13px;letter-spacing:.24em;color:var(--sky);font-weight:700} .words hr{border:0;border-top:1px solid rgba(255,255,255,.4);width:46px;margin:6px 0 0} .words small{font-size:12px;letter-spacing:.14em;color:#d6e4ef;line-height:1.7}
   /* the form section */
@@ -186,11 +191,10 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 </main>
 <dialog class="talkd" id="talkd" aria-labelledby="talkd-h">
   <button type="button" class="x" id="talkx" aria-label="Close">&times;</button>
-  <div class="eyebrow" style="color:#2393e6">TALK TO US FIRST</div>
-  <h2 id="talkd-h">Talk it through with Perry</h2>
-  <p>Not sure your idea is ready, or where it fits? Perry is glad to talk it through with you before you submit it.</p>
-  <div class="tk"><b>Perry Williams</b><span>Standards Program Manager, MISMO</span><a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div>
-  <div class="acts"><a class="bp" id="talkmail" href="mailto:pwilliams@mismo.org?subject=An%20idea%20I%E2%80%99d%20like%20to%20talk%20through">Email Perry</a><button type="button" class="q" id="talkcopy">Copy email address</button></div>
+  <h2 id="talkd-h">Talk to Perry first</h2>
+  <p>Not sure your idea is ready, or where it fits? He&rsquo;s glad to talk it through before you submit it.</p>
+  <div class="tk"><span class="pw" aria-hidden="true">PW</span><div><b>Perry Williams</b><span class="t">Standards Program Manager, MISMO</span><a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div></div>
+  <div class="acts"><a class="bp" id="talkmail" href="mailto:pwilliams@mismo.org?subject=An%20idea%20I%E2%80%99d%20like%20to%20talk%20through">Email Perry</a><button type="button" class="copy" id="talkcopy">Copy address</button></div>
 </dialog>
 <footer><div class="foot"><a class="logo" href="https://collaborate.mismo.org/mismowebsite/home" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO" style="--logo-body:#fff;--logo-s:#4fb0ec"><use href="#mismo-logo"/></svg></a>
   <span>1919 M Street NW, 5th Floor, Washington, DC 20036 &middot; <a href="mailto:info@mismo.org">info@mismo.org</a></span><span class="fsp"></span>
@@ -200,7 +204,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
    Talk to Us First opens a panel with Perry's details: email him, or copy his address (Perry, 18 Oct 2026). */
 (function () {
   var dlg = document.getElementById('talkd'), copy = document.getElementById('talkcopy');
-  document.getElementById('talk').addEventListener('click', function () { copy.textContent = 'Copy email address'; dlg.showModal(); document.getElementById('talkmail').focus(); });
+  document.getElementById('talk').addEventListener('click', function () { copy.textContent = 'Copy address'; dlg.showModal(); document.getElementById('talkmail').focus(); });
   document.getElementById('talkx').addEventListener('click', function () { dlg.close(); });
   dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   /* outside the panel */
   dlg.addEventListener('close', function () { document.getElementById('talk').focus(); });
