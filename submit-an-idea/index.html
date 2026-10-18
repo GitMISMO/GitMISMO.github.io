@@ -6,56 +6,78 @@
 <meta name="referrer" content="strict-origin-when-cross-origin">
 <meta name="description" content="Share an idea that could help the mortgage industry with MISMO. No account needed.">
 <title>Submit an Idea — MISMO</title>
-<!-- Submit an Idea (Perry, 16 Oct 2026): the public form MISMO's website links to, design B. No sign-in. It sends to the
-     relay's /hub-requests/ideas/submit (relay request 10), which keeps each idea in the private Work Requests repository
-     for the Ideas Inbox and emails the sender a receipt and the administrators an alert. -->
-<script>(function(){ try { if (localStorage.getItem('resources:hub:theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {} })();</script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800&family=Libre+Franklin:wght@400;500;600;700;800&display=swap">
+<!-- Submit an Idea (Perry, 16 Oct 2026; restyled 18 Oct as design W1): the public form MISMO's website links to, in the website's
+     own look: its header (menu, search, Log in) and its Get Involved hero. No sign-in. It sends to the relay's
+     /hub-requests/ideas/submit (relay request 10), which keeps each idea in the private Work Requests repository for the
+     Ideas Inbox and emails the sender a receipt and the administrators an alert. Fonts and colours matched from the
+     website (Figtree is the nearest match); swap in the site's own when Jonna has them. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap">
 <style>
-  :root{--paper:#F1F6FA;--surface:#FFFFFF;--sunk:#E9F1F8;--ink:#0f314c;--ink-2:#456179;--ink-3:#546F88;--line:#E5EEF5;--line-2:#D5E2ED;--line-3:#ADC4D6;
-    --accent:#14486E;--accent-soft:#dcedf8;--link:#2C74A6;--sky:#50a4db;--good:#0F7B5C;--good-soft:#E1F2EC;--bad:#B3372C;--bad-soft:#FBE9E7;--btn:#0f314c;--btn-ink:#fff;--input-bg:#fff;
-    --font:"Libre Franklin",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--display:"Archivo","Libre Franklin",-apple-system,sans-serif;color-scheme:light}
-  :root[data-theme="dark"]{--paper:#0B1826;--surface:#112336;--sunk:#172D44;--ink:#EEF3F8;--ink-2:#B9C8D6;--ink-3:#8C9FB1;--line:#1A3048;--line-2:#243E5A;--line-3:#3A5A7C;
-    --accent:#50A4DB;--accent-soft:#173A57;--link:#7AB9E1;--good:#72C08E;--good-soft:#1F3328;--bad:#F08579;--bad-soft:#3D2220;--btn:#50A4DB;--btn-ink:#0F314C;--input-bg:#0E1C2C;color-scheme:dark}
-  *{box-sizing:border-box} html,body{margin:0}
-  body{min-height:100vh;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.5;padding:env(safe-area-inset-top,0px) 0 env(safe-area-inset-bottom,0px)}
-  header{background:#0f314c;padding:12px 22px;display:flex;align-items:center;gap:18px;min-height:62px}
-  .plate{background:#fff;border-radius:5px;padding:9px 13px;line-height:0;display:inline-block} .plate svg{height:22px;width:auto;display:block}
-  .rule{width:1px;height:30px;background:rgba(116,191,235,.4)} .tn{color:#74bfeb;font-weight:600;font-size:16px}
-  .staff{margin-left:auto;border:1px solid rgba(255,255,255,.35);border-radius:4px;padding:8px 13px;font-weight:600;font-size:13px;color:#fff;text-decoration:none;white-space:nowrap}
-  .staff:hover{background:rgba(255,255,255,.08)} a:focus-visible,button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
-  main{max-width:1180px;margin:0 auto;padding:30px 22px 48px;display:grid;grid-template-columns:minmax(0,380px) minmax(0,1fr);gap:28px;align-items:start}
-  .eyebrow{font-size:12.5px;font-weight:700;color:var(--ink-2)} h1{font-family:var(--display);font-size:34px;line-height:1.15;margin:2px 0 0;letter-spacing:-.01em}
-  .sub{color:var(--ink-2);margin-top:6px} .hr{border-top:2px solid var(--ink);margin:14px 0 16px}
-  .card{background:var(--surface);border:1px solid var(--line-2);border-radius:8px}
-  .side{display:flex;flex-direction:column;gap:16px} .side .card{padding:18px 20px} .side h2{font-family:var(--display);font-size:16px;margin:0 0 6px}
-  .side p{margin:0;color:var(--ink-2);font-size:13.5px;line-height:1.6}
-  .talk{background:var(--accent-soft);color:var(--accent);border-radius:6px;padding:12px 14px;font-size:13.5px;line-height:1.5} .talk a{color:inherit;font-weight:700}
-  form.card,.done{padding:22px 24px;display:flex;flex-direction:column;gap:16px}
-  .fld{display:flex;flex-direction:column;gap:6px;border:0;margin:0;padding:0;min-width:0} .fld>label,.fld>legend{font-weight:700;font-size:13.5px;padding:0} .opt{color:var(--ink-3);font-weight:400;font-size:12.5px}
-  input[type=text],input[type=email],input[type=tel],textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--input-bg);border:1px solid var(--line-3);border-radius:4px;padding:9px 12px}
-  textarea{min-height:92px;resize:vertical;line-height:1.5} input:focus,textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(80,164,219,.25)}
-  [aria-invalid="true"]{border-color:var(--bad)!important}
-  .chips{display:flex;flex-wrap:wrap;gap:7px}
-  .chip{font:inherit;border:1px solid var(--line-2);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--ink-2);background:var(--surface);cursor:pointer}
-  .chip[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)} .chip[aria-pressed="true"]::before{content:"\2713\00a0"}
+  :root{--navy:#0b1e31;--ink:#12304d;--ink-2:#4d6074;--ink-3:#6b7d8f;--sky:#5ab4ee;--blue:#2393e6;--line:#e1e8ef;--field:#cfdae5;--bad:#b3372c;--bad-soft:#fbe9e7;--good:#0f7b5c;--good-soft:#e1f2ec;
+    --font:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color-scheme:light}
+  *{box-sizing:border-box} html,body{margin:0} html{scroll-padding-top:20px}
+  body{background:#fff;color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
+  a:focus-visible,button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+  .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  /* the website's header */
+  .site{background:var(--navy);color:#fff;padding-top:env(safe-area-inset-top,0px);position:relative;z-index:5}
+  .bar{max-width:1440px;margin:0 auto;height:68px;display:flex;align-items:center;gap:28px;padding:0 46px}
+  .logo{display:block;line-height:0;flex:none} .logo svg{height:32px;width:auto;--logo-body:#fff;--logo-s:#4fb0ec}
+  .menu{display:flex;list-style:none;margin:0 0 0 70px;padding:0;gap:22px} .dd{position:relative;display:flex;align-items:center}
+  .dd .top{color:#f2f6fa;text-decoration:none;font-weight:500;font-size:15px;padding:8px 0} .dd .top:hover{color:#fff}
+  .ddb{all:unset;cursor:pointer;width:22px;height:30px;display:inline-flex;align-items:center;justify-content:center;color:#f2f6fa}
+  .ddb svg{width:11px;height:11px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+  .sub{display:none;position:absolute;top:100%;left:-14px;min-width:240px;list-style:none;margin:0;padding:8px 0;background:#fff;border-radius:8px;box-shadow:0 12px 30px rgba(11,30,49,.25)}
+  .dd:hover .sub,.dd.open .sub{display:block} .sub a{display:block;padding:9px 16px;color:var(--ink);text-decoration:none;font-size:14.5px} .sub a:hover{background:#f2f8fd}
+  .right{margin-left:auto;display:flex;align-items:center;gap:18px} .search{color:#fff;line-height:0} .search svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+  .login{background:#16385a;color:#fff;text-decoration:none;border-radius:999px;padding:9px 20px;font-weight:700;font-size:15px} .login:hover{background:#1d4670}
+  .burger{all:unset;display:none;cursor:pointer;color:#fff;line-height:0} .burger svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+  /* the hero, as on Get Involved */
+  .hero{position:relative;overflow:hidden;color:#fff;background:linear-gradient(100deg,#0a1a2b 0%,#0c2640 48%,#113656 100%)}
+  .hero-in{position:relative;max-width:1440px;margin:0 auto;padding:64px 160px 72px;min-height:500px}
+  .skyline{position:absolute;right:0;bottom:0;width:58%;height:78%;opacity:.55} .skyline rect{fill:#1b4466;opacity:.55} .skyline .ln{stroke:var(--sky);stroke-width:.6;opacity:.7} .skyline .ln2{stroke:var(--sky);stroke-width:.4;opacity:.5}
+  .eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.2em;color:var(--sky)}
+  h1{font-weight:800;font-size:56px;line-height:1.05;letter-spacing:-.015em;margin:14px 0 0;max-width:800px} h1 .b{display:block;color:#59b5f0}
+  .lead{font-size:19px;font-weight:600;margin:24px 0 0;max-width:640px} .lead2{font-size:15.5px;font-weight:300;color:#8fcaf2;margin:12px 0 0;max-width:640px}
+  .btns{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap;position:relative}
+  .bp{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:14px 24px;font:inherit;font-weight:700;font-size:15.5px;box-shadow:0 6px 22px rgba(35,147,230,.45);text-decoration:none;cursor:pointer;display:inline-block}
+  .bp:hover{background:#1c86d6} .bp:disabled{opacity:.6;cursor:default}
+  .bs{border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.04);color:#fff;border-radius:6px;padding:13px 24px;font-weight:700;font-size:15.5px;text-decoration:none;display:inline-block} .bs:hover{background:rgba(255,255,255,.1)}
+  .words{position:absolute;right:120px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;padding-left:30px;border-left:1px solid rgba(255,255,255,.18)}
+  .words b{font-size:13px;letter-spacing:.24em;color:var(--sky);font-weight:700} .words hr{border:0;border-top:1px solid rgba(255,255,255,.4);width:46px;margin:6px 0 0} .words small{font-size:12px;letter-spacing:.14em;color:#d6e4ef;line-height:1.7}
+  /* the form section */
+  .sec{max-width:1440px;margin:0 auto;padding:52px 160px 64px} h2.h2{font-weight:800;font-size:36px;letter-spacing:-.01em;margin:0} .secsub{color:var(--ink-2);font-size:16px;font-weight:300;margin-top:10px}
+  .grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:32px;margin-top:30px;align-items:start}
+  .steps{display:flex;flex-direction:column;gap:14px} .stp{border:1px solid var(--line);border-radius:14px;padding:20px 22px;display:grid;grid-template-columns:1fr auto;gap:4px 12px}
+  .stp b{font-size:17px} .stp .n{grid-row:1 / span 2;grid-column:2;font-size:30px;font-weight:800;color:#d5e6f4} .stp span{color:var(--ink-2);font-size:14.5px;font-weight:300}
+  .talk{background:#f2f8fd;border-radius:12px;padding:16px 18px;font-size:14.5px;margin-top:14px} .talk a{color:#1f7fcc;font-weight:700}
+  form.card,.done{background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:0 10px 34px rgba(12,38,64,.10);padding:28px 30px;display:flex;flex-direction:column;gap:16px}
+  .ftitle{font-weight:800;font-size:22px}
+  .fld{display:flex;flex-direction:column;gap:7px;border:0;margin:0;padding:0;min-width:0} .fld>label,.fld>legend{font-weight:700;font-size:14.5px;padding:0} .opt{color:var(--ink-3);font-weight:400;font-size:13px}
+  input[type=text],input[type=email],input[type=tel],textarea{width:100%;font:inherit;font-size:14.5px;color:var(--ink);background:#fbfdff;border:1px solid var(--field);border-radius:8px;padding:11px 14px}
+  textarea{min-height:96px;resize:vertical} input:focus,textarea:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px rgba(90,180,238,.25)} [aria-invalid="true"]{border-color:var(--bad)!important}
+  .chips{display:flex;flex-wrap:wrap;gap:8px} .chip{font:inherit;border:1px solid var(--field);border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600;color:#3d5167;background:#fff;cursor:pointer}
+  .chip[aria-pressed="true"]{background:#e6f2fc;border-color:var(--blue);color:#0f5d9c} .chip[aria-pressed="true"]::before{content:"\2713\00a0"}
   .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .about{border-top:1px solid var(--line);padding-top:14px;display:flex;flex-direction:column;gap:14px} .about h2{font-family:var(--display);font-size:16px;margin:0}
-  .radio{display:flex;flex-wrap:wrap;gap:10px} .radio label{border:1px solid var(--line-2);border-radius:6px;padding:9px 14px;display:flex;gap:8px;align-items:center;font-weight:700;cursor:pointer;background:var(--surface)}
-  .radio input{accent-color:var(--accent);margin:0} .radio label:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
-  .send{display:flex;align-items:center;gap:14px;border-top:1px solid var(--line);padding-top:14px;flex-wrap:wrap}
-  .btn{font:inherit;font-weight:700;font-size:15px;border-radius:4px;padding:12px 22px;border:1px solid var(--btn);background:var(--btn);color:var(--btn-ink);cursor:pointer;text-decoration:none;display:inline-block}
-  .btn.q{background:var(--surface);color:var(--ink);border-color:var(--line-2);font-size:14px;padding:10px 16px} .btn:disabled{opacity:.6;cursor:default}
-  .fine{color:var(--ink-3);font-size:12.5px}
-  .msg{border-radius:6px;padding:11px 14px;font-size:13.5px;background:var(--bad-soft);color:var(--bad)} .msg[hidden]{display:none} .msg ul{margin:6px 0 0;padding-left:18px}
+  .about{border-top:1px solid #e9eef3;padding-top:16px;display:flex;flex-direction:column;gap:14px} .about h3{font-weight:800;font-size:17px;margin:0}
+  .radio{display:flex;flex-wrap:wrap;gap:10px} .radio label{border:1px solid var(--field);border-radius:8px;padding:10px 16px;display:flex;gap:8px;align-items:center;font-weight:700;cursor:pointer;font-size:14px}
+  .radio input{accent-color:var(--blue);margin:0} .radio label:has(input:checked){border-color:var(--blue);background:#e6f2fc}
+  .send{display:flex;align-items:center;gap:14px;border-top:1px solid #e9eef3;padding-top:16px;flex-wrap:wrap} .fine{color:var(--ink-3);font-size:13px}
+  .msg{border-radius:8px;padding:12px 14px;font-size:14px;background:var(--bad-soft);color:var(--bad)} .msg[hidden]{display:none} .msg ul{margin:6px 0 0;padding-left:18px} .msg a{color:inherit;font-weight:700}
   .hp{position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden}
-  .done[hidden],form[hidden]{display:none}
-  .ok{align-self:flex-start;background:var(--good-soft);color:var(--good);border-radius:4px;padding:4px 10px;font-size:13px;font-weight:700}
-  .done h2{font-family:var(--display);font-size:28px;line-height:1.2;margin:0} .done .sub{font-size:15px}
-  .kv{display:grid;grid-template-columns:130px 1fr;gap:8px 14px} .kv dt{color:var(--ink-2);font-weight:600} .kv dd{margin:0}
-  .acts{display:flex;gap:10px;flex-wrap:wrap}
-  @media (max-width:860px){ main{grid-template-columns:1fr;padding:22px 16px 40px} h1{font-size:28px} }
-  @media (max-width:560px){ .two{grid-template-columns:1fr} .tn,.rule{display:none} header{gap:12px;padding:10px 14px} .staff{padding:7px 10px;font-size:12.5px} form.card,.done{padding:18px 16px} }   /* the page heading says Submit an Idea */
+  .done[hidden],form[hidden]{display:none} .ok{align-self:flex-start;background:var(--good-soft);color:var(--good);border-radius:4px;padding:4px 10px;font-size:13px;font-weight:700}
+  .done h3{font-weight:800;font-size:28px;line-height:1.2;margin:0} .done .secsub{margin:0} .kv{display:grid;grid-template-columns:130px 1fr;gap:8px 14px;margin:0} .kv dt{color:var(--ink-2);font-weight:600} .kv dd{margin:0}
+  .acts{display:flex;gap:10px;flex-wrap:wrap} .q{font:inherit;font-weight:700;font-size:14.5px;border-radius:6px;padding:11px 18px;border:1px solid var(--field);background:#fff;color:var(--ink);cursor:pointer;text-decoration:none}
+  /* a footer like the website's, with the way in for MISMO staff */
+  footer{background:var(--navy);color:#c9d6e2;padding:30px 46px calc(30px + env(safe-area-inset-bottom,0px))} .foot{max-width:1440px;margin:0 auto;display:flex;gap:30px;flex-wrap:wrap;align-items:center;font-size:14px}
+  footer a{color:#fff} footer .logo svg{height:26px} .fsp{flex:1}
+  @media (max-width:1180px){ .menu{margin-left:20px;gap:14px} .hero-in,.sec{padding-left:60px;padding-right:60px} .words{display:none} }
+  @media (max-width:980px){
+    .bar{padding:0 18px;gap:14px} .burger{display:inline-block} .menu{display:none;position:absolute;top:68px;left:0;right:0;flex-direction:column;gap:0;margin:0;background:var(--navy);padding:6px 18px 14px;border-top:1px solid rgba(255,255,255,.1)}
+    .site.open .menu{display:flex} .dd{flex-wrap:wrap} .dd .top{flex:1;padding:12px 0} .sub{position:static;box-shadow:none;background:transparent;padding:0 0 8px 12px;min-width:0;width:100%} .dd:hover .sub,.dd:focus-within .sub{display:none} .dd.open .sub{display:block} .sub a{color:#c9d6e2}
+    .hero-in{padding:44px 20px 52px;min-height:0} h1{font-size:40px} .sec{padding:40px 16px 48px} .grid{grid-template-columns:1fr} .skyline{width:100%;height:45%}
+  }
+  @media (max-width:560px){ .two{grid-template-columns:1fr} h1{font-size:34px} .lead{font-size:17px} form.card,.done{padding:20px 16px} .login{padding:8px 14px;font-size:14px} .bar .search{display:none} }
 </style>
 </head>
 <body>
@@ -88,42 +110,81 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
 </defs></svg>
-<header><a class="plate" href="https://www.mismo.org/" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO"><use href="#mismo-logo"/></svg></a><span class="rule"></span><span class="tn">Submit an Idea</span><a class="staff" href="/">MISMO staff: sign in</a></header>
+<header class="site" id="site">
+  <div class="bar">
+    <a class="logo" href="https://collaborate.mismo.org/mismowebsite/home" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO"><use href="#mismo-logo"/></svg></a>
+    <ul class="menu" id="menu"><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/membership">Membership</a><button type="button" class="ddb" aria-expanded="false" aria-label="Membership menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
+        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/membership/member-directory">MISMO Members</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/membership/lender-champions">Our Lender Champions</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/membership/industry-champions">Our Industry Champions</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/membership/iif">Innovation Investment Fund</a></li></ul></li><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/standards-resources">Standards &amp; Resources</a><button type="button" class="ddb" aria-expanded="false" aria-label="Standards &amp; Resources menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
+        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/business-glossary">Business Glossary</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/certification">Certifications</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/mismo-link">MISMO Link</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/digital-mortgage-resource-center">Digital Mortgage Resource Center</a></li></ul></li><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/get-involved">Get Involved</a><button type="button" class="ddb" aria-expanded="false" aria-label="Get Involved menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
+        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/workgroups">Communities &amp; Workgroups</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/communities">Collaborate (Members Only)</a></li></ul></li><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/events">Events</a><button type="button" class="ddb" aria-expanded="false" aria-label="Events menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
+        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/events/summit">MISMO Summit</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/events/education">Education</a></li></ul></li><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/about-mismo">About MISMO</a><button type="button" class="ddb" aria-expanded="false" aria-label="About MISMO menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
+        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/news">News</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/contributor-awards">Contributor Awards</a></li></ul></li></ul>
+    <div class="right"><a class="search" href="https://collaborate.mismo.org/mismowebsite/home" title="Search on the MISMO website" aria-label="Search on the MISMO website"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></a>
+      <a class="login" href="https://identity.mba.org/connect/authorize?client_id=Mba.HigherLogic.MismoMigration&amp;scope=openid+profile+email+id&amp;response_type=code&amp;redirect_uri=https%3A%2F%2Fcollaborate.mismo.org&amp;state=https%3a%2f%2fcollaborate.mismo.org%2fmismowebsite%2fhome">Log in</a>
+      <button type="button" class="burger" id="burger" aria-expanded="false" aria-controls="menu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
+  </div>
+</header>
 <main>
-  <div class="side">
-    <div><div class="eyebrow">Get Involved</div><h1>Submit an Idea</h1>
-      <div class="sub">Tell us about an idea that could help the mortgage industry. A short description is enough to start a conversation.</div><div class="hr"></div></div>
-    <div class="card"><h2>What happens next</h2><p>A MISMO staff member reaches out within <b>two business days</b>, then helps guide the idea through the right MISMO process. You&rsquo;ll get a receipt by email.</p></div>
-    <div class="talk"><b>Rather talk first?</b> Perry Williams, Standards Program Manager: <a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div>
-  </div>
-  <div>
-    <form class="card" id="form" novalidate>
-      <div class="msg" id="msg" role="alert" hidden></div>
-      <div class="fld"><label for="title">What should we call your idea?</label><input type="text" id="title" maxlength="150" autocomplete="off"></div>
-      <div class="fld"><label for="idea">The idea or opportunity</label><textarea id="idea" maxlength="4000"></textarea></div>
-      <fieldset class="fld"><legend>Who should be involved, or would benefit? <span class="opt">&middot; choose any</span></legend>
-        <div class="chips" id="who"></div>
-        <input type="text" id="whoOther" maxlength="200" placeholder="Who else?" aria-label="Who else" hidden></fieldset>
-      <div class="fld"><label for="why">Why it matters <span class="opt">(optional)</span></label><textarea id="why" maxlength="4000" placeholder="Background, timing, a problem it solves, work already under way&hellip;"></textarea></div>
-      <div class="about"><h2>About you</h2>
-        <div class="two"><div class="fld"><label for="name">Your name</label><input type="text" id="name" maxlength="100" autocomplete="name"></div>
-          <div class="fld"><label for="company">Company <span class="opt">(optional)</span></label><input type="text" id="company" maxlength="150" autocomplete="organization"></div>
-          <div class="fld"><label for="email">Email</label><input type="email" id="email" maxlength="200" autocomplete="email"></div>
-          <div class="fld"><label for="phone">Phone <span class="opt">(optional)</span></label><input type="tel" id="phone" maxlength="40" autocomplete="tel"></div></div>
-        <fieldset class="fld"><legend>Is your company a MISMO member? <span class="opt">(optional)</span></legend>
-          <div class="radio"><label><input type="radio" name="member" value="yes">Yes</label><label><input type="radio" name="member" value="no">No</label><label><input type="radio" name="member" value="unsure">Not sure</label></div></fieldset></div>
-      <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" tabindex="-1" autocomplete="off"></div>
-      <div class="send"><button type="submit" class="btn" id="go">Submit idea</button><span class="fine">No account needed. We use your details only to follow up on this idea.</span></div>
-    </form>
-    <section class="card done" id="done" hidden aria-live="polite">
-      <span class="ok">&#10003; Submitted</span>
-      <h2 id="thanks" tabindex="-1">Thank you. Your idea is with MISMO.</h2>
-      <div class="sub" id="next"></div>
-      <dl class="kv" id="sum"></dl>
-      <div class="acts"><button type="button" class="btn q" id="again">Submit another idea</button><a class="btn q" href="https://www.mismo.org/get-involved/submit_an_idea">Back to mismo.org</a></div>
-    </section>
-  </div>
+  <section class="hero"><div class="hero-in"><svg class="skyline" viewBox="0 0 720 100" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="62" width="46" height="38"/><rect x="52" y="42" width="30" height="58"/><rect x="88" y="26" width="58" height="74"/><rect x="152" y="50" width="40" height="50"/><rect x="198" y="8" width="64" height="92"/><rect x="268" y="38" width="36" height="62"/><rect x="310" y="20" width="70" height="80"/><rect x="386" y="44" width="44" height="56"/><rect x="436" y="30" width="62" height="70"/><rect x="504" y="52" width="38" height="48"/><rect x="548" y="16" width="66" height="84"/><rect x="620" y="36" width="52" height="64"/><rect x="678" y="42" width="44" height="58"/><path class="ln" d="M360 100 L720 70"/><path class="ln2" d="M470 100 L720 84"/></svg>
+    <div class="words" aria-hidden="true"><b>SHARE</b><b>DISCUSS</b><b>DEVELOP</b><b>ADOPT</b><hr><small>A MORE EFFICIENT<br>MORTGAGE INDUSTRY</small></div>
+    <div style="position:relative"><div class="eyebrow">GET INVOLVED</div>
+      <h1>Share Your Idea<span class="b">Shape What Comes Next</span></h1>
+      <p class="lead">Have an idea that could help the mortgage industry work better together? Tell MISMO about it.</p>
+      <p class="lead2">No account needed, and no finished proposal. A few sentences is enough to start the conversation.</p>
+      <div class="btns"><a class="bp" href="#tell">Start Your Idea &darr;</a><a class="bs" href="mailto:pwilliams@mismo.org">Talk to Us First</a></div></div>
+  </div></section>
+  <section class="sec" id="tell"><h2 class="h2">Tell Us About Your Idea</h2><p class="secsub">It takes about five minutes. A MISMO staff member will reach out within two business days.</p>
+    <div class="grid">
+      <div><div class="steps"><div class="stp"><b>You submit</b><span>No account needed. You&rsquo;ll get a receipt by email.</span><span class="n" aria-hidden="true">01</span></div>
+        <div class="stp"><b>We reach out</b><span>A MISMO staff member contacts you within two business days.</span><span class="n" aria-hidden="true">02</span></div>
+        <div class="stp"><b>We guide it</b><span>Together we find the right MISMO process for the idea.</span><span class="n" aria-hidden="true">03</span></div></div>
+        <div class="talk"><b>Rather talk first?</b> Perry Williams, Standards Program Manager: <a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div></div>
+      <div>
+        <form class="card" id="form" novalidate>
+          <div class="ftitle">Your idea</div>
+          <div class="msg" id="msg" role="alert" hidden></div>
+          <div class="fld"><label for="title">What should we call your idea?</label><input type="text" id="title" maxlength="150" autocomplete="off" placeholder="A short name"></div>
+          <div class="fld"><label for="idea">The idea or opportunity</label><textarea id="idea" maxlength="4000" placeholder="A few sentences is plenty"></textarea></div>
+          <fieldset class="fld"><legend>Who should be involved, or would benefit? <span class="opt">Choose any</span></legend>
+            <div class="chips" id="who"></div>
+            <input type="text" id="whoOther" maxlength="200" placeholder="Who else?" aria-label="Who else" hidden></fieldset>
+          <div class="fld"><label for="why">Why it matters <span class="opt">(optional)</span></label><textarea id="why" maxlength="4000" placeholder="Background, timing, a problem it solves, work already under way&hellip;"></textarea></div>
+          <div class="about"><h3>About you</h3>
+            <div class="two"><div class="fld"><label for="name">Your name</label><input type="text" id="name" maxlength="100" autocomplete="name"></div>
+              <div class="fld"><label for="company">Company <span class="opt">(optional)</span></label><input type="text" id="company" maxlength="150" autocomplete="organization"></div>
+              <div class="fld"><label for="email">Email</label><input type="email" id="email" maxlength="200" autocomplete="email"></div>
+              <div class="fld"><label for="phone">Phone <span class="opt">(optional)</span></label><input type="tel" id="phone" maxlength="40" autocomplete="tel"></div></div>
+            <fieldset class="fld"><legend>Is your company a MISMO member? <span class="opt">(optional)</span></legend>
+              <div class="radio"><label><input type="radio" name="member" value="yes">Yes</label><label><input type="radio" name="member" value="no">No</label><label><input type="radio" name="member" value="unsure">Not sure</label></div></fieldset></div>
+          <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" tabindex="-1" autocomplete="off"></div>
+          <div class="send"><button type="submit" class="bp" id="go">Submit Your Idea &rarr;</button><span class="fine">No account needed. We use your details only to follow up on this idea.</span></div>
+        </form>
+        <section class="done" id="done" hidden aria-live="polite">
+          <span class="ok">&#10003; Submitted</span>
+          <h3 id="thanks" tabindex="-1">Thank you. Your idea is with MISMO.</h3>
+          <p class="secsub" id="next"></p>
+          <dl class="kv" id="sum"></dl>
+          <div class="acts"><button type="button" class="q" id="again">Submit another idea</button><a class="q" href="https://collaborate.mismo.org/mismowebsite/get-involved">Back to Get Involved</a></div>
+        </section>
+      </div>
+    </div>
+  </section>
 </main>
+<footer><div class="foot"><a class="logo" href="https://collaborate.mismo.org/mismowebsite/home" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO" style="--logo-body:#fff;--logo-s:#4fb0ec"><use href="#mismo-logo"/></svg></a>
+  <span>1919 M Street NW, 5th Floor, Washington, DC 20036 &middot; <a href="mailto:info@mismo.org">info@mismo.org</a></span><span class="fsp"></span>
+  <a href="https://collaborate.mismo.org/mismowebsite/privacy-policy">Privacy Policy</a><a href="https://collaborate.mismo.org/mismowebsite/terms-of-use">Terms of Use</a><a href="/">MISMO staff: sign in</a></div></footer>
+<script>
+/* The website's menu: each item opens its list from its arrow (and on hover); on a phone, the menu button opens the menu. */
+(function () {
+  var site = document.getElementById('site'), burger = document.getElementById('burger');
+  document.querySelectorAll('.ddb').forEach(function (b) { b.addEventListener('click', function () { var li = b.parentNode, on = !li.classList.contains('open');
+    document.querySelectorAll('.dd.open').forEach(function (x) { x.classList.remove('open'); x.querySelector('.ddb').setAttribute('aria-expanded', 'false'); });
+    if (on) { li.classList.add('open'); b.setAttribute('aria-expanded', 'true'); } }); });
+  burger.addEventListener('click', function () { var on = !site.classList.contains('open'); site.classList.toggle('open', on); burger.setAttribute('aria-expanded', String(on)); });
+  document.addEventListener('click', function (e) { if (!e.target.closest('.dd')) document.querySelectorAll('.dd.open').forEach(function (x) { x.classList.remove('open'); x.querySelector('.ddb').setAttribute('aria-expanded', 'false'); }); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.querySelectorAll('.dd.open').forEach(function (x) { x.classList.remove('open'); x.querySelector('.ddb').setAttribute('aria-expanded', 'false'); x.querySelector('.ddb').focus(); }); });
+})();
+</script>
 <script>
 (function () {
   var SUBMIT = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/hub-requests/ideas/submit';
@@ -166,6 +227,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       .then(function (x) {
         if (x.r.ok && x.j.ok) return thanks(body, x.j);
         if (x.r.status === 400 && x.j.problems) return say('<b>A few things to finish:</b><ul>' + x.j.problems.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>');
+        if (x.r.status === 404) return say('The idea form isn\u2019t switched on yet. Please try again in a few days, or email your idea to <a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a>. Your answers are still here.');
         say(esc(x.j.message || 'Your idea couldn\u2019t be sent just now (' + x.r.status + '). Your answers are still here: please try again in a minute.'));
       }, function () { say('MISMO couldn\u2019t be reached just now. Check your connection and try again; your answers are still here.'); })
       .then(function () { busy = false; $('go').disabled = false; $('go').textContent = 'Submit idea'; });
