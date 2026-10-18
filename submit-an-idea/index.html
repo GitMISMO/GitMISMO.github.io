@@ -59,6 +59,11 @@
   .chips{display:flex;flex-wrap:wrap;gap:8px} .chip{font:inherit;border:1px solid var(--field);border-radius:999px;padding:7px 14px;font-size:13.5px;font-weight:600;color:#3d5167;background:#fff;cursor:pointer}
   .chip[aria-pressed="true"]{background:#e6f2fc;border-color:var(--blue);color:#0f5d9c} .chip[aria-pressed="true"]::before{content:"\2713\00a0"}
   .two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .hint{margin:0;color:var(--ink-2);font-size:14px} .flabel{font-weight:700;font-size:14.5px}
+  .filebox{display:flex;flex-direction:column;gap:10px;align-items:flex-start} .pick{display:inline-block} #files:focus-visible + .flist, .pick:focus-within{outline:2px solid var(--sky)}
+  .flist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;width:100%} .flist:empty{display:none}
+  .flist li{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:14px} .flist .sz{color:var(--ink-3);margin-left:auto;white-space:nowrap}
+  .flist button{all:unset;cursor:pointer;color:var(--ink-2);font-size:18px;line-height:1;padding:0 4px} .flist button:focus-visible{outline:2px solid var(--sky)}
   .about{border-top:1px solid #e9eef3;padding-top:16px;display:flex;flex-direction:column;gap:14px} .about h3{font-weight:800;font-size:17px;margin:0}
   .radio{display:flex;flex-wrap:wrap;gap:10px} .radio label{border:1px solid var(--field);border-radius:8px;padding:10px 16px;display:flex;gap:8px;align-items:center;font-weight:700;cursor:pointer;font-size:14px}
   .radio input{accent-color:var(--blue);margin:0} .radio label:has(input:checked){border-color:var(--blue);background:#e6f2fc}
@@ -130,28 +135,30 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <div style="position:relative"><div class="eyebrow">GET INVOLVED</div>
       <h1>Share Your Idea<span class="b">Shape What Comes Next</span></h1>
       <p class="lead">Have an idea that could help the mortgage industry work better together? Tell MISMO about it.</p>
-      <p class="lead2">No account needed, and no finished proposal. A few sentences is enough to start the conversation.</p>
+      <p class="lead2">No account needed. The more detail you share, the sooner we can help move it forward.</p>
       <div class="btns"><a class="bp" href="#tell">Start Your Idea &darr;</a><a class="bs" href="mailto:pwilliams@mismo.org">Talk to Us First</a></div></div>
   </div></section>
-  <section class="sec" id="tell"><h2 class="h2">Tell Us About Your Idea</h2><p class="secsub">It takes about five minutes. A MISMO staff member will reach out within two business days.</p>
+  <section class="sec" id="tell"><h2 class="h2">Tell Us About Your Idea</h2><p class="secsub">Share as much detail as you can. A MISMO staff member will reach out within two business days.</p>
     <div class="grid">
-      <div><div class="steps"><div class="stp"><b>You submit</b><span>No account needed. You&rsquo;ll get a receipt by email.</span><span class="n" aria-hidden="true">01</span></div>
+      <div><div class="steps"><div class="stp"><b>You submit</b><span>Your idea, with as much detail as you can, and any documents that help explain it. You&rsquo;ll get a receipt by email.</span><span class="n" aria-hidden="true">01</span></div>
         <div class="stp"><b>We reach out</b><span>A MISMO staff member contacts you within two business days.</span><span class="n" aria-hidden="true">02</span></div>
-        <div class="stp"><b>We guide it</b><span>Together we find the right MISMO process for the idea.</span><span class="n" aria-hidden="true">03</span></div></div>
+        <div class="stp"><b>We plan the next steps</b><span>Together we decide how to move it forward: a new work request, an existing workgroup, or a MISMO community.</span><span class="n" aria-hidden="true">03</span></div></div>
         <div class="talk"><b>Rather talk first?</b> Perry Williams, Standards Program Manager: <a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div></div>
       <div>
         <form class="card" id="form" novalidate>
           <div class="ftitle">Your idea</div>
           <div class="msg" id="msg" role="alert" hidden></div>
-          <div class="fld"><label for="title">What should we call your idea?</label><input type="text" id="title" maxlength="150" autocomplete="off" placeholder="A short name"></div>
-          <div class="fld"><label for="idea">The idea or opportunity</label><textarea id="idea" maxlength="4000" placeholder="A few sentences is plenty"></textarea></div>
+          <div class="fld"><label for="title">What should we call your idea?</label><input type="text" id="title" maxlength="150" autocomplete="off"></div>
+          <div class="fld"><label for="idea">The idea or opportunity</label><p class="hint" id="idea-hint">Give us enough to understand it: the problem or opportunity, how things work today, what would change, and who it would affect.</p><textarea id="idea" maxlength="4000" aria-describedby="idea-hint" style="min-height:140px"></textarea></div>
           <fieldset class="fld"><legend>Who should be involved, or would benefit? <span class="opt">Choose any</span></legend>
             <div class="chips" id="who"></div>
-            <input type="text" id="whoOther" maxlength="200" placeholder="Who else?" aria-label="Who else" hidden></fieldset>
-          <div class="fld"><label for="why">Why it matters <span class="opt">(optional)</span></label><textarea id="why" maxlength="4000" placeholder="Background, timing, a problem it solves, work already under way&hellip;"></textarea></div>
+            <label for="whoOther" class="hint" id="whoOther-l" hidden style="font-weight:700;color:var(--ink)">Who else?</label><input type="text" id="whoOther" maxlength="200" hidden></fieldset>
+          <div class="fld"><label for="why">Why it matters <span class="opt">(optional)</span></label><p class="hint" id="why-hint">What makes it important now: costs, risks, regulation, timing, or work already under way.</p><textarea id="why" maxlength="4000" aria-describedby="why-hint"></textarea></div>
+          <div class="fld"><span class="flabel" id="files-l">Attachments <span class="opt">(optional)</span></span><p class="hint" id="files-hint">Anything that helps explain the idea: a write-up, an example, a diagram. Up to 5 files, 4&nbsp;MB each: PDF, Word, Excel, PowerPoint, PNG or JPEG images, text or CSV.</p>
+            <div class="filebox"><label class="q pick" for="files">Choose files</label><input type="file" id="files" class="vh" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.csv" aria-describedby="files-hint"><ul class="flist" id="flist" aria-live="polite"></ul></div></div>
           <div class="about"><h3>About you</h3>
             <div class="two"><div class="fld"><label for="name">Your name</label><input type="text" id="name" maxlength="100" autocomplete="name"></div>
-              <div class="fld"><label for="company">Company <span class="opt">(optional)</span></label><input type="text" id="company" maxlength="150" autocomplete="organization"></div>
+              <div class="fld"><label for="company">Company</label><input type="text" id="company" maxlength="150" autocomplete="organization"></div>
               <div class="fld"><label for="email">Email</label><input type="email" id="email" maxlength="200" autocomplete="email"></div>
               <div class="fld"><label for="phone">Phone <span class="opt">(optional)</span></label><input type="tel" id="phone" maxlength="40" autocomplete="tel"></div></div>
             <fieldset class="fld"><legend>Is your company a MISMO member? <span class="opt">(optional)</span></legend>
@@ -172,7 +179,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 </main>
 <footer><div class="foot"><a class="logo" href="https://collaborate.mismo.org/mismowebsite/home" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO" style="--logo-body:#fff;--logo-s:#4fb0ec"><use href="#mismo-logo"/></svg></a>
   <span>1919 M Street NW, 5th Floor, Washington, DC 20036 &middot; <a href="mailto:info@mismo.org">info@mismo.org</a></span><span class="fsp"></span>
-  <a href="https://collaborate.mismo.org/mismowebsite/privacy-policy">Privacy Policy</a><a href="https://collaborate.mismo.org/mismowebsite/terms-of-use">Terms of Use</a><a href="/">MISMO staff: sign in</a></div></footer>
+  <a href="https://collaborate.mismo.org/mismowebsite/privacy-policy">Privacy Policy</a><a href="https://collaborate.mismo.org/mismowebsite/terms-of-use">Terms of Use</a></div></footer>
 <script>
 /* The website's menu: each item opens its list from its arrow (and on hover); on a phone, the menu button opens the menu. */
 (function () {
@@ -194,7 +201,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function chips() {
     $('who').innerHTML = WHO.map(function (w) { return '<button type="button" class="chip" data-who="' + w + '" aria-pressed="' + !!chosen[w] + '">' + w + '</button>'; }).join('') +
       '<button type="button" class="chip" data-who="" aria-pressed="' + other + '">Other</button>';
-    $('whoOther').hidden = !other;
+    $('whoOther').hidden = !other; $('whoOther-l').hidden = !other;
   }
   $('who').addEventListener('click', function (e) { var b = e.target.closest('[data-who]'); if (!b) return; var w = b.dataset.who;
     if (w) chosen[w] = !chosen[w]; else { other = !other; if (other) setTimeout(function () { $('whoOther').focus(); }, 0); }
@@ -209,10 +216,41 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function check() {
     var bad = [], mark = function (id, wrong, text) { $(id).setAttribute('aria-invalid', wrong ? 'true' : 'false'); if (wrong) bad.push([id, text]); };
     mark('title', oneLine(val('title')).length < 3, 'Give your idea a short name.');
-    mark('idea', val('idea').length < 10, 'Describe the idea in a sentence or two.');
+    mark('idea', val('idea').length < 40, val('idea') ? 'Tell us a little more about the idea: a few sentences, with enough detail for us to understand it.' : 'Describe the idea.');
     mark('name', oneLine(val('name')).length < 2, 'Add your name.');
+    mark('company', oneLine(val('company')).length < 2, 'Add your company.');
     mark('email', !/^[^\s@]{1,64}@[^\s@]+\.[A-Za-z]{2,}$/.test(val('email')), 'Add an email address we can reply to.');
     return bad;
+  }
+  /* Attachments (Perry, 18 Oct 2026): checked here as they're chosen (the relay checks again), sent one by one after the idea,
+     each with the ticket the idea's answer carries. */
+  var ATTACH = SUBMIT.replace(/submit$/, 'attach'), files = [], MAXF = 5, MAXB = 4 * 1024 * 1024;
+  var KINDS = ['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'png', 'jpg', 'jpeg', 'txt', 'csv'];
+  function size(n) { return n < 1024 * 1024 ? Math.max(1, Math.round(n / 1024)) + ' KB' : (n / 1024 / 1024).toFixed(1) + ' MB'; }
+  function drawFiles() { $('flist').innerHTML = files.map(function (f, i) { return '<li><span>' + esc(f.name) + '</span><span class="sz">' + size(f.size) + '</span><button type="button" data-rmfile="' + i + '" aria-label="Remove ' + esc(f.name) + '">&times;</button></li>'; }).join(''); }
+  $('files').addEventListener('change', function () {
+    var refused = [];
+    Array.prototype.forEach.call($('files').files, function (f) {
+      var ext = ((f.name.match(/\.([A-Za-z0-9]{1,5})$/) || [])[1] || '').toLowerCase();
+      if (KINDS.indexOf(ext) < 0) refused.push(f.name + ': that kind of file can\u2019t be attached');
+      else if (f.size > MAXB) refused.push(f.name + ': over 4 MB (email it to MISMO after you submit)');
+      else if (!f.size) refused.push(f.name + ': the file is empty');
+      else if (files.length >= MAXF) refused.push(f.name + ': up to 5 files');
+      else files.push(f);
+    });
+    $('files').value = ''; drawFiles();
+    if (refused.length) say('<b>Not added:</b><ul>' + refused.map(function (r) { return '<li>' + esc(r) + '</li>'; }).join('') + '</ul>'); else $('msg').hidden = true;
+  });
+  $('flist').addEventListener('click', function (e) { var b = e.target.closest('[data-rmfile]'); if (!b) return; files.splice(+b.dataset.rmfile, 1); drawFiles(); $('files').focus(); });
+  function asBase64(f) { return new Promise(function (ok, no) { var r = new FileReader(); r.onload = function () { ok(String(r.result).split(',')[1] || ''); }; r.onerror = no; r.readAsDataURL(f); }); }
+  function sendFiles(j) {
+    var res = { sent: [], failed: [] }; if (!j.attach || !j.reference || !files.length) return Promise.resolve(res);
+    return files.reduce(function (p, f, i) { return p.then(function () {
+      $('go').textContent = 'Sending attachments (' + (i + 1) + ' of ' + files.length + ')\u2026';
+      return asBase64(f).then(function (data) { return fetch(ATTACH, { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store', body: JSON.stringify({ ticket: j.attach, name: f.name, data: data }) }); })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (x) { if (r.ok && x.ok) res.sent.push(x.name || f.name); else res.failed.push([f.name, x.message || 'it couldn\u2019t be sent']); }); },
+              function () { res.failed.push([f.name, 'MISMO couldn\u2019t be reached']); });
+    }); }, Promise.resolve()).then(function () { return res; });
   }
   $('form').addEventListener('submit', function (e) {
     e.preventDefault(); if (busy) return;
@@ -225,24 +263,28 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     fetch(SUBMIT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, cache: 'no-store', body: JSON.stringify(body) })
       .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { return { r: r, j: j }; }); })
       .then(function (x) {
-        if (x.r.ok && x.j.ok) return thanks(body, x.j);
+        if (x.r.ok && x.j.ok) return sendFiles(x.j).then(function (res) { thanks(body, x.j, res); });
         if (x.r.status === 400 && x.j.problems) return say('<b>A few things to finish:</b><ul>' + x.j.problems.map(function (p) { return '<li>' + esc(p) + '</li>'; }).join('') + '</ul>');
         if (x.r.status === 404) return say('The idea form isn\u2019t switched on yet. Please try again in a few days, or email your idea to <a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a>. Your answers are still here.');
         say(esc(x.j.message || 'Your idea couldn\u2019t be sent just now (' + x.r.status + '). Your answers are still here: please try again in a minute.'));
       }, function () { say('MISMO couldn\u2019t be reached just now. Check your connection and try again; your answers are still here.'); })
-      .then(function () { busy = false; $('go').disabled = false; $('go').textContent = 'Submit idea'; });
+      .then(function () { busy = false; $('go').disabled = false; $('go').innerHTML = 'Submit Your Idea &rarr;'; });
   });
   function day(ymd) { var d = new Date(ymd + 'T12:00:00Z'); return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }); }
-  function thanks(b, j) {
+  function thanks(b, j, res) {
+    res = res || { sent: [], failed: [] };
     var first = b.name.split(' ')[0];
     $('thanks').textContent = 'Thank you, ' + first + '. Your idea is with MISMO.';
     $('next').innerHTML = 'A MISMO staff member will reach out to <b>' + esc(b.email) + '</b> within two business days' + (j.replyBy ? ', by <b>' + esc(day(j.replyBy)) + '</b>' : '') + '. A receipt is on its way to that address.';
     var who = b.who.concat(b.whoOther ? [b.whoOther] : []).join(', ');
     $('sum').innerHTML = (j.reference ? '<dt>Reference</dt><dd>' + esc(j.reference) + '</dd>' : '') + '<dt>Your idea</dt><dd>' + esc(b.title) + '</dd>' + (who ? '<dt>Who&rsquo;s involved</dt><dd>' + esc(who) + '</dd>' : '');
+    if (res.sent.length) $('sum').innerHTML += '<dt>Attachments</dt><dd>' + res.sent.map(esc).join('<br>') + '</dd>';
+    if (res.failed.length) $('sum').insertAdjacentHTML('afterend', '<div class="msg" id="notattached"><b>Not attached:</b><ul>' + res.failed.map(function (f) { return '<li>' + esc(f[0]) + ': ' + esc(f[1]) + '</li>'; }).join('') + '</ul>Email ' + (res.failed.length === 1 ? 'it' : 'them') + ' to <a href="mailto:pwilliams@mismo.org?subject=' + encodeURIComponent('Attachments for ' + (j.reference || 'my idea')) + '">pwilliams@mismo.org</a>' + (j.reference ? ', mentioning ' + esc(j.reference) : '') + '.</div>');
     $('form').hidden = true; $('done').hidden = false; $('thanks').focus();
   }
   $('again').addEventListener('click', function () {
     ['title', 'idea', 'why', 'whoOther'].forEach(function (id) { $(id).value = ''; $(id).removeAttribute('aria-invalid'); });   /* the sender's own details stay */
+    files = []; drawFiles(); var na = $('notattached'); if (na) na.remove();
     chosen = {}; other = false; chips(); startedAt = Date.now(); $('done').hidden = true; $('form').hidden = false; $('msg').hidden = true; $('title').focus();
   });
 })();
