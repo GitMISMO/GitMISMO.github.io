@@ -35,6 +35,15 @@
       ".console/"
     ]
   },
+  "glossary-data": {
+    "repo": "GitMISMO/GitMISMO-glossary-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/",
+      ".console/"
+    ]
+  },
   "hub-files": {
     "repo": "GitMISMO/hub-files",
     "branch": "main",
