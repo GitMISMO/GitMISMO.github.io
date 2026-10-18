@@ -16,6 +16,7 @@
   :root{--navy:#0b1e31;--ink:#12304d;--ink-2:#4d6074;--ink-3:#6b7d8f;--sky:#5ab4ee;--blue:#2393e6;--line:#e1e8ef;--field:#cfdae5;--bad:#b3372c;--bad-soft:#fbe9e7;--good:#0f7b5c;--good-soft:#e1f2ec;
     --font:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color-scheme:light}
   *{box-sizing:border-box} html,body{margin:0} html{scroll-padding-top:20px}
+  @media (prefers-reduced-motion: no-preference){ html{scroll-behavior:smooth} }   /* Share Your Idea scrolls down rather than jumping */
   body{background:#fff;color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5}
   a:focus-visible,button:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
   .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
@@ -42,7 +43,13 @@
   .btns{display:flex;gap:14px;margin-top:26px;flex-wrap:wrap;position:relative}
   .bp{background:var(--blue);color:#fff;border:0;border-radius:6px;padding:14px 24px;font:inherit;font-weight:700;font-size:15.5px;box-shadow:0 6px 22px rgba(35,147,230,.45);text-decoration:none;cursor:pointer;display:inline-block}
   .bp:hover{background:#1c86d6} .bp:disabled{opacity:.6;cursor:default}
-  .bs{border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.04);color:#fff;border-radius:6px;padding:13px 24px;font-weight:700;font-size:15.5px;text-decoration:none;display:inline-block} .bs:hover{background:rgba(255,255,255,.1)}
+  .bs{border:1px solid rgba(255,255,255,.55);background:rgba(255,255,255,.04);color:#fff;border-radius:6px;padding:13px 24px;font:inherit;font-weight:700;font-size:15.5px;text-decoration:none;display:inline-block;cursor:pointer} .bs:hover{background:rgba(255,255,255,.1)}
+  /* Talk to Us First: who to reach, and two ways to do it */
+  .talkd{border:0;border-radius:14px;padding:30px 30px 26px;max-width:min(480px,calc(100vw - 32px));box-shadow:0 24px 60px rgba(11,30,49,.35);color:var(--ink);font-family:var(--font)}
+  .talkd::backdrop{background:rgba(11,30,49,.55)} .talkd h2{font-weight:800;font-size:26px;margin:6px 0 10px;line-height:1.2} .talkd p{margin:0 0 16px;color:var(--ink-2)}
+  .talkd .x{position:absolute;top:12px;right:14px;all:unset;cursor:pointer;font-size:24px;line-height:1;color:var(--ink-3);padding:4px 8px} .talkd .x:focus-visible{outline:2px solid var(--sky)}
+  .tk{border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;margin-bottom:18px} .tk span{color:var(--ink-2);font-size:14px} .tk a{color:#1f7fcc;font-weight:700}
+  .talkd .acts .bp{box-shadow:none;font-size:15px;padding:12px 20px}
   .words{position:absolute;right:120px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:20px;padding-left:30px;border-left:1px solid rgba(255,255,255,.18)}
   .words b{font-size:13px;letter-spacing:.24em;color:var(--sky);font-weight:700} .words hr{border:0;border-top:1px solid rgba(255,255,255,.4);width:46px;margin:6px 0 0} .words small{font-size:12px;letter-spacing:.14em;color:#d6e4ef;line-height:1.7}
   /* the form section */
@@ -136,7 +143,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       <h1>Share Your Idea<span class="b">Shape What Comes Next</span></h1>
       <p class="lead">Have an idea that could help the mortgage industry work better together? Tell MISMO about it.</p>
       <p class="lead2">No account needed. The more detail you share, the sooner we can help move it forward.</p>
-      <div class="btns"><a class="bp" href="#tell">Start Your Idea &darr;</a><a class="bs" href="mailto:pwilliams@mismo.org">Talk to Us First</a></div></div>
+      <div class="btns"><a class="bp" href="#tell">Share Your Idea &darr;</a><button type="button" class="bs" id="talk" aria-haspopup="dialog">Talk to Us First</button></div></div>
   </div></section>
   <section class="sec" id="tell"><h2 class="h2">Tell Us About Your Idea</h2><p class="secsub">Share as much detail as you can. A MISMO staff member will reach out within two business days.</p>
     <div class="grid">
@@ -177,12 +184,30 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     </div>
   </section>
 </main>
+<dialog class="talkd" id="talkd" aria-labelledby="talkd-h">
+  <button type="button" class="x" id="talkx" aria-label="Close">&times;</button>
+  <div class="eyebrow" style="color:#2393e6">TALK TO US FIRST</div>
+  <h2 id="talkd-h">Talk it through with Perry</h2>
+  <p>Not sure your idea is ready, or where it fits? Perry is glad to talk it through with you before you submit it.</p>
+  <div class="tk"><b>Perry Williams</b><span>Standards Program Manager, MISMO</span><a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div>
+  <div class="acts"><a class="bp" id="talkmail" href="mailto:pwilliams@mismo.org?subject=An%20idea%20I%E2%80%99d%20like%20to%20talk%20through">Email Perry</a><button type="button" class="q" id="talkcopy">Copy email address</button></div>
+</dialog>
 <footer><div class="foot"><a class="logo" href="https://collaborate.mismo.org/mismowebsite/home" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO" style="--logo-body:#fff;--logo-s:#4fb0ec"><use href="#mismo-logo"/></svg></a>
   <span>1919 M Street NW, 5th Floor, Washington, DC 20036 &middot; <a href="mailto:info@mismo.org">info@mismo.org</a></span><span class="fsp"></span>
   <a href="https://collaborate.mismo.org/mismowebsite/privacy-policy">Privacy Policy</a><a href="https://collaborate.mismo.org/mismowebsite/terms-of-use">Terms of Use</a></div></footer>
 <script>
-/* The website's menu: each item opens its list from its arrow (and on hover); on a phone, the menu button opens the menu. */
+/* The website's menu: each item opens its list from its arrow (and on hover); on a phone, the menu button opens the menu.
+   Talk to Us First opens a panel with Perry's details: email him, or copy his address (Perry, 18 Oct 2026). */
 (function () {
+  var dlg = document.getElementById('talkd'), copy = document.getElementById('talkcopy');
+  document.getElementById('talk').addEventListener('click', function () { copy.textContent = 'Copy email address'; dlg.showModal(); document.getElementById('talkmail').focus(); });
+  document.getElementById('talkx').addEventListener('click', function () { dlg.close(); });
+  dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   /* outside the panel */
+  dlg.addEventListener('close', function () { document.getElementById('talk').focus(); });
+  copy.addEventListener('click', function () { var done = function () { copy.textContent = 'Copied'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText('pwilliams@mismo.org').then(done, fallback); else fallback();
+    function fallback() { var t = document.createElement('textarea'); t.value = 'pwilliams@mismo.org'; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0'; dlg.appendChild(t); t.select();
+      try { document.execCommand('copy'); done(); } catch (e) { copy.textContent = 'pwilliams@mismo.org'; } t.remove(); } });
   var site = document.getElementById('site'), burger = document.getElementById('burger');
   document.querySelectorAll('.ddb').forEach(function (b) { b.addEventListener('click', function () { var li = b.parentNode, on = !li.classList.contains('open');
     document.querySelectorAll('.dd.open').forEach(function (x) { x.classList.remove('open'); x.querySelector('.ddb').setAttribute('aria-expanded', 'false'); });
