@@ -1,33 +1,5 @@
 {
-        "cms": {
-    "repo": "GitMISMO/cms-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "activity/",
-      "applications/",
-      "assessments/",
-      "certEdits/",
-      "cycleState/",
-      "formEdits/",
-      "invoices/",
-      "markLicense/",
-      "orgEdits/",
-      "pricing/",
-      "scenarioLog/",
-      "scores/",
-      "scriptPrep/"
-    ],
-    "readable": [
-      "finance/",
-      "frameAsk/",
-      "frameReview/",
-      "frameScores/",
-      "membership/",
-      "scenAssign/"
-    ]
-  },
-        "iif-hq": {
+         "iif-hq": {
          "repo": "GitMISMO/iif-hq-data",
          "branch": "main",
          "origin": "https://resources.mismo.org",
