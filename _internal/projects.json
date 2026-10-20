@@ -26,7 +26,7 @@
       "membership/",
       "scenAssign/"
     ]
-  }
+  },
          "iif-hq": {
          "repo": "GitMISMO/iif-hq-data",
          "branch": "main",
