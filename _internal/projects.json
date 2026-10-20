@@ -19,6 +19,8 @@
       "scriptPrep/"
     ],
     "readable": [
+     "portal-data.json",
+      "data/",
       "finance/",
       "frameAsk/",
       "frameReview/",
