@@ -1,4 +1,20 @@
 {
+        "iif-hq": {
+         "repo": "GitMISMO/iif-hq-data",
+         "branch": "main",
+         "origin": "https://resources.mismo.org",
+         "writable": [
+           "data/"
+         ]
+       },
+       "member-360": {
+         "repo": "GitMISMO/member-360-data",
+         "branch": "main",
+         "origin": "https://resources.mismo.org",
+         "writable": [
+           "data/"
+         ]
+       }, 
   "summit-hq": {
     "repo": "GitMISMO/summit-hq-data",
     "branch": "main",
