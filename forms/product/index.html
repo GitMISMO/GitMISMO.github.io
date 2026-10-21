@@ -369,8 +369,10 @@ a{color:var(--mm-blue);}
 .mm-footer-bar{background:#f4f7f9; display:flex; flex-wrap:wrap; align-items:center;
   justify-content:space-between; gap:10px 28px; padding:18px 50px;
   font-family:var(--mm-font);}
-.mm-f-logo{flex:0 0 auto; line-height:0;}
-.mm-f-logo img{display:block; width:197px; height:30px;}
+.mm-f-logo{flex:0 0 auto; line-height:0;
+  /* the two colours the shared MISMO symbol reads */
+  --logo-body:#0d314c; --logo-s:#50a4db;}
+.mm-f-mark{display:block; width:197px; height:30px;}
 .mm-f-addr{flex:1 1 300px; text-align:center; font-size:12.5px; line-height:20px;
   color:#5b7183;}
 .mm-f-addr a{color:#0d314c; text-decoration:none;}
@@ -489,6 +491,7 @@ textarea.in{min-height:120px; padding:12px 14px; line-height:1.5;}
   .two-acts .btn{flex:1 1 100%}
   .mm-header{height:62px}
   .mm-logo img{width:160px; height:30px}
+  .mm-f-mark{width:170px; height:26px}
   .mm-footer-bar{padding:18px 20px; justify-content:center; gap:14px 20px}
   .mm-f-addr{flex:1 1 100%}
 }
@@ -593,7 +596,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
 <footer class="mm-footer">
   <div class="mm-footer-bar">
-    <a class="mm-f-logo" href="https://collaborate.mismo.org/mismowebsite/home"><img src="https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/MISMO_FINAL_White.png" alt="MISMO" width="197" height="30"></a>
+    <a class="mm-f-logo" href="https://collaborate.mismo.org/mismowebsite/home"><svg class="mm-f-mark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></a>
     <div class="mm-f-addr">1919 M Street NW, 5th Floor, Washington, DC 20036<svg class="mm-f-env" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1.5" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M1.8 3l8.2 6 8.2-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><a href="mailto:info@mismo.org">info@mismo.org</a></div>
     <div class="mm-f-links"><a href="https://collaborate.mismo.org/mismowebsite/privacy-policy">Privacy Policy</a><a href="https://collaborate.mismo.org/mismowebsite/terms-of-use">Terms of Use</a></div>
     <div class="mm-f-social"><a class="mm-f-soc" href="https://www.linkedin.com/company/mismo-mortgage-industry-standards-maintenance-organization" aria-label="MISMO on LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="9.5" width="3" height="11" rx="1" fill="currentColor"/><circle cx="5" cy="5.6" r="1.9" fill="currentColor"/><path d="M10 20.5v-11h3v1.5a3.7 3.7 0 0 1 3.2-1.7c2.4 0 3.8 1.6 3.8 4.4v6.8h-3v-6.3c0-1.6-.6-2.5-2-2.5s-2 .9-2 2.5v6.3z" fill="currentColor"/></svg></a><a class="mm-f-soc" href="https://www.youtube.com/channel/UCuKIkeqACTIU7j0eL_igPHA" aria-label="MISMO on YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="3.6" fill="currentColor"/><path d="M10.2 9.4l5.4 2.6-5.4 2.6z" fill="#f4f7f9"/></svg></a></div>
