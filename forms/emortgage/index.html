@@ -345,22 +345,38 @@ body{font-family:var(--mm-font); font-size:16px; line-height:1.6;
   background:#ffffff; color:var(--mm-ink,#0d314c);}
 a{color:var(--mm-blue);}
 
-/* ---------- header bar: 70px, dark navy, logo left, Log in pill right ---------- */
-.mm-header{position:relative; z-index:5; height:70px; background:var(--mm-hero);
-  box-shadow:0 2px 4px 0 rgba(0,0,0,.1), 0 0 2px 0 rgba(153,153,153,.25);
-  display:flex; align-items:center; padding:0 50px; gap:56px;}
-.mm-logo img{display:block; width:194px; height:36px;}
-.mm-nav{display:flex; align-items:center; flex:1 1 auto;}
-.mm-nav-link{display:inline-flex; align-items:center; gap:8px; padding:8px 16px;
-  font-family:var(--mm-font); font-size:15px; font-weight:500; line-height:21px;
-  color:#ffffff; text-decoration:none; white-space:nowrap;}
-.mm-nav-link:hover{color:var(--mm-sky);}
-.mm-chev{width:11px; height:8px;}
-.mm-login{margin-left:auto; display:inline-block; padding:10px 20px; border-radius:50px;
-  background:var(--mm-pill); color:#ffffff; font-family:var(--mm-font); font-size:16px;
-  font-weight:600; line-height:16px; text-decoration:none; white-space:nowrap;
-  min-width:max-content;}
-@media (max-width:1100px){ .mm-nav{display:none} .mm-header{padding:0 20px} }
+/* ---------- Header bar (70px, dark navy, logo left, nav, Log in pill right) ---------- */
+.mm-header{position:relative;z-index:5;height:70px;background:var(--mm-hero);box-shadow:0 2px 4px 0 rgba(0,0,0,.1),0 0 2px 0 rgba(153,153,153,.25);display:flex;align-items:center;padding:0 50px;gap:56px}
+.mm-logo img{display:block;width:194px;height:36px;max-width:100%}
+.mm-logo{flex:0 1 194px;min-width:0}
+.mm-nav{display:flex;align-items:stretch;height:70px;margin:0;padding:0;list-style:none;flex:1 1 auto}
+.mm-nav>li{position:relative;display:flex;align-items:center;list-style:none}
+.mm-nav-link{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:21px;color:#ffffff;text-decoration:none;white-space:nowrap}
+.mm-nav>li:hover>.mm-nav-link,.mm-nav-link:focus-visible{color:var(--mm-sky)}
+.mm-chev{width:11px;height:8px}
+/* Dropdown menus: measured from the live site (opens on hover or keyboard focus) */
+.mm-dd{display:none;position:absolute;left:0;top:100%;z-index:20;min-width:250px;margin:0;padding:8px 0;list-style:none;background:#0b2740;border-top:2px solid var(--mm-blue);border-radius:0 0 8px 8px;box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
+.mm-nav>li:hover>.mm-dd,.mm-nav>li:focus-within>.mm-dd{display:block}
+.mm-dd a{display:block;padding:10px 18px 10px 16px;border-left:2px solid transparent;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:19.5px;color:#e6eef5;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.mm-dd a:hover,.mm-dd a:focus-visible{outline:none;background:rgba(116,191,235,.1);border-left-color:var(--mm-sky);color:var(--mm-sky)}
+.mm-login{margin-left:auto;display:inline-block;padding:10px 20px;border-radius:50px;background:var(--mm-pill);color:#ffffff;font-family:var(--mm-font);font-size:16px;font-weight:600;line-height:16px;text-decoration:none;white-space:nowrap;min-width:max-content}
+.mm-burger{display:none;width:40px;height:40px;margin-left:12px;padding:9px 8px;border:0;border-radius:6px;background:transparent;cursor:pointer}
+.mm-burger span{display:block;height:2px;margin:4px 0;border-radius:2px;background:#ffffff;transition:transform .2s,opacity .2s}
+/* Phones and tablets: hamburger shows the same menu as a panel under the bar, sub-pages listed under each heading */
+@media (max-width:1100px){
+  .mm-header{padding:0 20px;gap:12px}
+  .mm-burger{display:block}
+  .mm-nav{display:none}
+  .mm-header.is-open .mm-nav{display:block;position:absolute;top:70px;left:0;right:0;height:auto;max-height:calc(100vh - 70px);overflow-y:auto;padding:8px 0 16px;background:#0b2740;border-top:2px solid var(--mm-blue);box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
+  .mm-header.is-open .mm-nav>li{display:block}
+  .mm-header.is-open .mm-nav-link{display:flex;padding:12px 20px 6px;font-weight:600}
+  .mm-header.is-open .mm-chev{display:none}
+  .mm-header.is-open .mm-dd{display:block;position:static;min-width:0;padding:0 0 6px;background:transparent;border:0;border-radius:0;box-shadow:none}
+  .mm-header.is-open .mm-dd a{padding:9px 20px 9px 34px;white-space:normal}
+  .mm-header.is-open .mm-burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .mm-header.is-open .mm-burger span:nth-child(2){opacity:0}
+  .mm-header.is-open .mm-burger span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+}
 
 /* ---------- footer: the live site's, measured 21 Oct 2026 at 1440px ----------
    One 68px bar in #f4f7f9 - light, not dark - logo left, address in the middle,
@@ -489,8 +505,6 @@ textarea.in{min-height:120px; padding:12px 14px; line-height:1.5;}
     border-left:0 !important; padding-left:0 !important; min-width:0 !important}
   div[style*="flex: 0 1 200px"] > div:nth-child(n+5){display:none !important}
   .two-acts .btn{flex:1 1 100%}
-  .mm-header{height:62px}
-  .mm-logo img{width:160px; height:30px}
   .mm-f-mark{width:170px; height:26px}
   .mm-footer-bar{padding:18px 20px; justify-content:center; gap:14px 20px}
   .mm-f-addr{flex:1 1 100%}
@@ -536,8 +550,46 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 </symbol></defs></svg>
 <header class="mm-header">
   <a class="mm-logo" href="https://collaborate.mismo.org/mismowebsite/home"><img src="https://higherlogicdownload.s3.amazonaws.com/MISMO/LogoImages/6e07790a-6fc9-43dc-b9d6-9178e00c3342_mismo-reverse-nav-logo.png" alt="MISMO logo. This will take you to the homepage"></a>
-  <nav class="mm-nav" aria-label="Main"><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/membership">Membership <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/standards-resources">Standards &amp; Resources <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/get-involved">Get Involved <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/events">Events <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/about-mismo">About MISMO <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a></nav>
+  <nav aria-label="Main">
+  <ul class="mm-nav" id="mm-nav">
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/membership" aria-haspopup="true">Membership <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/member-directory">MISMO Members</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/lender-champions">Our Lender Champions</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/industry-champions">Our Industry Champions</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/iif">Innovation Investment Fund</a></li>
+      </ul>
+    </li>
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/standards-resources" aria-haspopup="true">Standards &amp; Resources <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/business-glossary">Business Glossary</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/certification">Certifications</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/mismo-link">MISMO Link</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/digital-mortgage-resource-center">Digital Mortgage Resource Center</a></li>
+      </ul>
+    </li>
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/get-involved" aria-haspopup="true">Get Involved <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/workgroups">Communities &amp; Workgroups</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/communities">Collaborate (Members Only)</a></li>
+      </ul>
+    </li>
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/events" aria-haspopup="true">Events <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/events/summit">MISMO Summit</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/events/education">Education</a></li>
+      </ul>
+    </li>
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/about-mismo" aria-haspopup="true">About MISMO <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/news">News</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/contributor-awards">Contributor Awards</a></li>
+      </ul>
+    </li>
+  </ul>
+  </nav>
   <a class="mm-login" href="https://collaborate.mismo.org/mismowebsite/home">Log in</a>
+  <button type="button" class="mm-burger" aria-label="Open menu" aria-expanded="false" aria-controls="mm-nav"><span></span><span></span><span></span></button>
 </header>
 <div style="position: relative; overflow: hidden; background: #071d2e; min-height: clamp(380px,37vw,520px); display: flex; align-items: center; padding: clamp(34px,3.8vw,50px) clamp(20px,5vw,48px);"><!-- built-in Pathway artwork (shows until a photo is added) --> <svg viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;"> <defs> <linearGradient id="skyhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0d314c" stop-opacity="0"></stop> </linearGradient> <linearGradient id="gndhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0e3a5c"></stop><stop offset="100%" stop-color="#071d2e"></stop> </linearGradient> <radialGradient id="glowhm" cx="50%" cy="50%" r="50%"> <stop offset="0%" stop-color="#74bfeb" stop-opacity=".42"></stop> <stop offset="100%" stop-color="#74bfeb" stop-opacity="0"></stop> </radialGradient> <linearGradient id="trailhm" x1="0" y1="0" x2="1" y2="0"> <stop offset="0%" stop-color="#74bfeb" stop-opacity="0"></stop> <stop offset="45%" stop-color="#9ad4f4" stop-opacity=".95"></stop> <stop offset="100%" stop-color="#ffffff" stop-opacity=".55"></stop> </linearGradient> </defs> <rect x="0" y="0" width="1200" height="560" fill="url(#gndhm)"></rect> <ellipse cx="930" cy="360" rx="420" ry="250" fill="url(#glowhm)"></ellipse> <g fill="#0a2740" opacity="1"> <rect x="640" y="300" width="52" height="260"></rect><rect x="698" y="236" width="40" height="324"></rect> <rect x="744" y="318" width="60" height="242"></rect><rect x="810" y="186" width="48" height="374"></rect> <rect x="864" y="268" width="68" height="292"></rect><rect x="938" y="214" width="42" height="346"></rect> <rect x="986" y="296" width="56" height="264"></rect><rect x="1048" y="238" width="50" height="322"></rect> <rect x="1104" y="310" width="64" height="250"></rect><rect x="1174" y="258" width="44" height="302"></rect> </g> <rect x="560" y="548" width="660" height="12" fill="#0a2740"></rect> <g fill="#74bfeb" opacity=".30"> <rect x="684" y="222" width="5" height="7"></rect><rect x="696" y="246" width="5" height="7"></rect> <rect x="800" y="184" width="5" height="7"></rect><rect x="814" y="216" width="5" height="7"></rect> <rect x="860" y="258" width="5" height="7"></rect><rect x="884" y="290" width="5" height="7"></rect> <rect x="932" y="214" width="5" height="7"></rect><rect x="988" y="292" width="5" height="7"></rect> <rect x="1050" y="240" width="5" height="7"></rect><rect x="1108" y="312" width="5" height="7"></rect> </g> <g fill="none" stroke="url(#trailhm)" stroke-linecap="round"> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="13" opacity=".15"></path> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="3"></path> <path d="M450,654 C680,572 890,500 1258,428" stroke-width="1.4" opacity=".7"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="7" opacity=".2"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="2" opacity=".85"></path> <path d="M580,712 C800,636 990,570 1272,500" stroke-width="1.2" opacity=".55"></path> </g> </svg> <!-- PHOTO LAYER -->
 <div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: none; background-size: cover; background-position: center right; background-repeat: no-repeat;"></div><div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(90deg,#071d2e 0%,rgba(7,29,46,.96) 30%,rgba(7,29,46,.80) 50%,rgba(7,29,46,.42) 72%,rgba(7,29,46,.22) 100%);"></div>
@@ -547,7 +599,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 <h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Apply for eMortgage<span style="display: block; color: #74bfeb;">Technology Certification</span></h1>
 <p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">One application for RON, eClosing and eVault. Tick the ones you want and only those questionnaires appear.</p>
 <p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3; max-width: 52ch;">Your answers save as you type, so you can close this page and come back whenever you like.</p>
-<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#form" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Start the Application&nbsp;&rarr;</a> <a href="https://collaborate.mismo.org/mismowebsite/standards-resources" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid rgba(255,255,255,.6);">Standards &amp; Resources</a></div>
+<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#form" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Start the Application&nbsp;&rarr;</a></div>
 </div>
 <div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
 <div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">People</div>
@@ -624,14 +676,14 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* Paste the Power Automate flow URL here - the "When an HTTP request is
      received" trigger. While it is empty the page hands the applicant a file
      to send in instead, so the form works either way. */
-  var FLOW_ENDPOINT = "";
+  var FLOW_ENDPOINT = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/21/workflows/6d7aac5cd3e14b5b8a8edd4c8475d8ee/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=1VbqwAN4bnnWSewkhSPKYETeeGmCN4CjvfEo4X2TpQs";
 
   /* The shared word the flow checks before it does anything with a
      submission. The flow URL is readable by anyone who views this page, so
      without this a stranger can post junk straight into certifications@.
      Put the same word here and in the flow's condition. It keeps the mailbox
      clean; it is not a password and protects nothing else. */
-  var FORM_KEY = "";
+  var FORM_KEY = "mismo-fmpi-m8on08";
 
   var data    = {};      /* every answer, by key */
   var openSet = {};      /* which sections are open */
@@ -1633,7 +1685,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     }
     var b = $("dosubmit"); if(b){ b.disabled = true; b.textContent = "Sending..."; }
     fetch(FLOW_ENDPOINT, {
-      method: "POST", headers: {"Content-Type": "application/json"},
+      method: "POST", headers: {"Content-Type": "text/plain;charset=UTF-8"},
       body: JSON.stringify(body)
     }).then(function(r){
       if(!r.ok) throw new Error("status " + r.status);
@@ -2096,6 +2148,10 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   window.__frame = { data: data, payload: payload, counts: counts, missing: appRequired };
 })();
 
+</script>
+<script>
+/* Phone and tablet menu: the hamburger opens the same menu as a panel under the header bar. */
+(function(){var h=document.querySelector(".mm-header"),b=h.querySelector(".mm-burger");b.addEventListener("click",function(){var o=h.classList.toggle("is-open");b.setAttribute("aria-expanded",o?"true":"false");b.setAttribute("aria-label",o?"Close menu":"Open menu");});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&h.classList.contains("is-open")){h.classList.remove("is-open");b.setAttribute("aria-expanded","false");b.focus();}});})();
 </script>
 </body>
 </html>
