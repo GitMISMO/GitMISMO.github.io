@@ -40,7 +40,7 @@ a{color:var(--mm-blue);}
 
 /* ---------- Header bar (70px, dark navy, logo left, nav, Log in pill right) ---------- */
 .mm-header{position:relative;z-index:5;height:70px;background:var(--mm-hero);box-shadow:0 2px 4px 0 rgba(0,0,0,.1),0 0 2px 0 rgba(153,153,153,.25);display:flex;align-items:center;padding:0 50px;gap:56px}
-.mm-logo img{display:block;width:194px;height:36px;max-width:100%}
+.mm-logo img{display:block;width:194px;height:36px;max-width:100%;object-fit:contain;object-position:left center} /* the logo file is 684x108; "contain" keeps its shape, as the live site does (it shows about 194x31). Never let it stretch to fill 194x36. */
 .mm-logo{flex:0 1 194px;min-width:0}
 .mm-nav{display:flex;align-items:stretch;height:70px;margin:0;padding:0;list-style:none;flex:1 1 auto}
 .mm-nav>li{position:relative;display:flex;align-items:center;list-style:none}
@@ -193,14 +193,23 @@ textarea.in{min-height:120px; padding:12px 14px; line-height:1.5;}
 
 /* ---------- phones ---------- */
 @media (max-width:600px){
-  div[style*="min-height: clamp(380px"]{min-height:0 !important; padding:30px 20px !important}
-  div[style*="flex: 0 1 200px"]{display:flex !important; flex-wrap:wrap; gap:4px 16px;
-    border-left:0 !important; padding-left:0 !important; min-width:0 !important}
-  div[style*="flex: 0 1 200px"] > div:nth-child(n+5){display:none !important}
   .two-acts .btn{flex:1 1 100%}
-  .mm-f-mark{width:170px; height:26px}
   .mm-footer-bar{padding:18px 20px; justify-content:center; gap:14px 20px}
   .mm-f-addr{flex:1 1 100%}
+  .mm-f-mark{width:170px; height:26px}
+}
+
+/* ---------- the hero rules the live site applies, lifted from the template ---------- */
+/* Desktop rules the live site applies to every hero (from the shared stylesheet):
+   the hero is 502px tall with 40px top and bottom padding, and hero buttons are only as wide as their text. */
+div[style*="min-height: clamp(380px"]{min-height:502px !important;padding-top:40px !important;padding-bottom:40px !important}
+div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
+/* Phone rules the live site applies to every hero (from the shared stylesheet) */
+@media (max-width:600px){
+  div[style*="min-height: clamp(380px"]{min-height:0 !important;padding:30px 20px !important}
+  div[style*="flex: 0 1 200px"]{display:flex !important;flex-wrap:wrap;gap:4px 16px;border-left:0 !important;padding-left:0 !important;min-width:0 !important}
+  div[style*="flex: 0 1 200px"] > div:nth-child(n+5){display:none !important}
+  div[style*="max-width: 560px"] > a{flex:0 0 100% !important}
 }
 
 /* ---------- the card grid, only on this page ---------- */
@@ -294,7 +303,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     </li>
   </ul>
   </nav>
-  <a class="mm-login" href="https://collaborate.mismo.org/mismowebsite/home">Log in</a>
+  <a class="mm-login" href="https://collaborate.mismo.org/mismowebsite/home">Log In</a>
   <button type="button" class="mm-burger" aria-label="Open menu" aria-expanded="false" aria-controls="mm-nav"><span></span><span></span><span></span></button>
 </header>
 <div style="position: relative; overflow: hidden; background: #071d2e; min-height: clamp(380px,37vw,520px); display: flex; align-items: center; padding: clamp(34px,3.8vw,50px) clamp(20px,5vw,48px);"><!-- built-in Pathway artwork (shows until a photo is added) --> <svg viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;"> <defs> <linearGradient id="skyhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0d314c" stop-opacity="0"></stop> </linearGradient> <linearGradient id="gndhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0e3a5c"></stop><stop offset="100%" stop-color="#071d2e"></stop> </linearGradient> <radialGradient id="glowhm" cx="50%" cy="50%" r="50%"> <stop offset="0%" stop-color="#74bfeb" stop-opacity=".42"></stop> <stop offset="100%" stop-color="#74bfeb" stop-opacity="0"></stop> </radialGradient> <linearGradient id="trailhm" x1="0" y1="0" x2="1" y2="0"> <stop offset="0%" stop-color="#74bfeb" stop-opacity="0"></stop> <stop offset="45%" stop-color="#9ad4f4" stop-opacity=".95"></stop> <stop offset="100%" stop-color="#ffffff" stop-opacity=".55"></stop> </linearGradient> </defs> <rect x="0" y="0" width="1200" height="560" fill="url(#gndhm)"></rect> <ellipse cx="930" cy="360" rx="420" ry="250" fill="url(#glowhm)"></ellipse> <g fill="#0a2740" opacity="1"> <rect x="640" y="300" width="52" height="260"></rect><rect x="698" y="236" width="40" height="324"></rect> <rect x="744" y="318" width="60" height="242"></rect><rect x="810" y="186" width="48" height="374"></rect> <rect x="864" y="268" width="68" height="292"></rect><rect x="938" y="214" width="42" height="346"></rect> <rect x="986" y="296" width="56" height="264"></rect><rect x="1048" y="238" width="50" height="322"></rect> <rect x="1104" y="310" width="64" height="250"></rect><rect x="1174" y="258" width="44" height="302"></rect> </g> <rect x="560" y="548" width="660" height="12" fill="#0a2740"></rect> <g fill="#74bfeb" opacity=".30"> <rect x="684" y="222" width="5" height="7"></rect><rect x="696" y="246" width="5" height="7"></rect> <rect x="800" y="184" width="5" height="7"></rect><rect x="814" y="216" width="5" height="7"></rect> <rect x="860" y="258" width="5" height="7"></rect><rect x="884" y="290" width="5" height="7"></rect> <rect x="932" y="214" width="5" height="7"></rect><rect x="988" y="292" width="5" height="7"></rect> <rect x="1050" y="240" width="5" height="7"></rect><rect x="1108" y="312" width="5" height="7"></rect> </g> <g fill="none" stroke="url(#trailhm)" stroke-linecap="round"> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="13" opacity=".15"></path> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="3"></path> <path d="M450,654 C680,572 890,500 1258,428" stroke-width="1.4" opacity=".7"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="7" opacity=".2"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="2" opacity=".85"></path> <path d="M580,712 C800,636 990,570 1272,500" stroke-width="1.2" opacity=".55"></path> </g> </svg> <!-- PHOTO LAYER -->
