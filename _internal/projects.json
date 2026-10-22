@@ -45,6 +45,18 @@
            "data/"
          ]
        }, 
+  "financials": {
+    "repo": "GitMISMO/financials-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/",
+      "files/"
+    ],
+    "readable": [
+      "app/"
+    ]
+  },
   "summit-hq": {
     "repo": "GitMISMO/summit-hq-data",
     "branch": "main",
