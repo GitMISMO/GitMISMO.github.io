@@ -80,6 +80,13 @@
       "path": "/meeting-trackers/"
     },
     {
+      "key": "financials",
+      "label": "MISMO Money",
+      "colour": "#0d314c",
+      "group": "Planning",
+      "path": "/financials/"
+    },
+    {
       "key": "iif-hq",
       "label": "IIF Planning HQ",
       "colour": "#4D7C0F",
