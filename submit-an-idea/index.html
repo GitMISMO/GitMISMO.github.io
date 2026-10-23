@@ -11,7 +11,6 @@
      /hub-requests/ideas/submit (relay request 10), which keeps each idea in the private Work Requests repository for the
      Ideas Inbox and emails the sender a receipt and the administrators an alert. Fonts and colours matched from the
      website (Figtree is the nearest match); swap in the site's own when Jonna has them. -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Figtree:wght@300;400;500;600;700;800&display=swap">
 <style>
   :root{--navy:#0b1e31;--ink:#12304d;--ink-2:#4d6074;--ink-3:#6b7d8f;--sky:#5ab4ee;--blue:#2393e6;--line:#e1e8ef;--field:#cfdae5;--bad:#b3372c;--bad-soft:#fbe9e7;--good:#0f7b5c;--good-soft:#e1f2ec;
     --font:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color-scheme:light}
@@ -95,6 +94,147 @@
     .hero-in{padding:44px 20px 52px;min-height:0} h1{font-size:40px} .sec{padding:40px 16px 48px} .grid{grid-template-columns:1fr} .skyline{width:100%;height:45%}
   }
   @media (max-width:560px){ .two{grid-template-columns:1fr} h1{font-size:34px} .lead{font-size:17px} form.card,.done{padding:20px 16px} .login{padding:8px 14px;font-size:14px} .bar .search{display:none} }
+
+/* ===================================================================================== the MISMO website template
+   (Jonna, 21 Oct 2026; MISMO-Page-Template.html and MISMO-Website-Style-Guide.md, measured from the live Home page).
+   Everything below wins over the older styles above it. */
+:root{
+  --mm-font:"IBM Plex Sans","Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  --mm-ink:#0d314c;        /* headings, body ink */
+  --mm-hero:#071d2e;       /* header bar and hero background */
+  --mm-pill:#0f314c;       /* Log in button */
+  --mm-blue:#1a8fe3;       /* primary buttons, links, focus */
+  --mm-blue-top:#2e9dee;   /* primary button gradient top */
+  --mm-sky:#74bfeb;        /* eyebrow, second line of hero title */
+  --mm-sky-2:#56b4f2;      /* hero side list */
+  --mm-sub:#a9d8f3;        /* hero sub text */
+  --mm-text:#44607a;       /* body copy on white */
+  --mm-line:#cfdeeb;       /* input borders, dividers */
+  --mm-tag-bg:#e3f1fc;     /* tag background */
+  --mm-tag-ink:#1a74b8;    /* tag text */
+  --mm-page:#ffffff;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:var(--mm-font);color:var(--mm-ink);background:var(--mm-page);font-size:16px;line-height:1.6}
+
+/* ---------- Header bar (70px, dark navy, logo left, nav, Log in pill right) ---------- */
+.mm-header{position:relative;z-index:5;height:70px;background:var(--mm-hero);box-shadow:0 2px 4px 0 rgba(0,0,0,.1),0 0 2px 0 rgba(153,153,153,.25);display:flex;align-items:center;padding:0 50px;gap:56px}
+.mm-logo img{display:block;width:194px;height:36px;max-width:100%;object-fit:contain;object-position:left center} /* the logo file is 684x108; "contain" keeps its shape, as the live site does (it shows about 194x31). Never let it stretch to fill 194x36. */
+.mm-logo{flex:0 1 194px;min-width:0}
+.mm-nav{display:flex;align-items:stretch;height:70px;margin:0;padding:0;list-style:none;flex:1 1 auto}
+.mm-nav>li{position:relative;display:flex;align-items:center;list-style:none}
+.mm-nav-link{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:21px;color:#ffffff;text-decoration:none;white-space:nowrap}
+.mm-nav>li:hover>.mm-nav-link,.mm-nav-link:focus-visible{color:var(--mm-sky)}
+.mm-chev{width:11px;height:8px}
+/* Dropdown menus: measured from the live site (opens on hover or keyboard focus) */
+.mm-dd{display:none;position:absolute;left:0;top:100%;z-index:20;min-width:250px;margin:0;padding:8px 0;list-style:none;background:#0b2740;border-top:2px solid var(--mm-blue);border-radius:0 0 8px 8px;box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
+.mm-nav>li:hover>.mm-dd,.mm-nav>li:focus-within>.mm-dd{display:block}
+.mm-dd a{display:block;padding:10px 18px 10px 16px;border-left:2px solid transparent;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:19.5px;color:#e6eef5;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.mm-dd a:hover,.mm-dd a:focus-visible{outline:none;background:rgba(116,191,235,.1);border-left-color:var(--mm-sky);color:var(--mm-sky)}
+.mm-login{margin-left:auto;display:inline-block;padding:10px 20px;border-radius:50px;background:var(--mm-pill);color:#ffffff;font-family:var(--mm-font);font-size:16px;font-weight:600;line-height:16px;text-decoration:none;white-space:nowrap;min-width:max-content}
+.mm-burger{display:none;width:40px;height:40px;margin-left:12px;padding:9px 8px;border:0;border-radius:6px;background:transparent;cursor:pointer}
+.mm-burger span{display:block;height:2px;margin:4px 0;border-radius:2px;background:#ffffff;transition:transform .2s,opacity .2s}
+/* Phones and tablets: hamburger shows the same menu as a panel under the bar, sub-pages listed under each heading */
+@media (max-width:1100px){
+  .mm-header{padding:0 20px;gap:12px}
+  .mm-burger{display:block}
+  .mm-nav{display:none}
+  .mm-header.is-open .mm-nav{display:block;position:absolute;top:70px;left:0;right:0;height:auto;max-height:calc(100vh - 70px);overflow-y:auto;padding:8px 0 16px;background:#0b2740;border-top:2px solid var(--mm-blue);box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
+  .mm-header.is-open .mm-nav>li{display:block}
+  .mm-header.is-open .mm-nav-link{display:flex;padding:12px 20px 6px;font-weight:600}
+  .mm-header.is-open .mm-chev{display:none}
+  .mm-header.is-open .mm-dd{display:block;position:static;min-width:0;padding:0 0 6px;background:transparent;border:0;border-radius:0;box-shadow:none}
+  .mm-header.is-open .mm-dd a{padding:9px 20px 9px 34px;white-space:normal}
+  .mm-header.is-open .mm-burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .mm-header.is-open .mm-burger span:nth-child(2){opacity:0}
+  .mm-header.is-open .mm-burger span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+}
+
+/* ---------- Page sections ---------- */
+.mm-section{max-width:1120px;margin:0 auto;padding:56px clamp(20px,5vw,48px)}
+.mm-eyebrow{margin:0 0 10px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:var(--mm-blue)}
+.mm-h2{margin:0 0 12px;font-size:38px;font-weight:700;line-height:1.2;color:var(--mm-ink)}
+.mm-lede{margin:0 0 28px;font-size:16px;line-height:1.6;color:var(--mm-text);max-width:62ch}
+
+/* ---------- Form ---------- */
+.mm-form{max-width:720px;background:#ffffff;border:1px solid var(--mm-line);border-radius:12px;padding:28px;box-shadow:0 14px 34px -22px rgba(7,29,46,.35)}
+.mm-field{margin:0 0 18px}
+.mm-label{display:block;margin:0 0 6px;font-size:14px;font-weight:600;color:var(--mm-ink)}
+.mm-hint{display:block;margin:4px 0 0;font-size:13px;color:var(--mm-text)}
+.mm-input,.mm-select,.mm-textarea{width:100%;height:44px;padding:0 14px;font-family:var(--mm-font);font-size:15px;color:var(--mm-ink);background:#ffffff;border:1px solid var(--mm-line);border-radius:8px;outline:none}
+.mm-textarea{height:auto;min-height:120px;padding:12px 14px;line-height:1.5;resize:vertical}
+.mm-input:focus,.mm-select:focus,.mm-textarea:focus{border-color:var(--mm-blue);box-shadow:0 0 0 3px rgba(26,143,227,.18)}
+.mm-row{display:flex;flex-wrap:wrap;gap:16px}.mm-row>.mm-field{flex:1 1 240px}
+.mm-check{display:flex;gap:10px;align-items:flex-start;font-size:14.5px;color:var(--mm-text)}
+.mm-check input{margin-top:4px;accent-color:var(--mm-blue)}
+.mm-tag{display:inline-block;padding:3px 8px;border-radius:4px;background:var(--mm-tag-bg);color:var(--mm-tag-ink);font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------- Buttons (never wrap) ---------- */
+.mm-actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}
+.mm-btn{display:inline-block;box-sizing:border-box;min-width:max-content;white-space:nowrap;text-align:center;padding:14px 22px;border-radius:8px;font-family:var(--mm-font);font-size:15px;font-weight:600;line-height:1.2;text-decoration:none;cursor:pointer}
+.mm-btn-primary{background:linear-gradient(180deg,var(--mm-blue-top) 0%,var(--mm-blue) 100%);box-shadow:0 5px 16px -4px rgba(26,143,227,.55);color:#ffffff;border:1.5px solid var(--mm-blue)}
+.mm-btn-secondary{background:#ffffff;color:var(--mm-blue);border:1.5px solid var(--mm-blue)}
+
+/* ---------- Footer (simple) ---------- */
+.mm-footer{background:var(--mm-hero);color:rgba(255,255,255,.85);font-size:14px}
+.mm-footer-in{max-width:1120px;margin:0 auto;padding:28px clamp(20px,5vw,48px);display:flex;flex-wrap:wrap;gap:16px 40px;align-items:center;justify-content:space-between}
+.mm-footer a{color:#ffffff}
+
+/* Desktop rules the live site applies to every hero (from the shared stylesheet):
+   the hero is 502px tall with 40px top and bottom padding, and hero buttons are only as wide as their text. */
+div[style*="min-height: clamp(380px"]{min-height:502px !important;padding-top:40px !important;padding-bottom:40px !important}
+div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
+/* Phone rules the live site applies to every hero (from the shared stylesheet) */
+@media (max-width:600px){
+  div[style*="min-height: clamp(380px"]{min-height:0 !important;padding:30px 20px !important}
+  div[style*="flex: 0 1 200px"]{display:flex !important;flex-wrap:wrap;gap:4px 16px;border-left:0 !important;padding-left:0 !important;min-width:0 !important}
+  div[style*="flex: 0 1 200px"] > div:nth-child(n+5){display:none !important}
+  div[style*="max-width: 560px"] > a{flex:0 0 100% !important}
+}
+@media (max-width:600px){.mm-h2{font-size:30px}.mm-form{padding:20px}.mm-btn{flex:1 1 100%}}
+body,button,input,select,textarea{font-family:var(--mm-font)}
+:focus-visible{outline:2px solid var(--mm-blue);outline-offset:2px}
+.mm-header{padding-top:env(safe-area-inset-top,0px);height:calc(70px + env(safe-area-inset-top,0px))}
+.mm-nav-link:focus-visible,.mm-login:focus-visible{outline:2px solid var(--mm-sky);outline-offset:2px;border-radius:6px}
+.mm-btn:focus-visible,[style*="gradient(180deg,#2e9dee"]:focus-visible,[style*="rgba(255,255,255,.12)"]:focus-visible{outline:2px solid #ffffff;outline-offset:3px}
+.mm-footer{padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (max-width:1100px){ .mm-header.is-open .mm-nav{top:100%} }
+div[style*="max-width: 560px"] > button{flex:0 0 auto !important}
+@media (max-width:600px){ div[style*="max-width: 560px"] > button{flex:0 0 100% !important} }
+@media (max-width:600px){ .mm-logo img{width:156px;height:auto} .mm-login{padding:9px 16px;font-size:15px} }
+
+:root{--ink:#0d314c;--ink-2:#44607a;--ink-3:#44607a;--sky:#1a8fe3;--blue:#1a8fe3;--line:#cfdeeb;--field:#cfdeeb;--font:var(--mm-font)}
+body{font-size:16px;line-height:1.6;color:var(--mm-ink)}
+.sec{max-width:calc(1120px + 2 * clamp(20px,5vw,48px));margin:0 auto;padding:56px clamp(20px,5vw,48px) 64px}
+h2.h2{font-size:38px;font-weight:700;line-height:1.2;letter-spacing:0;color:var(--mm-ink);margin:0 0 12px}
+.secsub{margin:0;font-size:16px;font-weight:400;line-height:1.6;color:var(--mm-text);max-width:62ch}
+.grid{grid-template-columns:340px minmax(0,1fr);gap:28px;margin-top:28px}
+.stp{border:1px solid var(--mm-line);border-radius:12px;padding:18px 20px} .stp b{font-size:16px;font-weight:600} .stp span{font-weight:400;color:var(--mm-text)} .stp .n{color:#cfe4f5;font-weight:700}
+.talk{background:var(--mm-tag-bg);border-radius:8px;color:var(--mm-ink)} .talk a,.tk a{color:var(--mm-blue)}
+form.card,.done{border:1px solid var(--mm-line);border-radius:12px;padding:28px;box-shadow:0 14px 34px -22px rgba(7,29,46,.35)}
+.ftitle{font-size:22px;font-weight:700}
+.fld>label,.fld>legend,.flabel{font-size:14px;font-weight:600;color:var(--mm-ink)}
+.hint{font-size:13px;color:var(--mm-text)} .opt{font-size:13px;color:var(--mm-text);font-weight:400}
+input[type=text],input[type=email],input[type=tel]{height:44px;padding:0 14px;font-size:15px;color:var(--mm-ink);background:#fff;border:1px solid var(--mm-line);border-radius:8px}
+textarea{min-height:120px;padding:12px 14px;font-size:15px;line-height:1.5;color:var(--mm-ink);background:#fff;border:1px solid var(--mm-line);border-radius:8px}
+input:focus,textarea:focus{border-color:var(--mm-blue);box-shadow:0 0 0 3px rgba(26,143,227,.18)}
+.chip{border:1px solid var(--mm-line);border-radius:8px;padding:8px 14px;font-size:14px;font-weight:600;color:var(--mm-ink);background:#fff}
+.chip:hover{border-color:var(--mm-blue)} .chip[aria-pressed="true"]{background:var(--mm-tag-bg);border-color:var(--mm-blue);color:var(--mm-tag-ink)}
+.radio label{border:1px solid var(--mm-line);border-radius:8px;font-weight:600;color:var(--mm-ink)} .radio input{accent-color:var(--mm-blue)} .radio label:has(input:checked){border-color:var(--mm-blue);background:var(--mm-tag-bg)}
+.flist li{border:1px solid var(--mm-line);border-radius:8px}
+.about,.send{border-top:1px solid var(--mm-line)} .about h3{font-weight:700}
+.bp{display:inline-block;box-sizing:border-box;min-width:max-content;white-space:nowrap;text-align:center;padding:14px 22px;border-radius:8px;font-size:15px;font-weight:600;line-height:1.2;
+  background:linear-gradient(180deg,var(--mm-blue-top) 0%,var(--mm-blue) 100%);border:1.5px solid var(--mm-blue);box-shadow:0 5px 16px -4px rgba(26,143,227,.55);color:#fff}
+.bp:hover{background:linear-gradient(180deg,#2492e3 0%,#1580cf 100%)}
+.q{display:inline-block;box-sizing:border-box;min-width:max-content;white-space:nowrap;padding:14px 22px;border-radius:8px;font-size:15px;font-weight:600;line-height:1.2;background:#fff;color:var(--mm-blue);border:1.5px solid var(--mm-blue)}
+.copy{color:var(--mm-blue);font-weight:600}
+.ok{border-radius:4px}
+.talkd{font-family:var(--mm-font);border-radius:12px} .talkd h2{font-weight:700} .talkd p{color:var(--mm-text)} .talkd .acts .bp{padding:12px 20px}
+.tk .pw{background:linear-gradient(180deg,var(--mm-blue-top),var(--mm-blue));font-weight:700}
+.done h3{font-weight:700}
+@media (max-width:980px){ .grid{grid-template-columns:1fr} }
+@media (max-width:600px){ h2.h2{font-size:30px} form.card,.done{padding:20px} .send .bp,.acts .bp,.acts .q{flex:1 1 100%} }
 </style>
 </head>
 <body>
@@ -127,53 +267,101 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
 </defs></svg>
-<header class="site" id="site">
-  <div class="bar">
-    <a class="logo" href="https://collaborate.mismo.org/mismowebsite/home" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO"><use href="#mismo-logo"/></svg></a>
-    <ul class="menu" id="menu"><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/membership">Membership</a><button type="button" class="ddb" aria-expanded="false" aria-label="Membership menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
-        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/membership/member-directory">MISMO Members</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/membership/lender-champions">Our Lender Champions</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/membership/industry-champions">Our Industry Champions</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/membership/iif">Innovation Investment Fund</a></li></ul></li><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/standards-resources">Standards &amp; Resources</a><button type="button" class="ddb" aria-expanded="false" aria-label="Standards &amp; Resources menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
-        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/business-glossary">Business Glossary</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/certification">Certifications</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/mismo-link">MISMO Link</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/digital-mortgage-resource-center">Digital Mortgage Resource Center</a></li></ul></li><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/get-involved">Get Involved</a><button type="button" class="ddb" aria-expanded="false" aria-label="Get Involved menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
-        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/workgroups">Communities &amp; Workgroups</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/communities">Collaborate (Members Only)</a></li></ul></li><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/events">Events</a><button type="button" class="ddb" aria-expanded="false" aria-label="Events menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
-        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/events/summit">MISMO Summit</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/events/education">Education</a></li></ul></li><li class="dd"><a class="top" href="https://collaborate.mismo.org/mismowebsite/about-mismo">About MISMO</a><button type="button" class="ddb" aria-expanded="false" aria-label="About MISMO menu"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 4.5L6 8l3.5-3.5"/></svg></button>
-        <ul class="sub"><li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/news">News</a></li><li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/contributor-awards">Contributor Awards</a></li></ul></li></ul>
-    <div class="right"><a class="search" href="https://collaborate.mismo.org/mismowebsite/home" title="Search on the MISMO website" aria-label="Search on the MISMO website"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></a>
-      <a class="login" href="https://identity.mba.org/connect/authorize?client_id=Mba.HigherLogic.MismoMigration&amp;scope=openid+profile+email+id&amp;response_type=code&amp;redirect_uri=https%3A%2F%2Fcollaborate.mismo.org&amp;state=https%3a%2f%2fcollaborate.mismo.org%2fmismowebsite%2fhome">Log in</a>
-      <button type="button" class="burger" id="burger" aria-expanded="false" aria-controls="menu" aria-label="Menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button></div>
-  </div>
+<header class="mm-header">
+  <a class="mm-logo" href="https://collaborate.mismo.org/mismowebsite/home"><img src="https://higherlogicdownload.s3.amazonaws.com/MISMO/LogoImages/6e07790a-6fc9-43dc-b9d6-9178e00c3342_mismo-reverse-nav-logo.png" alt="MISMO logo. This will take you to the homepage"></a>
+  <nav aria-label="Main">
+  <ul class="mm-nav" id="mm-nav">
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/membership" aria-haspopup="true">Membership <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/member-directory">MISMO Members</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/lender-champions">Our Lender Champions</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/industry-champions">Our Industry Champions</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/iif">Innovation Investment Fund</a></li>
+      </ul>
+    </li>
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/standards-resources" aria-haspopup="true">Standards &amp; Resources <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/business-glossary">Business Glossary</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/certification">Certifications</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/mismo-link">MISMO Link</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/digital-mortgage-resource-center">Digital Mortgage Resource Center</a></li>
+      </ul>
+    </li>
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/get-involved" aria-haspopup="true">Get Involved <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/workgroups">Communities &amp; Workgroups</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/communities">Collaborate (Members Only)</a></li>
+      </ul>
+    </li>
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/events" aria-haspopup="true">Events <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/events/summit">MISMO Summit</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/events/education">Education</a></li>
+      </ul>
+    </li>
+    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/about-mismo" aria-haspopup="true">About MISMO <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <ul class="mm-dd">
+        <li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/news">News</a></li>
+        <li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/contributor-awards">Contributor Awards</a></li>
+      </ul>
+    </li>
+  </ul>
+  </nav>
+  <a class="mm-login" href="https://identity.mba.org/connect/authorize?client_id=Mba.HigherLogic.MismoMigration&amp;scope=openid+profile+email+id&amp;response_type=code&amp;redirect_uri=https%3A%2F%2Fcollaborate.mismo.org&amp;state=https%3a%2f%2fcollaborate.mismo.org%2fmismowebsite%2fhome">Log In</a>
+  <button type="button" class="mm-burger" aria-label="Open menu" aria-expanded="false" aria-controls="mm-nav"><span></span><span></span><span></span></button>
 </header>
+<script>
+/* Phone and tablet menu: the hamburger opens the same menu as a panel under the header bar. */
+(function(){var h=document.querySelector(".mm-header"),b=h.querySelector(".mm-burger");b.addEventListener("click",function(){var o=h.classList.toggle("is-open");b.setAttribute("aria-expanded",o?"true":"false");b.setAttribute("aria-label",o?"Close menu":"Open menu");});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&h.classList.contains("is-open")){h.classList.remove("is-open");b.setAttribute("aria-expanded","false");b.focus();}});})();
+</script>
 <main>
-  <section class="hero"><div class="hero-in"><svg class="skyline" viewBox="0 0 720 100" preserveAspectRatio="none" aria-hidden="true"><rect x="0" y="62" width="46" height="38"/><rect x="52" y="42" width="30" height="58"/><rect x="88" y="26" width="58" height="74"/><rect x="152" y="50" width="40" height="50"/><rect x="198" y="8" width="64" height="92"/><rect x="268" y="38" width="36" height="62"/><rect x="310" y="20" width="70" height="80"/><rect x="386" y="44" width="44" height="56"/><rect x="436" y="30" width="62" height="70"/><rect x="504" y="52" width="38" height="48"/><rect x="548" y="16" width="66" height="84"/><rect x="620" y="36" width="52" height="64"/><rect x="678" y="42" width="44" height="58"/><path class="ln" d="M360 100 L720 70"/><path class="ln2" d="M470 100 L720 84"/></svg>
-    <div class="words" aria-hidden="true"><b>SHARE</b><b>DISCUSS</b><b>DEVELOP</b><b>ADOPT</b><hr><small>A MORE EFFICIENT<br>MORTGAGE INDUSTRY</small></div>
-    <div style="position:relative"><div class="eyebrow">GET INVOLVED</div>
-      <h1>Share Your Idea<span class="b">Shape What Comes Next</span></h1>
-      <p class="lead">Have an idea that could help the mortgage industry work better together? Tell MISMO about it.</p>
-      <p class="lead2">No account needed. The more detail you share, the sooner we can help move it forward.</p>
-      <div class="btns"><a class="bp" href="#tell">Share Your Idea &darr;</a><button type="button" class="bs" id="talk" aria-haspopup="dialog">Talk to Us First</button></div></div>
-  </div></section>
-  <section class="sec" id="tell"><h2 class="h2">Tell Us About Your Idea</h2><p class="secsub">Share as much detail as you can. A MISMO staff member will reach out within two business days.</p>
+  <div style="position: relative; overflow: hidden; background: #071d2e; min-height: clamp(380px,37vw,520px); display: flex; align-items: center; padding: clamp(34px,3.8vw,50px) clamp(20px,5vw,48px);"><!-- built-in Pathway artwork (shows until a photo is added) --> <svg viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;"> <defs> <linearGradient id="skyhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0d314c" stop-opacity="0"></stop> </linearGradient> <linearGradient id="gndhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0e3a5c"></stop><stop offset="100%" stop-color="#071d2e"></stop> </linearGradient> <radialGradient id="glowhm" cx="50%" cy="50%" r="50%"> <stop offset="0%" stop-color="#74bfeb" stop-opacity=".42"></stop> <stop offset="100%" stop-color="#74bfeb" stop-opacity="0"></stop> </radialGradient> <linearGradient id="trailhm" x1="0" y1="0" x2="1" y2="0"> <stop offset="0%" stop-color="#74bfeb" stop-opacity="0"></stop> <stop offset="45%" stop-color="#9ad4f4" stop-opacity=".95"></stop> <stop offset="100%" stop-color="#ffffff" stop-opacity=".55"></stop> </linearGradient> </defs> <rect x="0" y="0" width="1200" height="560" fill="url(#gndhm)"></rect> <ellipse cx="930" cy="360" rx="420" ry="250" fill="url(#glowhm)"></ellipse> <g fill="#0a2740" opacity="1"> <rect x="640" y="300" width="52" height="260"></rect><rect x="698" y="236" width="40" height="324"></rect> <rect x="744" y="318" width="60" height="242"></rect><rect x="810" y="186" width="48" height="374"></rect> <rect x="864" y="268" width="68" height="292"></rect><rect x="938" y="214" width="42" height="346"></rect> <rect x="986" y="296" width="56" height="264"></rect><rect x="1048" y="238" width="50" height="322"></rect> <rect x="1104" y="310" width="64" height="250"></rect><rect x="1174" y="258" width="44" height="302"></rect> </g> <rect x="560" y="548" width="660" height="12" fill="#0a2740"></rect> <g fill="#74bfeb" opacity=".30"> <rect x="684" y="222" width="5" height="7"></rect><rect x="696" y="246" width="5" height="7"></rect> <rect x="800" y="184" width="5" height="7"></rect><rect x="814" y="216" width="5" height="7"></rect> <rect x="860" y="258" width="5" height="7"></rect><rect x="884" y="290" width="5" height="7"></rect> <rect x="932" y="214" width="5" height="7"></rect><rect x="988" y="292" width="5" height="7"></rect> <rect x="1050" y="240" width="5" height="7"></rect><rect x="1108" y="312" width="5" height="7"></rect> </g> <g fill="none" stroke="url(#trailhm)" stroke-linecap="round"> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="13" opacity=".15"></path> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="3"></path> <path d="M450,654 C680,572 890,500 1258,428" stroke-width="1.4" opacity=".7"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="7" opacity=".2"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="2" opacity=".85"></path> <path d="M580,712 C800,636 990,570 1272,500" stroke-width="1.2" opacity=".55"></path> </g> </svg> <!-- PHOTO LAYER -->
+<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: none; background-size: cover; background-position: center right; background-repeat: no-repeat;"></div>
+<!-- scrim: keeps the copy readable over any photo -->
+<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(90deg,#071d2e 0%,rgba(7,29,46,.96) 30%,rgba(7,29,46,.80) 50%,rgba(7,29,46,.42) 72%,rgba(7,29,46,.22) 100%);"></div>
+<div style="position: relative; z-index: 2; width: 100%; max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 30px; align-items: center;">
+<div style="flex: 1 1 440px; min-width: 0; max-width: 620px; margin-right: auto;">
+<p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: #74bfeb; font-family: inherit; line-height: 1.5;">Get Involved</p>
+<h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Share Your Idea<span style="display: block; color: #74bfeb;">Shape What Comes Next</span></h1>
+<p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">Have an idea that could help the mortgage industry work better together? Tell MISMO about it.</p>
+<p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3; max-width: 52ch;">No account needed. The more detail you share, the sooner we can help move it forward.</p>
+<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#tell"  style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Share Your Idea&nbsp;&darr;</a> <button type="button" id="talk" aria-haspopup="dialog" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid rgba(255,255,255,.6); cursor: pointer;">Talk to Us First</button></div>
+</div>
+<div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Share</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Discuss</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Develop</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Adopt</div>
+<div style="width: 44px; height: 1px; background: rgba(255,255,255,.4); margin: 18px 0;"></div>
+<div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">A More Efficient</div>
+<div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Mortgage Industry</div>
+</div>
+</div>
+</div>
+  <section class="sec" id="tell"><p class="mm-eyebrow">Partner with MISMO</p><h2 class="h2">Tell Us About Your Idea</h2><p class="secsub">Share as much detail as you can. A MISMO staff member will reach out within two business days.</p>
     <div class="grid">
-      <div><div class="steps"><div class="stp"><b>You submit</b><span>Your idea, with as much detail as you can, and any documents that help explain it. You&rsquo;ll get a receipt by email.</span><span class="n" aria-hidden="true">01</span></div>
-        <div class="stp"><b>We reach out</b><span>A MISMO staff member contacts you within two business days.</span><span class="n" aria-hidden="true">02</span></div>
-        <div class="stp"><b>We plan the next steps</b><span>Together we decide how to move it forward: a new work request, an existing workgroup, or a MISMO community.</span><span class="n" aria-hidden="true">03</span></div></div>
+      <div><div class="steps"><div class="stp"><b>You Submit</b><span>Your idea, with as much detail as you can, and any documents that help explain it. You&rsquo;ll get a receipt by email.</span><span class="n" aria-hidden="true">01</span></div>
+        <div class="stp"><b>We Reach Out</b><span>A MISMO staff member contacts you within two business days.</span><span class="n" aria-hidden="true">02</span></div>
+        <div class="stp"><b>We Plan the Next Steps</b><span>Together we decide how to move it forward: a new work request, an existing workgroup, or a MISMO community.</span><span class="n" aria-hidden="true">03</span></div></div>
         <div class="talk"><b>Rather talk first?</b> Perry Williams, Standards Program Manager: <a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div></div>
       <div>
         <form class="card" id="form" novalidate>
-          <div class="ftitle">Your idea</div>
+          <div class="ftitle">Your Idea</div>
           <div class="msg" id="msg" role="alert" hidden></div>
-          <div class="fld"><label for="title">What should we call your idea?</label><input type="text" id="title" maxlength="150" autocomplete="off"></div>
-          <div class="fld"><label for="idea">The idea or opportunity</label><p class="hint" id="idea-hint">Give us enough to understand it: the problem or opportunity, how things work today, what would change, and who it would affect.</p><textarea id="idea" maxlength="4000" aria-describedby="idea-hint" style="min-height:140px"></textarea></div>
-          <fieldset class="fld"><legend>Who should be involved, or would benefit? <span class="opt">Choose any</span></legend>
+          <div class="fld"><label for="title">What Should We Call Your Idea?</label><input type="text" id="title" maxlength="150" autocomplete="off"></div>
+          <div class="fld"><label for="idea">The Idea or Opportunity</label><p class="hint" id="idea-hint">Give us enough to understand it: the problem or opportunity, how things work today, what would change, and who it would affect.</p><textarea id="idea" maxlength="4000" aria-describedby="idea-hint" style="min-height:140px"></textarea></div>
+          <fieldset class="fld"><legend>Who Should Be Involved, or Would Benefit? <span class="opt">Choose any</span></legend>
             <div class="chips" id="who"></div>
-            <label for="whoOther" class="hint" id="whoOther-l" hidden style="font-weight:700;color:var(--ink)">Who else?</label><input type="text" id="whoOther" maxlength="200" hidden></fieldset>
-          <div class="fld"><label for="why">Why it matters <span class="opt">(optional)</span></label><p class="hint" id="why-hint">What makes it important now: costs, risks, regulation, timing, or work already under way.</p><textarea id="why" maxlength="4000" aria-describedby="why-hint"></textarea></div>
+            <label for="whoOther" class="hint" id="whoOther-l" hidden style="font-weight:700;color:var(--ink)">Who Else?</label><input type="text" id="whoOther" maxlength="200" hidden></fieldset>
+          <div class="fld"><label for="why">Why It Matters</label><p class="hint" id="why-hint">What makes it important now: costs, risks, regulation, timing, or work already under way.</p><textarea id="why" maxlength="4000" aria-describedby="why-hint" aria-required="true"></textarea></div>
           <div class="fld"><span class="flabel" id="files-l">Attachments <span class="opt">(optional)</span></span><p class="hint" id="files-hint">Anything that helps explain the idea: a write-up, an example, a diagram. Up to 5 files, 4&nbsp;MB each: PDF, Word, Excel, PowerPoint, PNG or JPEG images, text or CSV.</p>
-            <div class="filebox"><label class="q pick" for="files">Choose files</label><input type="file" id="files" class="vh" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.csv" aria-describedby="files-hint"><ul class="flist" id="flist" aria-live="polite"></ul></div></div>
-          <div class="about"><h3>About you</h3>
-            <div class="two"><div class="fld"><label for="name">Your name</label><input type="text" id="name" maxlength="100" autocomplete="name"></div>
+            <div class="filebox"><label class="q pick" for="files">Choose Files</label><input type="file" id="files" class="vh" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.png,.jpg,.jpeg,.txt,.csv" aria-describedby="files-hint"><ul class="flist" id="flist" aria-live="polite"></ul></div></div>
+          <div class="about"><h3>About You</h3>
+            <div class="two"><div class="fld"><label for="name">Your Name</label><input type="text" id="name" maxlength="100" autocomplete="name"></div>
               <div class="fld"><label for="company">Company</label><input type="text" id="company" maxlength="150" autocomplete="organization"></div>
               <div class="fld"><label for="email">Email</label><input type="email" id="email" maxlength="200" autocomplete="email"></div>
               <div class="fld"><label for="phone">Phone <span class="opt">(optional)</span></label><input type="tel" id="phone" maxlength="40" autocomplete="tel"></div></div>
-            <fieldset class="fld"><legend>Is your company a MISMO member? <span class="opt">(optional)</span></legend>
+            <fieldset class="fld"><legend>Is Your Company a MISMO Member? <span class="opt">(optional)</span></legend>
               <div class="radio"><label><input type="radio" name="member" value="yes">Yes</label><label><input type="radio" name="member" value="no">No</label><label><input type="radio" name="member" value="unsure">Not sure</label></div></fieldset></div>
           <div class="hp" aria-hidden="true"><label for="website">Leave this empty</label><input type="text" id="website" tabindex="-1" autocomplete="off"></div>
           <div class="send"><button type="submit" class="bp" id="go">Submit Your Idea &rarr;</button><span class="fine">No account needed. We use your details only to follow up on this idea.</span></div>
@@ -183,7 +371,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
           <h3 id="thanks" tabindex="-1">Thank you. Your idea is with MISMO.</h3>
           <p class="secsub" id="next"></p>
           <dl class="kv" id="sum"></dl>
-          <div class="acts"><button type="button" class="q" id="again">Submit another idea</button><a class="q" href="https://collaborate.mismo.org/mismowebsite/get-involved">Back to Get Involved</a></div>
+          <div class="acts"><button type="button" class="q" id="again">Submit Another Idea</button><a class="q" href="https://collaborate.mismo.org/mismowebsite/get-involved">Back to Get Involved</a></div>
         </section>
       </div>
     </div>
@@ -191,20 +379,18 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 </main>
 <dialog class="talkd" id="talkd" aria-labelledby="talkd-h">
   <button type="button" class="x" id="talkx" aria-label="Close">&times;</button>
-  <h2 id="talkd-h">Talk to Perry first</h2>
+  <h2 id="talkd-h">Talk to Perry First</h2>
   <p>Not sure your idea is ready, or where it fits? He&rsquo;s glad to talk it through before you submit it.</p>
   <div class="tk"><span class="pw" aria-hidden="true">PW</span><div><b>Perry Williams</b><span class="t">Standards Program Manager, MISMO</span><a href="mailto:pwilliams@mismo.org">pwilliams@mismo.org</a></div></div>
-  <div class="acts"><a class="bp" id="talkmail" href="mailto:pwilliams@mismo.org?subject=An%20idea%20I%E2%80%99d%20like%20to%20talk%20through">Email Perry</a><button type="button" class="copy" id="talkcopy">Copy address</button></div>
+  <div class="acts"><a class="bp" id="talkmail" href="mailto:pwilliams@mismo.org?subject=An%20idea%20I%E2%80%99d%20like%20to%20talk%20through">Email Perry</a><button type="button" class="copy" id="talkcopy">Copy Address</button></div>
 </dialog>
-<footer><div class="foot"><a class="logo" href="https://collaborate.mismo.org/mismowebsite/home" aria-label="MISMO home"><svg viewBox="0 0 708 108" role="img" aria-label="MISMO" style="--logo-body:#fff;--logo-s:#4fb0ec"><use href="#mismo-logo"/></svg></a>
-  <span>1919 M Street NW, 5th Floor, Washington, DC 20036 &middot; <a href="mailto:info@mismo.org">info@mismo.org</a></span><span class="fsp"></span>
-  <a href="https://collaborate.mismo.org/mismowebsite/privacy-policy">Privacy Policy</a><a href="https://collaborate.mismo.org/mismowebsite/terms-of-use">Terms of Use</a></div></footer>
+<footer class="mm-footer"><div class="mm-footer-in"><span>MISMO &middot; 1919 M Street NW, 5th Floor, Washington, DC 20036 &middot; <a href="mailto:info@mismo.org">info@mismo.org</a></span><span>&copy; 2026 MISMO. All rights reserved.</span></div></footer>
 <script>
 /* The website's menu: each item opens its list from its arrow (and on hover); on a phone, the menu button opens the menu.
    Talk to Us First opens a panel with Perry's details: email him, or copy his address (Perry, 18 Oct 2026). */
 (function () {
   var dlg = document.getElementById('talkd'), copy = document.getElementById('talkcopy');
-  document.getElementById('talk').addEventListener('click', function () { copy.textContent = 'Copy address'; dlg.showModal(); document.getElementById('talkmail').focus(); });
+  document.getElementById('talk').addEventListener('click', function () { copy.textContent = 'Copy Address'; dlg.showModal(); document.getElementById('talkmail').focus(); });
   document.getElementById('talkx').addEventListener('click', function () { dlg.close(); });
   dlg.addEventListener('click', function (e) { if (e.target === dlg) dlg.close(); });   /* outside the panel */
   dlg.addEventListener('close', function () { document.getElementById('talk').focus(); });
@@ -212,13 +398,6 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText('pwilliams@mismo.org').then(done, fallback); else fallback();
     function fallback() { var t = document.createElement('textarea'); t.value = 'pwilliams@mismo.org'; t.setAttribute('readonly', ''); t.style.position = 'fixed'; t.style.opacity = '0'; dlg.appendChild(t); t.select();
       try { document.execCommand('copy'); done(); } catch (e) { copy.textContent = 'pwilliams@mismo.org'; } t.remove(); } });
-  var site = document.getElementById('site'), burger = document.getElementById('burger');
-  document.querySelectorAll('.ddb').forEach(function (b) { b.addEventListener('click', function () { var li = b.parentNode, on = !li.classList.contains('open');
-    document.querySelectorAll('.dd.open').forEach(function (x) { x.classList.remove('open'); x.querySelector('.ddb').setAttribute('aria-expanded', 'false'); });
-    if (on) { li.classList.add('open'); b.setAttribute('aria-expanded', 'true'); } }); });
-  burger.addEventListener('click', function () { var on = !site.classList.contains('open'); site.classList.toggle('open', on); burger.setAttribute('aria-expanded', String(on)); });
-  document.addEventListener('click', function (e) { if (!e.target.closest('.dd')) document.querySelectorAll('.dd.open').forEach(function (x) { x.classList.remove('open'); x.querySelector('.ddb').setAttribute('aria-expanded', 'false'); }); });
-  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') document.querySelectorAll('.dd.open').forEach(function (x) { x.classList.remove('open'); x.querySelector('.ddb').setAttribute('aria-expanded', 'false'); x.querySelector('.ddb').focus(); }); });
 })();
 </script>
 <script>
@@ -246,6 +425,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var bad = [], mark = function (id, wrong, text) { $(id).setAttribute('aria-invalid', wrong ? 'true' : 'false'); if (wrong) bad.push([id, text]); };
     mark('title', oneLine(val('title')).length < 3, 'Give your idea a short name.');
     mark('idea', val('idea').length < 40, val('idea') ? 'Tell us a little more about the idea: a few sentences, with enough detail for us to understand it.' : 'Describe the idea.');
+    mark('why', oneLine(val('why')).length < 10, val('why').trim() ? 'Say a little more about why it matters.' : 'Say why it matters.');
     mark('name', oneLine(val('name')).length < 2, 'Add your name.');
     mark('company', oneLine(val('company')).length < 2, 'Add your company.');
     mark('email', !/^[^\s@]{1,64}@[^\s@]+\.[A-Za-z]{2,}$/.test(val('email')), 'Add an email address we can reply to.');
