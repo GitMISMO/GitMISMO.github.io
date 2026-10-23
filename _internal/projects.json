@@ -57,6 +57,14 @@
       "app/"
     ]
   },
+  "mismo-link": {
+    "repo": "GitMISMO/mismo-link-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
   "summit-hq": {
     "repo": "GitMISMO/summit-hq-data",
     "branch": "main",

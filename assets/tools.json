@@ -46,6 +46,13 @@
       ]
     },
     {
+      "key": "mismo-link",
+      "label": "MISMO Link",
+      "colour": "#0369A1",
+      "group": "Standards & Tools",
+      "path": "/mismo-link/"
+    },
+    {
       "key": "summit-hq",
       "label": "Summit HQ",
       "colour": "#B45309",
