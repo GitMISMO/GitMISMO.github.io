@@ -133,6 +133,8 @@ const P = {
   website:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18 M3 12h18 M12 3c3 3 3 15 0 18 M12 3c-3 3-3 15 0 18',
   team:'M9 11a3.5 3.5 0 1 0 0-7a3.5 3.5 0 1 0 0 7 M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M17 11a3 3 0 1 0 0-6 M21 20c0-2.6-1.7-4.8-4-5.6',
   tracker:'M9 3h6v3H9z M7 4.5H5V21h14V4.5h-2 M8.5 13.5l2.5 2.5 4.5-5',
+  money:'M3 6.5h18v11H3z M12 9.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5 M6.5 9.5v.01 M17.5 14.5v.01',
+  link:'M10.6 13.4a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1.1 1.1 M13.4 10.6a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.1-1.1',
   qr:'M4 4h6v6H4z M14 4h6v6h-6z M4 14h6v6H4z M14 14h2v2h-2z M18 14h2v2h-2z M14 18h2v2h-2z M18 18h2v2h-2z',
   plus:'M12 5v14 M5 12h14', book:'M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3z', clock:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18 M12 7v5l3 2',
   bulb:'M9 18h6 M10 21h4 M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2V17h5v-1.1c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z', edit:'M4 20h4L19 9l-4-4L4 16v4z M13.5 6.5l4 4',
@@ -147,21 +149,26 @@ const TOOLS = [
   { key:'hub', name:'Initiative Hub', c:'#2A4DFF', icon:'hub', sec:'Standards & Tools' },
   { key:'glossary', name:'Business Glossary', c:'#0F9D77', icon:'glossary', sec:'Standards & Tools' },
   { key:'qr', name:'QR Code Manager', c:'#2477B8', icon:'qr', sec:'Standards & Tools' },
+  { key:'mismo-link', name:'MISMO Link', c:'#1E3A8A', icon:'link', sec:'Standards & Tools' },
   { key:'summit-hq', name:'Summit HQ', c:'#B45309', icon:'summit', sec:'Planning' },
   { key:'website-migration', name:'Website Migration HQ', c:'#475569', icon:'website', sec:'Planning' },
   { key:'team-hq', name:'Team HQ', c:'#0D314C', icon:'team', sec:'Planning' },
   { key:'meeting-trackers', name:'Meeting Trackers', c:'#6D28D9', icon:'tracker', sec:'Planning' },
   { key:'iif-hq', name:'IIF Planning HQ', c:'#4D7C0F', icon:'iif', sec:'Planning' },
   { key:'member-360', name:'Member 360', c:'#0F7B5C', icon:'member', sec:'Planning' },
+  { key:'financials', name:'MISMO Money', c:'#16A34A', icon:'money', sec:'Planning' },
   { key:'cms', name:'Certification Management System', c:'#BE123C', icon:'cert', sec:'Certification' },
   { key:'sponsorship', name:'Sponsorship', c:'#0EA5E9', icon:'sponsorship', sec:'Sponsorship' },
   { key:'so', name:'Service Orders and Agreements', c:'#E11D48', icon:'so', sec:'Certification' },
 ];
+TOOLS.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity:'base' }));   /* A to Z within each section, left to right, top to bottom (Perry, 23 Oct 2026) */
 /* Every page the old home page offered, once each, worded as what people come to do. */
 const ENTRIES = {
   'hub': [['Submit a work request', 'Work Requests', 'plus', '/initiative-hub/work-requests.html', 'hub-requests'], ['Browse potential initiatives', 'Potential Initiatives', 'bulb', '/initiative-hub/#potential'], ['Find an initiative', 'Initiative Hub', 'hub', '/initiative-hub/']],
   'glossary': [['Propose or edit a term', 'Business Glossary Console', 'edit', '/glossary/console/'], ['Find a glossary term', 'Public glossary', 'book', '/glossary/']],   /* the console leads (Perry, 13 Oct 2026) */
   'qr': [['See all QR codes', 'QR Code Manager', 'qr', '/qr/'], ['Make a QR code', 'Make a New Code', 'plus', '/qr/#new'], ['See how codes are scanned', 'Scans', 'chart', '/qr/#scans']],
+  'mismo-link': [['MISMO Link', 'MISMO Link', 'link', '/mismo-link/'], ['Send the beta agreement', 'MISMO Link Beta Agreement', 'send', '/mismo-link/sign/']],   /* the hub, and the public signing page (Perry, 23 Oct 2026) */
+  'financials': [['MISMO Money', 'MISMO Money', 'money', '/financials/']],   /* the main page only, named after the tool, until its views are known (Perry, 23 Oct 2026) */
   'summit-hq': [['Plan the summit', 'Summit HQ', 'summit', '/summit-hq/']],
   'website-migration': [['Check the migration', 'Website Migration HQ', 'website', '/website-migration/']],
   'team-hq': [['Open my board', 'Team HQ', 'team', '/team-hq/'], ['Jot it down', 'Team HQ', 'note', '/team-hq/']],
@@ -176,7 +183,8 @@ const ENTRIES = {
    page in it. A tool's pages are its own entries that lead somewhere other than its main page, plus these pages that
    have their own address. */
 const TOOL_PATH = { hub:'/initiative-hub/', glossary:'/glossary/console/', qr:'/qr/', 'summit-hq':'/summit-hq/', 'website-migration':'/website-migration/', 'team-hq':'/team-hq/',
-  'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/service-orders/' };
+  'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/service-orders/',
+  'mismo-link':'/mismo-link/', financials:'/financials/' };
 const MORE_PAGES = {
   hub: [['Meeting Calendar', 'Page', 'hub', '/initiative-hub/calendar.html'],
     ['Mortgage Compliance Dataset (MCD)', 'Overview', 'hub', '/initiative-hub/mcd-dashboard.html'], ['Common Confidence Score (CCS)', 'Overview', 'hub', '/initiative-hub/ccs-dashboard.html'],

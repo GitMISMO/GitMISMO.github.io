@@ -48,7 +48,7 @@
     {
       "key": "mismo-link",
       "label": "MISMO Link",
-      "colour": "#0369A1",
+      "colour": "#1E3A8A",
       "group": "Standards & Tools",
       "path": "/mismo-link/"
     },
@@ -89,7 +89,7 @@
     {
       "key": "financials",
       "label": "MISMO Money",
-      "colour": "#0d314c",
+      "colour": "#16A34A",
       "group": "Planning",
       "path": "/financials/"
     },
