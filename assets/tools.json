@@ -221,6 +221,36 @@
       "colour": "#BE123C",
       "group": "Certification",
       "path": "/cms/"
+    },
+    {
+      "key": "as-falcon",
+      "label": "Falcon Capital Advisors LLC",
+      "sum": "Assessor Portal (Falcon Capital Advisors LLC)",
+      "menu": "Falcon Capital Advisors LLC (Assessor)",
+      "colour": "#0891B2",
+      "group": "Certification — Assessor Portal",
+      "path": "/assessors/",
+      "family": true
+    },
+    {
+      "key": "as-actualize",
+      "label": "Actualize Consulting LLC",
+      "sum": "Assessor Portal (Actualize Consulting LLC)",
+      "menu": "Actualize Consulting LLC (Assessor)",
+      "colour": "#0891B2",
+      "group": "Certification — Assessor Portal",
+      "path": "/assessors/",
+      "family": true
+    },
+    {
+      "key": "as-vianteye",
+      "label": "Viant Eye LLC",
+      "sum": "Assessor Portal (Viant Eye LLC)",
+      "menu": "Viant Eye LLC (Assessor)",
+      "colour": "#0891B2",
+      "group": "Certification — Assessor Portal",
+      "path": "/assessors/",
+      "family": true
     }
   ]
 }
