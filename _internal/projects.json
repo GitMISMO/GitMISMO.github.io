@@ -199,6 +199,24 @@
       "orders/"
     ]
   },
+  "so-vianteye": {
+    "repo": "GitMISMO/so-vianteye-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "signatures/",
+      "notify/",
+      "hours/",
+      "revisions/",
+      "agreements/",
+      "orders-public/",
+      "invoices/",
+      "outbox/"
+    ],
+    "readable": [
+      "orders/"
+    ]
+  },
   "website-migration": {
     "repo": "GitMISMO/website-migration-data",
     "branch": "main",
@@ -315,6 +333,18 @@
   },
   "so-trudigital-hours": {
     "repo": "GitMISMO/so-trudigital-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "hours/",
+      "notify/"
+    ],
+    "readable": [
+      "orders-public/"
+    ]
+  },
+  "so-vianteye-hours": {
+    "repo": "GitMISMO/so-vianteye-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
     "writable": [
