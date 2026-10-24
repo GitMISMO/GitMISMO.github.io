@@ -324,5 +324,41 @@
     "readable": [
       "orders-public/"
     ]
+  },
+  "as-falcon": {
+    "repo": "GitMISMO/so-falcon-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "findings/",
+      "notify/assessment/"
+    ],
+    "readable": [
+      "engagements/"
+    ]
+  },
+  "as-actualize": {
+    "repo": "GitMISMO/so-actualize-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "findings/",
+      "notify/assessment/"
+    ],
+    "readable": [
+      "engagements/"
+    ]
+  },
+  "as-vianteye": {
+    "repo": "GitMISMO/as-vianteye-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "findings/",
+      "notify/assessment/"
+    ],
+    "readable": [
+      "engagements/"
+    ]
   }
 }
