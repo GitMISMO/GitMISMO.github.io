@@ -1,70 +1,4 @@
 {
- "cms": {
-    "repo": "GitMISMO/cms-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "activity/",
-      "applications/",
-      "assessments/",
-      "certEdits/",
-      "cycleState/",
-      "formEdits/",
-      "invoices/",
-      "markLicense/",
-      "orgEdits/",
-      "pricing/",
-      "scenarioLog/",
-      "scores/",
-      "scriptPrep/"
-    ],
-    "readable": [
-     "portal-data.json",
-      "data/",
-      "finance/",
-      "frameAsk/",
-      "frameReview/",
-      "frameScores/",
-      "membership/",
-      "scenAssign/"
-    ]
-  },
-         "iif-hq": {
-         "repo": "GitMISMO/iif-hq-data",
-         "branch": "main",
-         "origin": "https://resources.mismo.org",
-         "writable": [
-           "data/"
-         ]
-       },
-       "member-360": {
-         "repo": "GitMISMO/member-360-data",
-         "branch": "main",
-         "origin": "https://resources.mismo.org",
-         "writable": [
-           "data/"
-         ]
-       }, 
-  "financials": {
-    "repo": "GitMISMO/financials-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "data/",
-      "files/"
-    ],
-    "readable": [
-      "app/"
-    ]
-  },
-  "mismo-link": {
-    "repo": "GitMISMO/mismo-link-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "data/"
-    ]
-  },
   "summit-hq": {
     "repo": "GitMISMO/summit-hq-data",
     "branch": "main",
@@ -183,24 +117,6 @@
   },
   "so-trudigital": {
     "repo": "GitMISMO/so-trudigital-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "signatures/",
-      "notify/",
-      "hours/",
-      "revisions/",
-      "agreements/",
-      "orders-public/",
-      "invoices/",
-      "outbox/"
-    ],
-    "readable": [
-      "orders/"
-    ]
-  },
-  "so-vianteye": {
-    "repo": "GitMISMO/so-vianteye-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
     "writable": [
@@ -341,54 +257,6 @@
     ],
     "readable": [
       "orders-public/"
-    ]
-  },
-  "so-vianteye-hours": {
-    "repo": "GitMISMO/so-vianteye-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "hours/",
-      "notify/"
-    ],
-    "readable": [
-      "orders-public/"
-    ]
-  },
-  "as-falcon": {
-    "repo": "GitMISMO/so-falcon-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "findings/",
-      "notify/assessment/"
-    ],
-    "readable": [
-      "engagements/"
-    ]
-  },
-  "as-actualize": {
-    "repo": "GitMISMO/so-actualize-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "findings/",
-      "notify/assessment/"
-    ],
-    "readable": [
-      "engagements/"
-    ]
-  },
-  "as-vianteye": {
-    "repo": "GitMISMO/as-vianteye-data",
-    "branch": "main",
-    "origin": "https://resources.mismo.org",
-    "writable": [
-      "findings/",
-      "notify/assessment/"
-    ],
-    "readable": [
-      "engagements/"
     ]
   }
 }
