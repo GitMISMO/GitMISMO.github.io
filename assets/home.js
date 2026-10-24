@@ -213,7 +213,7 @@ const LEAD = ['hub', 'glossary', 'so', 'team-hq', 'qr', 'sponsorship', 'summit-h
 const RS = window.ResourcesSession;
 const ROLE_NAME = { admin:'Admin', staff:'Edit', view:'View' };
 const RANK = { view:1, staff:2, admin:3 };
-let COMPANIES = { 'so-phoenix':'Phoenix Oversight Group LLC', 'so-actualize':'Actualize Consulting LLC', 'so-trex':'Tidgewell Results eXperience LLC', 'so-falcon':'Falcon Capital Advisors LLC', 'so-trudigital':'TruDigital Mortgage Solutions LLC' };
+let COMPANIES = { 'so-phoenix':'Phoenix Oversight Group LLC', 'so-actualize':'Actualize Consulting LLC', 'so-trex':'Tidgewell Results eXperience LLC', 'so-falcon':'Falcon Capital Advisors LLC', 'so-trudigital':'TruDigital Mortgage Solutions LLC', 'so-vianteye':'Viant Eye LLC' };
 function me(){
   const s = (RS && RS.current()) || {}, acc = s.access || {}, admin = !!(RS && RS.isPlatformAdmin && RS.isPlatformAdmin());
   const soKeys = Object.keys(acc).filter(k => k.indexOf('so-') === 0 && acc[k]);
@@ -221,7 +221,7 @@ function me(){
   const roleOf = k => { if (admin) return 'Admin'; if (k === 'so'){ const best = soKeys.map(x => acc[x]).sort((x, y) => RANK[y] - RANK[x])[0]; return ROLE_NAME[best] || 'Edit'; } return ROLE_NAME[acc[k]] || 'Edit'; };
   const name = s.name || s.email || '';
   return { name, first: name.split(/\s+/)[0] || 'there', email: (s.email || '').toLowerCase(), admin, keys, roleOf,
-           so: admin ? 'All five companies' : soKeys.map(k => COMPANIES[k] || k).join(', ') };
+           so: admin ? 'All six companies' : soKeys.map(k => COMPANIES[k] || k).join(', ') };
 }
 let q = '';
 
