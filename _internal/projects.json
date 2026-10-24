@@ -356,7 +356,7 @@
     ]
   },
   "as-falcon": {
-    "repo": "GitMISMO/so-falcon-data",
+    "repo": "GitMISMO/as-falcon-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
     "writable": [
@@ -368,7 +368,7 @@
     ]
   },
   "as-actualize": {
-    "repo": "GitMISMO/so-actualize-data",
+    "repo": "GitMISMO/as-actualize-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
     "writable": [
