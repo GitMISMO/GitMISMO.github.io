@@ -115,7 +115,8 @@
     { key: "so-actualize", name: "Actualize Consulting LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
     { key: "so-trex", name: "Tidgewell Results eXperience LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
     { key: "so-falcon", name: "Falcon Capital Advisors LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
-    { key: "so-trudigital", name: "TruDigital Mortgage Solutions LLC", path: "/service-orders/", group: "Service Orders and Agreements" }
+    { key: "so-trudigital", name: "TruDigital Mortgage Solutions LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
+    { key: "so-vianteye", name: "Viant Eye LLC", path: "/service-orders/", group: "Service Orders and Agreements" }
   ];
   function useToolList(list) {
     var ok = (list || []).filter(function (t) { return t && /^[a-z0-9-]{1,40}$/.test(t.key) && t.label && t.group; });

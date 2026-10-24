@@ -198,6 +198,24 @@
       "path": "/service-orders/"
     },
     {
+      "key": "so-vianteye",
+      "label": "Viant Eye LLC",
+      "sum": "Service Orders (Viant Eye LLC)",
+      "colour": "#E11D48",
+      "group": "Service Orders and Agreements",
+      "path": "/service-orders/",
+      "family": true
+    },
+    {
+      "key": "so-vianteye-hours",
+      "label": "Viant Eye LLC — Hours Only",
+      "sum": "Hours Only, No Rates (Viant Eye LLC)",
+      "menu": "Viant Eye LLC (Hours Only)",
+      "colour": "#0F9D77",
+      "group": "Service Orders — Hours Only (No Rates)",
+      "path": "/service-orders/"
+    },
+    {
       "key": "cms",
       "label": "Certification Management System",
       "colour": "#BE123C",
