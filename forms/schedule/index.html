@@ -702,6 +702,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
           return say("bad", esc(out.why || "That could not be booked.") + " Your details are still filled in.");
         }
         render();
+        if (page.test) {
+          var lab = ((page.slots || []).filter(function (x) { return x.start === picked; })[0] || {}).label;
+          note("good", "<b>Practice booking received" + (out.status === "proposed" ? "" : lab ? ": " + esc(lab) : "") + ".</b><br>This is the practice page, so nothing was booked and no email was sent. A real company would now see its confirmation here.");
+          $("b-go").disabled = false; say("", "");
+        }
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
