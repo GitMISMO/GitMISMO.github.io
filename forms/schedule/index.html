@@ -581,7 +581,13 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var box = $("slots");
     if (page.mode === "propose") {
       $("when-h").textContent = "Offer Some Times";
-      $("when-sub").textContent = page.assessor + " has not published open times yet. Offer up to three that suit your team and they will confirm one. Please include the time zone.";
+      if (page.calendarLink) {
+        $("when-sub").innerHTML = '<a href="' + esc(page.calendarLink) + '" target="_blank" rel="noopener noreferrer"><b>See ' + esc(page.assessor) +
+          "'s open times on their calendar</b></a>. Please look only and do not book there. Then enter the time you would like below (up to three, in case one goes), and " +
+          esc(page.assessor) + " will confirm it.";
+      } else {
+        $("when-sub").textContent = page.assessor + " has not published open times yet. Offer up to three that suit your team and they will confirm one. Please include the time zone.";
+      }
       box.innerHTML = [1, 2, 3].map(function (n) {
         return '<div class="fld" style="margin-bottom:10px"><label for="o-' + n + '">Option ' + n + '</label><input class="in" type="text" id="o-' + n + '" placeholder="For example: Tuesday, November 3, 10:00 AM Eastern"></div>';
       }).join("");
