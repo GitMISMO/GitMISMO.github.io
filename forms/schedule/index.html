@@ -529,7 +529,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* The flow that reads and writes cms-data for this page ("MISMO Demo Booking - Serve").
      Empty until the flow is imported; ?preview=1 then shows sample times so the page can be
      looked at. */
-  var FLOW_ENDPOINT = "";
+  var FLOW_ENDPOINT = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/30/workflows/eb09924f6eb54c2d95c701a23d13c506/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=78PNgHmVC11lygLImiojG7gUqqy2C3yLuw_WcVe1VwI";
   var FORM_KEY = "mismo-demo-booking";
   var params = new URLSearchParams(location.search);
   var token = (params.get("b") || "").trim();
