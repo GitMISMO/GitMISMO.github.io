@@ -920,6 +920,9 @@ function wireAll(){
 function payload(){
   return {
     formKey: "mismo-renewal-response",
+    /* The flow switches on this. Without it the switch fell through to its default,
+       which answered 200, and the page below took that for success. */
+    mode: "submit",
     token: token,
     org: R.org, program: R.program, product: R.product || null,
     anniversary: R.anniversary,
@@ -959,6 +962,10 @@ function send(){
     body: JSON.stringify(body)
   }).then(function(r){
     if (!r.ok) throw new Error("status " + r.status);
+    return r.json();
+  }).then(function(d){
+    /* A 200 only means the flow answered. It says whether it kept the answers. */
+    if (!d || d.saved !== true) throw new Error((d && d.error) || "not saved");
     submitted = true; persist(); showDone();
   }).catch(function(){
     b.disabled = false; b.textContent = "Send to MISMO";
