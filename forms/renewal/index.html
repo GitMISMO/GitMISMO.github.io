@@ -469,7 +469,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   </div>
 
   <section class="panel">
-    <span class="step">STEP 1</span>
+    <span class="step" data-step="facts">STEP 1</span>
     <h2>What Is Being Renewed</h2>
     <p class="psub">If anything here is wrong, tell us before you go on &mdash; reply to the email that brought you here.</p>
     <dl class="facts" id="facts"></dl>
@@ -477,21 +477,28 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   </section>
 
   <section class="panel">
-    <span class="step">STEP 2</span>
+    <span class="step" data-step="docs">STEP 2</span>
     <h2>Your Application and Questionnaire</h2>
     <p class="psub">Open what you sent us last year and tell us whether it still holds. If anything has changed, send the corrected document back.</p>
     <div id="docs"></div>
   </section>
 
+  <section class="panel" id="script-panel" hidden>
+    <span class="step" data-step="script">STEP 3</span>
+    <h2>Your Answers for the Certification Script</h2>
+    <p class="psub">Your assessor works from these at your demonstration. We have filled in what you told us last time &mdash; correct anything that has changed, and answer anything left blank.</p>
+    <div id="script"></div>
+  </section>
+
   <section class="panel">
-    <span class="step">STEP 3</span>
+    <span class="step" data-step="signer">STEP 3</span>
     <h2>Who Signs for Your Company</h2>
     <p class="psub">Who MISMO has on file as authorised to act for your company.</p>
     <div id="signer"></div>
   </section>
 
   <section class="panel">
-    <span class="step">STEP 4</span>
+    <span class="step" data-step="website">STEP 4</span>
     <h2>How You Appear on mismo.org</h2>
     <p class="psub">This is what the public certification register shows for you. Correct anything that has moved on.</p>
     <div class="grid2">
@@ -512,14 +519,14 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   </section>
 
   <section class="panel">
-    <span class="step">STEP 5</span>
+    <span class="step" data-step="attest">STEP 5</span>
     <h2>Attestation</h2>
     <p class="psub">The same attestation you gave on your Application and Questionnaire.</p>
     <div id="attest"></div>
   </section>
 
   <section class="panel">
-    <span class="step">STEP 6</span>
+    <span class="step" data-step="send">STEP 6</span>
     <h2>Send It Back</h2>
     <p class="psub" id="ready-sub">Everything above is answered. Send it and we will take it from there.</p>
     <div id="blockers"></div>
@@ -587,7 +594,7 @@ var FLOW_ENDPOINT = "https://default867e5d11bde4499fb45e61572f9f33.7c.environmen
 var token = (new URLSearchParams(location.search)).get("r") || "";
 var KEY = "mismo.renewal." + (token || "preview");
 var R = null;             /* the renewal, as MISMO describes it */
-var A = { documents: {}, signer: {}, attest: {}, website: {}, files: {} };
+var A = { documents: {}, signer: {}, attest: {}, website: {}, files: {}, script: {} };
 var submitted = false;
 
 (function season(){ if (new Date().getMonth() === 11) document.documentElement.setAttribute("data-season","december"); })();
@@ -641,12 +648,45 @@ function getPath(path){
   return o;
 }
 
+/* ---------- step numbers ----------
+   The certification script step only appears for the programs that have a script (RON,
+   eClosing, eVault), so the steps are numbered from what is on the page, not typed in. */
+var STEP_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
+function hasScript(){ return !!(R && R.script && R.script.questions && R.script.questions.length); }
+function stepKeys(){
+  return ["facts", "docs"].concat(hasScript() ? ["script"] : []).concat(["signer", "website", "attest", "send"]);
+}
+function stepOf(key){ return stepKeys().indexOf(key) + 1; }
+function stepCount(){ return stepKeys().length; }
+function numberSteps(){
+  el("script-panel").hidden = !hasScript();
+  Array.prototype.forEach.call(document.querySelectorAll("[data-step]"), function(s){
+    s.textContent = "STEP " + stepOf(s.getAttribute("data-step"));
+  });
+}
+
+/* ---------- the certification script's questions ---------- */
+function renderScript(){
+  if (!hasScript()) { el("script").innerHTML = ""; return; }
+  A.script = A.script || {};
+  el("script").innerHTML = R.script.questions.map(function(q, i){
+    if (A.script[q.id] === undefined) A.script[q.id] = q.answer || "";
+    return '<div class="doc">'
+      + '<div class="fld"><label for="sq-' + esc(q.id) + '" style="text-transform:none;letter-spacing:0;font-size:14px;font-weight:600;line-height:1.45">'
+      + (q.number ? esc(q.number) + ". " : "") + esc(q.text) + "</label>"
+      + '<textarea id="sq-' + esc(q.id) + '" data-f="script.' + esc(q.id) + '" style="min-height:70px"></textarea>'
+      + (q.answer ? '<span class="hint">Filled in from what you told us last time.</span>' : "")
+      + "</div></div>";
+  }).join("");
+  wireFields(el("script"));
+}
+
 /* ---------- drawing ---------- */
 function renderHeader(){
   el("hd").textContent = R.program + " Certification Renewal";
   el("lede").innerHTML = "<b>" + esc(R.org) + "</b>" + (R.product ? " · " + esc(R.product) : "")
     + " — your certification renews on <b>" + esc(longDate(R.anniversary))
-    + "</b>. There are six short steps below.";
+    + "</b>. There are " + STEP_WORDS[stepCount()] + " short steps below.";
   document.title = R.program + " Renewal · " + R.org;
 }
 function renderFacts(){
@@ -899,21 +939,25 @@ function blockers(){
   var out = [];
   (R.documents || []).forEach(function(d){
     var a = A.documents[d.id] || {};
-    if (!a.response) out.push("Step 2: say whether your " + d.name + " has changed.");
+    if (!a.response) out.push("Step " + stepOf("docs") + ": say whether your " + d.name + " has changed.");
     else if (a.response === "updates" && !(A.files[d.id] || []).length)
-      out.push("Step 2: attach your corrected " + d.name + ".");
+      out.push("Step " + stepOf("docs") + ": attach your corrected " + d.name + ".");
   });
-  if (A.signer.keep === undefined) out.push("Step 3: confirm who signs for your company.");
-  if (A.signer.keep === false) {
-    if (!(A.signer.name || "").trim()) out.push("Step 3: give the new signer’s name.");
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((A.signer.email || "").trim())) out.push("Step 3: give the new signer’s email.");
+  if (hasScript()) {
+    var open = R.script.questions.filter(function(q){ return !String((A.script || {})[q.id] || "").trim(); }).length;
+    if (open) out.push("Step " + stepOf("script") + ": answer " + (open === 1 ? "the last certification script question." : "the " + open + " certification script questions still blank."));
   }
-  if (A.attest.agreed !== true) out.push("Step 5: tick the attestation.");
-  if (!(A.attest.name || "").trim()) out.push("Step 5: type your printed name.");
-  if (!(A.attest.title || "").trim()) out.push("Step 5: give your title.");
-  if (!(A.attest.company || "").trim()) out.push("Step 5: give your company.");
-  if (!(A.website.contact || "").trim()) out.push("Step 4: give a contact name for the register.");
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((A.website.contactEmail || "").trim())) out.push("Step 4: give a contact email for the register.");
+  if (A.signer.keep === undefined) out.push("Step " + stepOf("signer") + ": confirm who signs for your company.");
+  if (A.signer.keep === false) {
+    if (!(A.signer.name || "").trim()) out.push("Step " + stepOf("signer") + ": give the new signer’s name.");
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((A.signer.email || "").trim())) out.push("Step " + stepOf("signer") + ": give the new signer’s email.");
+  }
+  if (A.attest.agreed !== true) out.push("Step " + stepOf("attest") + ": tick the attestation.");
+  if (!(A.attest.name || "").trim()) out.push("Step " + stepOf("attest") + ": type your printed name.");
+  if (!(A.attest.title || "").trim()) out.push("Step " + stepOf("attest") + ": give your title.");
+  if (!(A.attest.company || "").trim()) out.push("Step " + stepOf("attest") + ": give your company.");
+  if (!(A.website.contact || "").trim()) out.push("Step " + stepOf("website") + ": give a contact name for the register.");
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((A.website.contactEmail || "").trim())) out.push("Step " + stepOf("website") + ": give a contact email for the register.");
   return out;
 }
 function paintReady(){
@@ -1002,6 +1046,12 @@ function payload(){
     signer: A.signer.keep ? { unchanged: true, name: R.signer && R.signer.name || null,
                               email: R.signer && R.signer.email || null }
                           : { unchanged: false, name: A.signer.name || null, email: A.signer.email || null },
+    /* The company's answers for the certification script, keyed the way the questionnaire
+       answers are, so they drop straight into the cycle and fill the assessor's workbook. */
+    scriptAnswers: hasScript() ? R.script.questions.map(function(q){
+      return { Section: q.section, Question: q.question, Answer: String((A.script || {})[q.id] || "").trim() || null,
+               number: q.number || null, text: q.text };
+    }) : [],
     website: { contact: A.website.contact || null, contactEmail: A.website.contactEmail || null,
                page: A.website.page || null, aboutUs: A.website.aboutUs || null },
     attestation: {
@@ -1096,7 +1146,8 @@ function boot(){
 function start(renewal){
   R = renewal;
   load();
-  renderHeader(); renderFacts(); renderInvoice(); renderDocs(); renderSigner(); renderAttest(); renderWebsite();
+  numberSteps();
+  renderHeader(); renderFacts(); renderInvoice(); renderDocs(); renderScript(); renderSigner(); renderAttest(); renderWebsite();
   wireAll(); paintReady();
   if (submitted) showDone();
 }
@@ -1105,7 +1156,7 @@ boot();
 </script>
 <script>
 /* Phone and tablet menu: the hamburger opens the same menu as a panel under the header bar. */
-(function(){var h=document.querySelector(".mm-header"),b=h.querySelector(".mm-burger");b.addEventListener("click",function(){var o=h.classList.toggle("is-open");b.setAttribute("aria-expanded",o?"true":"false");b.setAttribute("aria-label",o?"Close menu":"Open menu");});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&h.classList.contains("is-open")){h.classList.remove("is-open");b.setAttribute("aria-expanded","false");b.focus();}});})();
+(function(){var h=document.querySelector(".mm-header"),b=h&&h.querySelector(".mm-burger");if(!b)return;b.addEventListener("click",function(){var o=h.classList.toggle("is-open");b.setAttribute("aria-expanded",o?"true":"false");b.setAttribute("aria-label",o?"Close menu":"Open menu");});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&h.classList.contains("is-open")){h.classList.remove("is-open");b.setAttribute("aria-expanded","false");b.focus();}});})();
 </script>
 <footer class="mm-footer">
   <div class="mm-footer-bar">
