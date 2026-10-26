@@ -185,24 +185,24 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
   // The signature itself: a plain table with inline styles, the only layout every Outlook keeps.
   function sig(d, preview){
-    var font = "font-family:'Segoe UI',Arial,Helvetica,sans-serif;";
-    var t = "mso-line-height-rule:exactly;line-height:20px;";
+    var font = "font-family:Aptos,'Segoe UI',Arial,Helvetica,sans-serif;";
+    var t = "mso-line-height-rule:exactly;line-height:14px;";
     var a = "color:#14486e;text-decoration:none;";
     var name = d.name || (preview ? 'Your Name' : ''), title = d.title || (preview ? 'Your Title' : '');
     var email = d.email || (preview ? 'you@mismo.org' : '');
     var lines = '';
-    lines += '<div class="nm" style="' + font + 'font-size:16px;font-weight:700;color:#0d314c;line-height:22px;">' + esc(name) + '</div>';
-    if (title) lines += '<div style="' + font + t + 'font-size:13.5px;color:#0d314c;">' + esc(title) + '</div>';
-    if (d.addr) lines += '<div style="' + font + t + 'font-size:13.5px;color:#456179;">' + esc(d.addr) + '</div>';
+    lines += '<div class="nm" style="' + font + 'font-size:14pt;font-weight:700;color:#0d314c;line-height:20px;">' + esc(name) + '</div>';
+    if (title) lines += '<div style="' + font + t + 'font-size:9pt;color:#0d314c;">' + esc(title) + '</div>';
+    if (d.addr) lines += '<div style="' + font + t + 'font-size:9pt;color:#456179;">' + esc(d.addr) + '</div>';
     var p = '';
     if (d.phone) p += '<a href="tel:+1' + d.phone.replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'') + '" style="' + a + '">' + esc(d.phone) + '</a>&nbsp;&nbsp;|&nbsp;&nbsp;';
     p += '<a href="https://www.mismo.org" style="' + a + 'font-weight:600;">MISMO.org</a>';
-    lines += '<div style="' + font + t + 'font-size:13.5px;color:#456179;">' + p + '</div>';
-    if (email) lines += '<div style="' + font + t + 'font-size:13.5px;"><a href="mailto:' + esc(email) + '" style="' + a + '">' + esc(email) + '</a></div>';
+    lines += '<div style="' + font + t + 'font-size:9pt;color:#456179;">' + p + '</div>';
+    if (email) lines += '<div style="' + font + t + 'font-size:9pt;"><a href="mailto:' + esc(email) + '" style="' + a + '">' + esc(email) + '</a></div>';
     var html = '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
       + '<tr><td style="padding:0 16px 0 0;vertical-align:middle;"><a href="https://www.mismo.org"><img src="' + LOGO + '" width="172" height="39" alt="MISMO" style="display:block;border:0;width:172px;height:39px;"></a></td>'
       + '<td style="border-left:2px solid #74bfeb;padding:2px 0 2px 16px;vertical-align:middle;">' + lines + '</td></tr>';
-    if ($('banner').checked) html += '<tr><td colspan="2" style="padding:14px 0 0 0;"><a href="' + SUMMIT + '"><img src="' + BANNER + '" width="470" height="40" alt="Attend the MISMO Summit" style="display:block;border:0;width:470px;height:40px;"></a></td></tr>';
+    if ($('banner').checked) html += '<tr><td colspan="2" style="padding:10px 0 0 0;"><a href="' + SUMMIT + '"><img src="' + BANNER + '" width="352" height="30" alt="Attend the MISMO Summit" style="display:block;border:0;width:352px;height:30px;"></a></td></tr>';
     return html + '</table>';
   }
   function details(){ var d = {}; F.forEach(function(k){ d[k] = val(k); }); return d; }
