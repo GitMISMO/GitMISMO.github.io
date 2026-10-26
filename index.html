@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="en" data-rs-gate>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>MISMO Resources</title>
+<meta name="robots" content="noindex">
+<title>MISMO Email Signature</title>
 <script>/* The theme before any CSS paints, so a dark-mode visitor never sees a flash of light. */
 (function(){ try { var t = localStorage.getItem('resources:home:theme'); if (t) document.documentElement.setAttribute('data-theme', t); } catch (e) {} })();</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -38,133 +39,51 @@
   :focus-visible{ outline:2px solid var(--sky); outline-offset:2px; border-radius:6px }
   svg.i{ width:1em; height:1em; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round }
   .vh{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap }
-
-  /* top bar: the Resources frame */
   .top{ position:sticky; top:0; z-index:20; height:64px; padding:0 22px; background:#0f314c; color:#fff; display:flex; align-items:center; box-shadow:0 1px 0 rgba(80,164,219,.28) }
   .plate{ background:#fff; border-radius:5px; padding:9px 13px; line-height:0 } .plate svg{ height:24px; width:auto }
   .rule{ width:2px; height:34px; margin:0 20px; border-radius:1px; background:#50a4db }
   .brand{ font-size:15.5px; font-weight:700; color:#50a4db }
   .top-r{ margin-left:auto; display:flex; align-items:center; gap:10px; position:relative }
-  .iconbtn{ width:40px; height:40px; border-radius:4px; border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px }
-  .acct{ display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 12px 0 7px; border-radius:4px; border:0; background:#fff; color:#2C74A6; font-weight:600; font-size:13px; cursor:pointer }
-  .acct .av{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; background:linear-gradient(160deg,#a8d4ef,#6fb2dc) }
-  .menu{ position:absolute; right:0; top:52px; width:290px; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:12px; box-shadow:0 18px 40px -18px rgba(6,32,47,.55); padding:8px }
-  .menu p{ margin:4px 8px 8px; font-size:12px; color:var(--ink-3) }
-  .menu button{ display:block; width:100%; text-align:left; background:none; border:0; border-radius:8px; padding:9px 10px; cursor:pointer }
-  .menu button:hover, .menu button[aria-checked="true"]{ background:var(--accent-soft) }
-  .menu b{ display:block; font-size:13.5px } .menu small{ font-size:12px; color:var(--ink-2) }
-  .proto{ max-width:1200px; margin:14px auto 0; padding:8px 14px; border:1px dashed var(--line-3); border-radius:10px; font-size:12.5px; color:var(--ink-2) }
+  .iconbtn{ width:40px; height:40px; border-radius:4px; border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px }  .toast{ position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(20px); opacity:0; background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:10px; font-size:13.5px; transition:all .2s; pointer-events:none; z-index:50 }
+  .toast.on{ opacity:1; transform:translateX(-50%) translateY(0) }
 
-  main{ max-width:1200px; margin:0 auto; padding:36px 24px 72px }
-  /* the greeting and the box: the first thing anyone sees */
-  .hello{ max-width:760px; margin:0 auto; text-align:center }
-  .date{ font-size:12.5px; font-weight:600; color:var(--ink-3) }
-  h1{ margin:4px 0 0; font-family:var(--display); font-weight:800; font-size:clamp(28px,4vw,36px); letter-spacing:-.02em; line-height:1.1 }
-  .ask{ margin-top:22px; display:flex; align-items:center; gap:12px; background:var(--surface); border:2px solid var(--sky); border-radius:16px; padding:0 18px; box-shadow:0 18px 40px -26px rgba(15,49,76,.55) }
-  .ask svg{ color:var(--sky); font-size:22px }
-  .ask input{ flex:1; min-width:0; border:0; outline:0; background:transparent; color:var(--ink); font:inherit; font-size:17px; padding:18px 0 }
-  .ask input::placeholder{ color:var(--ink-3) }
-  .ask input::-webkit-search-cancel-button, .ask input::-webkit-search-decoration{ -webkit-appearance:none; appearance:none; display:none }   /* the page's own clear button only */
-  .ask kbd{ font:600 11px var(--font); color:var(--ink-3); border:1px solid var(--line-2); border-radius:5px; padding:1px 6px }
-  .ask .clear{ border:0; background:var(--sunk); color:var(--ink-2); border-radius:4px; width:26px; height:26px; cursor:pointer }
-  /* results: under the box, ranked, each saying why it matched */
-  .results{ margin-top:14px; text-align:left; background:var(--surface); border:1px solid var(--line-2); border-radius:16px; box-shadow:var(--shadow); overflow:hidden }
-  .best{ display:flex; align-items:center; gap:14px; padding:16px 18px; background:var(--accent-soft) }
-  .best .lbl{ font-size:12px; font-weight:700; color:var(--accent) }
-  .best .t{ font-size:17px; font-weight:700 } .best .s{ font-size:13px; color:var(--ink-2) }
-  .best .go{ margin-left:auto; flex:0 0 auto; display:inline-flex; align-items:center; gap:7px; border-radius:8px; padding:9px 15px; font-size:13.5px; font-weight:700; background:var(--btn); color:var(--btn-ink) }
-  .more{ list-style:none; margin:0; padding:4px 0 }
-  .more a{ display:flex; align-items:center; gap:12px; padding:10px 18px }
-  .more a:hover, .more a:focus-visible{ background:var(--sunk); outline-offset:-2px }
-  .more .t{ font-size:14px; font-weight:700 } .more .s{ font-size:12.5px; color:var(--ink-2) }
-  .why{ display:inline-flex; flex-wrap:wrap; gap:4px; margin-top:4px }
-  .why span{ font-size:11.5px; color:var(--ink-3); border:1px solid var(--line-2); border-radius:4px; padding:0 8px }
-  .missing{ display:flex; align-items:center; gap:10px; padding:12px 18px; border-top:1px solid var(--line); font-size:13px; color:var(--ink-2) }
-  .missing b{ color:var(--accent) }
-  .noresults{ padding:16px 18px; font-size:13.5px; color:var(--ink-2) }
-  .grp{ padding:12px 18px 2px; font-size:12px; font-weight:700; color:var(--ink-3); border-top:1px solid var(--line) }
-  .best + .grp{ border-top:0 }
-  .kind{ display:inline-block; vertical-align:2px; margin-left:6px; font-size:11px; font-weight:600; color:var(--ink-3); border:1px solid var(--line-2); border-radius:4px; padding:0 8px }
-
-  h2{ margin:0; font-family:var(--display); font-weight:700; font-size:19px; letter-spacing:-.01em }
-  .bar{ display:flex; align-items:baseline; gap:12px; margin:40px 0 12px; flex-wrap:wrap }
-  .bar .hint{ font-size:12.5px; color:var(--ink-3) }
-  .bar .linkbtn{ margin-left:auto; border:0; background:none; font-weight:600; font-size:13px; color:var(--accent); text-decoration:underline; text-underline-offset:3px; cursor:pointer; padding:4px 2px }
-
-  /* pinned */
-  .pins{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px }
-  .pins.n3{ grid-template-columns:repeat(3,minmax(0,1fr)) } .pins.n2{ grid-template-columns:repeat(2,minmax(0,1fr)) } .pins.n1{ grid-template-columns:minmax(0,420px) }
-  .pcard{ position:relative; background:var(--surface); border:1px solid var(--line-2); border-radius:14px; box-shadow:var(--shadow); padding:18px; display:flex; flex-direction:column; gap:12px }
-  .pcard.dragging{ opacity:.45 } .pcard.over{ outline:2px dashed var(--sky); outline-offset:2px }
-  .pcard .head{ display:flex; align-items:center; gap:10px }
-  .ticon{ flex:0 0 auto; display:inline-flex; align-items:center; justify-content:center }
-  .tag{ display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; color:var(--ink-3); min-width:0 }
-  .tag i{ width:8px; height:8px; border-radius:2px; flex:0 0 auto }
-  .pcard .t{ font-size:17px; font-weight:700 } .pcard .s{ font-size:13px; color:var(--ink-2); margin-top:3px }
-  .pcard .go{ align-self:flex-start; margin-top:auto; display:inline-flex; align-items:center; gap:7px; border-radius:8px; padding:8px 14px; font-size:13px; font-weight:700; background:var(--btn); color:var(--btn-ink) }
-  .handle{ margin-left:auto; border:0; background:none; color:var(--ink-3); cursor:grab; padding:4px; border-radius:6px; font-size:16px; display:inline-flex }
-  .handle:active{ cursor:grabbing }
-  .pinbtn{ flex:0 0 auto; width:32px; height:32px; border-radius:8px; border:1px solid var(--line-2); background:transparent; color:var(--ink-3); display:inline-flex; align-items:center; justify-content:center; cursor:pointer }
-  .pinbtn:hover{ border-color:var(--line-3); color:var(--ink) }
-  .pinbtn[aria-pressed="true"]{ background:var(--pin-soft); border-color:var(--pin-soft); color:var(--pin) }
-  .pinbtn[aria-pressed="true"] path{ fill:currentColor }
-  .empty{ border:1px dashed var(--line-3); border-radius:14px; padding:22px; text-align:center; color:var(--ink-2); font-size:13.5px }
-
-  /* everything: section cards that open and close */
-  .sec{ margin-top:14px; background:var(--surface); border:1px solid var(--line-2); border-radius:14px; box-shadow:var(--shadow); overflow:hidden }
+  main{ max-width:1200px; margin:0 auto; padding:32px 24px 72px }
+  h1{ margin:0; font-family:var(--display); font-weight:800; font-size:clamp(26px,3.4vw,32px); letter-spacing:-.02em; line-height:1.1 }
+  .lede{ margin:8px 0 0; color:var(--ink-2); font-size:14.5px }
+  .grid{ display:grid; grid-template-columns:minmax(0,380px) minmax(0,1fr); gap:28px; margin-top:28px; align-items:start }
+  .card{ background:var(--surface); border:1px solid var(--line-2); border-radius:14px; box-shadow:var(--shadow); padding:20px }
+  h2{ margin:0 0 14px; font-family:var(--display); font-weight:700; font-size:18px; letter-spacing:-.01em }
+  .f{ display:block; margin-bottom:14px }
+  .f span{ display:block; font-size:12.5px; font-weight:700; color:var(--ink-2); margin-bottom:5px }
+  .f input{ width:100%; font:inherit; font-size:14.5px; color:var(--ink); background:var(--surface); border:1px solid var(--line-3); border-radius:6px; padding:9px 11px }
+  .f input:focus{ outline:none; border-color:var(--sky); box-shadow:0 0 0 3px var(--sunk) }
+  .chk{ display:flex; align-items:center; gap:9px; font-size:13.5px; font-weight:600; margin:4px 0 18px; cursor:pointer }
+  .chk input{ width:17px; height:17px; accent-color:#14486e }
+  .go{ display:inline-flex; align-items:center; gap:8px; border:0; border-radius:8px; padding:11px 18px; font:inherit; font-size:14px; font-weight:700; background:var(--btn); color:var(--btn-ink); cursor:pointer; white-space:nowrap; min-width:max-content }
+  .go[disabled]{ opacity:.45; cursor:not-allowed }
+  .need{ margin:10px 0 0; font-size:12.5px; color:var(--ink-3) }
+  .pv{ border:1px solid var(--line-2); border-radius:10px; overflow-x:auto; margin-bottom:16px }
+  .pv .lbl{ display:flex; align-items:center; gap:8px; padding:8px 14px; font-size:12px; font-weight:700; color:var(--ink-3); border-bottom:1px solid var(--line) }
+  .pv .lbl i{ width:10px; height:10px; border-radius:2px; border:1px solid var(--line-3) }
+  .pv .mail{ padding:22px 20px }
+  .pv.light .mail{ background:#ffffff } .pv.light .lbl i{ background:#fff }
+  .pv.dark .mail{ background:#1f1f1f } .pv.dark .lbl i{ background:#1f1f1f }
+  /* Outlook repaints signature text itself in dark mode; this approximates what it does */
+  .pv.dark .mail td, .pv.dark .mail div, .pv.dark .mail span{ color:#d6e2ec !important }
+  .pv.dark .mail .nm{ color:#ffffff !important } .pv.dark .mail a{ color:#8cc6ec !important }
+  .note{ font-size:12.5px; color:var(--ink-3); margin:-6px 0 0 }
+  .sec{ margin-top:28px; background:var(--surface); border:1px solid var(--line-2); border-radius:14px; box-shadow:var(--shadow); overflow:hidden }
   .sec > button.sh{ width:100%; display:flex; align-items:center; gap:12px; padding:16px 20px; background:none; border:0; cursor:pointer; text-align:left }
-  .sh .dots{ display:inline-flex; gap:4px } .sh .dots i{ width:10px; height:10px; border-radius:3px }
-  .sh .nm{ font-family:var(--display); font-weight:700; font-size:17px }
-  .sh .ct{ font-size:12.5px; color:var(--ink-3) }
+  .sh .nm2{ font-family:var(--display); font-weight:700; font-size:17px }
   .sh .chev{ margin-left:auto; color:var(--ink-3); font-size:18px; transition:transform .18s }
   .sec[data-open="false"] .chev{ transform:rotate(-90deg) }
-  .cols{ display:grid; gap:28px; padding:14px 20px 12px; border-top:1px solid var(--line) }
-  .cols.c1{ grid-template-columns:minmax(0,1fr) } .cols.c2{ grid-template-columns:repeat(2,minmax(0,1fr)) } .cols.c3{ grid-template-columns:repeat(3,minmax(0,1fr)) }
-  .tool .th{ display:flex; align-items:center; gap:10px; margin-bottom:4px }
-  .tool .tn{ flex:1; min-width:0; font-size:14px; font-weight:700 } .tool .tn small{ display:block; font-weight:500; font-size:12px; color:var(--ink-3) }
-  .role{ font-size:11.5px; font-weight:700; border-radius:4px; padding:2px 9px; background:var(--accent-soft); color:var(--accent); white-space:nowrap }
-  .role.admin{ background:var(--admin-bg); color:var(--admin-ink) }
-  .row{ display:flex; align-items:center; gap:12px; padding:9px 0; border-top:1px dotted var(--sky) }
-  .tool .row:first-of-type{ border-top:0 }
-  .row a{ flex:1; min-width:0; display:flex; align-items:center; gap:12px; border-radius:8px }
-  .row a:hover .rt{ text-decoration:underline; text-underline-offset:3px }
-  .rt{ font-size:13.5px; font-weight:700 } .rs{ font-size:12px; color:var(--ink-2) }
-  mark{ background:var(--accent-soft); color:inherit; border-radius:3px; padding:0 1px }
-  .closed{ display:flex; flex-wrap:wrap; gap:8px; padding:0 20px 16px }
-  .tchip{ display:inline-flex; align-items:center; gap:8px; border:1px solid var(--line-2); background:transparent; border-radius:4px; padding:5px 12px 5px 6px; font-size:13px; font-weight:600; cursor:pointer }
-  .tchip:hover{ border-color:var(--line-3) }
-  .askadmin{ margin-top:22px; display:flex; align-items:center; gap:12px; border:1px dashed var(--line-3); border-radius:12px; padding:14px 18px; color:var(--ink-2); font-size:13.5px }
-  .askadmin b{ color:var(--accent) }
-  .toast{ position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(20px); opacity:0; background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:10px; font-size:13.5px; transition:all .2s; pointer-events:none; z-index:50 }
-  .toast.on{ opacity:1; transform:translateX(-50%) translateY(0) }
-  @media (max-width:900px){ .pins, .pins.n3{ grid-template-columns:repeat(2,minmax(0,1fr)) } .cols.c3, .cols.c2{ grid-template-columns:minmax(0,1fr) } }
-  @media (max-width:560px){ .pins, .pins.n2, .pins.n3{ grid-template-columns:minmax(0,1fr) } .top .brand, .rule{ display:none } main{ padding:24px 16px 56px } .sh .ct{ display:none } }
-  @media (prefers-reduced-motion: reduce){ *{ transition:none !important } }
-
-/* Home page D with pins (Perry, 13 Oct 2026): tool tiles, each with a pin menu */
-.tsec{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;margin-bottom:12px;box-shadow:var(--shadow)}
-.tsec{overflow:visible;position:relative} .tsec:has(.menu-open){z-index:30}   /* the pin menu may overflow its section */
-.sh2 .dots{display:flex;gap:4px} .sh2 .dots i{width:10px;height:10px;border-radius:2px;display:block}
-.sh2{display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid var(--line)} .sh2 .nm{font-family:Archivo,sans-serif;font-weight:700;font-size:17px} .sh2 .ct{font-size:12.5px;color:var(--ink-3)}
-.tgrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;padding:14px 18px 16px}
-@media (max-width:1100px){.tgrid{grid-template-columns:repeat(4,minmax(0,1fr))}} @media (max-width:760px){.tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-.ttile{position:relative;border:1px solid var(--line-2);border-radius:10px;background:var(--surface);min-height:112px;transition:border-color .12s,box-shadow .12s}
-.ttile:hover,.ttile:focus-within,.ttile.menu-open{border-color:var(--sky);box-shadow:0 0 0 3px var(--sunk)}
-.tlink{display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:14px 12px;height:100%;text-decoration:none;color:inherit;border-radius:10px}
-.tlink b{font-size:14px;line-height:1.25;padding-right:30px} .tlink small{font-size:11.5px;color:var(--ink-3)}
-.ttile .tpin{position:absolute;top:12px;right:10px}
-.pmenu{position:absolute;top:50px;left:-1px;z-index:20;width:330px;max-width:calc(100vw - 24px);background:var(--surface);border:1px solid var(--line-2);border-radius:10px;box-shadow:0 14px 34px rgba(15,49,76,.22);padding:10px;text-align:left}
-.tgrid .ttile:nth-child(6n) .pmenu,.tgrid .ttile:nth-child(6n-1) .pmenu{left:auto;right:-1px}
-.pttl{display:flex;justify-content:space-between;font-size:12.5px;font-weight:800;margin:0 2px 8px} .pttl span{color:var(--ink-3);font-weight:600}
-#pmq{width:100%;height:34px;border:1px solid var(--line-2);border-radius:4px;padding:0 10px;font:inherit;font-size:13px;background:var(--surface);color:var(--ink);margin-bottom:6px}
-#pmq:focus{outline:none;border-color:var(--sky);box-shadow:0 0 0 3px var(--sunk)}
-.plab{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin:8px 4px 4px}
-.pmenu{max-height:min(460px,70vh);overflow:auto}
-.prow{display:flex;align-items:center;gap:9px;width:100%;padding:6px;border:0;border-radius:4px;background:none;font:inherit;font-size:13px;color:var(--ink);text-align:left;cursor:pointer}
-.prow:hover,.prow:focus-visible{background:var(--sunk);outline:none} .prow .nm{flex:1;line-height:1.25} .prow small{display:block;color:var(--ink-3);font-size:11px}
-.prow .pinbtn{width:26px;height:26px} .prow .pinbtn.on{background:var(--sunk);border-color:var(--sky);color:var(--accent)}
-.prow mark{background:#FFF1B8;color:inherit;padding:0 1px;border-radius:2px}
-.pfoot{font-size:11.5px;color:var(--ink-3);margin:8px 4px 2px;line-height:1.4}
+  .sec[data-open="false"] .body{ display:none }
+  .body{ border-top:1px solid var(--line); padding:6px 20px 18px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:28px }
+  .body h3{ margin:12px 0 8px; font-size:14.5px; font-weight:700 }
+  .body ol{ margin:0; padding-left:20px; font-size:13.5px; color:var(--ink-2) } .body li{ margin:5px 0 }
+  .body b{ color:var(--ink) } .body a{ color:var(--accent); text-decoration:underline; text-underline-offset:3px }
+  @media (max-width:900px){ .grid, .body{ grid-template-columns:minmax(0,1fr) } }
+  @media (max-width:560px){ .top .brand, .rule{ display:none } main{ padding:24px 16px 56px } }
 </style>
 </head>
 <body>
@@ -199,36 +118,131 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 </defs></svg>
 <header class="top">
   <span class="plate"><svg role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
-  <span class="rule" aria-hidden="true"></span><span class="brand">Resources</span>
+  <span class="rule" aria-hidden="true"></span><span class="brand">Email Signature</span>
   <span class="top-r">
     <button type="button" class="iconbtn" id="theme" aria-label="Switch to dark mode"></button>
-    <!-- The shared account button every tool shows in this spot (session.js fills it). -->
-    <div id="rs-account"></div>
   </span>
 </header>
 <main>
-  <section class="hello" aria-labelledby="hi">
-    <div class="date" id="date"></div>
-    <h1 id="hi"></h1>
-    <label class="ask"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4a7 7 0 1 0 0 14a7 7 0 1 0 0-14 M20 20l-4-4"/></svg>
-      <span class="vh">Search your tools and pages</span>
-      <input id="q" type="search" placeholder="What do you need to do?" autocomplete="off" aria-describedby="qnote" aria-controls="results">
-      <button type="button" class="clear" id="clear" aria-label="Clear the search" hidden>&times;</button><kbd aria-hidden="true">/</kbd></label>
-    <div class="vh" id="qnote" aria-live="polite"></div>
-    <div class="results" id="results" hidden></div>
-  </section>
-  <section aria-labelledby="pinh">
-    <div class="bar"><h2 id="pinh">Pinned</h2><span class="hint" id="pinhint">Pin a tool, or any page in it, with the pin on its tile. Drag to reorder, or use the arrow keys on the handle.</span></div>
-    <div id="pins"></div>
-  </section>
-  <section aria-labelledby="allh">
-    <div class="bar"><h2 id="allh">Everything You Can Do</h2><button type="button" class="linkbtn" id="expall"></button></div>
-    <div id="secs"></div>
-    <div id="askadmin"></div>
+  <h1>Your MISMO Email Signature</h1>
+  <p class="lede">Fill in your details, check the preview, then copy it and paste it into Outlook. It looks right in both light and dark mode.</p>
+  <div class="grid">
+    <section class="card" aria-labelledby="dh">
+      <h2 id="dh">Your Details</h2>
+      <label class="f"><span>Full Name</span><input id="name" autocomplete="name" placeholder="First Last"></label>
+      <label class="f"><span>Job Title</span><input id="title" autocomplete="organization-title" placeholder="Your job title"></label>
+      <label class="f"><span>Phone</span><input id="phone" autocomplete="tel" placeholder="202.555.0100"></label>
+      <label class="f"><span>Email</span><input id="email" type="email" autocomplete="email" placeholder="you@mismo.org"></label>
+      <label class="f"><span>Office Address</span><input id="addr" value="1919 M Street NW, 5th Floor | Washington, DC"></label>
+      <label class="chk"><input type="checkbox" id="banner" checked> Include the Summit Banner</label>
+      <button type="button" class="go" id="copy" disabled>Copy My Signature</button>
+      <p class="need" id="need">Add your name and email to copy it.</p>
+    </section>
+    <section class="card" aria-labelledby="ph">
+      <h2 id="ph">Preview</h2>
+      <div class="pv light"><div class="lbl"><i></i>In Light Mode</div><div class="mail" id="pvl"></div></div>
+      <div class="pv dark"><div class="lbl"><i></i>In Dark Mode</div><div class="mail" id="pvd"></div></div>
+      <p class="note">Dark mode is a close preview. Outlook picks the exact text shades itself.</p>
+    </section>
+  </div>
+  <section class="sec" data-open="false" id="how">
+    <button type="button" class="sh" aria-expanded="false"><span class="nm2">How to Add It to Outlook</span><span class="chev" aria-hidden="true">&#9662;</span></button>
+    <div class="body">
+      <div><h3>New Outlook and Outlook on the Web</h3><ol>
+        <li>Click <b>Copy My Signature</b> above.</li>
+        <li>Open <a href="https://outlook.office.com/mail/options/mail/messageContent" target="_blank" rel="noopener">your signature settings</a>.</li>
+        <li>Click <b>+ New signature</b>, or pick your current one and delete everything in the box.</li>
+        <li>Click in the box and press <b>Ctrl + V</b> (Mac: <b>Cmd + V</b>).</li>
+        <li>Under <b>Select default signatures</b>, choose it for new messages and for replies/forwards.</li>
+        <li>Click <b>Save</b>.</li></ol></div>
+      <div><h3>Classic Outlook for Windows</h3><ol>
+        <li>Click <b>Copy My Signature</b> above.</li>
+        <li>In Outlook, click <b>File</b>, then <b>Options</b>, then <b>Mail</b>, then <b>Signatures&hellip;</b></li>
+        <li>Click <b>New</b>, type a name, and click <b>OK</b>.</li>
+        <li>Click in the big box under <b>Edit signature</b> and press <b>Ctrl + V</b>.</li>
+        <li>On the right, set <b>New messages</b> and <b>Replies/forwards</b> to it.</li>
+        <li>Click <b>OK</b>.</li></ol></div>
+      <div><h3>Outlook for Mac</h3><ol>
+        <li>Click <b>Copy My Signature</b> above.</li>
+        <li>In Outlook, click <b>Outlook</b> in the top menu, then <b>Settings</b>, then <b>Signatures</b>.</li>
+        <li>Click <b>+</b>, then click in the box and press <b>Cmd + V</b>.</li>
+        <li>Name it, close the window, and choose it under <b>Default signatures</b>.</li></ol></div>
+    </div>
   </section>
 </main>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
-<script src="/assets/session.js"></script>
-<script src="/assets/home.js"></script>
+<script>
+(function(){
+  var BASE = 'https://resources.mismo.org/signature/';
+  var LOGO = BASE + 'mismo-signature-logo.png', BANNER = BASE + 'mismo-summit-banner.png', SUMMIT = BASE + 'summit/';
+  var F = ['name','title','phone','email','addr'], KEY = 'resources:signature:details';
+  var $ = function(s){ return document.getElementById(s); };
+  function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function val(id){ return $(id).value.trim(); }
+
+  // The signature itself: a plain table with inline styles, the only layout every Outlook keeps.
+  function sig(d, preview){
+    var font = "font-family:'Segoe UI',Arial,Helvetica,sans-serif;";
+    var t = "mso-line-height-rule:exactly;line-height:20px;";
+    var a = "color:#14486e;text-decoration:none;";
+    var name = d.name || (preview ? 'Your Name' : ''), title = d.title || (preview ? 'Your Title' : '');
+    var email = d.email || (preview ? 'you@mismo.org' : '');
+    var lines = '';
+    lines += '<div class="nm" style="' + font + 'font-size:16px;font-weight:700;color:#0d314c;line-height:22px;">' + esc(name) + '</div>';
+    if (title) lines += '<div style="' + font + t + 'font-size:13.5px;color:#0d314c;">' + esc(title) + '</div>';
+    if (d.addr) lines += '<div style="' + font + t + 'font-size:13.5px;color:#456179;">' + esc(d.addr) + '</div>';
+    var p = '';
+    if (d.phone) p += '<a href="tel:+1' + d.phone.replace(/\D/g,'').replace(/^1(?=\d{10}$)/,'') + '" style="' + a + '">' + esc(d.phone) + '</a>&nbsp;&nbsp;|&nbsp;&nbsp;';
+    p += '<a href="https://www.mismo.org" style="' + a + 'font-weight:600;">MISMO.org</a>';
+    lines += '<div style="' + font + t + 'font-size:13.5px;color:#456179;">' + p + '</div>';
+    if (email) lines += '<div style="' + font + t + 'font-size:13.5px;"><a href="mailto:' + esc(email) + '" style="' + a + '">' + esc(email) + '</a></div>';
+    var html = '<table cellpadding="0" cellspacing="0" border="0" role="presentation" style="border-collapse:collapse;">'
+      + '<tr><td style="padding:0 16px 0 0;vertical-align:middle;"><a href="https://www.mismo.org"><img src="' + LOGO + '" width="172" height="39" alt="MISMO" style="display:block;border:0;width:172px;height:39px;"></a></td>'
+      + '<td style="border-left:2px solid #74bfeb;padding:2px 0 2px 16px;vertical-align:middle;">' + lines + '</td></tr>';
+    if ($('banner').checked) html += '<tr><td colspan="2" style="padding:14px 0 0 0;"><a href="' + SUMMIT + '"><img src="' + BANNER + '" width="470" height="40" alt="Attend the MISMO Summit" style="display:block;border:0;width:470px;height:40px;"></a></td></tr>';
+    return html + '</table>';
+  }
+  function details(){ var d = {}; F.forEach(function(k){ d[k] = val(k); }); return d; }
+  function draw(){
+    var d = details(), h = sig(d, true);
+    $('pvl').innerHTML = h; $('pvd').innerHTML = h;
+    var ok = !!(d.name && d.email);
+    $('copy').disabled = !ok; $('need').hidden = ok;
+    try { var s = details(); s.banner = $('banner').checked; localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {}
+  }
+  function toast(m){ var t = $('toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.h); toast.h = setTimeout(function(){ t.classList.remove('on'); }, 3200); }
+  function fallback(html){
+    var box = document.createElement('div'); box.contentEditable = 'true'; box.innerHTML = html;
+    box.style.cssText = 'position:fixed;left:-9999px;top:0;background:#fff;color:#000';
+    document.body.appendChild(box);
+    var r = document.createRange(); r.selectNodeContents(box); var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+    var ok = false; try { ok = document.execCommand('copy'); } catch (e) {}
+    s.removeAllRanges(); box.remove(); return ok;
+  }
+  $('copy').addEventListener('click', function(){
+    var d = details(), html = sig(d, false);
+    var text = [d.name, d.title, d.addr, (d.phone ? d.phone + ' | ' : '') + 'MISMO.org', d.email].filter(Boolean).join('\n');
+    var done = function(){ toast('Copied. Now paste it into Outlook.'); };
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([new ClipboardItem({ 'text/html': new Blob([html], {type:'text/html'}), 'text/plain': new Blob([text], {type:'text/plain'}) })])
+        .then(done, function(){ fallback(html) ? done() : toast('Copy was blocked. Select the light preview, then press Ctrl + C.'); });
+    } else { fallback(html) ? done() : toast('Copy was blocked. Select the light preview, then press Ctrl + C.'); }
+  });
+  try { var s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s) { F.forEach(function(k){ if (s[k] != null) $(k).value = s[k]; }); if (s.banner === false) $('banner').checked = false; } } catch (e) {}
+  F.forEach(function(k){ $(k).addEventListener('input', draw); }); $('banner').addEventListener('change', draw);
+  $('how').querySelector('.sh').addEventListener('click', function(){
+    var sec = $('how'), open = sec.getAttribute('data-open') !== 'true';
+    sec.setAttribute('data-open', open); this.setAttribute('aria-expanded', open);
+  });
+  // Theme: the same button, icons and saved key as the Resources home page.
+  var I = function(d){ return '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="' + d + '"/></svg>'; };
+  var P = { moon:'M12 3a6.4 6.4 0 0 0 9 9 9 9 0 1 1-9-9z', sun:'M12 7.9a4.1 4.1 0 1 0 0 8.2a4.1 4.1 0 1 0 0-8.2 M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7' };
+  function isDark(){ var t = document.documentElement.getAttribute('data-theme'); return t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches); }
+  function drawTheme(){ var dk = isDark(); $('theme').innerHTML = I(dk ? P.sun : P.moon); $('theme').setAttribute('aria-label', dk ? 'Switch to light mode' : 'Switch to dark mode'); }
+  $('theme').addEventListener('click', function(){ var dk = isDark(); document.documentElement.setAttribute('data-theme', dk ? 'light' : 'dark'); try { localStorage.setItem('resources:home:theme', dk ? 'light' : 'dark'); } catch (e) {} drawTheme(); });
+  matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawTheme);
+  drawTheme(); draw();
+})();
+</script>
 </body>
 </html>
