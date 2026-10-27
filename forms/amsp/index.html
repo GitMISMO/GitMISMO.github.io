@@ -699,7 +699,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
      first use is hoisted undefined and kills the whole script silently -
      it has cost this build a day more than once.
      ------------------------------------------------------------------ */
-  var APP      = {"program": "AMSP", "title": "MISMO Associate Standards Professional (AMSP) - Application", "h1": "Apply for MISMO AMSP Certification", "mastName": "Associate Standards Professional", "intro": ["You must complete MISMO's Boot Camp course and pass the Boot Camp exam before applying.", "Enrollment is $200 for MISMO members and $400 for non-members. There is a $50 discount for young professionals, and MISMO Champion members may qualify for complimentary enrollment.", "Renewal is every two years and needs at least 10 participation points.", "Your answers are saved as you type. You may close this page and come back to it."], "sections": [{"heading": "About You", "help": "MISMO holds business contact details only.", "fields": [{"key": "firstName", "label": "First Name", "type": "text", "required": true}, {"key": "lastName", "label": "Last Name", "type": "text", "required": true}, {"key": "title", "label": "Title", "type": "text", "required": true}, {"key": "org", "label": "Company Name", "type": "text", "required": true}, {"key": "email", "label": "E-mail Address", "type": "email", "required": true}]}, {"heading": "Fee and Membership", "fields": [{"key": "isMember", "label": "Is Your Company a MISMO Member?", "type": "choice", "required": true, "options": ["Yes", "No"], "help": "Members pay the lower fee."}, {"key": "youngProfessional", "label": "Claiming the Young Professional Discount", "type": "checkbox"}, {"key": "champion", "label": "Your Company Is a MISMO Champion Member", "type": "checkbox", "help": "Champion members may qualify for complimentary enrollment."}]}, {"heading": "Boot Camp", "help": "The prerequisite. AMSP cannot start without it.", "fields": [{"key": "bootCampPassed", "label": "Have You Passed the Boot Camp Exam?", "type": "choice", "required": true, "options": ["Yes", "No"]}, {"key": "bootCampDate", "label": "Date Passed", "type": "date", "showIf": {"key": "bootCampPassed", "equals": "Yes"}}]}, {"heading": "Initial or Renewal", "fields": [{"key": "kind", "label": "Applying For", "type": "choice", "required": true, "options": ["Initial certification", "Renewal"], "help": "Renew within one year of expiry or the whole process starts again."}]}, {"heading": "Participation Points", "help": "Renewal only. Add one entry for each thing you did: what it was, when, and a link if there is one. The total adds itself up as you go, at MISMO's published rates. MISMO counts activity from the last 24 months.", "tally": {"key": "participation", "from": "category", "times": "units", "label": "participation points", "target": 10}, "repeatingBlocks": [{"key": "participation", "itemLabel": "Entry", "min": 0, "max": 60, "fields": [{"key": "category", "label": "What You Did", "type": "choice", "required": true, "options": ["Board Member, or Committee / Council / Forum Chair — 10 points", "Workgroup Chair or Vice Chair — 10 points", "Information Management (IM) Representative — 5 points", "Architecture Workgroup (AWG) Representative — 5 points", "Educational Council Representative — 5 points", "Published Contributor to a MISMO Work Product — 5 points", "MISMO Boot Camp Instructor — 5 points", "MISMO Summit Attendance — 1 point per day", "Workgroup Attendance for a Year (at Least 33% of Meetings) — 3 points per year", "Developed a MISMO Webinar — 3 points", "Authored a Published MISMO-Related Industry Article — 3 points", "Participated in a MISMO Webinar — 2 points", "Served on a Summit Presentation Panel — 2 points", "Served on an Industry Panel Representing MISMO Topics — 2 points", "Developed a MISMO Short — 1 point", "MISMO Ambassador During a Summit — 1 point"]}, {"key": "what", "label": "Which One", "type": "text", "required": true, "help": "Name it the way MISMO would know it."}, {"key": "when", "label": "Date", "type": "date", "required": true, "help": "When it happened. MISMO counts the last 24 months."}, {"key": "units", "label": "Days or Years", "type": "number", "help": "Only for the per-day and per-year categories above. Leave it blank and the row counts once."}, {"key": "link", "label": "Link or Reference", "type": "url", "help": "Optional. Anything that lets MISMO check it."}]}]}, {"heading": "Attestation", "attestText": "I hereby attest that I am submitting this Application on my own behalf. The information provided in this Application is all accurate to the best of my knowledge and based on my diligent review, and everything claimed above is activity I personally undertook. Should any information cease to be accurate after the time of submission of this Application, I will notify MISMO of such and provide updated information.", "fields": [{"key": "attestedBy", "label": "Printed Name", "type": "text", "required": true}, {"key": "attestTitle", "label": "Title", "type": "text", "required": true}, {"key": "attestCompany", "label": "Company", "type": "text", "required": true}, {"key": "attestedOn", "label": "Date", "type": "date", "required": true}]}], "attachments": {"heading": "Attachments", "help": "Evidence for anything you have claimed above, where you have it.", "expected": ["Evidence for the participation points you are claiming"]}};   /* the application form */
+  var APP      = {"program": "AMSP", "title": "MISMO Associate Standards Professional (AMSP) - Application", "h1": "Apply for MISMO AMSP Certification", "mastName": "Associate Standards Professional", "intro": ["To become an AMSP, complete MISMO's Boot Camp course and pass its exam, then apply here with the pass email MBA Education sent you.", "Enrollment is $200 for MISMO members and $400 for non-members. Renewal is every two years: at least 10 participation points from the last 24 months, and $75 / $150.", "MISMO Champion companies' complimentary places are applied automatically.", "Your answers are saved as you type. You may close this page and come back to it."], "rules": {"renewal": {"participation": 10, "participationOnly": true}, "windowMonths": 24, "participation": "participation"}, "sections": [{"heading": "About You", "help": "MISMO holds business contact details only.", "fields": [{"key": "firstName", "label": "First Name", "type": "text", "required": true}, {"key": "lastName", "label": "Last Name", "type": "text", "required": true}, {"key": "title", "label": "Title", "type": "text", "required": true}, {"key": "org", "label": "Company Name", "type": "text", "required": true}, {"key": "email", "label": "E-mail Address", "type": "email", "required": true, "help": "Use the address your company knows you by: it is how MISMO matches you to your company's membership."}]}, {"heading": "Initial or Renewal", "fields": [{"key": "kind", "label": "Applying For", "type": "choice", "required": true, "options": ["Initial certification", "Renewal"], "help": "Renewal is every two years: at least 10 participation points from activity in the last 24 months."}]}, {"heading": "Fee and Membership", "fields": [{"key": "isMember", "label": "Is Your Company a MISMO Member?", "type": "choice", "required": true, "options": ["Yes", "No"], "help": "Members pay the lower fee."}, {"key": "championComp", "label": "If Your Company Is a MISMO Champion, Use One of Its Complimentary Places for You?", "type": "choice", "options": ["Yes", "No"], "help": "Champion companies receive a set number of complimentary enrollments and renewals each calendar year. MISMO checks your company's allotment and applies one for you, so you are only asked to pay if it does not cover you."}]}, {"heading": "Boot Camp", "showIf": {"key": "kind", "equals": "Initial certification"}, "help": "The one requirement for a new AMSP. Attach the pass email below.", "fields": [{"key": "bootCampPassed", "label": "Have You Passed the Boot Camp Exam?", "type": "choice", "required": true, "options": ["Yes", "No"], "blockIf": {"equals": "No", "message": "Pass the MISMO Boot Camp exam before applying: https://www.mismo.org/events-education/educational-offerings/mismo-boot-camp"}}, {"key": "bootCampDate", "label": "Date Passed", "type": "date", "required": true, "showIf": {"key": "bootCampPassed", "equals": "Yes"}}]}, {"heading": "Participation Points", "showIf": {"key": "kind", "equals": "Renewal"}, "help": "Add one entry for each thing you did in the last 24 months: what it was, when, how many, and a link if there is one. The total adds itself up at MISMO's published rates.", "tally": {"key": "participation", "from": "category", "times": "units", "label": "participation points", "target": {"renewal": 10}}, "repeatingBlocks": [{"key": "participation", "itemLabel": "Entry", "min": 0, "max": 60, "fields": [{"key": "category", "label": "What You Did", "type": "choice", "required": true, "options": ["Board Member — 10 points per year of service", "Committee, Council or Forum Chair, or Workgroup Chair or Vice Chair — 10 points per year of service", "Information Management (IM) Representative — 5 points per year of service", "Architecture Workgroup (AWG) Representative — 5 points per year of service", "Education Council Representative — 5 points per year of service", "MISMO Boot Camp Instructor — 5 points", "Developed a MISMO Webinar — 5 points per webinar", "MISMO Summit Attendance — 4 points per Summit", "Workgroup Attendance (at Least 33% of Meetings) — 3 points per workgroup per year", "Authored a Published MISMO-Related Industry Article — 3 points per article", "Summit Presentation Panel — 2 points per panel", "Industry Panel or Presentation on MISMO Topics — 2 points per panel", "Developed a MISMO Short — 1 point per Short", "MISMO Ambassador During a Summit — 1 point per Summit", "Attended a MISMO Monthly Webinar — 2 points per webinar"]}, {"key": "what", "label": "Which One", "type": "text", "required": true, "help": "Name it the way MISMO would know it."}, {"key": "when", "label": "Date", "type": "date", "required": true, "help": "When it happened (the most recent date, for something ongoing)."}, {"key": "units", "label": "How Many", "type": "number", "help": "Years, Summits, webinars, articles and so on. Leave it blank for one."}, {"key": "link", "label": "Link or Reference", "type": "url", "help": "Optional. Anything that lets MISMO check it."}]}]}, {"heading": "Attestation", "attestText": "I hereby attest that I am submitting this Application on my own behalf. The information provided in this Application is all accurate to the best of my knowledge and based on my diligent review, and everything claimed above is activity I personally undertook. Should any information cease to be accurate after the time of submission of this Application, I will notify MISMO of such and provide updated information.", "fields": [{"key": "attestedBy", "label": "Printed Name", "type": "text", "required": true}, {"key": "attestTitle", "label": "Title", "type": "text", "required": true}, {"key": "attestCompany", "label": "Company", "type": "text", "required": true}, {"key": "attestedOn", "label": "Date", "type": "date", "required": true}]}], "attachments": {"heading": "Boot Camp Pass Email", "help": "Attach the email MBA Education sent when you passed (subject “MBA Education Certificate for MISMO BOOT CAMP”), or a screenshot of it. A screenshot of the enrollment request is not proof of a pass. If you no longer have the email, write to certifications@mismo.org.", "expected": ["The Boot Camp pass email, or a screenshot of it (new applications)"], "requiredIf": {"key": "kind", "equals": "Initial certification", "label": "Attach your Boot Camp pass email, or a screenshot of it"}}};   /* the application form */
   /* [{code, gate, label, doc}] - a questionnaire, and what has to be ticked on
      the application for it to apply. An empty gate means it always applies. */
   var FORMS    = [];
@@ -1203,24 +1203,24 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     }else{
       var rows = get(t.key, []);
       if(!Array.isArray(rows)) rows = [];
-      rows.forEach(function(r){
-        var n = points(r[t.from] || "");
-        var times = Math.max(1, parseInt(r[t.times] || 1, 10) || 1);
-        sum += n * times;
-      });
+      rows.forEach(function(r){ sum += rowPoints(r, t); });
     }
     sum = Math.round(sum * 10) / 10;
-    var ok = t.target ? sum >= t.target : true;
-    var pct = t.target ? Math.min(100, Math.round(sum / t.target * 100)) : 0;
+    var target = t.target && typeof t.target === "object" ? t.target[kindKey()] : t.target;
+    var cap = t.cap && typeof t.cap === "object" ? t.cap[kindKey()] : t.cap;
+    var ok = target ? sum >= target : true;
+    var pct = target ? Math.min(100, Math.round(sum / target * 100)) : (cap ? Math.min(100, Math.round(sum / cap * 100)) : 0);
     return '<div class="tally' + (ok ? " ok" : "") + '">' +
-      '<div class="tally-n">' + sum + (t.target ? ' <i>of ' + t.target + '</i>' : '') + '</div>' +
+      '<div class="tally-n">' + sum + (target ? ' <i>of ' + target + '</i>' : (cap ? ' <i>up to ' + cap + ' count</i>' : '')) + '</div>' +
       '<div class="tally-b"><div class="tally-f" style="width:' + pct + '%"></div></div>' +
       '<div class="tally-t">' + esc(t.label) +
-        (t.target ? (ok ? ' \u2014 you have enough' : ' \u2014 ' + (t.target - sum) + ' to go') : '') +
+        (target ? (ok ? ' \u2014 you have enough' : ' \u2014 ' + (target - sum) + ' to go') : '') +
+        (windowFrom() ? ' (last 24 months only)' : '') +
       '</div></div>';
   }
 
   function appSectionHTML(sec, idx){
+    if(!shows(sec)) return "";
     var units = appUnits(sec);
     var done = units.filter(unitFilled).length;
     var id = "app" + idx, open = !!openSet[id];
@@ -1273,6 +1273,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
   function appUnits(sec){
     var out = [];
+    if(!shows(sec)) return out;
     /* A group of checkboxes where ticking any one of them is the answer - which
        product types you want certified - counts as one thing, not as none. */
     if(sec.requireAny) out.push({any: sec.requireAny.keys});
@@ -1288,8 +1289,10 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function appRequired(){
     var miss = [];
     (APP.sections || []).forEach(function(sec){
+      if(!shows(sec)) return;
       (sec.fields || []).forEach(function(f){
         if(f.required && shows(f) && !filled(get(f.key))) miss.push(f.label + " - " + sec.heading);
+        if(f.blockIf && shows(f) && get(f.key) === f.blockIf.equals) miss.push(f.blockIf.message);
       });
       if(sec.repeating){
         var rows = get(sec.repeating.key, []);
@@ -1316,7 +1319,40 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         }
       });
     });
-    return miss;
+    if(APP.attachments && APP.attachments.requiredIf && shows({ showIf: APP.attachments.requiredIf }) && !attList().length) miss.push(APP.attachments.requiredIf.label);
+    return miss.concat(ruleCheck());
+  }
+  /* The program's point thresholds, checked before anything is sent (Perry Williams, 27 Oct 2026):
+     only enough to clear them needs listing, and a claim short of them is caught here, not in review. */
+  function kindKey(){ return /renew/i.test(get("kind")) ? "renewal" : "new"; }
+  function windowFrom(){
+    var R = APP.rules || {};
+    if(kindKey() !== "renewal" || !R.windowMonths) return null;
+    var d = new Date(); d.setMonth(d.getMonth() - R.windowMonths); return d.toISOString().slice(0, 10);
+  }
+  function rowPoints(r, t){
+    var from = windowFrom();
+    if(from && r.when && String(r.when) < from) return 0;
+    var n = points(r[t.from] || "");
+    var times = r[t.times] === "" || r[t.times] == null ? 1 : Math.max(0, parseFloat(r[t.times]) || 0);
+    return n * times;
+  }
+  function sumOf(key){
+    var sec = (APP.sections || []).filter(function(s){ return s.tally && s.tally.key === key && shows(s); })[0];
+    if(!sec) return 0;
+    var rows = get(key, []); if(!Array.isArray(rows)) rows = [];
+    return rows.reduce(function(n, r){ return n + rowPoints(r, sec.tally); }, 0);
+  }
+  function ruleCheck(){
+    var R = APP.rules; if(!R) return [];
+    var rule = R[kindKey()]; if(!rule) return [];
+    var part = sumOf(R.participation || "participation"), edu = rule.participationOnly ? 0 : sumOf(R.education || "education");
+    if(rule.educationCap != null) edu = Math.min(edu, rule.educationCap);
+    var total = part + edu, out = [];
+    var older = windowFrom() ? " Only activity from the last 24 months counts." : "";
+    if(rule.participation != null && part < rule.participation) out.push("Participation points: " + part + " of the " + rule.participation + " needed." + older);
+    if(rule.total != null && total < rule.total) out.push("Points counted: " + total + " of the " + rule.total + " needed" + (rule.educationCap != null ? " (education counts up to " + rule.educationCap + ")" : "") + "." + older);
+    return out;
   }
   function counts(){
     var a = 0, at = 0;
@@ -1375,15 +1411,18 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       application: (function(){
         var o = {};
         (APP.sections || []).forEach(function(s){
-          (s.fields || []).forEach(function(f){ if(filled(get(f.key))) o[f.key] = get(f.key); });
+          if(!shows(s)) return;
+          (s.fields || []).forEach(function(f){ if(shows(f) && filled(get(f.key))) o[f.key] = get(f.key); });
           if(s.repeating && filled(get(s.repeating.key))) o[s.repeating.key] = get(s.repeating.key);
           (s.repeatingBlocks || []).forEach(function(r){
             var rows = (get(r.key, []) || []).filter(function(row){ return filled(row); });
             if(rows.length) o[r.key] = rows;
           });
         });
+        if(get("forCycle")) o.forCycle = get("forCycle");
         return o;
       })(),
+      attachmentNames: attList().map(function(f){ return f.name; }),
       answers: (function(){
         var o = {};
         Object.keys(data).forEach(function(k){ if(/^q\d/.test(k) || /^s[A-Za-z]/.test(k)) o[k] = data[k]; });
@@ -2101,6 +2140,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       box.innerHTML = tallyHTML(sec);
       if(box.firstElementChild) host.replaceWith(box.firstElementChild);
     });
+    if(APP.rules) paintSubmit();
   }
   /* An answer that no longer applies is not an answer. Saying "No" after "Yes"
      hides the follow-up, and this takes what was typed in it back out - otherwise
@@ -2113,7 +2153,9 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     });
   }
   function dependedOn(key){
+    if(key === "kind") return true;   /* the thresholds, tallies and sections follow the path */
     return (APP.sections || []).some(function(s){
+      if(s.showIf && s.showIf.key === key) return true;
       return (s.fields || []).some(function(f){ return f.showIf && f.showIf.key === key; });
     });
   }
@@ -2171,6 +2213,12 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   restore();
+  (function(){
+    var q = new URLSearchParams(location.search);
+    if(/^renew/i.test(q.get("kind") || "") && !get("kind")) data.kind = "Renewal";
+    if(/^initial|^new/i.test(q.get("kind") || "") && !get("kind")) data.kind = "Initial certification";
+    if(q.get("for")) data.forCycle = q.get("for").replace(/[^A-Za-z0-9-]/g, "").slice(0, 80);
+  })();
   initTheme();
   renderAll();
   showStage(stage);
