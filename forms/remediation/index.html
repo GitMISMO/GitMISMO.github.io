@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Remediation Target Date | MISMO</title>
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<style>
+/* Layout: a narrow single column the provider works straight down, the way the eight
+   application forms read. Each section is a panel; nothing is hidden behind a toggle,
+   because every part of this has to be answered. */
+:root{
+  --navy:#0d314c; --sky:#74bfeb; --navy-deep:#06202f; --navy-mid:#14486e;
+  --sky-soft:#a9d8f3; --sky-wash:#e4f2fb;
+  --ground:#f1f6fa; --surface:#ffffff; --surface-2:#f6fafd; --surface-3:#e9f1f8;
+  --border:#d5e2ed; --border-strong:#adc4d6; --rule:#e5eef5;
+  --ink:#0d314c; --ink-2:#456179; --ink-3:#7794aa;
+  --good:#0f7b5c; --bad:#b3372c; --warn:#a2701a;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
+  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
+  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#7a9db4;
+  --good:#4fc79b; --bad:#f08579; --warn:#e0a83c; --sky-wash:#102f41;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
+  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
+  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#7a9db4;
+  --good:#4fc79b; --bad:#f08579; --warn:#e0a83c; --sky-wash:#102f41;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+.masthead{background:var(--navy);color:#fff}
+.masthead-in{display:flex;align-items:center;gap:14px;padding-block:11px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  max-width:880px;margin:0 auto}
+.logoplate{position:relative;background:#fff;border-radius:5px;padding:9px 13px;display:flex;align-items:center;line-height:0;flex:none}
+.logoplate .wordmark{height:24px;width:auto}
+.santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
+html[data-season="december"] .logoplate .santa{display:block}
+html[data-season="december"] .masthead-in{padding-top:20px}
+.vrule{width:1px;align-self:stretch;background:rgba(116,191,235,.4);flex:none}
+.pagename{color:var(--sky-soft);font-weight:500;font-size:14.5px}
+.rightgrp{margin-left:auto;display:flex;align-items:center;gap:12px}
+.eyebrow{text-transform:uppercase;letter-spacing:.11em;font-size:10.5px;color:rgba(255,255,255,.62)}
+@media (max-width:560px){ .eyebrow{display:none} }
+.theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;
+  padding:5px 10px;font-size:11.5px;cursor:pointer;font-family:inherit;white-space:nowrap;min-width:max-content}
+.theme-btn:hover{background:rgba(255,255,255,.18)}
+.wrap{max-width:880px;margin:0 auto;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  padding-block:26px 64px;display:flex;flex-direction:column;gap:22px}
+h1{font-size:26px;margin:0 0 6px;letter-spacing:-.012em;text-wrap:balance}
+.lede{color:var(--ink-2);margin:0}
+.lede b{color:var(--ink)}
+.saveline{font-size:13px;color:var(--ink-3);margin:10px 0 0}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:20px 20px 22px}
+.panel h2{font-size:16px;margin:0 0 4px;letter-spacing:-.012em}
+.psub{margin:0 0 16px;color:var(--ink-3);font-size:13px}
+.step{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--sky);letter-spacing:.09em;margin:0 0 6px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.fact{background:var(--surface-2);padding:11px 13px}
+.fact dt{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600;margin:0 0 3px}
+.fact dd{margin:0;font-size:14.5px;font-weight:600}
+.fact dd.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+/* The invoice is a thing to take away, not a question to answer, so it sits under the
+   facts in step one rather than becoming a step of its own. */
+.inv{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:16px 0 0;padding:15px 16px;
+  border:1px solid var(--border);border-radius:7px;background:var(--surface-2)}
+.inv-i{flex:none;width:38px;height:46px;border:1px solid var(--border-strong);border-radius:4px;
+  background:var(--surface);display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;
+  font-family:var(--mono);font-size:9px;font-weight:600;color:var(--ink-3);letter-spacing:.06em}
+.inv-b{min-width:0;flex:1 1 220px}
+.inv-n{font-weight:600;font-size:14.5px;margin:0 0 2px}
+.inv-m{font-size:12.5px;color:var(--ink-3);margin:0}
+.inv-m .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.inv-a{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+/* The code step. A link that has been forwarded still opens the page, so the invoice
+   itself asks for a code sent to the contact MISMO already holds. It takes the invoice
+   row's place rather than sitting beside it, so there is only one thing to do at a time. */
+.inv-code{margin:16px 0 0;padding:15px 16px;border:1px solid var(--border);border-radius:7px;
+  background:var(--surface-2)}
+.inv-code p{margin:0 0 10px;font-size:13px;color:var(--ink-2);line-height:1.5}
+.inv-code .to{font-family:var(--mono);font-weight:600;color:var(--ink)}
+.inv-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.inv-row input[type=text]{font-family:var(--mono);font-size:18px;font-weight:600;letter-spacing:.28em;
+  width:7.4em;flex:0 0 auto;text-align:center;padding:9px 6px 9px 14px}
+.inv-again{background:none;border:0;padding:0;font:inherit;font-size:12.5px;color:var(--sky);
+  cursor:pointer;text-decoration:underline}
+.inv-again:disabled{color:var(--ink-3);cursor:default;text-decoration:none}
+.inv-bad{font-size:12.5px;color:var(--bad);margin:9px 0 0}
+.paid{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  padding:3px 9px;border-radius:4px;background:rgba(15,123,92,.14);color:var(--good)}
+:root[data-theme="dark"] .paid, :root:not([data-theme="light"]) .paid{background:rgba(79,199,155,.16)}
+.doc{border:1px solid var(--border);border-radius:7px;padding:15px 16px;margin:0 0 14px;background:var(--surface-2)}
+.doc:last-of-type{margin-bottom:0}
+.doc-h{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin:0 0 4px}
+.doc-n{font-weight:600;font-size:14.5px}
+.doc-s{font-size:12.5px;color:var(--ink-3)}
+.doc-link{font-size:13px;color:var(--navy-mid);font-weight:600;white-space:nowrap;min-width:max-content}
+:root[data-theme="dark"] .doc-link, :root:not([data-theme="light"]) .doc-link{color:var(--sky)}
+.choices{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0 0}
+.choice{display:flex;align-items:center;gap:8px;border:1px solid var(--border-strong);border-radius:6px;
+  padding:9px 13px;cursor:pointer;background:var(--surface);font-size:14px;white-space:nowrap;min-width:max-content}
+.choice:hover{border-color:var(--navy-mid)}
+.choice input{margin:0;accent-color:var(--navy-mid)}
+.choice.on{border-color:var(--navy-mid);background:var(--sky-wash);font-weight:600}
+.drop{margin:13px 0 0;border:1px dashed var(--border-strong);border-radius:7px;padding:16px;text-align:center;background:var(--surface)}
+.drop p{margin:0 0 10px;font-size:13px;color:var(--ink-3)}
+.filelist{list-style:none;margin:11px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.filelist li{display:flex;align-items:center;gap:10px;font-size:13px;background:var(--surface-3);border-radius:5px;padding:7px 11px}
+.filelist .nm{font-weight:600;min-width:0;overflow-wrap:anywhere}
+.filelist .sz{color:var(--ink-3);font-family:var(--mono);margin-left:auto;white-space:nowrap}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600}
+/* The choice labels are read as sentences, not as field captions, so they keep their own case. */
+input[type=text],input[type=email],input[type=url],textarea{font-family:inherit;font-size:14px;padding:9px 11px;
+  border:1px solid var(--border-strong);border-radius:6px;background:var(--surface-2);color:var(--ink);width:100%}
+textarea{resize:vertical;min-height:88px;line-height:1.55}
+.hint{font-size:12px;color:var(--ink-3)}
+.btn{font-family:inherit;font-size:14.5px;font-weight:600;padding:11px 22px;border-radius:6px;cursor:pointer;
+  background:var(--navy);color:#fff;border:1px solid var(--navy);white-space:nowrap;min-width:max-content}
+.btn:hover{background:var(--navy-mid)}
+.btn:disabled{opacity:.55;cursor:default}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--border-strong)}
+.btn.ghost:hover{background:var(--surface-3)}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,.choice:focus-within{outline:2px solid var(--sky);outline-offset:2px}
+.acts{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:4px 0 0}
+.next{border-left:3px solid var(--sky);background:var(--sky-wash);border-radius:0 7px 7px 0;padding:14px 16px;margin:18px 0 0}
+.next h3{margin:0 0 7px;font-size:13.5px}
+.next ol{margin:0;padding-left:19px;font-size:13.5px;color:var(--ink-2)}
+.next li{margin:0 0 5px}
+.warn{border:1px solid var(--warn);background:rgba(162,112,26,.1);border-radius:7px;padding:13px 15px;font-size:13.5px;color:var(--ink)}
+.done{text-align:center;padding:40px 20px}
+.done .tick{width:46px;height:46px;border-radius:50%;background:var(--good);color:#fff;display:flex;align-items:center;
+  justify-content:center;font-size:24px;margin:0 auto 16px}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom,0px));
+  background:var(--navy);color:#fff;padding:10px 20px;border-radius:6px;font-size:14px;z-index:60;
+  box-shadow:0 4px 18px rgba(6,32,47,.32);max-width:92vw}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<style>
+/* ===================================================================
+   MISMO website skin, applied over an application form.
+   Values from MISMO-Website-Style-Guide.md, measured from the live
+   Home page on 21 October 2026. Appended last so it wins on source
+   order; the dark-mode selectors are repeated here at their own
+   specificity so a stored "dark" preference cannot reach the page.
+   No web font is imported - the site names IBM Plex Sans and does not
+   load it, so importing it would make these forms look unlike the site.
+   =================================================================== */
+:root,
+:root:not([data-theme="light"]),
+:root[data-theme="dark"]{
+  --mm-font:"IBM Plex Sans","Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
+  --mm-hero:#071d2e; --mm-pill:#0f314c; --mm-blue:#1a8fe3; --mm-blue-top:#2e9dee;
+  --mm-sky:#74bfeb; --mm-sky-2:#56b4f2; --mm-sub:#a9d8f3;
+  --mm-text:#44607a; --mm-line:#cfdeeb; --mm-tag-bg:#e3f1fc; --mm-tag-ink:#1a74b8;
+
+  /* the form's own tokens, remapped to the website palette */
+  --navy:#071d2e; --navy-deep:#0d314c; --navy-mid:#1a8fe3;
+  --sky:#1a8fe3; --sky-soft:#74bfeb; --sky-wash:#e3f1fc;
+  --ground:#ffffff; --surface:#ffffff; --surface-2:#ffffff; --surface-3:#f4f8fc;
+  --border:#cfdeeb; --border-strong:#cfdeeb; --rule:#e5eef5;
+  --ink:#0d314c; --ink-2:#44607a; --ink-3:#44607a;
+  --good:#0f7b5c; --bad:#b3372c; --warn:#a2701a;
+  --chip:#e3f1fc; --track:#e3f1fc; --tab-active:#ffffff;
+  /* --soft and --line are used by the form but were never declared, so the
+     notes and the attestation box drew with no background and no border. */
+  --soft:#f4f8fc; --line:#cfdeeb;
+}
+body{font-family:var(--mm-font); font-size:16px; line-height:1.6;
+  background:#ffffff; color:var(--mm-ink,#0d314c);}
+a{color:var(--mm-blue);}
+
+/* ---------- Header bar (70px, dark navy, logo left, nav, Log in pill right) ---------- */
+.mm-header{position:relative;z-index:5;height:70px;background:var(--mm-hero);box-shadow:0 2px 4px 0 rgba(0,0,0,.1),0 0 2px 0 rgba(153,153,153,.25);display:flex;align-items:center;padding:0 50px;gap:56px}
+.mm-logo img{display:block;width:194px;height:36px;max-width:100%;object-fit:contain;object-position:left center} /* the logo file is 684x108; "contain" keeps its shape, as the live site does (it shows about 194x31). Never let it stretch to fill 194x36. */
+.mm-logo{flex:0 1 194px;min-width:0}
+.mm-nav{display:flex;align-items:stretch;height:70px;margin:0;padding:0;list-style:none;flex:1 1 auto}
+.mm-nav>li{position:relative;display:flex;align-items:center;list-style:none}
+.mm-nav-link{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:21px;color:#ffffff;text-decoration:none;white-space:nowrap}
+.mm-nav>li:hover>.mm-nav-link,.mm-nav-link:focus-visible{color:var(--mm-sky)}
+.mm-chev{width:11px;height:8px}
+/* Dropdown menus: measured from the live site (opens on hover or keyboard focus) */
+.mm-dd{display:none;position:absolute;left:0;top:100%;z-index:20;min-width:250px;margin:0;padding:8px 0;list-style:none;background:#0b2740;border-top:2px solid var(--mm-blue);border-radius:0 0 8px 8px;box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
+.mm-nav>li:hover>.mm-dd,.mm-nav>li:focus-within>.mm-dd{display:block}
+.mm-dd a{display:block;padding:10px 18px 10px 16px;border-left:2px solid transparent;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:19.5px;color:#e6eef5;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
+.mm-dd a:hover,.mm-dd a:focus-visible{outline:none;background:rgba(116,191,235,.1);border-left-color:var(--mm-sky);color:var(--mm-sky)}
+.mm-login{margin-left:auto;display:inline-block;padding:10px 20px;border-radius:50px;background:var(--mm-pill);color:#ffffff;font-family:var(--mm-font);font-size:16px;font-weight:600;line-height:16px;text-decoration:none;white-space:nowrap;min-width:max-content}
+.mm-burger{display:none;width:40px;height:40px;margin-left:auto;padding:9px 8px;border:0;border-radius:6px;background:transparent;cursor:pointer}
+.mm-burger span{display:block;height:2px;margin:4px 0;border-radius:2px;background:#ffffff;transition:transform .2s,opacity .2s}
+/* Phones and tablets: hamburger shows the same menu as a panel under the bar, sub-pages listed under each heading */
+@media (max-width:1100px){
+  .mm-header{padding:0 20px;gap:12px}
+  .mm-burger{display:block}
+  .mm-nav{display:none}
+  .mm-header.is-open .mm-nav{display:block;position:absolute;top:70px;left:0;right:0;height:auto;max-height:calc(100vh - 70px);overflow-y:auto;padding:8px 0 16px;background:#0b2740;border-top:2px solid var(--mm-blue);box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
+  .mm-header.is-open .mm-nav>li{display:block}
+  .mm-header.is-open .mm-nav-link{display:flex;padding:12px 20px 6px;font-weight:600}
+  .mm-header.is-open .mm-chev{display:none}
+  .mm-header.is-open .mm-dd{display:block;position:static;min-width:0;padding:0 0 6px;background:transparent;border:0;border-radius:0;box-shadow:none}
+  .mm-header.is-open .mm-dd a{padding:9px 20px 9px 34px;white-space:normal}
+  .mm-header.is-open .mm-burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
+  .mm-header.is-open .mm-burger span:nth-child(2){opacity:0}
+  .mm-header.is-open .mm-burger span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+}
+
+/* ---------- footer: the live site's, measured 21 Oct 2026 at 1440px ----------
+   One 68px bar in #f4f7f9 - light, not dark - logo left, address in the middle,
+   policy links then the two social circles on the right. */
+.mm-footer{background:#f4f7f9;}
+.mm-footer-bar{background:#f4f7f9; display:flex; flex-wrap:wrap; align-items:center;
+  justify-content:space-between; gap:10px 28px; padding:18px 50px;
+  font-family:var(--mm-font);}
+.mm-f-logo{flex:0 0 auto; line-height:0;
+  /* the two colors the shared MISMO symbol reads */
+  --logo-body:#0d314c; --logo-s:#50a4db;}
+.mm-f-mark{display:block; width:197px; height:30px;}
+.mm-f-addr{flex:1 1 300px; text-align:center; font-size:12.5px; line-height:20px;
+  color:#5b7183;}
+.mm-f-addr a{color:#0d314c; text-decoration:none;}
+.mm-f-addr a:hover{text-decoration:underline;}
+.mm-f-env{width:15px; height:12px; margin:0 7px 0 14px; color:#5b7183;
+  vertical-align:-1px;}
+.mm-f-links{flex:0 0 auto; display:flex; gap:16px;}
+.mm-f-links a, .mm-f-links span{font-size:13px; font-weight:600; color:#0d314c; text-decoration:none;
+  white-space:nowrap;}
+.mm-f-links a:hover{text-decoration:underline;}
+.mm-f-social{flex:0 0 auto; display:flex; gap:13px;}
+.mm-f-soc{width:32px; height:32px; border-radius:50px; background:#50a4db;
+  color:#0d314c; display:flex; align-items:center; justify-content:center;}
+.mm-f-soc svg{width:17px; height:17px; display:block;}
+.mm-f-soc:hover{background:#74bfeb;}
+
+/* ---------- the page column ---------- */
+.wrap{max-width:960px; margin:0 auto; padding:46px clamp(20px,5vw,48px) 110px;}
+/* The hero carries the title and the lede now, so the page does not say it twice. */
+h1.doc, .docsub{display:none;}
+.sect-head{margin:0 0 22px;}
+.sect-head .mm-eyebrow{margin:0 0 10px; font-size:12px; font-weight:600;
+  text-transform:uppercase; letter-spacing:.14em; color:var(--mm-blue);}
+.sect-head h2{margin:0 0 12px; font-size:38px; font-weight:700; line-height:1.2;
+  color:var(--mm-ink,#0d314c);}
+.sect-head p{margin:0; font-size:16px; line-height:1.6; color:var(--mm-text);}
+@media (max-width:600px){ .sect-head h2{font-size:30px;} }
+
+/* ---------- stage tabs ---------- */
+.stages{border-radius:10px;}
+.stage{font-size:14px;}
+.stage.on{box-shadow:0 1px 2px rgba(7,29,46,.12);}
+
+/* ---------- the sticky progress bar ---------- */
+/* The website header does not stick, so this sits at the top of the viewport
+   rather than under a masthead that is no longer there. */
+.bar{top:0; border-radius:12px; border:1px solid var(--mm-line); background:#ffffff;
+  box-shadow:0 8px 22px -18px rgba(7,29,46,.45); padding:12px 16px;}
+.ptrack{background:#e3f1fc;}
+.pfill{background:var(--mm-blue);}
+.bar .pct{color:var(--mm-blue);}
+
+/* ---------- buttons: never wrap ---------- */
+.btn{border-radius:8px; font-family:var(--mm-font); font-size:15px; font-weight:600;
+  line-height:1.2; white-space:nowrap; min-width:max-content; padding:14px 22px;
+  border:1.5px solid var(--mm-blue); color:#ffffff;
+  background:linear-gradient(180deg,var(--mm-blue-top) 0%, var(--mm-blue) 100%);
+  box-shadow:0 5px 16px -4px rgba(26,143,227,.55);}
+.btn:hover{background:linear-gradient(180deg,var(--mm-blue) 0%, #1580cc 100%);}
+.btn.ghost{background:#ffffff; color:var(--mm-blue); border:1.5px solid var(--mm-blue);
+  box-shadow:none;}
+.btn.ghost:hover{background:#f2f9fe; color:var(--mm-blue);}
+.btn:focus-visible{outline:3px solid rgba(26,143,227,.35); outline-offset:2px;}
+/* The bar sits above the form and holds three of them, so they take the smaller size. */
+.bar-acts .btn{padding:9px 16px; font-size:14px;}
+.rep-add{border-radius:8px; border:1.5px dashed var(--mm-line); color:var(--mm-text);
+  font-size:14px; padding:11px 16px;}
+.rep-add:hover{border-color:var(--mm-blue); color:var(--mm-blue);}
+
+/* ---------- a section is a form card: white, 1px #cfdeeb, 12px corners ---------- */
+.sect{border:1px solid var(--mm-line); border-radius:12px; background:#ffffff;
+  margin-bottom:14px; box-shadow:0 14px 34px -26px rgba(7,29,46,.35);}
+.sect-btn{padding:17px 24px; gap:14px;}
+.sect-btn .st{font-size:17px; font-weight:600; color:var(--mm-ink,#0d314c);}
+.sect-btn .sc{font-size:12px; padding:3px 11px; border-radius:4px; font-weight:600;
+  letter-spacing:.04em; background:var(--mm-tag-bg); color:var(--mm-tag-ink);}
+.sect-btn .sc.done{background:rgba(15,123,92,.13); color:var(--good);}
+.sect-btn[aria-expanded="true"]{background:#f4f8fc;}
+.sect-body{padding:6px 24px 24px;}
+@media (max-width:600px){ .sect-btn{padding:15px 20px} .sect-body{padding:4px 20px 20px} }
+
+/* ---------- questions ---------- */
+.q-txt{font-size:15px; font-weight:600; color:var(--mm-ink,#0d314c);}
+.q-no{font-size:12px; color:var(--mm-text);}
+.q-guide, .sect-intro{font-size:13px; color:var(--mm-text);}
+
+/* ---------- fields: 44px tall, 8px corners, the site's search box ---------- */
+.fld label{font-size:14px; font-weight:600; color:var(--mm-ink,#0d314c);
+  text-transform:none; letter-spacing:0; margin-bottom:6px;}
+.in{border:1px solid var(--mm-line); border-radius:8px; background:#ffffff;
+  color:var(--mm-ink,#0d314c); font-family:var(--mm-font); font-size:15px;}
+input.in, select.in{height:44px; padding:0 14px;}
+select.in{padding-right:34px;}
+textarea.in{min-height:120px; padding:12px 14px; line-height:1.5;}
+.flds .na-wide textarea.in{min-height:150px;}
+.in:focus{outline:none; border-color:var(--mm-blue);
+  box-shadow:0 0 0 3px rgba(26,143,227,.18);}
+.opt{font-size:15px; color:var(--mm-ink,#0d314c);}
+.fld .opt, .fld label.opt{font-size:15px;}
+.opt input{accent-color:var(--mm-blue);}
+.mx input{accent-color:var(--mm-blue);}
+.mx th{color:var(--mm-text);}
+
+/* ---------- notes, attestation, totals, attachments ---------- */
+.note, .stage-note, .intro-card{border-radius:8px; border-left:3px solid var(--mm-blue);
+  font-size:15px; color:var(--mm-text);}
+.intro-card p{font-size:15px; color:var(--mm-text);}
+.attest{border-left:3px solid var(--mm-blue); border-radius:0 8px 8px 0; font-size:15px;}
+.attest-tick{border-radius:8px; font-size:15px;}
+/* The renewal attestation. One box: the tick sits with the statement it belongs to,
+   the way the membership application does it, not a bolded line of its own. */
+.att-box{display:flex; align-items:flex-start; gap:12px; padding:16px 18px;
+  border:1px solid var(--border); border-radius:8px; background:var(--surface-2);
+  cursor:pointer; font-weight:400; font-size:15px; line-height:1.7; color:var(--ink);
+  background:#f8fbfe;}  /* the soft tint the membership application uses; --surface-2 is
+                            pinned to white by the shared skin on this page */
+.att-box input{margin-top:5px; width:18px; height:18px; flex:0 0 auto; cursor:pointer;}
+.att-box.on{border-color:var(--sky); background:var(--sky-wash);}
+.att-stamp{margin:12px 2px 0; font-size:13px; color:var(--ink-3);}
+.att{border:1.5px dashed var(--mm-line); border-radius:12px; background:#f8fbfe;}
+.att-list li{border-radius:8px; border-color:var(--mm-line);}
+.tally{border-radius:12px; background:#f8fbfe;}
+.done{border-radius:12px; border:1px solid var(--mm-line); border-left:3px solid var(--good);}
+.done h3{font-size:19px;}
+.done p{font-size:15px; color:var(--mm-text);}
+.rep{border-radius:10px; border-color:var(--mm-line); background:#f8fbfe;}
+.toast{border-radius:8px; font-size:15px;}
+.foot{font-size:13px; color:var(--mm-text); margin-top:34px;}
+
+/* ---------- phones ---------- */
+@media (max-width:600px){
+  .two-acts .btn{flex:1 1 100%}
+  .mm-footer-bar{padding:18px 20px; justify-content:center; gap:14px 20px}
+  .mm-f-addr{flex:1 1 100%}
+  .mm-f-mark{width:170px; height:26px}
+}
+
+/* ---------- the hero rules the live site applies, lifted from the template ---------- */
+/* Desktop rules the live site applies to every hero (from the shared stylesheet):
+   the hero is 502px tall with 40px top and bottom padding, and hero buttons are only as wide as their text. */
+div[style*="min-height: clamp(380px"]{min-height:502px !important;padding-top:40px !important;padding-bottom:40px !important}
+div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
+/* Phone rules the live site applies to every hero (from the shared stylesheet) */
+@media (max-width:600px){
+  div[style*="min-height: clamp(380px"]{min-height:0 !important;padding:30px 20px !important}
+  div[style*="flex: 0 1 200px"]{display:flex !important;flex-wrap:wrap;gap:4px 16px;border-left:0 !important;padding-left:0 !important;min-width:0 !important}
+  div[style*="flex: 0 1 200px"] > div:nth-child(n+5){display:none !important}
+  div[style*="max-width: 560px"] > a{flex:0 0 100% !important}
+}
+</style>
+
+<!-- MISMO site chrome v2 (October 25, 2026): loads IBM Plex Sans and matches the website header -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style id="mm-chrome-v2">
+.mm-actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex:0 0 auto}
+.mm-actions .mm-login{margin-left:0}
+.mm-login{display:inline-block;padding:10px 20px;border-radius:50px;background:var(--mm-pill,#0f314c);color:#ffffff;font-family:var(--mm-font,inherit);font-size:16px;font-weight:600;line-height:16px;text-decoration:none;white-space:nowrap;min-width:max-content}
+.mm-login:hover{background:#17476d;color:#ffffff}
+.mm-login:focus-visible,.mm-search-btn:focus-visible,.mm-search-in:focus-visible{outline:2px solid var(--mm-sky,#74bfeb);outline-offset:2px}
+.mm-search{display:flex;align-items:center;margin:0}
+.mm-search-in{box-sizing:border-box;width:0;height:34px;padding:0;border:0;border-radius:6px;opacity:0;background:#ffffff;color:#0d314c;font-family:var(--mm-font,inherit);font-size:15px;transition:width .2s ease,opacity .2s ease,padding .2s ease}
+.mm-search.is-open .mm-search-in{width:200px;padding:0 10px;opacity:1}
+.mm-search-btn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:0;background:transparent;color:#ffffff;cursor:pointer}
+@media (max-width:1100px){.mm-search{display:none}}
+@media (max-width:720px){.mm-login{padding:9px 16px;font-size:15px}}
+</style>
+<style>
+/* Booking page additions */
+.choices .choice{font-size:14px}
+.note.good{border-left:3px solid var(--good)!important}
+.note.warn{border-left:3px solid var(--warn)!important}
+.hint.bad{color:var(--bad)}
+#state:empty{display:none}
+</style>
+</head>
+<body>
+
+
+<!-- The link's code lives in the address. Two rules keep it from travelling anywhere it
+     should not: no-referrer stops the browser handing the address to any site the provider
+     clicks through to, and noindex keeps the page out of search results. -->
+
+
+
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0d314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
+0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58
+355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320
+c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
+-297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243
+-4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198
+0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3
+-104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245
+-337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17
+246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49
+203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12
+26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57
+187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44
+-204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288
+-20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92
+-51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12
+-24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297
+3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146
+-106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0
+-356 -14z"/></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #74bfeb)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263
+13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19
+-16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20
+-222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0
+46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62
+-220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6
+355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
+52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
+<symbol id="mismo-hat" viewBox="0 0 100 100">
+  <path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41
+           C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/>
+  <path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z"
+        fill="#0d314c" opacity=".17"/>
+  <rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/>
+  <rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/>
+  <circle cx="86" cy="45" r="11.5" fill="#ffffff"/>
+</symbol></defs></svg>
+
+<header class="mm-header">
+  <a class="mm-logo" href="https://www.mismo.org/"><img src="https://higherlogicdownload.s3.amazonaws.com/MISMO/LogoImages/6e07790a-6fc9-43dc-b9d6-9178e00c3342_mismo-reverse-nav-logo.png" alt="MISMO logo. This will take you to the homepage"></a>
+  
+</header>
+<div style="position: relative; overflow: hidden; background: #071d2e; min-height: clamp(380px,37vw,520px); display: flex; align-items: center; padding: clamp(34px,3.8vw,50px) clamp(20px,5vw,48px);"><!-- built-in Pathway artwork (shows until a photo is added) --> <svg viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;"> <defs> <linearGradient id="skyhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0d314c" stop-opacity="0"></stop> </linearGradient> <linearGradient id="gndhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0e3a5c"></stop><stop offset="100%" stop-color="#071d2e"></stop> </linearGradient> <radialGradient id="glowhm" cx="50%" cy="50%" r="50%"> <stop offset="0%" stop-color="#74bfeb" stop-opacity=".42"></stop> <stop offset="100%" stop-color="#74bfeb" stop-opacity="0"></stop> </radialGradient> <linearGradient id="trailhm" x1="0" y1="0" x2="1" y2="0"> <stop offset="0%" stop-color="#74bfeb" stop-opacity="0"></stop> <stop offset="45%" stop-color="#9ad4f4" stop-opacity=".95"></stop> <stop offset="100%" stop-color="#ffffff" stop-opacity=".55"></stop> </linearGradient> </defs> <rect x="0" y="0" width="1200" height="560" fill="url(#gndhm)"></rect> <ellipse cx="930" cy="360" rx="420" ry="250" fill="url(#glowhm)"></ellipse> <g fill="#0a2740" opacity="1"> <rect x="640" y="300" width="52" height="260"></rect><rect x="698" y="236" width="40" height="324"></rect> <rect x="744" y="318" width="60" height="242"></rect><rect x="810" y="186" width="48" height="374"></rect> <rect x="864" y="268" width="68" height="292"></rect><rect x="938" y="214" width="42" height="346"></rect> <rect x="986" y="296" width="56" height="264"></rect><rect x="1048" y="238" width="50" height="322"></rect> <rect x="1104" y="310" width="64" height="250"></rect><rect x="1174" y="258" width="44" height="302"></rect> </g> <rect x="560" y="548" width="660" height="12" fill="#0a2740"></rect> <g fill="#74bfeb" opacity=".30"> <rect x="684" y="222" width="5" height="7"></rect><rect x="696" y="246" width="5" height="7"></rect> <rect x="800" y="184" width="5" height="7"></rect><rect x="814" y="216" width="5" height="7"></rect> <rect x="860" y="258" width="5" height="7"></rect><rect x="884" y="290" width="5" height="7"></rect> <rect x="932" y="214" width="5" height="7"></rect><rect x="988" y="292" width="5" height="7"></rect> <rect x="1050" y="240" width="5" height="7"></rect><rect x="1108" y="312" width="5" height="7"></rect> </g> <g fill="none" stroke="url(#trailhm)" stroke-linecap="round"> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="13" opacity=".15"></path> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="3"></path> <path d="M450,654 C680,572 890,500 1258,428" stroke-width="1.4" opacity=".7"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="7" opacity=".2"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="2" opacity=".85"></path> <path d="M580,712 C800,636 990,570 1272,500" stroke-width="1.2" opacity=".55"></path> </g> </svg> <!-- PHOTO LAYER -->
+<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: none; background-size: cover; background-position: center right; background-repeat: no-repeat;"></div><div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(90deg,#071d2e 0%,rgba(7,29,46,.96) 30%,rgba(7,29,46,.80) 50%,rgba(7,29,46,.42) 72%,rgba(7,29,46,.22) 100%);"></div>
+<div style="position: relative; z-index: 2; width: 100%; max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 30px; align-items: center;">
+<div style="flex: 1 1 440px; min-width: 0; max-width: 620px; margin-right: auto;">
+<p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: #74bfeb; font-family: inherit; line-height: 1.5;">MISMO Certifications</p>
+<h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Your Remediation<span style="display: block; color: #74bfeb;">Target Date</span></h1>
+<p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">Tell us when you expect to finish remediating the findings. It takes a minute, and you can change it later.</p>
+<p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3; max-width: 52ch;">Your assessor and MISMO see the date as soon as you save it.</p>
+<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#target" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Give Your Date&nbsp;&rarr;</a></div>
+</div>
+<div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">People</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Systems</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Standards</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Progress</div>
+<div style="width: 44px; height: 1px; background: rgba(255,255,255,.4); margin: 18px 0;"></div>
+<div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">A More Efficient</div>
+<div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Mortgage Industry</div>
+</div>
+</div>
+</div>
+
+
+
+<main class="wrap" id="target-wrap"><span id="target"></span>
+  <div>
+    <h1 id="hd">Your Remediation Target Date</h1>
+    <p class="lede" id="lede">Loading your page&hellip;</p>
+  </div>
+
+  <div id="state"></div>
+
+  <section class="panel" id="p-what" hidden>
+    <span class="step">STEP 1</span>
+    <h2>The Certification</h2>
+    <p class="psub">The items to remediate are in the email from MISMO, and your assessor is working with you on them. If anything here is wrong, email <a href="mailto:certifications@mismo.org">certifications@mismo.org</a>.</p>
+    <dl class="facts" id="facts"></dl>
+  </section>
+
+  <section class="panel" id="p-date" hidden>
+    <span class="step">STEP 2</span>
+    <h2>When You Expect to Finish</h2>
+    <p class="psub">The date you expect to send your assessor the evidence for every item. If it changes, come back to this page and give the new date.</p>
+    <div class="grid2">
+      <div class="fld"><label for="t-date">Target Date</label>
+        <input class="in" type="date" id="t-date"></div>
+    </div>
+    <div class="grid2" style="margin-top:14px">
+      <div class="fld"><label for="t-name">Your Name</label>
+        <input class="in" type="text" id="t-name" autocomplete="name"></div>
+      <div class="fld"><label for="t-email">Your Email</label>
+        <input class="in" type="email" id="t-email" autocomplete="email"></div>
+    </div>
+    <div class="fld" style="margin-top:14px">
+      <label for="t-note">Anything Your Assessor Should Know</label>
+      <textarea class="in" id="t-note" rows="2" maxlength="600"></textarea>
+      <span class="hint">Optional.</span>
+    </div>
+  </section>
+
+  <section class="panel" id="p-send" hidden>
+    <span class="step">STEP 3</span>
+    <h2>Save It</h2>
+    <p class="psub">Your date is recorded against your certification. MISMO checks in with you if the date passes.</p>
+    <div class="acts"><button class="btn" type="button" id="t-go">Save My Date</button></div>
+    <div id="send-say" class="hint" style="margin-top:10px" role="status" aria-live="polite"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  /* Remediation target date (27 Oct 2026). Served by the same flow as the scheduling page
+     ("MISMO Demo Booking - Serve"): load returns this page by its token, book records the
+     company's date. The Stage notices job (scheduling.js) checks it and saves it on the
+     certification, and the target-date follow-ups run from it. */
+  var FLOW_ENDPOINT = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/30/workflows/eb09924f6eb54c2d95c701a23d13c506/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=78PNgHmVC11lygLImiojG7gUqqy2C3yLuw_WcVe1VwI";
+  var FORM_KEY = "mismo-demo-booking";
+  var params = new URLSearchParams(location.search);
+  var token = (params.get("b") || "").trim();
+  var preview = params.get("preview") === "1";
+  var page = null, rid = null, waitTimer = null, waitUntil = 0;
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function show(id, on) { $(id).hidden = !on; }
+  function note(kind, html) { $("state").innerHTML = html ? '<div class="note' + (kind ? " " + kind : "") + '" style="padding:14px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface)">' + html + "</div>" : ""; }
+  var MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  function longDate(iso) { if (!iso) return ""; return MONTHS[+iso.slice(5, 7) - 1] + " " + (+iso.slice(8, 10)) + ", " + iso.slice(0, 4); }
+  function todayIso() { return new Date().toLocaleDateString("en-CA", { timeZone: "America/New_York" }); }
+
+  function call(body) {
+    if (preview) return Promise.resolve(sample(body));
+    body.formKey = FORM_KEY; body.token = token;
+    return fetch(FLOW_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(body) })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error(j.error || ("The service answered " + r.status)); e.code = j.error; throw e; } return j; }); });
+  }
+
+  function facts() {
+    var rows = [
+      ["Company", page.org],
+      ["Certification", page.program + (page.product ? " · " + page.product : "")],
+      ["Kind", page.kind === "renewal" ? "Renewal" : "Initial certification"],
+      ["Assessor", page.assessor],
+      ["Target Date on File", page.target ? longDate(page.target) + (page.targetBy ? " (given by " + page.targetBy + ")" : "") : "None yet"]
+    ];
+    $("facts").innerHTML = rows.filter(function (r) { return r[1]; }).map(function (r) {
+      return '<div class="fact"><dt>' + esc(r[0]) + "</dt><dd>" + esc(r[1]) + "</dd></div>";
+    }).join("");
+  }
+
+  function render() {
+    facts();
+    show("p-what", true);
+    var open = page.status === "open";
+    ["p-date", "p-send"].forEach(function (id) { show(id, open); });
+    var d = $("t-date");
+    d.min = todayIso();
+    if (open && page.target && !d.value) d.value = page.target;
+    if (open) {
+      $("lede").innerHTML = "Your MISMO " + esc(page.program) + " certification is waiting on remediation with <b>" + esc(page.assessor) + "</b>. Tell us the date you expect to finish.";
+      note(page.target ? "good" : "", page.target ? "<b>Your target date is " + esc(longDate(page.target)) + ".</b> To change it, give the new date below." : "");
+      $("t-go").textContent = page.target ? "Save the New Date" : "Save My Date";
+    } else if (page.status === "hold") {
+      $("lede").textContent = "Nothing to do here just now.";
+      note("warn", "This certification is on hold. Please email <a href=\"mailto:certifications@mismo.org\">certifications@mismo.org</a>.");
+    } else {
+      $("lede").textContent = "Nothing to do here just now.";
+      note("", "Remediation is not open for this certification at the moment" + (page.target ? " (the last target date given was " + esc(longDate(page.target)) + ")" : "") + ". If you think it should be, email <a href=\"mailto:certifications@mismo.org\">certifications@mismo.org</a>.");
+    }
+  }
+
+  function load() {
+    if (!token && !preview) { $("lede").textContent = "This link is incomplete."; note("warn", "Please open the link exactly as it appears in your email from MISMO."); return Promise.resolve(); }
+    return call({ mode: "load" }).then(function (p) {
+      if (!p || p.error || p.purpose !== "remediation") { $("lede").textContent = "We could not find this page."; note("warn", "This link is not recognized. Please open it exactly as it appears in your email, or write to <a href=\"mailto:certifications@mismo.org\">certifications@mismo.org</a>."); return; }
+      page = p;
+      render();
+    })["catch"](function (e) { $("lede").textContent = "We could not load your page."; note("warn", esc(e.message) + " Please try again in a few minutes."); });
+  }
+
+  var EMAIL = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/;
+  function say(kind, html) { var s = $("send-say"); s.className = "hint" + (kind ? " " + kind : ""); s.innerHTML = html; }
+
+  function go() {
+    var target = $("t-date").value, name = $("t-name").value.trim(), email = $("t-email").value.trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(target)) return say("bad", "Please choose your target date.");
+    if (target < todayIso()) return say("bad", "Please choose a date from today on.");
+    if (!name) return say("bad", "Please give your name.");
+    if (!EMAIL.test(email)) return say("bad", "Please give a valid email address.");
+    rid = "t" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    var body = { mode: "book", kind: "target", target: target, name: name, email: email, note: $("t-note").value.trim(), rid: rid };
+    $("t-go").disabled = true;
+    say("", "Saving your date&hellip; this takes about a minute.");
+    call(body).then(function (r) {
+      if (!r || r.saved !== true) {
+        $("t-go").disabled = false;
+        if (r && r.error === "not-open") { load(); return say("bad", "This page has just changed. Please look again."); }
+        return say("bad", "That did not go through. Please try again.");
+      }
+      waitUntil = Date.now() + 4 * 60 * 1000;
+      poll();
+    })["catch"](function (e) { $("t-go").disabled = false; say("bad", esc(e.message) + " Please try again."); });
+  }
+
+  function poll() {
+    clearTimeout(waitTimer);
+    call({ mode: "load" }).then(function (p) {
+      var out = p && p.requests && p.requests[rid];
+      if (out && out.status) {
+        page = p;
+        $("t-go").disabled = false;
+        if (out.status === "refused") { render(); return say("bad", esc(out.why || "That could not be saved.") + " Your details are still filled in."); }
+        render(); say("", "");
+        note("good", "<b>Thank you. Your target date is " + esc(longDate(page.target)) + ".</b><br>Your assessor and MISMO can see it now. If it changes, come back to this page.");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      if (Date.now() > waitUntil) {
+        $("t-go").disabled = true;
+        return say("", "We have your date and it is being recorded. There is no need to send it again.");
+      }
+      waitTimer = setTimeout(poll, 6000);
+    })["catch"](function () { waitTimer = setTimeout(poll, 8000); });
+  }
+
+  $("t-go").addEventListener("click", go);
+
+  /* ---- preview only (?preview=1): sample data, nothing is sent ---- */
+  function sample(body) {
+    if (body.mode === "book") { sample.saved = body.target; return { saved: true }; }
+    var p = { purpose: "remediation", row: 0, org: "Example Company", program: "RON", product: "Example Notary Platform", kind: "renewal",
+      assessor: "Falcon Capital Advisors", status: "open", target: sample.saved || null, targetBy: sample.saved ? "You" : null, requests: {} };
+    if (rid && sample.saved) p.requests[rid] = { status: "saved" };
+    return p;
+  }
+
+  load();
+})();
+</script>
+
+<footer class="mm-footer">
+  <div class="mm-footer-bar">
+    <a class="mm-f-logo" href="https://collaborate.mismo.org/mismowebsite/home"><svg class="mm-f-mark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></a>
+    <div class="mm-f-addr">1919 M Street NW, 5th Floor, Washington, DC 20036<svg class="mm-f-env" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1.5" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M1.8 3l8.2 6 8.2-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><a href="mailto:info@mismo.org">info@mismo.org</a></div>
+    <div class="mm-f-links"><span>Privacy Policy</span><span>Terms of Use</span></div>
+    <div class="mm-f-social"><a class="mm-f-soc" href="https://www.linkedin.com/company/mismo-mortgage-industry-standards-maintenance-organization" aria-label="MISMO on LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="9.5" width="3" height="11" rx="1" fill="currentColor"/><circle cx="5" cy="5.6" r="1.9" fill="currentColor"/><path d="M10 20.5v-11h3v1.5a3.7 3.7 0 0 1 3.2-1.7c2.4 0 3.8 1.6 3.8 4.4v6.8h-3v-6.3c0-1.6-.6-2.5-2-2.5s-2 .9-2 2.5v6.3z" fill="currentColor"/></svg></a><a class="mm-f-soc" href="https://www.youtube.com/channel/UCuKIkeqACTIU7j0eL_igPHA" aria-label="MISMO on YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="3.6" fill="currentColor"/><path d="M10.2 9.4l5.4 2.6-5.4 2.6z" fill="#f4f7f9"/></svg></a></div>
+  </div>
+</footer>
+
+</body>
+</html>
