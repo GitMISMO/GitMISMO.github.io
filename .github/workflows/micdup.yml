@@ -1,0 +1,46 @@
+name: Publish Mic'd Up Episodes
+
+# Checks the MISMO YouTube channel every three hours and updates
+# podcast/micdup.json. The website home page reads that file, so new
+# Mic'd Up episodes appear there without anyone editing the page.
+
+on:
+  schedule:
+    - cron: '23 */3 * * *'     # every three hours, at 23 minutes past
+  workflow_dispatch:            # lets you run it by hand from the Actions tab
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish-micdup
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the website files
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Build the episode list
+        run: node podcast/build-micdup.mjs
+
+      - name: Commit if anything changed
+        run: |
+          set -euo pipefail
+          git config user.name  "MISMO Podcast Publisher"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add podcast/micdup.json 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "No new episodes."
+            exit 0
+          fi
+          git commit -m "Mic'd Up: update the episode list"
+          git pull --rebase
+          git push
