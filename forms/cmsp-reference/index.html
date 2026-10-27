@@ -1203,24 +1203,24 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     }else{
       var rows = get(t.key, []);
       if(!Array.isArray(rows)) rows = [];
-      rows.forEach(function(r){
-        var n = points(r[t.from] || "");
-        var times = Math.max(1, parseInt(r[t.times] || 1, 10) || 1);
-        sum += n * times;
-      });
+      rows.forEach(function(r){ sum += rowPoints(r, t); });
     }
     sum = Math.round(sum * 10) / 10;
-    var ok = t.target ? sum >= t.target : true;
-    var pct = t.target ? Math.min(100, Math.round(sum / t.target * 100)) : 0;
+    var target = t.target && typeof t.target === "object" ? t.target[kindKey()] : t.target;
+    var cap = t.cap && typeof t.cap === "object" ? t.cap[kindKey()] : t.cap;
+    var ok = target ? sum >= target : true;
+    var pct = target ? Math.min(100, Math.round(sum / target * 100)) : (cap ? Math.min(100, Math.round(sum / cap * 100)) : 0);
     return '<div class="tally' + (ok ? " ok" : "") + '">' +
-      '<div class="tally-n">' + sum + (t.target ? ' <i>of ' + t.target + '</i>' : '') + '</div>' +
+      '<div class="tally-n">' + sum + (target ? ' <i>of ' + target + '</i>' : (cap ? ' <i>up to ' + cap + ' count</i>' : '')) + '</div>' +
       '<div class="tally-b"><div class="tally-f" style="width:' + pct + '%"></div></div>' +
       '<div class="tally-t">' + esc(t.label) +
-        (t.target ? (ok ? ' \u2014 you have enough' : ' \u2014 ' + (t.target - sum) + ' to go') : '') +
+        (target ? (ok ? ' \u2014 you have enough' : ' \u2014 ' + (target - sum) + ' to go') : '') +
+        (windowFrom() ? ' (last 24 months only)' : '') +
       '</div></div>';
   }
 
   function appSectionHTML(sec, idx){
+    if(!shows(sec)) return "";
     var units = appUnits(sec);
     var done = units.filter(unitFilled).length;
     var id = "app" + idx, open = !!openSet[id];
@@ -1273,6 +1273,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
   function appUnits(sec){
     var out = [];
+    if(!shows(sec)) return out;
     /* A group of checkboxes where ticking any one of them is the answer - which
        product types you want certified - counts as one thing, not as none. */
     if(sec.requireAny) out.push({any: sec.requireAny.keys});
@@ -1288,8 +1289,10 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function appRequired(){
     var miss = [];
     (APP.sections || []).forEach(function(sec){
+      if(!shows(sec)) return;
       (sec.fields || []).forEach(function(f){
         if(f.required && shows(f) && !filled(get(f.key))) miss.push(f.label + " - " + sec.heading);
+        if(f.blockIf && shows(f) && get(f.key) === f.blockIf.equals) miss.push(f.blockIf.message);
       });
       if(sec.repeating){
         var rows = get(sec.repeating.key, []);
@@ -1316,7 +1319,40 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         }
       });
     });
-    return miss;
+    if(APP.attachments && APP.attachments.requiredIf && shows({ showIf: APP.attachments.requiredIf }) && !attList().length) miss.push(APP.attachments.requiredIf.label);
+    return miss.concat(ruleCheck());
+  }
+  /* The program's point thresholds, checked before anything is sent (Perry Williams, 27 Oct 2026):
+     only enough to clear them needs listing, and a claim short of them is caught here, not in review. */
+  function kindKey(){ return /renew/i.test(get("kind")) ? "renewal" : "new"; }
+  function windowFrom(){
+    var R = APP.rules || {};
+    if(kindKey() !== "renewal" || !R.windowMonths) return null;
+    var d = new Date(); d.setMonth(d.getMonth() - R.windowMonths); return d.toISOString().slice(0, 10);
+  }
+  function rowPoints(r, t){
+    var from = windowFrom();
+    if(from && r.when && String(r.when) < from) return 0;
+    var n = points(r[t.from] || "");
+    var times = r[t.times] === "" || r[t.times] == null ? 1 : Math.max(0, parseFloat(r[t.times]) || 0);
+    return n * times;
+  }
+  function sumOf(key){
+    var sec = (APP.sections || []).filter(function(s){ return s.tally && s.tally.key === key && shows(s); })[0];
+    if(!sec) return 0;
+    var rows = get(key, []); if(!Array.isArray(rows)) rows = [];
+    return rows.reduce(function(n, r){ return n + rowPoints(r, sec.tally); }, 0);
+  }
+  function ruleCheck(){
+    var R = APP.rules; if(!R) return [];
+    var rule = R[kindKey()]; if(!rule) return [];
+    var part = sumOf(R.participation || "participation"), edu = rule.participationOnly ? 0 : sumOf(R.education || "education");
+    if(rule.educationCap != null) edu = Math.min(edu, rule.educationCap);
+    var total = part + edu, out = [];
+    var older = windowFrom() ? " Only activity from the last 24 months counts." : "";
+    if(rule.participation != null && part < rule.participation) out.push("Participation points: " + part + " of the " + rule.participation + " needed." + older);
+    if(rule.total != null && total < rule.total) out.push("Points counted: " + total + " of the " + rule.total + " needed" + (rule.educationCap != null ? " (education counts up to " + rule.educationCap + ")" : "") + "." + older);
+    return out;
   }
   function counts(){
     var a = 0, at = 0;
@@ -1375,15 +1411,18 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       application: (function(){
         var o = {};
         (APP.sections || []).forEach(function(s){
-          (s.fields || []).forEach(function(f){ if(filled(get(f.key))) o[f.key] = get(f.key); });
+          if(!shows(s)) return;
+          (s.fields || []).forEach(function(f){ if(shows(f) && filled(get(f.key))) o[f.key] = get(f.key); });
           if(s.repeating && filled(get(s.repeating.key))) o[s.repeating.key] = get(s.repeating.key);
           (s.repeatingBlocks || []).forEach(function(r){
             var rows = (get(r.key, []) || []).filter(function(row){ return filled(row); });
             if(rows.length) o[r.key] = rows;
           });
         });
+        if(get("forCycle")) o.forCycle = get("forCycle");
         return o;
       })(),
+      attachmentNames: attList().map(function(f){ return f.name; }),
       answers: (function(){
         var o = {};
         Object.keys(data).forEach(function(k){ if(/^q\d/.test(k) || /^s[A-Za-z]/.test(k)) o[k] = data[k]; });
@@ -2101,6 +2140,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       box.innerHTML = tallyHTML(sec);
       if(box.firstElementChild) host.replaceWith(box.firstElementChild);
     });
+    if(APP.rules) paintSubmit();
   }
   /* An answer that no longer applies is not an answer. Saying "No" after "Yes"
      hides the follow-up, and this takes what was typed in it back out - otherwise
@@ -2113,7 +2153,9 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     });
   }
   function dependedOn(key){
+    if(key === "kind") return true;   /* the thresholds, tallies and sections follow the path */
     return (APP.sections || []).some(function(s){
+      if(s.showIf && s.showIf.key === key) return true;
       return (s.fields || []).some(function(f){ return f.showIf && f.showIf.key === key; });
     });
   }
@@ -2171,6 +2213,12 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   restore();
+  (function(){
+    var q = new URLSearchParams(location.search);
+    if(/^renew/i.test(q.get("kind") || "") && !get("kind")) data.kind = "Renewal";
+    if(/^initial|^new/i.test(q.get("kind") || "") && !get("kind")) data.kind = "Initial certification";
+    if(q.get("for")) data.forCycle = q.get("for").replace(/[^A-Za-z0-9-]/g, "").slice(0, 80);
+  })();
   initTheme();
   renderAll();
   showStage(stage);
