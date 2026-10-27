@@ -1,0 +1,598 @@
+{
+ "note": "Current CMSPs and AMSPs, name and company only. Written by the Individual certifications job in cms-data; not edited by hand.",
+ "updated": "2026-10-27",
+ "programs": {
+  "CMSP": {
+   "title": "Current CMSPs",
+   "count": 38,
+   "people": [
+    {
+     "name": "Kasie Woolrich (Lynn)",
+     "company": "Freddie Mac"
+    },
+    {
+     "name": "Karen Baldwin",
+     "company": "Actualize Consulting"
+    },
+    {
+     "name": "Leslie Bensen",
+     "company": "MGIC"
+    },
+    {
+     "name": "Erin Bittenbender",
+     "company": "PhoenixTeam"
+    },
+    {
+     "name": "Lynn Calahan",
+     "company": "Alpha7X"
+    },
+    {
+     "name": "Geran Combs",
+     "company": "Actualize Consulting"
+    },
+    {
+     "name": "Jessi Dennis",
+     "company": "PhoenixTeam"
+    },
+    {
+     "name": "Rusty Emory",
+     "company": "PrimeLending"
+    },
+    {
+     "name": "Charles Epperson",
+     "company": "Stavvy"
+    },
+    {
+     "name": "Leslie (Colleen) Flaxington",
+     "company": "Freddie Mac"
+    },
+    {
+     "name": "Brenda Florendo",
+     "company": "Docutech, A First American Company"
+    },
+    {
+     "name": "Harry Gardner",
+     "company": "ICE Mortgage Technology"
+    },
+    {
+     "name": "David Garrett",
+     "company": "DocMagic"
+    },
+    {
+     "name": "Liz Green",
+     "company": "Candescent Capital Ventures"
+    },
+    {
+     "name": "Justin Greer",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Becky Griswold",
+     "company": "PhoenixTeam"
+    },
+    {
+     "name": "Shawn Jobe",
+     "company": "Credit Interlink, Inc."
+    },
+    {
+     "name": "Srujana Kannekanti",
+     "company": "Freddie Mac"
+    },
+    {
+     "name": "Amy Ketterling",
+     "company": "MGIC"
+    },
+    {
+     "name": "Mark Kleingers",
+     "company": "Viking Sasquatch"
+    },
+    {
+     "name": "Bhargavi Kodiparthi",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Heather Kvasnak",
+     "company": "PhoenixTeam"
+    },
+    {
+     "name": "Sandra Martz-Griebe",
+     "company": "Contigo, llc"
+    },
+    {
+     "name": "Jamie Norris",
+     "company": "Experian"
+    },
+    {
+     "name": "Jonathan Pain",
+     "company": "Actualize Consulting"
+    },
+    {
+     "name": "Brian Pannell",
+     "company": "DocMagic"
+    },
+    {
+     "name": "Michelle Pogatchnik",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Rita Roy",
+     "company": "Freddie Mac"
+    },
+    {
+     "name": "Ralph Russo",
+     "company": "PNC Bank, National Associaiton"
+    },
+    {
+     "name": "Matt Seu",
+     "company": "Actualize Consulting"
+    },
+    {
+     "name": "Thomas Sitzler",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Rachael Sokolowski",
+     "company": "Magnolia Technologies"
+    },
+    {
+     "name": "Wayne Spencer",
+     "company": "Path Software"
+    },
+    {
+     "name": "Kellie Stoll",
+     "company": "Phoenix Team"
+    },
+    {
+     "name": "Meghan Tidgewell",
+     "company": "Tidgewell Results eXperience"
+    },
+    {
+     "name": "Chris Trujillo",
+     "company": "Viant Eye"
+    },
+    {
+     "name": "Todd White",
+     "company": "Xpanse"
+    },
+    {
+     "name": "Rachel Zaputil",
+     "company": "ICE Mortgage Technology"
+    }
+   ]
+  },
+  "AMSP": {
+   "title": "Current AMSPs",
+   "count": 107,
+   "people": [
+    {
+     "name": "Arvind Kumar Akula",
+     "company": "Rate"
+    },
+    {
+     "name": "Asmaa Al-Ghafari",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Keri Alphonso",
+     "company": "Falcon Capital Advisors"
+    },
+    {
+     "name": "Mlaika Azhar",
+     "company": "Accenture Federal Services"
+    },
+    {
+     "name": "Tiffany Baker",
+     "company": "Phoenix Outcomes"
+    },
+    {
+     "name": "Pam Baumgarten",
+     "company": "Wolters Kluwer"
+    },
+    {
+     "name": "Greg Black",
+     "company": "Accenture Federal Services"
+    },
+    {
+     "name": "Elizabeth Bowser",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Lee Breece",
+     "company": "KPMG"
+    },
+    {
+     "name": "Nathan Bruser",
+     "company": "Mortgage Banking Technology"
+    },
+    {
+     "name": "Melinda Burch",
+     "company": "Wolters Kluwer"
+    },
+    {
+     "name": "John (Jeb) Burgess",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Brad Byrd",
+     "company": "Deloitte"
+    },
+    {
+     "name": "Richard Collins",
+     "company": "United Wholesale Mortgage"
+    },
+    {
+     "name": "Brandi Constantino",
+     "company": "Deloitte & Touche LLP"
+    },
+    {
+     "name": "Tim Cooper",
+     "company": "Falcon Capital Advisors"
+    },
+    {
+     "name": "Jamaica Delmer",
+     "company": "First American"
+    },
+    {
+     "name": "Brad DeSimone",
+     "company": "Equifax"
+    },
+    {
+     "name": "Aaron Edwards",
+     "company": "Pensato AI"
+    },
+    {
+     "name": "Howard Ellison",
+     "company": "United Wholesale Mortgage"
+    },
+    {
+     "name": "Elizabeth Elmer",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Eric Evans",
+     "company": "KPMG LLP"
+    },
+    {
+     "name": "Delcina Felder",
+     "company": "Freddie Mac"
+    },
+    {
+     "name": "Kevin Fielden",
+     "company": "KPMG"
+    },
+    {
+     "name": "Ari Fink",
+     "company": "PhoenixTeam"
+    },
+    {
+     "name": "Tristan Forbes",
+     "company": "Pensato AI"
+    },
+    {
+     "name": "Jason Fry",
+     "company": "KPMG LLP"
+    },
+    {
+     "name": "Vaiola Gallo",
+     "company": "ICE Mortgage Technology"
+    },
+    {
+     "name": "Zachary Gribben",
+     "company": "Consolidated Analytics"
+    },
+    {
+     "name": "Christopher Hengge",
+     "company": "Actualize Consulting"
+    },
+    {
+     "name": "Candy Hepfner",
+     "company": "Mortgage Guaranty Insurance Corporation (MGIC)"
+    },
+    {
+     "name": "Kimberly Hester",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Kenneth Hizer",
+     "company": "Pennymac"
+    },
+    {
+     "name": "Collin Holston",
+     "company": "Falcon Capital Advisors"
+    },
+    {
+     "name": "Mallory Howard",
+     "company": "First American Docutech"
+    },
+    {
+     "name": "Abraham Hudak",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Noah Israel",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Dorian Jackson",
+     "company": "Factual Data"
+    },
+    {
+     "name": "Kevin Johnson",
+     "company": "Equifax"
+    },
+    {
+     "name": "Stephen Kaschak",
+     "company": "Phoenix Outcomes"
+    },
+    {
+     "name": "Alexa Kass",
+     "company": "Factual Data"
+    },
+    {
+     "name": "Steven Keim",
+     "company": "FICO"
+    },
+    {
+     "name": "Mike Kelley",
+     "company": "Sagent Lending"
+    },
+    {
+     "name": "Bonnie Kidwell",
+     "company": "Accenture"
+    },
+    {
+     "name": "Tyler King",
+     "company": "Wolters Kluwer"
+    },
+    {
+     "name": "Laurinne Krentz",
+     "company": "MGIC"
+    },
+    {
+     "name": "Philip Law",
+     "company": "Enact MI"
+    },
+    {
+     "name": "Eric Litwin",
+     "company": "Pennymac"
+    },
+    {
+     "name": "Clifford Long",
+     "company": "Radian"
+    },
+    {
+     "name": "Cody Lovins",
+     "company": "Paradatec Inc"
+    },
+    {
+     "name": "Jonathan Maj",
+     "company": "Anza MI"
+    },
+    {
+     "name": "Michael McCarthy",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Michelle McLaughlin",
+     "company": "U.S. Bank"
+    },
+    {
+     "name": "Britt Millermon",
+     "company": "Pensato AI"
+    },
+    {
+     "name": "Spencer Moore",
+     "company": "Falcon Capital Advisors"
+    },
+    {
+     "name": "Jaime Morton",
+     "company": "Xpanse"
+    },
+    {
+     "name": "Heather Mowry",
+     "company": "Factual Data"
+    },
+    {
+     "name": "Poonam Nair",
+     "company": "Pennymac"
+    },
+    {
+     "name": "Ryan Nelson",
+     "company": "Department of Veterans Affairs"
+    },
+    {
+     "name": "Phuong Nguyen",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Evelyne Nimmo",
+     "company": "Evelyne Nimmo"
+    },
+    {
+     "name": "Mandar Paranjpe",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Chad Parish",
+     "company": "ICE"
+    },
+    {
+     "name": "Shailaja Polasa",
+     "company": "FreddieMac"
+    },
+    {
+     "name": "John Pomaranski",
+     "company": "actualize consulting"
+    },
+    {
+     "name": "Rajkumar Ponnusamy",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Ashley Pontiff",
+     "company": "U.S. Department of Veteran Affairs"
+    },
+    {
+     "name": "Varun Potlacheruvu",
+     "company": "Enact Mortgage Insurance"
+    },
+    {
+     "name": "Patrick Quast",
+     "company": "MGIC"
+    },
+    {
+     "name": "Kelly Redfearn",
+     "company": "Phoenix"
+    },
+    {
+     "name": "Tim Renner",
+     "company": "Falcon Capital Advisors"
+    },
+    {
+     "name": "Bennett Rider",
+     "company": "Actualize Consulting"
+    },
+    {
+     "name": "Denise Rivoal",
+     "company": "Fannie Mae"
+    },
+    {
+     "name": "Angel Romero",
+     "company": "Down Payment Resource"
+    },
+    {
+     "name": "Samantha Rudolph",
+     "company": "PhoenixTeam"
+    },
+    {
+     "name": "Narendra Sagar",
+     "company": "Essent Guaranty, Inc."
+    },
+    {
+     "name": "Jenifer Salmeron",
+     "company": "Accenture Federal Services"
+    },
+    {
+     "name": "Kristina Sanders",
+     "company": "Mortgage Connect"
+    },
+    {
+     "name": "Tracy Schuessler",
+     "company": "Experian"
+    },
+    {
+     "name": "Angela Sella",
+     "company": "MGIC"
+    },
+    {
+     "name": "Jonathan Shafer",
+     "company": "First American"
+    },
+    {
+     "name": "Julie Singh",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Sharad Singh",
+     "company": "Radian Group Inc."
+    },
+    {
+     "name": "Benjamin Smelcer",
+     "company": "MGIC"
+    },
+    {
+     "name": "Jessye Smith",
+     "company": "Enact"
+    },
+    {
+     "name": "Wilson Smith",
+     "company": "Power Mortgage, Inc."
+    },
+    {
+     "name": "Ramya Thiagarajan Srinivas",
+     "company": "Mortgage Guaranty Insurance Corporation (MGIC) |Milwaukee |WI |Regular - Mortgage Insurance"
+    },
+    {
+     "name": "Kellie Stoll",
+     "company": "Phoenix Team"
+    },
+    {
+     "name": "Marvin Stone",
+     "company": "Stewart Lender Services"
+    },
+    {
+     "name": "Darlene Swain",
+     "company": "Consolidated Analytics"
+    },
+    {
+     "name": "Lee Swanson",
+     "company": "Mortgage Guaranty Insurance Corporation (MGIC)"
+    },
+    {
+     "name": "Katelyn Tabone",
+     "company": "DataVerify"
+    },
+    {
+     "name": "Eric Tolman",
+     "company": "Wolters Kluwer"
+    },
+    {
+     "name": "Larry Tran",
+     "company": "MGIC"
+    },
+    {
+     "name": "Patrick Troppe",
+     "company": "REMDOT"
+    },
+    {
+     "name": "Nery Valdez",
+     "company": "ALPHA7X"
+    },
+    {
+     "name": "Valerie VanKlompenberg",
+     "company": "Lender Toolkit"
+    },
+    {
+     "name": "Sravya Velagala",
+     "company": "Essent Guaranty"
+    },
+    {
+     "name": "Dennis Velazquez",
+     "company": "Automation Research, Inc."
+    },
+    {
+     "name": "Leeann Walker",
+     "company": "PhoenixTeam"
+    },
+    {
+     "name": "Ashley Wells",
+     "company": "Actualize Consulting"
+    },
+    {
+     "name": "Michael Werstuik",
+     "company": "Deloitte"
+    },
+    {
+     "name": "Kathryn Williams",
+     "company": "Actualize Consulting"
+    },
+    {
+     "name": "Richard Willis",
+     "company": "KPMG"
+    },
+    {
+     "name": "DEE-WEN WU",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Mohannad Yousef",
+     "company": "Guidehouse"
+    },
+    {
+     "name": "Suha Zehl",
+     "company": "Z Technology Solutions"
+    }
+   ]
+  }
+ }
+}
