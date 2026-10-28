@@ -101,6 +101,13 @@
       "path": "/iif-hq/"
     },
     {
+      "key": "marketing-hq",
+      "label": "Marketing HQ",
+      "colour": "#EB6834",
+      "group": "Planning",
+      "path": "/marketing-hq/"
+    },
+    {
       "key": "sponsorship",
       "label": "Sponsorship Portal",
       "colour": "#0EA5E9",
