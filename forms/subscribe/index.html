@@ -246,13 +246,13 @@ div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
 :root{--f-ink:#0d314c;--f-ink2:#44607a;--f-ink3:#7794aa;--f-line:#cfdeeb;--f-field:#adc4d6;--f-wash:#f1f6fa;--f-bad:#b3372c;--f-bad-soft:#fbe9e7;--f-good:#0f7b5c;--f-good-soft:#e1f2ec;--f-blue:#1a8fe3}
 *{box-sizing:border-box}
 html,body{margin:0}
-body{background:#ffffff;color:var(--f-ink);font-family:"IBM Plex Sans","Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{background:#ffffff;color:var(--f-ink);font-family:"IBM Plex Sans","Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
 .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sub-wrap{max-width:1120px;margin:0 auto;padding:46px max(20px,env(safe-area-inset-right,0px)) 64px max(20px,env(safe-area-inset-left,0px));display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:44px;align-items:start}
 @media(max-width:900px){.sub-wrap{grid-template-columns:minmax(0,1fr);gap:28px;padding-top:30px}}
 .sub-card{background:#ffffff;border:1px solid var(--f-line);border-radius:12px;padding:30px 30px 26px;box-shadow:0 10px 30px -18px rgba(7,29,46,.35)}
 @media(max-width:600px){.sub-card{padding:22px 18px}}
-.sub-card h2{margin:0 0 4px;font-size:26px;font-weight:700;letter-spacing:-.015em}
+.sub-card h2{margin:0 0 4px;font-size:26px;font-weight:700;letter-spacing:-.015em;line-height:1.2}
 .sub-card .lede{margin:0 0 22px;color:var(--f-ink2)}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px 18px}
 @media(max-width:560px){.grid{grid-template-columns:1fr}}
@@ -270,8 +270,8 @@ input.t[aria-invalid="true"]{border-color:var(--f-bad);background:var(--f-bad-so
 .consent{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--f-ink2);margin-top:4px}
 .consent input{width:18px;height:18px;margin:2px 0 0;flex:0 0 auto;accent-color:#0f314c}
 .consent[data-bad="true"]{color:var(--f-bad)}
-.go{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-width:max-content;white-space:nowrap;margin-top:22px;height:48px;padding:0 28px;border:0;border-radius:50px;background:var(--f-blue);color:#fff;font:inherit;font-size:16px;font-weight:600;cursor:pointer;box-shadow:0 6px 16px -8px rgba(26,143,227,.8)}
-.go:hover{background:#2e9dee}
+.go{display:inline-block;text-align:center;min-width:max-content;white-space:nowrap;margin-top:22px;padding:14px 22px;border-radius:8px;background:linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%);box-shadow:0 5px 16px -4px rgba(26,143,227,.55);color:#fff;font-family:inherit;font-size:15px;font-weight:600;line-height:1.2;border:1.5px solid #1a8fe3;cursor:pointer}
+.go:hover{background:linear-gradient(180deg,#45a9f0 0%,#2e9dee 100%)}
 .go:disabled{opacity:.6;cursor:wait}
 .go:focus-visible{outline:2px solid #0f314c;outline-offset:3px}
 .msg{margin-top:16px;padding:12px 14px;border-radius:8px;font-size:14px;background:var(--f-bad-soft);color:var(--f-bad)}
@@ -292,6 +292,14 @@ input.t[aria-invalid="true"]{border-color:var(--f-bad);background:var(--f-bad-so
 .side li span{color:var(--f-ink2);font-size:14px}
 .side .when{margin-top:22px;padding:14px 16px;border-radius:10px;background:var(--f-wash);font-size:14px;color:var(--f-ink2)}
 .side .when b{color:var(--f-ink)}
+/* the website's shared hero rules (Site Footer > Legal sheet), so this page sits exactly like Home */
+.mm-hero-wrap{font-weight:300}
+.mm-hero-wrap div[style*="min-height: clamp(380px,37vw,520px)"]{min-height:502px!important;padding-top:40px!important;padding-bottom:40px!important;align-items:flex-start!important}
+@media (max-width:600px){
+.mm-hero-wrap div[style*="min-height: clamp(380px,37vw,520px)"]{min-height:0!important;padding-top:30px!important;padding-bottom:30px!important}
+.mm-hero-wrap div[style*="flex: 0 1 200px"]{flex:1 1 100%!important;min-width:0!important;border-left:0!important;border-top:1px solid rgba(116,191,235,.35)!important;padding-left:0!important;padding-top:14px!important;margin-top:2px!important;display:flex!important;flex-wrap:wrap!important;gap:6px 16px!important}
+.mm-hero-wrap div[style*="flex: 0 1 200px"] > div:nth-child(n+5){display:none!important}
+}
 </style>
 </head>
 <body>
@@ -382,24 +390,28 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <button type="button" class="mm-burger" aria-label="Open menu" aria-expanded="false" aria-controls="mm-nav"><span></span><span></span><span></span></button>
 </header>
 
-<div style="position: relative; overflow: hidden; background: #071d2e; min-height: clamp(300px,30vw,420px); display: flex; align-items: center; padding: clamp(34px,3.8vw,50px) clamp(20px,5vw,48px);">
-<div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 85% 30%, rgba(26,143,227,.28), transparent 55%), radial-gradient(ellipse at 10% 120%, rgba(116,191,235,.16), transparent 50%);"></div>
+<div class="mm-hero-wrap" style="font-family: IBM Plex Sans,Segoe UI,-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif; color: #0d314c; line-height: 1.6; font-size: 16px; margin-top: 0px;">
+<div style="position: relative; overflow: hidden; background: #071d2e; min-height: clamp(380px,37vw,520px); display: flex; align-items: center; padding: clamp(34px,3.8vw,50px) clamp(20px,5vw,48px);"><!-- built-in Pathway artwork (shows until a photo is added) --> <svg viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;"> <defs> <linearGradient id="skyhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0d314c" stop-opacity="0"></stop> </linearGradient> <linearGradient id="gndhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0e3a5c"></stop><stop offset="100%" stop-color="#071d2e"></stop> </linearGradient> <radialGradient id="glowhm" cx="50%" cy="50%" r="50%"> <stop offset="0%" stop-color="#74bfeb" stop-opacity=".42"></stop> <stop offset="100%" stop-color="#74bfeb" stop-opacity="0"></stop> </radialGradient> <linearGradient id="trailhm" x1="0" y1="0" x2="1" y2="0"> <stop offset="0%" stop-color="#74bfeb" stop-opacity="0"></stop> <stop offset="45%" stop-color="#9ad4f4" stop-opacity=".95"></stop> <stop offset="100%" stop-color="#ffffff" stop-opacity=".55"></stop> </linearGradient> </defs> <rect x="0" y="0" width="1200" height="560" fill="url(#gndhm)"></rect> <ellipse cx="930" cy="360" rx="420" ry="250" fill="url(#glowhm)"></ellipse> <g fill="#0a2740" opacity="1"> <rect x="640" y="300" width="52" height="260"></rect><rect x="698" y="236" width="40" height="324"></rect> <rect x="744" y="318" width="60" height="242"></rect><rect x="810" y="186" width="48" height="374"></rect> <rect x="864" y="268" width="68" height="292"></rect><rect x="938" y="214" width="42" height="346"></rect> <rect x="986" y="296" width="56" height="264"></rect><rect x="1048" y="238" width="50" height="322"></rect> <rect x="1104" y="310" width="64" height="250"></rect><rect x="1174" y="258" width="44" height="302"></rect> </g> <rect x="560" y="548" width="660" height="12" fill="#0a2740"></rect> <g fill="#74bfeb" opacity=".30"> <rect x="684" y="222" width="5" height="7"></rect><rect x="696" y="246" width="5" height="7"></rect> <rect x="800" y="184" width="5" height="7"></rect><rect x="814" y="216" width="5" height="7"></rect> <rect x="860" y="258" width="5" height="7"></rect><rect x="884" y="290" width="5" height="7"></rect> <rect x="932" y="214" width="5" height="7"></rect><rect x="988" y="292" width="5" height="7"></rect> <rect x="1050" y="240" width="5" height="7"></rect><rect x="1108" y="312" width="5" height="7"></rect> </g> <g fill="none" stroke="url(#trailhm)" stroke-linecap="round"> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="13" opacity=".15"></path> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="3"></path> <path d="M450,654 C680,572 890,500 1258,428" stroke-width="1.4" opacity=".7"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="7" opacity=".2"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="2" opacity=".85"></path> <path d="M580,712 C800,636 990,570 1272,500" stroke-width="1.2" opacity=".55"></path> </g> </svg> <!-- PHOTO LAYER -->
+<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: none; background-size: cover; background-position: center right; background-repeat: no-repeat;"></div>
+<!-- scrim: keeps the copy readable over any photo -->
+<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(90deg,#071d2e 0%,rgba(7,29,46,.96) 30%,rgba(7,29,46,.80) 50%,rgba(7,29,46,.42) 72%,rgba(7,29,46,.22) 100%);"></div>
 <div style="position: relative; z-index: 2; width: 100%; max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 30px; align-items: center;">
-<div style="flex: 1 1 440px; min-width: 0; max-width: 660px; margin-right: auto;">
-<p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: #74bfeb; line-height: 1.5;">MISMO Matters</p>
-<h1 style="margin: 0 0 18px; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff;">Get MISMO Matters in Your Inbox</h1>
-<p style="margin: 0 0 12px; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff;">MISMO's monthly newsletter: the standards, workgroups, Summits and people shaping the future of the mortgage industry.</p>
-<p style="margin: 0; font-size: 15px; line-height: 1.6; color: #a9d8f3;">Free, once a month, and you can unsubscribe at any time.</p>
-<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px;"><a href="#signup" style="display: inline-block; min-width: max-content; white-space: nowrap; padding: 13px 26px; border-radius: 50px; background: #1a8fe3; color: #ffffff; font-weight: 600; font-size: 16px; text-decoration: none;">Subscribe&nbsp;→</a></div>
+<div style="flex: 1 1 440px; min-width: 0; max-width: 620px; margin-right: auto;">
+<p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: #74bfeb; font-family: inherit; line-height: 1.5;">MISMO Matters</p>
+<h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Get MISMO Matters<span style="display: block; color: #74bfeb;">in Your Inbox</span></h1>
+<p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">MISMO’s monthly newsletter on the standards, workgroups, Summits and people shaping mortgage finance.</p>
+<p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3; max-width: 52ch;">Free, once a month, and you can unsubscribe at any time.</p>
+<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#signup" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Subscribe&nbsp;→</a> <a href="https://collaborate.mismo.org/mismowebsite/home#mismo-matters" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid rgba(255,255,255,.6);">See Recent Editions</a></div>
 </div>
 <div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
-<div style="font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15;">Standards</div>
-<div style="font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15;">Workgroups</div>
-<div style="font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15;">Summits</div>
-<div style="font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15;">Mic'd Up</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Standards</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Workgroups</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Summits</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Mic’d Up</div>
 <div style="width: 44px; height: 1px; background: rgba(255,255,255,.4); margin: 18px 0;"></div>
-<div style="font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75;">Every Month</div>
-<div style="font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75;">In Your Inbox</div>
+<div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Every Month</div>
+<div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">In Your Inbox</div>
+</div>
 </div>
 </div>
 </div>
