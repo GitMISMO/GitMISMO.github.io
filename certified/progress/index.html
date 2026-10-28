@@ -1,0 +1,416 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>My Certification | MISMO</title>
+<!--
+  My Certification (resources.mismo.org/certified/progress/?p=<code>): one CMSP or AMSP applicant's or
+  holder's own view of where they stand - status, the steps, their points against what is needed,
+  fees, the exam, their dates. Private by link: the page holds no data of its own; it asks MISMO's
+  renewal-page flow for the one record that matches the code and shows nothing if none comes back.
+  The records are written by the Individual certifications job in cms-data. ?demo=1 shows a made-up example.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --navy:#0d314c;--navy-deep:#06202f;--navy-mid:#14486e;--sky:#74bfeb;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
+  --ground:#f1f6fa;--surface:#ffffff;--surface-2:#f6fafd;--surface-3:#e9f1f8;
+  --border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;
+  --ink:#0d314c;--ink-2:#456179;--ink-3:#7794aa;
+  --good:#0f7b5c;--good-wash:#e3f4ee;--bad:#b3372c;--bad-wash:#fbeceb;--warn:#a2701a;--warn-wash:#fbf2e1;
+  --track:#e3edf5;--part:#2477b8;--edu:#1baf7a;--hero-a:#0d314c;--hero-b:#14486e;--shadow:0 1px 2px rgba(13,49,76,.06),0 8px 24px rgba(13,49,76,.07);
+--btn-bg:#0d314c;--btn-ink:#ffffff;--accent:#14486e;--next-bg:#e4f2fb;--ic-bg:#0d314c;--total-bar:#14486e;--link:#14486e;--tab-on-bg:#0d314c;--tab-on-ink:#ffffff;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;
+  --border:#1f4a63;--border-strong:#2f6688;--rule:#173547;
+  --ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;
+  --good:#4fc79b;--good-wash:#123a33;--bad:#f08579;--bad-wash:#3a2224;--warn:#e0a83c;--warn-wash:#3a3020;
+  --track:#173c52;--part:#3987e5;--edu:#199e70;--hero-a:#0a2638;--hero-b:#123f5e;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+--btn-bg:#74bfeb;--btn-ink:#06202f;--accent:#74bfeb;--next-bg:#123143;--ic-bg:#2f6688;--total-bar:#74bfeb;--link:#74bfeb;--tab-on-bg:#74bfeb;--tab-on-ink:#06202f;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;
+  --border:#1f4a63;--border-strong:#2f6688;--rule:#173547;
+  --ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;
+  --good:#4fc79b;--good-wash:#123a33;--bad:#f08579;--bad-wash:#3a2224;--warn:#e0a83c;--warn-wash:#3a3020;
+  --track:#173c52;--part:#3987e5;--edu:#199e70;--hero-a:#0a2638;--hero-b:#123f5e;--shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.25);
+--btn-bg:#74bfeb;--btn-ink:#06202f;--accent:#74bfeb;--next-bg:#123143;--ic-bg:#2f6688;--total-bar:#74bfeb;--link:#74bfeb;--tab-on-bg:#74bfeb;--tab-on-ink:#06202f;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font:15px/1.55 "IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;-webkit-font-smoothing:antialiased}
+.num{font-family:"IBM Plex Mono",ui-monospace,monospace;font-variant-numeric:tabular-nums}
+a{color:var(--link)}
+/* masthead */
+.mast{background:var(--navy);color:#fff}
+.mast-in{max-width:1040px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px}
+.plate{background:#fff;border-radius:5px;padding:9px 13px;display:flex;align-items:center;line-height:0}
+.plate svg{height:22px;width:auto}
+.vr{width:1px;align-self:stretch;background:rgba(116,191,235,.4)}
+.mast-name{color:var(--sky-soft);font-weight:500;font-size:15px}
+.mast-r{margin-left:auto;display:flex;align-items:center;gap:14px}
+.eyebrow{text-transform:uppercase;letter-spacing:.11em;font-size:11px;color:rgba(255,255,255,.62)}
+.theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;padding:5px 10px;font-size:11.5px;cursor:pointer;font-family:inherit}
+.theme-btn:hover{background:rgba(255,255,255,.18)}
+@media (max-width:560px){.eyebrow{display:none}.mast-name{font-size:13.5px}}
+main{max-width:1040px;margin:0 auto;padding:22px 16px 48px}
+/* hero */
+.hero{position:relative;overflow:hidden;border-radius:14px;color:#fff;padding:28px 28px 26px;
+  background:radial-gradient(1200px 300px at 100% 0%,rgba(116,191,235,.28),transparent 60%),linear-gradient(135deg,var(--hero-a),var(--hero-b));box-shadow:var(--shadow)}
+.hero::after{content:"";position:absolute;right:-60px;bottom:-80px;width:280px;height:280px;border-radius:50%;border:38px solid rgba(116,191,235,.10)}
+.hero h1{margin:4px 0 6px;font-size:28px;line-height:1.15;letter-spacing:-.015em;font-weight:700}
+.hero .sub{color:var(--sky-soft);font-size:15px;max-width:640px;position:relative;z-index:1}
+.hello{text-transform:uppercase;letter-spacing:.12em;font-size:11.5px;color:var(--sky-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;position:relative;z-index:1}
+.chip{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:5px 12px;font-size:12.5px;font-weight:600;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.22);color:#fff}
+.chip .dot{width:8px;height:8px;border-radius:50%;background:var(--sky)}
+.chip.good .dot{background:#4fc79b}.chip.warn .dot{background:#f2b84b}.chip.bad .dot{background:#f08579}
+/* program tabs */
+.ptabs{display:flex;gap:6px;margin:22px 0 0}
+.ptab{font:600 14px "IBM Plex Sans",sans-serif;border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:999px;padding:7px 16px;cursor:pointer}
+.ptab.on{background:var(--tab-on-bg);border-color:var(--tab-on-bg);color:var(--tab-on-ink)}
+/* grid + cards */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:18px;margin-top:22px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px 22px;box-shadow:var(--shadow);min-width:0}
+.c12{grid-column:span 12}.c7{grid-column:span 7}.c5{grid-column:span 5}.c6{grid-column:span 6}
+@media (max-width:860px){.c7,.c5,.c6{grid-column:span 12}}
+.card h2{margin:0 0 4px;font-size:16.5px;letter-spacing:-.012em}
+.card .lede{margin:0 0 16px;color:var(--ink-2);font-size:13.5px}
+/* next step callout */
+.next{display:flex;gap:14px;align-items:flex-start;background:var(--next-bg);border:1px solid var(--border);border-left:4px solid var(--sky);border-radius:10px;padding:14px 16px}
+.next .ic{flex:0 0 34px;height:34px;border-radius:50%;background:var(--ic-bg);display:grid;place-items:center}
+.next .ic svg{width:18px;height:18px;stroke:#fff}
+.next b{display:block;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--ink-3);margin-bottom:2px}
+.next p{margin:0;font-size:15px}
+.acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.btn{display:inline-flex;align-items:center;gap:8px;text-decoration:none;font:600 14px "IBM Plex Sans",sans-serif;border-radius:8px;padding:10px 16px;border:1px solid var(--btn-bg);background:var(--btn-bg);color:var(--btn-ink);white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--border-strong)}
+/* stepper */
+.steps{list-style:none;margin:6px 0 0;padding:0;display:flex;gap:0}
+.step{flex:1;position:relative;text-align:center;padding-top:44px;min-width:0}
+.step::before{content:"";position:absolute;top:17px;left:-50%;right:50%;height:3px;background:var(--track)}
+.step:first-child::before{display:none}
+.step.done::before,.step.current::before{background:var(--good)}
+.step .bub{position:absolute;top:0;left:50%;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;display:grid;place-items:center;
+  background:var(--surface);border:3px solid var(--track);color:var(--ink-3);font:600 13px "IBM Plex Mono",monospace;z-index:1}
+.step.done .bub{background:var(--good);border-color:var(--good);color:#fff}
+.step.current .bub{border-color:var(--sky);color:var(--accent);box-shadow:0 0 0 6px rgba(116,191,235,.25);animation:pulse 2.2s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 5px rgba(116,191,235,.28)}50%{box-shadow:0 0 0 10px rgba(116,191,235,.08)}}
+.step .lab{font-size:12.5px;font-weight:600;line-height:1.3;padding:0 4px}
+.step .when{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.step.current .lab{color:var(--accent)}
+@media (max-width:640px){
+  .steps{flex-direction:column;gap:2px}
+  .step{text-align:left;padding:6px 0 14px 50px;min-height:46px}
+  .step::before{top:-14px;bottom:auto;left:16px;right:auto;width:3px;height:24px}
+  .step .bub{left:0;transform:none}
+}
+/* rings */
+.ringwrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+.ring{position:relative;width:168px;height:168px;flex:0 0 168px}
+.ring svg{width:168px;height:168px;transform:rotate(-90deg)}
+.ring .trk{fill:none;stroke:var(--track);stroke-width:14}
+.ring .arc{fill:none;stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset 1.4s cubic-bezier(.2,.8,.2,1)}
+.ring .mid{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .big{font:600 34px/1 "IBM Plex Mono",monospace;letter-spacing:-.02em}
+.ring .small{font-size:12px;color:var(--ink-3);margin-top:4px}
+.legend{flex:1;min-width:220px}
+.bar{margin:0 0 14px}
+.bar .top{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;margin-bottom:6px}
+.bar .top b{font-weight:600}
+.bar .trk{position:relative;height:10px;border-radius:999px;background:var(--track);overflow:visible}
+.bar .fill{height:100%;border-radius:999px;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.bar .mark{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink)}
+.bar .mark span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);font:600 10.5px "IBM Plex Mono",monospace;color:var(--ink-2);white-space:nowrap}
+.verdict{display:inline-flex;align-items:center;gap:8px;border-radius:8px;padding:8px 12px;font-weight:600;font-size:13.5px;margin-top:6px}
+.verdict.ok{background:var(--good-wash);color:var(--good)}.verdict.short{background:var(--warn-wash);color:var(--warn)}
+/* activity table */
+.acts-list{width:100%;border-collapse:collapse;margin-top:6px;font-size:13.5px}
+.acts-list th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600;padding:8px 8px;border-bottom:1px solid var(--border)}
+.acts-list td{padding:10px 8px;border-bottom:1px solid var(--rule);vertical-align:top}
+.acts-list td.r,.acts-list th.r{text-align:right}
+.tag{display:inline-block;font-size:11px;font-weight:600;border-radius:999px;padding:2px 8px;white-space:nowrap}
+.tag.p{background:rgba(36,119,184,.12);color:var(--part)}.tag.e{background:rgba(27,175,122,.14);color:var(--edu)}
+.tag.x{background:var(--surface-3);color:var(--ink-3)}
+tr.nocount td{color:var(--ink-3)}
+/* fees + facts */
+.fees{display:grid;gap:10px}
+.fee{display:flex;align-items:center;gap:12px;border:1px solid var(--border);border-radius:10px;padding:12px 14px;background:var(--surface-2)}
+.fee .st{flex:0 0 30px;height:30px;border-radius:50%;display:grid;place-items:center}
+.fee .st svg{width:16px;height:16px}
+.fee.paid .st,.fee.comped .st{background:var(--good-wash);color:var(--good)}
+.fee.due .st{background:var(--warn-wash);color:var(--warn)}
+.fee .t{flex:1;min-width:0}.fee .t b{display:block;font-size:14px}.fee .t span{font-size:12.5px;color:var(--ink-2)}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fact{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:12px 14px}
+.fact .k{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);font-weight:600}
+.fact .v{font-size:15px;font-weight:600;margin-top:3px}
+@media (max-width:420px){.facts{grid-template-columns:1fr}}
+/* certified view */
+.seal{width:132px;height:132px;flex:0 0 132px}
+.creds{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.creds h3{margin:0;font-size:22px;letter-spacing:-.015em}
+.creds .mark{font-family:"IBM Plex Mono",monospace;color:var(--ink-2);font-size:13px;margin-top:2px}
+.timeline{position:relative;margin:56px 6px 8px;height:10px;border-radius:999px;background:linear-gradient(90deg,var(--good) 0%,var(--good) var(--rem),var(--warn) var(--rem),var(--warn) 100%);opacity:.9}
+.timeline .pin{position:absolute;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:var(--surface);border:3px solid var(--ink)}
+.timeline .pin.today{width:20px;height:20px;border-color:var(--sky);box-shadow:0 0 0 5px rgba(116,191,235,.25)}
+.timeline .lbl{position:absolute;top:18px;transform:translateX(-50%);font-size:11.5px;color:var(--ink-2);white-space:nowrap;text-align:center;line-height:1.3}
+.timeline .lbl.up{top:auto;bottom:18px}
+.tl-wrap{padding:0 40px 40px}
+@media (max-width:560px){.tl-wrap{padding:0 30px 46px}.timeline .lbl{font-size:10.5px}}
+/* states */
+.center{max-width:560px;margin:60px auto;text-align:center}
+.center h1{font-size:24px;margin:16px 0 8px}
+.center p{color:var(--ink-2)}
+.spin{width:38px;height:38px;border-radius:50%;border:4px solid var(--track);border-top-color:var(--sky);animation:sp 1s linear infinite;margin:0 auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.foot{max-width:1040px;margin:0 auto;padding:0 16px 40px;color:var(--ink-3);font-size:12.5px}
+.foot a{color:inherit}
+.demo-flag{display:inline-block;background:#f2b84b;color:#3a2a00;font-weight:700;font-size:11px;border-radius:4px;padding:2px 7px;margin-left:8px;vertical-align:middle;letter-spacing:.04em}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media print{.mast,.theme-btn,.acts{display:none}.card,.hero{box-shadow:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
+0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58
+355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320
+c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
+-297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243
+-4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198
+0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3
+-104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245
+-337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17
+246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49
+203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12
+26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57
+187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44
+-204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288
+-20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92
+-51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12
+-24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297
+3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146
+-106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0
+-356 -14z"/></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263
+13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19
+-16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20
+-222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0
+46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62
+-220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6
+355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
+52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
+</defs></svg>
+<header class="mast"><div class="mast-in">
+  <div class="plate"><svg role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></div>
+  <div class="vr"></div>
+  <div class="mast-name">My Certification</div>
+  <div class="mast-r"><span class="eyebrow">CMSP &middot; AMSP</span><button class="theme-btn" id="theme-btn" type="button">Dark</button></div>
+</div></header>
+<main id="app"><div class="center"><div class="spin"></div><p>Opening your certification&hellip;</p></div></main>
+<div class="foot" id="foot"></div>
+<script>
+(function theme() {
+  var btn = document.getElementById("theme-btn");
+  function cur() { var t = document.documentElement.getAttribute("data-theme"); if (t) return t; return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; }
+  function paint() { btn.textContent = cur() === "dark" ? "Light" : "Dark"; }
+  btn.addEventListener("click", function () {
+    document.documentElement.setAttribute("data-theme", cur() === "dark" ? "light" : "dark"); paint();
+    try { localStorage.setItem("mismo.portal.theme", cur()); } catch (e) {}
+    if (window.__mismoProgressRender) window.__mismoProgressRender();
+  });
+  try { var saved = localStorage.getItem("mismo.portal.theme"); if (saved) document.documentElement.setAttribute("data-theme", saved); } catch (e) {}
+  paint();
+})();
+
+(function () {
+  "use strict";
+  var FLOW = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/30/workflows/b7c43e642a114351bea85f898ce0cf65/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GjeuqRbTNg00VzD2nKHSTcXJXRHlVLVtbeTYbNX6H5Q";
+  var Q = new URLSearchParams(location.search), TOKEN = (Q.get("p") || "").trim(), DEMO = Q.get("demo") === "1";
+  var app = document.getElementById("app");
+  var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
+  function d(iso) { if (!iso || !/^\d{4}-\d{2}-\d{2}/.test(iso)) return ""; var p = iso.slice(0, 10).split("-"); return MONTHS[+p[1] - 1] + " " + (+p[2]) + ", " + p[0]; }
+  function today() { var t = new Date(); return t.getFullYear() + "-" + ("0" + (t.getMonth() + 1)).slice(-2) + "-" + ("0" + t.getDate()).slice(-2); }
+  function days(a, b) { return Math.round((Date.parse(b + "T00:00:00Z") - Date.parse(a + "T00:00:00Z")) / 864e5); }
+  function money(n) { return "$" + Number(n).toLocaleString("en-US"); }
+  var ICON = {
+    check: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    arrow: '<svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>'
+  };
+
+  function state(p) {
+    if (p.state === "active") { var left = days(today(), p.expiry); return left <= 60 ? { t: "Time to Renew", c: "warn" } : { t: "Certified", c: "good" }; }
+    if (p.state === "lapsed") return { t: "Lapsed", c: "bad" };
+    if (p.state === "renewing") return { t: "Renewal in Progress", c: "warn" };
+    return { t: p.kind === "renewal" ? "Renewal in Progress" : "Application in Progress", c: "" };
+  }
+
+  /* ---------- pieces ---------- */
+  function nextCard(p) {
+    var acts = [];
+    if (p.state === "active" && days(today(), p.expiry) <= 60) acts.push('<a class="btn" href="' + esc(p.renewUrl) + '">Renew My ' + esc(p.program) + ICON.arrow.replace("<svg", '<svg width="16" height="16" stroke="currentColor"') + "</a>");
+    if (p.state === "lapsed") acts.push('<a class="btn" href="' + esc(p.applyUrl) + '">Apply Again</a>');
+    (p.fees || []).forEach(function (f) { if (f.status === "due" && f.pay) acts.push('<a class="btn" href="' + esc(f.pay) + '" target="_blank" rel="noopener">Pay the ' + esc(f.label) + "</a>"); });
+    return '<div class="card c12"><div class="next"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>'
+      + "<div><b>What Happens Next</b><p>" + esc(p.next) + "</p>" + (acts.length ? '<div class="acts">' + acts.join("") + "</div>" : "") + "</div></div></div>";
+  }
+  function stepsCard(p) {
+    if (!p.steps) return "";
+    var n = 0, done = p.steps.filter(function (s) { return s.done; }).length;
+    return '<div class="card c12"><h2>Your Progress</h2><p class="lede">' + done + " of " + p.steps.length + " steps complete.</p><ol class=\"steps\">"
+      + p.steps.map(function (s) { n++;
+        return '<li class="step' + (s.done ? " done" : "") + (s.current ? " current" : "") + '"><div class="bub">' + (s.done ? ICON.check.replace("<svg", '<svg width="16" height="16"') : n) + '</div><div class="lab">' + esc(s.label) + "</div>"
+          + '<div class="when">' + (s.on && s.on !== "yes" ? d(s.on) : s.current ? "In progress" : "") + "</div></li>"; }).join("") + "</ol></div>";
+  }
+  function ring(value, max, color, big, small) {
+    var r = 70, c = 2 * Math.PI * r, frac = Math.max(0, Math.min(1, max ? value / max : 0));
+    return '<div class="ring"><svg viewBox="0 0 168 168"><circle class="trk" cx="84" cy="84" r="' + r + '"/>'
+      + '<circle class="arc" cx="84" cy="84" r="' + r + '" stroke="' + color + '" stroke-dasharray="' + c.toFixed(1) + '" stroke-dashoffset="' + c.toFixed(1) + '" data-to="' + (c * (1 - frac)).toFixed(1) + '"/></svg>'
+      + '<div class="mid"><div><div class="big num" data-count="' + big + '">0</div><div class="small">' + small + "</div></div></div></div>";
+  }
+  function bar(label, value, need, cap, color) {
+    var max = Math.max(value, need || 0, cap || 0, 1) * 1.08, pct = Math.min(100, value / max * 100);
+    return '<div class="bar"><div class="top"><span>' + label + '</span><b class="num">' + value + (need ? " / " + need + " needed" : cap ? " (counts up to " + cap + ")" : "") + "</b></div>"
+      + '<div class="trk"><div class="fill" style="background:' + color + '" data-w="' + pct.toFixed(1) + '"></div>'
+      + (need ? '<div class="mark" style="left:' + Math.min(100, need / max * 100).toFixed(1) + '%"></div>' : "") + "</div></div>";
+  }
+  function pointsCard(p) {
+    var pt = p.points; if (!pt) return "";
+    var active = p.state === "active" || p.state === "lapsed";
+    var need = pt.needTotal || pt.needParticipation;
+    var big = pt.participationOnly ? pt.participation : pt.total;
+    var css = getComputedStyle(document.documentElement);
+    var col = (pt.ok ? css.getPropertyValue("--good") : css.getPropertyValue("--sky")).trim() || "#0f7b5c";
+    var title = active ? "Points on Your Last " + (p.lastApplication && p.lastApplication.kind === "renewal" ? "Renewal" : "Application") : "Your Points";
+    var lede = active ? "What you counted when you last applied" + (p.lastApplication && p.lastApplication.on ? ", " + d(p.lastApplication.on) : "") + ". To renew you need "
+        + (p.program === "AMSP" ? "10 participation points" : "25 points, 15 of them participation") + ", from the last 24 months."
+      : (pt.windowFrom ? "Activity since " + d(pt.windowFrom) + " counts toward this renewal." : "Every activity you listed, as we have counted it.");
+    var bars = bar("Participation", pt.participation, pt.needParticipation, null, "var(--part)")
+      + (pt.participationOnly ? "" : bar("Education", pt.education, null, pt.educationCap, "var(--edu)"))
+      + (!pt.participationOnly && pt.needTotal ? bar("Total", pt.total, pt.needTotal, null, "var(--total-bar)") : "");
+    var verdict = pt.ok ? '<div class="verdict ok">' + ICON.check.replace("<svg", '<svg width="16" height="16"') + " Meets the " + (p.kind === "renewal" ? "renewal" : "") + " requirement</div>"
+      : '<div class="verdict short">' + ICON.clock.replace("<svg", '<svg width="16" height="16"') + " Still needed: " + esc(pt.short.join("; ")) + "</div>";
+    var rows = (pt.entries || []).map(function (e) {
+      var tag = !e.counts ? '<span class="tag x">' + (e.old ? "Older than 24 months" : "Does not count here") + "</span>" : e.kind === "education" ? '<span class="tag e">Education</span>' : '<span class="tag p">Participation</span>';
+      return "<tr" + (e.counts ? "" : ' class="nocount"') + "><td>" + esc(e.label) + "</td><td>" + tag + '</td><td class="r num">' + e.units + '</td><td class="r num">' + (e.counts ? e.points : "&ndash;") + "</td></tr>";
+    }).join("");
+    return '<div class="card ' + (sideCard(p) ? "c7" : "c12") + '"><h2>' + title + '</h2><p class="lede">' + lede + "</p>"
+      + '<div class="ringwrap">' + ring(big, need, col, big, need ? "of " + need + " needed" : "points") + '<div class="legend">' + bars + (active ? "" : verdict) + "</div></div>"
+      + (rows ? '<table class="acts-list"><thead><tr><th>Activity</th><th>Counts As</th><th class="r">Count</th><th class="r">Points</th></tr></thead><tbody>' + rows + "</tbody></table>" : "")
+      + "</div>";
+  }
+  function sideCard(p) {
+    var out = "";
+    if (p.fees && p.fees.length) {
+      out += "<h2>Fees</h2><p class=\"lede\">Paid through the MBA store.</p><div class=\"fees\">" + p.fees.map(function (f) {
+        var s = f.status === "paid" ? "Paid" : f.status === "comped" ? "Complimentary" + (f.comp ? " from " + esc(f.comp) : "") : "Due" + (f.amount != null ? ", " + money(f.amount) : "");
+        return '<div class="fee ' + f.status + '"><div class="st">' + (f.status === "due" ? ICON.clock : ICON.check) + '</div><div class="t"><b>' + esc(f.label) + "</b><span>" + s + "</span></div>"
+          + (f.status === "due" && f.pay ? '<a class="btn ghost" href="' + esc(f.pay) + '" target="_blank" rel="noopener">Pay</a>' : "") + "</div>";
+      }).join("") + "</div>";
+    }
+    var facts = [];
+    if (p.submittedOn) facts.push(["Submitted", d(p.submittedOn)]);
+    if (p.exam) facts.push(["CMSP Exam", p.exam.status === "passed" ? "Passed " + d(p.exam.on) : p.exam.status === "open" ? "Open until " + d(p.exam.until) : "Opens after payment"]);
+    if (p.reference) facts.push(["Reference", p.reference.status === "received" ? "Received" : "Waiting" + (p.reference.name ? " on " + p.reference.name : "")]);
+    if (p.certDate && p.state !== "active" && p.state !== "lapsed" && p.state !== "renewing") facts.push(["Certified", d(p.certDate)]);
+    if (facts.length) out += '<h2 style="margin-top:' + (out ? "22px" : "0") + '">Details</h2><p class="lede"></p><div class="facts">' + facts.map(function (f) { return '<div class="fact"><div class="k">' + f[0] + '</div><div class="v">' + esc(f[1]) + "</div></div>"; }).join("") + "</div>";
+    return out ? '<div class="card c5">' + out + "</div>" : "";
+  }
+  function seal(mark) {
+    return '<svg class="seal" viewBox="0 0 140 140" aria-hidden="true"><defs><linearGradient id="sg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14486e"/><stop offset="1" stop-color="#0d314c"/></linearGradient></defs>'
+      + '<g transform="translate(70 70)">' + Array.apply(null, Array(24)).map(function (_, i) { return '<path d="M0,-66 L6,-54 L-6,-54 Z" fill="#74bfeb" transform="rotate(' + (i * 15) + ')"/>'; }).join("")
+      + '<circle r="56" fill="url(#sg)"/><circle r="49" fill="none" stroke="#74bfeb" stroke-width="1.5" stroke-dasharray="2 3"/>'
+      + '<text y="-14" text-anchor="middle" fill="#a9d8f3" font-family="IBM Plex Sans,sans-serif" font-size="9" letter-spacing="2">MISMO</text>'
+      + '<text y="10" text-anchor="middle" fill="#fff" font-family="IBM Plex Sans,sans-serif" font-weight="700" font-size="22">' + esc(mark.replace(/[®™]/g, "")) + "</text>"
+      + '<text y="28" text-anchor="middle" fill="#a9d8f3" font-family="IBM Plex Sans,sans-serif" font-size="8" letter-spacing="1.5">CERTIFIED</text></g></svg>';
+  }
+  function certifiedCard(p) {
+    if (!(p.state === "active" || p.state === "lapsed" || p.state === "renewing") || !p.expiry) return "";
+    var t = today(), total = Math.max(1, days(p.certDate || p.expiry, p.expiry)), left = days(t, p.expiry);
+    var pos = function (iso) { return Math.max(0, Math.min(100, days(p.certDate, iso) / total * 100)); };
+    var remPct = p.reminderFrom ? pos(p.reminderFrom) : 92;
+    var css = getComputedStyle(document.documentElement);
+    var col = (left < 0 ? css.getPropertyValue("--bad") : left <= 60 ? css.getPropertyValue("--warn") : css.getPropertyValue("--good")).trim();
+    var big = left < 0 ? 0 : left;
+    return '<div class="card c12"><div class="creds">' + seal(p.mark || p.program)
+      + '<div style="flex:1;min-width:220px"><h3>' + esc(p.name) + '</h3><div class="mark">' + esc(p.mark || p.program)
+      + (p.firstCertified ? " &middot; first certified " + d(p.firstCertified) : "") + "</div>"
+      + '<div class="facts" style="margin-top:14px"><div class="fact"><div class="k">Certified</div><div class="v">' + d(p.certDate) + '</div></div><div class="fact"><div class="k">' + (left < 0 ? "Expired" : "Valid Through") + '</div><div class="v">' + d(p.expiry) + "</div></div></div></div>"
+      + ring(Math.max(0, left), total, col, big, left < 0 ? "days left" : left === 1 ? "day left" : "days left") + "</div>"
+      + '<div class="tl-wrap"><div class="timeline" style="--rem:' + remPct.toFixed(1) + '%">'
+      + '<div class="pin" style="left:0%"></div><div class="lbl" style="left:0%">Certified<br>' + d(p.certDate) + "</div>"
+      + (p.reminderFrom ? '<div class="lbl up" style="left:' + remPct.toFixed(1) + '%">Renewal opens<br>' + d(p.reminderFrom) + "</div>" : "")
+      + '<div class="pin" style="left:100%"></div><div class="lbl" style="left:100%">Renew by<br>' + d(p.expiry) + "</div>"
+      + (left >= 0 ? '<div class="pin today" style="left:' + pos(t).toFixed(1) + '%" title="Today"></div>' : "")
+      + "</div></div></div>";
+  }
+  function programHtml(p) {
+    return '<div class="grid">' + nextCard(p) + certifiedCard(p) + stepsCard(p) + pointsCard(p) + sideCard(p) + "</div>";
+  }
+
+  /* ---------- page ---------- */
+  function animate() {
+    requestAnimationFrame(function () {
+      app.querySelectorAll(".arc[data-to]").forEach(function (a) { a.style.strokeDashoffset = a.getAttribute("data-to"); });
+      app.querySelectorAll(".fill[data-w]").forEach(function (f) { f.style.width = f.getAttribute("data-w") + "%"; });
+      app.querySelectorAll("[data-count]").forEach(function (el) {
+        var to = +el.getAttribute("data-count"), t0 = performance.now(), dur = 1200;
+        if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = to; return; }
+        (function tick(now) { var k = Math.min(1, (now - t0) / dur); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))); if (k < 1) requestAnimationFrame(tick); })(t0);
+      });
+    });
+  }
+  var DATA = null, SHOW = 0;
+  function render() {
+    var s = DATA, p = s.programs[SHOW], st = state(p);
+    var greet = p.state === "active" ? "You are " + (/^[AEIOU]/i.test(p.name) ? "an " : "a ") + p.name + "." : p.state === "lapsed" ? "Your " + p.program + " has lapsed." : p.kind === "renewal" ? "Your " + p.program + " renewal is underway." : "Your " + p.program + " application is underway.";
+    var hero = '<section class="hero"><div class="hello">Hello, ' + esc(s.first || s.name) + (DEMO ? '<span class="demo-flag">EXAMPLE</span>' : "") + "</div><h1>" + esc(greet) + '</h1><div class="sub">'
+      + esc(s.name) + (s.company ? " &middot; " + esc(s.company) : "") + '</div><div class="chips">'
+      + s.programs.map(function (q) { var x = state(q); return '<span class="chip ' + x.c + '"><span class="dot"></span>' + esc(q.program) + ": " + x.t + "</span>"; }).join("") + "</div></section>";
+    var tabs = s.programs.length > 1 ? '<div class="ptabs">' + s.programs.map(function (q, i) { return '<button class="ptab' + (i === SHOW ? " on" : "") + '" type="button" data-i="' + i + '">' + esc(q.program) + "</button>"; }).join("") + "</div>" : "";
+    app.innerHTML = hero + tabs + programHtml(p);
+    app.querySelectorAll(".ptab").forEach(function (b) { b.addEventListener("click", function () { SHOW = +b.getAttribute("data-i"); render(); }); });
+    document.getElementById("foot").innerHTML = "Updated " + d(s.updated) + ". This page is private to you; please do not forward the link. Questions? Email <a href=\"mailto:certifications@mismo.org\">certifications@mismo.org</a>.";
+    document.title = "My " + p.program + " | MISMO";
+    animate();
+  }
+  function fail(title, line) { app.innerHTML = '<div class="center"><h1>' + esc(title) + "</h1><p>" + line + "</p></div>"; }
+  function start(s) { DATA = s; render(); }
+  window.__mismoProgressRender = function () { if (DATA) render(); };
+
+  var EXAMPLE = { first: "Jordan", name: "Jordan Sample", company: "Example Mortgage Company", updated: today(), programs: [
+    { program: "CMSP", name: "Certified MISMO Standards Professional", mark: "CMSP®", kind: "new", state: "inprogress", next: "Your application is verified. Pay the exam fee, then take the CMSP exam.",
+      renewUrl: "#", applyUrl: "#", submittedOn: "2026-10-07",
+      steps: [{ label: "Application Received", done: true, on: "2026-10-07" }, { label: "Points Verified", done: true, on: "2026-10-14" }, { label: "Enrollment Fee", done: true }, { label: "Exam Fee", done: false, current: true }, { label: "Exam Passed", done: false }, { label: "Certified", done: false }],
+      fees: [{ label: "Program Enrollment", status: "paid" }, { label: "CMSP Exam", status: "due", amount: 200, pay: "https://www.mba.org/home/product/mismo-cmsp-exam-70229" }],
+      exam: { status: "not open" }, reference: { status: "received", by: "Pat Reference" },
+      points: { total: 113, participation: 38, education: 75, educationCap: 75, needTotal: 100, needParticipation: 25, ok: true, short: [], entries: [
+        { label: "MISMO Summit Attendance", units: 6, points: 24, kind: "participation", counts: true }, { label: "Workgroup Participation", units: 2, points: 10, kind: "participation", counts: true },
+        { label: "MISMO Ambassador During a Summit", units: 4, points: 4, kind: "participation", counts: true }, { label: "Completed the MISMO Boot Camp Course", units: 1, points: 50, kind: "education", counts: true },
+        { label: "Attended a MISMO Monthly Webinar", units: 14, points: 28, kind: "education", counts: true }] } },
+    { program: "AMSP", name: "Associate MISMO Standards Professional", mark: "AMSP™", kind: "new", state: "active", certDate: "2025-03-12", expiry: "2027-03-12", firstCertified: "2023-03-14", reminderFrom: "2027-01-11",
+      next: "Nothing is needed from you now. We will email you 60 days before March 12, 2027 with a link to renew.", renewUrl: "#", applyUrl: "#", lastApplication: { kind: "renewal", on: "2025-02-20" },
+      points: { total: 16, participation: 16, education: 0, needParticipation: 10, participationOnly: true, ok: true, short: [], entries: [
+        { label: "MISMO Summit Attendance", units: 2, points: 8, kind: "participation", counts: true }, { label: "Attended a MISMO Monthly Webinar", units: 8, points: 8, kind: "participation", counts: true }] } }] };
+
+  if (DEMO) { start(EXAMPLE); return; }
+  if (!/^[0-9a-f]{32}$/.test(TOKEN)) { fail("This link is not complete", "The address is missing the code that opens your certification. Use the <b>See My Progress</b> button in any email from MISMO Certifications, or email <a href=\"mailto:certifications@mismo.org\">certifications@mismo.org</a>."); return; }
+  fetch(FLOW, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify({ formKey: "mismo-renewal-response", mode: "load", token: TOKEN }) })
+    .then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(function (d) {
+      var s = d && d.script;
+      if (!s || s.kind !== "individual-progress" || !s.programs || !s.programs.length) throw new Error("none");
+      start(s);
+    })
+    .catch(function () { fail("We could not open this page", "The link may be out of date. Use the <b>See My Progress</b> button in your latest email from MISMO Certifications, or email <a href=\"mailto:certifications@mismo.org\">certifications@mismo.org</a> and we will send you a fresh one."); });
+})();
+
+</script>
+</body></html>
