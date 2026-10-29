@@ -1,6 +1,6 @@
 {
  "note": "Current CMSPs and AMSPs, name and company only. Written by the Individual certifications job in cms-data; not edited by hand.",
- "updated": "2026-10-27",
+ "updated": "2026-10-29",
  "programs": {
   "CMSP": {
    "title": "Current CMSPs",
@@ -162,7 +162,7 @@
   },
   "AMSP": {
    "title": "Current AMSPs",
-   "count": 107,
+   "count": 106,
    "people": [
     {
      "name": "Arvind Kumar Akula",
@@ -415,10 +415,6 @@
     {
      "name": "Chad Parish",
      "company": "ICE"
-    },
-    {
-     "name": "Shailaja Polasa",
-     "company": "FreddieMac"
     },
     {
      "name": "John Pomaranski",
