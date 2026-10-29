@@ -189,7 +189,7 @@ const MORE_PAGES = {
   hub: [['Meeting Calendar', 'Page', 'hub', '/initiative-hub/calendar.html'],
     ['Mortgage Compliance Dataset (MCD)', 'Overview', 'hub', '/initiative-hub/mcd-dashboard.html'], ['Common Confidence Score (CCS)', 'Overview', 'hub', '/initiative-hub/ccs-dashboard.html'],
     ['Loan Boarding Data Segment (LBDS)', 'Overview', 'hub', '/initiative-hub/lbds-dashboard.html'], ['Title Order Dataset Specification', 'Overview', 'hub', '/initiative-hub/title-order-dashboard.html'],
-    ['AVM Testing Guidance and Best Practices', 'Overview', 'hub', '/initiative-hub/avm-testing-dashboard.html'], ['Tri-Party eNote Bailee Agreement', 'Overview', 'hub', '/initiative-hub/tpa-dashboard.html']],
+    ['AVM Testing Guidance and Best Practices', 'Overview', 'hub', '/initiative-hub/avm-testing-dashboard.html'], ['eNote Master Controller Agreement', 'Overview', 'hub', '/initiative-hub/tpa-dashboard.html']],
 };
 /* Views inside each tool, opened from the address: #open=<view> through the shared sign-in, or the tool's own #<view>
    where it reads the address itself (Website Migration HQ, QR Code Manager). Setup views (Settings, Migration,
