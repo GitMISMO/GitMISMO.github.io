@@ -464,7 +464,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* Where sign-ups go: the MISMO Matters sign-up flow in Power Automate (the same kind of
      door the certification applications use). It adds each person to the MISMO Matters list
      in Higher Logic and to Marketing HQ. Empty until the flow is switched on. */
-  var FLOW_ENDPOINT = "";
+  var FLOW_ENDPOINT = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/22/workflows/079f28100f45415abc3b901e4de228b8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=lTOTIX-ERFzdl0GX0LvXYSQRaRmu9cb9dRW-8l3sQjY";
   var TOPICS = ["AI and FRAME", "eMortgage and eNotes", "Data Standards", "Servicing", "Commercial Real Estate", "Certifications", "Summits and Events", "Membership"];
   var $ = function (id) { return document.getElementById(id); };
   var startedAt = Date.now(), chosen = {}, busy = false;
