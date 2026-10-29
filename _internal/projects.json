@@ -1,5 +1,4 @@
 {
- "marketing-images": {"repo": "GitMISMO/marketing-images", "branch": "main", "origin": "https://resources.mismo.org", "writable": ["images/"]},
  "cms": {
     "repo": "GitMISMO/cms-data",
     "branch": "main",
