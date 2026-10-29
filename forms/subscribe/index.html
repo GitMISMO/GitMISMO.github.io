@@ -278,11 +278,11 @@ input.t[aria-invalid="true"]{border-color:var(--f-bad);background:var(--f-bad-so
 .msg ul{margin:6px 0 0;padding-left:18px}
 .fine{margin:18px 0 0;font-size:12.5px;color:var(--f-ink3)}
 .fine a{color:var(--f-ink2)}
-.done{text-align:left}
-.done .tick{width:52px;height:52px;border-radius:50%;background:var(--f-good-soft);color:var(--f-good);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
-.done .tick svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
-.done h2{margin-bottom:8px}
-.done p{color:var(--f-ink2);margin:0 0 10px}
+.sub-done{text-align:left}
+.sub-done .tick{width:52px;height:52px;border-radius:50%;background:var(--f-good-soft);color:var(--f-good);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.sub-done .tick svg{width:26px;height:26px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.sub-done h2{margin-bottom:8px}
+.sub-done p{color:var(--f-ink2);margin:0 0 10px}
 .side h3{margin:0 0 14px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#1a74b8;font-weight:700}
 .side ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
 .side li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start}
@@ -486,7 +486,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     return bad;
   }
   function thanks(body) {
-    $("card").innerHTML = '<div class="done"><div class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>' +
+    $("card").innerHTML = '<div class="sub-done"><div class="tick"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>' +
       '<h2>You’re Subscribed</h2><p>Thanks, ' + esc(body.firstName) + '. MISMO Matters will arrive at <b>' + esc(body.email) + '</b> on the third Wednesday of each month.</p>' +
       '<p>While you wait, see <a href="https://collaborate.mismo.org/mismowebsite/home#mismo-matters">recent editions</a> or <a href="https://www.youtube.com/@MISMOStandards/videos">watch MISMO Mic’d Up</a>.</p></div>';
     $("card").scrollIntoView({ block: "nearest", behavior: "smooth" });
