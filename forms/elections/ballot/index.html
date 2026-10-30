@@ -395,8 +395,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 </div>
 <div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
 <div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Business Domains</div>
-<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Areas of Focus</div>
-<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Governance</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Chair</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Vice Chair</div>
 <div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Leadership</div>
 <div style="width: 44px; height: 1px; background: rgba(255,255,255,.4); margin: 18px 0;"></div>
 <div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Member-Led</div>
@@ -428,7 +428,7 @@ var EF = (function(){
   function radio(root,n){ var x=root.querySelector('[name="'+n+'"]:checked'); return x?x.value:""; }
   function fld(name,label,type,req,extra){ return '<div class="field"><label for="ef-'+name+'">'+e(label)+(req?'':' <span class="efn">(optional)</span>')+'</label><input id="ef-'+name+'" name="'+name+'" type="'+(type||"text")+'" autocomplete="'+(extra||"off")+'"'+(req?' required':'')+'></div>'; }
   var LONG={aof:"Area of Focus Co-Chairs", domain:"Business Domain Leadership", goc:"Governance Committee", board:"Board of Directors"};
-  var WHAT={aof:"Two Co-Chairs for each Area of Focus", domain:"Chair, Vice Chair and Care and Feeding Lead for each Business Domain", goc:"The five members who confirm MISMO's process was followed", board:"Recommend someone for MISMO's Board of Directors"};
+  var WHAT={aof:"Two Co-Chairs for each Area of Focus", domain:"A Chair and a Vice Chair for each Business Domain (a company may lead only one domain)", goc:"The five members who confirm MISMO's process was followed", board:"Recommend someone for MISMO's Board of Directors"};
   function fmt(s){ var m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})/); if(!m) return ""; var d=new Date(+m[1],+m[2]-1,+m[3]); return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]+", "+["January","February","March","April","May","June","July","August","September","October","November","December"][d.getMonth()]+" "+d.getDate(); }
 
   function nominate(el, cfg){
