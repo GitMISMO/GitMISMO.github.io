@@ -10,7 +10,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<meta name="description" content="Nominate yourself or a colleague for MISMO leadership: Area of Focus Co-Chairs, Business Domain leaders and the Governance Committee.">
+<meta name="description" content="Nominate yourself or a colleague to lead a MISMO Business Domain as its Chair or Vice Chair.">
 <title>Nominate a MISMO Leader | MISMO</title>
 <style>
 /* ===================================================================
@@ -390,14 +390,14 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 <div style="flex: 1 1 440px; min-width: 0; max-width: 620px; margin-right: auto;">
 <p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: #74bfeb; font-family: inherit; line-height: 1.5;">MISMO Elections</p>
 <h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Nominate a<span style="display: block; color: #74bfeb;">MISMO Leader</span></h1>
-<p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">Put yourself or a colleague forward to lead an Area of Focus or a Business Domain, or to serve on the Governance Committee.</p>
+<p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">Put yourself or a colleague forward to lead one of MISMO's eight Business Domains as its Chair or Vice Chair.</p>
 <p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3; max-width: 52ch;">MISMO staff review every nomination and confirm with each nominee before anything appears on a ballot.</p>
 <div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#ef-host" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Make a Nomination&nbsp;&rarr;</a></div>
 </div>
 <div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
 <div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Business Domains</div>
-<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Areas of Focus</div>
-<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Governance</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Chair</div>
+<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Vice Chair</div>
 <div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Leadership</div>
 <div style="width: 44px; height: 1px; background: rgba(255,255,255,.4); margin: 18px 0;"></div>
 <div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Member-Led</div>
@@ -429,7 +429,7 @@ var EF = (function(){
   function radio(root,n){ var x=root.querySelector('[name="'+n+'"]:checked'); return x?x.value:""; }
   function fld(name,label,type,req,extra){ return '<div class="field"><label for="ef-'+name+'">'+e(label)+(req?'':' <span class="efn">(optional)</span>')+'</label><input id="ef-'+name+'" name="'+name+'" type="'+(type||"text")+'" autocomplete="'+(extra||"off")+'"'+(req?' required':'')+'></div>'; }
   var LONG={aof:"Area of Focus Co-Chairs", domain:"Business Domain Leadership", goc:"Governance Committee", board:"Board of Directors"};
-  var WHAT={aof:"Two Co-Chairs for each Area of Focus", domain:"Chair, Vice Chair and Care and Feeding Lead for each Business Domain", goc:"The five members who confirm MISMO's process was followed", board:"Recommend someone for MISMO's Board of Directors"};
+  var WHAT={aof:"Two Co-Chairs for each Area of Focus", domain:"A Chair and a Vice Chair for each Business Domain (a company may lead only one domain)", goc:"The five members who confirm MISMO's process was followed", board:"Recommend someone for MISMO's Board of Directors"};
   function fmt(s){ var m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})/); if(!m) return ""; var d=new Date(+m[1],+m[2]-1,+m[3]); return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]+", "+["January","February","March","April","May","June","July","August","September","October","November","December"][d.getMonth()]+" "+d.getDate(); }
 
   function nominate(el, cfg){
