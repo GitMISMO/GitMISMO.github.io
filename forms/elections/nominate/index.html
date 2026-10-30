@@ -549,11 +549,16 @@ var EF = (function(){
 
   function todayIso(){ var d=new Date(); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
   function isOpen(mode,from,until){ if(mode==="open") return true; if(mode==="closed") return false; var t=todayIso(); return !!(from && t>=from && (!until || t<=until)); }
+  /* the "Elections Forms" flow's address is published by Elections HQ in slates/forms.json */
+  var endpointP=null;
+  function endpoint(){ if(FLOW_ENDPOINT) return Promise.resolve(FLOW_ENDPOINT); if(!endpointP) endpointP=fetch("/elections-hq/slates/forms.json",{cache:"no-store"}).then(function(r){ return r.ok?r.json():{}; }).then(function(j){ return (j&&j.endpoint)||""; },function(){ return ""; }); return endpointP; }
   function send(kind, rec){
     if(rec.hp) return Promise.resolve();               /* a robot: thank it and send nothing */
-    if(!FLOW_ENDPOINT) return Promise.reject(new Error("this form opens in the next few days; until then email elections@mismo.org"));
-    return fetch(FLOW_ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(Object.assign({form:kind, page:document.referrer||""},rec))})
-      .then(function(r){ if(!r.ok) throw new Error("status "+r.status); });
+    return endpoint().then(function(url){
+      if(!url) throw new Error("this form opens in the next few days; until then email elections@mismo.org");
+      return fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify(Object.assign({form:kind, page:document.referrer||""},rec))})
+        .then(function(r){ if(!r.ok) throw new Error("status "+r.status); });
+    });
   }
   var q=new URLSearchParams(location.search), host=document.getElementById("ef-host");
 
