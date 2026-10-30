@@ -436,10 +436,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var hp=!!f.querySelector('[name=website]').value || Date.now()-started<2500;
     var done=function(){ host.innerHTML='<div class="ef"><div class="done"><b>Thank you. Your answer is in.</b>'+(a==="yes"?'You’ll be on the ballot. We’ll be in touch before voting opens.':'We’ve taken your name off the ballot. Thank you for letting us know.')+'</div></div>'; };
     if(hp){ done(); return; }
-    if(!FLOW_ENDPOINT){ er.textContent="Answers open in the next few days. Until then, reply to the email or write to elections@mismo.org."; return; }
     var b=f.querySelector("#ef-go"); b.disabled=true; b.textContent="Sending…";
-    fetch(FLOW_ENDPOINT,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify({form:"elections-confirm", id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6), n:n, t:t, answer:a, note:(f.querySelector("#ef-note").value||"").slice(0,400), at:new Date().toISOString()})})
-      .then(function(r){ if(!r.ok) throw new Error(r.status); done(); }).catch(function(){ b.disabled=false; b.textContent="Send My Answer"; er.textContent="That didn’t go through. Please try again, or reply to the email."; });
+    fetch("/elections-hq/slates/forms.json",{cache:"no-store"}).then(function(r){ return r.ok?r.json():{}; }).catch(function(){ return {}; }).then(function(j){ var url=FLOW_ENDPOINT||(j&&j.endpoint)||"";
+    if(!url){ b.disabled=false; b.textContent="Send My Answer"; er.textContent="Answers open in the next few days. Until then, reply to the email or write to elections@mismo.org."; return; }
+    fetch(url,{method:"POST",headers:{"Content-Type":"text/plain;charset=UTF-8"},body:JSON.stringify({form:"elections-confirm", id:"r"+Date.now().toString(36)+Math.random().toString(36).slice(2,6), n:n, t:t, answer:a, note:(f.querySelector("#ef-note").value||"").slice(0,400), at:new Date().toISOString()})})
+      .then(function(r){ if(!r.ok) throw new Error(r.status); done(); }).catch(function(){ b.disabled=false; b.textContent="Send My Answer"; er.textContent="That didn’t go through. Please try again, or reply to the email."; }); });
   });
 })();
 </script>
