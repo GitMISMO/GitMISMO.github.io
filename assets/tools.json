@@ -108,6 +108,14 @@
       "path": "/marketing-hq/"
     },
     {
+      "key": "elections-hq",
+      "label": "Elections HQ",
+      "colour": "#0E7490",
+      "group": "Planning",
+      "path": "/elections-hq/",
+      "also": ["elections-hq-public"]
+    },
+    {
       "key": "sponsorship",
       "label": "Sponsorship Portal",
       "colour": "#0EA5E9",
