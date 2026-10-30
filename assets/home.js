@@ -142,7 +142,10 @@ const P = {
   arrow:'M5 12h14 M13 6l6 6-6 6', chev:'M6 9l6 6 6-6', grip:'M9 6h.01 M15 6h.01 M9 12h.01 M15 12h.01 M9 18h.01 M15 18h.01',
   pin:'M9 3h6l-1.2 5.2L17 11.5H7l3.2-3.3z M12 11.5V21', moon:'M12 3a6.4 6.4 0 0 0 9 9 9 9 0 1 1-9-9z',
   sun:'M12 7.9a4.1 4.1 0 1 0 0 8.2a4.1 4.1 0 1 0 0-8.2 M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7',
-  key:'M8 15a4 4 0 1 0 0 .01 M10.8 12.2L20 3M16 7l3 3' };
+  key:'M8 15a4 4 0 1 0 0 .01 M10.8 12.2L20 3M16 7l3 3',
+  /* Elections HQ, MISMO Media and the Scheduler (Perry, 30 Oct 2026): a ballot box, a megaphone, a calendar with a clock */
+  ballot:'M4 13h16v8H4z M8 13V3.5h8V13 M10 8.2l1.5 1.5 2.8-3', media:'M3.5 10h3.5l8-4.5v13L7 14H3.5z M18.5 9a4 4 0 0 1 0 6 M7 14l1.5 5.5h2.5L10 14.6',
+  schedule:'M8 3v3 M16 3v3 M4 9h16 M11.5 20H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4.5 M17 13.5a3.75 3.75 0 1 0 0 7.5a3.75 3.75 0 1 0 0-7.5 M17 15.6v1.6l1.1 .9' };
 /* The sections and tools, in the admin panel's order (assets/tools.json, 5 Oct 2026). */
 const SECTIONS = ['Standards & Tools', 'Planning', 'Certification', 'Sponsorship'];   /* Service Orders sits in Certification on the home page (Perry, 9 Oct 2026) */
 const TOOLS = [
@@ -157,6 +160,9 @@ const TOOLS = [
   { key:'iif-hq', name:'IIF Planning HQ', c:'#4D7C0F', icon:'iif', sec:'Planning' },
   { key:'member-360', name:'Member 360', c:'#0F7B5C', icon:'member', sec:'Planning' },
   { key:'financials', name:'MISMO Money', c:'#16A34A', icon:'money', sec:'Planning' },
+  { key:'elections-hq', name:'Elections HQ', c:'#0E7490', icon:'ballot', sec:'Planning' },   /* Perry, 30 Oct 2026 (design C: a task on each tile, and its sections) */
+  { key:'marketing-hq', name:'MISMO Media', c:'#EB6834', icon:'media', sec:'Planning' },   /* formerly Marketing HQ; the key and address keep the old name */
+  { key:'scheduler', name:'Scheduler', c:'#2477B8', icon:'schedule', sec:'Planning' },
   { key:'cms', name:'Certification Management System', c:'#BE123C', icon:'cert', sec:'Certification' },
   { key:'sponsorship', name:'Sponsorship', c:'#0EA5E9', icon:'sponsorship', sec:'Sponsorship' },
   { key:'so', name:'Service Orders and Agreements', c:'#E11D48', icon:'so', sec:'Certification' },
@@ -174,6 +180,9 @@ const ENTRIES = {
   'team-hq': [['Open my board', 'Team HQ', 'team', '/team-hq/'], ['Jot it down', 'Team HQ', 'note', '/team-hq/']],
   'meeting-trackers': [['Track meeting attendance', 'Meeting Trackers', 'tracker', '/meeting-trackers/']],
   'iif-hq': [['IIF Planning HQ', 'IIF Planning HQ', 'iif', '/iif-hq/']],   /* the main page only, named after the tool (Perry, 9 Oct 2026) */
+  'elections-hq': [['Run the elections', 'Elections HQ', 'ballot', '/elections-hq/']],   /* Perry, 30 Oct 2026 */
+  'marketing-hq': [['Check the schedule', 'MISMO Media', 'media', '/marketing-hq/']],   /* it opens on the Schedule (Perry, 30 Oct 2026) */
+  'scheduler': [['Follow up on meeting requests', 'Scheduler', 'schedule', '/scheduler/'], ['Schedule a meeting', 'New Request', 'plus', '/scheduler/#tab=new']],   /* it opens on Follow Up (Perry, 30 Oct 2026) */
   'member-360': [['Member 360', 'Member 360', 'member', '/member-360/']],   /* no sub-pages identified: the main page only, named after the tool (Perry, 9 Oct 2026) */
   'cms': [['Certification Management System', 'Certification Management System', 'cert', '/cms/']],   /* one button, named after the tool (Perry, 9 Oct 2026) */
   'sponsorship': [['Track a sponsor', 'Sponsorship Portal', 'sponsorship', '/sponsorship/'], ['Send the prospectus', '2027 Summit Sponsorship Prospectus', 'send', '/sponsorship-prospectus/']],
@@ -184,7 +193,7 @@ const ENTRIES = {
    have their own address. */
 const TOOL_PATH = { hub:'/initiative-hub/', glossary:'/glossary/console/', qr:'/qr/', 'summit-hq':'/summit-hq/', 'website-migration':'/website-migration/', 'team-hq':'/team-hq/',
   'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/service-orders/',
-  'mismo-link':'/mismo-link/', financials:'/financials/' };
+  'mismo-link':'/mismo-link/', financials:'/financials/', 'elections-hq':'/elections-hq/', 'marketing-hq':'/marketing-hq/', scheduler:'/scheduler/' };
 const MORE_PAGES = {
   hub: [['Meeting Calendar', 'Page', 'hub', '/initiative-hub/calendar.html'],
     ['Mortgage Compliance Dataset (MCD)', 'Overview', 'hub', '/initiative-hub/mcd-dashboard.html'], ['Common Confidence Score (CCS)', 'Overview', 'hub', '/initiative-hub/ccs-dashboard.html'],
@@ -194,7 +203,7 @@ const MORE_PAGES = {
 /* Views inside each tool, opened from the address: #open=<view> through the shared sign-in, or the tool's own #<view>
    where it reads the address itself (Website Migration HQ, QR Code Manager). Setup views (Settings, Migration,
    Backups & Import) and each tool's default view are left out (Perry, 13 Oct 2026). */
-const NATIVE_HASH = new Set(['website-migration']);
+const NATIVE_HASH = new Set(['website-migration', 'scheduler', 'elections-hq', 'marketing-hq']);   /* these read their own address: #<view>, or the Scheduler's #tab=<view> (30 Oct 2026) */
 const VIEWS = {
   'team-hq': [['Today', 'today'], ['My Board', 'mine'], ['Team Projects', 'rocks'], ['Plans', 'plans'], ['Key Dates', 'dates'], ['Team Meeting', 'agenda'], ['Sync Ups', 'syncs'], ['Expenses', 'expenses']],
   'iif-hq': [['Tasks', 'tasks'], ['Key Dates', 'dates'], ['Decisions and Risks', 'raid'], ['Automations', 'autos'], ['Last Cycle', 'last']],
@@ -206,6 +215,14 @@ const VIEWS = {
   glossary: [['Terms', 'terms'], ['Staging', 'staging'], ['Needs a Decision', 'issues'], ['Draft & Publish', 'publish'], ['Classifications', 'classes'], ['Versions', 'versions']],
   'website-migration': [['Tasks', 'tasks'], ['Pages', 'pages'], ['Must-Keep', 'must'], ['Word Rules', 'words'], ['Key Dates', 'dates'], ['Meeting Prep', 'meeting'], ['Backup Plan', 'backup']],
   qr: [['All Codes', 'codes'], ['What Scanners See', 'scanner']],
+  /* Perry, 30 Oct 2026: each tool's sections in its own order, without Help, the view it opens on, or Elections HQ's Structure (setup). */
+  'elections-hq': [['Business Domains', 'domain'], ['Areas of Focus', 'aof'], ['Governance Committee', 'goc'], ['Board of Directors', 'board'], ['Nominations', 'noms'],
+    ['Ballots and Results', 'ballots'], ['Outbox', 'outbox'], ['Timeline and Tasks', 'tasks'], ['Communications', 'comms'], ['Onboarding New Leaders', 'onboard'],
+    ['Leadership Roster', 'roster'], ['Voter Lists', 'voters'], ['Public Forms', 'forms']],
+  'marketing-hq': [['Requests', 'requests'], ['MISMO Matters', 'matters'], ["MISMO Mic'd Up", 'micdup'], ['LinkedIn', 'linkedin'], ['YouTube', 'youtube'], ['Mailchimp', 'mailchimp'],
+    ['Summits', 'summits'], ['Rebranding', 'branding'], ['Orders: Pins, Swag, Banners', 'orders'], ['Results', 'results'], ['In the News', 'news'],
+    ['Subscribers and Downloaders', 'people'], ['Lists and Unsubscribes', 'lists'], ['Image Library', 'images']],
+  scheduler: [['Requests', 'tab=list'], ['Incoming', 'tab=inbox']],
 };
 /* Which tool's first entry leads, for the chips and the default pins. */
 const LEAD = ['hub', 'glossary', 'so', 'team-hq', 'qr', 'sponsorship', 'summit-hq', 'website-migration', 'meeting-trackers', 'iif-hq', 'member-360', 'cms'];
