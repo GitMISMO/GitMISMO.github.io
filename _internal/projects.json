@@ -414,5 +414,14 @@
     "readable": [
       "engagements/"
     ]
+  },
+  "scheduler": {
+    "repo": "GitMISMO/scheduler-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ],
+    "ask": true
   }
 }
