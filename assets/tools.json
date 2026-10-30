@@ -116,6 +116,13 @@
       "also": ["elections-hq-public"]
     },
     {
+      "key": "scheduler",
+      "label": "Scheduler",
+      "colour": "#2477B8",
+      "group": "Planning",
+      "path": "/scheduler/"
+    },
+    {
       "key": "sponsorship",
       "label": "Sponsorship Portal",
       "colour": "#0EA5E9",
