@@ -53,6 +53,22 @@
            "data/"
          ]
        },
+  "elections-hq": {
+    "repo": "GitMISMO/elections-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
+  "elections-hq-public": {
+    "repo": "GitMISMO/elections-hq",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "slates/"
+    ]
+  },
   "financials": {
     "repo": "GitMISMO/financials-data",
     "branch": "main",
