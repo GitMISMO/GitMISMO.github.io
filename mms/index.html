@@ -69,8 +69,10 @@ body.railmini .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + 
 html[data-season="december"] .santa{display:block}
 #rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
 #rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
-.whochip{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--navy);border-radius:4px;padding:4px 10px 4px 4px;font-size:13px;font-weight:600;border:0;cursor:default;white-space:nowrap}
-.whochip .av{width:26px;height:26px;border-radius:50%;background:var(--sky-wash);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.whochip{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#101b33;border:1px solid #e1e4ec;border-radius:4px;height:40px;padding:0 12px 0 7px;font-size:13px;font-weight:600;white-space:nowrap}
+.whochip .av{width:26px;height:26px;border-radius:50%;background:linear-gradient(160deg,#a8d4ef 0%,#94c8e9 45%,#6fb2dc 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:.02em}
+.whochip .fn{color:#2c74a6}
+.whochip .cv{color:#4b5670;font-size:10px}
 
 .hq.rail{position:fixed;left:0;top:calc(var(--hq-h) + env(safe-area-inset-top,0px));bottom:0;width:var(--rail-w);z-index:95;
   background:var(--navy);color:#fff;display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden auto;overscroll-behavior:contain;
@@ -402,6 +404,78 @@ main{padding:26px 30px 80px;max-width:none}
 .qitem>div:first-child{flex-wrap:wrap}
 .seg{flex-wrap:wrap;max-width:100%}
 @media(max-width:700px){.cprow{grid-template-columns:1fr}.cprow .cplab{display:none}.qlist{grid-template-columns:1fr}.pagehead .acts{margin-left:0}}
+/* tables inside cards: the header doesn't stick (it was sliding over the first row) */
+.card .tbl th,.psec .tbl th{position:static}
+.card{overflow-x:auto}
+/* overview, MISMO Media style */
+.hero2{display:grid;grid-template-columns:1.25fr 1fr;gap:22px;align-items:start}
+@media(max-width:1000px){.hero2{grid-template-columns:1fr}}
+.hero2 .hero-l{position:relative;z-index:1;padding-top:4px}
+.plate{position:relative;z-index:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:12px 12px 8px}
+.plate-h{display:flex;align-items:baseline;gap:8px;margin-bottom:8px}
+.plate-h span{font-size:11px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;color:#fff}
+.plate-h small{font-size:11px;color:rgba(255,255,255,.55)}
+.plate-r{display:grid;grid-template-columns:62px 1fr;gap:10px;width:100%;text-align:left;background:rgba(255,255,255,.05);border:0;border-radius:5px;padding:7px 10px;margin-bottom:5px;color:#fff;cursor:pointer;font:inherit;font-size:13px}
+.plate-r:hover{background:rgba(255,255,255,.12)}
+.plate-r .pw{color:var(--sky);font-weight:700;font-size:12px;white-space:nowrap}
+.plate-r .pl{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.plate-r .pl i{display:block;font-style:normal;font-size:11.5px;color:rgba(255,255,255,.6);overflow:hidden;text-overflow:ellipsis}
+.plate-e{font-size:13px;color:rgba(255,255,255,.7);padding:6px 2px}
+.plate-more{background:none;border:0;color:var(--sky);font:inherit;font-size:12.5px;font-weight:600;padding:6px 2px;cursor:pointer;white-space:nowrap}
+.secthead{display:flex;align-items:center;gap:12px;margin:4px 0 12px;flex-wrap:wrap}
+.secthead h2{font-size:19px;font-weight:700}
+.secthead .seg{margin-left:auto}
+.wk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-bottom:10px}
+@media(max-width:700px){.wk{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.wkd{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:9px 10px;text-align:left;cursor:pointer;color:var(--ink);display:flex;flex-direction:column;gap:3px;box-shadow:var(--shadow);min-width:0}
+.wkd:hover{border-color:var(--border-strong)}
+.wkd.on{outline:2px solid var(--sky);outline-offset:-1px}
+.wkd.today{background:var(--navy);border-color:var(--navy);color:#fff}
+.wkd .wn{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3)}
+.wkd.today .wn{color:var(--sky)}
+.wkd .wdn{font-size:22px;font-weight:700;line-height:1.1}
+.wkd .wb{display:flex;gap:3px;min-height:6px;align-items:center}
+.wkd .wb i{width:16px;height:5px;border-radius:2px}
+.wkd .wb em{font-style:normal;font-size:10.5px;color:var(--ink-3)}
+.wkd .wl{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wkd.today .wl{color:rgba(255,255,255,.8)}
+.daylist{display:flex;flex-direction:column;gap:4px;margin-bottom:18px}
+.dl{display:grid;grid-template-columns:8px 150px 1fr auto;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:7px 12px;text-align:left;cursor:pointer;color:var(--ink);font:inherit;font-size:13px}
+.dl:hover{background:var(--accent-soft)}
+.dl i{width:8px;height:8px;border-radius:2px}
+.dl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dl em{font-style:normal;color:var(--ink-3);font-size:12px;white-space:nowrap}
+@media(max-width:700px){.dl{grid-template-columns:8px 1fr}.dl span,.dl em{grid-column:2}}
+.st-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:22px}
+.st-t{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 15px 12px;text-align:left;cursor:pointer;color:var(--ink);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:2px;position:relative;overflow:hidden;transition:transform .12s,border-color .12s}
+.st-t:hover{transform:translateY(-2px);border-color:var(--border-strong)}
+.st-t .tk-k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-t .tk-v{font-size:32px;font-weight:700;line-height:1.1;color:var(--tc)}
+.st-t .tk-s{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-t .tk-bar{height:4px;border-radius:2px;background:var(--surface-3);margin-top:8px;overflow:hidden}
+.st-t .tk-bar i{display:block;height:100%;background:var(--tc);border-radius:2px}
+.st-t.hot{border-color:var(--c4)}
+.st-t.alert .tk-v{color:var(--bad)}
+.pm{display:flex;align-items:stretch;gap:10px;overflow-x:auto;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;margin-bottom:18px;box-shadow:var(--shadow)}
+.pm-grp{display:flex;flex-direction:column;gap:6px}
+.pm-gl{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3)}
+.pm-row{display:flex;align-items:center;gap:4px}
+.pm-arrow{align-self:center;font-size:22px;color:var(--ink-3);padding-top:16px}
+.pm-a{color:var(--ink-3);font-size:18px}
+.pm-s{display:flex;flex-direction:column;gap:2px;min-width:104px;max-width:120px;background:var(--surface-2);border:1px solid var(--border);border-top:3px solid var(--sc);border-radius:6px;padding:8px 9px;text-align:left;cursor:pointer;color:var(--ink)}
+.pm-s:hover{background:var(--accent-soft)}
+.pm-s.ext{border-style:dashed;border-top-style:solid}
+.pm-n{font-size:20px;font-weight:700;line-height:1}
+.pm-l{font-size:11.5px;font-weight:600;line-height:1.25}
+.pm-o{font-size:10.5px;color:var(--ink-3)}
+.facrow{display:grid;grid-template-columns:150px 1fr 34px;gap:10px;align-items:center;padding:6px 0;border:0;background:none;width:100%;cursor:pointer;color:var(--ink);text-align:left;font:inherit}
+.facrow .fn{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.facrow .fb{display:flex;gap:2px;height:14px}
+.facrow .fb i{border-radius:2px}
+.facrow b{text-align:right}
+.tbar{display:block;height:8px;background:var(--surface-3);border-radius:2px;overflow:hidden}
+.tbar i{display:block;height:100%;background:var(--accent)}
+.psec.rec{border-color:var(--good);border-left:4px solid var(--good)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -627,6 +701,8 @@ function emailOf(n){ const p=personByName(n); return p?p.email:''; }
 
 /* whose move is it — the heart of every queue */
 function whoseMove(t){
+  if(t.split){ const n=(t.deliverables||[]).length; return {role:'',label:'Split',text:'Split into '+n+' deliverable'+(n===1?'':'s')+'; each one moves on its own'}; }
+  if(t.rides&&t.state==='active'){ const b=S.tickets[t.rides]; return {role:'',label:'Moves With '+(b?b.wr:t.rides),text:'Held for the '+(b?b.wr+' '+b.name:'Reference Model')+' release and moves with it'}; }
   if(t.state==='hold') return {role:'staff',label:'On Hold',hold:true,text:'On hold'+(t.holdReason?': '+t.holdReason:'')};
   if(t.state!=='active') return {role:'',label:'Done',text:''};
   const g=govName(), sub=t.sub||'';
@@ -655,7 +731,7 @@ function whoseMove(t){
     case 'gc-publish': return {role:'gov',label:g,text:g+' approval to publish as '+(isStandard(t)?'Candidate Recommendation':'Final')};
     case 'release': return {role:'website',label:'Website Admin',text:'Publish the pages and announcement'};
   }
-  return {role:'staff',label:'MISMO Staff',text:''};
+  const sd=stageDef(t.stage); return {role:sd.owner||'staff',label:sd.owner==='gov'?govName():(ROLE_LABEL[sd.owner]||'MISMO Staff'),text:sd.desc||('Finish '+sd.name)};
 }
 const isStandard=t=>/standard/i.test(t.classification||'');
 function movers(t){ const w=whoseMove(t); return w.role?peopleFor(w.role,t):[]; }
@@ -669,8 +745,9 @@ function viewer(){ if(S.viewAs){ return personByName(S.viewAs)||{name:S.viewAs};
 
 /* ---------- ticket lists ---------- */
 const allTickets=()=>Object.values(S.tickets);
-const liveTickets=()=>allTickets().filter(t=>t.state==='active'||t.state==='hold');
-function pastTarget(t){ const d=t.dates||{}; return t.state==='active' && d.targetIM && d.targetIM<today() && ['approved','cfp','kickoff','work','aireview'].includes(t.stage); }
+const liveTickets=()=>allTickets().filter(t=>(t.state==='active'||t.state==='hold')&&!t.split);
+const ridersOf=id=>allTickets().filter(x=>x.rides===id&&x.state!=='canceled'&&x.state!=='closed');
+function pastTarget(t){ const d=t.dates||{}; return t.state==='active' && !t.split && !t.rides && d.targetIM && d.targetIM<today() && ['approved','cfp','kickoff','work','aireview'].includes(t.stage); }
 function stageAge(t){ return daysBetween(t.stageSince||(t.dates&&t.dates.workStart)||t.importedAt,today()); }
 function stalled(t){ const a=stageAge(t); return t.state==='active' && t.stage!=='work' && t.stage!=='comment' && a!=null && a>(S.notify.reminders.staleDays||45); }
 
@@ -692,6 +769,7 @@ async function move(t0,to,opts){
   hist(t,opts.text||('Moved from '+stageDef(from).name+' to '+stageDef(to).name),{from,to,note:opts.note||''});
   onEnter(t,to,from);
   await saveTicket(t,opts.toast||(t.wr+' moved to '+stageDef(to).name),before);
+  if(!opts.rider){ for(const r of ridersOf(t.id)){ if(r.stage!==to) await move(r,to,{rider:true,sub:to==='published'?'':t.sub,text:'Moved with '+t.wr+' (Reference Model release) to '+stageDef(to).name,toast:t.wr+' and the work riding with it moved to '+stageDef(to).name}); } }
   if(from!==to) notifyEnter(t,to);
   return t;
 }
@@ -827,7 +905,7 @@ function tkCard(t,drag){
   return '<button type="button" class="tk'+(pastTarget(t)?' late':'')+(t.state==='hold'?' hold':'')+'" data-open="'+esc(t.id)+'"'+(drag?' draggable="true" data-drag="'+esc(t.id)+'"':'')+'>'+
     '<div class="top"><span class="wr">'+esc(t.wr)+'</span>'+sizeTag(t)+'</div>'+
     '<div class="nm">'+esc(t.name)+'</div>'+
-    '<div class="meta">'+subChip(t)+stateChip(t)+(pastTarget(t)?'<span class="chip bad">Past Target</span>':'')+'</div>'+
+    '<div class="meta">'+(t.kind?'<span class="chip">'+esc(t.kind)+'</span>':'')+(t.rides?'<span class="chip info">Moves With '+esc((S.tickets[t.rides]||{}).wr||'')+'</span>':'')+(ridersOf(t.id).length?'<span class="chip info">'+ridersOf(t.id).length+' Riding</span>':'')+subChip(t)+stateChip(t)+(pastTarget(t)?'<span class="chip bad">Past Target</span>':'')+'</div>'+
     '<div class="who" style="margin-top:6px">'+esc(t.facilitator||'No facilitator')+' · '+esc(w.label||'')+'</div>'+
     (age!=null&&t.state==='active'?'<span class="age" title="Days in this stage">'+age+'d</span>':'')+'</button>';
 }
@@ -921,12 +999,12 @@ function filterBar(withState){
 VIEWS.board=function(){
   const L=filteredLive();
   const cols=stages().map(s=>{ const ts=L.filter(t=>t.stage===s.key).sort((a,b)=>(stageAge(b)||0)-(stageAge(a)||0)); return '<section class="bcol'+(ts.length?'':' none')+'" data-col="'+s.key+'" style="--sc:'+s.color+'"><header><h4>'+esc(s.name)+'<b>'+ts.length+'</b></h4><div class="o">'+esc(s.owner==='gov'?govName():ROLE_LABEL[s.owner]||'')+'</div></header><div class="cards">'+ts.map(t=>tkCard(t,S.canWrite)).join('')+'</div></section>'; }).join('');
-  return '<div class="pagehead"><div><h1>Pipeline Board</h1><div class="sub">Every live work request by stage. Drag a card to move it; every move is logged.</div></div><div class="acts">'+(S.isStaff?'<button class="btn" id="newtk" type="button">+ New Work Request</button>':'')+'</div></div>'+filterBar(false)+'<div class="board" id="board">'+cols+'</div>';
+  return '<div class="pagehead"><div><h1>Pipeline Board</h1><div class="sub">Every live work request by stage. Drag a card to move it; every move is logged.</div></div><div class="acts">'+'<a class="btn pri" href="https://resources.mismo.org/initiative-hub/work-requests.html#new" target="_blank" rel="noopener">+ New Work Request</a>'+(S.isStaff?' <button class="btn" id="newtk" type="button">Add Without the Hub</button>':'')+'</div></div>'+filterBar(false)+'<div class="board" id="board">'+cols+'</div>';
 };
 VIEWS.reviews=function(){
   const act=liveTickets().filter(t=>t.state==='active');
   const sec=(title,desc,list)=>'<div class="qgroup"><h3>'+title+' <span class="chip info">'+list.length+'</span></h3><div class="muted" style="font-size:12.5px;margin:-4px 0 10px">'+desc+'</div>'+(list.length?'<div class="qlist">'+list.map(qItem).join('')+'</div>':'<div class="empty">Nothing in this review right now.</div>')+'</div>';
-  return '<div class="pagehead"><div><h1>Review Desk</h1><div class="sub">AI Review, IM, AWG and License Designation in one place.</div></div></div>'+
+  return '<div class="pagehead"><div><h1>Review Desk</h1><div class="sub">AI Review, IM, AWG and License Designation in one place.</div></div></div>'+trendsCard()+
    sec('AI Review','Editor and readiness review in one step.',act.filter(t=>t.stage==='aireview'))+
    sec('IM Review','Information Management.',act.filter(t=>t.stage==='im'))+
    sec('AWG Review','Architecture Workgroup.',act.filter(t=>t.stage==='awg'))+
@@ -961,13 +1039,13 @@ VIEWS.all=function(){
   const key={wr:t=>t.wr,name:t=>t.name,wg:t=>t.workgroup||'',fac:t=>t.facilitator||'',stage:t=>String(stageIndex(t.stage)+100).padStart(4,'0'),size:t=>['S','M','L','XL'].indexOf(t.size),target:t=>(t.dates&&t.dates.targetIM)||'9',upd:t=>t.updatedAt||t.importedAt||''}[f.sort]||(t=>t.wr);
   L.sort((a,b)=>{ const x=key(a), y=key(b); return (x>y?1:x<y?-1:0)*f.dir; });
   const th=(k,l)=>'<th data-sort="'+k+'">'+l+(f.sort===k?(f.dir>0?' ↑':' ↓'):'')+'</th>';
-  return '<div class="pagehead"><div><h1>All Work</h1><div class="sub">'+L.length+' work requests. Click a column to sort.</div></div><div class="acts">'+(S.isStaff?'<button class="btn" id="newtk" type="button">+ New Work Request</button>':'')+'</div></div>'+filterBar(true)+
+  return '<div class="pagehead"><div><h1>All Work</h1><div class="sub">'+L.length+' work requests. Click a column to sort.</div></div><div class="acts">'+'<a class="btn pri" href="https://resources.mismo.org/initiative-hub/work-requests.html#new" target="_blank" rel="noopener">+ New Work Request</a>'+(S.isStaff?' <button class="btn" id="newtk" type="button">Add Without the Hub</button>':'')+'</div></div>'+filterBar(true)+
    (L.length?'<div class="tblwrap"><table class="tbl"><thead><tr>'+th('wr','WR#')+th('name','Work Request')+th('wg','Workgroup')+th('fac','Facilitator')+th('stage','Stage')+th('size','Size')+th('target','Target to IM')+th('upd','Updated')+'</tr></thead><tbody>'+L.slice(0,400).map(t=>'<tr class="rowlink" data-open="'+esc(t.id)+'"><td class="nowrap">'+esc(t.wr)+'</td><td class="nm">'+esc(t.name)+'</td><td>'+esc(t.workgroup||'')+'</td><td class="nowrap">'+esc(t.facilitator||'')+'</td><td>'+(t.state==='active'?stageChip(t)+' '+subChip(t):stateChip(t))+'</td><td>'+sizeTag(t)+'</td><td class="nowrap'+(pastTarget(t)?'" style="color:var(--bad);font-weight:600':'')+'">'+esc(fmtS(t.dates&&t.dates.targetIM))+'</td><td class="nowrap muted">'+esc(fmtS((t.updatedAt||t.importedAt||'').slice(0,10)))+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Nothing matches these filters.</div>');
 };
 VIEWS.media=function(){
   const L=Object.values(S.media).sort((a,b)=>(a.status==='Done')-(b.status==='Done')||(b.requested||'').localeCompare(a.requested||''));
   return '<div class="pagehead"><div><h1>MISMO Media Requests</h1><div class="sub">Calls for Participation, LinkedIn posts and release announcements the MMS has asked for. They\u2019ll flow straight into MISMO Media once the two are connected.</div></div></div>'+
-   (L.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>Requested</th><th>Request</th><th>Work Request</th><th>Status</th><th></th></tr></thead><tbody>'+L.map(m=>'<tr><td class="nowrap">'+esc(fmtS(m.requested))+'</td><td><div class="nm">'+esc(m.kind)+'</div><div class="muted" style="font-size:12px">'+esc(m.text)+'</div>'+(m.link?'<a href="'+esc(m.link)+'" target="_blank" rel="noopener">Link</a>':'')+'</td><td class="rowlink" data-open="'+esc(m.ticket)+'" style="cursor:pointer"><b>'+esc(m.wr)+'</b> '+esc(m.name)+'</td><td><span class="chip '+(m.status==='Done'?'good':m.status==='In Progress'?'info':'warn')+'">'+esc(m.status)+'</span></td><td class="nowrap">'+(S.canWrite&&m.status!=='Done'?'<button class="btn sm" data-media="'+esc(m.id)+'" type="button">Update</button>':'')+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">No requests yet. They\u2019re made automatically at Call for Participation, Comment Period and Release.</div>');
+   (L.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>Requested</th><th>Request</th><th>Work Request</th><th>Status</th><th></th></tr></thead><tbody>'+L.map(m=>'<tr><td class="nowrap">'+esc(fmtS(m.requested))+'</td><td><div class="nm">'+esc(m.kind)+'</div><div class="muted" style="font-size:12px">'+esc(m.text)+'</div>'+(m.link?'<a href="'+esc(m.link)+'" target="_blank" rel="noopener">Link</a>':'')+'</td><td class="rowlink" data-open="'+esc(m.ticket)+'" style="cursor:pointer"><b>'+esc(m.wr)+'</b> '+esc(m.name)+'</td><td><span class="chip '+(m.status==='Done'?'good':m.status==='In Progress'?'info':'warn')+'">'+esc(m.status)+'</span></td><td class="nowrap">'+'<button class="btn sm" data-mform="'+esc(m.id)+'" type="button">Open Request Form</button> '+(S.canWrite&&m.status!=='Done'?'<button class="btn sm ghost" data-media="'+esc(m.id)+'" type="button">Update</button>':'')+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">No requests yet. They\u2019re made automatically at Call for Participation, Comment Period and Release.</div>');
 };
 VIEWS.outbox=function(){
   const L=Object.values(S.outbox).sort((a,b)=>(b.at||'').localeCompare(a.at||''));
@@ -981,7 +1059,7 @@ const RC=[
   ['Initiative Hub','Initiatives, monthly updates and the meeting calendar','https://resources.mismo.org/initiative-hub/','M12 2l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5'],
   ['Facilitator Handbook','The core guide for facilitators (being redone)','https://mortgagebankersassociation.sharepoint.com/:w:/s/Facilitators/EcQiScj33DdBjFYgFsNO7-0B6aZV9Fyi0_eXcH5lEq0DRg','M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z'],
   ['Business Glossary','MISMO\u2019s Business Glossary console','https://resources.mismo.org/glossary/console/','M4 6h16M4 12h10M4 18h7'],
-  ['MISMO Media','Marketing and communications requests','https://resources.mismo.org/marketing-hq/','M4 11v2a1 1 0 001 1h2l5 4V6L7 10H5a1 1 0 00-1 1z'],
+  ['MISMO Media Request Form','Ask MISMO Media for a post, announcement or design','https://resources.mismo.org/forms/request/','M4 11v2a1 1 0 001 1h2l5 4V6L7 10H5a1 1 0 00-1 1z'],
   ['MISMO.org','The public website','https://www.mismo.org/','M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20']];
 const GOVLINKS=[['Business Executive Team (BET)','https://www.mismo.org/about-MISMO/mismo-leadership/prioritization-committee/business-executive-team'],['Residential Standards Governance Committee','https://www.mismo.org/about-MISMO/mismo-leadership/residential-standards-governance-committee'],['Commercial Standards Governance Committee','https://www.mismo.org/about-MISMO/mismo-leadership/commercial-standards-governance-committee'],['Council of Chairs','https://www.mismo.org/about-MISMO/mismo-leadership/council-of-chairs'],['Education Council','https://www.mismo.org/about-MISMO/mismo-leadership/education-council']];
 VIEWS.resources=function(){
@@ -1001,6 +1079,8 @@ function stageActions(t){
   const add=(label,fn,cls)=>A.push({label,fn,cls:cls||''});
   if(t.state==='hold'){ add('Resume Work',()=>resume(t),'pri'); return A; }
   if(t.state!=='active'){ add('Reopen',()=>reopen(t),'pri'); return A; }
+  if(t.split){ add('+ Add a Deliverable',()=>splitT(t),'pri'); return A; }
+  if(t.rides){ const b=S.tickets[t.rides]; if(t.stage==='designation') add('Approve Recommended Designation',()=>approveRec(t),'pri'); add('Open '+(b?b.wr:'the Release'),()=>openPanel(t.rides)); add('Stop Riding: Move on Its Own',()=>unride(t)); return A; }
   switch(t.stage){
     case 'approved': add('Start Work →',()=>startWork(t),'pri'); break;
     case 'cfp': add('Call for Participation Published →',()=>cfpDone(t),'pri'); break;
@@ -1022,7 +1102,7 @@ function stageActions(t){
       break; }
     case 'designation':
       if(sub==='prep'||!sub) add('Send to Designation →',()=>toDesignation(t),'pri');
-      if(sub==='director'||sub==='discuss') add('Recommend Designation',()=>directorRec(t),'pri');
+      if(sub==='director'||sub==='discuss'){ add('Approve Recommended Designation →',()=>approveRec(t),'pri'); add('Change the Designation',()=>directorRec(t)); }
       if(sub==='vps') add('Record VP Agreement',()=>vpAgree(t),'pri');
       break;
     case 'gc-comment': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
@@ -1033,7 +1113,9 @@ function stageActions(t){
     case 'post': add('Report What Came Back →',()=>postReport(t),'pri'); break;
     case 'gc-publish': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
     case 'release': add('Mark Published →',()=>markPublished(t),'pri'); break;
+    default: if(!STAGE_KEYS.includes(t.stage)) add('Done: Move On →',()=>move(t,nextStage(t),{text:stageDef(t.stage).name+' done'}),'pri');
   }
+  if(S.canWrite&&!t.parent&&!t.rides) A.push({label:'Split Into Deliverables',fn:()=>splitT(t),cls:'ghost'});
   return A;
 }
 function renderPanel(){
@@ -1064,10 +1146,12 @@ function renderPanel(){
    '<div class="pb"><div class="actbar"><div class="next"><div class="eyebrow">'+(t.state==='active'?'Next · '+esc(w.label||''):'Status')+'</div><b>'+esc(t.state==='active'?w.text:(t.state==='hold'?w.text:stageDef(t.stage).name+' · '+t.state))+'</b>'+(t.state==='active'&&stageAge(t)!=null?'<div class="why">'+stageAge(t)+' days at '+esc(stageDef(t.stage).name)+(movers(t).length?' · '+esc(movers(t).map(p=>p.name).join(', ')):'')+'</div>':'')+'</div>'+
    acts.map((a,i)=>'<button class="btn '+a.cls+'" data-act="'+i+'" type="button">'+esc(a.label)+'</button>').join('')+'</div>'+
    (more?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin:-8px 0 18px">'+more+'</div>':'')+
-   '<div class="pgrid">'+stagePanel(t)+sec('details','Details',details)+sec('dates','Key Dates',dates)+sec('links','Links',links)+
+   '<div class="pgrid">'+relPanel(t)+recPanel(t)+stagePanel(t)+leadPanel(t)+sec('details','Details',details)+sec('dates','Key Dates',dates)+sec('links','Links',links)+
    sec('hist','History',(S.canWrite?'<div style="display:flex;gap:8px;margin-bottom:12px"><input id="noteq" placeholder="Add a note to the history" style="flex:1;font:inherit;font-size:13px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:5px;padding:6px 8px"><button class="btn sm" id="noteadd" type="button">Add Note</button></div>':'')+'<ul class="hist">'+(t.history||[]).slice().reverse().map(h=>'<li><div class="when">'+esc(h.at?fmt(h.at.slice(0,10)):'')+(h.by?' · '+esc(h.by):'')+'</div>'+esc(h.text)+(h.note?'<div class="muted">'+esc(h.note)+'</div>':'')+'</li>').join('')+'</ul>',true)+'</div></div>';
   wireDates(P);
   $('#pclose').onclick=closePanel;
+  $$('.pb [data-open]',P).forEach(el=>el.onclick=()=>openPanel(el.dataset.open));
+  $$('[data-x2=split]',P).forEach(b=>b.onclick=()=>splitT(t));
   $$('[data-act]',P).forEach(b=>b.onclick=()=>acts[+b.dataset.act].fn());
   $$('[data-x]',P).forEach(b=>b.onclick=()=>({moveto:moveTo,hold:hold,close:closeT,cancel:cancelT})[b.dataset.x](t));
   $$('[data-sec]',P).forEach(s=>s.addEventListener('input',()=>{ const x=$('.dirty',s); if(x) x.hidden=false; }));
@@ -1286,6 +1370,196 @@ function showAI(r){
     (r.files&&r.files.length?'<p class="muted" style="font-size:12px">Files: '+esc(r.files.join(', '))+(r.clipped?' (long; the first part was reviewed)':'')+'</p>':'')});
 }
 
+/* ---------- license designation: the pattern so far, as a recommendation to approve ---------- */
+const DES_SINCE='2025-01-01';
+function desDate(x){ const d=x.dates||{}; return d.designation||d.gcComment||d.commentStart||''; }
+function pastDesignations(){ return allTickets().filter(x=>x.designation&&x.designation.license&&desDate(x)>=DES_SINCE); }
+function recommend(t){
+  const nm=((t.name||'')+' '+(t.product||'')).toLowerCase(), wg=(t.workgroup||'').toLowerCase(), kind=(t.kind||'').toLowerCase();
+  let cls, clsWhy;
+  if(kind){ cls=/dataset|reference model|api|schema/.test(kind)?'Standard':'Collateral'; clsWhy='A '+t.kind+' is '+(cls==='Standard'?'a standard':'collateral')+'.'; }
+  else if(/i-?guide|implementation guide|white paper|guidance|business process model|glossary maintenance|\bmeg\b|toolkit|adoption|\broi\b|template|life of loan|artifact update/.test(nm)){ cls='Collateral'; clsWhy='Guides, white papers, BPM, glossary and MEG work have been collateral.'; }
+  else if(/dataset|reference model|\bapi\b|specification|schema|\bxml\b|\bjson\b|mapping|documents to data|as data|naming guide|glossary of|\bpart b\b/.test(nm)){ cls='Standard'; clsWhy='Datasets, Reference Model, API and specification work have been standards.'; }
+  else { cls=t.classification||(t.workType==='Maintenance'?'Collateral':'Standard'); clsWhy='No clear signal in the name, so this follows '+(t.classification?'the classification on file':'the work type')+'.'; }
+  let prof, why;
+  if(/\bmeg\b|eldd|logical data dictionary|enumeration/.test(nm)||/architecture workgroup/.test(wg)){ prof={type:'Member',license:'Internal Use Only',royalty:'Royalty Temp Waived',availableTo:'Members Only'}; why='Architecture Workgroup, MEG and enumeration work has gone out Member, Internal Use Only since 2025.'; }
+  else if(/business glossary/.test(wg+' '+nm)){ prof={type:'Member',license:'Commercial Distributor',royalty:'Royalty Temp Waived',availableTo:'Public'}; why='Business Glossary releases since 2025 have gone to Member comment, Commercial Distributor, available to the public.'; }
+  else {
+    prof={type:'Public',license:'Commercial Distributor',royalty:'Royalty Temp Waived',availableTo:'Public'}; why='This is how most work has gone out since 2025.';
+    const prior=allTickets().filter(x=>x.id!==t.id&&x.workgroup&&x.workgroup===t.workgroup&&x.designation&&x.designation.license&&desDate(x)>=DES_SINCE).sort((a,b)=>desDate(b).localeCompare(desDate(a)))[0];
+    if(prior&&prior.designation.type){ const d=prior.designation; prof={type:d.type,license:d.license,royalty:d.royalty||'Royalty Temp Waived',availableTo:d.availableTo||'Public'}; why='Same as '+prior.wr+' '+prior.name+', the last one from '+t.workgroup+' ('+fmtS(desDate(prior))+').'; }
+  }
+  const P=pastDesignations(); const same=P.filter(x=>x.designation.type===prof.type&&x.designation.license===prof.license).length;
+  const days=(proc().commentDays||[30]).includes(30)?30:(proc().commentDays||[30])[0];
+  return Object.assign({classification:cls,clsWhy,why,commentDays:days,match:same,of:P.length},prof);
+}
+function recPanel(t){
+  if(t.stage!=='designation'||t.state!=='active') return '';
+  const r=recommend(t);
+  const row=(l,v)=>'<div class="f"><label>'+l+'</label><div class="ro"><b>'+esc(v)+'</b></div></div>';
+  return '<div class="psec full rec"><h4>Recommended Designation<span class="sp chip good">Matches '+r.match+' of '+r.of+' since 2025</span></h4><div class="kv">'+row('Classification',r.classification)+row('Comment Type',r.type)+row('License Usage',r.license)+row('Royalty Status',r.royalty)+row('Available To',r.availableTo)+row('Comment Length',r.commentDays+' days')+'</div><div class="muted" style="font-size:12.5px;margin-top:8px">'+esc(r.why)+' '+esc(r.clsWhy)+'</div></div>';
+}
+async function approveRec(t){
+  const r=recommend(t), x=clone(t);
+  x.classification=r.classification; x.commentDays=x.commentDays||r.commentDays;
+  x.designation=Object.assign({},x.designation,{type:r.type,license:r.license,royalty:r.royalty,availableTo:r.availableTo,recommended:true,vps:{}});
+  x.dates=Object.assign({},x.dates,{designation:today()});
+  if(t.rides){ hist(x,'Approved the recommended designation: '+[r.classification,r.type,r.license,r.availableTo].join(', ')); await saveTicket(x,'Designation approved',clone(t)); return; }
+  await setSub(x,'vps','Director approved the recommended designation: '+[r.classification,r.type,r.license,r.availableTo].join(', '));
+  queueMail({to:peopleFor('vps').map(p=>p.email),subject:t.wr+' '+t.name+': designation ready for your agreement',body:'The Director approved: '+[r.classification,r.type,r.license,r.royalty,r.availableTo].join(' · ')+'.\n\nAgree or ask to discuss in the MMS.',ticket:t.id,kind:'stage',key:t.id+'-vps-'+today()});
+}
+function trendsCard(){
+  const P=pastDesignations(); if(!P.length) return '';
+  const c={}; P.forEach(x=>{ const d=x.designation; const k=[d.type,d.license,d.royalty,d.availableTo||'—'].join(' · '); c[k]=(c[k]||0)+1; });
+  const top=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const cls={Standard:0,Collateral:0}; P.forEach(x=>{ if(cls[x.classification]!=null) cls[x.classification]++; });
+  const thirty=P.filter(x=>+x.commentDays===30).length;
+  return '<div class="card"><h3>Designation Trends Since 2025<span class="sp muted" style="font-size:12px;font-weight:500">'+P.length+' designations</span></h3>'+
+    top.map(([k,n])=>'<div style="display:grid;grid-template-columns:1fr 180px 36px;gap:10px;align-items:center;padding:5px 0"><span style="font-size:13px">'+esc(k)+'</span><span class="tbar"><i style="width:'+Math.round(n/P.length*100)+'%"></i></span><b style="text-align:right">'+n+'</b></div>').join('')+
+    '<p class="muted" style="font-size:12.5px;margin:10px 0 0">'+cls.Standard+' standards and '+cls.Collateral+' collateral; '+thirty+' of '+P.length+' used a 30-day comment period. Each designation now comes with a recommendation built from this pattern, so the Director can approve it in one click.</p></div>';
+}
+
+/* ---------- deliverables: split a work request, hold Reference Model changes for the RM release ---------- */
+const KINDS=['Dataset','Implementation Guide (iGuide)','Reference Model Change','API / Schema','White Paper / Guidance','Glossary','Other'];
+function rmCandidates(){ return liveTickets().filter(x=>/reference model|\brm\b/i.test(x.name+' '+(x.product||''))&&!x.rides).sort((a,b)=>a.wr.localeCompare(b.wr)); }
+async function splitT(t){
+  const base=t.split?t:t; const existing=(base.deliverables||[]).length;
+  const rms=rmCandidates();
+  const rows=[0,1,2,3].map(i=>'<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-bottom:6px"><input name="n'+i+'" placeholder="Deliverable '+(existing+i+1)+' name"'+(i===0&&!existing?' value="'+esc(t.name)+' Dataset"':'')+'>'+sel('k'+i,KINDS,i===0?'Dataset':(i===1?'Implementation Guide (iGuide)':''))+'<label style="grid-column:1/-1;display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--ink-2)"><input type="checkbox" name="d'+i+'" style="width:auto"> Needs the Reference Model change published first (holds it and moves it with the RM release)</label></div>').join('');
+  const v=await modal({title:t.split?'Add Deliverables':'Split Into Deliverables',text:'Each deliverable gets its own stage and license designation. Reference Model changes, and anything that needs them published first, are held for the RM release and move with it.',ok:'Create Deliverables',body:
+    rows+fld('Reference Model Release to Ride With',sel('rm',[['','None'],...rms.map(x=>[x.id,x.wr+' '+x.name])],''),rms.length?'Used for Reference Model changes and anything that needs them first.':'No live Reference Model work request found; add one first, or type its WR# in the name.'),
+    validate:x=>{ const any=[0,1,2,3].some(i=>(x['n'+i]||'').trim()); if(!any) return 'Name at least one deliverable'; const needRm=[0,1,2,3].some(i=>(x['n'+i]||'').trim()&&(x['k'+i]==='Reference Model Change'||x['d'+i])); return needRm&&!x.rm?'Pick the Reference Model release these ride with':''; }});
+  if(!v) return;
+  const p=clone(S.tickets[t.id]||t), before=clone(p); p.split=true; p.deliverables=p.deliverables||[];
+  let n=p.deliverables.length; const made=[];
+  for(const i of [0,1,2,3]){
+    const name=(v['n'+i]||'').trim(); if(!name) continue; n++;
+    const letter=String.fromCharCode(64+n), id=(p.id+'-'+letter).slice(0,190);
+    const rides=(v['k'+i]==='Reference Model Change'||v['d'+i])?v.rm:'';
+    const rm=rides?S.tickets[rides]:null;
+    const c={id,wr:p.wr+'-'+letter,uid:p.wr+'-'+letter,name,kind:v['k'+i],parent:p.id,workgroup:p.workgroup,groupType:p.groupType,facilitator:p.facilitator,workType:p.workType,reqType:p.reqType,segment:p.segment,size:p.size,
+      stage:rm?rm.stage:(p.stage==='published'?'work':p.stage),sub:'',state:'active',stageSince:today(),dates:clone(p.dates||{}),links:clone(p.links||{}),rides:rides||'',history:[],createdAt:new Date().toISOString(),source:'mms'};
+    hist(c,'Split from '+p.wr+' '+p.name+' as a '+c.kind+(rm?'; held for '+rm.wr+' and moves with it':''));
+    S.tickets[id]=c; await write('tickets',id,c); p.deliverables.push(id); made.push(c.wr);
+  }
+  hist(p,'Split into deliverables: '+made.join(', ')); await saveTicket(p,p.wr+' split into '+made.length+' deliverable'+(made.length===1?'':'s'));
+}
+async function unride(t){ const x=clone(t), b=clone(t); const was=S.tickets[t.rides]; x.rides=''; hist(x,'No longer held for '+(was?was.wr:'the RM release')+'; moves on its own'); await saveTicket(x,t.wr+' moves on its own now',b); }
+function relPanel(t){
+  let out='';
+  const kids=(t.deliverables||[]).map(id=>S.tickets[id]).filter(Boolean);
+  const row=x=>'<tr class="rowlink" data-open="'+esc(x.id)+'"><td class="nowrap">'+esc(x.wr)+'</td><td class="nm">'+esc(x.name)+'<div class="muted" style="font-size:12px;font-weight:400">'+esc(x.kind||'')+'</div></td><td>'+(x.state==='active'?stageChip(x):stateChip(x))+'</td><td style="font-size:12px">'+esc([x.classification,x.designation&&x.designation.license].filter(Boolean).join(' · ')||'Not designated yet')+'</td><td>'+(x.rides?'<span class="chip info">Moves With '+esc((S.tickets[x.rides]||{}).wr||x.rides)+'</span>':'')+'</td></tr>';
+  if(kids.length) out+='<div class="psec full"><h4>Deliverables<span class="sp">'+(S.canWrite?'<button class="btn sm" data-x2="split" type="button">+ Add a Deliverable</button>':'')+'</span></h4><table class="tbl"><thead><tr><th>WR#</th><th>Deliverable</th><th>Stage</th><th>Designation</th><th></th></tr></thead><tbody>'+kids.map(row).join('')+'</tbody></table></div>';
+  const riders=ridersOf(t.id);
+  if(riders.length) out+='<div class="psec full"><h4>Riding With This Release<span class="sp chip info">'+riders.length+'</span></h4><div class="muted" style="font-size:12.5px;margin:-4px 0 8px">These move with '+esc(t.wr)+' through every stage and publish with it.</div><table class="tbl"><thead><tr><th>WR#</th><th>Deliverable</th><th>Stage</th><th>Designation</th><th></th></tr></thead><tbody>'+riders.map(row).join('')+'</tbody></table></div>';
+  if(t.parent&&S.tickets[t.parent]){ const p=S.tickets[t.parent]; out='<div class="psec full"><h4>Part Of</h4><div class="rowlink" data-open="'+esc(p.id)+'" style="cursor:pointer"><b>'+esc(p.wr)+'</b> '+esc(p.name)+' <span class="muted">· '+(p.deliverables||[]).length+' deliverables</span></div>'+(t.rides?'<div class="banner info" style="margin:10px 0 0">Held for '+esc((S.tickets[t.rides]||{}).wr||t.rides)+' '+esc((S.tickets[t.rides]||{}).name||'')+'. It moves with that release and publishes with it.</div>':'')+'</div>'+out; }
+  return out;
+}
+
+/* ---------- the Initiative Hub: approved work requests come into the MMS on their own ---------- */
+async function hubSync(){
+  if(S.mode!=='relay') return;
+  const rs=window.ResourcesSession, tok=rs&&rs.token(); if(!tok) return;
+  try{
+    const r=await fetch(window.__hqRelay.config.RELAY_URL+'/hub-requests/data/requests',{headers:{Authorization:'Bearer '+tok},cache:'no-store'});
+    if(!r.ok) return; const b=await r.json(); S.hub=Object.values((b.data&&b.data.docs)||{});
+    if(S.canWrite) for(const x of S.hub){
+      if(!['approved','assigned','potential'].includes(x.status)||!x.wr) continue;
+      const id=x.wr.replace(/[^A-Za-z0-9_-]/g,'_'); if(S.tickets[id]) continue;
+      const q=x.req||{};
+      const t={id,wr:x.wr,uid:x.wr,name:q.title||x.wr,workgroup:q.cop||'',facilitator:x.facilitator||'',workType:q.maintenance?'Maintenance':'Initiative',reqType:q.isUpdate?'Update':'New',stage:'approved',sub:'',state:'active',stageSince:today(),dates:{submitted:x.submitted||'',bet:(x.updatedAt||'').slice(0,10)},history:[],source:'hub',hubId:x.id,createdAt:new Date().toISOString()};
+      hist(t,'Approved in the Initiative Hub ('+x.id+') and brought into the MMS'); S.tickets[id]=t; await write('tickets',id,t); notifyEnter(t,'approved');
+    }
+    if(S.view==='home') renderAll();
+  }catch(e){}
+}
+function hubCounts(){ const H=S.hub||[]; return {confirm:H.filter(x=>['new','submitted','confirm'].includes(x.status)).length, queue:H.filter(x=>['awaiting','info'].includes(x.status)).length}; }
+
+/* ---------- the Overview, given the MISMO Media treatment ---------- */
+S.homeTab='week'; S.daySel=null; let counted=false;
+function weekEvents(off){
+  const td=addDays(today(),off||0), end=addDays(td,6), ev=[]; const me=viewer();
+  const mineOnly=!S.isStaff||S.viewAs;
+  liveTickets().forEach(t=>{ const d=t.dates||{}; if(mineOnly&&!sameName(t.facilitator,me.name)&&!isMine(t,me)) return;
+    const add=(date,label,c)=>{ if(date&&date>=td&&date<=end) ev.push({date,label,t,c}); };
+    add(d.commentEnd,'Comment ends','var(--c6)'); add(d.commentStart,'Comment opens','var(--c3)');
+    if(['approved','work','aireview'].includes(t.stage)) add(d.targetIM,'Target to IM','var(--c2)');
+    if(t.state==='hold') add(t.holdUntil,'Check on hold','var(--hold)');
+    if(t.stage==='cfp') add(d.tentativeRelease,'Call for Participation','var(--c4)');
+  });
+  return ev.sort((a,b)=>a.date.localeCompare(b.date));
+}
+VIEWS.home=function(){
+  const live=liveTickets(), act=live.filter(t=>t.state==='active'), td=today();
+  const me=viewer(), mine=live.filter(t=>isMine(t,me)), first=(me.name||'').split(' ')[0];
+  const late=act.filter(pastTarget), inC=act.filter(t=>t.stage==='comment'), gov=act.filter(t=>GOV_STAGES.includes(t.stage)), hold=live.filter(t=>t.state==='hold');
+  const soon=inC.filter(t=>t.dates&&t.dates.commentEnd).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))[0];
+  const h=new Date().getHours(), g=h<12?'Good morning':(h<17?'Good afternoon':'Good evening');
+  let line='<b>'+act.length+'</b> work requests are moving through the MMS';
+  if(mine.length) line+='; <b>'+mine.length+'</b> '+(mine.length===1?'is':'are')+' waiting on '+(S.viewAs?esc(first):'you');
+  if(soon) line+='; the next comment period to close is <b>'+esc(soon.productPageName||soon.name)+'</b> on '+fmtS(soon.dates.commentEnd);
+  line+='.';
+  let off=0, ev=weekEvents(0); while(!ev.length&&off<28){ off+=7; ev=weekEvents(off); } if(!ev.length) off=0;
+  const plate=[...mine.slice(0,4).map(t=>({when:'Now',label:whoseMove(t).text,t})),...(off?[]:ev).slice(0,6).map(e=>({when:fmtS(e.date),label:e.label,t:e.t}))].slice(0,6);
+  const plateHtml='<div class="plate"><div class="plate-h"><span>On Your Plate</span><small>next 7 days</small></div>'+(plate.length?plate.map(p=>'<button type="button" class="plate-r" data-open="'+esc(p.t.id)+'"><span class="pw">'+esc(p.when)+'</span><span class="pl"><b>'+esc(p.t.wr)+'</b> '+esc(p.t.name)+'<i>'+esc(p.label)+'</i></span></button>').join(''):'<div class="plate-e">Nothing due this week.</div>')+'<button type="button" class="plate-more" data-go="mine">See '+(S.viewAs?esc(first)+'’s':'Your')+' Queue →</button></div>';
+  // the week strip
+  const days=[]; for(let i=0;i<7;i++){ const d=addDays(td,i+off); days.push({d,ev:ev.filter(e=>e.date===d)}); }
+  const sel=S.daySel&&days.some(x=>x.d===S.daySel)?S.daySel:(days.find(x=>x.ev.length)||days[0]).d;
+  const strip=(off?'<div class="muted" style="font-size:12.5px;margin:-4px 0 8px">Nothing dated this week, so here is the week of '+fmt(addDays(td,off))+'.</div>':'')+'<div class="wk">'+days.map((x,i)=>{ const dt=toD(x.d); return '<button type="button" class="wkd'+(i===0&&!off?' today':'')+(x.d===sel?' on':'')+'" data-day="'+x.d+'"><span class="wn">'+(i===0&&!off?'Today':['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()])+'</span><span class="wdn">'+dt.getDate()+'</span><span class="wb">'+x.ev.slice(0,5).map(e=>'<i style="background:'+e.c+'"></i>').join('')+(x.ev.length>5?'<em>+'+(x.ev.length-5)+'</em>':'')+'</span><span class="wl">'+(x.ev.length?esc(x.ev[0].label):'Clear')+'</span></button>'; }).join('')+'</div>';
+  const dayEv=ev.filter(e=>e.date===sel);
+  const dayList='<div class="daylist">'+(dayEv.length?dayEv.map(e=>'<button type="button" class="dl" data-open="'+esc(e.t.id)+'"><i style="background:'+e.c+'"></i><b>'+esc(e.label)+'</b><span>'+esc(e.t.wr)+' '+esc(e.t.name)+'</span><em>'+esc(e.t.facilitator||'')+'</em></button>').join(''):'<div class="muted" style="font-size:13px;padding:6px 2px">Nothing dated on '+fmt(sel)+'.</div>')+'</div>';
+  // tiles
+  const hc=hubCounts(), media=Object.values(S.media).filter(m=>m.status!=='Done').length;
+  const tile=(k,v,s,goTo,c,cls)=>'<button type="button" class="st-t '+(cls||'')+'" data-go="'+goTo+'" style="--tc:'+c+'"><span class="tk-k">'+k+'</span><span class="tk-v" data-count="'+v+'">'+v+'</span><span class="tk-s">'+s+'</span><span class="tk-bar"><i style="width:'+Math.min(100,act.length?Math.round(v/act.length*100):0)+'%"></i></span></button>';
+  const tiles='<div class="st-grid">'+tile('Your Move',mine.length,mine.length?'Waiting on '+(S.viewAs?esc(first):'you'):'Nothing waiting','mine','var(--c4)',mine.length?'hot':'')+tile('Live Work',act.length,'Approved through release','board','var(--c1)')+tile('Past Target',late.length,'Target to Submit to IM','late','var(--bad)',late.length?'alert':'')+tile('In Comment',inC.length,soon?'Next ends '+fmtS(soon.dates.commentEnd):'None open','comment','var(--c6)')+tile('Waiting on '+esc(govName()),gov.length,'Approvals to record','governance','var(--c5)')+tile('On Hold',hold.length,hold.length?'Paused work':'Nothing paused','hold','var(--hold)')+
+    (S.hub?tile('In the Initiative Hub',hc.confirm+hc.queue,hc.confirm+' to confirm, '+hc.queue+' awaiting approval','hub','var(--c3)'):'')+tile('MISMO Media',media,media?'Requests open':'Nothing open','media','var(--c2)')+'</div>';
+  // how it all connects
+  const step=(n,l,o,k,c,extra)=>'<button type="button" class="pm-s'+(k?'':' ext')+'"'+(k?' data-stage="'+k+'"':(extra?' data-go="'+extra+'"':''))+' style="--sc:'+c+'"><span class="pm-n">'+n+'</span><span class="pm-l">'+esc(l)+'</span><span class="pm-o">'+esc(o)+'</span></button>';
+  const map='<div class="pm"><div class="pm-grp"><div class="pm-gl">Initiative Hub</div><div class="pm-row">'+step(S.hub?hc.confirm:'·','Work Request Confirmed','MISMO Staff','', '#7794aa','hub')+step(S.hub?hc.queue:'·',proc().gov==='RSGC'?'BET Approval':'BET Approval','BET','','#7794aa','hub')+'</div></div><div class="pm-arrow">→</div><div class="pm-grp"><div class="pm-gl">MISMO Manufacturing System</div><div class="pm-row">'+stages().map(s=>step(act.filter(t=>t.stage===s.key).length,s.name,s.owner==='gov'?govName():(ROLE_LABEL[s.owner]||''),s.key,s.color)).join('<span class="pm-a">›</span>')+'<span class="pm-a">›</span>'+step(allTickets().filter(t=>t.state==='published'&&(t.dates&&t.dates.published||'')>=addDays(td,-365)).length,'Published','Last 12 months','','#0f7b5c','all')+'</div></div></div>';
+  const attention=[...late.map(t=>[t,'Past Target to Submit to IM ('+fmtS(t.dates.targetIM)+')','bad']),
+    ...act.filter(t=>t.stage==='comment'&&t.dates&&t.dates.commentEnd&&daysBetween(td,t.dates.commentEnd)<=7&&daysBetween(td,t.dates.commentEnd)>=0).map(t=>[t,'Comment period ends '+fmtS(t.dates.commentEnd),'warn']),
+    ...act.filter(stalled).map(t=>[t,stageAge(t)+' days at '+stageDef(t.stage).name,'warn']),
+    ...act.filter(t=>t.stage==='comment'&&t.sub==='setup').map(t=>[t,'Approved for comment; not posted yet','warn'])];
+  const att=attention.length?'<table class="tbl"><tbody>'+attention.slice(0,10).map(([t,why,c])=>'<tr class="rowlink" data-open="'+esc(t.id)+'"><td class="nowrap muted">'+esc(t.wr)+'</td><td><div class="nm">'+esc(t.name)+'</div><div class="muted" style="font-size:12px">'+esc(t.facilitator||'')+'</div></td><td><span class="chip '+c+'">'+esc(why)+'</span></td></tr>').join('')+'</tbody></table>':'<div class="empty">Nothing needs attention right now.</div>';
+  const facs=[...new Set(act.map(t=>t.facilitator||'Unassigned'))].sort();
+  const fbars=facs.map(f=>{ const ts=act.filter(t=>(t.facilitator||'Unassigned')===f); const segs=stages().map(s=>{ const n=ts.filter(t=>t.stage===s.key).length; return n?'<i style="flex:'+n+';background:'+s.color+'" title="'+esc(s.name)+': '+n+'"></i>':''; }).join(''); return '<button type="button" class="facrow" data-fac="'+esc(f)+'"><span class="fn">'+esc(f)+'</span><span class="fb">'+segs+'</span><b>'+ts.length+'</b></button>'; }).join('');
+  return '<div class="hero hero2"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}))+'</div><h2>'+g+(first?', '+esc(first):'')+'</h2><p>'+line+'</p></div>'+plateHtml+'</div>'+
+    '<div class="secthead"><h2>'+(off?'The Line, Looking Ahead':'The Line')+'</h2><div class="seg" id="hometab"><button type="button" data-ht="week" aria-pressed="'+(S.homeTab==='week')+'">This Week</button><button type="button" data-ht="map" aria-pressed="'+(S.homeTab==='map')+'">How It All Connects</button></div></div>'+
+    (S.homeTab==='week'?strip+dayList+tiles:map+tiles)+
+    '<div class="cols2"><div class="card"><h3>Needs Attention</h3>'+att+'</div><div class="card"><h3>Each Facilitator’s Work by Stage</h3>'+(fbars||'<div class="empty">No live work yet.</div>')+'</div></div>';
+};
+function homeLive(m){
+  $$('[data-ht]',m).forEach(b=>b.onclick=()=>{ S.homeTab=b.dataset.ht; renderAll(); });
+  $$('[data-day]',m).forEach(b=>b.onclick=()=>{ S.daySel=b.dataset.day; renderAll(); });
+  if(!counted){ counted=true; $$('[data-count]',m).forEach(el=>{ const to=+el.dataset.count; if(!to) return; const t0=performance.now(); const step=n=>{ const k=Math.min(1,(n-t0)/650); el.textContent=Math.round(to*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(step); }; el.textContent='0'; requestAnimationFrame(step); }); }
+}
+
+/* ---------- current leadership for each group, from Elections HQ ---------- */
+const ELECTIONS_ROSTER='https://resources.mismo.org/elections-hq/';
+const gnorm=s=>String(s||'').toLowerCase().replace(/\(.*?\)/g,' ').replace(/\b(cop|dwg|community of practice|development workgroup|workgroup|task force|area of focus)\b/g,' ').replace(/[^a-z0-9]/g,'');
+async function electionsSync(){
+  if(S.mode!=='relay') return;
+  const rs=window.ResourcesSession, tok=rs&&rs.token(); if(!tok) return;
+  const get=async n=>{ const r=await fetch(window.__hqRelay.config.RELAY_URL+'/elections-hq/data/'+n,{headers:{Authorization:'Bearer '+tok},cache:'no-store'}); if(!r.ok) throw new Error(r.status); const b=await r.json(); return Object.values((b.data&&b.data.docs)||{}); };
+  try{ const [L,G]=await Promise.all([get('leaders'),get('groups')]); S.leaders=L.filter(x=>x.status!=='inactive'&&x.status!=='former'); S.egroups=G; if(S.panel) renderPanel(); }catch(e){ S.leaders=null; }
+}
+function leadersFor(t){
+  if(!S.leaders) return null;
+  const k=gnorm(t.workgroup); if(!k) return [];
+  const names=new Set([k]); (S.egroups||[]).forEach(g=>{ if([g.name,g.formerly,g.mtName].some(x=>gnorm(x)===k)){ [g.name,g.formerly,g.mtName].forEach(x=>x&&names.add(gnorm(x))); } });
+  return S.leaders.filter(l=>names.has(gnorm(l.group))||names.has(gnorm(l.formerGroup))).sort((a,b)=>String(a.position).localeCompare(String(b.position)));
+}
+function leadPanel(t){
+  if(!t.workgroup) return '';
+  const L=leadersFor(t);
+  const link='<a class="btn sm" href="'+ELECTIONS_ROSTER+'" target="_blank" rel="noopener">Open in Elections HQ</a>';
+  let body;
+  if(L===null) body='<div class="muted" style="font-size:13px">Current leaders for '+esc(t.workgroup)+' are kept in Elections HQ.</div>';
+  else if(!L.length) body='<div class="muted" style="font-size:13px">Elections HQ has no current leaders listed for '+esc(t.workgroup)+'.</div>';
+  else body=L.map(l=>'<div class="vote"><span class="nm"><b>'+esc(l.name)+'</b>'+(l.company?' <span class="muted">· '+esc(l.company)+'</span>':'')+'</span><span class="chip">'+esc(l.position||'Leader')+'</span>'+(l.termEnd?'<span class="muted" style="font-size:12px">term ends '+esc(fmtS(l.termEnd))+'</span>':'')+'</div>').join('');
+  return '<div class="psec"><h4>Current Leadership<span class="sp">'+link+'</span></h4>'+body+'</div>';
+}
+
 /* ---------- settings ---------- */
 let setTab='process';
 VIEWS.settings=function(){
@@ -1298,7 +1572,7 @@ VIEWS.settings=function(){
       '<p class="muted" style="font-size:13px;margin:10px 0 0">Switching changes the stage list, the governance body ('+esc(p.presets.current.gov)+' or '+esc(p.presets.next.gov)+') and the comment lengths for everyone at once. Tickets keep their place and their history; a ticket in a stage the new process turns off shows up for staff to move.</p></div>'+
       '<div class="card"><h3>Stages: '+esc(pr.label)+'<span class="sp"><button class="btn sm pri" id="psave" type="button">Save Stages</button></span></h3>'+
       '<div class="kv" style="margin-bottom:12px"><div class="f"><label>Governance Body</label><input id="pgov" value="'+esc(pr.gov)+'"></div><div class="f"><label>Comment Lengths (Days)</label><input id="pdays" value="'+esc((pr.commentDays||[]).join(', '))+'"></div></div>'+
-      '<div class="muted" style="font-size:12px;margin-bottom:8px">Drag to reorder. Untick a stage to switch it off.</div><div class="stagelist" id="slist">'+pr.stages.map((s,i)=>'<div class="srow'+(s.on===false?' off':'')+'" draggable="true" data-i="'+i+'"><span class="grip" title="Drag">⋮⋮</span><input type="checkbox" data-f="on"'+(s.on!==false?' checked':'')+' style="width:16px;height:16px"><input data-f="name" value="'+esc(s.name)+'"><select data-f="owner">'+Object.entries(ROLE_LABEL).map(([k,l])=>'<option value="'+k+'"'+(s.owner===k?' selected':'')+'>'+esc(l)+'</option>').join('')+'</select><input class="hide-sm" data-f="desc" value="'+esc(s.desc||'')+'"><input class="hide-sm" type="color" data-f="color" value="'+esc(s.color)+'" style="padding:0;height:28px"></div>').join('')+'</div></div>';
+      '<div class="muted" style="font-size:12px;margin-bottom:8px">Drag to reorder. Untick a stage to switch it off. Rename it, change who owns it, or add your own stage; a stage you add gets a Done button that moves the work on.</div><div class="stagelist" id="slist">'+pr.stages.map((s,i)=>'<div class="srow'+(s.on===false?' off':'')+'" draggable="true" data-i="'+i+'"><span class="grip" title="Drag">⋮⋮</span><input type="checkbox" data-f="on"'+(s.on!==false?' checked':'')+' style="width:16px;height:16px"><input data-f="name" value="'+esc(s.name)+'"><select data-f="owner">'+Object.entries(ROLE_LABEL).map(([k,l])=>'<option value="'+k+'"'+(s.owner===k?' selected':'')+'>'+esc(l)+'</option>').join('')+'</select><input class="hide-sm" data-f="desc" value="'+esc(s.desc||'')+'"><input class="hide-sm" type="color" data-f="color" value="'+esc(s.color)+'" style="padding:0;height:28px">'+(STAGE_KEYS.includes(s.key)?'':'<button class="btn sm ghost" data-sdel="'+i+'" type="button" title="Remove this stage">Remove</button>')+'</div>').join('')+'</div><div style="margin-top:10px"><button class="btn sm" id="sadd" type="button">+ Add a Stage</button></div></div>';
   }
   if(setTab==='people'){
     const P=S.people; const block=(title,key,list,desc)=>'<div class="card" data-plist="'+key+'"><h3>'+esc(title)+'<span class="sp"><button class="btn sm" data-padd="'+key+'" type="button">+ Add</button></span></h3>'+(desc?'<div class="muted" style="font-size:12px;margin:-4px 0 8px">'+desc+'</div>':'')+(list||[]).slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>'<div class="vote"><span class="nm"><b>'+esc(p.name)+'</b> <span class="muted">'+esc(p.email||'')+'</span></span><button class="btn sm ghost" data-pdel="'+key+'|'+esc(p.name)+'" type="button">Remove</button></div>').join('')+'</div>';
@@ -1325,6 +1599,10 @@ function wireSettings(m){
       r.addEventListener('dragover',e=>{ e.preventDefault(); r.classList.add('dragover'); }); r.addEventListener('dragleave',()=>r.classList.remove('dragover'));
       r.addEventListener('drop',e=>{ e.preventDefault(); if(drag&&drag!==r){ const rect=r.getBoundingClientRect(); sl.insertBefore(drag,(e.clientY-rect.top)>rect.height/2?r.nextSibling:r); } });
       $('[data-f=on]',r).onchange=e=>r.classList.toggle('off',!e.target.checked); });
+    const sa=$('#sadd',m); if(sa) sa.onclick=async()=>{ const v=await modal({title:'Add a Stage',ok:'Add',body:fld('Stage Name',inp('name',''))+fld('Who Owns It',sel('owner',Object.entries(ROLE_LABEL),'staff'))+fld('Goes After',sel('after',allStages().map(s=>[s.key,s.name]),'work'))+fld('What Happens Here',inp('desc','')),validate:x=>x.name?'':'Name the stage'}); if(!v) return;
+      const p=clone(S.process), pr=p.presets[p.active]; const key='x-'+v.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').slice(0,30); const i=pr.stages.findIndex(s=>s.key===v.after);
+      pr.stages.splice(i+1,0,{key,name:v.name,owner:v.owner,color:'#456179',on:true,desc:v.desc}); S.process=p; await write('config','process',p); toast('Stage added'); renderAll(); };
+    $$('[data-sdel]',m).forEach(b=>b.onclick=async()=>{ const p=clone(S.process), pr=p.presets[p.active]; const st=pr.stages[+b.dataset.sdel]; if(liveTickets().some(t=>t.stage===st.key)){ toast('Move the work out of '+st.name+' first'); return; } pr.stages.splice(+b.dataset.sdel,1); S.process=p; await write('config','process',p); renderAll(); });
     $('#psave',m).onclick=async()=>{ const p=clone(S.process), pr=p.presets[p.active]; const old=pr.stages;
       pr.stages=$$('.srow',sl).map(r=>{ const o=clone(old[+r.dataset.i]); o.on=$('[data-f=on]',r).checked; o.name=$('[data-f=name]',r).value.trim()||o.name; o.owner=$('[data-f=owner]',r).value; const d=$('[data-f=desc]',r); if(d) o.desc=d.value; const c=$('[data-f=color]',r); if(c) o.color=c.value; return o; });
       pr.gov=$('#pgov',m).value.trim()||pr.gov; pr.commentDays=$('#pdays',m).value.split(/[ ,]+/).map(Number).filter(Boolean); if(!pr.commentDays.length) pr.commentDays=[30];
@@ -1361,7 +1639,7 @@ async function importData(txt,over,msg){
 /* ---------- wiring the page ---------- */
 function wireMain(m){
   $$('[data-open]',m).forEach(el=>el.addEventListener('click',e=>{ if(e.target.closest('[data-decide],[data-media],a')) return; openPanel(el.dataset.open); }));
-  $$('[data-go]',m).forEach(b=>b.onclick=()=>{ const g=b.dataset.go; if(g==='late'){ S.filters.state='live'; go('all'); S.filters.sort='target'; S.filters.dir=1; renderAll(); return; } if(g==='hold'){ S.filters.state='hold'; go('all'); return; } go(g); });
+  $$('[data-go]',m).forEach(b=>b.onclick=()=>{ const g=b.dataset.go; if(g==='late'){ S.filters.state='live'; go('all'); S.filters.sort='target'; S.filters.dir=1; renderAll(); return; } if(g==='hold'){ S.filters.state='hold'; go('all'); return; } if(g==='hub'){ window.open('https://resources.mismo.org/initiative-hub/work-requests.html#all','_blank','noopener'); return; } go(g); });
   $$('[data-stage]',m).forEach(b=>b.onclick=()=>{ go('board'); setTimeout(()=>{ const c=$('[data-col="'+b.dataset.stage+'"]'); if(c) c.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); },50); });
   $$('[data-fac]',m).forEach(b=>b.onclick=()=>{ S.filters.fac=b.dataset.fac==='Unassigned'?'':b.dataset.fac; go('board'); });
   $$('[data-decide]',m).forEach(b=>b.onclick=()=>decideFromList(b.dataset.decide));
@@ -1383,6 +1661,8 @@ function wireMain(m){
       col.addEventListener('drop',async e=>{ e.preventDefault(); col.classList.remove('drop'); const t=S.tickets[dragId]; const to=col.dataset.col; if(!t||t.stage===to) return; await move(t,to,{text:'Moved on the board from '+stageDef(t.stage).name+' to '+stageDef(to).name}); }); });
   }
   if(S.view==='settings') wireSettings(m);
+  if(S.view==='home') homeLive(m);
+  $$('[data-mform]',m).forEach(b=>b.onclick=async()=>{ const x=S.media[b.dataset.mform]; if(x){ try{ await navigator.clipboard.writeText(x.kind+' for '+x.wr+' '+x.name+'\n\n'+x.text); toast('Request copied: paste it into the MISMO Media form'); }catch(e){} } window.open('https://resources.mismo.org/forms/request/','_blank','noopener'); });
 }
 
 /* ---------- rail: collapse, remember, search (Summit HQ pattern) ---------- */
@@ -1446,7 +1726,7 @@ async function boot(){
   try{ const rs=window.ResourcesSession&&window.ResourcesSession.current(); if(rs){ S.me.name=S.me.name||rs.name||''; S.me.email=S.me.email||rs.email||''; S.relayRole=window.ResourcesSession.role&&window.ResourcesSession.role('mms'); if(S.relayRole==='view') S.canWrite=false; } }catch(e){}
   if(!ok && window.__mmsSeed){ const sd=window.__mmsSeed; Store.mem={tickets:sd.tickets||{},config:{},outbox:{},media:{}}; if(sd.me) S.me=sd.me; }
   try{ S.sample=window.claude&&await window.claude.use('sample'); }catch(e){ S.sample=null; }
-  const done=()=>{ if(S.loaded.tickets&&S.loaded.config&&!S.ready){ S.ready=true; computeRole(); setupViewAs(); if(!location.hash&&!S.isStaff&&(S.people.facilitators||[]).some(f=>sameName(f.name,S.me.name))) S.view='mine'; go(S.view); runAutomations(); setInterval(runAutomations,5*60000); } else if(S.ready){ computeRole(); renderAll(); } };
+  const done=()=>{ if(S.loaded.tickets&&S.loaded.config&&!S.ready){ S.ready=true; computeRole(); setupViewAs(); if(!location.hash&&!S.isStaff&&(S.people.facilitators||[]).some(f=>sameName(f.name,S.me.name))) S.view='mine'; go(S.view); runAutomations(); setInterval(runAutomations,5*60000); hubSync(); setInterval(hubSync,5*60000); electionsSync(); } else if(S.ready){ computeRole(); renderAll(); } };
   const timer=setTimeout(()=>{ if(!S.ready){ S.loaded.tickets=S.loaded.config=true; done(); toast('The MMS records are taking a while to load; what shows may be out of date.'); } },12000);
   Store.sub('tickets',o=>{ S.tickets=o; S.loaded.tickets=true; clearTimeout(timer); done(); });
   Store.sub('config',o=>{ if(o.process&&o.process.presets) S.process=o.process; if(o.people&&o.people.roles) S.people=o.people; if(o.notify) S.notify=Object.assign(clone(DEFAULT_NOTIFY),o.notify); S.loaded.config=true; done(); });
@@ -1467,8 +1747,9 @@ function setupViewAs(){
 }
 function renderWho(){
   const w=$('#who-chip'); if(window.ResourcesSession||!S.me.name){ w.innerHTML=''; return; }
-  const ini=S.me.name.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
-  w.innerHTML='<span class="whochip"><span class="av">'+esc(ini)+'</span>'+esc(S.me.name.split(' ')[0])+'</span>';
+  const full=(personByName(S.me.name)||{}).name||S.me.name;
+  const ini=full.split(' ').filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase();
+  w.innerHTML='<span class="whochip" title="'+esc(full)+'"><span class="av">'+esc(ini)+'</span><span class="fn">'+esc(full.split(' ')[0])+'</span><span class="cv">\u25be</span></span>';
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
 })();
