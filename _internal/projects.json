@@ -1,4 +1,12 @@
 {
+  "mms": {
+    "repo": "GitMISMO/mms-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
+  },
  "cms": {
     "repo": "GitMISMO/cms-data",
     "branch": "main",
