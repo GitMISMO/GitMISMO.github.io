@@ -994,7 +994,7 @@ main.enter .mn{animation:mnin .4s cubic-bezier(.2,.7,.2,1) both;animation-delay:
 .metro.dragging .mn[data-mst] .mn-dot b{border-style:dashed;transform:scale(1.08)}
 .metro.dragging .mn.over .mn-dot b{background:var(--sc);color:#fff;transform:scale(1.35);border-style:solid}
 .metro.dragging .mn.cur{opacity:.35}
-@media(max-width:760px){.mt-row{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:6px}.mt-tr,.mt-ph{display:none}.mn-tip{display:none!important}}
+@media(max-width:1100px){.mt-row{grid-template-columns:repeat(auto-fill,minmax(92px,1fr));row-gap:8px}.mt-tr,.mt-ph{display:none}}@media(max-width:760px){.mn-tip{display:none!important}}
 
 /* Pipeline Board around the line */
 .bdetail{background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;max-height:max(420px,calc(100vh - 400px))}
