@@ -36,6 +36,14 @@
       "path": "/initiative-hub/work-requests.html"
     },
     {
+      "key": "mms",
+      "label": "MISMO Manufacturing System",
+      "menu": "MMS (MISMO Manufacturing System)",
+      "colour": "#0D314C",
+      "group": "Standards & Tools",
+      "path": "/mms/"
+    },
+    {
       "key": "qr",
       "label": "QR Code Manager",
       "colour": "#2477B8",
