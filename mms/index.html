@@ -1,0 +1,1478 @@
+<!doctype html>
+<html lang="en" data-rs-gate>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MMS · MISMO Manufacturing System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>:root{
+  --navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
+  --ground:#f1f6fa;--surface:#ffffff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;
+  --border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
+  --ink:#0d314c;--ink-2:#456179;--ink-3:#7794aa;
+  --good:#0f7b5c;--bad:#b3372c;--warn:#a2701a;
+  --good-bg:#e3f4ed;--bad-bg:#fbe9e7;--warn-bg:#fbf1dc;--info-bg:#e4f2fb;--hold-bg:#efe9f7;--hold:#6b4fa0;
+  --accent:#2477b8;--accent-soft:#e4f2fb;
+  --c1:#2477b8;--c2:#eb6834;--c3:#1baf7a;--c4:#eda100;--c5:#e87ba4;--c6:#008300;
+  --display:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --ui:var(--display);--mono:var(--display);
+  --hq-h:64px;--rail-w:240px;--rail-mini:62px;
+  --shadow:0 1px 2px rgba(13,49,76,.06),0 4px 14px rgba(13,49,76,.06);
+  --r:6px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#0a2130;
+  --border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;
+  --ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;
+  --good:#4fc79b;--bad:#f08579;--warn:#e0a83c;
+  --good-bg:#0f3a30;--bad-bg:#432423;--warn-bg:#3d3017;--info-bg:#123a55;--hold-bg:#2c2545;--hold:#b9a3e8;
+  --accent:#3987e5;--accent-soft:#173c52;
+  --c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#2f9e2f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#0a2130;
+  --border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;
+  --ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;
+  --good:#4fc79b;--bad:#f08579;--warn:#e0a83c;
+  --good-bg:#0f3a30;--bad-bg:#432423;--warn-bg:#3d3017;--info-bg:#123a55;--hold-bg:#2c2545;--hold:#b9a3e8;
+  --accent:#3987e5;--accent-soft:#173c52;
+  --c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#2f9e2f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--display);font-size:14px;line-height:1.45;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{letter-spacing:-.012em;margin:0;color:var(--ink)}
+a{color:var(--accent)}
+button{font-family:inherit}
+[hidden]{display:none!important}
+
+/* ── masthead + rail (Summit HQ pattern) ── */
+.hqtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:97;height:var(--hq-h);
+  background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;
+  padding:0 22px;box-shadow:0 1px 0 rgba(80,164,219,.28);
+  margin-left:calc(0px - var(--rail-w));width:calc(100% + var(--rail-w));
+  transition:margin-left .2s cubic-bezier(.4,0,.2,1), width .2s cubic-bezier(.4,0,.2,1)}
+body.railmini .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}
+.hqtop .mastrule{display:block;width:2px;height:34px;flex:0 0 auto;margin-inline:20px;border-radius:1px;background:var(--sky)}
+.hqtop .hqname .short{display:none}
+@media(max-width:700px){.hqtop .hqname .short{display:inline}}
+.hqtop .hqname{font-family:var(--display);font-size:15.5px;font-weight:700;letter-spacing:-.005em;color:var(--sky);white-space:nowrap}
+.hqtop-r{margin-left:auto;display:flex;align-items:center;gap:13px}
+.hqtop .eyebrow-m{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
+@media(max-width:700px){.hqtop .hqname .long{display:none}.hqtop .eyebrow-m{display:none}.figs{grid-template-columns:1fr 1fr}.fig .v{font-size:24px}.hqtop .mastrule{margin-inline:12px}.hqtop{padding:0 12px}}
+.logoplate{background:#fff;border-radius:7px;padding:8px 14px;display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative}
+.logoplate .wordmark{height:24px;width:auto;display:block}
+.santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
+html[data-season="december"] .santa{display:block}
+#rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
+#rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
+.whochip{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--navy);border-radius:4px;padding:4px 10px 4px 4px;font-size:13px;font-weight:600;border:0;cursor:default;white-space:nowrap}
+.whochip .av{width:26px;height:26px;border-radius:50%;background:var(--sky-wash);color:var(--navy);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+
+.hq.rail{position:fixed;left:0;top:calc(var(--hq-h) + env(safe-area-inset-top,0px));bottom:0;width:var(--rail-w);z-index:95;
+  background:var(--navy);color:#fff;display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden auto;overscroll-behavior:contain;
+  box-shadow:1px 0 0 rgba(80,164,219,.22), 4px 0 18px rgba(6,32,47,.14);transition:width .2s cubic-bezier(.4,0,.2,1)}
+body{padding-left:var(--rail-w);transition:padding-left .2s cubic-bezier(.4,0,.2,1)}
+@media (prefers-reduced-motion:reduce){.hq.rail,body,.hqtop{transition:none}}
+body.railmini{padding-left:var(--rail-mini)}
+body.railmini .hq.rail{width:var(--rail-mini)}
+body.railmini .rail-top{justify-content:center;padding:10px 0 9px}
+body.railmini .rail-lbl{display:none}
+body.railmini .railhide{margin:0}
+body.railmini .railhide svg{transform:scaleX(-1)}
+body.railmini .railfind{padding:9px 0 2px;display:flex;justify-content:center}
+body.railmini .railfind .fi,body.railmini .railfind input,body.railmini .railq-x,body.railmini .railhits{display:none}
+body.railmini .railfind-b{display:flex}
+body.railmini .hq nav{padding:6px 0 4px;align-items:center;gap:4px}
+body.railmini .hq nav button{width:42px;padding:10px 0;justify-content:center;border-radius:9px;box-shadow:none}
+body.railmini .hq nav button span,body.railmini .hq nav .navgrp,body.railmini .hq nav button b{display:none}
+body.railmini .hq nav button svg{width:19px;height:19px}
+body.railmini .hq nav button[aria-current]{background:var(--sky);color:var(--navy-deep)}
+body.railmini .hq nav button[aria-current] svg{stroke:var(--navy-deep);opacity:1}
+body.railmini .railsum{display:none}
+body.railmini .hq .mast-right{gap:3px;padding:8px 0 11px;align-items:center}
+body.railmini .hq .mast-right .theme-btn{width:42px;padding:9px 0;font-size:0;justify-content:center;border-radius:9px}
+body.railmini .hq .mast-right .theme-btn span{display:none}
+.railfind-b{display:none;width:34px;height:30px;border:1px solid rgba(255,255,255,.18);border-radius:7px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);align-items:center;justify-content:center;padding:0}
+.railfind-b svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.rail-top{display:flex;align-items:center;gap:8px;padding:11px 10px 9px;border-bottom:1px solid rgba(80,164,219,.2);flex:0 0 auto}
+.rail-lbl{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.55);padding-left:3px}
+.railhide{margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.18);border-radius:5px;color:rgba(255,255,255,.75);width:24px;height:24px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.railhide svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.railhide:hover{background:rgba(255,255,255,.14);color:#fff}
+.railfind{position:relative;padding:11px 12px 3px;flex:0 0 auto}
+.railfind .fi{position:absolute;left:21px;top:20px;width:14px;height:14px;fill:none;stroke:rgba(255,255,255,.5);stroke-width:2;stroke-linecap:round;pointer-events:none}
+.railfind input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:6px;color:#fff;font:inherit;font-size:12.5px;padding:6px 26px 6px 30px}
+.railfind input::placeholder{color:rgba(255,255,255,.5)}
+.railfind input:focus{outline:2px solid var(--sky);outline-offset:-1px;background:rgba(255,255,255,.16)}
+.railfind input::-webkit-search-cancel-button{display:none}
+.railq-x{position:absolute;right:17px;top:16px;width:20px;height:20px;border:0;border-radius:4px;background:transparent;color:rgba(255,255,255,.6);font-size:15px;line-height:1;padding:0;cursor:pointer}
+.railhits{margin-top:7px;background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;box-shadow:0 10px 26px rgba(6,32,47,.3);overflow:hidden auto;max-height:min(52vh,420px)}
+.railhits .rh-g{font-size:9px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--ink-3);background:var(--sunk);padding:4px 10px;border-bottom:1px solid var(--line);position:sticky;top:0}
+.railhits .rh{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:6px 10px;color:var(--ink);cursor:pointer}
+.railhits .rh:hover,.railhits .rh.on{background:var(--accent-soft)}
+.railhits .rh b{display:block;font-size:12.5px;font-weight:600;line-height:1.3}
+.railhits .rh i{display:block;font-style:normal;font-size:10.5px;color:var(--ink-3);margin-top:1px}
+.railhits .rh-none{padding:10px;font-size:12px;color:var(--ink-3)}
+.hq nav{display:flex;flex-direction:column;gap:1px;padding:8px 8px 4px;flex:0 0 auto}
+.hq nav .navgrp{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.45);padding:12px 10px 4px}
+.hq nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;color:rgba(255,255,255,.76);padding:8px 10px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.hq nav button svg{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.hq nav button b{margin-left:auto;font-size:11px;font-weight:700;background:rgba(255,255,255,.14);border-radius:4px;padding:1px 6px;min-width:22px;text-align:center}
+.hq nav button b.warn{background:var(--sky);color:var(--navy-deep)}
+.hq nav button:hover{color:#fff;background:rgba(255,255,255,.09)}
+.hq nav button[aria-current]{color:#fff;font-weight:600;background:var(--navy-mid);box-shadow:inset 3px 0 0 var(--sky)}
+.hq nav button[aria-current] svg{opacity:1;stroke:var(--sky)}
+.railsum{padding:6px 12px 10px;flex:0 0 auto;border-top:1px solid rgba(80,164,219,.16);margin-top:4px;padding-top:11px}
+.railsum label{display:block;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.52);font-weight:700;margin-bottom:4px}
+.hq .hq-pick{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.26);color:#fff;border-radius:5px;padding:6px 9px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;width:100%}
+.hq .hq-pick option{background:var(--surface);color:var(--ink);font-weight:500}
+.hq .mast-right{margin-top:auto;display:flex;flex-direction:column;align-items:stretch;gap:1px;padding:8px 8px 10px;border-top:1px solid rgba(80,164,219,.2);flex:0 0 auto}
+.theme-btn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;color:rgba(255,255,255,.76);padding:8px 10px;font:inherit;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.theme-btn .ti{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.theme-btn .ti-sun{display:none}
+:root[data-theme="dark"] .theme-btn .ti-moon{display:none}
+:root[data-theme="dark"] .theme-btn .ti-sun{display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme-btn .ti-moon{display:none}:root:not([data-theme="light"]) .theme-btn .ti-sun{display:block}}
+.theme-btn:hover{color:#fff;background:rgba(255,255,255,.09)}
+.railscrim{position:fixed;inset:0;z-index:94;background:rgba(6,32,47,.42);border:0;padding:0;display:none}
+@media(max-width:900px){
+  body:not(.railmini){padding-left:var(--rail-mini)}
+  body:not(.railmini) .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}
+  body:not(.railmini) .hq.rail{box-shadow:4px 0 26px rgba(6,32,47,.4)}
+  body:not(.railmini) .railscrim{display:block}
+}
+
+/* ── page ── */
+main{padding:26px 30px 80px;max-width:none}
+@media(max-width:700px){main{padding:18px 16px 80px}}
+.pagehead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.pagehead h1{font-size:24px;font-weight:700}
+.pagehead .sub{color:var(--ink-2);font-size:13.5px;margin-top:3px}
+.pagehead .acts{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.eyebrow{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;color:var(--ink-3)}
+.banner{background:var(--warn-bg);color:var(--ink);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:var(--r);padding:9px 14px;margin-bottom:16px;font-size:13px}
+.banner.info{background:var(--info-bg);border-left-color:var(--accent)}
+
+/* hero */
+.hero{background:linear-gradient(135deg,#0d314c 0%,#14486e 100%);color:#fff;border-radius:10px;padding:22px 26px;margin-bottom:22px;position:relative;overflow:hidden}
+.hero:after{content:"";position:absolute;right:-60px;top:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(116,191,235,.28),rgba(116,191,235,0) 70%)}
+.hero .date{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sky);font-weight:700}
+.hero h2{color:#fff;font-size:27px;font-weight:700;margin:6px 0 6px}
+.hero p{margin:0;color:rgba(255,255,255,.85);font-size:14.5px;position:relative;z-index:1}
+.hero p b{color:var(--sky)}
+
+/* figure boxes */
+.figs{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:22px}
+.fig{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 15px;text-align:left;cursor:pointer;color:var(--ink);box-shadow:var(--shadow);position:relative;transition:transform .12s, border-color .12s}
+.fig:hover{transform:translateY(-1px);border-color:var(--border-strong)}
+.fig .k{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--ink-3);white-space:nowrap}
+.fig .v{font-size:30px;font-weight:700;line-height:1.1;margin-top:4px}
+.fig .s{font-size:12px;color:var(--ink-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fig.alert .v{color:var(--bad)}
+.fig.warnf .v{color:var(--warn)}
+.fig:before{content:"";position:absolute;left:0;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:var(--fc,var(--accent))}
+
+/* cards & sections */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:22px}
+.card h3{font-size:15px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:10px}
+.card h3 .sp{margin-left:auto}
+.cols2{display:grid;grid-template-columns:1.4fr 1fr;gap:22px}
+@media(max-width:1100px){.cols2{grid-template-columns:1fr}}
+
+/* pipeline (stage strip) */
+.pipe{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.pipe .st{min-width:0;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:10px 10px 9px;cursor:pointer;text-align:left;color:var(--ink);position:relative}
+.pipe .st:hover{border-color:var(--border-strong);background:var(--accent-soft)}
+.pipe .st .n{font-size:24px;font-weight:700;line-height:1}
+.pipe .st .l{font-size:11.5px;font-weight:600;color:var(--ink-2);margin-top:5px;line-height:1.25}
+.pipe .st .o{font-size:10.5px;color:var(--ink-3);margin-top:2px}
+.pipe .st .bar{position:absolute;left:0;right:0;bottom:0;height:3px;border-radius:0 0 6px 6px;background:var(--sc,var(--accent))}
+.pipe .st.zero{opacity:.55}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:5px;padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;min-width:max-content;line-height:1.3}
+.btn:hover{background:var(--surface-3)}
+.btn.pri{background:var(--navy);border-color:var(--navy);color:#fff}
+:root[data-theme="dark"] .btn.pri{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.pri{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}}
+.btn.pri:hover{filter:brightness(1.12)}
+.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.danger:hover{background:var(--bad-bg)}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:var(--surface-3)}
+.btn.sm{padding:3px 9px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+/* chips (rectangles, never pills) */
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;border-radius:3px;padding:2px 7px;background:var(--surface-3);color:var(--ink-2);white-space:nowrap;line-height:1.4}
+.chip.good{background:var(--good-bg);color:var(--good)}
+.chip.bad{background:var(--bad-bg);color:var(--bad)}
+.chip.warn{background:var(--warn-bg);color:var(--warn)}
+.chip.info{background:var(--info-bg);color:var(--accent)}
+.chip.hold{background:var(--hold-bg);color:var(--hold)}
+.chip .dot{width:7px;height:7px;border-radius:2px;background:currentColor}
+.size{display:inline-flex;align-items:center;justify-content:center;min-width:24px;height:20px;border-radius:3px;font-size:10.5px;font-weight:700;background:var(--navy);color:#fff;padding:0 5px}
+:root[data-theme="dark"] .size{background:var(--sky);color:var(--navy-deep)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .size{background:var(--sky);color:var(--navy-deep)}}
+
+/* filters */
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.filters select{max-width:240px}
+.filters select,.filters input{font:inherit;font-size:13px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:5px;padding:6px 9px}
+.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:5px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;color:var(--ink-2);padding:6px 12px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;border-right:1px solid var(--border)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}}
+
+/* board */
+.board{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start;min-height:60vh}
+.bcol{flex:0 0 268px;background:var(--surface-2);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;max-height:calc(100vh - 220px)}
+.bcol header{padding:10px 12px 8px;border-bottom:1px solid var(--border);position:relative}
+.bcol header:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:8px 8px 0 0;background:var(--sc,var(--accent))}
+.bcol header h4{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.bcol header h4 b{margin-left:auto;font-size:11px;background:var(--surface-3);border-radius:3px;padding:1px 6px;color:var(--ink-2)}
+.bcol header .o{font-size:11px;color:var(--ink-3);margin-top:1px}
+.bcol .cards{padding:8px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:60px}
+.bcol.none{flex-basis:170px}
+.bcol.drop{outline:2px dashed var(--accent);outline-offset:-3px;background:var(--accent-soft)}
+.tk{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:9px 10px;cursor:pointer;box-shadow:0 1px 1px rgba(13,49,76,.04);position:relative;text-align:left;width:100%;color:var(--ink);display:block}
+.tk:hover{border-color:var(--border-strong);box-shadow:var(--shadow)}
+.tk.dragging{opacity:.45}
+.tk .top{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--ink-3);font-weight:600}
+.tk .top .wr{color:var(--ink-2)}
+.tk .top .size{margin-left:auto}
+.tk .nm{font-size:13px;font-weight:600;margin:4px 0 6px;line-height:1.3}
+.tk .meta{display:flex;flex-wrap:wrap;gap:4px;align-items:center}
+.tk .who{font-size:11.5px;color:var(--ink-2)}
+.tk .age{position:absolute;right:9px;bottom:8px;font-size:10.5px;color:var(--ink-3)}
+.tk.late{border-left:3px solid var(--bad)}
+.tk.hold{border-left:3px solid var(--hold)}
+
+/* tables */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:13px}
+.tbl th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:700;padding:8px 10px;border-bottom:1px solid var(--navy);background:var(--surface-3);position:sticky;top:var(--hq-h);z-index:2;white-space:nowrap;cursor:pointer;user-select:none}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl tr.rowlink{cursor:pointer}
+.tbl tr.rowlink:hover td{background:var(--accent-soft)}
+.tbl .nm{font-weight:600}
+.tblwrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:auto;box-shadow:var(--shadow)}
+.tblwrap .tbl th{top:0}
+
+/* queue lists */
+.qgroup{margin-bottom:22px}
+.qgroup>h3{font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.qgroup>h3 .chip{font-size:11px}
+.qlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+.qitem{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;cursor:pointer;box-shadow:var(--shadow);text-align:left;color:var(--ink);width:100%}
+.qitem:hover{border-color:var(--border-strong)}
+.qitem .nm{font-weight:700;font-size:14px;margin:3px 0 4px}
+.qitem .nx{font-size:12.5px;color:var(--ink-2);margin-top:6px;display:flex;gap:6px;align-items:center}
+.qitem .nx b{color:var(--ink)}
+.mini-track{display:flex;gap:2px;margin-top:8px}
+.mini-track i{flex:1;height:5px;border-radius:2px;background:var(--surface-3)}
+.mini-track i.done{background:var(--sky)}
+.mini-track i.cur{background:var(--navy)}
+:root[data-theme="dark"] .mini-track i.cur{background:#fff}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mini-track i.cur{background:#fff}}
+
+.empty{padding:26px;text-align:center;color:var(--ink-3);font-size:13px;background:var(--surface);border:1px dashed var(--border-strong);border-radius:8px}
+
+/* right panel */
+.scrim{position:fixed;inset:0;background:rgba(6,32,47,.38);z-index:98;opacity:0;pointer-events:none;transition:opacity .18s}
+.scrim.on{opacity:1;pointer-events:auto}
+.panel{position:fixed;top:0;right:0;bottom:0;width:75vw;max-width:1280px;background:var(--ground);z-index:99;transform:translateX(102%);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;box-shadow:-10px 0 34px rgba(6,32,47,.25)}
+.panel.on{transform:none}
+@media(max-width:900px){.panel{width:100vw}}
+.ph{background:var(--navy);color:#fff;padding:16px 22px 0}
+.ph .row1{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ph .wr{font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--sky)}
+.ph h2{color:#fff;font-size:21px;font-weight:700;margin:6px 0 4px;line-height:1.25}
+.ph .sub{color:rgba(255,255,255,.75);font-size:13px}
+.ph .x{margin-left:auto;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;width:32px;height:30px;font-size:18px;cursor:pointer}
+.ph .x:hover{background:rgba(255,255,255,.2)}
+.track{display:flex;gap:3px;margin:14px 0 0;overflow-x:auto;padding-bottom:14px}
+.track .tst{flex:1 0 74px;min-width:74px;text-align:left;font-size:10.5px;color:rgba(255,255,255,.55);font-weight:600;border:0;background:none;padding:0;cursor:default;line-height:1.25}
+.track .tst i{display:block;height:6px;border-radius:2px;background:rgba(255,255,255,.14);margin-bottom:6px}
+.track .tst.done{color:rgba(255,255,255,.8)}
+.track .tst.done i{background:var(--sky)}
+.track .tst.cur{color:#fff}
+.track .tst.cur i{background:#fff;box-shadow:0 0 0 2px rgba(116,191,235,.55)}
+.track .tst small{display:block;font-weight:500;color:rgba(255,255,255,.5);font-size:10px;margin-top:1px}
+.pb{flex:1;overflow-y:auto;padding:18px 22px 40px}
+.actbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:18px;box-shadow:var(--shadow)}
+.actbar .next{flex:1 1 260px;min-width:220px}
+.actbar .next .eyebrow{margin-bottom:2px}
+.actbar .next b{font-size:14px}
+.actbar .next .why{font-size:12.5px;color:var(--ink-2)}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media(max-width:1100px){.pgrid{grid-template-columns:1fr}}
+.psec{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px;box-shadow:var(--shadow)}
+.psec h4{font-size:13.5px;font-weight:700;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.psec h4 .sp{margin-left:auto}
+.psec.full{grid-column:1/-1}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px 16px}
+.kv .f label{display:block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin-bottom:3px;white-space:nowrap}
+.kv .f input,.kv .f select,.kv .f textarea,.fld input,.fld select,.fld textarea{width:100%;font:inherit;font-size:13px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:5px;padding:6px 8px}
+.kv .f input:focus,.kv .f select:focus,.kv .f textarea:focus,.fld input:focus,.fld select:focus,.fld textarea:focus{outline:2px solid var(--sky);outline-offset:-1px;background:var(--surface)}
+.kv .f.wide{grid-column:1/-1}
+.kv .f .ro{font-size:13px;padding:6px 0;color:var(--ink)}
+.dateb{display:flex;gap:4px}
+.dateb input[type=text]{flex:1}
+.dateb .cal{position:relative;width:32px;flex:0 0 32px;border:1px solid var(--border);border-radius:5px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;cursor:pointer;overflow:hidden}
+.dateb .cal svg{width:15px;height:15px;fill:none;stroke:var(--ink-2);stroke-width:1.8;pointer-events:none}
+.dateb .cal input[type=date]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.dateb .cal input[type=date]::-webkit-calendar-picker-indicator{position:absolute;inset:0;width:100%;height:100%;cursor:pointer}
+.savebar{display:flex;gap:8px;align-items:center;margin-top:12px}
+.savebar .dirty{font-size:12px;color:var(--warn);font-weight:600}
+.hist{list-style:none;margin:0;padding:0;position:relative}
+.hist li{padding:0 0 12px 20px;position:relative;font-size:13px}
+.hist li:before{content:"";position:absolute;left:5px;top:6px;width:8px;height:8px;border-radius:2px;background:var(--sky)}
+.hist li:after{content:"";position:absolute;left:8px;top:16px;bottom:0;width:2px;background:var(--rule)}
+.hist li:last-child:after{display:none}
+.hist li .when{font-size:11.5px;color:var(--ink-3)}
+.hist li b{font-weight:600}
+.revbox{border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-top:10px;background:var(--surface-2)}
+.revbox .chk{display:flex;gap:8px;align-items:flex-start;padding:5px 0;border-bottom:1px solid var(--rule);font-size:13px}
+.revbox .chk:last-child{border-bottom:0}
+.vote{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--rule);font-size:13px}
+.vote:last-child{border-bottom:0}
+.vote .nm{flex:1}
+
+/* modal */
+.modal{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;background:rgba(6,32,47,.45);padding:16px}
+.modal .box{background:var(--surface);border-radius:10px;box-shadow:0 20px 50px rgba(6,32,47,.4);width:min(560px,100%);max-height:90vh;overflow:auto}
+.modal .box header{padding:16px 20px 6px}
+.modal .box header h3{font-size:17px}
+.modal .box header p{margin:4px 0 0;color:var(--ink-2);font-size:13px}
+.modal .box .bd{padding:10px 20px}
+.modal .box footer{padding:12px 20px 16px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+.fld{margin-bottom:12px}
+.fld>label{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin-bottom:4px}
+.fld .hint{font-size:12px;color:var(--ink-3);margin-top:3px}
+.radios{display:flex;flex-wrap:wrap;gap:6px}
+.radios label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-strong);border-radius:5px;padding:6px 10px;font-size:13px;cursor:pointer;background:var(--surface)}
+.radios input{margin:0}
+.radios label:has(input:checked){background:var(--accent-soft);border-color:var(--accent);font-weight:600}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;border-radius:6px;padding:10px 12px 10px 16px;display:flex;gap:12px;align-items:center;font-size:13.5px;z-index:130;opacity:0;pointer-events:none;transition:all .2s;box-shadow:0 10px 30px rgba(6,32,47,.35);max-width:calc(100vw - 32px)}
+.toast.on{opacity:1;transform:translateX(-50%);pointer-events:auto}
+.toast button{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.25);border-radius:4px;padding:4px 10px;font-weight:600;cursor:pointer;font-size:12.5px}
+.savestate{position:fixed;right:16px;bottom:14px;font-size:11.5px;color:var(--ink-3);z-index:40}
+.savestate.err{color:var(--bad);font-weight:600}
+
+/* settings */
+.stagelist{display:flex;flex-direction:column;gap:6px}
+.srow{display:grid;grid-template-columns:22px 26px 1.2fr 1fr 1.4fr 70px;gap:10px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.srow .grip{cursor:grab;color:var(--ink-3);text-align:center;user-select:none}
+.srow input,.srow select{width:100%;font:inherit;font-size:13px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:5px;padding:5px 7px}
+.srow.off{opacity:.5}
+.srow.dragover{outline:2px dashed var(--accent)}
+.swatch{width:20px;height:20px;border-radius:4px;border:1px solid var(--border)}
+@media(max-width:900px){.srow{grid-template-columns:22px 26px 1fr 70px}.srow .hide-sm{display:none}}
+.peoplegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.rc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.rc{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow)}
+.rc:hover{border-color:var(--border-strong);background:var(--accent-soft)}
+.rc .ic{width:34px;height:34px;border-radius:7px;background:var(--navy);display:flex;align-items:center;justify-content:center;flex:0 0 34px}
+.rc .ic svg{width:18px;height:18px;fill:none;stroke:var(--sky);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.rc b{display:block;font-size:14px}
+.rc span{font-size:12.5px;color:var(--ink-2)}
+.muted{color:var(--ink-3)}
+.nowrap{white-space:nowrap}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.timeline{position:relative}
+.cprow{display:grid;grid-template-columns:minmax(220px,1.2fr) 3fr;gap:12px;align-items:center;padding:8px 0;border-bottom:1px solid var(--rule);cursor:pointer}
+.cprow:hover{background:var(--accent-soft)}
+.cprow .bartrack{position:relative;height:22px;background:var(--surface-2);border-radius:4px}
+.cprow .cpbar{position:absolute;top:3px;bottom:3px;border-radius:3px;background:var(--c1);opacity:.85}
+.cprow .cplab{position:absolute;top:3px;font-size:11px;color:var(--ink-2);white-space:nowrap}
+.todayline{position:absolute;top:0;bottom:0;width:2px;background:var(--bad)}
+.card{overflow-x:auto}
+.tbl .chip{white-space:normal}
+.qitem>div:first-child{flex-wrap:wrap}
+.seg{flex-wrap:wrap;max-width:100%}
+@media(max-width:700px){.cprow{grid-template-columns:1fr}.cprow .cplab{display:none}.qlist{grid-template-columns:1fr}.pagehead .acts{margin-left:0}}
+</style>
+<script src="/assets/session.js"></script>
+<script src="mms-door.js"></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320 c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20 -297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243 -4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198 0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3 -104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245 -337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17 246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49 203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12 26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57 187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44 -204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288 -20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92 -51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12 -24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297 3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146 -106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0 -356 -14z"></path></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263 13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19 -16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20 -222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0 46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"></path></g></symbol><symbol id="mismo-hat" viewBox="0 0 100 100"><path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41 C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/><path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z" fill="#0d314c" opacity=".17"/><rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/><rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/><circle cx="86" cy="45" r="11.5" fill="#ffffff"/></symbol></defs></svg>
+
+<header class="hqtop">
+  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg><svg class="santa" viewBox="0 0 100 100" aria-hidden="true"><use href="#mismo-hat"/></svg></span>
+  <span class="mastrule"></span>
+  <span class="hqname"><span class="long">MISMO Manufacturing System</span><span class="short">MMS</span></span>
+  <span class="hqtop-r"><span class="eyebrow-m">Programs &amp; Operations</span>
+    <div id="rs-account"></div><span id="who-chip"></span></span>
+</header>
+
+<aside class="hq rail" id="rail">
+  <div class="rail-top">
+    <span class="rail-lbl">Sections</span>
+    <button class="railhide" id="rail-hide" type="button" aria-label="Narrow the menu" title="Narrow the menu (backslash)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+  </div>
+  <div class="railfind">
+    <button class="railfind-b" id="rail-qb" type="button" aria-label="Search" title="Search" tabindex="-1">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+    </button>
+    <svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+    <input type="search" id="rail-q" autocomplete="off" spellcheck="false" placeholder="Search" aria-label="Search work requests, workgroups and people">
+    <button class="railq-x" id="rail-qx" type="button" aria-label="Clear the search" hidden>×</button>
+    <div class="railhits" id="rail-hits" hidden></div>
+  </div>
+  <nav aria-label="MISMO Manufacturing System" id="nav">
+    <button type="button" data-hq="home" aria-current="page" title="Overview"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Overview</span></button>
+    <button type="button" data-hq="mine" title="My Queue"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>My Queue</span><b id="nav-mine" hidden></b></button>
+    <button type="button" data-hq="board" title="Pipeline Board"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="11" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg><span>Pipeline Board</span></button>
+    <button type="button" data-hq="reviews" title="Review Desk"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/></svg><span>Review Desk</span><b id="nav-reviews" hidden></b></button>
+    <button type="button" data-hq="governance" title="Governance"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6"/></svg><span>Governance</span><b id="nav-gov" hidden></b></button>
+    <button type="button" data-hq="comment" title="Comment Periods"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L4 21l1.9-5.4A8 8 0 1121 12z"/></svg><span>Comment Periods</span></button>
+    <button type="button" data-hq="all" title="All Work"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>All Work</span></button>
+    <div class="navgrp">Hand-Offs</div>
+    <button type="button" data-hq="media" title="MISMO Media Requests"><svg viewBox="0 0 24 24"><path d="M4 11v2a1 1 0 001 1h2l5 4V6L7 10H5a1 1 0 00-1 1z"/><path d="M16 8a5 5 0 010 8"/></svg><span>MISMO Media</span><b id="nav-media" hidden></b></button>
+    <button type="button" data-hq="outbox" title="Notifications"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Notifications</span><b id="nav-outbox" hidden></b></button>
+    <div class="navgrp">Help</div>
+    <button type="button" data-hq="resources" title="Facilitator Resource Center"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg><span>Resource Center</span></button>
+    <button type="button" data-hq="settings" title="Settings" id="nav-settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg><span>Settings</span></button>
+  </nav>
+  <div class="railsum" id="viewas-wrap" hidden>
+    <label for="viewas">Viewing As</label>
+    <select id="viewas" class="hq-pick" aria-label="Viewing as"></select>
+  </div>
+  <div class="mast-right">
+    <button class="theme-btn" id="theme-btn" type="button">
+      <svg class="ti ti-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6.4 6.4 0 009 9 9 9 0 11-9-9z"/></svg>
+      <svg class="ti ti-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+      <span id="theme-lab">Dark Mode</span>
+    </button>
+  </div>
+</aside>
+<div class="railscrim" id="rail-scrim"></div>
+
+<main id="main"><div class="empty" id="boot">Loading the MISMO Manufacturing System…</div></main>
+
+<div class="scrim" id="scrim"></div>
+<section class="panel" id="panel" aria-label="Work request" aria-hidden="true"></section>
+<div class="toast" id="toast" role="status"><span id="toast-msg"></span><button id="toast-undo" type="button" hidden>Undo</button></div>
+<div class="savestate" id="savestate"></div>
+<div id="modal-root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script><script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" defer></script>
+<script>
+/* ============================================================================
+   MISMO Manufacturing System (MMS)
+   One ticket per Work Request, carried from Approved to Published.
+   Data: window.claude.use('db') — the Claude version's store, or the
+   resources.mismo.org relay door (project key "mms"), same calls either way.
+   Collections: tickets/<id>, config/<process|people|notify>, outbox/<id>, media/<id>
+   ============================================================================ */
+(function(){
+"use strict";
+const $=(s,el)=>(el||document).querySelector(s);
+const $$=(s,el)=>Array.from((el||document).querySelectorAll(s));
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o||null));
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+
+/* ---------- dates (local calendar days, stored as YYYY-MM-DD) ---------- */
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const today=()=>ymd(new Date());
+const toD=s=>{ if(!s) return null; const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})/); return m?new Date(+m[1],+m[2]-1,+m[3]):null; };
+const addDays=(s,n)=>{ const d=toD(s)||new Date(); d.setDate(d.getDate()+n); return ymd(d); };
+const daysBetween=(a,b)=>{ const x=toD(a), y=toD(b); if(!x||!y) return null; return Math.round((y-x)/864e5); };
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const fmt=s=>{ const d=toD(s); if(!d) return ''; return MON[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear(); };
+const fmtS=s=>{ const d=toD(s); if(!d) return ''; const y=d.getFullYear()!==new Date().getFullYear(); return MON[d.getMonth()]+' '+d.getDate()+(y?', '+d.getFullYear():''); };
+function parseDate(v){
+  v=String(v||'').trim(); if(!v) return '';
+  let m=v.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/); if(m) return m[1]+'-'+pad(m[2])+'-'+pad(m[3]);
+  m=v.match(/^(\d{1,2})[\/\-.](\d{1,2})(?:[\/\-.](\d{2,4}))?$/);
+  if(m){ let y=m[3]?+m[3]:new Date().getFullYear(); if(y<100) y+=2000; return y+'-'+pad(m[1])+'-'+pad(m[2]); }
+  const d=new Date(v); if(!isNaN(d)) return ymd(d);
+  return null;
+}
+const ago=s=>{ const n=daysBetween(s,today()); if(n==null) return ''; if(n<=0) return 'today'; if(n===1) return '1 day'; return n+' days'; };
+
+/* ---------- people & roles ---------- */
+const ROLE_LABEL={facilitator:'Facilitator',staff:'MISMO Staff',media:'MISMO Media',imawg:'IM/AWG Facilitator',director:'Director',vps:'VPs',gov:'Governance',website:'Website Admin',workgroup:'Workgroup',bet:'BET'};
+const DEFAULT_PEOPLE={
+  facilitators:[
+    {name:'Erin Bittenbender',email:'ebittenbender@mismo.org'},
+    {name:'Kathryn Williams',email:'kwilliams@mismo.org'},
+    {name:'Kellie Stoll',email:'kstoll@mismo.org'},
+    {name:'Leeann Walker',email:'lwalker@mismo.org'},
+    {name:'Meghan Tidgewell',email:'mtidgewell@mismo.org'}],
+  roles:{
+    staff:[{name:'Perry Williams',email:'workrequests@mismo.org'},{name:'Jonna Critchley',email:'jcritchley@mba.org'},{name:'Vanessa Rios',email:'vrios@mismo.org'}],
+    media:[{name:'Amy Moses',email:'amoses@mba.org'},{name:'Perry Williams',email:'pwilliams@mba.org'}],
+    imawg:[{name:'Erin Bittenbender',email:'ebittenbender@mismo.org'}],
+    director:[{name:'Jonna Critchley',email:'jcritchley@mba.org'}],
+    vps:[{name:'Jonathan Kearns',email:'jkearns@mismo.org'},{name:'Jonna Critchley',email:'jcritchley@mba.org'}],
+    gov:[],
+    website:[{name:'Vanessa Rios',email:'vrios@mismo.org'}]
+  },
+  gc:'GC'
+};
+
+/* ---------- the process: stages are settings, not code ---------- */
+const STAGE_KEYS=['approved','cfp','kickoff','work','aireview','im','awg','designation','gc-comment','comment','post','gc-publish','release'];
+function baseStages(gov){ return [
+  {key:'approved',name:'Approved – Set Up',owner:'staff',color:'#7794aa',on:true,desc:'Approved by the executive team. Set the start date, T-shirt size and target, and decide on a Call for Participation.'},
+  {key:'cfp',name:'Call for Participation',owner:'media',color:'#eb6834',on:true,desc:'MISMO Media drafts and publishes the Call for Participation.'},
+  {key:'kickoff',name:'Kickoff Approval',owner:'gov',color:'#e87ba4',on:true,desc:gov+' approves kicking off a new Development Workgroup once enough participants have signed up.'},
+  {key:'work',name:'In Work',owner:'facilitator',color:'#2477b8',on:true,desc:'The workgroup builds the work product, aiming at the Target to Submit to IM date.'},
+  {key:'aireview',name:'AI Review',owner:'facilitator',color:'#1baf7a',on:true,desc:'Editor and readiness review in one: Claude checks the submission and lists anything to fix before IM.'},
+  {key:'im',name:'IM Review',owner:'imawg',color:'#14486e',on:true,desc:'Information Management reviews the submission.'},
+  {key:'awg',name:'AWG Review',owner:'imawg',color:'#2f6688',on:true,desc:'Architecture Workgroup reviews the submission.'},
+  {key:'designation',name:'License Designation',owner:'director',color:'#eda100',on:true,desc:'Director recommends comment type, classification and license; the VPs agree.'},
+  {key:'gc-comment',name:gov+' Approval to Comment',owner:'gov',color:'#d55181',on:true,desc:gov+' approves the work product to go out for public comment.'},
+  {key:'comment',name:'Comment Period',owner:'website',color:'#008300',on:true,desc:'Posted to the website standards page and announced. Moves on by itself when the period ends.'},
+  {key:'post',name:'Post-Comment',owner:'facilitator',color:'#456179',on:true,desc:'The facilitator reports what came back from the comment period.'},
+  {key:'gc-publish',name:gov+' Approval to Publish',owner:'gov',color:'#b3372c',on:true,desc:gov+' approves publishing as a Candidate Recommendation (standard) or Final (collateral).'},
+  {key:'release',name:'Release',owner:'website',color:'#0f7b5c',on:true,desc:'MISMO Media announces it and the website pages go live.'}
+];}
+function presetCurrent(){ return {label:"Today's Process",gov:'GC',commentDays:[30,60,90],stages:baseStages('GC')}; }
+function presetNext(){
+  const s=baseStages('RSGC');
+  s.find(x=>x.key==='approved').desc='Approved by BET (RSGC approval delegated to BET). Set the start date, T-shirt size and Target to Submit to IM, and decide on a Call for Participation.';
+  s.find(x=>x.key==='kickoff').on=false;
+  s.find(x=>x.key==='comment').desc='30 days. Posts to the website standards page and MISMO Media is asked for a LinkedIn post. Moves on by itself when it ends.';
+  return {label:'New Process',gov:'RSGC',commentDays:[30],stages:s};
+}
+const DEFAULT_PROCESS={active:'current',switchOn:'',presets:{current:presetCurrent(),next:presetNext()}};
+const DEFAULT_NOTIFY={flowUrl:'',from:'workrequests@mismo.org',onEnter:{
+  approved:['staff'],cfp:['media','facilitator'],kickoff:['staff'],work:['facilitator'],aireview:['facilitator'],im:['imawg','facilitator'],awg:['imawg','facilitator'],
+  designation:['director'],'gc-comment':['staff'],comment:['website','media','facilitator'],post:['facilitator'],'gc-publish':['staff'],release:['media','website','facilitator']},
+  reminders:{targetDays:7,commentEndingDays:3,staleDays:45}};
+const SIZE_DAYS={S:60,M:90,L:150,XL:210};
+const SIZES=[['S','Small'],['M','Medium'],['L','Large'],['XL','X-Large']];
+
+/* ---------- app state ---------- */
+const S={ready:false,tickets:{},process:clone(DEFAULT_PROCESS),people:clone(DEFAULT_PEOPLE),notify:clone(DEFAULT_NOTIFY),
+  outbox:{},media:{},me:{name:'',email:''},canWrite:true,isStaff:false,viewAs:'',view:'home',panel:null,
+  filters:{fac:'',wg:'',size:'',type:'',q:'',state:'live',sort:'stage',dir:1,stage:''},sample:null,mode:'claude',loaded:{}};
+window.__mms=S;
+
+/* ---------- store: claude db, or memory when no store is reachable ---------- */
+const Store={db:null,mem:null,subs:{},
+  async init(){
+    let db=null;
+    try{ if(window.claude && window.claude.use){ db=window.__hqRelay?await window.claude.use('db'):await Promise.race([window.claude.use('db'),new Promise(r=>setTimeout(()=>r(null),10000))]); if(window.__hqRelay) S.mode='relay'; } }catch(e){ db=null; }
+    if(db){ this.db=db; return true; }
+    this.mem={}; S.mode='memory'; return false;
+  },
+  sub(coll,cb){
+    if(this.db){
+      return this.db.collection(coll).onSnapshot(snap=>{ const o={}; snap.docs.forEach(d=>{ o[d.id]=d.data(); }); cb(o, snap.metadata||{}); },
+        e=>{ saveState(false,(e&&e.message)||'Could not load '+coll); });
+    }
+    (this.subs[coll]=this.subs[coll]||[]).push(cb); setTimeout(()=>cb(clone(this.mem[coll]||{}),{}),0); return ()=>{};
+  },
+  async set(coll,id,data){
+    if(this.db){ return this.db.collection(coll).doc(id).set(clone(data)); }
+    (this.mem[coll]=this.mem[coll]||{})[id]=clone(data); (this.subs[coll]||[]).forEach(cb=>cb(clone(this.mem[coll]),{}));
+  },
+  async del(coll,id){
+    if(this.db){ return this.db.collection(coll).doc(id).delete(); }
+    if(this.mem[coll]) delete this.mem[coll][id]; (this.subs[coll]||[]).forEach(cb=>cb(clone(this.mem[coll]),{}));
+  }
+};
+let pendingSaves=0;
+function saveState(ok,msg){ const el=$('#savestate'); if(!el) return; if(ok===false){ el.textContent='Not saved: '+msg; el.className='savestate err'; return; } el.className='savestate'; el.textContent=pendingSaves?'Saving…':(S.mode==='memory'?'Not connected: changes stay on this screen':'All changes saved'); }
+async function write(coll,id,data){
+  pendingSaves++; saveState();
+  try{ await Store.set(coll,id,data); pendingSaves--; saveState(); return true; }
+  catch(e){ pendingSaves--; saveState(false,(e&&e.message)||'try again'); toast('That change did not save. '+((e&&e.message)||'')); return false; }
+}
+async function remove(coll,id){ try{ await Store.del(coll,id); }catch(e){ toast('Could not delete: '+((e&&e.message)||'')); } }
+
+/* ---------- process helpers ---------- */
+function proc(){ const p=S.process||DEFAULT_PROCESS; return (p.presets&&p.presets[p.active])||presetCurrent(); }
+function stages(){ return (proc().stages||[]).filter(s=>s.on!==false); }
+function allStages(){ return proc().stages||[]; }
+function stageDef(k){ return allStages().find(s=>s.key===k) || (k==='published'?{key:'published',name:'Published',owner:'',color:'#0f7b5c'}:{key:k,name:k,owner:'staff',color:'#7794aa'}); }
+function govName(){ return proc().gov||S.people.gc||'GC'; }
+function stageIndex(k){ return stages().findIndex(s=>s.key===k); }
+function nextStage(t,from){
+  const list=stages(); let i=list.findIndex(s=>s.key===(from||t.stage));
+  for(let j=i+1;j<list.length;j++){
+    const k=list[j].key;
+    if(k==='cfp' && !(t.cfp&&t.cfp.needed)) continue;
+    if(k==='kickoff' && !((t.cfp&&t.cfp.needed) && /dwg/i.test(t.groupType||''))) continue;
+    return k;
+  }
+  return 'published';
+}
+function peopleFor(role,t){
+  if(role==='facilitator') return t&&t.facilitator?[personByName(t.facilitator)||{name:t.facilitator,email:''}]:[];
+  return (S.people.roles&&S.people.roles[role])||[];
+}
+function sameName(a,b){ a=String(a||'').trim().toLowerCase(); b=String(b||'').trim().toLowerCase(); if(!a||!b) return false; if(a===b) return true; if(a.indexOf(' ')<0) return b.split(' ')[0]===a; if(b.indexOf(' ')<0) return a.split(' ')[0]===b; return false; }
+function personByName(n){ const all=[...(S.people.facilitators||[]),...Object.values(S.people.roles||{}).flat()]; return all.find(p=>p.name.toLowerCase()===String(n||'').toLowerCase())||all.find(p=>sameName(p.name,n)); }
+function emailOf(n){ const p=personByName(n); return p?p.email:''; }
+
+/* whose move is it — the heart of every queue */
+function whoseMove(t){
+  if(t.state==='hold') return {role:'staff',label:'On Hold',hold:true,text:'On hold'+(t.holdReason?': '+t.holdReason:'')};
+  if(t.state!=='active') return {role:'',label:'Done',text:''};
+  const g=govName(), sub=t.sub||'';
+  switch(t.stage){
+    case 'approved': return {role:'staff',label:'MISMO Staff',text:'Set the start date, size and target'};
+    case 'cfp': return sub==='published'?{role:'staff',label:'MISMO Staff',text:'Confirm the Call for Participation is out'}:{role:'media',label:'MISMO Media',text:'Draft and publish the Call for Participation'};
+    case 'kickoff': return {role:'gov',label:g,text:g+' decision to kick off the workgroup'};
+    case 'work': return {role:'facilitator',label:'Facilitator',text:'Build the work product; submit for AI Review when ready'};
+    case 'aireview':
+      if(sub==='updates') return {role:'facilitator',label:'Facilitator',text:'Make the updates AI Review found, then resubmit'};
+      if(sub==='reviewed') return {role:'facilitator',label:'Facilitator',text:'Read the AI Review and send to IM, or make updates'};
+      return {role:'facilitator',label:'Facilitator',text:'Run the AI Review on the submission'};
+    case 'im': case 'awg': {
+      const nm=t.stage==='im'?'IM':'AWG';
+      if(sub==='updates') return {role:'facilitator',label:'Facilitator',text:'Make the '+nm+' updates, then resubmit'};
+      if(sub==='prep') return {role:'facilitator',label:'Facilitator',text:'Submit to '+nm+' through MISMO Connect'};
+      return {role:'imawg',label:'IM/AWG Facilitator',text:sub==='in-review'?nm+' is reviewing':(sub==='resubmitted'?'Review the '+nm+' resubmission':'Start the '+nm+' review')};
+    }
+    case 'designation':
+      if(sub==='vps') return {role:'vps',label:'VPs',text:'Agree with the Director’s designation'};
+      if(sub==='director'||sub==='discuss') return {role:'director',label:'Director',text:sub==='discuss'?'Talk with the VPs and update the designation':'Recommend the designation'};
+      return {role:'facilitator',label:'Facilitator',text:'Send to designation with the comment length and page name'};
+    case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
+    case 'comment': return sub==='setup'?{role:'website',label:'Website Admin',text:'Post to the standards page and set the dates'}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)};
+    case 'post': return {role:'facilitator',label:'Facilitator',text:'Report what came back from comment'};
+    case 'gc-publish': return {role:'gov',label:g,text:g+' approval to publish as '+(isStandard(t)?'Candidate Recommendation':'Final')};
+    case 'release': return {role:'website',label:'Website Admin',text:'Publish the pages and announcement'};
+  }
+  return {role:'staff',label:'MISMO Staff',text:''};
+}
+const isStandard=t=>/standard/i.test(t.classification||'');
+function movers(t){ const w=whoseMove(t); return w.role?peopleFor(w.role,t):[]; }
+function isMine(t,who){
+  who=who||viewer(); if(!who||!who.name) return false;
+  const w=whoseMove(t); if(!w.role) return false;
+  return movers(t).some(p=>sameName(p.name,who.name)||(who.email&&p.email&&p.email.toLowerCase()===who.email.toLowerCase()));
+}
+function myFacTickets(who){ who=who||viewer(); return liveTickets().filter(t=>sameName(t.facilitator,who.name)); }
+function viewer(){ if(S.viewAs){ return personByName(S.viewAs)||{name:S.viewAs}; } const p=personByName(S.me.name); return p&&!S.me.email?Object.assign({},S.me,{name:p.name}):S.me; }
+
+/* ---------- ticket lists ---------- */
+const allTickets=()=>Object.values(S.tickets);
+const liveTickets=()=>allTickets().filter(t=>t.state==='active'||t.state==='hold');
+function pastTarget(t){ const d=t.dates||{}; return t.state==='active' && d.targetIM && d.targetIM<today() && ['approved','cfp','kickoff','work','aireview'].includes(t.stage); }
+function stageAge(t){ return daysBetween(t.stageSince||(t.dates&&t.dates.workStart)||t.importedAt,today()); }
+function stalled(t){ const a=stageAge(t); return t.state==='active' && t.stage!=='work' && t.stage!=='comment' && a!=null && a>(S.notify.reminders.staleDays||45); }
+
+/* ---------- moving a ticket (every move is logged) ---------- */
+let lastUndo=null;
+function hist(t,text,extra){ t.history=t.history||[]; t.history.push(Object.assign({at:new Date().toISOString(),by:S.me.name||'Someone',text},extra||{})); }
+async function saveTicket(t,msg,before){
+  t.updatedAt=new Date().toISOString(); t.updatedBy=S.me.name||'';
+  S.tickets[t.id]=t; renderAll();
+  const ok=await write('tickets',t.id,t);
+  if(ok && msg){ lastUndo=before?{id:t.id,before}:null; toast(msg,!!before); }
+  return ok;
+}
+async function move(t0,to,opts){
+  opts=opts||{}; const t=clone(t0), before=clone(S.tickets[t0.id]||t0);
+  const from=t.stage; t.stage=to; t.sub=opts.sub||''; t.stageSince=today(); t.state=to==='published'?'published':(t.state==='hold'?'active':t.state);
+  if(to==='published'){ t.dates=t.dates||{}; t.dates.published=t.dates.published||today(); }
+  Object.assign(t,opts.patch||{}); if(opts.dates){ t.dates=Object.assign(t.dates||{},opts.dates); }
+  hist(t,opts.text||('Moved from '+stageDef(from).name+' to '+stageDef(to).name),{from,to,note:opts.note||''});
+  onEnter(t,to,from);
+  await saveTicket(t,opts.toast||(t.wr+' moved to '+stageDef(to).name),before);
+  if(from!==to) notifyEnter(t,to);
+  return t;
+}
+async function setSub(t0,sub,text,patch,note){
+  const t=clone(t0), before=clone(S.tickets[t0.id]||t0); t.sub=sub; Object.assign(t,patch||{}); hist(t,text,{note:note||''});
+  await saveTicket(t,text,before); return t;
+}
+/* what happens automatically when a ticket enters a stage */
+function onEnter(t,to){
+  t.dates=t.dates||{};
+  if(to==='aireview'){ t.dates.aiSubmitted=today(); }
+  if(to==='im'){ t.dates.imSubmitted=t.dates.imSubmitted||today(); t.im=t.im||{}; if(!t.sub) t.sub='new'; }
+  if(to==='awg'){ t.dates.awgSubmitted=t.dates.awgSubmitted||today(); t.awg=t.awg||{}; if(!t.sub) t.sub='new'; }
+  if(to==='designation' && !t.sub) t.sub='prep';
+  if(to==='cfp'){ mediaRequest(t,'Call for Participation','Draft and publish the Call for Participation for '+t.name+'.'); }
+  if(to==='comment'){
+    const days=Number(t.commentDays)||proc().commentDays[0]||30;
+    if(!t.dates.commentStart){ t.sub='setup'; }
+    else if(!t.dates.commentEnd){ t.dates.commentEnd=addDays(t.dates.commentStart,days); }
+    mediaRequest(t,'LinkedIn Post','LinkedIn post announcing '+(t.productPageName||t.name)+' is open for public comment.');
+  }
+  if(to==='release'){ mediaRequest(t,isStandard(t)?'Candidate Recommendation Announcement':'Final Release Announcement','Announce '+(t.productPageName||t.name)+' as '+(isStandard(t)?'a Candidate Recommendation':'Final')+'.'); }
+}
+function mediaRequest(t,kind,text){
+  const id=(t.id+'-'+kind).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,120);
+  const m={id,ticket:t.id,wr:t.wr,name:t.name,kind,text,status:'Requested',requested:today(),by:S.me.name||'',due:''};
+  if(S.media[id] && S.media[id].status!=='Done') return;
+  S.media[id]=m; write('media',id,m);
+}
+/* email notices: queued in Notifications; sent by the flow when one is set */
+function notifyEnter(t,to){
+  const roles=(S.notify.onEnter&&S.notify.onEnter[to])||[];
+  const ppl=[]; roles.forEach(r=>peopleFor(r,t).forEach(p=>{ if(p.email && !ppl.some(x=>x.email===p.email)) ppl.push(p); }));
+  if(!ppl.length) return;
+  const w=whoseMove(t);
+  queueMail({to:ppl.map(p=>p.email),subject:t.wr+' '+t.name+': '+stageDef(to).name,
+    body:t.name+' ('+t.wr+') is now at '+stageDef(to).name+'.\n\nNext: '+(w.text||'')+(w.label?' ('+w.label+')':'')+'\n\nOpen it in the MISMO Manufacturing System.',ticket:t.id,kind:'stage',key:t.id+'-'+to+'-'+today()});
+}
+async function queueMail(m){
+  const id=(m.key||uid()).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,140);
+  if(S.outbox[id]) return;
+  const doc=Object.assign({id,at:new Date().toISOString(),status:'Queued'},m); delete doc.key;
+  S.outbox[id]=doc; await write('outbox',id,doc);
+  if(S.notify.flowUrl){ try{ const r=await fetch(S.notify.flowUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:doc.to.join(';'),subject:doc.subject,body:doc.body,from:S.notify.from})}); if(r.ok){ doc.status='Sent'; doc.sentAt=new Date().toISOString(); write('outbox',id,doc); } }catch(e){} }
+}
+
+/* ---------- automations that run whenever the page is open ---------- */
+async function runAutomations(){
+  if(!S.ready || !S.canWrite) return;
+  const td=today(), R=S.notify.reminders||{};
+  for(const t of liveTickets()){
+    if(t.state!=='active') continue;
+    const d=t.dates||{};
+    if(t.stage==='comment' && t.sub!=='setup' && d.commentEnd && d.commentEnd<td){
+      await move(t,'post',{text:'Comment period ended '+fmt(d.commentEnd)+'; moved to Post-Comment automatically',toast:t.wr+': comment period ended'});
+      continue;
+    }
+    if(d.targetIM && ['work','approved'].includes(t.stage)){
+      const n=daysBetween(td,d.targetIM);
+      if(n!=null && n>=0 && n<=(R.targetDays||7)){
+        queueMail({to:[emailOf(t.facilitator)].filter(Boolean),subject:t.wr+' '+t.name+': Target to Submit to IM is '+fmt(d.targetIM),body:'The Target to Submit to IM for '+t.name+' is '+fmt(d.targetIM)+'. Submit for AI Review when ready, or update the target date in the MMS.',ticket:t.id,kind:'reminder',key:t.id+'-target-'+d.targetIM});
+      }
+    }
+    if(t.stage==='comment' && d.commentEnd){
+      const n=daysBetween(td,d.commentEnd);
+      if(n!=null && n>=0 && n<=(R.commentEndingDays||3)){
+        queueMail({to:[emailOf(t.facilitator)].filter(Boolean),subject:t.wr+' '+t.name+': comment period ends '+fmt(d.commentEnd),body:'The comment period for '+t.name+' ends '+fmt(d.commentEnd)+'. You will be asked what came back the day after.',ticket:t.id,kind:'reminder',key:t.id+'-commentend-'+d.commentEnd});
+      }
+    }
+  }
+}
+
+/* ---------- small UI pieces ---------- */
+let toastT=null;
+function toast(msg,undo){
+  const el=$('#toast'); $('#toast-msg').textContent=msg; $('#toast-undo').hidden=!undo; el.classList.add('on');
+  clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'),undo?7000:3500);
+}
+async function doUndo(){
+  if(!lastUndo) return; const u=lastUndo; lastUndo=null; $('#toast').classList.remove('on');
+  const b=clone(u.before); S.tickets[b.id]=b; renderAll(); await write('tickets',b.id,b); toast('Undone');
+}
+function modal(o){
+  return new Promise(res=>{
+    const root=$('#modal-root');
+    root.innerHTML='<div class="modal" role="dialog" aria-modal="true"><div class="box"><header><h3>'+esc(o.title)+'</h3>'+(o.text?'<p>'+o.text+'</p>':'')+'</header><div class="bd">'+(o.body||'')+'</div><footer><button class="btn" data-m="cancel" type="button">Cancel</button><button class="btn '+(o.danger?'danger':'pri')+'" data-m="ok" type="button">'+esc(o.ok||'Save')+'</button></footer></div></div>';
+    const box=$('.modal',root);
+    wireDates(box);
+    const close=v=>{ root.innerHTML=''; res(v); };
+    $('[data-m=cancel]',box).onclick=()=>close(null);
+    box.addEventListener('mousedown',e=>{ if(e.target===box) close(null); });
+    box.addEventListener('keydown',e=>{ if(e.key==='Escape') close(null); });
+    $('[data-m=ok]',box).onclick=()=>{
+      const vals={}; $$('[name]',box).forEach(i=>{ if(i.type==='radio'){ if(i.checked) vals[i.name]=i.value; } else if(i.type==='checkbox'){ vals[i.name]=i.checked; } else vals[i.name]=i.value; });
+      $$('[data-date]',box).forEach(i=>{ const v=parseDate(i.value); vals[i.dataset.date]=v===null?'__bad':v; });
+      if(Object.values(vals).includes('__bad')){ toast('A date did not read right. Try a format like 9/30/26.'); return; }
+      if(o.validate){ const err=o.validate(vals); if(err){ toast(err); return; } }
+      close(vals);
+    };
+    const f=$('input,select,textarea',box); if(f) setTimeout(()=>f.focus(),30);
+  });
+}
+const CAL='<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
+function dateField(name,val){ return '<div class="dateb"><input type="text" data-date="'+name+'" value="'+esc(val?fmt(val):'')+'" placeholder="e.g. 9/30/26"><span class="cal" title="Pick a date">'+CAL+'<input type="date" tabindex="-1" value="'+esc(val||'')+'" aria-label="Calendar"></span></div>'; }
+function wireDates(root){
+  $$('.dateb',root).forEach(w=>{ const t=$('input[type=text]',w), c=$('input[type=date]',w);
+    c.addEventListener('change',()=>{ t.value=c.value?fmt(c.value):''; t.dispatchEvent(new Event('input',{bubbles:true})); });
+    t.addEventListener('blur',()=>{ const v=parseDate(t.value); if(v){ t.value=fmt(v); c.value=v; } });
+  });
+}
+const fld=(label,inner,hint)=>'<div class="fld"><label>'+esc(label)+'</label>'+inner+(hint?'<div class="hint">'+hint+'</div>':'')+'</div>';
+const sel=(name,opts,val)=>'<select name="'+name+'">'+opts.map(o=>{ const v=Array.isArray(o)?o[0]:o, l=Array.isArray(o)?o[1]:o; return '<option value="'+esc(v)+'"'+(String(v)===String(val||'')?' selected':'')+'>'+esc(l)+'</option>'; }).join('')+'</select>';
+const radios=(name,opts,val)=>'<div class="radios">'+opts.map(o=>{ const v=Array.isArray(o)?o[0]:o, l=Array.isArray(o)?o[1]:o; return '<label><input type="radio" name="'+name+'" value="'+esc(v)+'"'+(String(v)===String(val||'')?' checked':'')+'>'+esc(l)+'</label>'; }).join('')+'</div>';
+const inp=(name,val,ph)=>'<input name="'+name+'" value="'+esc(val||'')+'" placeholder="'+esc(ph||'')+'">';
+const ta=(name,val,ph)=>'<textarea name="'+name+'" rows="3" placeholder="'+esc(ph||'')+'">'+esc(val||'')+'</textarea>';
+
+function stateChip(t){
+  if(t.state==='hold') return '<span class="chip hold"><span class="dot"></span>On Hold</span>';
+  if(t.state==='published') return '<span class="chip good"><span class="dot"></span>Published</span>';
+  if(t.state==='closed') return '<span class="chip"><span class="dot"></span>Closed</span>';
+  if(t.state==='canceled') return '<span class="chip bad"><span class="dot"></span>Canceled</span>';
+  return '';
+}
+function stageChip(t){ const s=stageDef(t.stage); return '<span class="chip" style="background:color-mix(in srgb,'+s.color+' 16%,transparent);color:var(--ink)"><span class="dot" style="background:'+s.color+'"></span>'+esc(s.name)+'</span>'; }
+function subChip(t){
+  const m={updates:['Updates Needed','warn'],resubmitted:['Resubmitted','info'],'in-review':['In Review','info'],new:['Waiting','info'],reviewed:['Reviewed','good'],setup:['Being Set Up','warn'],prep:['Facilitator Prep','warn'],vps:['With VPs','info'],director:['With Director','info'],discuss:['Needs Discussion','warn'],published:['Published','good']};
+  const x=m[t.sub]; return x?'<span class="chip '+x[1]+'">'+x[0]+'</span>':'';
+}
+const sizeTag=t=>t.size?'<span class="size" title="'+esc((SIZES.find(s=>s[0]===t.size)||[])[1]||'')+'">'+esc(t.size)+'</span>':'';
+function miniTrack(t){ const list=stages(); const i=list.findIndex(s=>s.key===t.stage); return '<div class="mini-track">'+list.map((s,j)=>'<i class="'+(t.state==='published'||j<i?'done':(j===i?'cur':''))+'" title="'+esc(s.name)+'"></i>').join('')+'</div>'; }
+function tkCard(t,drag){
+  const w=whoseMove(t), age=stageAge(t);
+  return '<button type="button" class="tk'+(pastTarget(t)?' late':'')+(t.state==='hold'?' hold':'')+'" data-open="'+esc(t.id)+'"'+(drag?' draggable="true" data-drag="'+esc(t.id)+'"':'')+'>'+
+    '<div class="top"><span class="wr">'+esc(t.wr)+'</span>'+sizeTag(t)+'</div>'+
+    '<div class="nm">'+esc(t.name)+'</div>'+
+    '<div class="meta">'+subChip(t)+stateChip(t)+(pastTarget(t)?'<span class="chip bad">Past Target</span>':'')+'</div>'+
+    '<div class="who" style="margin-top:6px">'+esc(t.facilitator||'No facilitator')+' · '+esc(w.label||'')+'</div>'+
+    (age!=null&&t.state==='active'?'<span class="age" title="Days in this stage">'+age+'d</span>':'')+'</button>';
+}
+function qItem(t){
+  const w=whoseMove(t), d=t.dates||{};
+  let due=''; if(t.stage==='comment'&&d.commentEnd) due='Comment ends '+fmtS(d.commentEnd); else if(d.targetIM && ['approved','work','aireview'].includes(t.stage)) due='Target to IM '+fmtS(d.targetIM);
+  return '<button type="button" class="qitem" data-open="'+esc(t.id)+'">'+
+    '<div style="display:flex;gap:6px;align-items:center;font-size:11.5px;color:var(--ink-3);font-weight:600"><span>'+esc(t.wr)+'</span>'+stageChip(t)+subChip(t)+stateChip(t)+'<span style="margin-left:auto">'+sizeTag(t)+'</span></div>'+
+    '<div class="nm">'+esc(t.name)+'</div><div class="muted" style="font-size:12.5px">'+esc(t.workgroup||'')+'</div>'+
+    '<div class="nx"><b>Next:</b> '+esc(w.text||'')+'</div>'+
+    (due?'<div class="nx'+(pastTarget(t)?'" style="color:var(--bad);font-weight:600':'')+'">'+esc(due)+'</div>':'')+miniTrack(t)+'</button>';
+}
+
+/* ---------- views ---------- */
+const VIEWS={};
+function renderAll(){
+  if(!S.ready||S.importing) return;
+  const v=VIEWS[S.view]||VIEWS.home; const m=$('#main'); const y=window.scrollY;
+  m.innerHTML=(S.mode==='memory'?'<div class="banner">This copy isn\u2019t connected to the MMS records, so nothing here is saved. Open the published MMS to work for real.</div>':'')+(S.canWrite?'':'<div class="banner info">You can look at everything here; ask MISMO staff if you need to make changes.</div>')+v();
+  wireMain(m); window.scrollTo(0,y); counts(); if(S.panel) renderPanel();
+}
+function counts(){
+  const set=(id,n,warn)=>{ const b=$(id); if(!b) return; b.hidden=!n; b.textContent=n; b.classList.toggle('warn',!!warn); };
+  set('#nav-mine',liveTickets().filter(t=>isMine(t)).length,true);
+  set('#nav-reviews',liveTickets().filter(t=>t.state==='active'&&['aireview','im','awg','designation'].includes(t.stage)).length);
+  set('#nav-gov',liveTickets().filter(t=>t.state==='active'&&['kickoff','gc-comment','gc-publish'].includes(t.stage)).length);
+  set('#nav-media',Object.values(S.media).filter(m=>m.status!=='Done').length);
+  set('#nav-outbox',Object.values(S.outbox).filter(m=>m.status==='Queued').length);
+  $('#nav-settings').hidden=!S.isStaff;
+}
+function go(view){ S.view=view; $$('#nav button[data-hq]').forEach(b=>{ if(b.dataset.hq===view) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); }); try{ history.replaceState(null,'','#'+view); }catch(e){} window.scrollTo(0,0); renderAll(); }
+
+VIEWS.home=function(){
+  const live=liveTickets(), act=live.filter(t=>t.state==='active'), td=today();
+  const me=viewer(), mine=live.filter(t=>isMine(t,me));
+  const late=act.filter(pastTarget), inC=act.filter(t=>t.stage==='comment'), gov=act.filter(t=>['kickoff','gc-comment','gc-publish'].includes(t.stage)), hold=live.filter(t=>t.state==='hold');
+  const soon=act.filter(t=>t.stage==='comment'&&t.dates&&t.dates.commentEnd).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))[0];
+  const g=new Date().getHours()<12?'Good morning':(new Date().getHours()<17?'Good afternoon':'Good evening');
+  const first=(me.name||'').split(' ')[0];
+  let line='<b>'+act.length+'</b> work requests are moving through the MMS';
+  if(mine.length) line+='; <b>'+mine.length+'</b> '+(mine.length===1?'is':'are')+' waiting on '+(S.viewAs?first:'you');
+  if(soon) line+='; the next comment period to close is <b>'+esc(soon.name)+'</b> on '+fmtS(soon.dates.commentEnd);
+  line+='.';
+  const fig=(k,v,s,go,cls,c)=>'<button type="button" class="fig '+(cls||'')+'" data-go="'+go+'" style="--fc:'+(c||'var(--accent)')+'"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></button>';
+  const pipe='<div class="pipe">'+stages().map(s=>{ const n=act.filter(t=>t.stage===s.key).length; return '<button type="button" class="st'+(n?'':' zero')+'" data-stage="'+s.key+'" style="--sc:'+s.color+'"><div class="n">'+n+'</div><div class="l">'+esc(s.name)+'</div><div class="o">'+esc(ROLE_LABEL[s.owner]==='Governance'?govName():ROLE_LABEL[s.owner]||'')+'</div><span class="bar"></span></button>'; }).join('')+'</div>';
+  const attention=[...late.map(t=>[t,'Past Target to Submit to IM ('+fmtS(t.dates.targetIM)+')','bad']),
+    ...act.filter(t=>t.stage==='comment'&&t.dates&&t.dates.commentEnd&&daysBetween(td,t.dates.commentEnd)<=7&&daysBetween(td,t.dates.commentEnd)>=0).map(t=>[t,'Comment period ends '+fmtS(t.dates.commentEnd),'warn']),
+    ...act.filter(stalled).map(t=>[t,stageAge(t)+' days at '+stageDef(t.stage).name,'warn']),
+    ...act.filter(t=>t.stage==='comment'&&t.sub==='setup').map(t=>[t,'Approved for comment; not posted yet','warn'])];
+  const att=attention.length?'<table class="tbl"><tbody>'+attention.slice(0,12).map(([t,why,c])=>'<tr class="rowlink" data-open="'+esc(t.id)+'"><td class="nowrap muted">'+esc(t.wr)+'</td><td><div class="nm">'+esc(t.name)+'</div><div class="muted" style="font-size:12px">'+esc(t.facilitator||'')+'</div></td><td><span class="chip '+c+'">'+esc(why)+'</span></td></tr>').join('')+'</tbody></table>':'<div class="empty">Nothing needs attention right now.</div>';
+  const facs=[...new Set(act.map(t=>t.facilitator||'Unassigned'))].sort();
+  const fbars=facs.map(f=>{ const ts=act.filter(t=>(t.facilitator||'Unassigned')===f); const segs=stages().map(s=>{ const n=ts.filter(t=>t.stage===s.key).length; return n?'<i style="flex:'+n+';background:'+s.color+'" title="'+esc(s.name)+': '+n+'"></i>':''; }).join(''); return '<button type="button" class="facrow" data-fac="'+esc(f)+'" style="display:grid;grid-template-columns:150px 1fr 34px;gap:10px;align-items:center;padding:6px 0;border:0;background:none;width:100%;cursor:pointer;color:var(--ink);text-align:left"><span style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(f)+'</span><span style="display:flex;gap:2px;height:14px">'+segs.replace(/<i /g,'<i ').replace(/<\/i>/g,'</i>')+'</span><b style="text-align:right">'+ts.length+'</b></button>'; }).join('');
+  const recent=[]; allTickets().forEach(t=>(t.history||[]).forEach(h=>{ if(h.at) recent.push([h,t]); })); recent.sort((a,b)=>b[0].at.localeCompare(a[0].at));
+  const rec=recent.slice(0,8).map(([h,t])=>'<li><div class="when">'+esc(fmtS(h.at.slice(0,10)))+' · '+esc(h.by||'')+'</div><b data-open="'+esc(t.id)+'" style="cursor:pointer">'+esc(t.wr)+'</b> '+esc(h.text)+'</li>').join('');
+  return '<div class="hero"><div class="date">'+esc(new Date().toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}))+'</div><h2>'+g+(first?', '+esc(first):'')+'</h2><p>'+line+'</p></div>'+
+   '<div class="figs">'+fig('Your Move',mine.length,mine.length?'Waiting on '+(S.viewAs?esc(first):'you'):'Nothing waiting','mine',mine.length?'warnf':'','var(--c4)')+fig('Live Work',act.length,'Approved through release','board','','var(--c1)')+fig('Past Target',late.length,'Target to Submit to IM','late',late.length?'alert':'','var(--bad)')+fig('In Comment',inC.length,soon?'Next ends '+fmtS(soon.dates.commentEnd):'None open','comment','','var(--c6)')+fig('Waiting on '+esc(govName()),gov.length,'Approvals to record','governance','','var(--c5)')+fig('On Hold',hold.length,hold.length?'Paused work':'Nothing paused','hold','','var(--hold)')+'</div>'+
+   '<div class="card"><h3>Where the Work Is<span class="sp muted" style="font-size:12px;font-weight:500">'+esc(proc().label)+'</span></h3>'+pipe+'</div>'+
+   '<div class="cols2"><div class="card"><h3>Needs Attention</h3>'+att+'</div><div><div class="card"><h3>Each Facilitator\u2019s Work by Stage</h3>'+(fbars||'<div class="empty">No live work yet.</div>')+'</div><div class="card"><h3>Latest Moves</h3>'+(rec?'<ul class="hist">'+rec+'</ul>':'<div class="empty">Moves show here as work goes through.</div>')+'</div></div></div>';
+};
+
+VIEWS.mine=function(){
+  const me=viewer(); const nm=me.name||'';
+  const yours=liveTickets().filter(t=>isMine(t,me));
+  const facT=myFacTickets(me).filter(t=>!yours.includes(t));
+  const grp=(title,list,chip)=>'<div class="qgroup"><h3>'+title+' <span class="chip '+(chip||'')+'">'+list.length+'</span></h3>'+(list.length?'<div class="qlist">'+list.map(qItem).join('')+'</div>':'<div class="empty">Nothing here.</div>')+'</div>';
+  const withRev=facT.filter(t=>['aireview','im','awg','designation'].includes(t.stage)&&t.state==='active');
+  const withGov=facT.filter(t=>['kickoff','gc-comment','gc-publish'].includes(t.stage)&&t.state==='active');
+  const out=facT.filter(t=>['comment','release','cfp','approved'].includes(t.stage)&&t.state==='active');
+  const held=facT.filter(t=>t.state==='hold');
+  if(!nm) return '<div class="pagehead"><div><h1>My Queue</h1></div></div><div class="empty">Sign in to see your queue.</div>';
+  const sorted=l=>l.sort((a,b)=>stageIndex(a.stage)-stageIndex(b.stage));
+  return '<div class="pagehead"><div><div class="eyebrow">'+esc(nm)+'</div><h1>My Queue</h1><div class="sub">Everything waiting on '+(S.viewAs?esc(nm.split(' ')[0]):'you')+' first, then where the rest of '+(S.viewAs?'their':'your')+' work stands.</div></div></div>'+
+   grp('Your Move',sorted(yours),'warn')+(facT.length||!yours.length?grp('With Reviewers',sorted(withRev),'info')+grp('Waiting on '+esc(govName()),sorted(withGov),'info')+grp('Out the Door',sorted(out),'good')+(held.length?grp('On Hold',held,'hold'):''):'');
+};
+
+function filteredLive(){
+  const f=S.filters; const q=(f.q||'').toLowerCase();
+  return liveTickets().filter(t=>(!f.fac||t.facilitator===f.fac)&&(!f.wg||t.workgroup===f.wg)&&(!f.size||t.size===f.size)&&(!f.type||t.workType===f.type)&&(!q||(t.name+' '+t.wr+' '+t.workgroup+' '+t.facilitator).toLowerCase().includes(q)));
+}
+function filterBar(withState){
+  const f=S.filters, L=allTickets();
+  const uniq=k=>[...new Set(L.map(t=>t[k]).filter(Boolean))].sort();
+  return '<div class="filters">'+(withState?'<div class="seg" id="statef">'+[['live','Live'],['hold','On Hold'],['published','Published'],['closed','Closed'],['canceled','Canceled'],['all','All']].map(([v,l])=>'<button type="button" data-state="'+v+'" aria-pressed="'+(f.state===v)+'">'+l+'</button>').join('')+'</div>':'')+
+   '<input type="search" id="fq" placeholder="Filter by name or WR#" value="'+esc(f.q)+'" style="min-width:200px">'+
+   '<select id="ffac"><option value="">All Facilitators</option>'+uniq('facilitator').map(x=>'<option'+(f.fac===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select>'+
+   '<select id="fwg"><option value="">All Workgroups</option>'+uniq('workgroup').map(x=>'<option'+(f.wg===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select>'+
+   '<select id="fsize"><option value="">All Sizes</option>'+SIZES.map(([v,l])=>'<option value="'+v+'"'+(f.size===v?' selected':'')+'>'+l+'</option>').join('')+'</select>'+
+   '<select id="ftype"><option value="">All Work Types</option>'+uniq('workType').map(x=>'<option'+(f.type===x?' selected':'')+'>'+esc(x)+'</option>').join('')+'</select>'+
+   ((f.q||f.fac||f.wg||f.size||f.type)?'<button class="btn ghost sm" id="fclear" type="button">Clear Filters</button>':'')+'</div>';
+}
+VIEWS.board=function(){
+  const L=filteredLive();
+  const cols=stages().map(s=>{ const ts=L.filter(t=>t.stage===s.key).sort((a,b)=>(stageAge(b)||0)-(stageAge(a)||0)); return '<section class="bcol'+(ts.length?'':' none')+'" data-col="'+s.key+'" style="--sc:'+s.color+'"><header><h4>'+esc(s.name)+'<b>'+ts.length+'</b></h4><div class="o">'+esc(s.owner==='gov'?govName():ROLE_LABEL[s.owner]||'')+'</div></header><div class="cards">'+ts.map(t=>tkCard(t,S.canWrite)).join('')+'</div></section>'; }).join('');
+  return '<div class="pagehead"><div><h1>Pipeline Board</h1><div class="sub">Every live work request by stage. Drag a card to move it; every move is logged.</div></div><div class="acts">'+(S.isStaff?'<button class="btn" id="newtk" type="button">+ New Work Request</button>':'')+'</div></div>'+filterBar(false)+'<div class="board" id="board">'+cols+'</div>';
+};
+VIEWS.reviews=function(){
+  const act=liveTickets().filter(t=>t.state==='active');
+  const sec=(title,desc,list)=>'<div class="qgroup"><h3>'+title+' <span class="chip info">'+list.length+'</span></h3><div class="muted" style="font-size:12.5px;margin:-4px 0 10px">'+desc+'</div>'+(list.length?'<div class="qlist">'+list.map(qItem).join('')+'</div>':'<div class="empty">Nothing in this review right now.</div>')+'</div>';
+  return '<div class="pagehead"><div><h1>Review Desk</h1><div class="sub">AI Review, IM, AWG and License Designation in one place.</div></div></div>'+
+   sec('AI Review','Editor and readiness review in one step.',act.filter(t=>t.stage==='aireview'))+
+   sec('IM Review','Information Management.',act.filter(t=>t.stage==='im'))+
+   sec('AWG Review','Architecture Workgroup.',act.filter(t=>t.stage==='awg'))+
+   sec('License Designation','Director recommends; VPs agree.',act.filter(t=>t.stage==='designation'));
+};
+VIEWS.governance=function(){
+  const act=liveTickets().filter(t=>t.state==='active'); const g=govName();
+  const row=t=>{ const v=(t.votes||[]).filter(x=>x.stage===t.stage).slice(-1)[0]; return '<tr class="rowlink" data-open="'+esc(t.id)+'"><td class="nowrap muted">'+esc(t.wr)+'</td><td><div class="nm">'+esc(t.name)+'</div><div class="muted" style="font-size:12px">'+esc(t.workgroup||'')+' · '+esc(t.facilitator||'')+'</div></td><td>'+stageChip(t)+'</td><td class="nowrap">'+(stageAge(t)!=null?stageAge(t)+' days':'')+'</td><td>'+(S.canWrite?'<button class="btn sm pri" data-decide="'+esc(t.id)+'" type="button">Record Decision</button>':'')+'</td></tr>'; };
+  const list=act.filter(t=>['kickoff','gc-comment','gc-publish'].includes(t.stage)).sort((a,b)=>stageIndex(a.stage)-stageIndex(b.stage));
+  const decided=[]; allTickets().forEach(t=>(t.votes||[]).forEach(v=>decided.push([v,t]))); decided.sort((a,b)=>(b[0].date||'').localeCompare(a[0].date||''));
+  return '<div class="pagehead"><div><h1>Governance</h1><div class="sub">What\u2019s waiting on '+esc(g)+', with each member\u2019s vote logged.</div></div><div class="acts">'+(list.length?'<button class="btn" id="agenda" type="button">Copy Agenda</button>':'')+'</div></div>'+
+   '<div class="card"><h3>Waiting on '+esc(g)+'</h3>'+(list.length?'<table class="tbl"><thead><tr><th>WR#</th><th>Work Request</th><th>Decision Needed</th><th>Waiting</th><th></th></tr></thead><tbody>'+list.map(row).join('')+'</tbody></table>':'<div class="empty">Nothing is waiting on '+esc(g)+'.</div>')+'</div>'+
+   '<div class="card"><h3>Decision Log</h3>'+(decided.length?'<table class="tbl"><thead><tr><th>Date</th><th>WR#</th><th>Decision</th><th>Outcome</th><th>Votes</th></tr></thead><tbody>'+decided.slice(0,40).map(([v,t])=>'<tr class="rowlink" data-open="'+esc(t.id)+'"><td class="nowrap">'+esc(fmtS(v.date))+'</td><td class="nowrap">'+esc(t.wr)+'</td><td>'+esc(stageDef(v.stage).name)+'</td><td><span class="chip '+(v.outcome==='Approved'?'good':'bad')+'">'+esc(v.outcome)+'</span></td><td style="font-size:12px">'+esc(Object.entries(v.members||{}).map(([n,x])=>n+': '+x).join(' · ')||v.method||'')+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">Decisions show here once they\u2019re recorded.</div>')+'</div>';
+};
+VIEWS.comment=function(){
+  const td=today();
+  const L=allTickets().filter(t=>t.dates&&t.dates.commentStart&&t.dates.commentEnd&&(t.stage==='comment'||daysBetween(t.dates.commentEnd,td)<=45)).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd));
+  const setup=liveTickets().filter(t=>t.stage==='comment'&&t.sub==='setup');
+  if(!L.length && !setup.length) return '<div class="pagehead"><div><h1>Comment Periods</h1></div></div><div class="empty">No comment periods are open or recently closed.</div>';
+  const lo=[td,...L.map(t=>t.dates.commentStart)].sort()[0], hi=[addDays(td,14),...L.map(t=>t.dates.commentEnd)].sort().slice(-1)[0];
+  const span=Math.max(1,daysBetween(lo,hi)); const X=d=>Math.max(0,Math.min(100,daysBetween(lo,d)/span*100));
+  const rows=L.map(t=>{ const d=t.dates, left=X(d.commentStart), w=Math.max(1.5,X(d.commentEnd)-left), open=t.stage==='comment', n=daysBetween(td,d.commentEnd);
+    return '<div class="cprow" data-open="'+esc(t.id)+'"><div><div style="font-weight:600;font-size:13px">'+esc(t.productPageName||t.name)+'</div><div class="muted" style="font-size:12px">'+esc(t.wr)+' · '+(open?(n>=0?n+' days left':'ending'):'Closed '+fmtS(d.commentEnd))+'</div></div><div class="bartrack"><div class="cpbar" style="left:'+left+'%;width:'+w+'%;background:'+(open?'var(--c6)':'var(--border-strong)')+'"></div><div class="todayline" style="left:'+X(td)+'%"></div><span class="cplab" style="left:calc('+Math.min(left+w,80)+'% + 6px)">'+fmtS(d.commentStart)+' to '+fmtS(d.commentEnd)+'</span></div></div>'; }).join('');
+  return '<div class="pagehead"><div><h1>Comment Periods</h1><div class="sub">Open and recently closed. The red line is today; each one moves to Post-Comment by itself when it ends.</div></div></div>'+
+    (setup.length?'<div class="card"><h3>Approved, Not Posted Yet</h3><div class="qlist">'+setup.map(qItem).join('')+'</div></div>':'')+
+    '<div class="card">'+rows+'</div>';
+};
+VIEWS.all=function(){
+  const f=S.filters; const q=(f.q||'').toLowerCase();
+  let L=allTickets().filter(t=>f.state==='all'||(f.state==='live'?t.state==='active':t.state===f.state));
+  L=L.filter(t=>(!f.fac||t.facilitator===f.fac)&&(!f.wg||t.workgroup===f.wg)&&(!f.size||t.size===f.size)&&(!f.type||t.workType===f.type)&&(!q||(t.name+' '+t.wr+' '+t.workgroup+' '+t.facilitator).toLowerCase().includes(q)));
+  const key={wr:t=>t.wr,name:t=>t.name,wg:t=>t.workgroup||'',fac:t=>t.facilitator||'',stage:t=>String(stageIndex(t.stage)+100).padStart(4,'0'),size:t=>['S','M','L','XL'].indexOf(t.size),target:t=>(t.dates&&t.dates.targetIM)||'9',upd:t=>t.updatedAt||t.importedAt||''}[f.sort]||(t=>t.wr);
+  L.sort((a,b)=>{ const x=key(a), y=key(b); return (x>y?1:x<y?-1:0)*f.dir; });
+  const th=(k,l)=>'<th data-sort="'+k+'">'+l+(f.sort===k?(f.dir>0?' ↑':' ↓'):'')+'</th>';
+  return '<div class="pagehead"><div><h1>All Work</h1><div class="sub">'+L.length+' work requests. Click a column to sort.</div></div><div class="acts">'+(S.isStaff?'<button class="btn" id="newtk" type="button">+ New Work Request</button>':'')+'</div></div>'+filterBar(true)+
+   (L.length?'<div class="tblwrap"><table class="tbl"><thead><tr>'+th('wr','WR#')+th('name','Work Request')+th('wg','Workgroup')+th('fac','Facilitator')+th('stage','Stage')+th('size','Size')+th('target','Target to IM')+th('upd','Updated')+'</tr></thead><tbody>'+L.slice(0,400).map(t=>'<tr class="rowlink" data-open="'+esc(t.id)+'"><td class="nowrap">'+esc(t.wr)+'</td><td class="nm">'+esc(t.name)+'</td><td>'+esc(t.workgroup||'')+'</td><td class="nowrap">'+esc(t.facilitator||'')+'</td><td>'+(t.state==='active'?stageChip(t)+' '+subChip(t):stateChip(t))+'</td><td>'+sizeTag(t)+'</td><td class="nowrap'+(pastTarget(t)?'" style="color:var(--bad);font-weight:600':'')+'">'+esc(fmtS(t.dates&&t.dates.targetIM))+'</td><td class="nowrap muted">'+esc(fmtS((t.updatedAt||t.importedAt||'').slice(0,10)))+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">Nothing matches these filters.</div>');
+};
+VIEWS.media=function(){
+  const L=Object.values(S.media).sort((a,b)=>(a.status==='Done')-(b.status==='Done')||(b.requested||'').localeCompare(a.requested||''));
+  return '<div class="pagehead"><div><h1>MISMO Media Requests</h1><div class="sub">Calls for Participation, LinkedIn posts and release announcements the MMS has asked for. They\u2019ll flow straight into MISMO Media once the two are connected.</div></div></div>'+
+   (L.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>Requested</th><th>Request</th><th>Work Request</th><th>Status</th><th></th></tr></thead><tbody>'+L.map(m=>'<tr><td class="nowrap">'+esc(fmtS(m.requested))+'</td><td><div class="nm">'+esc(m.kind)+'</div><div class="muted" style="font-size:12px">'+esc(m.text)+'</div>'+(m.link?'<a href="'+esc(m.link)+'" target="_blank" rel="noopener">Link</a>':'')+'</td><td class="rowlink" data-open="'+esc(m.ticket)+'" style="cursor:pointer"><b>'+esc(m.wr)+'</b> '+esc(m.name)+'</td><td><span class="chip '+(m.status==='Done'?'good':m.status==='In Progress'?'info':'warn')+'">'+esc(m.status)+'</span></td><td class="nowrap">'+(S.canWrite&&m.status!=='Done'?'<button class="btn sm" data-media="'+esc(m.id)+'" type="button">Update</button>':'')+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">No requests yet. They\u2019re made automatically at Call for Participation, Comment Period and Release.</div>');
+};
+VIEWS.outbox=function(){
+  const L=Object.values(S.outbox).sort((a,b)=>(b.at||'').localeCompare(a.at||''));
+  return '<div class="pagehead"><div><h1>Notifications</h1><div class="sub">Every email the MMS has lined up. '+(S.notify.flowUrl?'They send automatically through the email flow.':'Until the email flow is connected, open each one to send it from Outlook.')+'</div></div>'+(L.some(m=>m.status==='Queued')&&S.canWrite?'<div class="acts"><button class="btn" id="sentall" type="button">Mark All Sent</button></div>':'')+'</div>'+
+   (L.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>Queued</th><th>To</th><th>Subject</th><th>Status</th><th></th></tr></thead><tbody>'+L.slice(0,200).map(m=>'<tr><td class="nowrap">'+esc(fmtS((m.at||'').slice(0,10)))+'</td><td style="font-size:12px">'+esc((m.to||[]).join(', '))+'</td><td><div class="nm">'+esc(m.subject)+'</div><div class="muted" style="font-size:12px;white-space:pre-line">'+esc((m.body||'').slice(0,180))+'</div></td><td><span class="chip '+(m.status==='Sent'?'good':'warn')+'">'+esc(m.status)+'</span></td><td class="nowrap"><a class="btn sm" href="mailto:'+esc((m.to||[]).join(';'))+'?subject='+encodeURIComponent(m.subject||'')+'&body='+encodeURIComponent(m.body||'')+'">Open Email</a> '+(S.canWrite&&m.status!=='Sent'?'<button class="btn sm ghost" data-sent="'+esc(m.id)+'" type="button">Mark Sent</button>':'')+'</td></tr>').join('')+'</tbody></table></div>':'<div class="empty">No notifications yet.</div>');
+};
+const RC=[
+  ['Meeting Trackers','Attendance for your workgroup meetings','https://resources.mismo.org/meeting-trackers/','M4 4h16v16H4zM4 9h16M9 4v16'],
+  ['Submit a Work Request','Start a new request in the Initiative Hub','https://resources.mismo.org/initiative-hub/work-requests.html#new','M12 5v14M5 12h14'],
+  ['My Work Requests','Follow requests you\u2019ve submitted','https://resources.mismo.org/initiative-hub/work-requests.html#mine','M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01'],
+  ['Initiative Hub','Initiatives, monthly updates and the meeting calendar','https://resources.mismo.org/initiative-hub/','M12 2l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5'],
+  ['Facilitator Handbook','The core guide for facilitators (being redone)','https://mortgagebankersassociation.sharepoint.com/:w:/s/Facilitators/EcQiScj33DdBjFYgFsNO7-0B6aZV9Fyi0_eXcH5lEq0DRg','M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z'],
+  ['Business Glossary','MISMO\u2019s Business Glossary console','https://resources.mismo.org/glossary/console/','M4 6h16M4 12h10M4 18h7'],
+  ['MISMO Media','Marketing and communications requests','https://resources.mismo.org/marketing-hq/','M4 11v2a1 1 0 001 1h2l5 4V6L7 10H5a1 1 0 00-1 1z'],
+  ['MISMO.org','The public website','https://www.mismo.org/','M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20']];
+const GOVLINKS=[['Business Executive Team (BET)','https://www.mismo.org/about-MISMO/mismo-leadership/prioritization-committee/business-executive-team'],['Residential Standards Governance Committee','https://www.mismo.org/about-MISMO/mismo-leadership/residential-standards-governance-committee'],['Commercial Standards Governance Committee','https://www.mismo.org/about-MISMO/mismo-leadership/commercial-standards-governance-committee'],['Council of Chairs','https://www.mismo.org/about-MISMO/mismo-leadership/council-of-chairs'],['Education Council','https://www.mismo.org/about-MISMO/mismo-leadership/education-council']];
+VIEWS.resources=function(){
+  return '<div class="pagehead"><div><h1>Facilitator Resource Center</h1><div class="sub">The tools and references facilitators use every week.</div></div></div>'+
+   '<div class="rc-grid" style="margin-bottom:22px">'+RC.map(([n,d,u,ic])=>'<a class="rc" href="'+esc(u)+'" target="_blank" rel="noopener"><span class="ic"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg></span><span><b>'+esc(n)+'</b><span>'+esc(d)+'</span></span></a>').join('')+'</div>'+
+   '<div class="cols2"><div class="card"><h3>How a Work Request Moves</h3><ol style="margin:0;padding-left:20px;font-size:13.5px">'+stages().map(s=>'<li style="margin-bottom:6px"><b>'+esc(s.name)+'</b> <span class="muted">('+esc(s.owner==='gov'?govName():ROLE_LABEL[s.owner]||'')+')</span><br><span style="color:var(--ink-2)">'+esc(s.desc||'')+'</span></li>').join('')+'<li><b>Published</b></li></ol></div>'+
+   '<div class="card"><h3>Governance</h3>'+GOVLINKS.map(([n,u])=>'<div style="padding:7px 0;border-bottom:1px solid var(--rule)"><a href="'+esc(u)+'" target="_blank" rel="noopener">'+esc(n)+'</a></div>').join('')+'</div></div>';
+};
+
+/* ---------- the ticket panel ---------- */
+function openPanel(id){ S.panel=id; renderPanel(); $('#panel').classList.add('on'); $('#panel').setAttribute('aria-hidden','false'); $('#scrim').classList.add('on'); }
+function closePanel(){ S.panel=null; $('#panel').classList.remove('on'); $('#panel').setAttribute('aria-hidden','true'); $('#scrim').classList.remove('on'); }
+const GOV_STAGES=['kickoff','gc-comment','gc-publish'];
+
+function stageActions(t){
+  const A=[], g=govName(), sub=t.sub||'';
+  const add=(label,fn,cls)=>A.push({label,fn,cls:cls||''});
+  if(t.state==='hold'){ add('Resume Work',()=>resume(t),'pri'); return A; }
+  if(t.state!=='active'){ add('Reopen',()=>reopen(t),'pri'); return A; }
+  switch(t.stage){
+    case 'approved': add('Start Work →',()=>startWork(t),'pri'); break;
+    case 'cfp': add('Call for Participation Published →',()=>cfpDone(t),'pri'); break;
+    case 'kickoff': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
+    case 'work': add('Submit for AI Review →',()=>submitAI(t),'pri'); add('Change Target Date',()=>changeTarget(t)); break;
+    case 'aireview':
+      add(sub==='reviewed'?'Run AI Review Again':'Run AI Review',()=>aiReview(t),sub==='reviewed'?'':'pri');
+      if(sub==='reviewed'||sub==='') add('Send to IM Review →',()=>move(t,nextStage(t),{dates:{aiDecision:today()},patch:{ai:Object.assign({},t.ai,{status:'Passed'})},text:'AI Review passed; sent to '+stageDef(nextStage(t)).name}),sub==='reviewed'?'pri':'');
+      if(sub!=='updates') add('Make Updates First',()=>setSub(t,'updates','Facilitator making updates from AI Review'));
+      else add('Resubmit for AI Review',()=>setSub(t,'resubmitted','Resubmitted for AI Review'),'pri');
+      break;
+    case 'im': case 'awg': {
+      const k=t.stage, nm=k==='im'?'IM':'AWG';
+      if(sub==='prep') add('Submitted to '+nm+' →',()=>setSub(t,'new','Submitted to '+nm+' through MISMO Connect',{dates:Object.assign({},t.dates,{[k+'Submitted']:today()})}),'pri');
+      if(sub==='new'||sub==='resubmitted') add('Start '+nm+' Review',()=>setSub(t,'in-review',nm+' review started',{dates:Object.assign({},t.dates,{[k+'Review']:today()})}),'pri');
+      if(sub==='updates') add('Resubmit to '+nm,()=>{ const x=clone(t[k]||{}); x.resubs=(x.resubs||0)+1; return setSub(t,'resubmitted','Resubmitted to '+nm,{[k]:x,dates:Object.assign({},t.dates,{[k+'Resubmitted']:today()})}); },'pri');
+      if(sub!=='updates'&&sub!=='prep'){ add(nm+' Decision →',()=>reviewDecision(t),sub==='in-review'?'pri':''); add('Updates Needed',()=>updatesNeeded(t)); }
+      add('Not Required: Skip',()=>move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)'})},text:nm+' review not required; skipped'}),'ghost');
+      break; }
+    case 'designation':
+      if(sub==='prep'||!sub) add('Send to Designation →',()=>toDesignation(t),'pri');
+      if(sub==='director'||sub==='discuss') add('Recommend Designation',()=>directorRec(t),'pri');
+      if(sub==='vps') add('Record VP Agreement',()=>vpAgree(t),'pri');
+      break;
+    case 'gc-comment': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
+    case 'comment':
+      if(sub==='setup') add('Posted: Set Comment Dates →',()=>commentSetup(t),'pri');
+      else { add('End Comment Period Now',()=>move(t,'post',{text:'Comment period closed early',dates:{commentEnd:today()}})); add('Change Dates',()=>commentSetup(t)); }
+      break;
+    case 'post': add('Report What Came Back →',()=>postReport(t),'pri'); break;
+    case 'gc-publish': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
+    case 'release': add('Mark Published →',()=>markPublished(t),'pri'); break;
+  }
+  return A;
+}
+function renderPanel(){
+  const t=S.tickets[S.panel]; const P=$('#panel'); if(!t){ P.innerHTML=''; return; }
+  const list=stages(); const ci=list.findIndex(s=>s.key===t.stage); const w=whoseMove(t); const d=t.dates||{};
+  const stageDates={approved:d.bet,cfp:d.cfpPublished,kickoff:d.kickoffGc,work:d.workStart,aireview:d.aiSubmitted,im:d.imSubmitted,awg:d.awgSubmitted,designation:d.designation,'gc-comment':d.gcComment,comment:d.commentStart,post:d.commentEnd,'gc-publish':d.postGc,release:d.published};
+  const track=list.map((s,j)=>'<div class="tst '+(t.state==='published'||j<ci?'done':(j===ci?'cur':''))+'" title="'+esc(s.desc||'')+'"><i></i>'+esc(s.name)+(stageDates[s.key]?'<small>'+esc(fmtS(stageDates[s.key]))+'</small>':'')+'</div>').join('');
+  const acts=S.canWrite?stageActions(t):[];
+  const more=S.canWrite?['<button class="btn sm" data-x="moveto" type="button">Move To…</button>',
+    t.state==='active'?'<button class="btn sm" data-x="hold" type="button">Put on Hold</button>':'',
+    t.state==='active'||t.state==='hold'?'<button class="btn sm" data-x="close" type="button">Close</button><button class="btn sm danger" data-x="cancel" type="button">Cancel</button>':''].join(''):'';
+  const facs=(S.people.facilitators||[]).map(p=>p.name).sort();
+  const field=(label,key,val,type,opts,wide)=>{
+    let el; const v=val==null?'':val;
+    if(type==='date') el=dateField(key,v);
+    else if(type==='select') el='<select data-k="'+key+'">'+['',...opts].map(o=>{ const ov=Array.isArray(o)?o[0]:o, ol=Array.isArray(o)?o[1]:o; return '<option value="'+esc(ov)+'"'+(String(ov)===String(v)?' selected':'')+'>'+esc(ol||'—')+'</option>'; }).join('')+(v&&!opts.some(o=>(Array.isArray(o)?o[0]:o)===v)?'<option selected>'+esc(v)+'</option>':'')+'</select>';
+    else if(type==='area') el='<textarea data-k="'+key+'" rows="4">'+esc(v)+'</textarea>';
+    else el='<input data-k="'+key+'" value="'+esc(v)+'">';
+    if(!S.canWrite) el='<div class="ro">'+esc(type==='date'?fmt(v):v)||'—'+'</div>';
+    return '<div class="f'+(wide?' wide':'')+'"><label>'+esc(label)+'</label>'+el+'</div>';
+  };
+  const sec=(id,title,inner,full,extra)=>'<div class="psec'+(full?' full':'')+'" data-sec="'+id+'"><h4>'+title+(extra||'')+'</h4>'+inner+(S.canWrite&&id!=='hist'&&id!=='stage'?'<div class="savebar"><button class="btn sm pri" data-save="'+id+'" type="button">Save</button><span class="dirty" hidden>Unsaved changes</span></div>':'')+'</div>';
+  const details='<div class="kv">'+field('Work Request Name','name',t.name,'text',null,true)+field('Work Product Name','product',t.product)+field('Workgroup','workgroup',t.workgroup)+field('DWG or CoP','groupType',t.groupType,'select',['CoP','DWG'])+field('Facilitator','facilitator',t.facilitator,'select',facs)+field('T-Shirt Size','size',t.size,'select',SIZES)+field('Work Type','workType',t.workType,'select',['Initiative','Initiative Deliverable','Maintenance','Non-Initiative'])+field('Request Type','reqType',t.reqType,'select',['New','Update'])+field('MISMO Segment','segment',t.segment)+field('Part of RM Release','rmRelease',t.rmRelease)+field('Product Page Name','productPageName',t.productPageName)+field('Classification','classification',t.classification,'select',['Standard','Collateral'])+field('Summary','summary',t.summary,'area',null,true)+'</div>';
+  const dates='<div class="kv">'+field('Submitted','dates.submitted',d.submitted,'date')+field('Approved (BET)','dates.bet',d.bet,'date')+field('Work Start','dates.workStart',d.workStart,'date')+field('Target to Submit to IM','dates.targetIM',d.targetIM,'date')+field('AI Review Submitted','dates.aiSubmitted',d.aiSubmitted,'date')+field('IM Submitted','dates.imSubmitted',d.imSubmitted,'date')+field('IM Decision','dates.imDecision',d.imDecision,'date')+field('AWG Decision','dates.awgDecision',d.awgDecision,'date')+field(govName()+' Approval to Comment','dates.gcComment',d.gcComment,'date')+field('Comment Start','dates.commentStart',d.commentStart,'date')+field('Comment End','dates.commentEnd',d.commentEnd,'date')+field(govName()+' Approval to Publish','dates.postGc',d.postGc,'date')+field('Published','dates.published',d.published,'date')+field('Regulation / Mandate','dates.regulation',d.regulation,'date')+'</div>'+(t.targetChanges?'<div class="muted" style="font-size:12px;margin-top:8px">Target to IM has changed '+t.targetChanges+' time'+(t.targetChanges===1?'':'s')+'.</div>':'');
+  const L=t.links||{};
+  const links='<div class="kv">'+[['MISMO.org Product Page','productPage'],['Resource Library','resourceLibrary'],['Workgroup Page','workgroupPage'],['MISMO Connect Site','connect'],['Work Product File (SharePoint)','workFile'],['Comment Announcement','newsComment'],['CR or Final Announcement','newsFinal']].map(([l,k])=>'<div class="f"><label>'+esc(l)+(L[k]?' <a href="'+esc(L[k])+'" target="_blank" rel="noopener" style="text-transform:none;letter-spacing:0">Open</a>':'')+'</label>'+(S.canWrite?'<input data-k="links.'+k+'" value="'+esc(L[k]||'')+'" placeholder="https://">':'<div class="ro">'+esc(L[k]||'—')+'</div>')+'</div>').join('')+'</div>';
+  P.innerHTML='<div class="ph"><div class="row1"><span class="wr">'+esc(t.wr)+'</span>'+stateChip(t)+(pastTarget(t)?'<span class="chip bad">Past Target</span>':'')+'<button class="x" type="button" id="pclose" aria-label="Close">×</button></div><h2>'+esc(t.name)+'</h2><div class="sub">'+esc([t.workgroup,t.facilitator,(SIZES.find(s=>s[0]===t.size)||[])[1]].filter(Boolean).join(' · '))+'</div><div class="track">'+track+'</div></div>'+
+   '<div class="pb"><div class="actbar"><div class="next"><div class="eyebrow">'+(t.state==='active'?'Next · '+esc(w.label||''):'Status')+'</div><b>'+esc(t.state==='active'?w.text:(t.state==='hold'?w.text:stageDef(t.stage).name+' · '+t.state))+'</b>'+(t.state==='active'&&stageAge(t)!=null?'<div class="why">'+stageAge(t)+' days at '+esc(stageDef(t.stage).name)+(movers(t).length?' · '+esc(movers(t).map(p=>p.name).join(', ')):'')+'</div>':'')+'</div>'+
+   acts.map((a,i)=>'<button class="btn '+a.cls+'" data-act="'+i+'" type="button">'+esc(a.label)+'</button>').join('')+'</div>'+
+   (more?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin:-8px 0 18px">'+more+'</div>':'')+
+   '<div class="pgrid">'+stagePanel(t)+sec('details','Details',details)+sec('dates','Key Dates',dates)+sec('links','Links',links)+
+   sec('hist','History',(S.canWrite?'<div style="display:flex;gap:8px;margin-bottom:12px"><input id="noteq" placeholder="Add a note to the history" style="flex:1;font:inherit;font-size:13px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:5px;padding:6px 8px"><button class="btn sm" id="noteadd" type="button">Add Note</button></div>':'')+'<ul class="hist">'+(t.history||[]).slice().reverse().map(h=>'<li><div class="when">'+esc(h.at?fmt(h.at.slice(0,10)):'')+(h.by?' · '+esc(h.by):'')+'</div>'+esc(h.text)+(h.note?'<div class="muted">'+esc(h.note)+'</div>':'')+'</li>').join('')+'</ul>',true)+'</div></div>';
+  wireDates(P);
+  $('#pclose').onclick=closePanel;
+  $$('[data-act]',P).forEach(b=>b.onclick=()=>acts[+b.dataset.act].fn());
+  $$('[data-x]',P).forEach(b=>b.onclick=()=>({moveto:moveTo,hold:hold,close:closeT,cancel:cancelT})[b.dataset.x](t));
+  $$('[data-sec]',P).forEach(s=>s.addEventListener('input',()=>{ const x=$('.dirty',s); if(x) x.hidden=false; }));
+  $$('[data-save]',P).forEach(b=>b.onclick=()=>saveSection(t,b.closest('[data-sec]')));
+  const na=$('#noteadd'); if(na) na.onclick=async()=>{ const v=$('#noteq').value.trim(); if(!v) return; const x=clone(t); hist(x,'Note: '+v); await saveTicket(x,'Note added'); };
+  $$('[data-aiview]',P).forEach(b=>b.onclick=()=>{ const r=(t.ai&&t.ai.rounds||[])[+b.dataset.aiview]; if(r) showAI(r); });
+}
+async function saveSection(t0,sec){
+  const t=clone(t0), before=clone(t0); let bad=false, changed=[];
+  $$('[data-k]',sec).forEach(i=>{ const k=i.dataset.k; let v=i.value.trim(); const parts=k.split('.'); let o=t; for(let j=0;j<parts.length-1;j++){ o[parts[j]]=o[parts[j]]||{}; o=o[parts[j]]; } if((o[parts.at(-1)]||'')!==v){ o[parts.at(-1)]=v; changed.push(k); } });
+  $$('[data-date]',sec).forEach(i=>{ const k=i.dataset.date; const v=parseDate(i.value); if(v===null){ bad=true; return; } const parts=k.split('.'); let o=t; for(let j=0;j<parts.length-1;j++){ o[parts[j]]=o[parts[j]]||{}; o=o[parts[j]]; } if((o[parts.at(-1)]||'')!==v){ if(k==='dates.targetIM'&&o[parts.at(-1)]) t.targetChanges=(t.targetChanges||0)+1; o[parts.at(-1)]=v; changed.push(k); } });
+  if(bad){ toast('A date did not read right. Try a format like 9/30/26.'); return; }
+  if(!changed.length){ toast('Nothing changed'); return; }
+  hist(t,'Updated '+changed.map(k=>k.replace(/^(dates|links)\./,'')).join(', '));
+  await saveTicket(t,'Saved',before);
+}
+function stagePanel(t){
+  const sub=t.sub||''; let inner='';
+  const ai=t.ai||{}; const rounds=ai.rounds||[];
+  if(['aireview','im','awg','designation'].includes(t.stage)||rounds.length){
+    inner+='<div style="margin-bottom:10px"><b style="font-size:12.5px">AI Review</b> '+(rounds.length?'<span class="chip '+(rounds.at(-1).verdict==='ready'?'good':'warn')+'">'+(rounds.at(-1).verdict==='ready'?'Ready':'Updates Suggested')+'</span>':'<span class="chip">Not run yet</span>')+
+      (rounds.length?'<div style="font-size:12.5px;color:var(--ink-2);margin-top:4px">'+esc(rounds.at(-1).summary||'')+'</div><div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">'+rounds.map((r,i)=>'<button class="btn sm" data-aiview="'+i+'" type="button">Round '+(i+1)+' · '+esc(fmtS(r.at.slice(0,10)))+'</button>').join('')+'</div>':'')+'</div>';
+  }
+  if(t.im||t.stage==='im') inner+='<div class="vote"><span class="nm">IM Review</span>'+(t.stage==='im'?subChip(t):'')+'<span class="chip">'+esc((t.im&&t.im.status)||(t.dates&&t.dates.imDecision?'Decided':'—'))+'</span>'+((t.im&&t.im.resubs)?'<span class="muted" style="font-size:12px">'+t.im.resubs+' resubmission(s)</span>':'')+'</div>';
+  if(t.awg||t.stage==='awg') inner+='<div class="vote"><span class="nm">AWG Review</span>'+(t.stage==='awg'?subChip(t):'')+'<span class="chip">'+esc((t.awg&&t.awg.status)||'—')+'</span>'+((t.awg&&t.awg.resubs)?'<span class="muted" style="font-size:12px">'+t.awg.resubs+' resubmission(s)</span>':'')+'</div>';
+  const ds=t.designation||{};
+  if(t.stage==='designation'||ds.type||ds.license){
+    inner+='<div style="margin-top:10px"><b style="font-size:12.5px">License Designation</b> '+(t.stage==='designation'?subChip(t):'')+'<div class="kv" style="margin-top:6px">'+[['Comment Type',ds.type],['Classification',t.classification],['License Usage',ds.license],['Royalty Status',ds.royalty],['Available To',ds.availableTo],['Comment Length',t.commentDays?t.commentDays+' days':'']].map(([l,v])=>'<div class="f"><label>'+l+'</label><div class="ro">'+esc(v||'—')+'</div></div>').join('')+'</div>'+
+      ((ds.vps&&Object.keys(ds.vps).length)?'<div style="margin-top:6px">'+Object.entries(ds.vps).map(([n,v])=>'<div class="vote"><span class="nm">'+esc(n)+'</span><span class="chip '+(v.vote==='Agree'?'good':'warn')+'">'+esc(v.vote)+'</span><span class="muted" style="font-size:12px">'+esc(v.note||'')+'</span></div>').join('')+'</div>':'')+'</div>';
+  }
+  const votes=t.votes||[];
+  if(votes.length) inner+='<div style="margin-top:10px"><b style="font-size:12.5px">Decisions</b>'+votes.map(v=>'<div class="vote"><span class="nm">'+esc(stageDef(v.stage).name)+' · '+esc(fmtS(v.date))+(v.method?' · '+esc(v.method):'')+'</span><span class="chip '+(v.outcome==='Approved'?'good':'bad')+'">'+esc(v.outcome)+'</span></div>'+(Object.keys(v.members||{}).length?'<div class="muted" style="font-size:12px;padding:0 0 6px">'+esc(Object.entries(v.members).map(([n,x])=>n+': '+x).join(' · '))+'</div>':'')).join('')+'</div>';
+  if(t.commentReport) inner+='<div class="vote"><span class="nm">Comment Report</span><span class="chip">'+esc(t.commentReport)+'</span></div>';
+  if(t.cfp&&t.cfp.needed) inner+='<div class="vote"><span class="nm">Call for Participation</span><span class="chip '+(t.dates&&t.dates.cfpPublished?'good':'warn')+'">'+(t.dates&&t.dates.cfpPublished?'Published '+fmtS(t.dates.cfpPublished):'Needed')+'</span></div>';
+  if(!inner) return '';
+  return '<div class="psec full" data-sec="stage"><h4>Reviews and Decisions</h4>'+inner+'</div>';
+}
+
+/* ---------- stage actions ---------- */
+async function startWork(t){
+  const v=await modal({title:'Start Work',text:esc(t.name),ok:'Start Work',body:
+    fld('Work Start',dateField('start',today()))+fld('T-Shirt Size',radios('size',SIZES,t.size||'M'))+fld('Target to Submit to IM',dateField('target',t.dates&&t.dates.targetIM||''),'Leave blank to set it from the size: Small 60 days, Medium 90, Large 150, X-Large 210.')+
+    fld('Call for Participation Needed?',radios('cfp',[['no','No, work begins'],['yes','Yes, ask MISMO Media']],'no'))+fld('DWG or CoP',radios('gt',[['CoP','Community of Practice'],['DWG','Development Workgroup']],t.groupType||'CoP'))});
+  if(!v) return;
+  const target=v.target||addDays(v.start||today(),SIZE_DAYS[v.size]||90);
+  const x=clone(t); x.size=v.size; x.groupType=v.gt; x.cfp={needed:v.cfp==='yes'}; x.dates=Object.assign({},x.dates,{workStart:v.start||today(),targetIM:target,forecastIM:target});
+  await move(x,v.cfp==='yes'?'cfp':nextStage(x,'kickoff'),{text:'Work approved to start'+(v.cfp==='yes'?'; Call for Participation requested from MISMO Media':'')+'. Target to Submit to IM '+fmt(target)});
+}
+async function cfpDone(t){
+  const v=await modal({title:'Call for Participation Published',ok:'Save and Move On',body:fld('Published',dateField('d',today()))+fld('Announcement Link',inp('url','','https://'))});
+  if(!v) return; const x=clone(t); x.links=Object.assign({},x.links,{newsCfp:v.url}); x.dates=Object.assign({},x.dates,{cfpPublished:v.d});
+  await move(x,nextStage(x),{text:'Call for Participation published '+fmt(v.d)});
+}
+async function changeTarget(t){
+  const v=await modal({title:'Change Target to Submit to IM',ok:'Save',body:fld('New Target',dateField('d',t.dates&&t.dates.targetIM))+fld('Why',inp('why','','Optional'))});
+  if(!v||!v.d) return; const x=clone(t), b=clone(t); const old=x.dates&&x.dates.targetIM; x.dates=Object.assign({},x.dates,{targetIM:v.d}); x.targetChanges=(x.targetChanges||0)+(old?1:0);
+  hist(x,'Target to Submit to IM changed'+(old?' from '+fmt(old):'')+' to '+fmt(v.d),{note:v.why}); await saveTicket(x,'Target updated',b);
+}
+async function submitAI(t){
+  const v=await modal({title:'Submit for AI Review',text:'AI Review covers what the Editor and Readiness reviews did, in one step.',ok:'Submit',body:fld('Work Product File Link',inp('link',(t.links&&t.links.workFile)||'','SharePoint or MISMO Connect link'))+fld('Note for the Review',ta('note','','Anything the review should know'))});
+  if(!v) return; const x=clone(t); x.links=Object.assign({},x.links,{workFile:v.link}); x.ai=Object.assign({},x.ai,{note:v.note});
+  const nt=await move(x,'aireview',{text:'Submitted for AI Review',note:v.note}); if(nt) aiReview(nt);
+}
+async function updatesNeeded(t){
+  const nm=t.stage==='im'?'IM':'AWG';
+  const v=await modal({title:nm+': Updates Needed',ok:'Send Back to Facilitator',body:fld('What Needs Updating',ta('note','','Feedback for the facilitator'))});
+  if(!v) return; const x=clone(t[t.stage]||{}); x.status='02. Facilitator Updates Needed';
+  await setSub(t,'updates',nm+' asked for updates',{[t.stage]:x,dates:Object.assign({},t.dates,{[t.stage+'Updates']:today()})},v.note);
+  queueMail({to:[emailOf(t.facilitator)].filter(Boolean),subject:t.wr+' '+t.name+': '+nm+' updates needed',body:nm+' asked for updates to '+t.name+'.\n\n'+(v.note||'See MISMO Connect for the feedback.')+'\n\nResubmit in the MMS when ready.',ticket:t.id,kind:'stage',key:t.id+'-'+t.stage+'-upd-'+today()});
+}
+async function reviewDecision(t){
+  const k=t.stage, nm=k==='im'?'IM':'AWG';
+  const v=await modal({title:nm+' Decision',ok:'Record Decision',body:fld('Decision',radios('dec',['Approved','Passed','Conditional Approval'],'Approved'))+fld('Decision Date',dateField('d',today()))+fld('Vote Method',radios('vm',['Meeting','Electronic','Not Needed'],'Meeting'))+fld('Notes',ta('note',''))});
+  if(!v) return; const x=clone(t); x[k]=Object.assign({},x[k],{status:v.dec,voteMethod:v.vm}); x.dates=Object.assign({},x.dates,{[k+'Decision']:v.d});
+  const nx=nextStage(x); await move(x,nx,{sub:nx==='designation'?'prep':(nx==='awg'?'new':''),text:nm+' '+v.dec.toLowerCase()+' '+fmt(v.d)+'; moved to '+stageDef(nx).name,note:v.note});
+}
+async function toDesignation(t){
+  const days=proc().commentDays||[30];
+  const v=await modal({title:'Send to License Designation',text:'Attach the approved work product with the Comment Period IPR language, then send it on.',ok:'Send to Director',body:
+    fld('Comment Length',radios('days',days.map(x=>[String(x),x+' days']),String(t.commentDays||days[0])))+fld('Release Priority',radios('pri',['Low','Medium','High'],t.releasePriority||'Medium'))+fld('MISMO.org Product Page Name',inp('page',t.productPageName||t.name))+fld('Work Product File Link',inp('link',(t.links&&t.links.workFile)||'','https://'))});
+  if(!v) return; const x=clone(t); x.commentDays=+v.days; x.releasePriority=v.pri; x.productPageName=v.page; x.links=Object.assign({},x.links,{workFile:v.link});
+  await setSub(x,'director','Sent to the Director for License Designation');
+  queueMail({to:peopleFor('director').map(p=>p.email),subject:t.wr+' '+t.name+': ready for License Designation',body:t.name+' is ready for License Designation.',ticket:t.id,kind:'stage',key:t.id+'-des-'+today()});
+}
+async function directorRec(t){
+  const ds=t.designation||{};
+  const v=await modal({title:'Recommend Designation',ok:'Send to VPs',body:
+    fld('Comment Type',radios('type',['Public','Member'],ds.type||'Public'))+fld('Product Classification',radios('cls',['Standard','Collateral'],t.classification||'Standard'))+
+    fld('License Usage',radios('lic',['Commercial Distributor','Non Commercial Distributor','Internal Use Only','Copyright'],ds.license||''))+
+    fld('Royalty Status',sel('roy',['','Public for Free','Available to PUBLIC for FREE with COMMERCIAL USAGE LICENSE','Members Only for Free','Public for a Fee','Royalty Temp Waived'],ds.royalty))+
+    fld('Available To',radios('avail',['Public','Members Only'],ds.availableTo||'Public'))+fld('Notes',ta('note',ds.notes||''))});
+  if(!v) return; const x=clone(t); x.classification=v.cls; x.designation=Object.assign({},ds,{type:v.type,license:v.lic,royalty:v.roy,availableTo:v.avail,notes:v.note,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
+  await setSub(x,'vps','Director recommended: '+[v.type,v.cls,v.lic,v.avail].filter(Boolean).join(', '));
+  queueMail({to:peopleFor('vps').map(p=>p.email),subject:t.wr+' '+t.name+': designation ready for your agreement',body:'The Director recommends: '+[v.type,v.cls,v.lic,v.roy,v.avail].filter(Boolean).join(' · ')+'.\n\nAgree or ask to discuss in the MMS.',ticket:t.id,kind:'stage',key:t.id+'-vps-'+today()});
+}
+async function vpAgree(t){
+  const vps=peopleFor('vps'); const cur=(t.designation&&t.designation.vps)||{};
+  const body=vps.map((p,i)=>fld(p.name,radios('v'+i,['Agree','Needs Discussion','Not Yet'],(cur[p.name]&&cur[p.name].vote)||'Not Yet')+'<input name="n'+i+'" placeholder="Note (optional)" style="margin-top:6px" value="'+esc((cur[p.name]&&cur[p.name].note)||'')+'">')).join('');
+  const v=await modal({title:'VP Agreement',ok:'Save',body:body||'<p>Add the VPs in Settings, People and Roles.</p>'});
+  if(!v) return; const x=clone(t); const vs={}; vps.forEach((p,i)=>{ if(v['v'+i]&&v['v'+i]!=='Not Yet') vs[p.name]={vote:v['v'+i],note:v['n'+i]||'',at:today()}; });
+  x.designation=Object.assign({},x.designation,{vps:vs});
+  const all=vps.length&&vps.every(p=>vs[p.name]&&vs[p.name].vote==='Agree'), disc=Object.values(vs).some(z=>z.vote==='Needs Discussion');
+  if(all){ x.designation.status='3. Approved'; await move(x,nextStage(x),{text:'VPs agreed with the designation; added to the '+govName()+' agenda'}); }
+  else if(disc){ await setSub(x,'discuss','A VP asked to discuss the designation'); queueMail({to:peopleFor('director').map(p=>p.email),subject:t.wr+' '+t.name+': a VP wants to discuss the designation',body:Object.entries(vs).map(([n,z])=>n+': '+z.vote+(z.note?' ('+z.note+')':'')).join('\n'),ticket:t.id,kind:'stage',key:t.id+'-disc-'+today()}); }
+  else { hist(x,'VP agreement updated'); await saveTicket(x,'Saved',clone(t)); }
+}
+async function decide(t){
+  const g=govName(); const members=peopleFor('gov');
+  const what={kickoff:'kick off the workgroup','gc-comment':'go out for public comment','gc-publish':'publish as '+(isStandard(t)?'a Candidate Recommendation':'Final')}[t.stage]||'approve';
+  const body=fld('Decision',radios('out',['Approved','Not Approved','Deferred'],'Approved'))+fld('Decision Date',dateField('d',today()))+fld('How',radios('how',['Meeting','Electronic Vote'],'Meeting'))+
+    (members.length?fld('Each Member’s Vote','<div>'+members.map((p,i)=>'<div class="vote"><span class="nm">'+esc(p.name)+'</span>'+sel('m'+i,['Approve','Oppose','Abstain','Absent'],'Approve')+'</div>').join('')+'</div>'):fld('Votes',ta('votes','','e.g. 9 approve, 0 oppose, 1 abstain'),'Add '+g+' members in Settings to log each person’s vote.'))+fld('Notes',ta('note',''));
+  const v=await modal({title:g+' Decision',text:'Approval to '+esc(what)+': '+esc(t.name),ok:'Record Decision',body});
+  if(!v) return; const x=clone(t); const mem={}; members.forEach((p,i)=>mem[p.name]=v['m'+i]);
+  const rec={stage:t.stage,date:v.d||today(),method:v.how,outcome:v.out,members:mem,tally:v.votes||'',note:v.note||'',by:S.me.name||''};
+  x.votes=[...(x.votes||[]),rec];
+  const dk={kickoff:'kickoffGc','gc-comment':'gcComment','gc-publish':'postGc'}[t.stage];
+  if(v.out==='Approved'){ x.dates=Object.assign({},x.dates,{[dk]:rec.date}); const nx=nextStage(x); await move(x,nx,{text:g+' approved to '+what+' ('+fmt(rec.date)+')',note:v.note}); }
+  else if(v.out==='Not Approved'){ await move(x,'work',{text:g+' did not approve ('+fmt(rec.date)+'); back to In Work',note:v.note}); }
+  else { hist(x,g+' deferred the decision ('+fmt(rec.date)+')',{note:v.note}); await saveTicket(x,'Decision recorded',clone(t)); }
+}
+async function commentSetup(t){
+  const days=Number(t.commentDays)||proc().commentDays[0]||30; const d=t.dates||{};
+  const v=await modal({title:'Comment Period',text:'Posted to the website standards page; MISMO Media has the LinkedIn request.',ok:'Save',body:fld('Comment Start',dateField('s',d.commentStart||today()))+fld('Comment End',dateField('e',d.commentEnd||''),'Leave blank for '+days+' days after the start.')+fld('MISMO.org Product Page',inp('pp',(t.links&&t.links.productPage)||'','https://'))+fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'))});
+  if(!v) return; const x=clone(t), b=clone(t); const end=v.e||addDays(v.s||today(),days);
+  x.dates=Object.assign({},x.dates,{commentStart:v.s||today(),commentEnd:end,commentPublished:x.dates&&x.dates.commentPublished||today()}); x.links=Object.assign({},x.links,{productPage:v.pp,resourceLibrary:v.rl}); x.sub='';
+  hist(x,'Comment period set: '+fmt(x.dates.commentStart)+' to '+fmt(end)); await saveTicket(x,'Comment period set',b);
+  queueMail({to:[emailOf(t.facilitator)].filter(Boolean),subject:t.wr+' '+t.name+' is open for comment',body:t.name+' is open for public comment from '+fmt(x.dates.commentStart)+' to '+fmt(end)+'.',ticket:t.id,kind:'stage',key:t.id+'-copen-'+x.dates.commentStart});
+}
+async function postReport(t){
+  const v=await modal({title:'What Came Back from Comment',text:esc(t.name),ok:'Save and Move On',body:fld('Comment Results',radios('r',[['none','No comments received'],['nochange','Comments received, no material changes'],['change','Material or significant changes needed']],'none'))+fld('Notes',ta('note',''))});
+  if(!v) return; const x=clone(t); x.commentReport={none:'Received No Comments',nochange:'Received Comments/No Changes Needed',change:'Received Comments/Changes Needed'}[v.r];
+  if(v.r==='change'){ x.commentRound=(x.commentRound||1)+1; x.dates=Object.assign({},x.dates,{commentStart:'',commentEnd:''}); await move(x,'work',{text:'Material changes from comment; back to In Work for a second comment period',note:v.note}); }
+  else await move(x,nextStage(x),{text:x.commentReport+'; ready for '+govName()+' approval to publish as '+(isStandard(x)?'Candidate Recommendation':'Final'),note:v.note});
+}
+async function markPublished(t){
+  const v=await modal({title:'Published',ok:'Mark Published',body:fld('Published',dateField('d',today()))+fld('Announcement Link',inp('news',(t.links&&t.links.newsFinal)||'','https://'))+fld('MISMO.org Product Page',inp('pp',(t.links&&t.links.productPage)||'','https://'))+fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'))});
+  if(!v) return; const x=clone(t); x.links=Object.assign({},x.links,{newsFinal:v.news,productPage:v.pp,resourceLibrary:v.rl}); x.dates=Object.assign({},x.dates,{published:v.d});
+  await move(x,'published',{text:'Published as '+(isStandard(x)?'Candidate Recommendation':'Final')+' '+fmt(v.d)});
+}
+async function moveTo(t){
+  const opts=stages().map(s=>[s.key,s.name]);
+  const v=await modal({title:'Move To a Stage',text:'For one-off fixes. The move is logged.',ok:'Move',body:fld('Stage',sel('to',opts,t.stage))+fld('Why',inp('why','','Optional'))});
+  if(!v||v.to===t.stage) return; await move(t,v.to,{text:'Moved by hand to '+stageDef(v.to).name,note:v.why});
+}
+async function hold(t){
+  const v=await modal({title:'Put on Hold',ok:'Put on Hold',body:fld('Reason',inp('why','','Why it’s paused'))+fld('Check Back On',dateField('until',''),'Optional')});
+  if(!v) return; const x=clone(t), b=clone(t); x.state='hold'; x.holdReason=v.why; x.holdUntil=v.until; hist(x,'Put on hold'+(v.why?': '+v.why:'')); await saveTicket(x,t.wr+' is on hold',b);
+}
+async function resume(t){ const x=clone(t), b=clone(t); x.state='active'; delete x.holdReason; delete x.holdUntil; hist(x,'Resumed'); await saveTicket(x,t.wr+' resumed',b); }
+async function closeT(t){
+  const v=await modal({title:'Close Work Request',text:'For work that is finished or folded into something else.',ok:'Close',body:fld('Notes',ta('note',''))});
+  if(!v) return; const x=clone(t), b=clone(t); x.state='closed'; x.dates=Object.assign({},x.dates,{closed:today()}); x.notes=Object.assign({},x.notes,{closed:v.note}); hist(x,'Closed',{note:v.note}); await saveTicket(x,t.wr+' closed',b);
+}
+async function cancelT(t){
+  const v=await modal({title:'Cancel Work Request',ok:'Cancel Work Request',danger:true,body:fld('Reason',ta('note',''))});
+  if(!v) return; const x=clone(t), b=clone(t); x.state='canceled'; x.dates=Object.assign({},x.dates,{canceled:today()}); x.notes=Object.assign({},x.notes,{closed:v.note}); hist(x,'Canceled',{note:v.note}); await saveTicket(x,t.wr+' canceled',b);
+}
+async function reopen(t){ const x=clone(t), b=clone(t); x.state='active'; if(x.stage==='published') x.stage='release'; hist(x,'Reopened'); await saveTicket(x,t.wr+' reopened',b); }
+async function newTicket(){
+  const facs=(S.people.facilitators||[]).map(p=>p.name).sort();
+  const v=await modal({title:'New Work Request',text:'For an approved request that isn’t in the MMS yet. (Initiative Hub approvals will come in on their own once the two are connected.)',ok:'Create',body:
+    fld('WR#',inp('wr','','e.g. WR2026_19'))+fld('Work Request Name',inp('name',''))+fld('Workgroup',inp('wg',''))+fld('Facilitator',sel('fac',['',...facs],''))+fld('Work Type',radios('wt',['Initiative','Maintenance','Non-Initiative'],'Maintenance'))+fld('Request Type',radios('rt',['New','Update'],'New'))+fld('Approved (BET)',dateField('bet',today())),
+    validate:x=>!x.wr?'Add the WR#':(!x.name?'Add a name':(S.tickets[x.wr.replace(/[^A-Za-z0-9_-]/g,'_')]?'That WR# is already in the MMS':''))});
+  if(!v) return; const id=v.wr.replace(/[^A-Za-z0-9_-]/g,'_');
+  const t={id,wr:v.wr,uid:v.wr,name:v.name,workgroup:v.wg,facilitator:v.fac,workType:v.wt,reqType:v.rt,stage:'approved',sub:'',state:'active',stageSince:today(),dates:{bet:v.bet},history:[],createdAt:new Date().toISOString(),source:'mms'};
+  hist(t,'Created in the MMS'); await saveTicket(t,v.wr+' created'); notifyEnter(t,'approved'); openPanel(id);
+}
+async function mediaUpdate(id){
+  const m=S.media[id]; if(!m) return;
+  const v=await modal({title:m.kind,text:esc(m.wr+' '+m.name),ok:'Save',body:fld('Status',radios('st',['Requested','In Progress','Done'],m.status))+fld('Link',inp('link',m.link||'','https://'))+fld('Due',dateField('due',m.due||''))});
+  if(!v) return; const x=Object.assign({},m,{status:v.st,link:v.link,due:v.due}); S.media[id]=x; await write('media',id,x); renderAll();
+}
+async function decideFromList(id){ const t=S.tickets[id]; if(t) decide(t); }
+
+/* ---------- AI Review (editor + readiness in one) ---------- */
+async function readFile(f){
+  const n=f.name.toLowerCase();
+  if(/\.(txt|md|csv|xml|json|xsd|html?)$/.test(n)) return await f.text();
+  if(/\.docx$/.test(n)&&window.JSZip){ const z=await JSZip.loadAsync(f); const x=await z.file('word/document.xml').async('string'); return x.replace(/<\/w:p>/g,'\n').replace(/<w:tab\/>/g,'\t').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"'); }
+  if(/\.(xlsx|xls)$/.test(n)&&window.XLSX){ const wb=XLSX.read(await f.arrayBuffer()); return wb.SheetNames.map(s=>'## '+s+'\n'+XLSX.utils.sheet_to_csv(wb.Sheets[s])).join('\n\n'); }
+  if(/\.pptx$/.test(n)&&window.JSZip){ const z=await JSZip.loadAsync(f); const names=Object.keys(z.files).filter(k=>/^ppt\/slides\/slide\d+\.xml$/.test(k)).sort(); let out=''; for(const k of names){ out+='\n## '+k+'\n'+(await z.file(k).async('string')).replace(/<\/a:p>/g,'\n').replace(/<[^>]+>/g,''); } return out; }
+  throw new Error(f.name+': paste the text instead (this file type can’t be read here)');
+}
+async function aiReview(t){
+  if(!S.sample){
+    const v=await modal({title:'AI Review',text:'Claude isn’t reachable from this copy of the MMS yet, so the review can’t run here. You can record the review by hand.',ok:'Record Review',body:fld('Result',radios('r',[['ready','Ready for IM'],['fix','Updates needed']],'ready'))+fld('Findings',ta('note',''))});
+    if(!v) return; const x=clone(t); const r={at:new Date().toISOString(),by:S.me.name||'',verdict:v.r==='ready'?'ready':'fix',summary:v.note||'Recorded by hand',checks:[],edits:[],manual:true};
+    x.ai=Object.assign({},x.ai,{rounds:[...((x.ai&&x.ai.rounds)||[]),r]}); return setSub(x,v.r==='ready'?'reviewed':'updates','AI Review recorded by hand: '+(v.r==='ready'?'ready for IM':'updates needed'));
+  }
+  const root=$('#modal-root');
+  root.innerHTML='<div class="modal"><div class="box" style="width:min(760px,100%)"><header><h3>AI Review</h3><p>'+esc(t.name)+'. Add the work product files (Word, Excel, PowerPoint, text, CSV, XML) or paste the text. Files are read here and aren’t stored.</p></header><div class="bd">'+
+    fld('Files','<input type="file" id="aif" multiple accept=".docx,.xlsx,.xls,.pptx,.txt,.md,.csv,.xml,.xsd,.json,.html">')+fld('Or Paste Text','<textarea id="ait" rows="7" placeholder="Paste the work product text"></textarea>')+'<div id="aiout"></div></div><footer><button class="btn" data-m="cancel" type="button">Close</button><button class="btn pri" id="airun" type="button">Run AI Review</button></footer></div></div>';
+  const box=$('.modal',root); $('[data-m=cancel]',box).onclick=()=>root.innerHTML='';
+  $('#airun').onclick=async()=>{
+    const out=$('#aiout'); let text=$('#ait').value.trim(); const names=[];
+    try{ for(const f of $('#aif').files){ text+='\n\n# FILE: '+f.name+'\n'+(await readFile(f)); names.push(f.name); } }catch(e){ out.innerHTML='<div class="banner">'+esc(e.message)+'</div>'; return; }
+    if(text.length<40){ out.innerHTML='<div class="banner">Add a file or paste the text first.</div>'; return; }
+    let cap=180000; try{ const lim=await S.sample.limits(); if(lim&&lim.inputBytes) cap=Math.min(cap,Math.floor(lim.inputBytes*0.8)); }catch(e){}
+    const clipped=text.length>cap; if(clipped) text=text.slice(0,cap);
+    $('#airun').disabled=true; out.innerHTML='<div class="banner info"><span class="spin"></span> Claude is reviewing'+(clipped?' the first part of':'')+' the submission…</div>';
+    const prompt='You are the MISMO editor and readiness reviewer for the MISMO Manufacturing System. MISMO (Mortgage Industry Standards Maintenance Organization) builds mortgage data standards and collateral. Review the work product below before it goes to Information Management (IM) review.\n\nWork request: '+t.wr+' '+t.name+'\nWorkgroup: '+(t.workgroup||'')+'\nWork type: '+(t.workType||'')+' / '+(t.reqType||'')+'\nNote from facilitator: '+((t.ai&&t.ai.note)||'none')+'\n\nCheck:\n1. Editorial: spelling, grammar, American spelling, consistent terms and capitalization, clear and unambiguous wording, defined acronyms.\n2. MISMO conventions: the work product name and version follow MISMO naming, Comment Period IPR (intellectual property rights) language is present, the MISMO name is used correctly, no internal notes or tracked comments left in.\n3. Readiness: complete sections, no placeholders or TODOs, definitions present for new data points, consistent cross-references, examples match the specification.\n4. Anything IM or the Architecture Workgroup would likely send back.\n\nReturn ONLY JSON: {"verdict":"ready"|"fix","summary":"two sentences","checks":[{"name":"short check name","result":"pass"|"fix"|"note","detail":"one sentence"}],"edits":[{"where":"section or quote","issue":"what is wrong","suggestion":"the fix"}]}. Keep edits to the 25 most important.\n\nSUBMISSION:\n'+text;
+    try{
+      const r=await S.sample.json(prompt,{modelTier:'complex'});
+      const round={at:new Date().toISOString(),by:S.me.name||'',verdict:r.verdict==='ready'?'ready':'fix',summary:r.summary||'',checks:(r.checks||[]).slice(0,30),edits:(r.edits||[]).slice(0,25),files:names,clipped};
+      const x=clone(S.tickets[t.id]||t); x.ai=Object.assign({},x.ai,{rounds:[...((x.ai&&x.ai.rounds)||[]),round]});
+      root.innerHTML=''; await setSub(x,'reviewed','AI Review round '+x.ai.rounds.length+': '+(round.verdict==='ready'?'ready for IM':'updates suggested'));
+      showAI(round);
+    }catch(e){ $('#airun').disabled=false; out.innerHTML='<div class="banner">The review didn’t finish: '+esc((e&&e.message)||'try again')+'</div>'; }
+  };
+}
+function showAI(r){
+  const ic={pass:'<span class="chip good">Pass</span>',fix:'<span class="chip warn">Fix</span>',note:'<span class="chip info">Note</span>'};
+  modal({title:'AI Review: '+(r.verdict==='ready'?'Ready for IM':'Updates Suggested'),text:esc(r.summary||''),ok:'Done',body:
+    (r.checks&&r.checks.length?'<div class="revbox">'+r.checks.map(c=>'<div class="chk">'+(ic[c.result]||'')+'<div><b>'+esc(c.name)+'</b><div class="muted">'+esc(c.detail||'')+'</div></div></div>').join('')+'</div>':'')+
+    (r.edits&&r.edits.length?'<h4 style="margin:14px 0 6px;font-size:13.5px">Suggested Edits</h4><div class="revbox">'+r.edits.map(e=>'<div class="chk"><div><b>'+esc(e.where)+'</b><div>'+esc(e.issue)+'</div><div class="muted">'+esc(e.suggestion)+'</div></div></div>').join('')+'</div>':'')+
+    (r.files&&r.files.length?'<p class="muted" style="font-size:12px">Files: '+esc(r.files.join(', '))+(r.clipped?' (long; the first part was reviewed)':'')+'</p>':'')});
+}
+
+/* ---------- settings ---------- */
+let setTab='process';
+VIEWS.settings=function(){
+  if(!S.isStaff) return '<div class="empty">Settings are for MISMO staff.</div>';
+  const tabs=[['process','Process'],['people','People and Roles'],['notify','Notifications'],['data','Import and Backup']];
+  let body='';
+  if(setTab==='process'){
+    const p=S.process, a=p.active, pr=p.presets[a];
+    body='<div class="card"><h3>Which Process Is Running</h3><div class="seg" id="pswitch">'+Object.entries(p.presets).map(([k,v])=>'<button type="button" data-preset="'+k+'" aria-pressed="'+(k===a)+'">'+esc(v.label)+'</button>').join('')+'</div>'+
+      '<p class="muted" style="font-size:13px;margin:10px 0 0">Switching changes the stage list, the governance body ('+esc(p.presets.current.gov)+' or '+esc(p.presets.next.gov)+') and the comment lengths for everyone at once. Tickets keep their place and their history; a ticket in a stage the new process turns off shows up for staff to move.</p></div>'+
+      '<div class="card"><h3>Stages: '+esc(pr.label)+'<span class="sp"><button class="btn sm pri" id="psave" type="button">Save Stages</button></span></h3>'+
+      '<div class="kv" style="margin-bottom:12px"><div class="f"><label>Governance Body</label><input id="pgov" value="'+esc(pr.gov)+'"></div><div class="f"><label>Comment Lengths (Days)</label><input id="pdays" value="'+esc((pr.commentDays||[]).join(', '))+'"></div></div>'+
+      '<div class="muted" style="font-size:12px;margin-bottom:8px">Drag to reorder. Untick a stage to switch it off.</div><div class="stagelist" id="slist">'+pr.stages.map((s,i)=>'<div class="srow'+(s.on===false?' off':'')+'" draggable="true" data-i="'+i+'"><span class="grip" title="Drag">⋮⋮</span><input type="checkbox" data-f="on"'+(s.on!==false?' checked':'')+' style="width:16px;height:16px"><input data-f="name" value="'+esc(s.name)+'"><select data-f="owner">'+Object.entries(ROLE_LABEL).map(([k,l])=>'<option value="'+k+'"'+(s.owner===k?' selected':'')+'>'+esc(l)+'</option>').join('')+'</select><input class="hide-sm" data-f="desc" value="'+esc(s.desc||'')+'"><input class="hide-sm" type="color" data-f="color" value="'+esc(s.color)+'" style="padding:0;height:28px"></div>').join('')+'</div></div>';
+  }
+  if(setTab==='people'){
+    const P=S.people; const block=(title,key,list,desc)=>'<div class="card" data-plist="'+key+'"><h3>'+esc(title)+'<span class="sp"><button class="btn sm" data-padd="'+key+'" type="button">+ Add</button></span></h3>'+(desc?'<div class="muted" style="font-size:12px;margin:-4px 0 8px">'+desc+'</div>':'')+(list||[]).slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>'<div class="vote"><span class="nm"><b>'+esc(p.name)+'</b> <span class="muted">'+esc(p.email||'')+'</span></span><button class="btn sm ghost" data-pdel="'+key+'|'+esc(p.name)+'" type="button">Remove</button></div>').join('')+'</div>';
+    body='<div class="banner info">Who can open and save the MMS on resources.mismo.org is set in People and Access, same as Meeting Trackers. These lists decide whose queue a ticket lands in and who gets emailed.</div><div class="peoplegrid">'+block('Facilitators','facilitators',P.facilitators)+Object.keys(ROLE_LABEL).filter(k=>!['facilitator','workgroup','bet'].includes(k)).map(k=>block(k==='gov'?govName()+' Members':ROLE_LABEL[k],'roles.'+k,P.roles[k],{staff:'MISMO staff who set up approved work and see Settings.',gov:'Listed here, each member’s vote is logged with every decision.',vps:'Every VP listed must agree before designation moves on.'}[k]||'')).join('')+'</div>';
+  }
+  if(setTab==='notify'){
+    const N=S.notify;
+    body='<div class="card"><h3>Email Flow<span class="sp"><button class="btn sm pri" id="nsave" type="button">Save</button></span></h3><div class="kv"><div class="f wide"><label>Power Automate Flow Link (HTTP Trigger)</label><input id="nflow" value="'+esc(N.flowUrl||'')+'" placeholder="https://prod-00.westus.logic.azure.com/…"></div><div class="f"><label>Sent From</label><input id="nfrom" value="'+esc(N.from||'')+'"></div><div class="f"><label>Target Reminder (Days Before)</label><input id="nr1" value="'+esc(N.reminders.targetDays)+'"></div><div class="f"><label>Comment Ending (Days Before)</label><input id="nr2" value="'+esc(N.reminders.commentEndingDays)+'"></div><div class="f"><label>Stalled After (Days)</label><input id="nr3" value="'+esc(N.reminders.staleDays)+'"></div></div><p class="muted" style="font-size:12.5px;margin:10px 0 0">With no flow link, emails wait in Notifications with an Open Email button. The flow gets to, subject, body and from, same as the Meeting Trackers calendar flow.</p></div>'+
+      '<div class="card"><h3>Who Hears When Work Arrives at Each Stage</h3><table class="tbl"><thead><tr><th>Stage</th>'+['staff','facilitator','media','imawg','director','vps','gov','website'].map(r=>'<th style="text-align:center">'+esc(r==='gov'?govName():ROLE_LABEL[r])+'</th>').join('')+'</tr></thead><tbody>'+stages().map(s=>'<tr><td class="nm">'+esc(s.name)+'</td>'+['staff','facilitator','media','imawg','director','vps','gov','website'].map(r=>'<td style="text-align:center"><input type="checkbox" data-nr="'+s.key+'|'+r+'"'+(((N.onEnter||{})[s.key]||[]).includes(r)?' checked':'')+'></td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+  }
+  if(setTab==='data'){
+    const n=allTickets().length;
+    body='<div class="card"><h3>Import from Smartsheet</h3><p style="font-size:13px;margin:0 0 10px">Paste the Master [MMS] export (JSON) or choose the file. Work requests already here are only replaced if you tick the box.</p><input type="file" id="impf" accept=".json" style="margin-bottom:8px"><textarea id="impt" rows="6" style="width:100%;font:inherit;font-size:12px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:5px;padding:8px" placeholder="Paste the export here"></textarea><label style="display:flex;gap:8px;align-items:center;font-size:13px;margin:8px 0"><input type="checkbox" id="impo"> Replace work requests that are already here</label><button class="btn pri" id="impgo" type="button">Import</button> <span id="impmsg" class="muted" style="font-size:13px"></span></div>'+
+      '<div class="card"><h3>Backup</h3><p style="font-size:13px;margin:0 0 10px">'+n+' work requests. Download everything as one file.</p><button class="btn" id="expgo" type="button">Download Backup</button></div>';
+  }
+  return '<div class="pagehead"><div><h1>Settings</h1><div class="sub">Change how the MMS works without changing the page.</div></div></div><div class="seg" style="margin-bottom:18px" id="settabs">'+tabs.map(([k,l])=>'<button type="button" data-st="'+k+'" aria-pressed="'+(k===setTab)+'">'+l+'</button>').join('')+'</div>'+body;
+};
+function wireSettings(m){
+  $$('[data-st]',m).forEach(b=>b.onclick=()=>{ setTab=b.dataset.st; renderAll(); });
+  $$('[data-preset]',m).forEach(b=>b.onclick=async()=>{ if(b.dataset.preset===S.process.active) return; const to=S.process.presets[b.dataset.preset]; const ok=await modal({title:'Switch to '+to.label+'?',text:'Everyone sees the new stages right away. You can switch back.',ok:'Switch'}); if(!ok) return; const p=clone(S.process); p.active=b.dataset.preset; p.switchedOn=today(); p.switchedBy=S.me.name||''; S.process=p; await write('config','process',p); toast('Now running '+to.label); renderAll(); });
+  const sl=$('#slist',m);
+  if(sl){ let drag=null;
+    $$('.srow',sl).forEach(r=>{ r.addEventListener('dragstart',()=>{ drag=r; r.style.opacity=.4; }); r.addEventListener('dragend',()=>{ r.style.opacity=''; $$('.srow',sl).forEach(x=>x.classList.remove('dragover')); });
+      r.addEventListener('dragover',e=>{ e.preventDefault(); r.classList.add('dragover'); }); r.addEventListener('dragleave',()=>r.classList.remove('dragover'));
+      r.addEventListener('drop',e=>{ e.preventDefault(); if(drag&&drag!==r){ const rect=r.getBoundingClientRect(); sl.insertBefore(drag,(e.clientY-rect.top)>rect.height/2?r.nextSibling:r); } });
+      $('[data-f=on]',r).onchange=e=>r.classList.toggle('off',!e.target.checked); });
+    $('#psave',m).onclick=async()=>{ const p=clone(S.process), pr=p.presets[p.active]; const old=pr.stages;
+      pr.stages=$$('.srow',sl).map(r=>{ const o=clone(old[+r.dataset.i]); o.on=$('[data-f=on]',r).checked; o.name=$('[data-f=name]',r).value.trim()||o.name; o.owner=$('[data-f=owner]',r).value; const d=$('[data-f=desc]',r); if(d) o.desc=d.value; const c=$('[data-f=color]',r); if(c) o.color=c.value; return o; });
+      pr.gov=$('#pgov',m).value.trim()||pr.gov; pr.commentDays=$('#pdays',m).value.split(/[ ,]+/).map(Number).filter(Boolean); if(!pr.commentDays.length) pr.commentDays=[30];
+      S.process=p; await write('config','process',p); toast('Stages saved'); renderAll(); };
+  }
+  $$('[data-padd]',m).forEach(b=>b.onclick=async()=>{ const v=await modal({title:'Add Person',ok:'Add',body:fld('Name',inp('name',''))+fld('Email',inp('email','','first initial + last name @mismo.org')),validate:x=>x.name?'':'Add a name'}); if(!v) return; const P=clone(S.people); const path=b.dataset.padd.split('.'); let arr=path.length>1?(P.roles[path[1]]=P.roles[path[1]]||[]):P.facilitators; arr.push({name:v.name.trim(),email:v.email.trim()}); S.people=P; await write('config','people',P); renderAll(); });
+  $$('[data-pdel]',m).forEach(b=>b.onclick=async()=>{ const [key,name]=b.dataset.pdel.split('|'); const P=clone(S.people); const path=key.split('.'); const arr=path.length>1?P.roles[path[1]]:P.facilitators; const i=arr.findIndex(p=>p.name===name); if(i>=0) arr.splice(i,1); S.people=P; await write('config','people',P); renderAll(); });
+  const ns=$('#nsave',m); if(ns) ns.onclick=async()=>{ const N=clone(S.notify); N.flowUrl=$('#nflow',m).value.trim(); N.from=$('#nfrom',m).value.trim(); N.reminders={targetDays:+$('#nr1',m).value||7,commentEndingDays:+$('#nr2',m).value||3,staleDays:+$('#nr3',m).value||45}; S.notify=N; await write('config','notify',N); toast('Saved'); renderAll(); };
+  $$('[data-nr]',m).forEach(c=>c.onchange=async()=>{ const [k,r]=c.dataset.nr.split('|'); const N=clone(S.notify); N.onEnter=N.onEnter||{}; const a=new Set(N.onEnter[k]||[]); c.checked?a.add(r):a.delete(r); N.onEnter[k]=[...a]; S.notify=N; await write('config','notify',N); });
+  const ig=$('#impgo',m); if(ig){ $('#impf',m).onchange=async e=>{ const f=e.target.files[0]; if(f) $('#impt',m).value=await f.text(); }; ig.onclick=()=>importData($('#impt',m).value,$('#impo',m).checked,$('#impmsg',m)); }
+  const eg=$('#expgo',m); if(eg) eg.onclick=async()=>{ const data=JSON.stringify({exportedAt:new Date().toISOString(),tickets:S.tickets,process:S.process,people:S.people,notify:S.notify,media:S.media},null,1); const name='MMS Backup '+today()+'.json';
+    let dl=null; try{ dl=window.claude&&await window.claude.use('downloads'); }catch(e){}
+    if(dl){ try{ await dl.save({filename:name,data:new Blob([data],{type:'application/json'})}); }catch(e){} return; }
+    const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=name; a.click(); };
+}
+function seedHistory(t){
+  const d=t.dates||{}; const ev=[['submitted','Work request submitted'],['bet','Approved by the executive team'],['cfpPublished','Call for Participation published'],['kickoffGc','Kickoff approved'],['workStart','Work started'],['aiSubmitted','Submitted for editor / readiness review'],['imSubmitted','Submitted to IM'],['imDecision','IM decision'],['awgSubmitted','Submitted to AWG'],['awgDecision','AWG decision'],['designation','License designation'],['gcComment','Approved to go to comment'],['commentStart','Comment period opened'],['commentEnd','Comment period ended'],['postGc','Approved to publish'],['published','Published'],['closed','Closed'],['canceled','Canceled']];
+  const h=ev.filter(([k])=>d[k]).map(([k,txt])=>({at:d[k]+'T12:00:00.000Z',by:'Smartsheet',text:txt+(k==='targetIM'?'':'')}));
+  h.sort((a,b)=>a.at.localeCompare(b.at)); h.push({at:new Date().toISOString(),by:S.me.name||'MMS',text:'Brought over from the Smartsheet MMS ('+((t.legacy&&t.legacy.phase)||'')+((t.legacy&&t.legacy.resp)?', '+t.legacy.resp:'')+')'});
+  return h;
+}
+async function importData(txt,over,msg){
+  let arr, whole=null; try{ arr=JSON.parse(txt); if(!Array.isArray(arr)){ whole=arr; arr=arr.tickets?Object.values(arr.tickets):[]; } }catch(e){ msg.textContent='That isn’t a readable export.'; return; }
+  if(whole){ if(whole.process&&whole.process.presets){ S.process=whole.process; await write('config','process',whole.process); } if(whole.people&&whole.people.roles){ S.people=whole.people; await write('config','people',whole.people); } if(whole.notify){ S.notify=whole.notify; await write('config','notify',whole.notify); } for(const m of Object.values(whole.media||{})){ if(m&&m.id){ S.media[m.id]=m; await write('media',m.id,m); } } }
+  if(!arr.length){ msg.textContent='Nothing to import.'; return; }
+  let n=0, skip=0; S.importing=true; msg.innerHTML='<span class="spin"></span> Importing…';
+  const queue=arr.slice(); const work=async()=>{ while(queue.length){ const t=queue.shift(); if(!t||!t.id) continue; if(S.tickets[t.id]&&!over){ skip++; continue; }
+    t.history=(t.history&&t.history.length)?t.history:seedHistory(t); t.stageSince=t.stageSince||(t.dates&&(t.dates.imSubmitted||t.dates.workStart))||t.importedAt||today(); t.sub=t.sub||''; t.dates=t.dates||{};
+    S.tickets[t.id]=t; await write('tickets',t.id,t); n++; if(n%10===0) msg.innerHTML='<span class="spin"></span> '+n+' of '+arr.length+'…'; } };
+  await Promise.all([work(),work(),work()]); S.importing=false;
+  msg.textContent='Imported '+n+(skip?', skipped '+skip+' already here':'')+'.'; renderAll();
+}
+
+/* ---------- wiring the page ---------- */
+function wireMain(m){
+  $$('[data-open]',m).forEach(el=>el.addEventListener('click',e=>{ if(e.target.closest('[data-decide],[data-media],a')) return; openPanel(el.dataset.open); }));
+  $$('[data-go]',m).forEach(b=>b.onclick=()=>{ const g=b.dataset.go; if(g==='late'){ S.filters.state='live'; go('all'); S.filters.sort='target'; S.filters.dir=1; renderAll(); return; } if(g==='hold'){ S.filters.state='hold'; go('all'); return; } go(g); });
+  $$('[data-stage]',m).forEach(b=>b.onclick=()=>{ go('board'); setTimeout(()=>{ const c=$('[data-col="'+b.dataset.stage+'"]'); if(c) c.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'}); },50); });
+  $$('[data-fac]',m).forEach(b=>b.onclick=()=>{ S.filters.fac=b.dataset.fac==='Unassigned'?'':b.dataset.fac; go('board'); });
+  $$('[data-decide]',m).forEach(b=>b.onclick=()=>decideFromList(b.dataset.decide));
+  $$('[data-media]',m).forEach(b=>b.onclick=()=>mediaUpdate(b.dataset.media));
+  $$('[data-sent]',m).forEach(b=>b.onclick=async()=>{ const x=Object.assign({},S.outbox[b.dataset.sent],{status:'Sent',sentAt:new Date().toISOString()}); S.outbox[x.id]=x; await write('outbox',x.id,x); renderAll(); });
+  const sa=$('#sentall',m); if(sa) sa.onclick=async()=>{ for(const x of Object.values(S.outbox).filter(o=>o.status==='Queued')){ const y=Object.assign({},x,{status:'Sent',sentAt:new Date().toISOString()}); S.outbox[y.id]=y; await write('outbox',y.id,y); } renderAll(); };
+  const nt=$('#newtk',m); if(nt) nt.onclick=newTicket;
+  const ag=$('#agenda',m); if(ag) ag.onclick=()=>{ const L=liveTickets().filter(t=>t.state==='active'&&GOV_STAGES.includes(t.stage)); const txt=govName()+' agenda items, '+fmt(today())+'\n\n'+L.map(t=>'• '+t.wr+' '+t.name+' ('+t.workgroup+'): '+stageDef(t.stage).name+(t.classification?' · '+t.classification:'')).join('\n'); try{ navigator.clipboard.writeText(txt); toast('Agenda copied'); }catch(e){ modal({title:'Agenda',body:'<textarea rows="10" style="width:100%">'+esc(txt)+'</textarea>',ok:'Done'}); } };
+  $$('[data-state]',m).forEach(b=>b.onclick=()=>{ S.filters.state=b.dataset.state; renderAll(); });
+  $$('th[data-sort]',m).forEach(th=>th.onclick=()=>{ const k=th.dataset.sort; if(S.filters.sort===k) S.filters.dir*=-1; else { S.filters.sort=k; S.filters.dir=1; } renderAll(); });
+  const fq=$('#fq',m); if(fq){ fq.oninput=()=>{ S.filters.q=fq.value; clearTimeout(fq._t); fq._t=setTimeout(()=>{ renderAll(); const n=$('#fq'); if(n){ n.focus(); n.setSelectionRange(n.value.length,n.value.length); } },250); }; }
+  [['#ffac','fac'],['#fwg','wg'],['#fsize','size'],['#ftype','type']].forEach(([id,k])=>{ const s=$(id,m); if(s) s.onchange=()=>{ S.filters[k]=s.value; renderAll(); }; });
+  const fc=$('#fclear',m); if(fc) fc.onclick=()=>{ Object.assign(S.filters,{q:'',fac:'',wg:'',size:'',type:''}); renderAll(); };
+  const bd=$('#board',m);
+  if(bd && S.canWrite){
+    let dragId=null;
+    $$('[data-drag]',bd).forEach(c=>{ c.addEventListener('dragstart',e=>{ dragId=c.dataset.drag; c.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain',dragId); }catch(x){} }); c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); $$('.bcol',bd).forEach(x=>x.classList.remove('drop')); }); });
+    $$('.bcol',bd).forEach(col=>{ col.addEventListener('dragover',e=>{ e.preventDefault(); col.classList.add('drop'); }); col.addEventListener('dragleave',e=>{ if(!col.contains(e.relatedTarget)) col.classList.remove('drop'); });
+      col.addEventListener('drop',async e=>{ e.preventDefault(); col.classList.remove('drop'); const t=S.tickets[dragId]; const to=col.dataset.col; if(!t||t.stage===to) return; await move(t,to,{text:'Moved on the board from '+stageDef(t.stage).name+' to '+stageDef(to).name}); }); });
+  }
+  if(S.view==='settings') wireSettings(m);
+}
+
+/* ---------- rail: collapse, remember, search (Summit HQ pattern) ---------- */
+(function(){
+  const KEY='hq.rail.off';
+  function set(off,remember){ document.body.classList.toggle('railmini',!!off); const h=$('#rail-hide'); if(h){ h.setAttribute('aria-expanded',off?'false':'true'); h.setAttribute('aria-label',off?'Open the menu':'Narrow the menu'); h.title=(off?'Open the menu':'Narrow the menu')+' (backslash)'; } if(off) close(); if(remember!==false){ try{ localStorage.setItem(KEY,off?'1':'0'); }catch(e){} } }
+  function toggle(){ set(!document.body.classList.contains('railmini')); }
+  function start(){
+    let off=null; try{ const v=localStorage.getItem(KEY); if(v!==null) off=(v==='1'); }catch(e){}
+    if(off===null) off=window.matchMedia('(max-width:900px)').matches; set(off,false);
+    $('#rail-hide').addEventListener('click',toggle); $('#rail-scrim').addEventListener('click',()=>set(true));
+    $('#rail-qb').addEventListener('click',()=>{ set(false); setTimeout(()=>$('#rail-q').focus(),230); });
+    $$('.hq nav button[data-hq]').forEach(b=>b.addEventListener('click',()=>{ go(b.dataset.hq); if(window.matchMedia('(max-width:900px)').matches) set(true); }));
+    wireFind();
+  }
+  document.addEventListener('keydown',e=>{ const t=e.target; const typing=t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable);
+    if(e.key==='\\'&&!typing&&!e.metaKey&&!e.ctrlKey&&!e.altKey){ e.preventDefault(); toggle(); }
+    if((e.metaKey||e.ctrlKey)&&e.key.toLowerCase()==='k'){ e.preventDefault(); set(false); setTimeout(()=>{ const q=$('#rail-q'); q.focus(); q.select(); },230); }
+    if(e.key==='Escape'&&S.panel&&!$('#modal-root').innerHTML) closePanel(); });
+  let picked=-1, rows=[];
+  const norm=x=>String(x||'').replace(/\s+/g,' ').trim().toLowerCase();
+  function gather(q){ const t=norm(q); if(t.length<2) return []; const out=[];
+    const score=n=>{ n=norm(n); return n===t?3:n.indexOf(t)===0?2:n.indexOf(t)>=0?1:0; };
+    try{ allTickets().forEach(x=>{ const s=Math.max(score(x.name),score(x.wr),score(x.product)); if(!s) return; out.push({group:x.state==='active'||x.state==='hold'?'Live Work':'Earlier Work',name:x.wr+' '+x.name,where:[stageDef(x.stage).name,x.facilitator,x.workgroup].filter(Boolean).join(' · '),s,go:()=>openPanel(x.id)}); }); }catch(e){}
+    try{ [...new Set(allTickets().map(x=>x.workgroup).filter(Boolean))].forEach(w=>{ const s=score(w); if(s) out.push({group:'Workgroups',name:w,where:liveTickets().filter(x=>x.workgroup===w).length+' live',s,go:()=>{ S.filters.wg=w; go('board'); }}); }); }catch(e){}
+    try{ (S.people.facilitators||[]).forEach(p=>{ const s=score(p.name); if(s) out.push({group:'Facilitators',name:p.name,where:liveTickets().filter(x=>x.facilitator===p.name).length+' live',s,go:()=>{ S.filters.fac=p.name; go('board'); }}); }); }catch(e){}
+    const ORDER=['Live Work','Workgroups','Facilitators','Earlier Work']; const best={}; out.forEach(h=>best[h.group]=Math.max(best[h.group]||0,h.s));
+    out.sort((a,b)=>(best[b.group]-best[a.group])||(ORDER.indexOf(a.group)-ORDER.indexOf(b.group))||(b.s-a.s)||a.name.localeCompare(b.name)); return out; }
+  function draw(list){ const box=$('#rail-hits'); box.textContent=''; rows=[]; picked=-1;
+    if(!list.length){ const n=document.createElement('div'); n.className='rh-none'; n.textContent='Nothing matches.'; box.appendChild(n); box.hidden=false; return; }
+    let g=null; list.slice(0,24).forEach(h=>{ if(h.group!==g){ g=h.group; const hd=document.createElement('div'); hd.className='rh-g'; hd.textContent=g; box.appendChild(hd); }
+      const b=document.createElement('button'); b.type='button'; b.className='rh'; const nm=document.createElement('b'); nm.textContent=h.name; b.appendChild(nm); if(h.where){ const w=document.createElement('i'); w.textContent=h.where; b.appendChild(w); }
+      b.addEventListener('click',()=>{ close(); h.go(); }); rows.push(b); box.appendChild(b); }); box.hidden=false; }
+  function close(){ const b=$('#rail-hits'); if(b){ b.hidden=true; b.textContent=''; } rows=[]; picked=-1; }
+  function mark(){ rows.forEach((r,i)=>r.classList.toggle('on',i===picked)); if(rows[picked]) rows[picked].scrollIntoView({block:'nearest'}); }
+  function wireFind(){ const q=$('#rail-q'), x=$('#rail-qx'); let tmr=null;
+    const run=()=>{ const v=q.value; x.hidden=!v; if(norm(v).length<2){ close(); return; } draw(gather(v)); };
+    q.addEventListener('input',()=>{ clearTimeout(tmr); tmr=setTimeout(run,150); }); q.addEventListener('focus',()=>{ if(norm(q.value).length>=2) run(); });
+    q.addEventListener('keydown',e=>{ if(e.key==='Escape'){ close(); q.blur(); return; } if(!rows.length) return;
+      if(e.key==='ArrowDown'){ e.preventDefault(); picked=(picked+1)%rows.length; mark(); } else if(e.key==='ArrowUp'){ e.preventDefault(); picked=(picked-1+rows.length)%rows.length; mark(); } else if(e.key==='Enter'){ e.preventDefault(); (rows[picked]||rows[0]).click(); } });
+    x.addEventListener('click',()=>{ q.value=''; x.hidden=true; close(); q.focus(); });
+    document.addEventListener('click',e=>{ if(!e.target.closest('.railfind')) close(); }); }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+(function theme(){
+  const btn=$('#theme-btn');
+  const cur=()=>document.documentElement.getAttribute('data-theme')||(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+  const paint=()=>{ const dark=cur()==='dark'; $('#theme-lab').textContent=dark?'Light Mode':'Dark Mode'; btn.title='Switch to '+(dark?'light':'dark')+' mode'; };
+  btn.addEventListener('click',()=>{ document.documentElement.setAttribute('data-theme',cur()==='dark'?'light':'dark'); paint(); try{ localStorage.setItem('mismo.portal.theme',cur()); }catch(e){} });
+  try{ const s=localStorage.getItem('mismo.portal.theme'); if(s) document.documentElement.setAttribute('data-theme',s); }catch(e){}
+  paint();
+  if(new Date().getMonth()===11) document.documentElement.setAttribute('data-season','december');
+})();
+
+/* ---------- start ---------- */
+async function boot(){
+  $('#toast-undo').onclick=doUndo; $('#scrim').onclick=closePanel;
+  const h=(location.hash||'').slice(1); if(VIEWS[h]) S.view=h;
+  const ok=await Store.init();
+  try{ const u=window.claude&&await window.claude.use('user'); if(u){ const m=await u.me(); S.me={name:(m&&(m.name||m.displayName))||'',email:(m&&m.email)||''}; try{ const c=await u.can('data.write'); S.canWrite=c!==false; }catch(e){} try{ S.isOwnerish=await u.canEdit(); }catch(e){} } }catch(e){}
+  try{ const rs=window.ResourcesSession&&window.ResourcesSession.current(); if(rs){ S.me.name=S.me.name||rs.name||''; S.me.email=S.me.email||rs.email||''; S.relayRole=window.ResourcesSession.role&&window.ResourcesSession.role('mms'); if(S.relayRole==='view') S.canWrite=false; } }catch(e){}
+  if(!ok && window.__mmsSeed){ const sd=window.__mmsSeed; Store.mem={tickets:sd.tickets||{},config:{},outbox:{},media:{}}; if(sd.me) S.me=sd.me; }
+  try{ S.sample=window.claude&&await window.claude.use('sample'); }catch(e){ S.sample=null; }
+  const done=()=>{ if(S.loaded.tickets&&S.loaded.config&&!S.ready){ S.ready=true; computeRole(); setupViewAs(); if(!location.hash&&!S.isStaff&&(S.people.facilitators||[]).some(f=>sameName(f.name,S.me.name))) S.view='mine'; go(S.view); runAutomations(); setInterval(runAutomations,5*60000); } else if(S.ready){ computeRole(); renderAll(); } };
+  const timer=setTimeout(()=>{ if(!S.ready){ S.loaded.tickets=S.loaded.config=true; done(); toast('The MMS records are taking a while to load; what shows may be out of date.'); } },12000);
+  Store.sub('tickets',o=>{ S.tickets=o; S.loaded.tickets=true; clearTimeout(timer); done(); });
+  Store.sub('config',o=>{ if(o.process&&o.process.presets) S.process=o.process; if(o.people&&o.people.roles) S.people=o.people; if(o.notify) S.notify=Object.assign(clone(DEFAULT_NOTIFY),o.notify); S.loaded.config=true; done(); });
+  Store.sub('outbox',o=>{ S.outbox=o; if(S.ready) counts(); if(S.ready&&S.view==='outbox') renderAll(); });
+  Store.sub('media',o=>{ S.media=o; if(S.ready) counts(); if(S.ready&&S.view==='media') renderAll(); });
+  renderWho();
+}
+function computeRole(){
+  const nm=(S.me.name||'').toLowerCase(), em=(S.me.email||'').toLowerCase();
+  const inList=l=>(l||[]).some(p=>sameName(p.name,nm)||(em&&(p.email||'').toLowerCase()===em));
+  S.isStaff=!!(S.isOwnerish||S.relayRole==='admin'||inList(S.people.roles&&S.people.roles.staff)||S.mode==='memory');
+}
+function setupViewAs(){
+  const w=$('#viewas-wrap'); if(!S.isStaff){ w.hidden=true; return; } w.hidden=false;
+  const ppl=[...new Map([...(S.people.facilitators||[]),...Object.values(S.people.roles||{}).flat()].map(p=>[p.name,p])).values()].sort((a,b)=>a.name.localeCompare(b.name));
+  const s=$('#viewas'); s.innerHTML='<option value="">Myself'+(S.me.name?' ('+esc(S.me.name.split(' ')[0])+')':'')+'</option>'+ppl.filter(p=>p.name!==S.me.name).map(p=>'<option>'+esc(p.name)+'</option>').join('');
+  s.onchange=()=>{ S.viewAs=s.value; renderAll(); };
+}
+function renderWho(){
+  const w=$('#who-chip'); if(window.ResourcesSession||!S.me.name){ w.innerHTML=''; return; }
+  const ini=S.me.name.split(' ').map(x=>x[0]).join('').slice(0,2).toUpperCase();
+  w.innerHTML='<span class="whochip"><span class="av">'+esc(ini)+'</span>'+esc(S.me.name.split(' ')[0])+'</span>';
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+})();
+
+</script>
+</body>
+</html>
