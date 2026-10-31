@@ -929,6 +929,30 @@ td.bad{color:var(--bad);font-weight:600}
 .tsearch input:focus+kbd{display:none}
 .fx-stage{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:3px;background:rgba(255,255,255,.12);color:#fff}.fx-stage i{width:7px;height:7px;border-radius:2px;background:var(--sc)}
 @media(max-width:700px){.river{display:none}.facpick button>span:not(.av){display:none}.facpick button{padding:3px 7px 3px 4px}.pagehead.slim .sub{font-size:12.5px}.pagehead.slim .acts .btn{padding:5px 10px;font-size:12.5px}.ftbar{gap:8px}.tsearch{flex:1 1 100%}}
+
+/* calmer board + cards (v2) */
+.tk2:before{background:var(--border-strong)}
+.tk2.late:before{background:var(--bad)}
+.tk2.isnext{box-shadow:0 0 0 2px var(--c4)}
+.t2-top{gap:8px}
+.t2-sz{font-size:10.5px;font-weight:700;color:var(--ink-2);border:1px solid var(--border-strong);border-radius:3px;padding:0 5px;line-height:16px}
+.t2-age{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink-3)}
+.t2-age.bad{color:var(--bad)}
+.t2-st{font-size:11.5px;font-weight:600;color:var(--ink-2);margin:-2px 0 6px}
+.bg{margin-bottom:6px}
+.bg-h{position:sticky;top:-10px;z-index:2;display:flex;align-items:center;gap:6px;margin:0 -10px 8px;padding:7px 12px 6px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:11px;letter-spacing:.07em;text-transform:uppercase;font-weight:700;color:var(--ink-2)}
+.bg-h b{color:var(--ink);font-size:12px}
+.bg+.bg .bg-h{margin-top:4px}
+.board2 .lane>header{border-top-color:var(--navy)}
+.board2 .ln{background:var(--surface-3)}
+.onlyst{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:5px;padding:5px 10px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.dzi{border-color:var(--border-strong);background:var(--surface)}
+.dzi.over{background:var(--accent-soft);border-color:var(--accent)}
+.mx-h span{border-top:0}
+.mc{border-left:3px solid var(--border-strong);flex-direction:column;align-items:flex-start;gap:0}
+.mc.late{border-left-color:var(--bad)}
+.mc>span:first-child{width:100%}
+.mc em{font-style:normal;font-size:10.5px;color:var(--ink-3)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2247,13 +2271,15 @@ function qaBtns(t,max,all){
   return A.map((a,i)=>{ const k=t.id+'|'+i+'|'+a.label; S._qa[k]=a.fn; return '<button type="button" class="btn sm '+(a.cls==='pri'?'pri':'')+'" data-qa="'+esc(k)+'">'+esc(a.label)+'</button>'; }).join('');
 }
 function card2(t,o){
-  o=o||{}; const s=stageDef(t.stage), w=whoseMove(t), tg=tags(t);
+  o=o||{}; const s=stageDef(t.stage), w=whoseMove(t), tg=tags(t), a=stageAge(t), hl=heatLevel(t);
   const acts=o.act?qaBtns(t,1):'';
-  return '<div role="button" tabindex="0" class="tk2'+(t.state==='hold'?' hold':'')+(pastTarget(t)?' late':'')+(o.focus?' focus':'')+'" data-open="'+esc(t.id)+'"'+(o.drag?' draggable="true" data-drag="'+esc(t.id)+'"':'')+' style="--sc:'+s.color+';--i:'+(o.i||0)+'">'+
-    '<div class="t2-top"><span class="wr">'+esc(t.wr)+'</span><span class="t2-r">'+sizeTag(t)+heat(t)+'</span></div>'+
+  const age=(a!=null&&t.state==='active')?'<span class="t2-age'+(hl===2?' bad':'')+'" title="'+a+' days at '+esc(s.name)+'">'+ageTxt(a)+' in stage</span>':'';
+  return '<div role="button" tabindex="0" class="tk2'+(t.state==='hold'?' hold':'')+(pastTarget(t)?' late':'')+(o.focus?' isnext':'')+'" data-open="'+esc(t.id)+'"'+(o.drag?' draggable="true" data-drag="'+esc(t.id)+'"':'')+' style="--i:'+(o.i||0)+'">'+
+    '<div class="t2-top"><span class="wr">'+esc(t.wr)+'</span>'+(t.size?'<span class="t2-sz" title="'+esc((SIZES.find(x=>x[0]===t.size)||[])[1]||'')+'">'+esc(t.size)+'</span>':'')+age+'</div>'+
     '<div class="t2-nm">'+esc(t.name)+'</div>'+
-    ((tg||o.stage)?'<div class="t2-tags">'+(o.stage?'<span class="t2-st"><i></i>'+esc(s.name)+'</span>':'')+tg+'</div>':'')+
-    '<div class="t2-ft">'+av(t.facilitator,'sm')+'<span class="t2-who">'+(o.next?'<b>'+esc(w.label||'')+':</b> '+esc(w.text||''):esc(t.facilitator||'No facilitator')+(o.wg&&t.workgroup?' · '+esc(t.workgroup):''))+'</span></div>'+
+    (o.stage?'<div class="t2-st">'+esc(s.name)+'</div>':'')+
+    (tg?'<div class="t2-tags">'+tg+'</div>':'')+
+    '<div class="t2-ft">'+av(t.facilitator,'sm')+'<span class="t2-who">'+(o.next?'<b>'+esc(w.label||'')+':</b> '+esc(w.text||''):esc(t.facilitator||'No facilitator'))+'</span></div>'+
     (acts?'<div class="t2-acts">'+acts+'</div>':'')+'</div>';
 }
 function lanesHtml(id,L,lt){
@@ -2288,28 +2314,25 @@ function toolbar(pre,post){
 VIEWS.board=function(){
   const L=filteredLive(), f=S.filters, mode=S.boardMode||'lanes', stF=S.bStage||'';
   const drag=S.canWrite&&S.isStaff;
-  const sz=n=>n?(1.2+Math.sqrt(n)*1.3):.75;
-  const river='<div class="river" aria-label="Work by stage">'+stages().map(s=>{ const n=L.filter(t=>t.stage===s.key).length; return '<button type="button" class="rv'+(n?'':' z')+(stF===s.key?' on':'')+'" data-rv="'+s.key+'" style="--sc:'+s.color+';flex:'+sz(n)+'" title="'+esc(s.name)+': '+n+'"><b>'+n+'</b><span>'+esc(s.name)+'</span></button>'; }).join('')+'</div>';
   const seg='<div class="seg" id="bmode"><button type="button" data-bm="lanes" aria-pressed="'+(mode==='lanes')+'">By Phase</button><button type="button" data-bm="fac" aria-pressed="'+(mode==='fac')+'">By Facilitator</button></div>';
-  let body='';
+  const only=stF?'<button type="button" class="onlyst" data-rv="'+stF+'">Only '+esc(stageDef(stF).name)+' <span aria-hidden="true">✕</span></button>':'';
+  let body='', i=0;
   if(mode==='lanes'){
-    let i=0;
     body=lanesHtml('board',PHASES.map(ph=>{ const sts=phaseStages(ph); if(!sts.length) return null;
-      let ts=L.filter(t=>sts.some(s=>s.key===t.stage)); const all=ts.length; if(stF) ts=ts.filter(t=>t.stage===stF);
-      ts.sort((a,b)=>stageIndex(a.stage)-stageIndex(b.stage)||(stageAge(b)||0)-(stageAge(a)||0));
-      const head='<div class="lst">'+sts.map(s=>{ const n=L.filter(t=>t.stage===s.key).length; return '<button type="button" data-rv="'+s.key+'" class="lsc'+(stF===s.key?' on':'')+(n?'':' z')+'" style="--sc:'+s.color+'"><i></i>'+esc(s.name)+'<b>'+n+'</b></button>'; }).join('')+'</div>';
-      const drop=drag?'<div class="dz">'+sts.map(s=>'<div class="dzi" data-dz="'+s.key+'" style="--sc:'+s.color+'"><span>Move to</span><b>'+esc(s.name)+'</b></div>').join('')+'</div>':'';
-      return {key:ph.key,title:ph.name,n:all,c:ph.c,head,drop,body:ts.map(t=>card2(t,{drag,stage:sts.length>1,i:i++})).join(''),empty:stF?'Nothing at this stage':'Nothing in this phase'}; }),'var(--lt-board)');
+      const inPh=L.filter(t=>sts.some(s=>s.key===t.stage));
+      const groups=sts.filter(s=>!stF||s.key===stF).map(s=>{ const ts=inPh.filter(t=>t.stage===s.key).sort((a,b)=>(stageAge(b)||0)-(stageAge(a)||0)); if(!ts.length) return '';
+        return '<div class="bg"><div class="bg-h"><span>'+esc(s.name)+'</span><b>'+ts.length+'</b></div>'+ts.map(t=>card2(t,{drag,i:i++})).join('')+'</div>'; }).join('');
+      const drop=drag?'<div class="dz">'+sts.map(s=>'<div class="dzi" data-dz="'+s.key+'"><span>Move to</span><b>'+esc(s.name)+'</b></div>').join('')+'</div>':'';
+      return {key:ph.key,title:ph.name,n:inPh.length,c:'var(--navy)',sub:esc(sts.map(s=>s.name).join(' · ')),drop,body:groups,empty:'Nothing here right now'}; }),'var(--lt-board)');
   } else {
     const facs=[...new Set(L.map(t=>t.facilitator||''))].sort((a,b)=>(!a)-(!b)||a.localeCompare(b));
     const phs=PHASES.filter(ph=>phaseStages(ph).length);
-    body='<div class="mx" style="--n:'+phs.length+'"><div class="mx-h"><span></span>'+phs.map(ph=>'<span style="--lc:'+ph.c+'">'+esc(ph.name)+'</span>').join('')+'</div><div class="mx-b">'+facs.map(fa=>{ const ts=L.filter(t=>(t.facilitator||'')===fa&&(!stF||t.stage===stF));
-      const bar=stages().map(s=>{ const n=ts.filter(t=>t.stage===s.key).length; return n?'<i style="flex:'+n+';background:'+s.color+'"></i>':''; }).join('');
-      return '<div class="mx-r"><button type="button" class="mx-p" data-fp="'+esc(fa)+'">'+av(fa)+'<span><b>'+esc(fa||'Unassigned')+'</b><em>'+ts.length+' live</em><span class="mx-bar">'+bar+'</span></span></button>'+phs.map(ph=>{ const c=ts.filter(t=>phaseOf(t.stage)===ph.key).sort((a,b)=>(stageAge(b)||0)-(stageAge(a)||0));
-        return '<div class="mx-c">'+c.slice(0,5).map(t=>'<button type="button" class="mc'+(pastTarget(t)?' late':'')+(t.state==='hold'?' hold':'')+'" data-open="'+esc(t.id)+'" style="--sc:'+stageDef(t.stage).color+'" title="'+esc(t.wr+' '+t.name+' · '+stageDef(t.stage).name+(stageAge(t)!=null?' · '+stageAge(t)+' days':''))+'"><span>'+esc(t.name)+'</span>'+heat(t)+'</button>').join('')+(c.length>5?'<button type="button" class="mc-more" data-fp="'+esc(fa)+'" data-bm2="lanes">+'+(c.length-5)+' more</button>':'')+(c.length?'':'<span class="mc-0">·</span>')+'</div>'; }).join('')+'</div>'; }).join('')+'</div></div>';
+    body='<div class="mx" style="--n:'+phs.length+'"><div class="mx-h"><span></span>'+phs.map(ph=>'<span>'+esc(ph.name)+'</span>').join('')+'</div><div class="mx-b">'+facs.map(fa=>{ const ts=L.filter(t=>(t.facilitator||'')===fa&&(!stF||t.stage===stF));
+      return '<div class="mx-r"><button type="button" class="mx-p" data-fp="'+esc(fa)+'">'+av(fa)+'<span><b>'+esc(fa||'Unassigned')+'</b><em>'+ts.length+' live</em></span></button>'+phs.map(ph=>{ const c=ts.filter(t=>phaseOf(t.stage)===ph.key).sort((a,b)=>(stageAge(b)||0)-(stageAge(a)||0));
+        return '<div class="mx-c">'+c.slice(0,5).map(t=>'<button type="button" class="mc'+(pastTarget(t)?' late':'')+(t.state==='hold'?' hold':'')+'" data-open="'+esc(t.id)+'" title="'+esc(t.wr+' '+t.name+' · '+stageDef(t.stage).name+(stageAge(t)!=null?' · '+stageAge(t)+' days':''))+'"><span>'+esc(t.name)+'</span><em>'+esc(stageDef(t.stage).name)+'</em></button>').join('')+(c.length>5?'<button type="button" class="mc-more" data-fp="'+esc(fa)+'" data-bm2="lanes">+'+(c.length-5)+' more</button>':'')+'</div>'; }).join('')+'</div>'; }).join('')+'</div></div>';
   }
-  return '<div class="pagehead slim"><div><h1>Pipeline Board</h1><div class="sub">'+L.length+' live work requests'+(drag?'. Drag a card onto a stage to move it; every move is logged.':'.')+'</div></div><div class="acts">'+seg+'<a class="btn pri" href="https://resources.mismo.org/initiative-hub/work-requests.html#new" target="_blank" rel="noopener">+ New Work Request</a>'+(S.isStaff?'<button class="btn" id="newtk" type="button">Add Without the Hub</button>':'')+'</div></div>'+
-    toolbar('',facPick(liveTickets(),f.fac))+river+'<div id="board2" class="board2">'+body+'</div>';
+  return '<div class="pagehead slim"><div><h1>Pipeline Board</h1><div class="sub">'+L.length+' live work requests, oldest first in each stage'+(drag?'. Drag a card onto a stage to move it.':'.')+'</div></div><div class="acts">'+seg+'<a class="btn pri" href="https://resources.mismo.org/initiative-hub/work-requests.html#new" target="_blank" rel="noopener">+ New Work Request</a></div></div>'+
+    toolbar(only,facPick(liveTickets(),f.fac))+'<div id="board2" class="board2">'+body+'</div>';
 };
 
 /* ---------------- My Queue ---------------- */
@@ -2434,7 +2457,7 @@ VIEWS.all=function(){
   const pager='<div class="pager"><span>'+(L.length?(S.page*PER+1)+'–'+Math.min(L.length,S.page*PER+PER)+' of '+L.length:'0')+'</span><button class="btn sm" type="button" data-pg="-1"'+(S.page?'':' disabled')+'>‹ Prev</button><button class="btn sm" type="button" data-pg="1"'+(S.page<pages-1?'':' disabled')+'>Next ›</button></div>';
   const rows=P.map(t=>{ const s=stageDef(t.stage);
     return '<tr class="rowlink" data-open="'+esc(t.id)+'"><td class="nowrap wrc"><i style="background:'+(t.state==='active'?s.color:'var(--border-strong)')+'"></i>'+esc(t.wr)+'</td><td><div class="nm">'+esc(t.name)+'</div><div class="muted sm1">'+esc(t.workgroup||'')+'</div></td><td class="nowrap"><span class="facc">'+av(t.facilitator,'xs')+esc(t.facilitator||'')+'</span></td><td>'+(t.state==='active'?stageChip(t)+' '+subChip(t)+miniTrack(t):stateChip(t))+'</td><td>'+sizeTag(t)+'</td><td class="nowrap'+(pastTarget(t)?' bad':'')+'">'+esc(fmtS(t.dates&&t.dates.targetIM))+'</td><td class="nowrap muted">'+esc(fmtS((t.updatedAt||t.importedAt||'').slice(0,10)))+'</td></tr>'; }).join('');
-  return '<div class="pagehead slim"><div><h1>All Work</h1><div class="sub">Every work request, live and done. Click a column to sort.</div></div><div class="acts"><a class="btn pri" href="https://resources.mismo.org/initiative-hub/work-requests.html#new" target="_blank" rel="noopener">+ New Work Request</a>'+(S.isStaff?'<button class="btn" id="newtk" type="button">Add Without the Hub</button>':'')+'</div></div>'+
+  return '<div class="pagehead slim"><div><h1>All Work</h1><div class="sub">Every work request, live and done. Click a column to sort.</div></div><div class="acts"><a class="btn pri" href="https://resources.mismo.org/initiative-hub/work-requests.html#new" target="_blank" rel="noopener">+ New Work Request</a></div></div>'+
     toolbar(segS,facPick(base.filter(t=>inState(t,f.state)),f.fac))+
     '<div class="tcard">'+(L.length?'<div class="tscroll"><table class="tbl t2"><thead><tr>'+th('wr','WR#')+th('name','Work Request')+th('fac','Facilitator')+th('stage','Stage')+th('size','Size')+th('target','Target to IM')+th('upd','Updated')+'</tr></thead><tbody>'+rows+'</tbody></table></div>':'<div class="empty" style="margin:16px">Nothing matches these filters.</div>')+pager+'</div>';
 };
