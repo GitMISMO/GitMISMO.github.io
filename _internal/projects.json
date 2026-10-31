@@ -5,7 +5,8 @@
     "origin": "https://resources.mismo.org",
     "writable": [
       "data/"
-    ]
+    ],
+    "ask": true
   },
  "cms": {
     "repo": "GitMISMO/cms-data",
