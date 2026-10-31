@@ -582,6 +582,11 @@ main{padding:26px 30px 80px;max-width:none}
 .cp-lab{position:absolute;top:5px;font-size:11.5px;color:var(--ink-2);white-space:nowrap;z-index:3}
 .cp-lab b{color:var(--ink)}
 @media(max-width:800px){.cp-axis,.cp-row{grid-template-columns:1fr}.cp-axis>div:first-child{display:none}}
+.arc-id{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink-3)}
+.arc-w0{font-size:12px;color:var(--ink-3);margin-bottom:6px}
+.arcol.c-hold{--ac:var(--hold)}
+.arboard{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.archb .eyebrow{margin-bottom:2px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -1764,65 +1769,91 @@ async function decideAsk(t,yes){
   if(fe) queueMail({to:[fe],subject:t.wr+' '+t.name+': your request to '+ASK_WORD[r.kind].toLowerCase()+' was '+(yes?'approved':'declined'),body:yes?'MISMO staff approved it.':'MISMO staff declined it.'+(note?'\n\n'+note:''),ticket:t.id,kind:'request',key:t.id+'-askd-'+r.kind+'-'+today()});
 }
 
-/* ---------- Architecture Help: facilitator asks, Program Manager approves, Architect works it ---------- */
-const ARCH_TYPES=['Data Modeling / Reference Model','Schema (XSD) or Extension','MEG or Guideline Question','API Design or Review','Work Product Review','Mapping Support','Other'];
-const ARCH_STATUS=['Requested','Approved','In Progress','Done','Declined'];
-async function archRequest(t){
-  const v=await modal({title:'Request Architecture Help',text:esc(t.wr+' '+t.name)+'. The Program Manager reviews it; once approved it goes to the Architect’s queue.',ok:'Send to the Program Manager',body:
-    fld('What You Need',inp('title','','A short name for the task'))+
-    fld('Type of Help',radios('type',ARCH_TYPES,ARCH_TYPES[0]))+
-    fld('Details',ta('details','','What the architect should look at, the question to answer, and what done looks like'))+
-    fld('Work Product or Deliverable',inp('product',t.product||t.name))+
+/* ---------- Architecture Help: facilitator asks, Program Manager approves, Architect works it ----------
+   Carries on the Architecture Task Board's numbering (ATB0000015 and up) and its fields. */
+const ARCH_TYPES=['Data Modeling / Reference Model','Schema (XSD) or Extension','MEG or Guideline Question','API Design or Review','Work Product Review','Mapping Support','Website or Documentation','Outside Question','Other'];
+function nextAtb(){ const n=Math.max(14,...Object.keys(S.arch||{}).map(k=>{ const m=k.match(/^ATB(\d+)$/); return m?+m[1]:0; })); return 'ATB'+String(n+1).padStart(7,'0'); }
+async function archRequest(t,follow){
+  const live=liveTickets().slice().sort((a,b)=>a.wr.localeCompare(b.wr));
+  const wgs=[...new Set(allTickets().map(x=>x.workgroup).filter(Boolean))].sort();
+  const v=await modal({title:follow?'Follow-Up Architecture Work':'Request Architecture Help',text:(t?esc(t.wr+' '+t.name)+'. ':'')+'The Program Manager reviews it; once approved it goes to the Architect’s queue.',ok:'Send to the Program Manager',body:
+    fld('Request',inp('title',follow?('Follow-up: '+follow.title):'','A short name for the task'))+
+    (t?'':fld('Related Work Request',sel('wr',[['','Not tied to a work request'],...live.map(x=>[x.id,x.wr+' '+x.name])],''))+fld('Workgroup',sel('wg',[['','Not tied to a workgroup'],...wgs.map(w=>[w,w])],follow?follow.workgroup:'')))+
+    fld('Type of Help',radios('type',ARCH_TYPES,follow?follow.type:ARCH_TYPES[0]))+
+    fld('Description of the Work',ta('details',follow?follow.further||'':'','What the architect should do, the question to answer, and what done looks like'))+
+    fld('Additional Information or Instructions',ta('info','','Context, who asked, anything already tried'))+
+    fld('Work Product or Deliverable',inp('product',t?(t.product||t.name):''))+
     fld('MISMO Version',inp('version','','e.g. 3.6.2'))+
-    fld('Priority',radios('pri',['Low','Medium','High','Urgent'],'Medium'))+
-    fld('Needed By',dateField('need',''))+
+    fld('Priority',radios('pri',['Low','Medium','High'],'Medium'))+
+    fld('Target Date',dateField('need',''))+
     fld('Estimated Effort (Hours)',inp('hours','','Best guess'))+
     fld('Files or Links',inp('links','','SharePoint or MISMO Connect links'))+
     fld('Workgroup Meeting Needed?',radios('meet',[['no','No'],['yes','Yes, join a workgroup call']],'no')),
-    validate:x=>!x.title?'Name the task':(!x.details?'Add the details':'')});
+    validate:x=>!x.title?'Name the request':(!x.details?'Describe the work':'')});
   if(!v) return;
-  const id=(t.id+'-AR'+Date.now().toString(36)).slice(0,190);
-  const a={id,ticket:t.id,wr:t.wr,name:t.name,workgroup:t.workgroup||'',facilitator:t.facilitator||'',requestedBy:S.me.name||'',requested:today(),at:new Date().toISOString(),
-    title:v.title,type:v.type,details:v.details,product:v.product,version:v.version,priority:v.pri,needBy:v.need||'',hours:v.hours,links:v.links,meeting:v.meet==='yes',status:'Requested',assignedTo:(peopleFor('architect')[0]||{}).name||'',log:[{at:new Date().toISOString(),by:S.me.name||'',text:'Requested'}]};
+  const tk=t||(v.wr?S.tickets[v.wr]:null);
+  const id=nextAtb();
+  const a={id,ticket:tk?tk.id:'',wr:tk?tk.wr:'',name:tk?tk.name:'',workgroup:tk?(tk.workgroup||''):(v.wg||''),facilitator:tk?(tk.facilitator||''):(S.me.name||''),requestedBy:S.me.name||'',requested:today(),at:new Date().toISOString(),
+    title:v.title,type:v.type,details:v.details,info:v.info,product:v.product,version:v.version,priority:v.pri,needBy:v.need||'',hours:v.hours,links:v.links,meeting:v.meet==='yes',status:'Requested',
+    assignedTo:(peopleFor('architect')[0]||{}).name||'',followUpOf:follow?follow.id:'',log:[{at:new Date().toISOString(),by:S.me.name||'',text:'Requested'}]};
   S.arch[id]=a; await write('arch',id,a);
-  const x=clone(t); hist(x,'Requested architecture help: '+v.title); await saveTicket(x,'Sent to the Program Manager');
-  queueMail({to:peopleFor('pm').map(p=>p.email),subject:'Architecture help requested: '+v.title+' ('+t.wr+')',body:(S.me.name||'A facilitator')+' asked for architecture help on '+t.name+'.\n\n'+v.type+' · '+v.pri+(v.need?' · needed by '+fmt(v.need):'')+'\n\n'+v.details+'\n\nApprove or decline it in the MMS under Architecture Help.',ticket:t.id,kind:'arch',key:id+'-req'});
+  if(tk){ const x=clone(S.tickets[tk.id]); hist(x,'Requested architecture help ('+id+'): '+v.title); await saveTicket(x,id+' sent to the Program Manager'); } else { toast(id+' sent to the Program Manager'); renderAll(); }
+  queueMail({to:peopleFor('pm').map(p=>p.email),subject:id+' architecture help requested: '+v.title,body:(S.me.name||'Someone')+' asked for architecture help'+(tk?' on '+tk.wr+' '+tk.name:'')+'.\n\n'+v.type+' · '+v.pri+(v.need?' · target '+fmt(v.need):'')+'\n\n'+v.details+(v.info?'\n\n'+v.info:'')+'\n\nApprove or decline it in the MMS under Architecture Help.',ticket:tk?tk.id:'',kind:'arch',key:id+'-req'});
 }
 function archBanner(t){
-  const L=Object.values(S.arch||{}).filter(a=>a.ticket===t.id&&a.status!=='Done'&&a.status!=='Declined'); if(!L.length) return '';
-  return '<div class="archb">'+L.map(a=>'<div><span class="chip '+(a.status==='Requested'?'warn':'info')+'">'+esc(a.status)+'</span> <b>'+esc(a.title)+'</b> <span class="muted">· '+esc(a.type)+(a.needBy?' · needed by '+esc(fmtS(a.needBy)):'')+'</span></div>').join('')+'</div>';
+  const L=Object.values(S.arch||{}).filter(a=>a.ticket===t.id).sort((a,b)=>b.id.localeCompare(a.id)); if(!L.length) return '';
+  return '<div class="archb"><div class="eyebrow">Architecture Help</div>'+L.map(a=>'<div><span class="chip '+({Requested:'warn',Done:'good',Declined:'bad','On Hold':'hold'}[a.status]||'info')+'">'+esc(a.status)+'</span> <b>'+esc(a.id)+'</b> '+esc(a.title)+' <span class="muted">· '+esc(a.type)+(a.needBy&&a.status!=='Done'?' · target '+esc(fmtS(a.needBy)):'')+(a.done?' · done '+esc(fmtS(a.done)):'')+'</span></div>').join('')+'</div>';
 }
 async function archMove(id,to){
-  const a=clone(S.arch[id]); if(!a) return; let note='';
-  if(to==='Declined'||to==='Done'||to==='Approved'){ const v=await modal({title:{Declined:'Decline the Request',Done:'Mark Done',Approved:'Approve for the Architect'}[to],ok:{Declined:'Decline',Done:'Mark Done',Approved:'Approve'}[to],body:fld(to==='Done'?'What Was Done':'Note',ta('note',''))+(to==='Done'?fld('Hours Spent',inp('hrs','')):'')+(to==='Approved'?fld('Assign To',sel('who',peopleFor('architect').map(p=>p.name),a.assignedTo))+fld('Priority',radios('pri',['Low','Medium','High','Urgent'],a.priority)):'')}); if(!v) return; note=v.note||''; if(v.hrs) a.hoursSpent=v.hrs; if(v.who) a.assignedTo=v.who; if(v.pri) a.priority=v.pri; }
+  const a=clone(S.arch[id]); if(!a) return; let v={};
+  const titles={Approved:'Approve for the Architect',Declined:'Decline the Request','In Progress':'Start Work','On Hold':'Put on Hold',Done:'Mark Done'};
+  const body={Approved:fld('Assign To',sel('who',peopleFor('architect').map(p=>p.name),a.assignedTo))+fld('Priority',radios('pri',['Low','Medium','High'],a.priority))+fld('Note',ta('note','')),
+    Declined:fld('Note for '+(a.requestedBy||'the requester'),ta('note','')),
+    'In Progress':fld('Target Date',dateField('need',a.needBy||''))+fld('Note',ta('note','')),
+    'On Hold':fld('Why',ta('note',''),'Waiting on the workgroup, more changes, a meeting')+fld('Check Back On',dateField('need',a.needBy||'')),
+    Done:fld('What Was Done',ta('note',''))+fld('Hours Spent',inp('hrs',''))+fld('Further Work Needed?',radios('further',[['no','No'],['yes','Yes, start a follow-up request']],'no'))+fld('What Further Work',ta('fw','','Only if further work is needed'))}[to];
+  if(body){ v=await modal({title:titles[to],text:esc(a.id+' '+a.title),ok:titles[to],body}); if(!v) return; }
+  const note=v.note||'';
   a.status=to; a.log=[...(a.log||[]),{at:new Date().toISOString(),by:S.me.name||'',text:to,note}];
+  if(v.who) a.assignedTo=v.who; if(v.pri) a.priority=v.pri; if(v.need) a.needBy=v.need;
   if(to==='Approved'){ a.approvedBy=S.me.name||''; a.approved=today(); }
-  if(to==='Done'){ a.done=today(); a.result=note; }
+  if(to==='In Progress'){ a.started=a.started||today(); }
+  if(to==='On Hold'){ a.holdWhy=note; }
+  if(to==='Done'){ a.done=today(); a.result=note; if(v.hrs) a.hoursSpent=v.hrs; if(v.further==='yes'){ a.further=v.fw||'Further work needed'; } }
   S.arch[id]=a; await write('arch',id,a); renderAll();
   const fe=emailOf(a.requestedBy)||emailOf(a.facilitator);
-  if(to==='Approved'){ queueMail({to:[emailOf(a.assignedTo)].filter(Boolean),subject:'New architecture task: '+a.title+' ('+a.wr+')',body:a.type+' · '+a.priority+(a.needBy?' · needed by '+fmt(a.needBy):'')+'\n\n'+a.details+'\n\nRequested by '+a.requestedBy+' for '+a.name+'.',ticket:a.ticket,kind:'arch',key:id+'-appr'}); }
-  if(fe&&['Approved','Declined','Done'].includes(to)) queueMail({to:[fe],subject:'Architecture help '+to.toLowerCase()+': '+a.title,body:'Your request "'+a.title+'" for '+a.wr+' was '+to.toLowerCase()+'.'+(note?'\n\n'+note:''),ticket:a.ticket,kind:'arch',key:id+'-'+to});
+  if(to==='Approved') queueMail({to:[emailOf(a.assignedTo)].filter(Boolean),subject:'New architecture task '+a.id+': '+a.title,body:a.type+' · '+a.priority+(a.needBy?' · target '+fmt(a.needBy):'')+'\n\n'+a.details+'\n\nRequested by '+a.requestedBy+(a.wr?' for '+a.wr+' '+a.name:'')+'.',ticket:a.ticket,kind:'arch',key:id+'-appr'});
+  if(fe&&['Approved','Declined','Done','On Hold'].includes(to)) queueMail({to:[fe],subject:a.id+' '+a.title+': '+to.toLowerCase(),body:'Your architecture request "'+a.title+'" is now '+to.toLowerCase()+'.'+(note?'\n\n'+note:''),ticket:a.ticket,kind:'arch',key:id+'-'+to+'-'+today()});
+  if(to==='Done'&&v.further==='yes') archRequest(a.ticket?S.tickets[a.ticket]:null,a);
 }
 function archCard(a,acts){
-  const pc={Urgent:'bad',High:'warn',Medium:'info',Low:''}[a.priority]||'';
-  return '<div class="arc"><div class="arc-top"><span class="chip '+pc+'">'+esc(a.priority)+'</span><span class="chip">'+esc(a.type)+'</span>'+(a.needBy?'<span class="arc-due'+(a.needBy<today()&&a.status!=='Done'?' late':'')+'">Needed by '+esc(fmtS(a.needBy))+'</span>':'')+'</div>'+
-    '<div class="arc-t">'+esc(a.title)+'</div><div class="arc-w" data-open="'+esc(a.ticket)+'">'+esc(a.wr)+' '+esc(a.name)+' · '+esc(a.workgroup)+'</div>'+
+  const pc={High:'bad',Medium:'info',Low:''}[a.priority]||'';
+  const late=a.needBy&&a.needBy<today()&&!['Done','Declined'].includes(a.status);
+  return '<div class="arc"><div class="arc-top"><span class="arc-id">'+esc(a.id)+'</span><span class="chip '+pc+'">'+esc(a.priority||'Medium')+'</span>'+(a.needBy&&a.status!=='Done'?'<span class="arc-due'+(late?' late':'')+'">Target '+esc(fmtS(a.needBy))+'</span>':'')+'</div>'+
+    '<div class="arc-t">'+esc(a.title)+'</div>'+
+    (a.ticket?'<div class="arc-w" data-open="'+esc(a.ticket)+'">'+esc(a.wr)+' '+esc(a.name)+'</div>':(a.workgroup?'<div class="arc-w0">'+esc(a.workgroup)+'</div>':''))+
     '<div class="arc-d">'+esc(a.details)+'</div>'+
-    '<div class="arc-meta">'+[a.product&&'Work product: '+a.product,a.version&&'Version '+a.version,a.hours&&a.hours+' hrs estimated',a.meeting&&'Workgroup call needed',a.requestedBy&&'From '+a.requestedBy+' · '+fmtS(a.requested),a.assignedTo&&a.status!=='Requested'&&'Architect: '+a.assignedTo].filter(Boolean).map(esc).join(' · ')+(a.links?' · <a href="'+esc(a.links)+'" target="_blank" rel="noopener">Files</a>':'')+'</div>'+
-    (a.result?'<div class="arc-res"><b>Done:</b> '+esc(a.result)+(a.hoursSpent?' ('+esc(a.hoursSpent)+' hrs)':'')+'</div>':'')+
+    '<div class="arc-meta">'+[a.type&&a.type!=='Other'&&a.type,a.version&&'Version '+a.version,a.hours&&a.hours+' hrs est.',a.meeting&&'Workgroup call needed',a.requestedBy&&'From '+a.requestedBy+' · '+fmtS(a.requested),a.status!=='Requested'&&a.assignedTo&&'Architect: '+a.assignedTo,a.started&&'Started '+fmtS(a.started),a.holdWhy&&a.status==='On Hold'&&'On hold: '+a.holdWhy].filter(Boolean).map(esc).join(' · ')+(a.links?' · <a href="'+esc(a.links)+'" target="_blank" rel="noopener">Files</a>':'')+'</div>'+
+    (a.result&&a.status==='Done'?'<div class="arc-res"><b>Done '+esc(fmtS(a.done))+':</b> '+esc(a.result)+(a.hoursSpent?' ('+esc(a.hoursSpent)+' hrs)':'')+(a.further?'<div class="muted">Further work: '+esc(a.further)+'</div>':'')+'</div>':'')+
     (acts&&S.canWrite?'<div class="arc-acts">'+acts+'</div>':'')+'</div>';
 }
 VIEWS.arch=function(){
-  const A=Object.values(S.arch||{}).sort((a,b)=>({Urgent:0,High:1,Medium:2,Low:3}[a.priority]-{Urgent:0,High:1,Medium:2,Low:3}[b.priority])||String(a.needBy||'9').localeCompare(String(b.needBy||'9')));
+  const pr={High:0,Medium:1,Low:2};
+  const A=Object.values(S.arch||{}).sort((a,b)=>(pr[a.priority]??1)-(pr[b.priority]??1)||String(a.needBy||'9').localeCompare(String(b.needBy||'9')));
   const pm=isRole('pm')||S.isStaff, ar=isRole('architect')||S.isStaff;
   const col=(title,sub,list,actsFor,cls)=>'<section class="arcol '+(cls||'')+'"><header><h4>'+title+'<b>'+list.length+'</b></h4><div class="o">'+sub+'</div></header><div class="cards">'+(list.length?list.map(a=>archCard(a,actsFor(a))).join(''):'<div class="lead-empty">Nothing here.</div>')+'</div></section>';
   const btn=(id,to,l,c)=>'<button class="btn sm '+(c||'')+'" data-arch="'+esc(id)+'" data-to="'+to+'" type="button">'+l+'</button>';
-  return '<div class="pagehead"><div><h1>Architecture Help</h1><div class="sub">Facilitators ask from a work request; the Program Manager approves; the Architect works the queue.</div></div></div>'+
+  const open=A.filter(a=>!['Done','Declined'].includes(a.status)), late=open.filter(a=>a.needBy&&a.needBy<today()).length;
+  const doneRecent=A.filter(a=>(a.status==='Done'||a.status==='Declined')).sort((a,b)=>String(b.done||b.requested).localeCompare(String(a.done||a.requested)));
+  const fig=(k,v,s,c)=>'<div class="fig" style="--fc:'+c+';cursor:default"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>';
+  return '<div class="pagehead"><div><h1>Architecture Help</h1><div class="sub">Facilitators ask, the Program Manager approves, and the Architect works the queue, all tied to the work it supports.</div></div><div class="acts">'+(S.canWrite?'<button class="btn pri" id="archnew" type="button">+ Request Architecture Help</button>':'')+'</div></div>'+
+    '<div class="figs">'+fig('Waiting on Approval',A.filter(a=>a.status==='Requested').length,esc(peopleFor('pm').map(p=>p.name.split(' ')[0]).join(', ')||'Program Manager'),'var(--c4)')+fig('In the Architect’s Queue',A.filter(a=>['Approved','In Progress'].includes(a.status)).length,esc(peopleFor('architect').map(p=>p.name).join(', ')||'Architect'),'var(--c1)')+fig('Past Target',late,late?'Check in with the architect':'All on track',late?'var(--bad)':'var(--good)')+fig('Done This Year',A.filter(a=>a.status==='Done'&&String(a.done||'').slice(0,4)===today().slice(0,4)).length,'Completed requests','var(--good)')+'</div>'+
     '<div class="arboard">'+
     col('Waiting on the Program Manager',esc(peopleFor('pm').map(p=>p.name).join(', ')||'Program Manager'),A.filter(a=>a.status==='Requested'),a=>pm?btn(a.id,'Approved','Approve →','pri')+btn(a.id,'Declined','Decline'):'','c-pm')+
-    col('Architect Queue',esc(peopleFor('architect').map(p=>p.name).join(', ')||'Architect'),A.filter(a=>a.status==='Approved'),a=>ar?btn(a.id,'In Progress','Start','pri'):'','c-q')+
-    col('In Progress','Being worked',A.filter(a=>a.status==='In Progress'),a=>ar?btn(a.id,'Done','Mark Done','good'):'','c-ip')+
-    col('Done','Last 90 days',A.filter(a=>(a.status==='Done'||a.status==='Declined')&&(a.done||a.requested||'')>=addDays(today(),-90)),()=> '','c-done')+'</div>';
+    col('Architect Queue',esc(peopleFor('architect').map(p=>p.name).join(', ')||'Architect'),A.filter(a=>a.status==='Approved'),a=>ar?btn(a.id,'In Progress','Start','pri')+btn(a.id,'On Hold','Hold'):'','c-q')+
+    col('In Progress','Being worked',A.filter(a=>a.status==='In Progress'),a=>ar?btn(a.id,'Done','Mark Done','good')+btn(a.id,'On Hold','Hold'):'','c-ip')+
+    (A.some(a=>a.status==='On Hold')?col('On Hold','Paused',A.filter(a=>a.status==='On Hold'),a=>ar?btn(a.id,'In Progress','Resume','pri'):'','c-hold'):'')+
+    col('Done','Most recent first',doneRecent.slice(0,12),()=> '','c-done')+'</div>';
 };
 function archMine(me){
   const A=Object.values(S.arch||{});
@@ -1834,6 +1865,7 @@ function archMine(me){
   return out;
 }
 function wireArch(m){
+  const an=$('#archnew',m); if(an) an.onclick=()=>archRequest(null);
   $$('[data-arch]',m).forEach(b=>b.onclick=()=>archMove(b.dataset.arch,b.dataset.to));
   $$('.arc-w[data-open]',m).forEach(el=>el.onclick=()=>openPanel(el.dataset.open));
 }
@@ -1904,7 +1936,7 @@ function seedHistory(t){
 }
 async function importData(txt,over,msg){
   let arr, whole=null; try{ arr=JSON.parse(txt); if(!Array.isArray(arr)){ whole=arr; arr=arr.tickets?Object.values(arr.tickets):[]; } }catch(e){ msg.textContent='That isn’t a readable export.'; return; }
-  if(whole){ if(whole.leaders&&whole.leaders.list){ S.leaderSnap=whole.leaders; await write('config','leaders',whole.leaders); } if(whole.process&&whole.process.presets){ S.process=whole.process; await write('config','process',whole.process); } if(whole.people&&whole.people.roles){ S.people=whole.people; await write('config','people',whole.people); } if(whole.notify){ S.notify=whole.notify; await write('config','notify',whole.notify); } for(const m of Object.values(whole.media||{})){ if(m&&m.id){ S.media[m.id]=m; await write('media',m.id,m); } } }
+  if(whole){ for(const a of Object.values(whole.arch||{})){ if(a&&a.id&&(over||!S.arch[a.id])){ S.arch[a.id]=a; await write('arch',a.id,a); } } if(whole.leaders&&whole.leaders.list){ S.leaderSnap=whole.leaders; await write('config','leaders',whole.leaders); } if(whole.process&&whole.process.presets){ S.process=whole.process; await write('config','process',whole.process); } if(whole.people&&whole.people.roles){ S.people=whole.people; await write('config','people',whole.people); } if(whole.notify){ S.notify=whole.notify; await write('config','notify',whole.notify); } for(const m of Object.values(whole.media||{})){ if(m&&m.id){ S.media[m.id]=m; await write('media',m.id,m); } } }
   if(!arr.length){ msg.textContent='Nothing to import.'; return; }
   let n=0, skip=0; S.importing=true; msg.innerHTML='<span class="spin"></span> Importing…';
   const queue=arr.slice(); const work=async()=>{ while(queue.length){ const t=queue.shift(); if(!t||!t.id) continue; if(S.tickets[t.id]&&!over){ skip++; continue; }
