@@ -801,7 +801,7 @@ main.enter .tk2{animation:rise .3s cubic-bezier(.2,.7,.2,1) both;animation-delay
 .pane{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--border);border-radius:9px;box-shadow:var(--shadow);overflow:hidden;max-height:max(380px,calc(100vh - 318px));min-height:0}
 .pane>header{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .pane>header h3{font-size:14.5px}
-.pane>header>:last-child{margin-left:auto}
+.pane>header>:last-child:not(:first-child){margin-left:auto}
 .pane-b{flex:1;overflow:auto;padding:10px 12px;min-height:0;overscroll-behavior:contain}
 .dk-g{margin-bottom:12px}
 .dk-gh{display:flex;align-items:center;gap:7px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--ink-2);padding:2px 2px 7px}
@@ -953,6 +953,138 @@ td.bad{color:var(--bad);font-weight:600}
 .mc.late{border-left-color:var(--bad)}
 .mc>span:first-child{width:100%}
 .mc em{font-style:normal;font-size:10.5px;color:var(--ink-3)}
+
+/* ===================== The Line (metro) ===================== */
+#viewas-wrap{display:none!important}
+.linecard{background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);padding:14px 12px 10px;margin-bottom:14px;position:relative}
+.metro{position:relative}
+.mt-row{position:relative;display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));align-items:start}
+@keyframes flowx{to{background-position:24px 0,0 0}}
+@keyframes hotp{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--bad) 45%,transparent)}70%,100%{box-shadow:0 0 0 9px transparent}}
+@keyframes mnin{from{opacity:0;transform:translateY(6px) scale(.8)}to{opacity:1;transform:none}}
+.mt-tr{position:absolute;top:28px;height:4px;margin-top:-2px;border-radius:2px;z-index:0;pointer-events:none}
+.mt-tr.live{background:repeating-linear-gradient(90deg,color-mix(in srgb,var(--sky) 85%,transparent) 0 10px,transparent 10px 24px),var(--surface-3);background-size:24px 100%,auto;animation:flowx 1.6s linear infinite}
+.mt-tr.hubtr{background:repeating-linear-gradient(90deg,var(--border-strong) 0 5px,transparent 5px 11px)}
+.mt-tr.pubtr{background:color-mix(in srgb,var(--good) 55%,var(--surface-3))}
+.mn{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:2px;border:0;background:none;padding:0 3px 4px;cursor:pointer;color:var(--ink);text-align:center;min-width:0;font:inherit;outline:none}
+main.enter .mn{animation:mnin .4s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d)}
+.mn-dot{height:56px;width:100%;display:flex;align-items:center;justify-content:center;position:relative}
+.mn-dot b{width:var(--sz);height:var(--sz);border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface);border:3px solid var(--sc);font-size:13.5px;font-weight:700;color:var(--ink);box-shadow:0 2px 6px rgba(13,49,76,.14);transition:transform .2s cubic-bezier(.2,.7,.2,1),background .2s,color .2s}
+.mn.z .mn-dot b{border-color:var(--border-strong);color:var(--ink-3);font-weight:600;font-size:11px;background:var(--surface-2);box-shadow:none}
+.mn:hover .mn-dot b,.mn:focus-visible .mn-dot b{transform:scale(1.14)}
+.mn.on .mn-dot b{background:var(--sc);color:#fff;border-color:var(--sc);box-shadow:0 0 0 5px color-mix(in srgb,var(--sc) 25%,transparent)}
+.mn.hot .mn-dot b{animation:hotp 2.2s infinite}
+.mn.ext .mn-dot b{border-style:dashed;border-color:var(--border-strong);background:var(--surface-2)}
+.mn.pub .mn-dot b{background:var(--good);border-color:var(--good);color:#fff}
+.mn-late{position:absolute;top:1px;left:calc(50% + var(--sz) / 2 - 10px);min-width:18px;height:18px;border-radius:9px;background:var(--bad);color:#fff;font-size:10px;font-style:normal;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px;box-shadow:0 0 0 2px var(--surface)}
+.mn-l{font-size:11.5px;font-weight:600;line-height:1.25;max-width:100%;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.mn.on .mn-l{color:var(--accent)}
+.mn-o{font-size:10.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mn-tip{display:none;position:absolute;top:calc(100% - 4px);left:50%;transform:translateX(-50%);width:230px;z-index:40;background:var(--navy);color:#fff;border-radius:8px;padding:10px 12px;text-align:left;flex-direction:column;gap:3px;box-shadow:0 10px 30px rgba(6,32,47,.35);font-size:12px;line-height:1.4;pointer-events:none}
+.mn-tip b{font-size:13px}.mn-tip em{font-style:normal;color:var(--sky);font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.mn-tip span{color:#d6e7f3}.mn-tip .mn-tf{color:#fff;font-weight:600;margin-top:3px;padding-top:5px;border-top:1px solid rgba(255,255,255,.18)}
+.mn-tip .bad{color:#f6a59c}
+.mn:hover .mn-tip,.mn:focus-visible .mn-tip{display:flex}
+.metro.dragging .mn-tip{display:none!important}
+.mn:nth-of-type(1) .mn-tip,.mn:nth-of-type(2) .mn-tip{left:0;transform:none}
+.mn:nth-last-of-type(1) .mn-tip,.mn:nth-last-of-type(2) .mn-tip{left:auto;right:0;transform:none}
+.mt-ph{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));margin-top:6px}
+.mt-ph span{margin:0 5px;border-top:3px solid var(--lc);padding-top:4px;font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--ink-3);text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.metro.dragging:after{content:"Drop it on the stop it should move to";position:absolute;top:-12px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;font-size:11.5px;font-weight:600;padding:3px 10px;border-radius:4px;z-index:5}
+.metro.dragging .mn[data-mst] .mn-dot b{border-style:dashed;transform:scale(1.08)}
+.metro.dragging .mn.over .mn-dot b{background:var(--sc);color:#fff;transform:scale(1.35);border-style:solid}
+.metro.dragging .mn.cur{opacity:.35}
+@media(max-width:760px){.mt-row{grid-template-columns:repeat(4,minmax(0,1fr));row-gap:6px}.mt-tr,.mt-ph{display:none}.mn-tip{display:none!important}}
+
+/* Pipeline Board around the line */
+.bdetail{background:var(--surface);border:1px solid var(--border);border-radius:10px;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column;max-height:max(420px,calc(100vh - 400px))}
+.bd-h{display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;padding:14px 18px;border-bottom:1px solid var(--border);background:linear-gradient(90deg,color-mix(in srgb,var(--sc) 12%,var(--surface)),var(--surface) 70%);border-left:5px solid var(--sc);animation:rise .25s both}
+.bd-t{flex:1 1 380px;min-width:0}
+.bd-k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3)}
+.bd-t h2{font-size:20px;margin:2px 0 3px;display:flex;align-items:center;gap:8px}
+.bd-t h2 b{font-size:13px;background:var(--sc);color:#fff;border-radius:4px;padding:1px 8px}
+.bd-t p{margin:0;color:var(--ink-2);font-size:13px;max-width:720px}
+.bd-m{display:flex;gap:18px;align-items:center;flex-wrap:wrap;font-size:13px;font-weight:600}
+.bd-m>span{display:flex;flex-direction:column}
+.bd-m em{font-style:normal;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.bd-m .bad{color:var(--bad)}
+.bd-nav{flex-direction:row!important;gap:6px}
+.bd-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 14px;border-bottom:1px solid var(--border);background:var(--surface-2);font-size:12.5px}
+.bd-bar>.muted{margin-right:auto}
+.bd-b{flex:1;overflow:auto;padding:12px 14px;min-height:0;overscroll-behavior:contain}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.cgrid .tk2{margin-bottom:0}
+.bg2{margin-bottom:14px}
+.bg2-h{position:sticky;top:-12px;z-index:3;display:flex;align-items:center;gap:8px;width:calc(100% + 28px);margin:-12px -14px 10px;padding:9px 14px;border:0;border-bottom:1px solid var(--border);background:var(--surface);cursor:pointer;color:var(--ink);font:inherit;font-size:13px;text-align:left}
+.bg2+.bg2 .bg2-h{margin-top:0}
+.bg2-h i{width:10px;height:10px;border-radius:3px;background:var(--sc)}
+.bg2-n{font-weight:700;font-size:12px;background:var(--surface-3);border-radius:4px;padding:0 7px}
+.bg2-go{margin-left:auto;color:var(--accent);font-size:12px;font-weight:600;opacity:0;transition:opacity .15s}
+.bg2-h:hover .bg2-go{opacity:1}
+.bg2-h:hover{background:var(--surface-2)}
+span.bad{color:var(--bad)}
+
+/* Overview */
+.kpis{display:grid;grid-template-columns:repeat(var(--k),minmax(0,1fr));gap:10px;margin-bottom:16px}
+@media(max-width:1250px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:600px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kp{position:relative;display:flex;flex-direction:column;align-items:flex-start;gap:1px;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:12px 12px 11px;cursor:pointer;color:var(--ink);box-shadow:var(--shadow);overflow:hidden;min-height:116px;font:inherit;transition:transform .15s,box-shadow .15s,border-color .15s}
+.kp:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;background:var(--kc)}
+.kp:hover{transform:translateY(-3px);box-shadow:var(--shadow),0 10px 24px rgba(13,49,76,.12);border-color:var(--border-strong)}
+.kp-k{font-size:10px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.kp-v{font-size:30px;font-weight:700;line-height:1.1;color:var(--kc)}
+.kp-s{font-size:11.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.kp.alert .kp-v{color:var(--bad)}
+.kp.hot{border-color:color-mix(in srgb,var(--c4) 60%,var(--border))}
+.kp-bar{display:flex;gap:1px;height:7px;width:100%;margin-top:auto;border-radius:3px;overflow:hidden;padding-top:0}
+.kp-faces{display:flex;margin-top:auto;padding-left:2px;align-items:center}
+.kp-faces .av{margin-left:-4px;box-shadow:0 0 0 2px var(--surface)}
+.kp-faces .av:first-child{margin-left:0}
+.kp-faces em{font-style:normal;font-size:11px;color:var(--ink-3);margin-left:5px;font-weight:600}
+.kp-ok{margin-top:auto;color:var(--good);font-weight:700;font-size:14px}
+.kp-ring{position:absolute;right:10px;top:12px;width:40px;height:40px;border-radius:50%;background:conic-gradient(var(--kc) calc(var(--p)*1%),var(--surface-3) 0);display:flex;align-items:center;justify-content:center}
+.kp-ring b{width:30px;height:30px;border-radius:50%;background:var(--surface);font-size:10.5px;display:flex;align-items:center;justify-content:center}
+.home-line{padding:14px 16px 12px;overflow:visible}
+.lc-h{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.lc-h h3{font-size:16px;margin:0}
+.lc-s{font-size:12.5px}
+.lc-h .seg{margin-left:auto}
+.dl2{max-height:156px;overflow:auto}
+.dl2 .dl em{display:inline-flex;align-items:center;gap:5px}
+.mt-foot{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-2)}
+.mt-key{display:flex;gap:12px;font-size:11.5px}
+.mt-key span{display:inline-flex;align-items:center;gap:5px}
+.mt-key i{display:inline-block;width:18px;height:4px;border-radius:2px}
+.mt-key .k-live{background:var(--sky)}.mt-key .k-hub{background:repeating-linear-gradient(90deg,var(--border-strong) 0 4px,transparent 4px 7px)}.mt-key .k-hot{width:10px;height:10px;border-radius:50%;background:var(--bad)}
+.mt-foot .btn{margin-left:auto}
+.home3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.home3 .pane{max-height:390px;min-height:300px}
+@media(max-width:1150px){.home3{grid-template-columns:1fr 1fr}.home3 .pane:last-child{grid-column:1/-1}}
+@media(max-width:760px){.home3{grid-template-columns:1fr}}
+.att-tabs2{margin:10px 12px 2px;align-self:flex-start}
+.ar{display:flex;align-items:center;gap:10px;width:100%;border:0;border-bottom:1px solid var(--rule);background:none;padding:8px 4px;cursor:pointer;color:var(--ink);text-align:left;font:inherit;border-radius:5px}
+.ar:hover{background:var(--surface-2)}
+.ar-m{display:flex;flex-direction:column;flex:1;min-width:0}
+.ar-m b{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ar-m em{font-style:normal;font-size:11.5px;color:var(--ink-3)}
+.fr{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:7px 4px;cursor:pointer;color:var(--ink);text-align:left;font:inherit;border-radius:5px}
+.fr:hover{background:var(--surface-2)}
+.fr-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.fr-n{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.fr-n em{font-style:normal;font-size:12px;color:var(--ink-2);font-weight:600}
+.fr-bar{display:flex;gap:1px;height:9px;border-radius:3px;overflow:hidden;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.fr-key{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:11px;color:var(--ink-3);margin-top:10px;padding-top:8px;border-top:1px solid var(--rule)}
+.fr-key span{display:inline-flex;align-items:center;gap:5px}.fr-key i{width:8px;height:8px;border-radius:2px}
+@keyframes livep{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--good) 55%,transparent)}80%,100%{box-shadow:0 0 0 7px transparent}}
+.live-dot{width:8px;height:8px;border-radius:50%;background:var(--good);animation:livep 2s infinite}
+.feed{list-style:none;margin:0;padding:0}
+.feed li{display:flex;gap:9px;align-items:flex-start;padding:8px 4px;border-bottom:1px solid var(--rule);cursor:pointer;font-size:12.5px;border-radius:5px}
+.feed li:hover{background:var(--surface-2)}
+.feed li .av{margin-top:2px}
+.feed em{display:block;font-style:normal;font-size:11px;color:var(--ink-3);margin-top:1px}
+.metro.dragging .mn.over .mn-dot b{background:var(--sc)!important;border-color:var(--sc)!important;color:#fff!important;transform:scale(1.35)!important}
+.att-tabs2 button{padding:4px 8px}
+.seg.att-tabs2{flex-wrap:nowrap}.att-tabs2 button{padding:4px 7px;font-size:11.5px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2518,7 +2650,7 @@ VIEWS.resources=function(){
 
 /* ---------------- wiring for all of the above ---------------- */
 function countUp(m){
-  $$('.fig .v[data-n], .ring b[data-n]',m).forEach(el=>{ const end=+el.dataset.n; if(!(end>0)||!isFinite(end)) return; const t0=performance.now(), dur=520;
+  $$('.fig .v[data-n], .ring b[data-n], .mn-dot b[data-n]',m).forEach(el=>{ const end=+el.dataset.n; if(!(end>0)||!isFinite(end)) return; const t0=performance.now(), dur=520;
     const step=now=>{ const p=Math.min(1,(now-t0)/dur); el.textContent=Math.round(end*(1-Math.pow(1-p,3))); if(p<1) requestAnimationFrame(step); }; el.textContent='0'; requestAnimationFrame(step); });
 }
 function flowWire(m){
@@ -2558,6 +2690,148 @@ wireMain=function(m){ _wireMain0(m); flowWire(m); };
 const _go0=go;
 go=function(v){ S._enter=true; S.bStage=S.bStage&&v==='board'?S.bStage:''; _go0(v); };
 document.addEventListener('keydown',e=>{ const t=e.target; if(e.key!=='/'||e.metaKey||e.ctrlKey||(t&&(t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.tagName==='SELECT'||t.isContentEditable))) return; const q=$('#fq')||$('#mq'); if(q){ e.preventDefault(); q.focus(); q.select(); } });
+
+/* =====================================================================
+   The Line: one picture of the whole process, built from Settings.
+   Used on the Overview ("How It All Connects") and as the heart of the
+   Pipeline Board. Stage names, owners, colors, on/off and custom stages
+   all come from the active process, so a change in Settings shows here.
+   ===================================================================== */
+function ownerName(s){ return s.owner==='gov'?govName():(ROLE_LABEL[s.owner]||'MISMO Staff'); }
+function metro(o){
+  o=o||{}; const L=o.L||liveTickets(), st=stages(), td=today();
+  const hc=hubCounts(), hubOn=!!S.hub;
+  const nodes=[];
+  if(o.hub){
+    nodes.push({key:'hub-new',name:'Request Submitted',owner:'Initiative Hub',n:hubOn?hc.confirm:null,ext:'hub',c:'#7794aa',desc:'Someone submits a work request in the Initiative Hub and MISMO staff confirm it.',hub:1});
+    nodes.push({key:'hub-bet',name:proc().gov==='RSGC'?'BET Approval':'BET Approval',owner:'BET',n:hubOn?hc.queue:null,ext:'hub',c:'#7794aa',desc:'The Business Executive Team approves it. Once approved, it lands here in the MMS on its own.',hub:1});
+  }
+  st.forEach(s=>{ const ts=L.filter(t=>t.stage===s.key); nodes.push({key:s.key,name:s.name,owner:ownerName(s),n:ts.length,c:s.color||'#2477b8',desc:s.desc||'',late:ts.filter(t=>heatLevel(t)===2).length,hold:ts.filter(t=>t.state==='hold').length,oldest:ts.reduce((m,t)=>Math.max(m,stageAge(t)||0),0),stage:1}); });
+  if(o.pub){ const n=allTickets().filter(t=>t.state==='published'&&((t.dates&&t.dates.published)||'')>=addDays(td,-365)).length; nodes.push({key:'published',name:'Published',owner:'Last 12 months',n,ext:'pub',c:'#0f7b5c',desc:'Out the door: posted on the standards page and announced.',pub:1}); }
+  const N=nodes.length, max=Math.max(1,...nodes.filter(x=>x.stage).map(x=>x.n||0));
+  const X=i=>((i+.5)/N*100);
+  const firstStage=nodes.findIndex(x=>x.stage), lastStage=nodes.length-1-[...nodes].reverse().findIndex(x=>x.stage);
+  const tracks=(o.hub&&firstStage>0?'<i class="mt-tr hubtr" style="left:'+X(0)+'%;width:'+(X(firstStage)-X(0))+'%"></i>':'')+
+    '<i class="mt-tr live" style="left:'+X(firstStage)+'%;width:'+(X(lastStage)-X(firstStage))+'%"></i>'+
+    (o.pub?'<i class="mt-tr pubtr" style="left:'+X(lastStage)+'%;width:'+(X(N-1)-X(lastStage))+'%"></i>':'');
+  const node=(x,i)=>{ const sz=x.n?Math.round(34+Math.min(22,Math.sqrt(x.n/max)*22)):26;
+    const cls=['mn',x.n?'':'z',o.sel===x.key?'on':'',x.late?'hot':'',x.hub?'ext':'',x.pub?'pub':''].filter(Boolean).join(' ');
+    const tip='<span class="mn-tip"><b>'+esc(x.name)+'</b><em>'+esc(x.owner)+'</em>'+(x.desc?'<span>'+esc(x.desc)+'</span>':'')+(x.stage?'<span class="mn-tf">'+(x.n?x.n+' here'+(x.oldest?' · oldest '+ageTxt(x.oldest):'')+(x.late?' · <b class="bad">'+x.late+' overdue</b>':''):'Nothing here right now')+'</span>':'')+'</span>';
+    return '<button type="button" class="'+cls+'" '+(x.ext?'data-mext="'+x.ext+'"':'data-mst="'+x.key+'"')+' style="--sc:'+x.c+';--sz:'+sz+'px;--d:'+(i*40)+'ms"><span class="mn-dot"><b'+(x.n?' data-n="'+x.n+'"':'')+'>'+(x.n==null?'—':x.n)+'</b>'+(x.late?'<i class="mn-late" title="'+x.late+' overdue">'+x.late+'</i>':'')+'</span><span class="mn-l">'+esc(x.name)+'</span><span class="mn-o">'+esc(x.owner)+'</span>'+tip+'</button>'; };
+  // phase brackets along the bottom
+  const groups=[]; nodes.forEach((x,i)=>{ const g=x.hub?{k:'hub',n:'Initiative Hub',c:'#7794aa'}:x.pub?{k:'pub',n:'Done',c:'#0f7b5c'}:(()=>{ const p=PHASES.find(p=>p.key===phaseOf(x.key)); return {k:p.key,n:p.name,c:p.c}; })(); const last=groups[groups.length-1]; if(last&&last.k===g.k) last.span++; else groups.push(Object.assign({start:i+1,span:1},g)); });
+  const ph='<div class="mt-ph">'+groups.map(g=>'<span style="grid-column:'+g.start+' / span '+g.span+';--lc:'+g.c+'">'+esc(g.n)+'</span>').join('')+'</div>';
+  return '<div class="metro'+(o.drop?' can-drop':'')+'" style="--n:'+N+'"><div class="mt-row">'+tracks+nodes.map(node).join('')+'</div>'+ph+'</div>';
+}
+
+/* ---------------- Pipeline Board, reimagined around the line ---------------- */
+VIEWS.board=function(){
+  const L=filteredLive(), f=S.filters, drag=S.canWrite&&S.isStaff;
+  if(S.bSel&&!stages().some(s=>s.key===S.bSel)) S.bSel='';
+  const sel=S.bSel||'', sort=S.bSort||'old';
+  const srt={old:(a,b)=>(stageAge(b)||0)-(stageAge(a)||0),new:(a,b)=>(stageAge(a)||0)-(stageAge(b)||0),fac:(a,b)=>String(a.facilitator||'~').localeCompare(String(b.facilitator||'~'))||(stageAge(b)||0)-(stageAge(a)||0),target:(a,b)=>String((a.dates||{}).targetIM||'9').localeCompare(String((b.dates||{}).targetIM||'9'))}[sort];
+  const late=L.filter(t=>heatLevel(t)===2).length, hold=L.filter(t=>t.state==='hold').length;
+  const sortSeg='<div class="seg sm" id="bsort">'+[['old','Oldest First'],['new','Newest'],['target','Target Date'],['fac','Facilitator']].map(([k,l])=>'<button type="button" data-bs="'+k+'" aria-pressed="'+(sort===k)+'">'+l+'</button>').join('')+'</div>';
+  let i=0, detail;
+  if(sel){
+    const s=stageDef(sel), ts=L.filter(t=>t.stage===sel).sort(srt), w=ts[0]?whoseMove(ts[0]):{label:ownerName(s)};
+    const lateN=ts.filter(t=>heatLevel(t)===2).length, idx=stageIndex(sel), list=stages();
+    detail='<div class="bd-h" style="--sc:'+s.color+'"><div class="bd-t"><span class="bd-k">Stop '+(idx+1)+' of '+list.length+' · '+esc(PHASES.find(p=>p.key===phaseOf(sel)).name)+'</span><h2>'+esc(s.name)+' <b>'+ts.length+'</b></h2><p>'+esc(s.desc||'')+'</p></div><div class="bd-m"><span><em>Whose move</em>'+esc(ownerName(s))+'</span>'+(lateN?'<span class="bad"><em>Overdue</em>'+lateN+'</span>':'')+'<span class="bd-nav">'+(idx>0?'<button type="button" class="btn sm" data-mst="'+list[idx-1].key+'">‹ '+esc(list[idx-1].name)+'</button>':'')+(idx<list.length-1?'<button type="button" class="btn sm" data-mst="'+list[idx+1].key+'">'+esc(list[idx+1].name)+' ›</button>':'')+'</span></div></div>'+
+      '<div class="bd-bar"><span class="muted">'+ts.length+' work request'+(ts.length===1?'':'s')+(f.fac?' for '+esc(firstName(f.fac)):'')+'</span>'+sortSeg+'<button type="button" class="btn sm ghost" data-mst="">Show Every Stop</button></div>'+
+      '<div class="bd-b">'+(ts.length?'<div class="cgrid">'+ts.map(t=>card2(t,{drag,next:true,act:true,i:i++})).join('')+'</div>':'<div class="lane-e"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing at this stop'+(f.fac||f.q?' for these filters':'')+'.</div>')+'</div>';
+  } else {
+    const groups=stages().map(s=>{ const ts=L.filter(t=>t.stage===s.key).sort(srt); if(!ts.length) return ''; const lateN=ts.filter(t=>heatLevel(t)===2).length;
+      return '<section class="bg2" style="--sc:'+s.color+'"><button type="button" class="bg2-h" data-mst="'+s.key+'"><i></i><b>'+esc(s.name)+'</b><span class="bg2-n">'+ts.length+'</span><span class="muted">'+esc(ownerName(s))+'</span>'+(lateN?'<span class="chip bad">'+lateN+' overdue</span>':'')+'<span class="bg2-go">Open this stop ›</span></button><div class="cgrid">'+ts.map(t=>card2(t,{drag,i:i++})).join('')+'</div></section>'; }).join('');
+    detail='<div class="bd-bar"><span class="muted"><b style="color:var(--ink)">Every stop</b> · '+L.length+' live'+(late?' · <span class="bad">'+late+' overdue</span>':'')+(hold?' · '+hold+' on hold':'')+'</span>'+sortSeg+'</div><div class="bd-b">'+(groups||'<div class="lane-e">Nothing matches these filters.</div>')+'</div>';
+  }
+  return '<div class="pagehead slim"><div><h1>Pipeline Board</h1><div class="sub">Every live work request on the line. Click a stop to see what’s there'+(drag?'; drag a card onto a stop to move it':'')+'.</div></div><div class="acts"><a class="btn pri" href="https://resources.mismo.org/initiative-hub/work-requests.html#new" target="_blank" rel="noopener">+ New Work Request</a></div></div>'+
+    toolbar('',facPick(liveTickets(),f.fac))+
+    '<div class="linecard">'+metro({L,sel,drop:drag})+'</div>'+
+    '<div class="bdetail" id="board3">'+detail+'</div>';
+};
+
+/* ---------------- Overview ---------------- */
+function relTime(iso){ if(!iso) return ''; const ms=Date.now()-new Date(iso).getTime(); const m=Math.round(ms/6e4); if(m<1) return 'just now'; if(m<60) return m+'m ago'; const h=Math.round(m/60); if(h<24) return h+'h ago'; const d=Math.round(h/24); if(d<7) return d+'d ago'; return fmtS(iso.slice(0,10)); }
+VIEWS.home=function(){
+  const live=liveTickets(), act=live.filter(t=>t.state==='active'), td=today();
+  const me=viewer(), mine=live.filter(t=>isMine(t,me)), first=firstName(me.name);
+  const late=act.filter(pastTarget), inC=act.filter(t=>t.stage==='comment'&&t.sub!=='setup'), gov=act.filter(t=>GOV_STAGES.includes(t.stage)), hold=live.filter(t=>t.state==='hold');
+  const soon=inC.filter(t=>t.dates&&t.dates.commentEnd).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))[0];
+  const h=new Date().getHours(), g=h<12?'Good morning':(h<17?'Good afternoon':'Good evening');
+  let line='<b>'+act.length+'</b> work requests are moving through the MMS';
+  if(mine.length) line+='; <b>'+mine.length+'</b> '+(mine.length===1?'is':'are')+' waiting on you';
+  if(soon) line+='; the next comment period to close is <b>'+esc(cpName(soon))+'</b> on '+fmtS(soon.dates.commentEnd);
+  line+='.';
+  let off=0, ev=weekEvents(0); while(!ev.length&&off<28){ off+=7; ev=weekEvents(off); } if(!ev.length) off=0;
+  const plate=[...mine.slice(0,4).map(t=>({when:'Now',label:whoseMove(t).text,t})),...(off?[]:ev).slice(0,6).map(e=>({when:fmtS(e.date),label:e.label,t:e.t}))].slice(0,5);
+  const plateHtml='<div class="plate"><div class="plate-h"><span>On Your Plate</span><small>next 7 days</small></div>'+(plate.length?plate.map(p=>'<button type="button" class="plate-r" data-open="'+esc(p.t.id)+'"><span class="pw">'+esc(p.when)+'</span><span class="pl"><b>'+esc(p.t.wr)+'</b> '+esc(p.t.name)+'<i>'+esc(p.label)+'</i></span></button>').join(''):'<div class="plate-e">Nothing due this week.</div>')+'<button type="button" class="plate-more" data-go="mine">See Your Queue →</button></div>';
+  // KPI strip: one row, each with its own little picture
+  const phaseBar='<span class="kp-bar">'+PHASES.map(p=>{ const n=act.filter(t=>phaseOf(t.stage)===p.key).length; return n?'<i style="flex:'+n+';background:'+p.c+'" title="'+esc(p.name)+': '+n+'"></i>':''; }).join('')+'</span>';
+  const faces=list=>{ const fs=[...new Set(list.map(t=>t.facilitator).filter(Boolean))]; return '<span class="kp-faces">'+fs.slice(0,4).map(n=>av(n,'xs')).join('')+(fs.length>4?'<em>+'+(fs.length-4)+'</em>':'')+'</span>'; };
+  const days=soon?daysBetween(td,soon.dates.commentEnd):null, span=soon?Math.max(1,daysBetween(soon.dates.commentStart,soon.dates.commentEnd)):1;
+  const ring=soon?'<span class="kp-ring" style="--p:'+Math.max(4,Math.min(100,100-days/span*100))+'"><b>'+days+'d</b></span>':'';
+  const govOld=gov.reduce((m,t)=>Math.max(m,stageAge(t)||0),0), hc=hubCounts(), media=Object.values(S.media).filter(m=>m.status!=='Done').length;
+  const kp=(k,v,s,goTo,c,vis,cls)=>'<button type="button" class="kp '+(cls||'')+'" data-go="'+goTo+'" style="--kc:'+c+'"><span class="kp-k">'+k+'</span><span class="kp-v" data-count="'+v+'">'+v+'</span><span class="kp-s">'+s+'</span>'+(vis||'')+'</button>';
+  const K=[kp('Your Move',mine.length,mine.length?'waiting on you':'all caught up','mine','var(--c4)',mine.length?faces(mine):'<span class="kp-ok">✓</span>',mine.length?'hot':''),
+    kp('Live Work',act.length,'on the line','board','var(--c1)',phaseBar),
+    kp('Past Target',late.length,'due to IM','late','var(--bad)',late.length?faces(late):'',late.length?'alert':''),
+    kp('In Comment',inC.length,soon?'next closes '+fmtS(soon.dates.commentEnd):'none open','comment','var(--c6)',ring),
+    kp('With '+esc(govName()),gov.length,govOld?'oldest '+ageTxt(govOld):'nothing waiting','governance','var(--c5)'),
+    kp('On Hold',hold.length,hold.length?'paused':'nothing paused','hold','var(--hold)'),
+    kp('MISMO Media',media,media?'requests open':'nothing open','media','var(--c2)')];
+  if(S.hub) K.push(kp('In the Hub',hc.confirm+hc.queue,'not yet approved','hub','#7794aa'));
+  const kpis='<div class="kpis" style="--k:'+K.length+'">'+K.join('')+'</div>';
+  // the line: this week or how it all connects
+  const daysA=[]; for(let i=0;i<7;i++){ const d=addDays(td,i+off); daysA.push({d,ev:ev.filter(e=>e.date===d)}); }
+  const sel=S.daySel&&daysA.some(x=>x.d===S.daySel)?S.daySel:(daysA.find(x=>x.ev.length)||daysA[0]).d;
+  const strip='<div class="wk">'+daysA.map((x,i)=>{ const dt=toD(x.d); return '<button type="button" class="wkd'+(i===0&&!off?' today':'')+(x.d===sel?' on':'')+'" data-day="'+x.d+'"><span class="wn">'+(i===0&&!off?'Today':['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][dt.getDay()])+'</span><span class="wdn">'+dt.getDate()+'</span><span class="wb">'+x.ev.slice(0,5).map(e=>'<i style="background:'+e.c+'"></i>').join('')+(x.ev.length>5?'<em>+'+(x.ev.length-5)+'</em>':'')+'</span><span class="wl">'+(x.ev.length?esc(x.ev[0].label):'Clear')+'</span></button>'; }).join('')+'</div>';
+  const dayEv=ev.filter(e=>e.date===sel);
+  const dayList='<div class="daylist dl2">'+(dayEv.length?dayEv.map(e=>'<button type="button" class="dl" data-open="'+esc(e.t.id)+'"><i style="background:'+e.c+'"></i><b>'+esc(e.label)+'</b><span>'+esc(e.t.wr)+' '+esc(e.t.name)+'</span><em>'+av(e.t.facilitator,'xs')+esc(e.t.facilitator||'')+'</em></button>').join(''):'<div class="muted" style="font-size:13px;padding:6px 2px">Nothing dated on '+fmt(sel)+'.</div>')+'</div>';
+  const p=S.process||{}, nextOn=p.switchOn&&p.active!=='next'?' · switches to '+esc(((p.presets||{}).next||{}).label||'the next process')+' on '+fmt(p.switchOn):'';
+  const mapFoot='<div class="mt-foot"><span><b>'+esc(proc().label)+'</b> · '+stages().length+' stops · '+esc(govName())+' approves'+nextOn+'</span><span class="mt-key"><span><i class="k-live"></i>MMS</span><span><i class="k-hub"></i>Initiative Hub</span><span><i class="k-hot"></i>Overdue</span></span>'+(S.isStaff?'<button type="button" class="btn sm ghost" data-go="settings">Change the Process ›</button>':'')+'</div>';
+  const tab=S.homeTab==='map'?'map':'week';
+  const lineCard='<div class="card linecard home-line"><div class="lc-h"><h3>'+(tab==='map'?'How It All Connects':(off?'The Line, Looking Ahead':'This Week on the Line'))+'</h3><span class="muted lc-s">'+(tab==='map'?'Hover a stop for what happens there; click it to open that stop on the board.':(off?'Nothing dated this week, so here is the week of '+fmt(addDays(td,off))+'.':'Dates coming up for '+(S.isStaff?'all live work':'your work')+'.'))+'</span><div class="seg" id="hometab"><button type="button" data-ht="week" aria-pressed="'+(tab==='week')+'">This Week</button><button type="button" data-ht="map" aria-pressed="'+(tab==='map')+'">How It All Connects</button></div></div>'+
+    (tab==='map'?metro({hub:true,pub:true})+mapFoot:strip+dayList)+'</div>';
+  // bottom: attention · facilitators · latest moves
+  const AG=[['late','Past Target',late.map(t=>[t,'Due '+fmtS(t.dates.targetIM),'bad'])],
+    ['soon','Closing',inC.filter(t=>t.dates&&t.dates.commentEnd&&daysBetween(td,t.dates.commentEnd)<=7&&daysBetween(td,t.dates.commentEnd)>=0).map(t=>[t,'Ends '+fmtS(t.dates.commentEnd),'warn'])],
+    ['stall','Stalled',act.filter(stalled).sort((a,b)=>(stageAge(b)||0)-(stageAge(a)||0)).map(t=>[t,ageTxt(stageAge(t))+' at '+stageDef(t.stage).name,'warn'])],
+    ['post','Not Posted',act.filter(t=>t.stage==='comment'&&t.sub==='setup').map(t=>[t,'Approved for comment','warn'])]];
+  const atk=(AG.find(x=>x[0]===S.attTab&&x[2].length)||AG.find(x=>x[2].length)||AG[0])[0], cur=AG.find(x=>x[0]===atk)[2];
+  const att='<section class="pane"><header><h3>Needs Attention</h3></header><div class="seg sm att-tabs2">'+AG.map(([k,l,Lx])=>'<button type="button" data-att="'+k+'" aria-pressed="'+(k===atk)+'">'+l+' <b>'+Lx.length+'</b></button>').join('')+'</div><div class="pane-b">'+(cur.length?cur.map(([t,why,c])=>'<button type="button" class="ar" data-open="'+esc(t.id)+'">'+av(t.facilitator,'sm')+'<span class="ar-m"><b>'+esc(t.name)+'</b><em>'+esc(t.wr)+' · '+esc(t.facilitator||'')+'</em></span><span class="chip '+c+'">'+esc(why)+'</span></button>').join(''):'<div class="lane-e"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing needs attention</div>')+'</div></section>';
+  const facs=[...new Set(act.map(t=>t.facilitator||'Unassigned'))].sort(), fmax=Math.max(1,...facs.map(fa=>act.filter(t=>(t.facilitator||'Unassigned')===fa).length));
+  const fl='<section class="pane"><header><h3>Each Facilitator’s Work</h3><span class="muted" style="font-size:12px">by phase</span></header><div class="pane-b">'+(facs.length?facs.map(fa=>{ const ts=act.filter(t=>(t.facilitator||'Unassigned')===fa), lt=ts.filter(t=>heatLevel(t)===2).length;
+    return '<button type="button" class="fr" data-fac="'+esc(fa)+'">'+av(fa==='Unassigned'?'':fa,'sm')+'<span class="fr-m"><span class="fr-n"><b>'+esc(fa)+'</b><em>'+ts.length+(lt?' · <span class="bad">'+lt+' overdue</span>':'')+'</em></span><span class="fr-bar" style="width:'+Math.max(8,ts.length/fmax*100)+'%">'+PHASES.map(p=>{ const n=ts.filter(t=>phaseOf(t.stage)===p.key).length; return n?'<i style="flex:'+n+';background:'+p.c+'" title="'+esc(p.name)+': '+n+'"></i>':''; }).join('')+'</span></span></button>'; }).join('')+'<div class="fr-key">'+PHASES.map(p=>'<span><i style="background:'+p.c+'"></i>'+esc(p.name)+'</span>').join('')+'</div>':'<div class="lane-e">No live work yet.</div>')+'</div></section>';
+  const nowIso=new Date().toISOString(), recent=[]; allTickets().forEach(t=>(t.history||[]).forEach(hh=>{ if(hh.at&&hh.at<=nowIso&&!/^Brought over/.test(hh.text||'')) recent.push([hh,t]); })); recent.sort((a,b)=>b[0].at.localeCompare(a[0].at));
+  const feed='<section class="pane"><header><h3>Latest Moves</h3><span class="live-dot" title="Updates as work moves"></span></header><div class="pane-b">'+(recent.length?'<ol class="feed">'+recent.slice(0,25).map(([hh,t])=>'<li data-open="'+esc(t.id)+'">'+av(hh.by||'','xs')+'<span><b>'+esc(t.wr)+'</b> '+esc(hh.text)+'<em>'+esc(hh.by||'')+' · '+esc(relTime(hh.at))+'</em></span></li>').join('')+'</ol>':'<div class="lane-e">Moves show here as work goes through.</div>')+'</div></section>';
+  return '<div class="hero hero2"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}))+'</div><h2>'+g+(first?', '+esc(first):'')+'</h2><p>'+line+'</p></div>'+plateHtml+'</div>'+kpis+lineCard+'<div class="home3">'+att+fl+feed+'</div>';
+};
+
+/* ---------------- wiring ---------------- */
+function lineWire(m){
+  // stops on the line
+  $$('[data-mst]',m).forEach(b=>b.onclick=()=>{ const k=b.dataset.mst; if(S.view==='board'){ S.bSel=S.bSel===k&&b.classList.contains('mn')?'':k; renderAll(); const d=$('#board3'); if(d) d.scrollTop=0; } else { S.bSel=k; go('board'); } });
+  $$('[data-mext]',m).forEach(b=>b.onclick=()=>{ if(b.dataset.mext==='hub') window.open('https://resources.mismo.org/initiative-hub/work-requests.html#all','_blank','noopener'); else { S.filters.state='published'; go('all'); } });
+  $$('[data-stage]',m).forEach(b=>b.onclick=()=>{ S.bSel=b.dataset.stage; go('board'); });
+  $$('[data-fac]',m).forEach(b=>b.onclick=()=>{ S.filters.fac=b.dataset.fac==='Unassigned'?'':b.dataset.fac; S.bSel=''; go('board'); });
+  $$('[data-bs]',m).forEach(b=>b.onclick=()=>{ S.bSort=b.dataset.bs; renderAll(); });
+  // drag a card onto a stop
+  const bd=$('#board3',m), mt=$('.metro.can-drop',m);
+  if(bd&&mt&&S.canWrite&&S.isStaff){
+    let dragId=null;
+    $$('[data-drag]',bd).forEach(c=>{ c.addEventListener('dragstart',e=>{ dragId=c.dataset.drag; c.classList.add('dragging'); mt.classList.add('dragging'); const t=S.tickets[dragId]; $$('.mn',mt).forEach(n=>n.classList.toggle('cur',!!t&&n.dataset.mst===t.stage)); try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragId); }catch(x){} if(window.scrollY>40) window.scrollTo({top:0,behavior:'smooth'}); });
+      c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); mt.classList.remove('dragging'); $$('.mn',mt).forEach(n=>n.classList.remove('over','cur')); }); });
+    $$('.mn[data-mst]',mt).forEach(n=>{ n.addEventListener('dragover',e=>{ e.preventDefault(); n.classList.add('over'); }); n.addEventListener('dragleave',()=>n.classList.remove('over'));
+      n.addEventListener('drop',async e=>{ e.preventDefault(); mt.classList.remove('dragging'); n.classList.remove('over'); const t=S.tickets[dragId], to=n.dataset.mst; if(!t||t.stage===to) return; await move(t,to,{text:'Moved on the board from '+stageDef(t.stage).name+' to '+stageDef(to).name}); }); });
+  }
+}
+const _wireMain1=wireMain;
+wireMain=function(m){ _wireMain1(m); lineWire(m); };
+const _go1=go;
+go=function(v){ if(v!=='mine'&&S.viewAs){ S.viewAs=''; const s=$('#viewas'); if(s) s.value=''; } _go1(v); };
+// Hub numbers: retry until the sign-in token is ready, and refresh whatever page is open
+const _hubSync0=hubSync; let hubTries=0;
+hubSync=async function(){ const rs=window.ResourcesSession; if(S.mode==='relay'&&!(rs&&rs.token())&&hubTries++<10){ setTimeout(hubSync,3000); return; } await _hubSync0(); if(S.hub&&S.view!=='home') renderAll(); };
 
 /* ---------- settings ---------- */
 let setTab='process';
