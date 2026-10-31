@@ -476,6 +476,112 @@ main{padding:26px 30px 80px;max-width:none}
 .tbar{display:block;height:8px;background:var(--surface-3);border-radius:2px;overflow:hidden}
 .tbar i{display:block;height:100%;background:var(--accent)}
 .psec.rec{border-color:var(--good);border-left:4px solid var(--good)}
+/* current leadership */
+.lead-sub{font-size:12.5px;color:var(--ink-2);margin:-4px 0 12px}
+.lead-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px}
+.lead{display:grid;grid-template-columns:38px 1fr;grid-template-rows:auto auto;column-gap:10px;row-gap:6px;align-items:center;background:var(--surface-2);border:1px solid var(--border);border-left:3px solid var(--border-strong);border-radius:6px;padding:10px 12px}
+.lead.chair{border-left-color:var(--navy)}
+.lead.vice{border-left-color:var(--sky)}
+:root[data-theme="dark"] .lead.chair{border-left-color:#fff}
+.lav{grid-row:1/3;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;color:#fff;background:linear-gradient(160deg,#a8d4ef 0%,#94c8e9 45%,#6fb2dc 100%)}
+.lead.chair .lav{background:linear-gradient(160deg,#14486e,#0d314c)}
+.lt{min-width:0;display:flex;flex-direction:column}
+.lt b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lt span{font-size:12px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lpos{justify-self:start;font-size:11px;font-weight:700;border-radius:3px;padding:2px 7px;background:var(--surface-3);color:var(--ink-2);white-space:nowrap}
+.lead.chair .lpos{background:var(--navy);color:#fff}
+.lead.vice .lpos{background:var(--sky-wash);color:var(--navy)}
+:root[data-theme="dark"] .lead.chair .lpos{background:var(--sky);color:var(--navy-deep)}
+:root[data-theme="dark"] .lead.vice .lpos{background:var(--surface-3);color:var(--sky)}
+.lterm{grid-column:2;font-size:11px;color:var(--ink-3);margin-top:-2px}
+.lead .lpos+.lterm{grid-column:2}
+.lead-empty{font-size:13px;color:var(--ink-3);padding:10px 12px;background:var(--surface-2);border:1px dashed var(--border-strong);border-radius:6px}
+.lead-foot{font-size:11.5px;color:var(--ink-3);margin-top:10px}
+/* split into deliverables */
+.split-box{width:min(820px,100%)}
+.split-box header .eyebrow{margin-bottom:2px}
+.dv{border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:10px;background:var(--surface-2);border-left:4px solid var(--accent)}
+.dv.held{border-left-color:var(--c4);background:color-mix(in srgb,var(--c4) 7%,var(--surface-2))}
+.dv-top{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.dv-id{font-size:11px;font-weight:700;letter-spacing:.04em;color:var(--ink-3);white-space:nowrap}
+.dv-name{flex:1;min-width:0;font:inherit;font-size:14px;font-weight:600;border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:5px;padding:7px 10px}
+.dv-name:focus{outline:2px solid var(--sky);outline-offset:-1px}
+.dv-x{border:0;background:none;color:var(--ink-3);font-size:20px;width:28px;height:28px;border-radius:4px;cursor:pointer}
+.dv-x:hover{background:var(--surface-3);color:var(--bad)}
+.dv-kinds{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.dv-k{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink-2);border-radius:5px;padding:5px 10px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.dv-k svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dv-k:hover{border-color:var(--accent);color:var(--ink)}
+.dv-k.on{background:var(--navy);border-color:var(--navy);color:#fff}
+:root[data-theme="dark"] .dv-k.on{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}
+.dv-hold{display:flex;align-items:center;gap:10px;font-size:12.5px;color:var(--ink-2);cursor:pointer}
+.dv-hold.locked{cursor:default}
+.sw{position:relative;width:34px;height:20px;flex:0 0 34px}
+.sw input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.sw i{position:absolute;inset:0;border-radius:10px;background:var(--border-strong);transition:background .15s}
+.sw i:after{content:"";position:absolute;left:3px;top:3px;width:14px;height:14px;border-radius:50%;background:#fff;transition:transform .15s}
+.sw.on i{background:var(--c4)}
+.sw.on i:after{transform:translateX(14px)}
+.dv-add{width:100%;border:1px dashed var(--border-strong);background:none;color:var(--accent);font:inherit;font-weight:600;font-size:13px;border-radius:8px;padding:10px;cursor:pointer;margin-bottom:12px}
+.dv-add:hover{background:var(--accent-soft)}
+.dv-rm{border:1px solid var(--c4);border-radius:8px;padding:12px 14px;background:color-mix(in srgb,var(--c4) 8%,var(--surface))}
+.dv-rm-h{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13.5px}
+.dv-rm-h svg{width:18px;height:18px;fill:none;stroke:var(--c4);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dv-rms{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.dv-r{display:flex;flex-direction:column;gap:4px;align-items:flex-start;text-align:left;border:1px solid var(--border-strong);background:var(--surface);border-radius:6px;padding:9px 11px;cursor:pointer;color:var(--ink);font:inherit}
+.dv-r span{font-size:12.5px;color:var(--ink-2)}
+.dv-r.on{border-color:var(--c4);box-shadow:0 0 0 2px var(--c4)}
+.dv-sum{margin-right:auto;align-self:center;font-size:12.5px;color:var(--ink-3)}
+/* requests + architecture help */
+.askb{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--warn-bg);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:8px;padding:12px 14px;margin-bottom:18px}
+.askb>div{flex:1;min-width:240px}
+.archb{background:var(--info-bg);border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:8px;padding:10px 14px;margin:-6px 0 18px;display:flex;flex-direction:column;gap:6px;font-size:13px}
+.arboard{display:grid;grid-template-columns:repeat(4,minmax(260px,1fr));gap:12px;overflow-x:auto;align-items:start}
+@media(max-width:1100px){.arboard{grid-template-columns:repeat(4,280px)}}
+.arcol{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column}
+.arcol header{padding:10px 12px 8px;border-bottom:1px solid var(--border);position:relative}
+.arcol header:before{content:"";position:absolute;left:0;right:0;top:0;height:3px;border-radius:8px 8px 0 0;background:var(--ac,var(--accent))}
+.arcol.c-pm{--ac:var(--c4)} .arcol.c-q{--ac:var(--c1)} .arcol.c-ip{--ac:var(--c3)} .arcol.c-done{--ac:var(--good)}
+.arcol header h4{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.arcol header h4 b{margin-left:auto;font-size:11px;background:var(--surface-3);border-radius:3px;padding:1px 6px;color:var(--ink-2)}
+.arcol header .o{font-size:11px;color:var(--ink-3)}
+.arcol .cards,.arcgrid{padding:8px;display:flex;flex-direction:column;gap:8px}
+.arcgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));padding:0}
+.arc{background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 12px;box-shadow:0 1px 1px rgba(13,49,76,.04)}
+.arc-top{display:flex;flex-wrap:wrap;gap:5px;align-items:center}
+.arc-due{margin-left:auto;font-size:11px;font-weight:600;color:var(--ink-2)}
+.arc-due.late{color:var(--bad)}
+.arc-t{font-size:14px;font-weight:700;margin:6px 0 2px}
+.arc-w{font-size:12px;color:var(--accent);cursor:pointer;margin-bottom:6px}
+.arc-d{font-size:12.5px;color:var(--ink-2);white-space:pre-line;max-height:7.5em;overflow:hidden}
+.arc-meta{font-size:11.5px;color:var(--ink-3);margin-top:6px}
+.arc-res{font-size:12.5px;margin-top:6px;padding-top:6px;border-top:1px solid var(--rule)}
+.arc-acts{display:flex;gap:6px;margin-top:8px}
+/* comment period timeline */
+.cp h3{flex-wrap:wrap}
+.cp-key{display:flex;gap:14px;font-size:12px;font-weight:500;color:var(--ink-2)}
+.cp-key span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.cp-key i{display:inline-block;width:16px;height:8px;border-radius:2px}
+.cp-key i.open{background:var(--c6)} .cp-key i.closed{background:var(--border-strong)} .cp-key i.now{width:2px;height:12px;background:var(--bad)}
+.cp-axis,.cp-row{display:grid;grid-template-columns:minmax(220px,300px) 1fr;gap:16px;align-items:center}
+.cp-scale{position:relative;height:22px;border-bottom:1px solid var(--border)}
+.cp-scale span{position:absolute;bottom:4px;transform:translateX(-50%);font-size:11px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.06em}
+.cp-scale .cp-today{color:var(--bad)}
+.cp-grp{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3);padding:14px 0 4px}
+.cp-row{padding:7px 0;border-bottom:1px solid var(--rule);cursor:pointer}
+.cp-row:hover{background:var(--accent-soft)}
+.cp-name{min-width:0;display:flex;flex-direction:column}
+.cp-name b{font-size:13px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.cp-name span{font-size:11.5px;color:var(--ink-3)}
+.cp-track{position:relative;height:26px}
+.cp-grid{position:absolute;top:0;bottom:0;width:1px;background:var(--rule)}
+.cp-now{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--bad);z-index:2}
+.cp-bar{position:absolute;top:6px;height:14px;border-radius:3px}
+.cp-bar.open{background:var(--c6)}
+.cp-bar.closed{background:var(--border-strong)}
+.cp-lab{position:absolute;top:5px;font-size:11.5px;color:var(--ink-2);white-space:nowrap;z-index:3}
+.cp-lab b{color:var(--ink)}
+@media(max-width:800px){.cp-axis,.cp-row{grid-template-columns:1fr}.cp-axis>div:first-child{display:none}}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -517,6 +623,7 @@ main{padding:26px 30px 80px;max-width:none}
     <button type="button" data-hq="all" title="All Work"><svg viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>All Work</span></button>
     <div class="navgrp">Hand-Offs</div>
     <button type="button" data-hq="media" title="MISMO Media Requests"><svg viewBox="0 0 24 24"><path d="M4 11v2a1 1 0 001 1h2l5 4V6L7 10H5a1 1 0 00-1 1z"/><path d="M16 8a5 5 0 010 8"/></svg><span>MISMO Media</span><b id="nav-media" hidden></b></button>
+    <button type="button" data-hq="arch" title="Architecture Help"><svg viewBox="0 0 24 24"><path d="M12 2l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5"/></svg><span>Architecture Help</span><b id="nav-arch" hidden></b></button>
     <button type="button" data-hq="outbox" title="Notifications"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Notifications</span><b id="nav-outbox" hidden></b></button>
     <div class="navgrp">Help</div>
     <button type="button" data-hq="resources" title="Facilitator Resource Center"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg><span>Resource Center</span></button>
@@ -582,7 +689,7 @@ function parseDate(v){
 const ago=s=>{ const n=daysBetween(s,today()); if(n==null) return ''; if(n<=0) return 'today'; if(n===1) return '1 day'; return n+' days'; };
 
 /* ---------- people & roles ---------- */
-const ROLE_LABEL={facilitator:'Facilitator',staff:'MISMO Staff',media:'MISMO Media',imawg:'IM/AWG Facilitator',director:'Director',vps:'VPs',gov:'Governance',website:'Website Admin',workgroup:'Workgroup',bet:'BET'};
+const ROLE_LABEL={facilitator:'Facilitator',staff:'MISMO Staff',media:'MISMO Media',imawg:'IM/AWG Facilitator',director:'Director',vps:'VPs',gov:'Governance',website:'Website Admin',pm:'Program Manager',architect:'Architect',workgroup:'Workgroup',bet:'BET'};
 const DEFAULT_PEOPLE={
   facilitators:[
     {name:'Erin Bittenbender',email:'ebittenbender@mismo.org'},
@@ -597,7 +704,9 @@ const DEFAULT_PEOPLE={
     director:[{name:'Jonna Critchley',email:'jcritchley@mba.org'}],
     vps:[{name:'Jonathan Kearns',email:'jkearns@mismo.org'},{name:'Jonna Critchley',email:'jcritchley@mba.org'}],
     gov:[],
-    website:[{name:'Vanessa Rios',email:'vrios@mismo.org'}]
+    website:[{name:'Vanessa Rios',email:'vrios@mismo.org'}],
+    pm:[{name:'Perry Williams',email:'pwilliams@mba.org'}],
+    architect:[{name:'Mark Kleingers',email:'mkleingers@mismo.org'}]
   },
   gc:'GC'
 };
@@ -637,7 +746,7 @@ const SIZES=[['S','Small'],['M','Medium'],['L','Large'],['XL','X-Large']];
 
 /* ---------- app state ---------- */
 const S={ready:false,tickets:{},process:clone(DEFAULT_PROCESS),people:clone(DEFAULT_PEOPLE),notify:clone(DEFAULT_NOTIFY),
-  outbox:{},media:{},me:{name:'',email:''},canWrite:true,isStaff:false,viewAs:'',view:'home',panel:null,
+  outbox:{},media:{},arch:{},me:{name:'',email:''},canWrite:true,isStaff:false,viewAs:'',view:'home',panel:null,
   filters:{fac:'',wg:'',size:'',type:'',q:'',state:'live',sort:'stage',dir:1,stage:''},sample:null,mode:'claude',loaded:{}};
 window.__mms=S;
 
@@ -701,6 +810,7 @@ function emailOf(n){ const p=personByName(n); return p?p.email:''; }
 
 /* whose move is it — the heart of every queue */
 function whoseMove(t){
+  if(t.request) return {role:'staff',label:'MISMO Staff',text:(t.request.by||'The facilitator')+' asked to '+({hold:'put this on hold',resume:'resume this',close:'close this',cancel:'cancel this'}[t.request.kind]||t.request.kind)};
   if(t.split){ const n=(t.deliverables||[]).length; return {role:'',label:'Split',text:'Split into '+n+' deliverable'+(n===1?'':'s')+'; each one moves on its own'}; }
   if(t.rides&&t.state==='active'){ const b=S.tickets[t.rides]; return {role:'',label:'Moves With '+(b?b.wr:t.rides),text:'Held for the '+(b?b.wr+' '+b.name:'Reference Model')+' release and moves with it'}; }
   if(t.state==='hold') return {role:'staff',label:'On Hold',hold:true,text:'On hold'+(t.holdReason?': '+t.holdReason:'')};
@@ -933,6 +1043,7 @@ function counts(){
   set('#nav-reviews',liveTickets().filter(t=>t.state==='active'&&['aireview','im','awg','designation'].includes(t.stage)).length);
   set('#nav-gov',liveTickets().filter(t=>t.state==='active'&&['kickoff','gc-comment','gc-publish'].includes(t.stage)).length);
   set('#nav-media',Object.values(S.media).filter(m=>m.status!=='Done').length);
+  set('#nav-arch',Object.values(S.arch||{}).filter(a=>(a.status==='Requested'&&isRole('pm'))||(['Approved','In Progress'].includes(a.status)&&isRole('architect'))).length,true);
   set('#nav-outbox',Object.values(S.outbox).filter(m=>m.status==='Queued').length);
   $('#nav-settings').hidden=!S.isStaff;
 }
@@ -978,7 +1089,7 @@ VIEWS.mine=function(){
   if(!nm) return '<div class="pagehead"><div><h1>My Queue</h1></div></div><div class="empty">Sign in to see your queue.</div>';
   const sorted=l=>l.sort((a,b)=>stageIndex(a.stage)-stageIndex(b.stage));
   return '<div class="pagehead"><div><div class="eyebrow">'+esc(nm)+'</div><h1>My Queue</h1><div class="sub">Everything waiting on '+(S.viewAs?esc(nm.split(' ')[0]):'you')+' first, then where the rest of '+(S.viewAs?'their':'your')+' work stands.</div></div></div>'+
-   grp('Your Move',sorted(yours),'warn')+(facT.length||!yours.length?grp('With Reviewers',sorted(withRev),'info')+grp('Waiting on '+esc(govName()),sorted(withGov),'info')+grp('Out the Door',sorted(out),'good')+(held.length?grp('On Hold',held,'hold'):''):'');
+   archMine(me)+grp('Your Move',sorted(yours),'warn')+(facT.length||!yours.length?grp('With Reviewers',sorted(withRev),'info')+grp('Waiting on '+esc(govName()),sorted(withGov),'info')+grp('Out the Door',sorted(out),'good')+(held.length?grp('On Hold',held,'hold'):''):'');
 };
 
 function filteredLive(){
@@ -998,7 +1109,7 @@ function filterBar(withState){
 }
 VIEWS.board=function(){
   const L=filteredLive();
-  const cols=stages().map(s=>{ const ts=L.filter(t=>t.stage===s.key).sort((a,b)=>(stageAge(b)||0)-(stageAge(a)||0)); return '<section class="bcol'+(ts.length?'':' none')+'" data-col="'+s.key+'" style="--sc:'+s.color+'"><header><h4>'+esc(s.name)+'<b>'+ts.length+'</b></h4><div class="o">'+esc(s.owner==='gov'?govName():ROLE_LABEL[s.owner]||'')+'</div></header><div class="cards">'+ts.map(t=>tkCard(t,S.canWrite)).join('')+'</div></section>'; }).join('');
+  const cols=stages().map(s=>{ const ts=L.filter(t=>t.stage===s.key).sort((a,b)=>(stageAge(b)||0)-(stageAge(a)||0)); return '<section class="bcol'+(ts.length?'':' none')+'" data-col="'+s.key+'" style="--sc:'+s.color+'"><header><h4>'+esc(s.name)+'<b>'+ts.length+'</b></h4><div class="o">'+esc(s.owner==='gov'?govName():ROLE_LABEL[s.owner]||'')+'</div></header><div class="cards">'+ts.map(t=>tkCard(t,S.canWrite&&S.isStaff)).join('')+'</div></section>'; }).join('');
   return '<div class="pagehead"><div><h1>Pipeline Board</h1><div class="sub">Every live work request by stage. Drag a card to move it; every move is logged.</div></div><div class="acts">'+'<a class="btn pri" href="https://resources.mismo.org/initiative-hub/work-requests.html#new" target="_blank" rel="noopener">+ New Work Request</a>'+(S.isStaff?' <button class="btn" id="newtk" type="button">Add Without the Hub</button>':'')+'</div></div>'+filterBar(false)+'<div class="board" id="board">'+cols+'</div>';
 };
 VIEWS.reviews=function(){
@@ -1019,18 +1130,28 @@ VIEWS.governance=function(){
    '<div class="card"><h3>Waiting on '+esc(g)+'</h3>'+(list.length?'<table class="tbl"><thead><tr><th>WR#</th><th>Work Request</th><th>Decision Needed</th><th>Waiting</th><th></th></tr></thead><tbody>'+list.map(row).join('')+'</tbody></table>':'<div class="empty">Nothing is waiting on '+esc(g)+'.</div>')+'</div>'+
    '<div class="card"><h3>Decision Log</h3>'+(decided.length?'<table class="tbl"><thead><tr><th>Date</th><th>WR#</th><th>Decision</th><th>Outcome</th><th>Votes</th></tr></thead><tbody>'+decided.slice(0,40).map(([v,t])=>'<tr class="rowlink" data-open="'+esc(t.id)+'"><td class="nowrap">'+esc(fmtS(v.date))+'</td><td class="nowrap">'+esc(t.wr)+'</td><td>'+esc(stageDef(v.stage).name)+'</td><td><span class="chip '+(v.outcome==='Approved'?'good':'bad')+'">'+esc(v.outcome)+'</span></td><td style="font-size:12px">'+esc(Object.entries(v.members||{}).map(([n,x])=>n+': '+x).join(' · ')||v.method||'')+'</td></tr>').join('')+'</tbody></table>':'<div class="empty">Decisions show here once they\u2019re recorded.</div>')+'</div>';
 };
+const cpName=t=>{ const n=t.productPageName||''; return (!n||/^https?:|www\./i.test(n))?t.name:n; };
 VIEWS.comment=function(){
   const td=today();
-  const L=allTickets().filter(t=>t.dates&&t.dates.commentStart&&t.dates.commentEnd&&(t.stage==='comment'||daysBetween(t.dates.commentEnd,td)<=45)).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd));
+  const open=allTickets().filter(t=>t.stage==='comment'&&t.state==='active'&&t.sub!=='setup'&&t.dates&&t.dates.commentStart&&t.dates.commentEnd).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd));
+  const closed=allTickets().filter(t=>!open.includes(t)&&t.dates&&t.dates.commentStart&&t.dates.commentEnd&&t.dates.commentEnd<td&&daysBetween(t.dates.commentEnd,td)<=45).sort((a,b)=>b.dates.commentEnd.localeCompare(a.dates.commentEnd));
   const setup=liveTickets().filter(t=>t.stage==='comment'&&t.sub==='setup');
-  if(!L.length && !setup.length) return '<div class="pagehead"><div><h1>Comment Periods</h1></div></div><div class="empty">No comment periods are open or recently closed.</div>';
-  const lo=[td,...L.map(t=>t.dates.commentStart)].sort()[0], hi=[addDays(td,14),...L.map(t=>t.dates.commentEnd)].sort().slice(-1)[0];
+  const fig=(k,v,s,c)=>'<div class="fig" style="--fc:'+c+';cursor:default"><div class="k">'+k+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>';
+  const next=open[0];
+  let html='<div class="pagehead"><div><h1>Comment Periods</h1><div class="sub">What’s open for public comment, what just closed, and what’s approved but not posted yet.</div></div></div>'+
+    '<div class="figs">'+fig('Open Now',open.length,next?'Next closes '+fmtS(next.dates.commentEnd):'None open','var(--c6)')+fig('Closing in 7 Days',open.filter(t=>daysBetween(td,t.dates.commentEnd)<=7).length,'Facilitators asked the day after','var(--c4)')+fig('Not Posted Yet',setup.length,'Approved for comment','var(--warn)')+fig('Closed, Last 45 Days',closed.length,'Now in Post-Comment or later','var(--ink-3)')+'</div>';
+  if(setup.length) html+='<div class="card"><h3>Approved, Not Posted Yet</h3><div class="qlist">'+setup.map(qItem).join('')+'</div></div>';
+  const rows=[...open,...closed];
+  if(!rows.length) return html+'<div class="empty">No comment periods are open or recently closed.</div>';
+  const lo=addDays([td,...rows.map(t=>t.dates.commentStart)].sort()[0],-3), hi=addDays([addDays(td,14),...rows.map(t=>t.dates.commentEnd)].sort().slice(-1)[0],3);
   const span=Math.max(1,daysBetween(lo,hi)); const X=d=>Math.max(0,Math.min(100,daysBetween(lo,d)/span*100));
-  const rows=L.map(t=>{ const d=t.dates, left=X(d.commentStart), w=Math.max(1.5,X(d.commentEnd)-left), open=t.stage==='comment', n=daysBetween(td,d.commentEnd);
-    return '<div class="cprow" data-open="'+esc(t.id)+'"><div><div style="font-weight:600;font-size:13px">'+esc(t.productPageName||t.name)+'</div><div class="muted" style="font-size:12px">'+esc(t.wr)+' · '+(open?(n>=0?n+' days left':'ending'):'Closed '+fmtS(d.commentEnd))+'</div></div><div class="bartrack"><div class="cpbar" style="left:'+left+'%;width:'+w+'%;background:'+(open?'var(--c6)':'var(--border-strong)')+'"></div><div class="todayline" style="left:'+X(td)+'%"></div><span class="cplab" style="left:calc('+Math.min(left+w,80)+'% + 6px)">'+fmtS(d.commentStart)+' to '+fmtS(d.commentEnd)+'</span></div></div>'; }).join('');
-  return '<div class="pagehead"><div><h1>Comment Periods</h1><div class="sub">Open and recently closed. The red line is today; each one moves to Post-Comment by itself when it ends.</div></div></div>'+
-    (setup.length?'<div class="card"><h3>Approved, Not Posted Yet</h3><div class="qlist">'+setup.map(qItem).join('')+'</div></div>':'')+
-    '<div class="card">'+rows+'</div>';
+  const ticks=[]; { const d=toD(lo); d.setDate(1); d.setMonth(d.getMonth()+1); while(ymd(d)<=hi){ ticks.push(ymd(d)); d.setMonth(d.getMonth()+1); } }
+  const axis='<div class="cp-axis"><div></div><div class="cp-scale">'+ticks.filter(m=>Math.abs(X(m)-X(td))>5).map(m=>'<span style="left:'+X(m)+'%">'+MON[toD(m).getMonth()]+'</span>').join('')+'<span class="cp-today" style="left:'+X(td)+'%">Today</span></div></div>';
+  const row=t=>{ const d=t.dates, isOpen=open.includes(t), l=X(d.commentStart), w=Math.max(1.2,X(d.commentEnd)-l), n=daysBetween(td,d.commentEnd), right=l+w<78;
+    return '<div class="cp-row" data-open="'+esc(t.id)+'"><div class="cp-name"><b>'+esc(cpName(t))+'</b><span>'+esc(t.wr)+' · '+esc(t.facilitator||'')+'</span></div><div class="cp-track">'+ticks.map(m=>'<i class="cp-grid" style="left:'+X(m)+'%"></i>').join('')+'<i class="cp-now" style="left:'+X(td)+'%"></i><div class="cp-bar '+(isOpen?'open':'closed')+'" style="left:'+l+'%;width:'+w+'%"></div><span class="cp-lab '+(right?'r':'l')+'" style="'+(right?'left:calc('+(l+w)+'% + 8px)':'right:calc('+(100-l)+'% + 8px)')+'">'+(isOpen?'<b>'+(n<=0?'Closes today':n+' day'+(n===1?'':'s')+' left')+'</b> · ':'')+esc(fmtS(d.commentStart))+' to '+esc(fmtS(d.commentEnd))+'</span></div></div>'; };
+  html+='<div class="card cp"><h3>Comment Period Timeline<span class="sp cp-key"><span><i class="open"></i>Open now</span><span><i class="closed"></i>Closed in the last 45 days</span><span><i class="now"></i>Today</span></span></h3>'+axis+
+    (open.length?'<div class="cp-grp">Open Now</div>'+open.map(row).join(''):'')+(closed.length?'<div class="cp-grp">Recently Closed</div>'+closed.map(row).join(''):'')+'</div>';
+  return html;
 };
 VIEWS.all=function(){
   const f=S.filters; const q=(f.q||'').toLowerCase();
@@ -1124,9 +1245,12 @@ function renderPanel(){
   const stageDates={approved:d.bet,cfp:d.cfpPublished,kickoff:d.kickoffGc,work:d.workStart,aireview:d.aiSubmitted,im:d.imSubmitted,awg:d.awgSubmitted,designation:d.designation,'gc-comment':d.gcComment,comment:d.commentStart,post:d.commentEnd,'gc-publish':d.postGc,release:d.published};
   const track=list.map((s,j)=>'<div class="tst '+(t.state==='published'||j<ci?'done':(j===ci?'cur':''))+'" title="'+esc(s.desc||'')+'"><i></i>'+esc(s.name)+(stageDates[s.key]?'<small>'+esc(fmtS(stageDates[s.key]))+'</small>':'')+'</div>').join('');
   const acts=S.canWrite?stageActions(t):[];
-  const more=S.canWrite?['<button class="btn sm" data-x="moveto" type="button">Move To…</button>',
+  const live=t.state==='active'||t.state==='hold';
+  const more=!S.canWrite?'':(S.isStaff?['<button class="btn sm" data-x="moveto" type="button">Move To…</button>',
     t.state==='active'?'<button class="btn sm" data-x="hold" type="button">Put on Hold</button>':'',
-    t.state==='active'||t.state==='hold'?'<button class="btn sm" data-x="close" type="button">Close</button><button class="btn sm danger" data-x="cancel" type="button">Cancel</button>':''].join(''):'';
+    live?'<button class="btn sm" data-x="close" type="button">Close</button><button class="btn sm danger" data-x="cancel" type="button">Cancel</button>':''].join('')
+    :(live&&!t.request?['<button class="btn sm" data-x="rhold" type="button">'+(t.state==='hold'?'Ask to Resume':'Ask to Put on Hold')+'</button>','<button class="btn sm" data-x="rclose" type="button">Ask to Close</button>','<button class="btn sm" data-x="rcancel" type="button">Ask to Cancel</button>'].join(''):''))+
+    (live&&S.canWrite?'<button class="btn sm" data-x="arch" type="button">Request Architecture Help</button>':'');
   const facs=(S.people.facilitators||[]).map(p=>p.name).sort();
   const field=(label,key,val,type,opts,wide)=>{
     let el; const v=val==null?'':val;
@@ -1146,14 +1270,15 @@ function renderPanel(){
    '<div class="pb"><div class="actbar"><div class="next"><div class="eyebrow">'+(t.state==='active'?'Next · '+esc(w.label||''):'Status')+'</div><b>'+esc(t.state==='active'?w.text:(t.state==='hold'?w.text:stageDef(t.stage).name+' · '+t.state))+'</b>'+(t.state==='active'&&stageAge(t)!=null?'<div class="why">'+stageAge(t)+' days at '+esc(stageDef(t.stage).name)+(movers(t).length?' · '+esc(movers(t).map(p=>p.name).join(', ')):'')+'</div>':'')+'</div>'+
    acts.map((a,i)=>'<button class="btn '+a.cls+'" data-act="'+i+'" type="button">'+esc(a.label)+'</button>').join('')+'</div>'+
    (more?'<div style="display:flex;gap:6px;flex-wrap:wrap;margin:-8px 0 18px">'+more+'</div>':'')+
-   '<div class="pgrid">'+relPanel(t)+recPanel(t)+stagePanel(t)+leadPanel(t)+sec('details','Details',details)+sec('dates','Key Dates',dates)+sec('links','Links',links)+
+   (t.request?askBanner(t):'')+archBanner(t)+'<div class="pgrid">'+relPanel(t)+recPanel(t)+stagePanel(t)+leadPanel(t)+sec('details','Details',details)+sec('dates','Key Dates',dates)+sec('links','Links',links)+
    sec('hist','History',(S.canWrite?'<div style="display:flex;gap:8px;margin-bottom:12px"><input id="noteq" placeholder="Add a note to the history" style="flex:1;font:inherit;font-size:13px;border:1px solid var(--border);background:var(--surface-2);color:var(--ink);border-radius:5px;padding:6px 8px"><button class="btn sm" id="noteadd" type="button">Add Note</button></div>':'')+'<ul class="hist">'+(t.history||[]).slice().reverse().map(h=>'<li><div class="when">'+esc(h.at?fmt(h.at.slice(0,10)):'')+(h.by?' · '+esc(h.by):'')+'</div>'+esc(h.text)+(h.note?'<div class="muted">'+esc(h.note)+'</div>':'')+'</li>').join('')+'</ul>',true)+'</div></div>';
   wireDates(P);
   $('#pclose').onclick=closePanel;
   $$('.pb [data-open]',P).forEach(el=>el.onclick=()=>openPanel(el.dataset.open));
   $$('[data-x2=split]',P).forEach(b=>b.onclick=()=>splitT(t));
   $$('[data-act]',P).forEach(b=>b.onclick=()=>acts[+b.dataset.act].fn());
-  $$('[data-x]',P).forEach(b=>b.onclick=()=>({moveto:moveTo,hold:hold,close:closeT,cancel:cancelT})[b.dataset.x](t));
+  $$('[data-x]',P).forEach(b=>b.onclick=()=>({moveto:moveTo,hold:hold,close:closeT,cancel:cancelT,rhold:x=>askFor(x,x.state==='hold'?'resume':'hold'),rclose:x=>askFor(x,'close'),rcancel:x=>askFor(x,'cancel'),arch:archRequest})[b.dataset.x](t));
+  $$('[data-req]',P).forEach(b=>b.onclick=()=>decideAsk(t,b.dataset.req==='yes'));
   $$('[data-sec]',P).forEach(s=>s.addEventListener('input',()=>{ const x=$('.dirty',s); if(x) x.hidden=false; }));
   $$('[data-save]',P).forEach(b=>b.onclick=()=>saveSection(t,b.closest('[data-sec]')));
   const na=$('#noteadd'); if(na) na.onclick=async()=>{ const v=$('#noteq').value.trim(); if(!v) return; const x=clone(t); hist(x,'Note: '+v); await saveTicket(x,'Note added'); };
@@ -1422,22 +1547,49 @@ function trendsCard(){
 /* ---------- deliverables: split a work request, hold Reference Model changes for the RM release ---------- */
 const KINDS=['Dataset','Implementation Guide (iGuide)','Reference Model Change','API / Schema','White Paper / Guidance','Glossary','Other'];
 function rmCandidates(){ return liveTickets().filter(x=>/reference model|\brm\b/i.test(x.name+' '+(x.product||''))&&!x.rides).sort((a,b)=>a.wr.localeCompare(b.wr)); }
-async function splitT(t){
-  const base=t.split?t:t; const existing=(base.deliverables||[]).length;
-  const rms=rmCandidates();
-  const rows=[0,1,2,3].map(i=>'<div style="display:grid;grid-template-columns:1.4fr 1fr;gap:8px;margin-bottom:6px"><input name="n'+i+'" placeholder="Deliverable '+(existing+i+1)+' name"'+(i===0&&!existing?' value="'+esc(t.name)+' Dataset"':'')+'>'+sel('k'+i,KINDS,i===0?'Dataset':(i===1?'Implementation Guide (iGuide)':''))+'<label style="grid-column:1/-1;display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--ink-2)"><input type="checkbox" name="d'+i+'" style="width:auto"> Needs the Reference Model change published first (holds it and moves it with the RM release)</label></div>').join('');
-  const v=await modal({title:t.split?'Add Deliverables':'Split Into Deliverables',text:'Each deliverable gets its own stage and license designation. Reference Model changes, and anything that needs them published first, are held for the RM release and move with it.',ok:'Create Deliverables',body:
-    rows+fld('Reference Model Release to Ride With',sel('rm',[['','None'],...rms.map(x=>[x.id,x.wr+' '+x.name])],''),rms.length?'Used for Reference Model changes and anything that needs them first.':'No live Reference Model work request found; add one first, or type its WR# in the name.'),
-    validate:x=>{ const any=[0,1,2,3].some(i=>(x['n'+i]||'').trim()); if(!any) return 'Name at least one deliverable'; const needRm=[0,1,2,3].some(i=>(x['n'+i]||'').trim()&&(x['k'+i]==='Reference Model Change'||x['d'+i])); return needRm&&!x.rm?'Pick the Reference Model release these ride with':''; }});
-  if(!v) return;
-  const p=clone(S.tickets[t.id]||t), before=clone(p); p.split=true; p.deliverables=p.deliverables||[];
+const KIND_ICON={'Dataset':'M4 6c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3zM4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6','Implementation Guide (iGuide)':'M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z','Reference Model Change':'M12 2l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5','API / Schema':'M8 9l-4 3 4 3M16 9l4 3-4 3M14 5l-4 14','White Paper / Guidance':'M14 3H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V9zM14 3v6h6M8 13h8M8 17h5','Glossary':'M4 6h16M4 12h10M4 18h7','Other':'M12 5v14M5 12h14'};
+const KIND_SHORT={'Implementation Guide (iGuide)':'iGuide','Reference Model Change':'RM Change','White Paper / Guidance':'White Paper','API / Schema':'API / Schema'};
+function splitT(t){
+  const base=S.tickets[t.id]||t, existing=(base.deliverables||[]).length, rms=rmCandidates();
+  let rows=existing?[{name:'',kind:'Dataset',hold:false}]:[{name:base.name+' Dataset',kind:'Dataset',hold:false},{name:base.name+' iGuide',kind:'Implementation Guide (iGuide)',hold:false}];
+  let rm=''; const root=$('#modal-root');
+  const letter=i=>String.fromCharCode(65+existing+i);
+  const draw=()=>{
+    const need=rows.some(r=>r.name.trim()&&(r.kind==='Reference Model Change'||r.hold));
+    root.innerHTML='<div class="modal" role="dialog" aria-modal="true"><div class="box split-box"><header><div class="eyebrow">'+esc(base.wr)+'</div><h3>'+(existing?'Add Deliverables':'Split Into Deliverables')+'</h3><p>'+esc(base.name)+'. Each deliverable gets its own stage and its own license designation.</p></header><div class="bd">'+
+      rows.map((r,i)=>{ const isRM=r.kind==='Reference Model Change', held=isRM||r.hold;
+        return '<div class="dv'+(held?' held':'')+'" data-i="'+i+'"><div class="dv-top"><span class="dv-id">'+esc(base.wr)+'-'+letter(i)+'</span><input class="dv-name" data-f="name" value="'+esc(r.name)+'" placeholder="Name this deliverable">'+(rows.length>1?'<button class="dv-x" type="button" data-rm="'+i+'" aria-label="Remove">×</button>':'')+'</div>'+
+          '<div class="dv-kinds">'+KINDS.map(k=>'<button type="button" class="dv-k'+(r.kind===k?' on':'')+'" data-k="'+esc(k)+'"><svg viewBox="0 0 24 24"><path d="'+KIND_ICON[k]+'"/></svg>'+esc(KIND_SHORT[k]||k)+'</button>').join('')+'</div>'+
+          '<label class="dv-hold'+(isRM?' locked':'')+'"><span class="sw'+(held?' on':'')+'"><input type="checkbox" data-f="hold"'+(held?' checked':'')+(isRM?' disabled':'')+'><i></i></span><span>'+(isRM?'Reference Model changes are always held for the RM release and publish with it':'Needs the Reference Model change published first: hold it and move it with the RM release')+'</span></label></div>'; }).join('')+
+      '<button type="button" class="dv-add" id="dvadd">+ Add Another Deliverable</button>'+
+      (need?'<div class="dv-rm"><div class="dv-rm-h"><svg viewBox="0 0 24 24"><path d="'+KIND_ICON['Reference Model Change']+'"/></svg><b>Which Reference Model release do these ride with?</b></div>'+(rms.length?'<div class="dv-rms">'+rms.map(x=>'<button type="button" class="dv-r'+(rm===x.id?' on':'')+'" data-rmid="'+esc(x.id)+'"><b>'+esc(x.wr)+'</b><span>'+esc(x.name)+'</span>'+stageChip(x)+'</button>').join('')+'</div>':'<div class="lead-empty">No live Reference Model work request yet. Add it first (Pipeline Board → New Work Request), then come back.</div>')+'</div>':'')+
+      '</div><footer><span class="dv-sum">'+rows.filter(r=>r.name.trim()).length+' deliverable'+(rows.filter(r=>r.name.trim()).length===1?'':'s')+(need&&rm?' · '+rows.filter(r=>r.name.trim()&&(r.kind==='Reference Model Change'||r.hold)).length+' riding with '+esc((S.tickets[rm]||{}).wr||''):'')+'</span><button class="btn" data-m="cancel" type="button">Cancel</button><button class="btn pri" id="dvgo" type="button">Create Deliverables</button></footer></div></div>';
+    const box=$('.modal',root);
+    $$('.dv',box).forEach(el=>{ const i=+el.dataset.i;
+      $('.dv-name',el).oninput=e=>{ rows[i].name=e.target.value; const sm=$('.dv-sum',box); if(sm) sm.textContent=rows.filter(r=>r.name.trim()).length+' deliverables'; };
+      $$('.dv-k',el).forEach(b=>b.onclick=()=>{ rows[i].kind=b.dataset.k; draw(); });
+      const h=$('[data-f=hold]',el); if(h) h.onchange=e=>{ rows[i].hold=e.target.checked; draw(); };
+    });
+    $$('[data-rm]',box).forEach(b=>b.onclick=()=>{ rows.splice(+b.dataset.rm,1); draw(); });
+    $$('[data-rmid]',box).forEach(b=>b.onclick=()=>{ rm=b.dataset.rmid; draw(); });
+    $('#dvadd',box).onclick=()=>{ rows.push({name:'',kind:'Dataset',hold:false}); draw(); setTimeout(()=>{ const n=$$('.dv-name',box); n.at(-1)&&n.at(-1).focus(); },20); };
+    $('[data-m=cancel]',box).onclick=()=>{ root.innerHTML=''; };
+    box.addEventListener('mousedown',e=>{ if(e.target===box) root.innerHTML=''; });
+    $('#dvgo',box).onclick=async()=>{
+      const list=rows.filter(r=>r.name.trim()); if(!list.length){ toast('Name at least one deliverable'); return; }
+      if(list.some(r=>r.kind==='Reference Model Change'||r.hold)&&!rm){ toast('Pick the Reference Model release these ride with'); return; }
+      root.innerHTML=''; await createDeliverables(base,list,rm);
+    };
+  };
+  draw(); setTimeout(()=>{ const n=$('.dv-name'); n&&n.focus(); },30);
+}
+async function createDeliverables(t,list,rmId){
+  const p=clone(S.tickets[t.id]||t); p.split=true; p.deliverables=p.deliverables||[];
   let n=p.deliverables.length; const made=[];
-  for(const i of [0,1,2,3]){
-    const name=(v['n'+i]||'').trim(); if(!name) continue; n++;
-    const letter=String.fromCharCode(64+n), id=(p.id+'-'+letter).slice(0,190);
-    const rides=(v['k'+i]==='Reference Model Change'||v['d'+i])?v.rm:'';
-    const rm=rides?S.tickets[rides]:null;
-    const c={id,wr:p.wr+'-'+letter,uid:p.wr+'-'+letter,name,kind:v['k'+i],parent:p.id,workgroup:p.workgroup,groupType:p.groupType,facilitator:p.facilitator,workType:p.workType,reqType:p.reqType,segment:p.segment,size:p.size,
+  for(const r of list){
+    n++; const letter=String.fromCharCode(64+n), id=(p.id+'-'+letter).slice(0,190);
+    const rides=(r.kind==='Reference Model Change'||r.hold)?rmId:''; const rm=rides?S.tickets[rides]:null;
+    const c={id,wr:p.wr+'-'+letter,uid:p.wr+'-'+letter,name:r.name.trim(),kind:r.kind,parent:p.id,workgroup:p.workgroup,groupType:p.groupType,facilitator:p.facilitator,workType:p.workType,reqType:p.reqType,segment:p.segment,size:p.size,
       stage:rm?rm.stage:(p.stage==='published'?'work':p.stage),sub:'',state:'active',stageSince:today(),dates:clone(p.dates||{}),links:clone(p.links||{}),rides:rides||'',history:[],createdAt:new Date().toISOString(),source:'mms'};
     hist(c,'Split from '+p.wr+' '+p.name+' as a '+c.kind+(rm?'; held for '+rm.wr+' and moves with it':''));
     S.tickets[id]=c; await write('tickets',id,c); p.deliverables.push(id); made.push(c.wr);
@@ -1534,30 +1686,156 @@ function homeLive(m){
   if(!counted){ counted=true; $$('[data-count]',m).forEach(el=>{ const to=+el.dataset.count; if(!to) return; const t0=performance.now(); const step=n=>{ const k=Math.min(1,(n-t0)/650); el.textContent=Math.round(to*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(step); }; el.textContent='0'; requestAnimationFrame(step); }); }
 }
 
-/* ---------- current leadership for each group, from Elections HQ ---------- */
+/* ---------- current leadership for each group, brought in from Elections HQ ---------- */
 const ELECTIONS_ROSTER='https://resources.mismo.org/elections-hq/';
-const gnorm=s=>String(s||'').toLowerCase().replace(/\(.*?\)/g,' ').replace(/\b(cop|dwg|community of practice|development workgroup|workgroup|task force|area of focus)\b/g,' ').replace(/[^a-z0-9]/g,'');
+const gnorm=s=>String(s||'').toLowerCase().replace(/\(.*?\)/g,' ').replace(/\b(cop|dwg|community of practice|development workgroup|workgroup|task force|area of focus|docs)\b/g,' ').replace(/[^a-z0-9]/g,'');
+/* Elections HQ is read by whoever can open it (staff); a copy lands in the MMS records so every
+   facilitator sees the same leaders, whether or not they have Elections HQ themselves. */
 async function electionsSync(){
   if(S.mode!=='relay') return;
   const rs=window.ResourcesSession, tok=rs&&rs.token(); if(!tok) return;
   const get=async n=>{ const r=await fetch(window.__hqRelay.config.RELAY_URL+'/elections-hq/data/'+n,{headers:{Authorization:'Bearer '+tok},cache:'no-store'}); if(!r.ok) throw new Error(r.status); const b=await r.json(); return Object.values((b.data&&b.data.docs)||{}); };
-  try{ const [L,G]=await Promise.all([get('leaders'),get('groups')]); S.leaders=L.filter(x=>x.status!=='inactive'&&x.status!=='former'); S.egroups=G; if(S.panel) renderPanel(); }catch(e){ S.leaders=null; }
+  try{
+    const [L,G]=await Promise.all([get('leaders'),get('groups')]);
+    const alias={}; G.forEach(g=>{ const a=[g.name,g.formerly,g.mtName].filter(Boolean); a.forEach(x=>{ alias[gnorm(x)]=a; }); });
+    const list=L.filter(x=>x.status!=='inactive'&&x.status!=='former').map(l=>{ const a=new Set([l.group,l.formerGroup,...(alias[gnorm(l.group)]||[]),...(alias[gnorm(l.formerGroup)]||[])].filter(Boolean)); return [l.name||'',l.position||'',l.company||'',l.group||'',l.formerGroup||'',(l.termEnd||'').slice(0,10),l.gtype||'',[...a].join('|')]; }).sort((a,b)=>(a[3]+a[0]).localeCompare(b[3]+b[0]));
+    const old=S.leaderSnap&&JSON.stringify(S.leaderSnap.list);
+    S.leaderSnap={at:new Date().toISOString(),list};
+    if(S.canWrite&&old!==JSON.stringify(list)) write('config','leaders',S.leaderSnap);
+    if(S.panel) renderPanel();
+  }catch(e){}
 }
 function leadersFor(t){
-  if(!S.leaders) return null;
+  const snap=S.leaderSnap; if(!snap||!snap.list) return null;
   const k=gnorm(t.workgroup); if(!k) return [];
-  const names=new Set([k]); (S.egroups||[]).forEach(g=>{ if([g.name,g.formerly,g.mtName].some(x=>gnorm(x)===k)){ [g.name,g.formerly,g.mtName].forEach(x=>x&&names.add(gnorm(x))); } });
-  return S.leaders.filter(l=>names.has(gnorm(l.group))||names.has(gnorm(l.formerGroup))).sort((a,b)=>String(a.position).localeCompare(String(b.position)));
+  const rank=p=>{ p=String(p).toLowerCase(); return /^chair|^co-chair/.test(p)?0:/vice/.test(p)?1:/lead/.test(p)?2:/rep/.test(p)?3:4; };
+  return snap.list.map(r=>({name:r[0],position:r[1],company:r[2],group:r[3],formerGroup:r[4],termEnd:r[5],gtype:r[6],aliases:(r[7]||'').split('|')}))
+    .filter(l=>[l.group,l.formerGroup,...l.aliases].some(x=>x&&gnorm(x)===k))
+    .sort((a,b)=>rank(a.position)-rank(b.position)||a.name.localeCompare(b.name));
 }
+const GTYPE={aof:'Area of Focus',tf:'Task Force',process:'Process Group',gov:'Governance',board:'Board',other:'Workgroup'};
 function leadPanel(t){
   if(!t.workgroup) return '';
-  const L=leadersFor(t);
-  const link='<a class="btn sm" href="'+ELECTIONS_ROSTER+'" target="_blank" rel="noopener">Open in Elections HQ</a>';
-  let body;
-  if(L===null) body='<div class="muted" style="font-size:13px">Current leaders for '+esc(t.workgroup)+' are kept in Elections HQ.</div>';
-  else if(!L.length) body='<div class="muted" style="font-size:13px">Elections HQ has no current leaders listed for '+esc(t.workgroup)+'.</div>';
-  else body=L.map(l=>'<div class="vote"><span class="nm"><b>'+esc(l.name)+'</b>'+(l.company?' <span class="muted">· '+esc(l.company)+'</span>':'')+'</span><span class="chip">'+esc(l.position||'Leader')+'</span>'+(l.termEnd?'<span class="muted" style="font-size:12px">term ends '+esc(fmtS(l.termEnd))+'</span>':'')+'</div>').join('');
-  return '<div class="psec"><h4>Current Leadership<span class="sp">'+link+'</span></h4>'+body+'</div>';
+  const L=leadersFor(t), snap=S.leaderSnap;
+  const link='<a class="btn sm" href="'+ELECTIONS_ROSTER+'" target="_blank" rel="noopener">Elections HQ ↗</a>';
+  let body, sub='';
+  if(L===null) body='<div class="lead-empty">Leaders come in from Elections HQ the next time MISMO staff open the MMS.</div>';
+  else if(!L.length) body='<div class="lead-empty">Elections HQ has no current leaders for '+esc(t.workgroup)+'.</div>';
+  else {
+    const g=L[0]; sub='<div class="lead-sub">'+esc(g.group)+(g.gtype?' · '+esc(GTYPE[g.gtype]||''):'')+(g.formerGroup&&gnorm(g.formerGroup)!==gnorm(g.group)?' · formerly '+esc(g.formerGroup):'')+'</div>';
+    body='<div class="lead-grid">'+L.map(l=>{ const ini=l.name.replace(/["“”].*?["“”]/g,'').split(/\s+/).filter(Boolean).map(x=>x[0]).join('').slice(0,2).toUpperCase(); const r=String(l.position).toLowerCase(); const cls=/^chair|^co-chair/.test(r)?'chair':/vice/.test(r)?'vice':'rep';
+      return '<div class="lead '+cls+'"><span class="lav">'+esc(ini)+'</span><span class="lt"><b>'+esc(l.name)+'</b><span>'+esc(l.company||'—')+'</span></span><span class="lpos">'+esc(l.position||'Leader')+'</span>'+(l.termEnd?'<span class="lterm">Term ends '+esc(fmtS(l.termEnd))+'</span>':'')+'</div>'; }).join('')+'</div>';
+  }
+  return '<div class="psec full"><h4>Current Leadership<span class="sp">'+link+'</span></h4>'+sub+body+(snap&&snap.at&&L&&L.length?'<div class="lead-foot">From Elections HQ · updated '+esc(fmtS(snap.at.slice(0,10)))+'</div>':'')+'</div>';
+}
+
+/* ---------- who holds a role ---------- */
+function isRole(role,who){ who=who||viewer(); return (S.people.roles&&S.people.roles[role]||[]).some(p=>sameName(p.name,who.name)||(who.email&&p.email&&p.email.toLowerCase()===String(who.email).toLowerCase())); }
+
+/* ---------- facilitators ask; MISMO staff decide (hold, resume, close, cancel) ---------- */
+const ASK_WORD={hold:'Put on Hold',resume:'Resume',close:'Close',cancel:'Cancel'};
+async function askFor(t,kind){
+  const v=await modal({title:'Ask to '+ASK_WORD[kind],text:'MISMO staff will see your request and decide. Nothing changes until they do.',ok:'Send Request',body:
+    fld('Why',ta('why','',kind==='hold'?'What it is waiting on':'What happened'))+(kind==='hold'?fld('Check Back On',dateField('until',''),'Optional'):''),validate:x=>x.why&&x.why.trim()?'':'Say why'});
+  if(!v) return;
+  const x=clone(t), b=clone(t); x.request={kind,why:v.why.trim(),until:v.until||'',by:S.me.name||'',at:new Date().toISOString()};
+  hist(x,'Asked MISMO staff to '+ASK_WORD[kind].toLowerCase()+' this',{note:v.why}); await saveTicket(x,'Request sent to MISMO staff',b);
+  queueMail({to:peopleFor('staff').map(p=>p.email),subject:t.wr+' '+t.name+': request to '+ASK_WORD[kind].toLowerCase(),body:(S.me.name||'A facilitator')+' asked to '+ASK_WORD[kind].toLowerCase()+' '+t.name+'.\n\nWhy: '+v.why+'\n\nApprove or decline it in the MMS.',ticket:t.id,kind:'request',key:t.id+'-ask-'+kind+'-'+today()});
+}
+function askBanner(t){
+  const r=t.request; const who=esc(r.by||'The facilitator');
+  return '<div class="askb"><div><div class="eyebrow">Request</div><b>'+who+' asked to '+esc(ASK_WORD[r.kind].toLowerCase())+' this</b><div class="muted" style="font-size:12.5px">'+esc(r.why||'')+(r.until?' · check back '+esc(fmtS(r.until)):'')+' · '+esc(fmtS(r.at.slice(0,10)))+'</div></div>'+
+    (S.isStaff?'<button class="btn pri" data-req="yes" type="button">Approve: '+esc(ASK_WORD[r.kind])+'</button><button class="btn" data-req="no" type="button">Decline</button>':'<span class="chip warn">Waiting on MISMO staff</span>')+'</div>';
+}
+async function decideAsk(t,yes){
+  const r=t.request; if(!r) return;
+  let note='';
+  if(!yes){ const v=await modal({title:'Decline the Request',ok:'Decline',body:fld('Note for '+(r.by||'the facilitator'),ta('note',''))}); if(!v) return; note=v.note||''; }
+  const x=clone(t), b=clone(t); delete x.request;
+  if(yes){
+    if(r.kind==='hold'){ x.state='hold'; x.holdReason=r.why; x.holdUntil=r.until; }
+    if(r.kind==='resume'){ x.state='active'; delete x.holdReason; delete x.holdUntil; }
+    if(r.kind==='close'){ x.state='closed'; x.dates=Object.assign({},x.dates,{closed:today()}); x.notes=Object.assign({},x.notes,{closed:r.why}); }
+    if(r.kind==='cancel'){ x.state='canceled'; x.dates=Object.assign({},x.dates,{canceled:today()}); x.notes=Object.assign({},x.notes,{closed:r.why}); }
+    hist(x,'Approved '+(r.by||'')+'’s request to '+ASK_WORD[r.kind].toLowerCase(),{note:r.why});
+  } else hist(x,'Declined '+(r.by||'')+'’s request to '+ASK_WORD[r.kind].toLowerCase(),{note});
+  await saveTicket(x,yes?t.wr+': '+ASK_WORD[r.kind].toLowerCase()+' approved':'Request declined',b);
+  const fe=emailOf(r.by)||emailOf(t.facilitator);
+  if(fe) queueMail({to:[fe],subject:t.wr+' '+t.name+': your request to '+ASK_WORD[r.kind].toLowerCase()+' was '+(yes?'approved':'declined'),body:yes?'MISMO staff approved it.':'MISMO staff declined it.'+(note?'\n\n'+note:''),ticket:t.id,kind:'request',key:t.id+'-askd-'+r.kind+'-'+today()});
+}
+
+/* ---------- Architecture Help: facilitator asks, Program Manager approves, Architect works it ---------- */
+const ARCH_TYPES=['Data Modeling / Reference Model','Schema (XSD) or Extension','MEG or Guideline Question','API Design or Review','Work Product Review','Mapping Support','Other'];
+const ARCH_STATUS=['Requested','Approved','In Progress','Done','Declined'];
+async function archRequest(t){
+  const v=await modal({title:'Request Architecture Help',text:esc(t.wr+' '+t.name)+'. The Program Manager reviews it; once approved it goes to the Architect’s queue.',ok:'Send to the Program Manager',body:
+    fld('What You Need',inp('title','','A short name for the task'))+
+    fld('Type of Help',radios('type',ARCH_TYPES,ARCH_TYPES[0]))+
+    fld('Details',ta('details','','What the architect should look at, the question to answer, and what done looks like'))+
+    fld('Work Product or Deliverable',inp('product',t.product||t.name))+
+    fld('MISMO Version',inp('version','','e.g. 3.6.2'))+
+    fld('Priority',radios('pri',['Low','Medium','High','Urgent'],'Medium'))+
+    fld('Needed By',dateField('need',''))+
+    fld('Estimated Effort (Hours)',inp('hours','','Best guess'))+
+    fld('Files or Links',inp('links','','SharePoint or MISMO Connect links'))+
+    fld('Workgroup Meeting Needed?',radios('meet',[['no','No'],['yes','Yes, join a workgroup call']],'no')),
+    validate:x=>!x.title?'Name the task':(!x.details?'Add the details':'')});
+  if(!v) return;
+  const id=(t.id+'-AR'+Date.now().toString(36)).slice(0,190);
+  const a={id,ticket:t.id,wr:t.wr,name:t.name,workgroup:t.workgroup||'',facilitator:t.facilitator||'',requestedBy:S.me.name||'',requested:today(),at:new Date().toISOString(),
+    title:v.title,type:v.type,details:v.details,product:v.product,version:v.version,priority:v.pri,needBy:v.need||'',hours:v.hours,links:v.links,meeting:v.meet==='yes',status:'Requested',assignedTo:(peopleFor('architect')[0]||{}).name||'',log:[{at:new Date().toISOString(),by:S.me.name||'',text:'Requested'}]};
+  S.arch[id]=a; await write('arch',id,a);
+  const x=clone(t); hist(x,'Requested architecture help: '+v.title); await saveTicket(x,'Sent to the Program Manager');
+  queueMail({to:peopleFor('pm').map(p=>p.email),subject:'Architecture help requested: '+v.title+' ('+t.wr+')',body:(S.me.name||'A facilitator')+' asked for architecture help on '+t.name+'.\n\n'+v.type+' · '+v.pri+(v.need?' · needed by '+fmt(v.need):'')+'\n\n'+v.details+'\n\nApprove or decline it in the MMS under Architecture Help.',ticket:t.id,kind:'arch',key:id+'-req'});
+}
+function archBanner(t){
+  const L=Object.values(S.arch||{}).filter(a=>a.ticket===t.id&&a.status!=='Done'&&a.status!=='Declined'); if(!L.length) return '';
+  return '<div class="archb">'+L.map(a=>'<div><span class="chip '+(a.status==='Requested'?'warn':'info')+'">'+esc(a.status)+'</span> <b>'+esc(a.title)+'</b> <span class="muted">· '+esc(a.type)+(a.needBy?' · needed by '+esc(fmtS(a.needBy)):'')+'</span></div>').join('')+'</div>';
+}
+async function archMove(id,to){
+  const a=clone(S.arch[id]); if(!a) return; let note='';
+  if(to==='Declined'||to==='Done'||to==='Approved'){ const v=await modal({title:{Declined:'Decline the Request',Done:'Mark Done',Approved:'Approve for the Architect'}[to],ok:{Declined:'Decline',Done:'Mark Done',Approved:'Approve'}[to],body:fld(to==='Done'?'What Was Done':'Note',ta('note',''))+(to==='Done'?fld('Hours Spent',inp('hrs','')):'')+(to==='Approved'?fld('Assign To',sel('who',peopleFor('architect').map(p=>p.name),a.assignedTo))+fld('Priority',radios('pri',['Low','Medium','High','Urgent'],a.priority)):'')}); if(!v) return; note=v.note||''; if(v.hrs) a.hoursSpent=v.hrs; if(v.who) a.assignedTo=v.who; if(v.pri) a.priority=v.pri; }
+  a.status=to; a.log=[...(a.log||[]),{at:new Date().toISOString(),by:S.me.name||'',text:to,note}];
+  if(to==='Approved'){ a.approvedBy=S.me.name||''; a.approved=today(); }
+  if(to==='Done'){ a.done=today(); a.result=note; }
+  S.arch[id]=a; await write('arch',id,a); renderAll();
+  const fe=emailOf(a.requestedBy)||emailOf(a.facilitator);
+  if(to==='Approved'){ queueMail({to:[emailOf(a.assignedTo)].filter(Boolean),subject:'New architecture task: '+a.title+' ('+a.wr+')',body:a.type+' · '+a.priority+(a.needBy?' · needed by '+fmt(a.needBy):'')+'\n\n'+a.details+'\n\nRequested by '+a.requestedBy+' for '+a.name+'.',ticket:a.ticket,kind:'arch',key:id+'-appr'}); }
+  if(fe&&['Approved','Declined','Done'].includes(to)) queueMail({to:[fe],subject:'Architecture help '+to.toLowerCase()+': '+a.title,body:'Your request "'+a.title+'" for '+a.wr+' was '+to.toLowerCase()+'.'+(note?'\n\n'+note:''),ticket:a.ticket,kind:'arch',key:id+'-'+to});
+}
+function archCard(a,acts){
+  const pc={Urgent:'bad',High:'warn',Medium:'info',Low:''}[a.priority]||'';
+  return '<div class="arc"><div class="arc-top"><span class="chip '+pc+'">'+esc(a.priority)+'</span><span class="chip">'+esc(a.type)+'</span>'+(a.needBy?'<span class="arc-due'+(a.needBy<today()&&a.status!=='Done'?' late':'')+'">Needed by '+esc(fmtS(a.needBy))+'</span>':'')+'</div>'+
+    '<div class="arc-t">'+esc(a.title)+'</div><div class="arc-w" data-open="'+esc(a.ticket)+'">'+esc(a.wr)+' '+esc(a.name)+' · '+esc(a.workgroup)+'</div>'+
+    '<div class="arc-d">'+esc(a.details)+'</div>'+
+    '<div class="arc-meta">'+[a.product&&'Work product: '+a.product,a.version&&'Version '+a.version,a.hours&&a.hours+' hrs estimated',a.meeting&&'Workgroup call needed',a.requestedBy&&'From '+a.requestedBy+' · '+fmtS(a.requested),a.assignedTo&&a.status!=='Requested'&&'Architect: '+a.assignedTo].filter(Boolean).map(esc).join(' · ')+(a.links?' · <a href="'+esc(a.links)+'" target="_blank" rel="noopener">Files</a>':'')+'</div>'+
+    (a.result?'<div class="arc-res"><b>Done:</b> '+esc(a.result)+(a.hoursSpent?' ('+esc(a.hoursSpent)+' hrs)':'')+'</div>':'')+
+    (acts&&S.canWrite?'<div class="arc-acts">'+acts+'</div>':'')+'</div>';
+}
+VIEWS.arch=function(){
+  const A=Object.values(S.arch||{}).sort((a,b)=>({Urgent:0,High:1,Medium:2,Low:3}[a.priority]-{Urgent:0,High:1,Medium:2,Low:3}[b.priority])||String(a.needBy||'9').localeCompare(String(b.needBy||'9')));
+  const pm=isRole('pm')||S.isStaff, ar=isRole('architect')||S.isStaff;
+  const col=(title,sub,list,actsFor,cls)=>'<section class="arcol '+(cls||'')+'"><header><h4>'+title+'<b>'+list.length+'</b></h4><div class="o">'+sub+'</div></header><div class="cards">'+(list.length?list.map(a=>archCard(a,actsFor(a))).join(''):'<div class="lead-empty">Nothing here.</div>')+'</div></section>';
+  const btn=(id,to,l,c)=>'<button class="btn sm '+(c||'')+'" data-arch="'+esc(id)+'" data-to="'+to+'" type="button">'+l+'</button>';
+  return '<div class="pagehead"><div><h1>Architecture Help</h1><div class="sub">Facilitators ask from a work request; the Program Manager approves; the Architect works the queue.</div></div></div>'+
+    '<div class="arboard">'+
+    col('Waiting on the Program Manager',esc(peopleFor('pm').map(p=>p.name).join(', ')||'Program Manager'),A.filter(a=>a.status==='Requested'),a=>pm?btn(a.id,'Approved','Approve →','pri')+btn(a.id,'Declined','Decline'):'','c-pm')+
+    col('Architect Queue',esc(peopleFor('architect').map(p=>p.name).join(', ')||'Architect'),A.filter(a=>a.status==='Approved'),a=>ar?btn(a.id,'In Progress','Start','pri'):'','c-q')+
+    col('In Progress','Being worked',A.filter(a=>a.status==='In Progress'),a=>ar?btn(a.id,'Done','Mark Done','good'):'','c-ip')+
+    col('Done','Last 90 days',A.filter(a=>(a.status==='Done'||a.status==='Declined')&&(a.done||a.requested||'')>=addDays(today(),-90)),()=> '','c-done')+'</div>';
+};
+function archMine(me){
+  const A=Object.values(S.arch||{});
+  const L=[...(isRole('pm',me)?A.filter(a=>a.status==='Requested'):[]),...(isRole('architect',me)?A.filter(a=>['Approved','In Progress'].includes(a.status)&&sameName(a.assignedTo,me.name)):[]),...A.filter(a=>sameName(a.requestedBy,me.name)&&!['Done','Declined'].includes(a.status))];
+  const reqs=liveTickets().filter(t=>t.request&&S.isStaff&&!S.viewAs);
+  let out='';
+  if(reqs.length) out+='<div class="qgroup"><h3>Requests to Decide <span class="chip warn">'+reqs.length+'</span></h3><div class="qlist">'+reqs.map(qItem).join('')+'</div></div>';
+  if(L.length) out+='<div class="qgroup"><h3>Architecture Help <span class="chip info">'+L.length+'</span></h3><div class="arcgrid">'+[...new Map(L.map(a=>[a.id,a])).values()].map(a=>archCard(a,'')).join('')+'</div></div>';
+  return out;
+}
+function wireArch(m){
+  $$('[data-arch]',m).forEach(b=>b.onclick=()=>archMove(b.dataset.arch,b.dataset.to));
+  $$('.arc-w[data-open]',m).forEach(el=>el.onclick=()=>openPanel(el.dataset.open));
 }
 
 /* ---------- settings ---------- */
@@ -1613,7 +1891,7 @@ function wireSettings(m){
   const ns=$('#nsave',m); if(ns) ns.onclick=async()=>{ const N=clone(S.notify); N.flowUrl=$('#nflow',m).value.trim(); N.from=$('#nfrom',m).value.trim(); N.reminders={targetDays:+$('#nr1',m).value||7,commentEndingDays:+$('#nr2',m).value||3,staleDays:+$('#nr3',m).value||45}; S.notify=N; await write('config','notify',N); toast('Saved'); renderAll(); };
   $$('[data-nr]',m).forEach(c=>c.onchange=async()=>{ const [k,r]=c.dataset.nr.split('|'); const N=clone(S.notify); N.onEnter=N.onEnter||{}; const a=new Set(N.onEnter[k]||[]); c.checked?a.add(r):a.delete(r); N.onEnter[k]=[...a]; S.notify=N; await write('config','notify',N); });
   const ig=$('#impgo',m); if(ig){ $('#impf',m).onchange=async e=>{ const f=e.target.files[0]; if(f) $('#impt',m).value=await f.text(); }; ig.onclick=()=>importData($('#impt',m).value,$('#impo',m).checked,$('#impmsg',m)); }
-  const eg=$('#expgo',m); if(eg) eg.onclick=async()=>{ const data=JSON.stringify({exportedAt:new Date().toISOString(),tickets:S.tickets,process:S.process,people:S.people,notify:S.notify,media:S.media},null,1); const name='MMS Backup '+today()+'.json';
+  const eg=$('#expgo',m); if(eg) eg.onclick=async()=>{ const data=JSON.stringify({exportedAt:new Date().toISOString(),tickets:S.tickets,leaders:S.leaderSnap,process:S.process,people:S.people,notify:S.notify,media:S.media},null,1); const name='MMS Backup '+today()+'.json';
     let dl=null; try{ dl=window.claude&&await window.claude.use('downloads'); }catch(e){}
     if(dl){ try{ await dl.save({filename:name,data:new Blob([data],{type:'application/json'})}); }catch(e){} return; }
     const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([data],{type:'application/json'})); a.download=name; a.click(); };
@@ -1626,7 +1904,7 @@ function seedHistory(t){
 }
 async function importData(txt,over,msg){
   let arr, whole=null; try{ arr=JSON.parse(txt); if(!Array.isArray(arr)){ whole=arr; arr=arr.tickets?Object.values(arr.tickets):[]; } }catch(e){ msg.textContent='That isn’t a readable export.'; return; }
-  if(whole){ if(whole.process&&whole.process.presets){ S.process=whole.process; await write('config','process',whole.process); } if(whole.people&&whole.people.roles){ S.people=whole.people; await write('config','people',whole.people); } if(whole.notify){ S.notify=whole.notify; await write('config','notify',whole.notify); } for(const m of Object.values(whole.media||{})){ if(m&&m.id){ S.media[m.id]=m; await write('media',m.id,m); } } }
+  if(whole){ if(whole.leaders&&whole.leaders.list){ S.leaderSnap=whole.leaders; await write('config','leaders',whole.leaders); } if(whole.process&&whole.process.presets){ S.process=whole.process; await write('config','process',whole.process); } if(whole.people&&whole.people.roles){ S.people=whole.people; await write('config','people',whole.people); } if(whole.notify){ S.notify=whole.notify; await write('config','notify',whole.notify); } for(const m of Object.values(whole.media||{})){ if(m&&m.id){ S.media[m.id]=m; await write('media',m.id,m); } } }
   if(!arr.length){ msg.textContent='Nothing to import.'; return; }
   let n=0, skip=0; S.importing=true; msg.innerHTML='<span class="spin"></span> Importing…';
   const queue=arr.slice(); const work=async()=>{ while(queue.length){ const t=queue.shift(); if(!t||!t.id) continue; if(S.tickets[t.id]&&!over){ skip++; continue; }
@@ -1654,7 +1932,7 @@ function wireMain(m){
   [['#ffac','fac'],['#fwg','wg'],['#fsize','size'],['#ftype','type']].forEach(([id,k])=>{ const s=$(id,m); if(s) s.onchange=()=>{ S.filters[k]=s.value; renderAll(); }; });
   const fc=$('#fclear',m); if(fc) fc.onclick=()=>{ Object.assign(S.filters,{q:'',fac:'',wg:'',size:'',type:''}); renderAll(); };
   const bd=$('#board',m);
-  if(bd && S.canWrite){
+  if(bd && S.canWrite && S.isStaff){
     let dragId=null;
     $$('[data-drag]',bd).forEach(c=>{ c.addEventListener('dragstart',e=>{ dragId=c.dataset.drag; c.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; try{ e.dataTransfer.setData('text/plain',dragId); }catch(x){} }); c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); $$('.bcol',bd).forEach(x=>x.classList.remove('drop')); }); });
     $$('.bcol',bd).forEach(col=>{ col.addEventListener('dragover',e=>{ e.preventDefault(); col.classList.add('drop'); }); col.addEventListener('dragleave',e=>{ if(!col.contains(e.relatedTarget)) col.classList.remove('drop'); });
@@ -1662,6 +1940,7 @@ function wireMain(m){
   }
   if(S.view==='settings') wireSettings(m);
   if(S.view==='home') homeLive(m);
+  wireArch(m);
   $$('[data-mform]',m).forEach(b=>b.onclick=async()=>{ const x=S.media[b.dataset.mform]; if(x){ try{ await navigator.clipboard.writeText(x.kind+' for '+x.wr+' '+x.name+'\n\n'+x.text); toast('Request copied: paste it into the MISMO Media form'); }catch(e){} } window.open('https://resources.mismo.org/forms/request/','_blank','noopener'); });
 }
 
@@ -1729,8 +2008,9 @@ async function boot(){
   const done=()=>{ if(S.loaded.tickets&&S.loaded.config&&!S.ready){ S.ready=true; computeRole(); setupViewAs(); if(!location.hash&&!S.isStaff&&(S.people.facilitators||[]).some(f=>sameName(f.name,S.me.name))) S.view='mine'; go(S.view); runAutomations(); setInterval(runAutomations,5*60000); hubSync(); setInterval(hubSync,5*60000); electionsSync(); } else if(S.ready){ computeRole(); renderAll(); } };
   const timer=setTimeout(()=>{ if(!S.ready){ S.loaded.tickets=S.loaded.config=true; done(); toast('The MMS records are taking a while to load; what shows may be out of date.'); } },12000);
   Store.sub('tickets',o=>{ S.tickets=o; S.loaded.tickets=true; clearTimeout(timer); done(); });
-  Store.sub('config',o=>{ if(o.process&&o.process.presets) S.process=o.process; if(o.people&&o.people.roles) S.people=o.people; if(o.notify) S.notify=Object.assign(clone(DEFAULT_NOTIFY),o.notify); S.loaded.config=true; done(); });
+  Store.sub('config',o=>{ if(o.process&&o.process.presets) S.process=o.process; if(o.people&&o.people.roles) S.people=o.people; if(o.notify) S.notify=Object.assign(clone(DEFAULT_NOTIFY),o.notify); if(o.leaders&&o.leaders.list&&(!S.leaderSnap||(o.leaders.at||'')>=(S.leaderSnap.at||''))) S.leaderSnap=o.leaders; S.loaded.config=true; done(); });
   Store.sub('outbox',o=>{ S.outbox=o; if(S.ready) counts(); if(S.ready&&S.view==='outbox') renderAll(); });
+  Store.sub('arch',o=>{ S.arch=o; if(S.ready){ counts(); if(['arch','mine','home'].includes(S.view)) renderAll(); } });
   Store.sub('media',o=>{ S.media=o; if(S.ready) counts(); if(S.ready&&S.view==='media') renderAll(); });
   renderWho();
 }
