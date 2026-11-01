@@ -1609,6 +1609,11 @@ button.hp-t{cursor:pointer}button.hp-t:hover{background:rgba(255,255,255,.12)}
 .t2-acts{display:flex;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%}
 .t2-acts .btn{white-space:normal;min-width:0;max-width:100%;text-align:center;line-height:1.25}
 .tk2{min-width:0;overflow:hidden}
+/* board: the Overdue figure is a link that shows just the overdue work */
+.bd-late{display:flex;flex-direction:column;align-items:flex-start;gap:1px;background:none;border:0;padding:0;font:inherit;font-size:22px;font-weight:700;color:var(--bad);cursor:pointer;text-align:left;line-height:1.1}
+.bd-late i{font-style:normal;font-size:11.5px;font-weight:600;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
+.bd-late:hover i,.bd-late.on i{color:var(--bad)}
+.bd-late.on{background:var(--bad-bg);border-radius:6px;padding:4px 8px;margin:-4px -8px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3603,9 +3608,9 @@ VIEWS.board=function(){
   const sortSeg='<div class="seg sm" id="bsort">'+[['old','Oldest First'],['new','Newest'],['target','Target Date'],['fac','Facilitator']].map(([k,l])=>'<button type="button" data-bs="'+k+'" aria-pressed="'+(sort===k)+'">'+l+'</button>').join('')+'</div>';
   let i=0, detail;
   if(sel){
-    const s=stageDef(sel), ts=L.filter(t=>t.stage===sel).sort(srt), w=ts[0]?whoseMove(ts[0]):{label:ownerName(s)};
-    const lateN=ts.filter(t=>heatLevel(t)===2).length, idx=stageIndex(sel), list=stages();
-    detail='<div class="bd-h" style="--sc:'+s.color+'"><div class="bd-t"><span class="bd-k">Stop '+(idx+1)+' of '+list.length+' · '+esc(PHASES.find(p=>p.key===phaseOf(sel)).name)+'</span><h2>'+esc(s.name)+' <b>'+ts.length+'</b></h2><p>'+esc(s.desc||'')+'</p></div><div class="bd-m"><span><em>Whose move</em>'+esc(ownerName(s))+'</span>'+(lateN?'<span class="bad"><em>Overdue</em>'+lateN+'</span>':'')+'<span class="bd-nav">'+(idx>0?'<button type="button" class="btn sm" data-mst="'+list[idx-1].key+'">‹ '+esc(list[idx-1].name)+'</button>':'')+(idx<list.length-1?'<button type="button" class="btn sm" data-mst="'+list[idx+1].key+'">'+esc(list[idx+1].name)+' ›</button>':'')+'</span></div></div>'+
+    const s=stageDef(sel), allTs=L.filter(t=>t.stage===sel).sort(srt), lateN=allTs.filter(t=>heatLevel(t)===2).length; if(!lateN) S.bLate=false; const ts=S.bLate?allTs.filter(t=>heatLevel(t)===2):allTs, w=ts[0]?whoseMove(ts[0]):{label:ownerName(s)};
+    const idx=stageIndex(sel), list=stages();
+    detail='<div class="bd-h" style="--sc:'+s.color+'"><div class="bd-t"><span class="bd-k">Stop '+(idx+1)+' of '+list.length+' · '+esc(PHASES.find(p=>p.key===phaseOf(sel)).name)+'</span><h2>'+esc(s.name)+' <b>'+ts.length+'</b></h2><p>'+esc(s.desc||'')+'</p></div><div class="bd-m"><span><em>Whose move</em>'+esc(ownerName(s))+'</span>'+(lateN?'<button type="button" class="bd-late'+(S.bLate?' on':'')+'" data-blate="1" aria-pressed="'+!!S.bLate+'" title="'+(S.bLate?'Show every work request at this stop':'Show only the overdue ones')+'"><em>Overdue</em>'+lateN+'<i>'+(S.bLate?'Show all ›':'Show them ›')+'</i></button>':'')+'<span class="bd-nav">'+(idx>0?'<button type="button" class="btn sm" data-mst="'+list[idx-1].key+'">‹ '+esc(list[idx-1].name)+'</button>':'')+(idx<list.length-1?'<button type="button" class="btn sm" data-mst="'+list[idx+1].key+'">'+esc(list[idx+1].name)+' ›</button>':'')+'</span></div></div>'+
       '<div class="bd-bar"><span class="muted">'+ts.length+' work request'+(ts.length===1?'':'s')+(f.fac?' for '+esc(firstName(f.fac)):'')+'</span>'+sortSeg+'<button type="button" class="btn sm ghost" data-mst="">Show Every Stop</button></div>'+
       '<div class="bd-b">'+(ts.length?'<div class="cgrid">'+bpg(ts,'sel:'+sel).items.map(t=>card2(t,{drag,next:true,act:true,i:i++})).join('')+'</div>'+bpg(ts,'sel:'+sel).bar:'<div class="lane-e"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing at this stop'+(f.fac||f.q?' for these filters':'')+'.</div>')+'</div>';
   } else {
@@ -3698,7 +3703,8 @@ VIEWS.home=function(){
 /* ---------------- wiring ---------------- */
 function lineWire(m){
   // stops on the line
-  $$('[data-mst]',m).forEach(b=>b.onclick=()=>{ const k=b.dataset.mst; if(S.view==='board'){ S.bSel=S.bSel===k&&b.classList.contains('mn')?'':k; renderAll(); const d=$('#board3'); if(d) d.scrollTop=0; } else { S.bSel=k; go('board'); } });
+  $$('[data-blate]',m).forEach(b=>b.onclick=()=>{ S.bLate=!S.bLate; renderAll(); });
+  $$('[data-mst]',m).forEach(b=>b.onclick=()=>{ const k=b.dataset.mst; S.bLate=false; if(S.view==='board'){ S.bSel=S.bSel===k&&b.classList.contains('mn')?'':k; renderAll(); const d=$('#board3'); if(d) d.scrollTop=0; } else { S.bSel=k; go('board'); } });
   $$('[data-mext]',m).forEach(b=>b.onclick=()=>{ if(b.dataset.mext==='hub') window.open('https://resources.mismo.org/initiative-hub/work-requests.html#all','_blank','noopener'); else { S.filters.state='published'; go('all'); } });
   $$('[data-stage]',m).forEach(b=>b.onclick=()=>{ S.bSel=b.dataset.stage; go('board'); });
   $$('[data-fac]',m).forEach(b=>b.onclick=()=>{ S.filters.fac=b.dataset.fac==='Unassigned'?'':b.dataset.fac; S.bSel=''; go('board'); });
