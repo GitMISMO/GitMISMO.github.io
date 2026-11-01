@@ -426,6 +426,93 @@ kbd{display:inline-block;min-width:18px;text-align:center;font:600 11px var(--di
 @media(max-width:560px){.wc-nums b{font-size:17px}.keys{display:none}.hero-k{display:none}}
 .card h3{flex-wrap:wrap;row-gap:6px}
 @media(max-width:560px){.card h3 .seg{width:100%;display:flex}.card h3 .seg button{flex:1}.donut{width:150px}}
+/* ── round 3: balanced hero, road, showcase charts, pager ── */
+.hero{grid-template-columns:minmax(0,1fr) 270px;align-items:stretch;gap:20px}
+.hero .hstats{grid-template-columns:repeat(4,minmax(0,1fr));margin-top:16px}
+.hs.amb b{color:#f3c169}.hs.grn b{color:#7ee0b8}.hs.red b{color:#ff9b8f}
+.hero-r{display:grid;place-items:center;align-content:center;gap:10px;padding:16px 14px;position:relative}
+.hero-r .donut{width:150px;height:150px;transform:rotate(-90deg)}
+.dn-c{position:absolute;top:16px;left:0;right:0;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none}
+.dn-c b{font-size:30px;line-height:1;color:#fff}.dn-c span{font-size:10px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--sky);margin-top:4px;text-align:center;max-width:110px}
+.dn-key{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 10px;font-size:11.5px;color:rgba(255,255,255,.8)}
+.dn-key span{white-space:nowrap}
+/* coming to IM */
+.ups{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:10px}
+.up{grid-template-columns:74px 1fr}
+.up-d{width:74px;min-height:58px;padding:6px 4px;text-align:center}
+.up-d b{display:block;font-size:22px;line-height:1}
+.up-d em{display:block;font-size:9.5px;letter-spacing:.05em;white-space:nowrap;margin-top:3px}
+/* the road */
+.road{position:relative}
+.rd-plot{position:relative;height:150px;margin:4px 0 0 92px;border-radius:8px;background:linear-gradient(180deg,var(--surface-2),var(--surface));border:1px solid var(--border)}
+.rd-lane{position:absolute;left:-92px;right:0;height:0;border-top:1px dashed var(--border)}
+.rd-lane span{position:absolute;left:0;top:-9px;width:84px;font-size:11px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.05em}
+.rd-t{position:absolute;bottom:-20px;transform:translateX(-50%);font-size:10.5px;font-weight:700;color:var(--ink-3);letter-spacing:.06em}
+.rd-t:before{content:"";position:absolute;left:50%;bottom:20px;height:150px;border-left:1px solid var(--rule)}
+.rd-today{position:absolute;top:-6px;bottom:-6px;border-left:2px solid var(--navy);z-index:2}
+:root[data-theme="dark"] .rd-today{border-color:var(--sky)}
+.rd-today b{position:absolute;top:-18px;left:0;transform:translateX(-50%);font-size:10.5px;letter-spacing:.08em;color:var(--ink)}
+.rd-past{position:absolute;left:0;top:0;bottom:0;background:rgba(116,191,235,.07);border-radius:8px 0 0 8px}
+.rd-dot{display:block;box-sizing:border-box;position:absolute;width:var(--s);height:var(--s);border-radius:50%;transform:translate(-50%,calc(-50% + var(--o)));border:2px solid var(--surface);box-shadow:0 1px 3px rgba(13,49,76,.25);z-index:3;transition:transform .15s;animation:pop .5s cubic-bezier(.2,.7,.2,1.3) both}
+.rd-dot:hover,.rd-dot:focus{transform:translate(-50%,calc(-50% + var(--o))) scale(1.35);z-index:5;outline:none}
+.rd-dot.rd-dec{background:var(--good)}.rd-dot.rd-wait{background:var(--warn)}.rd-dot.rd-due{background:var(--surface);border:2.5px dashed var(--ink-3)}.rd-dot.rd-late{background:var(--bad-bg);border:2.5px dashed var(--bad)}
+@keyframes pop{from{transform:translate(-50%,calc(-50% + var(--o))) scale(0)}}
+.rd-key{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:28px;font-size:12px;color:var(--ink-2)}
+.rd-key .rk{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px;vertical-align:-1px}
+.rd-key .rk.dec{background:var(--good)}.rd-key .rk.wait{background:var(--warn)}.rd-key .rk.due{border:2px dashed var(--ink-3)}.rd-key .rk.late{border:2px dashed var(--bad);background:var(--bad-bg)}
+/* how a submission gets here */
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1fr;gap:10px;align-items:stretch}
+.fl-s{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.fl-n{width:24px;height:24px;border-radius:6px;background:var(--navy);color:#fff;font-weight:700;font-size:12.5px;display:grid;place-items:center}
+:root[data-theme="dark"] .fl-n{background:var(--sky);color:var(--navy-deep)}
+.fl-s b{font-size:13.5px}.fl-s span:last-child{font-size:12.5px;color:var(--ink-2)}
+.fl-a{align-self:center;font-size:22px;color:var(--ink-3)}
+@media(max-width:900px){.flow{grid-template-columns:1fr}.fl-a{display:none}}
+/* showcase panels (Summit HQ / MISMO Media) */
+.showcase{background:linear-gradient(135deg,#0d314c 0%,#14486e 100%);color:#fff;border-radius:10px;padding:18px 22px 16px;margin-bottom:18px;position:relative;overflow:hidden}
+.showcase:after{content:"";position:absolute;right:-80px;top:-100px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(116,191,235,.22),rgba(116,191,235,0) 70%);pointer-events:none}
+.sc-h{display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:12px;position:relative;z-index:1}
+.sc-h h3{color:#fff;font-size:17px;margin:2px 0 0}.sc-h .seg{margin-left:auto}
+.sc-e{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--sky)}
+.sc-k{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px;position:relative;z-index:1}
+.sc-k>div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:10px 13px}
+.sc-k b{display:block;font-size:24px;line-height:1.15}.sc-k span{font-size:12px;color:rgba(255,255,255,.7)}
+.sc-k em{font-style:normal;font-weight:700}.sc-k em.up{color:#7ee0b8}.sc-k em.dn{color:#ff9b8f}
+.seg.dark{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}.seg.dark button{color:rgba(255,255,255,.8)}.seg.dark button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}
+.chart.dark{position:relative;z-index:1}.chart.dark .ax-d,.ax-d{font-size:11px;fill:rgba(255,255,255,.6)}
+.chart.dark .pk{font-size:11px;font-weight:700;fill:#fff}
+.chart.dark .col-bg{fill:transparent}.chart.dark .col:hover .col-bg{fill:rgba(255,255,255,.07)}
+.legend.dark{color:rgba(255,255,255,.8);margin:8px 0 0;position:relative;z-index:1}
+.col-bg{fill:transparent;transition:fill .15s}.col:hover .col-bg{fill:var(--surface-3)}
+.chart .cl{font-size:11px;font-weight:700;fill:#fff;pointer-events:none}
+.xh line{stroke:var(--ink-3);stroke-dasharray:3 3;opacity:0;transition:opacity .12s}.xh:hover line{opacity:.7}
+.endlab{font-size:12px;font-weight:700}
+.line-in{stroke-dasharray:1;stroke-dashoffset:1;animation:drawl 1.1s cubic-bezier(.3,.7,.2,1) forwards}
+@keyframes drawl{to{stroke-dashoffset:0}}
+.area-in{animation:fadein 1s .3s both}@keyframes fadein{from{opacity:0}}
+.pt-in{animation:fadein .4s both;animation-delay:var(--d)}
+.tip .tk{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px}
+.hb{display:grid;gap:8px}
+.hb-r{display:grid;grid-template-columns:22px minmax(110px,38%) 1fr auto;gap:10px;align-items:center;font-size:13px;padding:3px 4px;border-radius:5px}
+.hb-r:hover{background:var(--surface-2)}
+.hb-n{width:20px;height:20px;border-radius:5px;background:var(--surface-3);color:var(--ink-2);font-size:11px;font-weight:700;display:grid;place-items:center}
+.hb-r:first-child .hb-n{background:var(--navy);color:#fff}
+.hb-t{height:12px;background:var(--surface-3);border-radius:0 6px 6px 0;overflow:hidden}
+.hb-t i{display:block;height:100%;width:var(--w);border-radius:0 6px 6px 0;background:linear-gradient(90deg,color-mix(in srgb,var(--c) 70%,transparent),var(--c));animation:grow .8s cubic-bezier(.2,.7,.2,1) both;animation-delay:var(--d)}
+.hb-r b{font-size:12.5px;min-width:36px;text-align:right}
+.kp.dark{background:linear-gradient(135deg,#0d314c 0%,#14486e 100%);border-radius:10px;padding:14px;gap:10px}
+.kp.dark .k{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-top:3px solid var(--kc,var(--sky))}
+.kp.dark .k span{color:var(--sky)}.kp.dark .k b{color:#fff}.kp.dark .k em{color:rgba(255,255,255,.72)}
+/* pager */
+.pager{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);font-size:12.5px}
+.pager .sp{flex:1}.pager .pg{min-width:32px}.pager .pg.on{background:var(--navy);border-color:var(--navy);color:#fff}
+:root[data-theme="dark"] .pager .pg.on{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}
+.pg-gap{padding:0 4px;color:var(--ink-3)}
+.pg-size{display:inline-flex;align-items:center;gap:6px;margin-left:8px;color:var(--ink-2)}
+.pg-size select,.inp{font:inherit;font-size:13px;border:1px solid var(--border-strong);border-radius:5px;padding:5px 8px;background:var(--surface);color:var(--ink)}
+.inp{min-width:240px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}.hero .hstats{grid-template-columns:repeat(2,minmax(0,1fr))}.sc-k{grid-template-columns:repeat(2,minmax(0,1fr))}.rd-plot{margin-left:0}.rd-lane span{display:none}.rd-lane{left:0}}
+@media(max-width:560px){.ups{grid-template-columns:1fr}.inp{min-width:0;width:100%}.pager .pg:not(.on){display:none}.pager .pg-gap{display:none}.hb-r{grid-template-columns:20px 1fr auto}.hb-t{grid-column:2/4}}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -595,56 +682,93 @@ function subCard(q){ const n=q.rows||0, look=q.look||0, done=q.status==="decided
     '<span class="sc-m"><span class="m">'+(done?Object.entries(cnt).filter(([d,v])=>v>0).sort((a,b)=>(RANK[a[0]]||0)-(RANK[b[0]]||0)).map(([d,v])=>'<span class="pill">'+v+' '+esc(d.replace(/^Approved /,"").toLowerCase())+'</span>').join("")+(q.agree!=null?'<span class="pill ok">'+q.agree+'% agreed with the draft</span>':'')+(q.resub?'<span class="pill">Resubmission</span>':''):'<span class="pill look">'+look+' need'+(look===1?'s':'')+' a look</span><span class="pill ok">'+(n-look)+' clean</span>'+(q.resub?'<span class="pill">Resubmission</span>':''))+'</span>'+bar+'</span>'+
     '<span class="sc-go">'+(done?'Open':'Start Review')+' ›</span></a>'; }
 const ago=iso=>{ if(!iso) return ""; const d=Math.floor((Date.now()-new Date(iso))/864e5); return d<=0?"today":d===1?"1 day":d+" days"; };
-function donut(look,clean,done){ const tot=look+clean, R=46, C=2*Math.PI*R; const seg=(v,off,c)=>v?'<circle r="'+R+'" cx="60" cy="60" fill="none" stroke="'+c+'" stroke-width="13" stroke-dasharray="'+(v/tot*C)+' '+C+'" stroke-dashoffset="'+(-off/tot*C)+'" class="dn-seg"/>':'';
-  return '<svg class="donut" viewBox="0 0 120 120" role="img" aria-label="'+look+' rows need a look, '+clean+' clean"><circle r="'+R+'" cx="60" cy="60" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="13"/>'+(tot?seg(look,0,"#e0a83c")+seg(clean,look,"#4fc79b"):'')+'<text x="60" y="57" text-anchor="middle" class="dn-n" data-count="'+tot+'">'+tot+'</text><text x="60" y="74" text-anchor="middle" class="dn-l">rows</text></svg>'; }
+const YR=String(new Date().getFullYear());
+/* a ring split into parts, Summit HQ style */
+function ring(parts,center,sub){ const tot=parts.reduce((s,p)=>s+p.v,0), R=50, C=2*Math.PI*R; let off=0;
+  const segs=tot?parts.filter(p=>p.v).map(p=>{ const len=p.v/tot*C, gap=parts.filter(x=>x.v).length>1?2.5:0; const el='<circle r="'+R+'" cx="64" cy="64" fill="none" stroke="'+p.c+'" stroke-width="12" stroke-linecap="butt" stroke-dasharray="'+Math.max(0,len-gap)+' '+C+'" stroke-dashoffset="'+(-off)+'" class="dn-seg"><title>'+esc(p.v.toLocaleString()+' '+p.k)+'</title></circle>'; off+=len; return el; }).join(""):'';
+  return '<svg class="donut" viewBox="0 0 128 128" role="img" aria-label="'+esc(center+' '+sub)+'"><circle r="'+R+'" cx="64" cy="64" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="12"/>'+segs+'</svg><div class="dn-c"><b data-count="'+(+String(center).replace(/\D/g,'')||0)+'">'+esc(center)+'</b><span>'+esc(sub)+'</span></div>'; }
 function waitCard(q,i){ const n=q.rows||0, look=q.look||0, done=q.done||0, age=Math.floor((Date.now()-new Date(q.sentAt||q.at||Date.now()))/864e5), heat=age>=14?"hot":age>=7?"warm":"";
   const mins=Math.max(5,Math.round(look*1.2+(n-look)*0.05)); const dc=q.draftCounts||{};
   return '<a class="wc rise '+heat+'" style="--i:'+i+'" href="#/review/'+encodeURIComponent(q.rep)+'"><span class="wc-top"><span class="wr">'+esc(q.wr||"")+(q.wg?" · "+esc(q.wg):"")+'</span><span class="wc-age" title="Sent '+esc(fmtD(q.sentAt))+'">'+(age<=0?"Sent today":"Waiting "+ago(q.sentAt))+'</span></span><b class="wc-n">'+esc(q.name||"")+'</b>'+
     '<span class="wc-nums"><span><b data-count="'+look+'">'+look+'</b><em>need a look</em></span><span><b data-count="'+(n-look)+'">'+(n-look)+'</b><em>clean</em></span><span><b>~'+mins+'</b><em>minutes</em></span></span>'+
     (Object.keys(dc).length?'<span class="wc-mix" title="What the draft suggests">'+DEC.filter(d=>dc[d]).map(d=>'<i style="flex:'+dc[d]+';background:'+DCOL[d]+'" title="'+esc(dc[d]+" "+d)+'"></i>').join("")+'</span>':'')+
     '<span class="wc-prog"><i style="--w:'+pct(done,n)+'%"></i></span><span class="wc-f">'+(done?done+' of '+n+' decided'+(q.lastBy?' · '+esc(first(q.lastBy))+' '+esc(ago(q.lastAt))+' ago':''):'Not started')+(q.fac&&q.fac.name?' · Facilitator '+esc(q.fac.name):'')+'<span class="wc-go">'+(done?'Resume':'Start')+' ›</span></span></a>'; }
-function upcomingHtml(){ const U=(S.up||[]).slice().sort((a,b)=>String(a.targetIM).localeCompare(String(b.targetIM)));
-  if(!U.length) return '<div class="empty">Nothing is due to IM in the next 60 days.</div>';
-  const td=new Date().toISOString().slice(0,10);
-  return '<div class="up-l">'+U.slice(0,8).map((u,i)=>{ const dd=Math.round((new Date(u.targetIM)-new Date(td))/864e5); return '<div class="up rise" style="--i:'+i+'"><span class="up-d'+(dd<0?' late':dd<=14?' soon':'')+'"><b>'+(dd<0?Math.abs(dd):dd)+'</b><em>'+(dd<0?'days late':dd===1?'day':'days')+'</em></span><span class="up-m"><span class="wr">'+esc(u.wr)+(u.wg?' · '+esc(u.wg):'')+'</span><b>'+esc(u.name)+'</b><em>'+esc((u.stage||'')+(u.fac?' · '+u.fac:''))+' · target '+esc(fmtS(u.targetIM))+'</em></span></div>'; }).join("")+'</div>'+(U.length>8?'<p class="note">And '+(U.length-8)+' more.</p>':''); }
-function activityChart(months){ const L=Object.values(S.queue).filter(q=>q.status==="decided"&&q.decidedAt); const now=new Date(); const per=[]; for(let i=months-1;i>=0;i--){ const d=new Date(now.getFullYear(),now.getMonth()-i,1); per.push({k:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),label:MON[d.getMonth()]+(d.getMonth()===0||i===months-1?" "+String(d.getFullYear()).slice(2):""),c:{},n:0,subs:0}); }
+const daysTo=d=>Math.round((new Date(d+"T12:00:00")-new Date(new Date().toISOString().slice(0,10)+"T12:00:00"))/864e5);
+function upCard(u,i){ const dd=daysTo(u.targetIM); return '<div class="up rise" style="--i:'+i+'"><span class="up-d'+(dd<0?' late':dd<=14?' soon':'')+'"><b>'+Math.abs(dd)+'</b><em>'+(dd<0?'days late':dd===0?'today':dd===1?'day':'days')+'</em></span><span class="up-m"><span class="wr">'+esc(u.wr)+(u.wg?' · '+esc(u.wg):'')+'</span><b title="'+esc(u.name)+'">'+esc(u.name)+'</b><em>'+esc((u.stage||'')+(u.fac?' · '+u.fac:''))+' · target '+esc(fmtS(u.targetIM))+'</em></span></div>'; }
+/* the road to IM: what IM decided lately, what is waiting, and what is due, on one line (Summit HQ's road) */
+function roadHtml(){ const td=new Date(); const lo=new Date(td.getTime()-150*864e5), hi=new Date(td.getTime()+62*864e5); const span=hi-lo, X=d=>Math.max(0,Math.min(100,(new Date(d+(String(d).length===10?"T12:00:00":""))-lo)/span*100));
+  const L=Object.values(S.queue), dec=L.filter(q=>q.status==="decided"&&q.decidedAt&&new Date(q.decidedAt)>=lo), aw=L.filter(q=>q.status==="awaiting"), up=(S.up||[]);
+  const lane=(y,lab)=>'<div class="rd-lane" style="top:'+y+'px"><span>'+lab+'</span></div>';
+  const stack={}; const dot=(x,lane,cls,tip,href,sz)=>{ const k=lane+':'+Math.round(x*1.5); const n=stack[k]=(stack[k]||0)+1; const o=(n%2?-1:1)*Math.ceil((n-1)/2)*11;
+    return '<'+(href?'a href="'+href+'"':'span')+' class="rd-dot '+cls+'" style="left:'+x+'%;top:'+(lane===0?30:lane===1?74:118)+'px;--o:'+o+'px;--s:'+(sz||12)+'px" data-tip="'+esc(tip)+'" tabindex="0"></'+(href?'a':'span')+'>'; };
+  let marks='';
+  dec.forEach(q=>{ const c=q.counts||{}; marks+=dot(X(String(q.decidedAt).slice(0,10)),0,'rd-dec','<b>'+esc((q.wr?q.wr+' ':'')+(q.wrName||q.name||''))+'</b><br>Decided '+esc(fmtD(q.decidedAt))+' · '+(q.rows||0)+' rows<br>'+Object.entries(c).filter(x=>x[1]).map(([d,v])=>v+' '+esc(d.toLowerCase())).join(', '),'#/review/'+encodeURIComponent(q.rep),Math.max(10,Math.min(22,8+Math.sqrt(q.rows||1)*1.3))); });
+  aw.forEach(q=>{ marks+=dot(X(String(q.sentAt).slice(0,10)),1,'rd-wait','<b>'+esc(q.wr+' '+q.name)+'</b><br>Sent '+esc(fmtD(q.sentAt))+' · '+(q.look||0)+' to look at','#/review/'+encodeURIComponent(q.rep),14); });
+  up.forEach(u=>{ const dd=daysTo(u.targetIM); marks+=dot(X(u.targetIM),2,dd<0?'rd-late':'rd-due','<b>'+esc(u.wr+' '+u.name)+'</b><br>Target to IM '+esc(fmtD(u.targetIM))+(dd<0?' · '+Math.abs(dd)+' days late':' · in '+dd+' days')+'<br>'+esc(u.stage+(u.fac?' · '+u.fac:'')),'',11); });
+  let ticks=''; for(let m=new Date(lo.getFullYear(),lo.getMonth()+1,1);m<hi;m=new Date(m.getFullYear(),m.getMonth()+1,1)){ if(X(m.toISOString().slice(0,10))>95) break; ticks+='<span class="rd-t" style="left:'+X(m.toISOString().slice(0,10))+'%">'+MON[m.getMonth()].toUpperCase()+(m.getMonth()===0?' '+m.getFullYear():'')+'</span>'; }
+  const tx=X(td.toISOString().slice(0,10));
+  return '<div class="road chart"><div class="rd-plot">'+lane(30,'Decided')+lane(74,'Waiting')+lane(118,'Due to IM')+ticks+'<span class="rd-today" style="left:'+tx+'%"><b>TODAY</b></span><span class="rd-past" style="width:'+tx+'%"></span>'+marks+'</div>'+
+    '<div class="rd-key"><span><i class="rk dec"></i>Decided (size = rows)</span><span><i class="rk wait"></i>Waiting for IM</span><span><i class="rk due"></i>Due to IM</span><span><i class="rk late"></i>Past its target</span><span class="muted">Hover for details · click a dot to open it</span></div></div>'; }
+function flowHtml(){ const st=(n,t,d)=>'<div class="fl-s"><span class="fl-n">'+n+'</span><b>'+t+'</b><span>'+d+'</span></div>';
+  return '<div class="flow">'+st(1,'Facilitator runs the IM Pre-Review','In the MMS, on the work request’s Reviews tab, they drop in the IM Submission Form.')+'<span class="fl-a">›</span>'+st(2,'The draft is built','Software checks, the Reference Model and Claude’s read give every row a draft decision.')+'<span class="fl-a">›</span>'+st(3,'Sent to IM','The facilitator fixes what they can, then sends it. It lands here and IM reviewers get an email.')+'<span class="fl-a">›</span>'+st(4,'IM decides','Agree or change each row and finish. The decisions go back to the work request.')+'</div>'; }
+/* rows IM decided each month, as a showcase panel */
+function activityChart(months){ const L=Object.values(S.queue).filter(q=>q.status==="decided"&&q.decidedAt); const now=new Date(); const per=[]; for(let i=months-1;i>=0;i--){ const d=new Date(now.getFullYear(),now.getMonth()-i,1); per.push({k:d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0"),m:d.getMonth(),y:d.getFullYear(),c:{},n:0,subs:0}); }
   const by={}; per.forEach(p=>by[p.k]=p); L.forEach(q=>{ const p=by[String(q.decidedAt).slice(0,7)]; if(!p) return; p.subs++; Object.entries(q.counts||{}).forEach(([d,v])=>{ p.c[d]=(p.c[d]||0)+v; p.n+=v; }); });
-  const W=760,H=200,pl=34,pb=24,pt=10, mx=Math.max(10,...per.map(p=>p.n)), cw=(W-pl)/per.length, bw=Math.max(4,cw*0.62), Y=v=>(H-pb-pt)*v/mx;
-  let g='<line class="base" x1="'+pl+'" x2="'+W+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'"/>'; [0.5,1].forEach(f=>{ const v=Math.round(mx*f), y=H-pb-Y(v); g+='<line class="gl" x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'"/><text class="ax" x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end">'+v+'</text>'; });
-  per.forEach((p,i)=>{ const x=pl+i*cw+(cw-bw)/2; let y=H-pb; DEC.filter(d=>p.c[d]).forEach(d=>{ const h=Y(p.c[d]); y-=h; g+='<rect class="bar-in" style="--d:'+(i*18)+'ms" x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(0,h-1.5)+'" fill="'+DCOL[d]+'"/>'; });
-    if(i%Math.ceil(per.length/12)===0||i===per.length-1) g+='<text class="ax" x="'+(x+bw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(p.label)+'</text>';
-    g+='<rect x="'+(pl+i*cw)+'" y="'+pt+'" width="'+cw+'" height="'+(H-pb-pt)+'" fill="transparent" tabindex="0" data-tip="'+esc('<b>'+MON[+p.k.slice(5)-1]+' '+p.k.slice(0,4)+'</b><br>'+(p.n?p.subs+' submission'+(p.subs===1?'':'s')+', '+p.n+' rows<br>'+DEC.filter(d=>p.c[d]).map(d=>esc(d)+': '+p.c[d]).join('<br>'):'No decisions'))+'"/>'; });
-  const tot=per.reduce((s,p)=>s+p.n,0), subs=per.reduce((s,p)=>s+p.subs,0);
-  return {svg:'<div class="legend">'+DEC.slice(0,5).map(d=>'<span><i style="background:'+DCOL[d]+'"></i>'+esc(d)+'</span>').join("")+'</div><div class="chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Rows IM decided each month">'+g+'</svg></div>',tot,subs}; }
+  const W=900,H=230,pl=36,pb=26,pt=14, mx=Math.max(10,...per.map(p=>p.n)), cw=(W-pl)/per.length, bw=Math.max(4,Math.min(26,cw*0.6)), Y=v=>(H-pb-pt)*v/mx;
+  const ACOL={"Approved as Submitted":"url(#g-as)","Approved with Modification":"url(#g-mod)","Returned":"#e0a83c","Denied":"#f08579","Withdrawn":"#7a9db4","Deferred":"#b9a3e8"};
+  let g='<defs><linearGradient id="g-as" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fd6a6"/><stop offset="1" stop-color="#1baf7a"/></linearGradient><linearGradient id="g-mod" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd0f3"/><stop offset="1" stop-color="#3987e5"/></linearGradient></defs>';
+  [0.5,1].forEach(f=>{ const v=Math.round(mx*f), y=H-pb-Y(v); g+='<line x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'" stroke="rgba(255,255,255,.1)"/><text x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end" class="ax-d">'+v+'</text>'; });
+  per.forEach((p,i)=>{ const x=pl+i*cw+(cw-bw)/2; let y=H-pb; const segs=DEC.filter(d=>p.c[d]); let col='<g class="col">'+'<rect class="col-bg" x="'+(pl+i*cw+1)+'" y="'+pt+'" width="'+(cw-2)+'" height="'+(H-pb-pt)+'" rx="4"/>';
+    segs.forEach((d,j)=>{ const h=Y(p.c[d]); y-=h; const top=j===segs.length-1; col+='<rect class="bar-in" style="--d:'+(i*14)+'ms" x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(0,h-(top?0:1.5))+'" rx="'+(top?Math.min(4,bw/2):0)+'" fill="'+ACOL[d]+'"/>'; });
+    if(p.n&&p.n===mx) col+='<text x="'+(x+bw/2)+'" y="'+(y-6)+'" text-anchor="middle" class="pk">'+p.n+'</text>';
+    col+='<rect x="'+(pl+i*cw)+'" y="'+pt+'" width="'+cw+'" height="'+(H-pb-pt)+'" fill="transparent" tabindex="0" data-tip="'+esc('<b>'+MON[p.m]+' '+p.y+'</b><br>'+(p.n?p.subs+' submission'+(p.subs===1?'':'s')+' · '+p.n+' rows<br>'+DEC.filter(d=>p.c[d]).map(d=>esc(d)+': '+p.c[d]+' ('+pct(p.c[d],p.n)+'%)').join('<br>'):'No decisions'))+'"/></g>'; g+=col;
+    const every=months<=12?1:months<=24?3:months<=36?4:12; if(p.m%every===0) g+='<text x="'+(x+bw/2)+'" y="'+(H-8)+'" text-anchor="middle" class="ax-d">'+(every===12?String(p.y):MON[p.m]+(p.m===0?" '"+String(p.y).slice(2):""))+'</text>'; });
+  const tot=per.reduce((s,p)=>s+p.n,0), subs=per.reduce((s,p)=>s+p.subs,0), as=per.reduce((s,p)=>s+(p.c["Approved as Submitted"]||0),0);
+  const half=Math.floor(per.length/2), a1=per.slice(0,half), a2=per.slice(half); const r=A=>{ const n=A.reduce((s,p)=>s+p.n,0); return n?A.reduce((s,p)=>s+(p.c["Approved as Submitted"]||0),0)/n*100:null; }; const p1=r(a1), p2=r(a2);
+  const busiest=per.reduce((b,p)=>p.n>b.n?p:b,per[0]);
+  return {tot,subs,as,html:'<div class="sc-k"><div><b data-count="'+tot+'">'+tot.toLocaleString()+'</b><span>rows decided</span></div><div><b data-count="'+subs+'">'+subs+'</b><span>submissions</span></div><div><b>'+(tot?pct(as,tot):0)+'%</b><span>approved as submitted'+(p1!=null&&p2!=null?' <em class="'+(p2>=p1?'up':'dn')+'">'+(p2>=p1?'▲':'▼')+' '+Math.abs(Math.round(p2-p1))+' pts</em>':'')+'</span></div><div><b>'+(busiest&&busiest.n?MON[busiest.m]+' ’'+String(busiest.y).slice(2):'—')+'</b><span>busiest month'+(busiest&&busiest.n?' · '+busiest.n+' rows':'')+'</span></div></div>'+
+    '<div class="chart dark"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Rows IM decided each month">'+g+'</svg></div><div class="legend dark">'+DEC.slice(0,5).map(d=>'<span><i style="background:'+DCOL[d]+'"></i>'+esc(d)+'</span>').join("")+'</div>'}; }
 function home(){
   const L=Object.values(S.queue), aw=L.filter(q=>q.status==="awaiting").sort((a,b)=>String(a.sentAt).localeCompare(String(b.sentAt))), dn=L.filter(q=>q.status==="decided").sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
   const rows=aw.reduce((s,q)=>s+(q.rows||0),0), look=aw.reduce((s,q)=>s+(q.look||0),0), doneR=aw.reduce((s,q)=>s+(q.done||0),0);
   const h=new Date().getHours(), g=h<12?"Good morning":h<17?"Good afternoon":"Good evening";
   const lv=Object.values(S.learn), agree=lv.length?pct(lv.filter(x=>x.agreed).length,lv.length):null;
   const mins=aw.reduce((s,q)=>s+Math.max(5,Math.round((q.look||0)*1.2+((q.rows||0)-(q.look||0))*0.05)),0);
-  const line=aw.length?'<b>'+aw.length+'</b> submission'+(aw.length===1?' is':'s are')+' waiting for IM. <b>'+look+'</b> of '+rows+' rows need your judgment; the draft found nothing to change on the other '+(rows-look)+'. About <b>'+mins+' minutes</b> in all.':'<b>You’re all caught up.</b> Nothing is waiting for IM. '+((S.up||[]).length?'<b>'+S.up.length+'</b> work request'+(S.up.length===1?' is':'s are')+' due to IM in the next 60 days.':'');
-  const st=(k,v,s,c)=>'<div class="hs"><span>'+k+'</span><b'+(typeof v==="number"?' data-count="'+v+'"':'')+'>'+v+'</b><em>'+s+'</em></div>';
-  const yr=String(new Date().getFullYear()), dnY=dn.filter(q=>String(q.decidedAt).slice(0,4)===yr), oldest=aw[0];
-  const M=S.homeMonths||24, A=activityChart(M);
+  const U=(S.up||[]).slice().sort((a,b)=>String(a.targetIM).localeCompare(String(b.targetIM))), late=U.filter(u=>daysTo(u.targetIM)<0).length, soon=U.filter(u=>{ const d=daysTo(u.targetIM); return d>=0&&d<=30; }).length;
+  const line=aw.length?'<b>'+aw.length+'</b> submission'+(aw.length===1?' is':'s are')+' waiting for IM. <b>'+look+'</b> of '+rows+' rows need your judgment; the draft found nothing to change on the other '+(rows-look)+'. About <b>'+mins+' minutes</b> in all.':'<b>You’re all caught up.</b> Nothing is waiting for IM. '+(U.length?'<b>'+U.length+'</b> work request'+(U.length===1?' is':'s are')+' due to IM in the next 60 days'+(late?', <b>'+late+'</b> already past target':'')+'.':'');
+  const st=(k,v,s,cls)=>'<div class="hs'+(cls?' '+cls:'')+'"><span>'+k+'</span><b'+(typeof v==="number"?' data-count="'+v+'"':'')+'>'+v+'</b><em>'+s+'</em></div>';
+  const dnY=dn.filter(q=>String(q.decidedAt).slice(0,4)===YR), cY={}; dnY.forEach(q=>Object.entries(q.counts||{}).forEach(([d,v])=>cY[d]=(cY[d]||0)+v)); const rowsY=Object.values(cY).reduce((a,b)=>a+b,0);
+  const tiles=aw.length?st("Need a Look",look,"rows waiting","amb")+st("Clean",rows-look,"rows, one click each","grn")+st("Oldest",ago(aw[0].sentAt),esc(aw[0].wr))+st("Decided in "+YR,dnY.length,rowsY.toLocaleString()+" rows")
+    :st("Waiting",0,"nothing for IM today","grn")+st("Due in 30 Days",soon,"work requests")+st("Past Target",late,"not yet sent to IM",late?"red":"")+st("Decided in "+YR,dnY.length,rowsY.toLocaleString()+" rows");
+  const ringP=aw.length?[{k:'need a look',v:look,c:'#e0a83c'},{k:'clean',v:rows-look,c:'#4fc79b'}]:DEC.map(d=>({k:d.toLowerCase(),v:cY[d]||0,c:{"Approved as Submitted":"#4fc79b","Approved with Modification":"#74bfeb","Returned":"#e0a83c","Denied":"#f08579","Withdrawn":"#7a9db4","Deferred":"#b9a3e8"}[d]}));
+  const ringBox='<div class="hero-r">'+ring(ringP,aw.length?String(rows):rowsY.toLocaleString(),aw.length?'rows waiting':'rows decided in '+YR)+'<div class="dn-key">'+ringP.filter(p=>p.v).slice(0,4).map(p=>'<span><i style="background:'+p.c+'"></i>'+esc(p.k.replace(/^approved /,''))+' '+p.v+'</span>').join('')+'</div>'+(aw.length&&doneR?'<div class="dn-done">'+doneR+' already decided</div>':'')+'</div>';
+  const M=S.homeMonths||24, A=activityChart(M), upN=S.upAll?U.length:6;
   return '<div class="hero rise"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}))+'</div><h2>'+g+(S.me.name?", "+esc(first(S.me.name)):"")+'</h2><p>'+line+'</p>'+
-    (aw.length?'<div class="hero-acts"><a class="btn hero-go" href="#/review/'+encodeURIComponent(aw[0].rep)+'">'+((aw[0].done||0)?'Resume ':'Start With ')+esc(aw[0].wr)+' ›</a><span class="hero-k">Tip: in a review, <kbd>J</kbd>/<kbd>K</kbd> move, <kbd>A</kbd> agrees</span></div>':'')+
-    '<div class="hstats">'+st("Need a Look",look,"rows waiting")+st("Clean",rows-look,"rows, one click each")+st("Oldest",oldest?ago(oldest.sentAt):"—",oldest?esc(oldest.wr):"nothing waiting")+st("Decided in "+yr,dnY.length,dnY.reduce((s,q)=>s+(q.rows||0),0).toLocaleString()+" rows")+'</div></div>'+
-    '<div class="hero-r">'+(aw.length?donut(look,rows-look)+'<div class="dn-key"><span><i style="background:#e0a83c"></i>Need a look</span><span><i style="background:#4fc79b"></i>Clean</span></div>'+(doneR?'<div class="dn-done">'+doneR+' of '+rows+' already decided</div>':''):'<div class="caught"><svg viewBox="0 0 52 52" aria-hidden="true"><circle cx="26" cy="26" r="24"/><path d="M15 27l7 7 15-16"/></svg><b>All caught up</b><span>Draft agreement: '+(agree!=null?agree+'%':'starts with the first review here')+'</span></div>')+'</div></div>'+
-    '<div class="g2 home2"><div class="card"><h3>Waiting for IM<small>oldest first</small></h3>'+(aw.length?'<div class="wcs">'+aw.map(waitCard).join("")+'</div>':'<div class="empty">Nothing waiting. A submission lands here when a facilitator sends the IM Pre-Review from the MMS.</div>')+'</div>'+
-      '<div class="card"><h3>Coming to IM<small>Target to Submit to IM, next 60 days'+(S.upAt?' · as of '+esc(fmtS(S.upAt)):'')+'</small></h3>'+upcomingHtml()+'</div></div>'+
-    '<div class="card"><h3>IM Activity<small>'+A.subs+' submissions, '+A.tot.toLocaleString()+' rows decided in the last '+M+' months</small><span class="sp"></span><span class="seg sm" id="months">'+[12,24,36,72].map(m=>'<button type="button" data-months="'+m+'" aria-pressed="'+(M===m)+'">'+(m>=24?(m/12)+' yr':m+' mo')+'</button>').join("")+'</span></h3>'+A.svg+'</div>'+
+    (aw.length?'<div class="hero-acts"><a class="btn hero-go" href="#/review/'+encodeURIComponent(aw[0].rep)+'">'+((aw[0].done||0)?'Resume ':'Start With ')+esc(aw[0].wr)+' ›</a><span class="hero-k">In a review, <kbd>J</kbd>/<kbd>K</kbd> move, <kbd>A</kbd> agrees</span></div>':'')+
+    '<div class="hstats">'+tiles+'</div></div>'+ringBox+'</div>'+
+    '<div class="card"><h3>The Road to IM<small>the last five months and the next two</small></h3>'+roadHtml()+'</div>'+
+    (aw.length?'<div class="card"><h3>Waiting for IM<small>oldest first</small></h3><div class="wcs">'+aw.map(waitCard).join("")+'</div></div>':'<div class="card"><h3>How a Submission Gets Here</h3>'+flowHtml()+'</div>')+
+    (U.length?'<div class="card"><h3>Coming to IM<small>Target to Submit to IM in the next 60 days'+(S.upAt?' · as of '+esc(fmtS(S.upAt)):'')+'</small><span class="sp"></span>'+(U.length>6?'<button type="button" class="btn sm" data-upall="1">'+(S.upAll?'Show Fewer':'Show All '+U.length)+'</button>':'')+'</h3><div class="ups">'+U.slice(0,upN).map(upCard).join("")+'</div></div>':'')+
+    '<div class="showcase rise"><div class="sc-h"><div><span class="sc-e">IM Activity</span><h3>Rows IM Decided, Month by Month</h3></div><span class="seg sm dark" id="months">'+[12,24,36,72].map(m=>'<button type="button" data-months="'+m+'" aria-pressed="'+(M===m)+'">'+(m>=24?(m/12)+' yr':m+' mo')+'</button>').join("")+'</span></div>'+A.html+'</div>'+
     (dn.length?'<div class="card"><h3>Recently Decided<small><a href="#/decided">See all '+dn.length+'</a></small></h3><div class="subs">'+dn.slice(0,3).map(subCard).join("")+'</div></div>':'');
 }
-function decidedView(){ const dn=Object.values(S.queue).filter(q=>q.status==="decided").sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
-  const here=dn.filter(q=>!q.hist), lib=dn.filter(q=>q.hist), yrs=[...new Set(lib.map(q=>String(q.decidedAt).slice(0,4)))];
-  const rows=lib.reduce((s,q)=>s+(q.rows||0),0);
-  return '<div class="head"><div><h1>Decided</h1><div class="sub">Every IM decision on record: reviews finished here, and every decided IM Submission Form in the IM library back to '+esc(yrs[yrs.length-1]||"2020")+' ('+lib.length+' submissions, '+rows.toLocaleString()+' rows). Open one to see each row, what IM decided and why, and IM’s final wording. Search from the menu by work request or name.</div></div></div>'+
-    (here.length?'<div class="card"><h3>Reviewed in IM Review</h3><div class="subs">'+here.map(subCard).join("")+'</div></div>':'')+
-    yrs.map(y=>{ const L=lib.filter(q=>String(q.decidedAt).slice(0,4)===y); return '<div class="card"><h3>'+y+'<small>'+L.length+' submission'+(L.length===1?'':'s')+' · '+L.reduce((s,q)=>s+(q.rows||0),0).toLocaleString()+' rows · from the IM library</small></h3><div class="subs">'+L.map(subCard).join("")+'</div></div>'; }).join("")+
-    (!dn.length?'<div class="card"><div class="empty">Nothing decided yet.</div></div>':''); }
+/* every decision on record, a page at a time */
+S.dec={page:0,size:10,year:"all",q:""};
+function decidedView(){ const all=Object.values(S.queue).filter(q=>q.status==="decided").sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
+  const D=S.dec, yrs=[...new Set(all.map(q=>String(q.decidedAt).slice(0,4)))]; const qq=D.q.trim().toLowerCase();
+  const L=all.filter(q=>(D.year==="all"||String(q.decidedAt).slice(0,4)===D.year)&&(!qq||[q.wr,q.wrName,q.name,q.wg,q.cop,q.file].join(" ").toLowerCase().includes(qq)));
+  const pages=Math.max(1,Math.ceil(L.length/D.size)); if(D.page>=pages) D.page=pages-1; const P=L.slice(D.page*D.size,D.page*D.size+D.size);
+  const rows=all.reduce((s,q)=>s+(q.rows||0),0);
+  const pager=pagerHtml(D.page,pages,L.length,D.size,"dec");
+  return '<div class="head"><div><h1>Decided</h1><div class="sub">Every IM decision on record: reviews finished here, and every decided IM Submission Form in the IM library back to '+esc(yrs[yrs.length-1]||"2020")+' ('+all.length+' submissions, '+rows.toLocaleString()+' rows). Open one to see each row, what IM decided and why, and IM’s final wording.</div></div></div>'+
+    '<div class="card"><div class="dtools"><input type="search" class="inp" id="decq" placeholder="Find a work request or name" value="'+esc(D.q)+'" aria-label="Find a decision"><div class="seg sm" role="tablist"><button type="button" data-dyear="all" aria-pressed="'+(D.year==="all")+'">All</button>'+yrs.map(y=>'<button type="button" data-dyear="'+y+'" aria-pressed="'+(D.year===y)+'">'+y+'</button>').join("")+'</div><span class="sp"></span></div>'+
+    (P.length?'<div class="subs">'+P.map(subCard).join("")+'</div>':'<div class="empty">Nothing matches.</div>')+pager+'</div>'; }
+function pagerHtml(page,pages,n,size,key){ if(n<=10&&pages<=1) return '<div class="pager"><span class="muted">'+n+' shown</span></div>';
+  const nums=[]; for(let i=0;i<pages;i++){ if(i===0||i===pages-1||Math.abs(i-page)<=1) nums.push(i); else if(nums[nums.length-1]!=="…") nums.push("…"); }
+  return '<div class="pager"><span class="muted">'+(page*size+1)+'–'+Math.min(n,(page+1)*size)+' of '+n+'</span><span class="sp"></span><button type="button" class="btn sm" data-pg="'+key+'|'+(page-1)+'"'+(page<=0?' disabled':'')+'>‹ Back</button>'+nums.map(i=>i==="…"?'<span class="pg-gap">…</span>':'<button type="button" class="btn sm pg'+(i===page?' on':'')+'" data-pg="'+key+'|'+i+'"'+(i===page?' aria-current="page"':'')+'>'+(i+1)+'</button>').join("")+'<button type="button" class="btn sm" data-pg="'+key+'|'+(page+1)+'"'+(page>=pages-1?' disabled':'')+'>Next ›</button><label class="pg-size">Show <select data-pgsize="'+key+'">'+[10,25,50,100].map(s=>'<option'+(s===size?' selected':'')+'>'+s+'</option>').join("")+'</select></label></div>'; }
 
 /* a decision from the IM library: what was submitted, what IM decided and why */
-function histDesk(doc){ const R=doc.rows||[], F=S.filter==="all"?"all":"changed"; const ch=R.filter(r=>r.dec!=="Approved as Submitted"); const shown=F==="all"?R:ch;
+function histDesk(doc){ const R=doc.rows||[], F=S.filter==="all"?"all":"changed"; const ch=R.filter(r=>r.dec!=="Approved as Submitted"); const shownAll=F==="all"?R:ch; const RP=S.rowPg[doc.rep+F]||{page:0,size:25}; const pages=Math.max(1,Math.ceil(shownAll.length/RP.size)); if(RP.page>=pages) RP.page=pages-1; const shown=shownAll.slice(RP.page*RP.size,RP.page*RP.size+RP.size); const link=(S.queue[doc.rep]||{}).url||"";
   const c={}; R.forEach(r=>{ c[r.dec]=(c[r.dec]||0)+1; });
   const row=r=>'<div class="row'+(r.dec==="Approved as Submitted"?" ok":" chg")+'"><div class="rh"><span class="it">Item '+esc(r.item)+'</span><span class="ct">'+esc([r.ct,r.tt].filter(Boolean).join(" · "))+'</span><b>'+esc(r.name||"")+'</b>'+(r.pc?'<span class="pc">in '+esc(r.pc)+'</span>':'')+'</div>'+
     (r.old?'<div class="def"><span class="lbl">Original or Old Value</span>'+esc(r.old)+'</div>':'')+
@@ -652,16 +776,17 @@ function histDesk(doc){ const R=doc.rows||[], F=S.filter==="all"?"all":"changed"
     '<div class="box" style="margin-top:10px"><span class="lbl">IM decided</span>'+chip(r.dec)+(r.com?'<div class="why">'+esc(r.com)+'</div>':(r.dec!=="Approved as Submitted"?'<div class="why muted">No comment on the form.</div>':''))+'</div></div>';
   return '<div class="dhead"><div class="t"><a class="back" href="#/decided">‹ All Decisions</a><h1 style="margin-top:6px">'+esc(((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||"")))+'</h1><div class="sub">'+esc(["Decided "+fmtD(doc.decidedAt),doc.file,doc.cop,doc.resub?"resubmission":""].filter(Boolean).join(" · "))+'</div></div>'+
     '<div class="prog"><b>'+R.length+'</b><span>rows</span><div class="pb" style="display:flex;gap:2px">'+DEC.filter(d=>c[d]).map(d=>'<i style="width:auto;flex:'+c[d]+';background:'+DCOL[d]+';border-radius:0" title="'+esc(c[d]+" "+d)+'"></i>').join("")+'</div></div></div>'+
-    '<div class="card" style="border-left:4px solid var(--good)"><b>From the IM library.</b> <span class="muted">'+Object.entries(c).sort((a,b)=>(RANK[a[0]]||0)-(RANK[b[0]]||0)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span>'+(doc.url?' <a href="'+esc(doc.url)+'" target="_blank" rel="noopener">Open the decided form ↗</a>':'')+'</div>'+
+    '<div class="card" style="border-left:4px solid var(--good)"><b>From the IM library.</b> <span class="muted">'+Object.entries(c).sort((a,b)=>(RANK[a[0]]||0)-(RANK[b[0]]||0)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span>'+(link?' <a href="'+esc(link)+'" target="_blank" rel="noopener">Open the decided form in the IM library ↗</a>':'')+'</div>'+
     '<div class="dtools"><div class="seg" role="tablist"><button type="button" data-f="changed" aria-pressed="'+(F==="changed")+'">Changed by IM<b>'+ch.length+'</b></button><button type="button" data-f="all" aria-pressed="'+(F==="all")+'">All Rows<b>'+R.length+'</b></button></div><span class="sp"></span><button class="btn sm" data-xl="1">Download for Excel</button></div>'+
-    '<div class="rows">'+(shown.length?shown.map(row).join(""):'<div class="empty">IM approved every row as submitted.</div>')+'</div>'; }
+    '<div class="rows">'+(shown.length?shown.map(row).join(""):'<div class="empty">IM approved every row as submitted.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):''); }
+S.rowPg={};
 /* ---------- the desk ---------- */
 function desk(doc){ if(doc.hist) return histDesk(doc);
   const R=doc.rows||[], decided=doc.status==="decided", q=S.queue[doc.rep]||{}, F=S.filter;
   const looks=R.filter(isLook), clean=R.filter(r=>!isLook(r)), done=R.filter(r=>r.final).length;
   const lookLeft=looks.filter(r=>!r.final).length, cleanLeft=clean.filter(r=>!r.final).length;
   const vis=r=>F==="all"||(F==="look"?isLook(r):F==="clean"?!isLook(r):F==="changed"?(r.final&&!r.final.agreed):true);
-  const shown=R.filter(vis);
+  const shownAll=R.filter(vis); const RP=S.rowPg[doc.rep+F]||(S.rowPg[doc.rep+F]={page:0,size:50}); const pages=Math.max(1,Math.ceil(shownAll.length/RP.size)); if(RP.page>=pages) RP.page=pages-1; const shown=shownAll.slice(RP.page*RP.size,RP.page*RP.size+RP.size);
   const can=canReview()&&!decided;
   const step=(k,n,t,btn,cur)=>'<div class="step'+(cur?" cur":"")+'"><span class="sk">'+k+'</span><b>'+n+'</b><p>'+t+'</p>'+(btn||"")+'</div>';
   const plan=decided?'':'<div class="plan">'+
@@ -670,12 +795,12 @@ function desk(doc){ if(doc.hist) return histDesk(doc);
     step("3 · Finish",done+" of "+R.length,"When every row is decided, finish. The facilitator gets the decisions and the draft learns from your changes.",can?'<button class="btn sm pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':"",done===R.length&&!decided)+'</div>';
   const nChg=R.filter(r=>r.final&&!r.final.agreed).length;
   const tools='<div class="dtools"><div class="seg" role="tablist">'+[["look","Needs a Look",looks.length],["clean","Clean",clean.length],["all","All Rows",R.length]].concat(nChg?[["changed","Changed by IM",nChg]]:[]).map(([k,l,n])=>'<button type="button" data-f="'+k+'" aria-pressed="'+(F===k)+'">'+l+'<b>'+n+'</b></button>').join("")+'</div><span class="sp"></span>'+
-    (can&&shown.some(r=>!r.final)&&F!=="changed"?'<button class="btn sm" data-all="'+F+'">Agree With All '+shown.filter(r=>!r.final).length+' Shown</button>':"")+'</div>';
+    (can&&shownAll.some(r=>!r.final)&&F!=="changed"?'<button class="btn sm" data-all="'+F+'">Agree With All '+shownAll.filter(r=>!r.final).length+(F==="all"?' Remaining':' Shown')+'</button>':"")+'</div>';
   return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div></div>'+
     '<div class="prog"><b>'+done+' of '+R.length+'</b><span>rows decided</span><div class="pb"><i style="width:'+pct(done,R.length)+'%"></i></div></div></div>'+
     (decided?'<div class="card" style="border-left:4px solid var(--good)"><b>Decided '+esc(fmtD(doc.decidedAt))+' by '+esc(doc.decidedBy||"")+'.</b> <span class="muted">'+Object.entries(tally(R)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span></div>':'')+
     (!canReview()&&!decided?'<div class="card">You can follow this review here. IM reviewers make the decisions.</div>':'')+
-    plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+
+    plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):'')+
     '<div class="foot"><span>'+(decided?"Decided "+esc(fmtD(doc.decidedAt)):(R.length-done)?(R.length-done)+" row"+(R.length-done===1?"":"s")+" still to decide":"Every row is decided")+'</span><span class="sp"></span><button class="btn" data-xl="1">Download for Excel</button>'+(can?'<button class="btn pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':'')+'</div>';
 }
 function tally(R){ const c={}; R.forEach(r=>{ const d=(r.final&&r.final.dec)||r.draft.dec; c[d]=(c[d]||0)+1; }); return c; }
@@ -718,29 +843,35 @@ function exportXl(doc){ const head=["Item #","Change Type","Change Target Type",
 /* ---------- charts (small, plain SVG, with a hover tip) ---------- */
 function tipOn(el){ const box=el.closest(".chart"); let t=$(".tip",box); if(!t){ t=document.createElement("div"); t.className="tip"; t.hidden=true; box.appendChild(t); }
   $$("[data-tip]",el).forEach(m=>{ m.addEventListener("mouseenter",()=>{ t.innerHTML=m.dataset.tip; t.hidden=false; }); m.addEventListener("mousemove",e=>{ const b=box.getBoundingClientRect(); let x=e.clientX-b.left+12; if(x+t.offsetWidth>b.width) x=e.clientX-b.left-t.offsetWidth-12; t.style.left=Math.max(0,x)+"px"; t.style.top=(e.clientY-b.top-10-t.offsetHeight)+"px"; }); m.addEventListener("mouseleave",()=>t.hidden=true); m.addEventListener("focus",()=>{ t.innerHTML=m.dataset.tip; t.hidden=false; t.style.left="10px"; t.style.top="0px"; }); m.addEventListener("blur",()=>t.hidden=true); }); }
-/* 100% stacked columns, one per period */
-function stackChart(periods,keys,cols,valOf,{h=210,fmtTip}={}){ const W=560,H=h,pl=34,pb=24,pt=8,cw=(W-pl)/periods.length, bw=Math.min(46,cw*0.62);
+/* 100% stacked columns, one per period: rounded tops, the hovered year lifts */
+let gid=0;
+function stackChart(periods,keys,cols,valOf,{h=230}={}){ const W=560,H=h,pl=36,pb=26,pt=10,cw=(W-pl)/periods.length, bw=Math.min(54,cw*0.64);
   let g='<line class="base" x1="'+pl+'" x2="'+W+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'"/>'; [0,50,100].forEach(v=>{ const y=H-pb-(H-pb-pt)*v/100; g+='<text class="ax" x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end">'+v+'%</text>'+(v?'<line class="gl" x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'"/>':''); });
-  periods.forEach((p,i)=>{ const tot=keys.reduce((s,k)=>s+(valOf(p,k)||0),0); if(!tot) return; let y=H-pb; const x=pl+i*cw+(cw-bw)/2;
-    const segs=keys.filter(k=>valOf(p,k));
-    segs.forEach((k,j)=>{ const v=valOf(p,k), hh=(H-pb-pt)*v/tot; const top=j===segs.length-1; y-=hh; g+='<rect x="'+x+'" y="'+(y+(j?0:0))+'" width="'+bw+'" height="'+Math.max(0,hh-2)+'" rx="'+(top?3:0)+'" fill="'+cols[k]+'"/>'; });
+  periods.forEach((p,i)=>{ const tot=keys.reduce((s,k)=>s+(valOf(p,k)||0),0); if(!tot) return; let y=H-pb; const x=pl+i*cw+(cw-bw)/2; const segs=keys.filter(k=>valOf(p,k));
+    let col='<g class="col"><rect class="col-bg" x="'+(pl+i*cw+2)+'" y="'+pt+'" width="'+(cw-4)+'" height="'+(H-pb-pt)+'" rx="5"/>';
+    segs.forEach((k,j)=>{ const v=valOf(p,k), hh=(H-pb-pt)*v/tot, top=j===segs.length-1; y-=hh; col+='<rect class="bar-in" style="--d:'+(i*60)+'ms" x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(0,hh-(top?0:2))+'" rx="'+(top?5:0)+'" fill="'+cols[k]+'"/>'; });
+    const first=valOf(p,keys[0])||0; col+='<text class="cl" x="'+(x+bw/2)+'" y="'+(H-pb-(H-pb-pt)*first/tot/2+4)+'" text-anchor="middle">'+pct(first,tot)+'%</text>';
     const tip='<b>'+esc(p.label)+'</b> · '+tot.toLocaleString()+' rows<br>'+keys.filter(k=>valOf(p,k)).map(k=>esc(k)+': '+valOf(p,k).toLocaleString()+' ('+pct(valOf(p,k),tot)+'%)').join("<br>");
-    g+='<rect x="'+(pl+i*cw)+'" y="'+pt+'" width="'+cw+'" height="'+(H-pb-pt)+'" fill="transparent" data-tip="'+esc(tip)+'" tabindex="0"/>';
-    g+='<text class="ax" x="'+(x+bw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(p.label)+'</text>'; });
+    col+='<rect x="'+(pl+i*cw)+'" y="'+pt+'" width="'+cw+'" height="'+(H-pb-pt)+'" fill="transparent" data-tip="'+esc(tip)+'" tabindex="0"/></g>'; g+=col;
+    g+='<text class="ax" x="'+(x+bw/2)+'" y="'+(H-7)+'" text-anchor="middle">'+esc(p.label)+'</text>'; });
   return '<div class="legend">'+keys.map(k=>'<span><i style="background:'+cols[k]+'"></i>'+esc(k)+'</span>').join("")+'</div><div class="chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Share of rows by decision, by year">'+g+'</svg></div>'; }
-/* one or more lines over periods, a crosshair tip per period */
-function lineChart(periods,series,{h=190,unit="",max}={}){ const W=560,H=h,pl=40,pb=24,pt=12, n=periods.length, cw=(W-pl-14)/Math.max(1,n-1);
-  const all=series.flatMap(s=>periods.map(p=>s.v(p)).filter(v=>v!=null)); const top=max||Math.max(1,...all)*1.12; const Y=v=>H-pb-(H-pb-pt)*v/top, X=i=>pl+i*cw;
-  let g='<line class="base" x1="'+pl+'" x2="'+W+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'"/>'; [0.5,1].forEach(f=>{ const v=top*f/1.12; const y=Y(v); g+='<line class="gl" x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'"/><text class="ax" x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end">'+Math.round(v)+unit+'</text>'; });
-  const used=[]; series.forEach(s=>{ const pts=periods.map((p,i)=>[i,s.v(p)]).filter(x=>x[1]!=null); g+='<polyline fill="none" stroke="'+s.c+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="'+pts.map(([i,v])=>X(i)+","+Y(v)).join(" ")+'"/>'+pts.map(([i,v])=>'<circle cx="'+X(i)+'" cy="'+Y(v)+'" r="4" fill="'+s.c+'" stroke="var(--surface)" stroke-width="2"/>').join("");
-    const lp=pts[pts.length-1]; if(lp&&series.length<=4){ let ly=Y(lp[1])-10; while(used.some(u=>Math.abs(u-ly)<14)) ly+=26; used.push(ly); g+='<text x="'+(X(lp[0])-8)+'" y="'+ly+'" text-anchor="end" style="font-size:11.5px;font-weight:700;fill:var(--ink)">'+Math.round(lp[1])+unit+'</text>'; } });
-  periods.forEach((p,i)=>{ g+='<text class="ax" x="'+X(i)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(p.label)+'</text>';
-    const tip='<b>'+esc(p.label)+'</b><br>'+series.map(s=>{ const v=s.v(p); return esc(s.name)+': '+(v==null?'—':Math.round(v)+unit)+(s.extra?s.extra(p):''); }).join("<br>");
-    g+='<rect x="'+(X(i)-cw/2)+'" y="'+pt+'" width="'+cw+'" height="'+(H-pb-pt)+'" fill="transparent" data-tip="'+esc(tip)+'" tabindex="0"/>'; });
-  return (series.length>1?'<div class="legend">'+series.map(s=>'<span><i style="background:'+s.c+'"></i>'+esc(s.name)+'</span>').join("")+'</div>':'')+'<div class="chart"><svg viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg></div>'; }
-/* horizontal bars for a ranked list */
+/* lines with a soft area under them, drawn in, with a crosshair per period */
+function lineChart(periods,series,{h=200,unit="",max}={}){ const W=560,H=h,pl=40,pb=26,pt=16, n=periods.length, cw=(W-pl-18)/Math.max(1,n-1);
+  const all=series.flatMap(s=>periods.map(p=>s.v(p)).filter(v=>v!=null)); const top=max||Math.max(1,...all)*1.15; const Y=v=>H-pb-(H-pb-pt)*v/top, X=i=>pl+6+i*cw; const id='lg'+(++gid);
+  let defs='<defs>'+series.map((s,k)=>'<linearGradient id="'+id+k+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="'+s.c+'" stop-opacity=".28"/><stop offset="1" stop-color="'+s.c+'" stop-opacity="0"/></linearGradient>').join("")+'</defs>';
+  let g='<line class="base" x1="'+pl+'" x2="'+W+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'"/>'; [0.5,1].forEach(f=>{ const v=top*f/1.15; const y=Y(v); g+='<line class="gl" x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'"/><text class="ax" x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end">'+Math.round(v)+unit+'</text>'; });
+  const used=[];
+  series.forEach((s,k)=>{ const pts=periods.map((p,i)=>[i,s.v(p)]).filter(x=>x[1]!=null); if(!pts.length) return; const d=pts.map(([i,v],j)=>(j?'L':'M')+X(i)+' '+Y(v)).join(' ');
+    if(series.length<=2) g+='<path d="'+d+' L'+X(pts[pts.length-1][0])+' '+(H-pb)+' L'+X(pts[0][0])+' '+(H-pb)+' Z" fill="url(#'+id+k+')" class="area-in"/>';
+    g+='<path d="'+d+'" fill="none" stroke="'+s.c+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round" class="line-in" pathLength="1"/>'+pts.map(([i,v])=>'<circle cx="'+X(i)+'" cy="'+Y(v)+'" r="4.5" fill="'+s.c+'" stroke="var(--surface)" stroke-width="2" class="pt-in" style="--d:'+(i*80+300)+'ms"/>').join("");
+    const lp=pts[pts.length-1]; if(series.length<=4){ let ly=Y(lp[1])-11; while(used.some(u=>Math.abs(u-ly)<14)) ly+=26; used.push(ly); g+='<text x="'+(X(lp[0])-9)+'" y="'+ly+'" text-anchor="end" class="endlab" fill="'+s.c+'">'+Math.round(lp[1])+unit+'</text>'; } });
+  periods.forEach((p,i)=>{ g+='<text class="ax" x="'+X(i)+'" y="'+(H-7)+'" text-anchor="middle">'+esc(p.label)+'</text>';
+    const tip='<b>'+esc(p.label)+'</b><br>'+series.map(s=>{ const v=s.v(p); return '<i class="tk" style="background:'+s.c+'"></i>'+esc(s.name)+': '+(v==null?'—':Math.round(v)+unit)+(s.extra?s.extra(p):''); }).join("<br>");
+    g+='<g class="xh"><line x1="'+X(i)+'" x2="'+X(i)+'" y1="'+pt+'" y2="'+(H-pb)+'"/><rect x="'+(X(i)-cw/2)+'" y="'+pt+'" width="'+cw+'" height="'+(H-pb-pt)+'" fill="transparent" data-tip="'+esc(tip)+'" tabindex="0"/></g>'; });
+  return (series.length>1?'<div class="legend">'+series.map(s=>'<span><i style="background:'+s.c+'"></i>'+esc(s.name)+'</span>').join("")+'</div>':'')+'<div class="chart"><svg viewBox="0 0 '+W+' '+H+'" role="img">'+defs+g+'</svg></div>'; }
+/* ranked bars: rank, gradient fill, grows in */
 function hbars(items,{c="var(--c1)",unit=""}={}){ const mx=Math.max(1,...items.map(x=>x.v));
-  return '<div class="chart"><div style="display:grid;gap:7px">'+items.map(x=>'<div data-tip="'+esc('<b>'+esc(x.k)+'</b><br>'+(x.tip||x.v+unit))+'" tabindex="0" style="display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:10px;align-items:center;font-size:13px"><span>'+esc(x.k)+'</span><span style="height:10px;background:var(--surface-3);border-radius:0 3px 3px 0"><i style="display:block;height:100%;width:'+Math.max(2,x.v/mx*100)+'%;background:'+(x.c||c)+';border-radius:0 3px 3px 0"></i></span><b style="font-size:12.5px;min-width:34px;text-align:right">'+x.v.toLocaleString()+unit+'</b></div>').join("")+'</div></div>'; }
+  return '<div class="chart"><div class="hb">'+items.map((x,i)=>'<div class="hb-r" data-tip="'+esc('<b>'+esc(x.k)+'</b><br>'+(x.tip||x.v+unit))+'" tabindex="0"><span class="hb-n">'+(i+1)+'</span><span class="hb-k">'+esc(x.k)+'</span><span class="hb-t"><i style="--w:'+Math.max(2,x.v/mx*100)+'%;--c:'+(x.c||c)+';--d:'+(i*70)+'ms"></i></span><b>'+x.v.toLocaleString()+unit+'</b></div>').join("")+'</div></div>'; }
 
 function trendsView(){ const B=S.bt;
   if(!B||!B.years) return '<div class="head"><div><h1>Trends</h1><div class="sub">The history of IM’s decisions loads here once the analysis of the IM library is published.</div></div></div><div class="card"><div class="empty">No trend data yet.</div></div>';
@@ -751,7 +882,7 @@ function trendsView(){ const B=S.bt;
   const k=(t,v,s,c)=>'<div class="k" style="--kc:'+c+'"><span>'+t+'</span><b>'+v+'</b><em>'+s+'</em></div>';
   const tot=Y.reduce((s,y)=>s+y.rows,0), subs=Y.reduce((s,y)=>s+y.subs,0);
   return '<div class="head"><div><h1>Trends</h1><div class="sub">What IM has decided since '+esc(Y[0]&&Y[0].y)+', from '+subs.toLocaleString()+' decided submissions and '+tot.toLocaleString()+' Reference Model rows in the IM library'+(B.asOf?', as of '+esc(fmtD(B.asOf)):'')+'. Hover any chart for the numbers.</div></div></div>'+
-    '<div class="kp">'+k("Approved as Submitted, "+last.y,asP(last)+"%",chg(asP(last),prev.rows?asP(prev):null)||"of "+last.rows+" rows","var(--good)")+
+    '<div class="kp dark">'+k("Approved as Submitted, "+last.y,asP(last)+"%",chg(asP(last),prev.rows?asP(prev):null)||"of "+last.rows+" rows","var(--good)")+
       k("Rows Reviewed, "+last.y,(last.rows||0).toLocaleString(),(last.subs||0)+" submissions","var(--c1)")+
       k("Days to IM Approval",last.medDays!=null?last.medDays:"—",last.medDays!=null?"median in "+last.y+(prev.medDays!=null?" ("+prev.medDays+" in "+prev.y+")":""):"not enough dates","var(--c4)")+
       k("Resubmitted",pct(last.resub||0,last.wrs||0)+"%","of "+(last.wrs||0)+" work requests in "+last.y,"var(--c2)")+'</div>'+
@@ -771,7 +902,7 @@ function draftView(){ const B=S.bt, D=B&&B.draft, C=B&&B.claude, E=B&&B.edits, k
   const label=kind=>{ const [d,ru,tt]=kind.split("|"); return '<b>'+esc(d)+'</b> · '+esc(RULE_NAME[ru]||ru)+' · '+esc(tt||"any row"); };
   const cb=C&&C.both;
   return '<div class="head"><div><h1>How the Draft Is Doing</h1><div class="sub">The <b>draft</b> is the decision the system suggests for each row before IM looks at it (Approved as Submitted, Approved with Modification, Returned or Denied), with the comment and wording IM would likely give. This page is its report card: how often IM’s actual decision matched it. When a kind of row has matched IM 95% of the time or more over at least 30 rows, it can arrive already approved, so reviewers only see the exceptions. Reviewers can still change any row.</div></div></div>'+
-    '<div class="kp">'+k("Agreed Here",lv.length?pct(la,lv.length)+"%":"—",lv.length?la+" of "+lv.length+" rows reviewed in this portal":"fills in as you review","var(--c1)")+
+    '<div class="kp dark">'+k("Agreed Here",lv.length?pct(la,lv.length)+"%":"—",lv.length?la+" of "+lv.length+" rows reviewed in this portal":"fills in as you review","var(--c1)")+
       (cb?k("IM Changes Spotted",pct(cb.caught,cb.changed)+"%",cb.caught+" of "+cb.changed+" rows IM changed, "+esc(C.period),"var(--c2)")+
         k("When the Draft Says Clean",pct(cb.cleanKept,cb.clean)+"%","IM approved as submitted (any row: "+pct(C.base,cb.rows)+"%)","var(--good)")+
         k("Left for a Reviewer",pct(cb.flagged,cb.rows)+"%","of rows flagged for a look","var(--c4)"):"")+'</div>'+
@@ -808,6 +939,12 @@ document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.tagName==="I
   else if(k==="?"){ const h=$(".keys",m); if(h) h.hidden=!h.hidden; } });
 function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-months]",m).forEach(b=>b.onclick=()=>{ S.homeMonths=+b.dataset.months; seenView.waiting=1; render(); });
+  $$("[data-upall]",m).forEach(b=>b.onclick=()=>{ S.upAll=!S.upAll; seenView.waiting=1; render(); });
+  const pgState=key=>{ if(key==="dec") return S.dec; const k=key.slice(5); return S.rowPg[k]||(S.rowPg[k]={page:0,size:25}); };
+  $$("[data-pg]",m).forEach(b=>b.onclick=()=>{ const i=b.dataset.pg.lastIndexOf("|"), key=b.dataset.pg.slice(0,i); pgState(key).page=+b.dataset.pg.slice(i+1); S.focus=-1; render(); const t=$(".dtools",$("#main"))||$("#main"); t.scrollIntoView({block:"start",behavior:"smooth"}); });
+  $$("[data-pgsize]",m).forEach(sel=>sel.onchange=()=>{ const st=pgState(sel.dataset.pgsize); st.size=+sel.value; st.page=0; render(); });
+  $$("[data-dyear]",m).forEach(b=>b.onclick=()=>{ S.dec.year=b.dataset.dyear; S.dec.page=0; render(); });
+  const dq=$("#decq",m); if(dq){ dq.oninput=()=>{ clearTimeout(dq._t); dq._t=setTimeout(()=>{ S.dec.q=dq.value; S.dec.page=0; const pos=dq.selectionStart; render(); const n=$("#decq"); if(n){ n.focus(); n.setSelectionRange(pos,pos); } },200); }; }
   if(route().view==="review"&&S.focus>=0) focusRow(m,S.focus);
   $$("[data-auto]",m).forEach(c=>c.onchange=async()=>{ const kd=c.dataset.auto; try{ const o=await update("config",cur=>{ const x=cur||{}; x.imauto=Object.assign({},x.imauto||{},{[kd]:c.checked}); return x; }); S.cfg=o; toast(c.checked?"Those rows will arrive already approved":"Those rows will need a reviewer again"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); });
   const r=route(); if(r.view!=="review") return; const doc=S.docs[r.rep]; if(!doc) return;
