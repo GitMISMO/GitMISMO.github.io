@@ -55,11 +55,11 @@
          ]
        }, 
        "membership-desk": {
-         "repo": "GitMISMO/member-360-data",
+         "repo": "GitMISMO/membership-desk-data",
          "branch": "main",
          "origin": "https://resources.mismo.org",
          "writable": [
-           "desk/"
+           "data/"
          ]
        }, 
        "marketing-hq": {
