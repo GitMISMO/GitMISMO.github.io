@@ -531,6 +531,20 @@ body.railmini .hq nav button .nb{display:none}
 .dn-c{top:16px;height:168px}
 .dn-c b{font-size:30px;line-height:1}
 .dn-c span{font-size:9.5px;letter-spacing:.06em;margin-top:5px}
+
+/* documents: each opens the file itself */
+.card.docs h3{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.dl{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px}
+.dl-f{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:inherit;text-decoration:none;min-width:0;transition:border-color .15s,transform .15s}
+.dl-f:hover{border-color:var(--sky);transform:translateY(-1px)}
+.dl-f.main{border-left:3px solid var(--sky)}
+.dl-i{flex:0 0 30px;height:30px;border-radius:5px;display:grid;place-items:center;background:var(--surface-3)}
+.dl-i svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.dl-doc{color:#2b6cb0}.dl-xls{color:#1f8a5b}.dl-pdf{color:#c0392b}.dl-zip{color:#8a6d1f}.dl-file{color:var(--ink-3)}
+.dl-n{display:flex;flex-direction:column;min-width:0;flex:1}
+.dl-n b{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dl-n em{font-style:normal;font-size:11.5px;color:var(--ink-3)}
+.dl-go{color:var(--ink-3);font-size:13px}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -794,7 +808,7 @@ function histDesk(doc){ const R=doc.rows||[], F=S.filter==="all"?"all":"changed"
     '<div class="box" style="margin-top:10px"><span class="lbl">IM decided</span>'+chip(r.dec)+(r.com?'<div class="why">'+esc(r.com)+'</div>':(r.dec!=="Approved as Submitted"?'<div class="why muted">No comment on the form.</div>':''))+'</div></div>';
   return '<div class="dhead"><div class="t"><a class="back" href="#/decided">‹ All Decisions</a><h1 style="margin-top:6px">'+esc(((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||"")))+'</h1><div class="sub">'+esc(["Decided "+fmtD(doc.decidedAt),doc.file,doc.cop,doc.resub?"resubmission":""].filter(Boolean).join(" · "))+'</div></div>'+
     '<div class="prog"><b>'+R.length+'</b><span>rows</span><div class="pb" style="display:flex;gap:2px">'+DEC.filter(d=>c[d]).map(d=>'<i style="width:auto;flex:'+c[d]+';background:'+DCOL[d]+';border-radius:0" title="'+esc(c[d]+" "+d)+'"></i>').join("")+'</div></div></div>'+
-    '<div class="card" style="border-left:4px solid var(--good)"><b>From the IM library.</b> <span class="muted">'+Object.entries(c).sort((a,b)=>(RANK[a[0]]||0)-(RANK[b[0]]||0)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span>'+(link?' <a href="'+esc(link)+'" target="_blank" rel="noopener">Open the decision form in the IM library ↗</a>':'')+'</div>'+
+    '<div class="card" style="border-left:4px solid var(--good)"><b>From the IM library.</b> <span class="muted">'+Object.entries(c).sort((a,b)=>(RANK[a[0]]||0)-(RANK[b[0]]||0)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span>'+(link?' <a href="'+esc(link)+'" target="_blank" rel="noopener">Open the decision form ↗</a>':'')+'</div>'+
     '<div class="dtools"><div class="seg" role="tablist"><button type="button" data-f="changed" aria-pressed="'+(F==="changed")+'">Changed by IM<b>'+ch.length+'</b></button><button type="button" data-f="all" aria-pressed="'+(F==="all")+'">All Rows<b>'+R.length+'</b></button></div><span class="sp"></span><button class="btn sm" data-xl="1">Download for Excel</button></div>'+
     '<div class="rows">'+(shown.length?shown.map(row).join(""):'<div class="empty">IM approved every row as submitted.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):''); }
 S.rowPg={};
@@ -814,14 +828,23 @@ function desk(doc){ if(doc.hist) return histDesk(doc);
   const nChg=R.filter(r=>r.final&&!r.final.agreed).length;
   const tools='<div class="dtools"><div class="seg" role="tablist">'+[["look","Needs a Look",looks.length],["clean","Clean",clean.length],["all","All Rows",R.length]].concat(nChg?[["changed","Changed by IM",nChg]]:[]).map(([k,l,n])=>'<button type="button" data-f="'+k+'" aria-pressed="'+(F===k)+'">'+l+'<b>'+n+'</b></button>').join("")+'</div><span class="sp"></span>'+
     (can&&shownAll.some(r=>!r.final)&&F!=="changed"?'<button class="btn sm" data-all="'+F+'">Agree With All '+shownAll.filter(r=>!r.final).length+(F==="all"?' Remaining':' Shown')+'</button>':"")+'</div>';
-  return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div>'+((q.form&&q.form.u)||q.folder?'<div class="splinks">'+(q.form&&q.form.u?'<a class="btn sm" href="'+esc(q.form.u)+'" target="_blank" rel="noopener">Open the Submission Form in SharePoint ↗</a>':'')+(q.folder?'<a class="btn sm ghost" href="'+esc(q.folder)+'" target="_blank" rel="noopener">Work Request Folder ↗</a>':'')+'</div>':'')+'</div>'+
+  return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div>'+'</div>'+
     '<div class="prog"><b>'+done+' of '+R.length+'</b><span>rows decided</span><div class="pb"><i style="width:'+pct(done,R.length)+'%"></i></div></div></div>'+
+    docsHtml(q,doc.rep)+
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: agree, change rows, finish. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
     (decided?'<div class="card" style="border-left:4px solid var(--good)"><b>Decided '+esc(fmtD(doc.decidedAt))+' by '+esc(doc.decidedBy||"")+'.</b> <span class="muted">'+Object.entries(tally(R)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span></div>':'')+
     (!canReview()&&!decided?'<div class="card">You can follow this review here. IM reviewers make the decisions.</div>':'')+
     plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):'')+
     '<div class="foot"><span>'+(decided?"Decided "+esc(fmtD(doc.decidedAt)):(R.length-done)?(R.length-done)+" row"+(R.length-done===1?"":"s")+" still to decide":"Every row is decided")+'</span><span class="sp"></span><button class="btn" data-xl="1">Download for Excel</button>'+(can?'<button class="btn pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':'')+'</div>';
 }
+/* the work request's documents: each opens the file itself in a new tab (PDF in the browser, Word and Excel in Office online) */
+const DOC_IC={doc:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h6',xls:'M4 4h16v16H4zM4 10h16M10 4v16',pdf:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 15h2a1.5 1.5 0 0 0 0-3H8v6',zip:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M11 7v2M11 11v2M11 15v2',file:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6'};
+const docKind=n=>{ const e=(String(n).split('.').pop()||'').toLowerCase(); return /docx?|rtf|txt/.test(e)?'doc':/xls|csv/.test(e)?'xls':e==='pdf'?'pdf':/zip/.test(e)?'zip':'file'; };
+function docsHtml(q,key){ const L=[]; if(q.form&&q.form.u) L.push({n:q.form.n||'Submission form',u:q.form.u,tag:'Submission Form',main:1});
+  (q.docs||[]).forEach(d=>{ if(!L.some(x=>x.u===d.u)) L.push(d); }); if(q.url) L.push({n:'This decision in the library',u:q.url,tag:'MISMO Connect',k:'file'});
+  if(!L.length) return ''; const all=S.docsAll===key, show=all?L:L.slice(0,6);
+  return '<div class="card docs"><h3>Documents<small>'+L.length+' · click one to open it in a new tab</small><span class="sp"></span>'+(L.length>6?'<button type="button" class="btn sm" data-docsall="'+esc(key)+'">'+(all?'Show Fewer':'Show All '+L.length)+'</button>':'')+'</h3><div class="dl">'+
+    show.map(d=>{ const k=d.k||docKind(d.n); return '<a class="dl-f'+(d.main?' main':'')+'" href="'+esc(d.u)+'" target="_blank" rel="noopener"><span class="dl-i dl-'+k+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(DOC_IC[k]||DOC_IC.file)+'"/></svg></span><span class="dl-n"><b title="'+esc(d.n)+'">'+esc(d.n)+'</b><em>'+esc([d.tag,d.d?fmtS(d.d)+(String(d.d).slice(0,4)!==YR?' '+String(d.d).slice(0,4):''):''].filter(Boolean).join(' · '))+'</em></span><span class="dl-go">↗</span></a>'; }).join('')+'</div></div>'; }
 function tally(R){ const c={}; R.forEach(r=>{ const d=(r.final&&r.final.dec)||r.draft.dec; c[d]=(c[d]||0)+1; }); return c; }
 function rowHtml(r,can){ const f=r.final, ed=S.edit===r.i&&can, lk=isLook(r);
   const conf=confidence(r);
@@ -960,6 +983,7 @@ document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.tagName==="I
 function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-months]",m).forEach(b=>b.onclick=()=>{ S.homeMonths=+b.dataset.months; seenView.waiting=1; render(); });
   $$("[data-upall]",m).forEach(b=>b.onclick=()=>{ S.upAll=!S.upAll; seenView.waiting=1; render(); });
+  $$("[data-docsall]",m).forEach(b=>b.onclick=()=>{ S.docsAll=S.docsAll===b.dataset.docsall?"":b.dataset.docsall; render(); });
   const pgState=key=>{ if(key==="dec") return S.dec; const k=key.slice(5); return S.rowPg[k]||(S.rowPg[k]={page:0,size:10}); };
   $$("[data-pg]",m).forEach(b=>b.onclick=()=>{ const i=b.dataset.pg.lastIndexOf("|"), key=b.dataset.pg.slice(0,i); pgState(key).page=+b.dataset.pg.slice(i+1); S.focus=-1; render(); const t=$(".dtools",$("#main"))||$("#main"); t.scrollIntoView({block:"start",behavior:"smooth"}); });
   $$("[data-pgsize]",m).forEach(sel=>sel.onchange=()=>{ const st=pgState(sel.dataset.pgsize); st.size=+sel.value; st.page=0; render(); });
