@@ -1264,6 +1264,31 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 .aq-d{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--good-bg);border-radius:6px;padding:5px 10px;font:inherit;font-size:12.5px;color:var(--ink);cursor:pointer}
 .aq-d em{font-style:normal;color:var(--ink-3);font-size:11.5px}
 .okdot{display:inline-flex;width:16px;height:16px;border-radius:50%;background:var(--good);color:#fff;font-size:10px;align-items:center;justify-content:center}
+
+/* Architecture Help in the queue: compact rows */
+.aq{padding:10px 14px 12px;border-radius:10px}
+.aq:before{height:3px}
+.aq-h{align-items:center;gap:10px;margin-bottom:8px}
+.aq-h h3{font-size:14.5px}
+.aq-h .muted{flex:1}
+.aq-grid{grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:8px}
+.atile{flex-direction:row;align-items:center;gap:12px;padding:8px 12px;border-top-width:1px;border-left:4px solid var(--ac);border-radius:8px;background:var(--surface)}
+.atile:hover,.atile:focus-visible{transform:translateY(-1px);box-shadow:var(--shadow)}
+.at-ring{width:40px;height:40px;background:radial-gradient(closest-side,var(--surface) 74%,transparent 76% 100%),conic-gradient(var(--ac) calc(var(--p)*1%),var(--surface-3) 0)}
+.at-ring b{font-size:13px}.at-ring em{font-size:8px}
+.at-txt{flex:1;min-width:0}
+.at-t{font-size:13.5px;-webkit-line-clamp:1;display:block;white-space:nowrap;text-overflow:ellipsis}
+.at-id{font-size:10.5px;font-weight:700;color:var(--ink-3);margin-right:6px;letter-spacing:.04em}
+.at-sub{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--ink-2);margin-top:2px;white-space:nowrap;overflow:hidden}
+.at-sub span{overflow:hidden;text-overflow:ellipsis}
+.at-wr{display:inline;margin:0;font-size:12px}
+.at-track{width:64px;flex:0 0 auto}
+.at-track i{height:5px}
+.at-foot{margin:0;flex:0 0 auto}
+.at-open{margin:0;font-size:18px;opacity:.5}
+.aq-done{margin-top:8px;padding-top:8px}
+.aq-d{padding:3px 8px;font-size:12px}
+@media(max-width:700px){.aq-grid{grid-template-columns:1fr}.at-track{display:none}}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3753,20 +3778,18 @@ function archTile(a,role){
   const last=(a.log||[]).slice().reverse().find(l=>l.note);
   const t=a.ticket&&S.tickets[a.ticket];
   const span=a.needBy&&a.requested?Math.max(1,daysBetween(a.requested,a.needBy)):null, used=span?Math.max(0,Math.min(100,Math.round(daysBetween(a.requested,td)/span*100))):0;
-  const ring=a.needBy?'<span class="at-ring'+(late?' late':left<=7?' soon':'')+'" style="--p:'+(late?100:used)+'" title="Target '+esc(fmt(a.needBy))+'"><b>'+(late?Math.abs(left):left)+'</b><em>'+(late?'days late':left===1?'day left':'days left')+'</em></span>':'<span class="at-ring none"><b>—</b><em>no target</em></span>';
+  const ring=a.needBy?'<span class="at-ring'+(late?' late':left<=7?' soon':'')+'" style="--p:'+(late?100:used)+'" title="Target '+esc(fmt(a.needBy))+'"><b>'+(late?Math.abs(left):left)+'</b><em>'+(late?'late':'days')+'</em></span>':'<span class="at-ring none" title="No target date"><b>—</b></span>';
   const btn=(to,l,c)=>'<button class="btn sm '+(c||'')+'" data-arch="'+esc(a.id)+'" data-to="'+to+'" type="button">'+l+'</button>';
   let acts='';
   if(S.canWrite&&role==='pm'&&a.status==='Requested') acts=btn('Approved','Approve →','pri')+btn('Declined','Decline');
   if(S.canWrite&&role==='architect'){ if(a.status==='Approved') acts=btn('In Progress','Start →','pri'); if(a.status==='In Progress') acts=btn('Done','Mark Done →','pri')+btn('On Hold','Hold'); if(a.status==='On Hold') acts=btn('In Progress','Resume →','pri'); }
-  return '<div class="atile s-'+esc(a.status.replace(/\s+/g,'-').toLowerCase())+'" role="button" tabindex="0" data-archopen="'+esc(a.id)+'">'+
-    '<div class="at-top"><span class="at-id">'+esc(a.id)+'</span><span class="chip '+pc+'">'+esc(a.priority||'Medium')+'</span><span class="chip '+archTone(a.status)+'">'+esc(a.status)+'</span>'+(role?'<span class="at-role">'+(role==='pm'?'For you to approve':role==='architect'?'In your queue':'You asked')+'</span>':'')+'</div>'+
-    '<div class="at-main"><div class="at-txt"><div class="at-t">'+esc(a.title)+'</div>'+
-      (t?'<a href="#" class="at-wr" data-open="'+esc(t.id)+'">'+esc(t.wr)+' '+esc(t.name)+'</a>':(a.workgroup?'<div class="at-wr0">'+esc(a.workgroup)+'</div>':''))+
-      '<div class="at-type">'+esc(a.type||'')+(a.hours?' · '+esc(a.hours)+' hrs est.':'')+'</div></div>'+ring+'</div>'+
-    '<div class="at-track">'+steps.map((s,i)=>'<i class="'+(i<at||a.status==='Done'?'d':i===at?'c':'')+(a.status==='On Hold'&&i===at?' h':'')+'" title="'+esc(s)+'"></i>').join('')+'</div>'+
-    '<div class="at-who">'+av(who,'sm')+'<span>'+esc(say)+'</span></div>'+
-    (last?'<div class="at-note"><b>'+esc(String(last.by||'').split(' ')[0])+':</b> '+esc(last.note.length>140?last.note.slice(0,140)+'…':last.note)+'</div>':'')+
-    '<div class="at-foot">'+acts+'<span class="at-open">Open →</span></div></div>';
+  const lastTip=last?' title="'+esc((last.by||'')+': '+last.note)+'"':'';
+  return '<div class="atile s-'+esc(a.status.replace(/\s+/g,'-').toLowerCase())+'" role="button" tabindex="0" data-archopen="'+esc(a.id)+'"'+lastTip+'>'+
+    ring+
+    '<div class="at-txt"><div class="at-t"><span class="at-id">'+esc(a.id)+'</span>'+esc(a.title)+'</div>'+
+      '<div class="at-sub">'+(t?'<a href="#" class="at-wr" data-open="'+esc(t.id)+'">'+esc(t.wr)+'</a> · ':(a.workgroup?esc(a.workgroup)+' · ':''))+av(who,'xs')+'<span>'+esc(say)+'</span></div></div>'+
+    '<div class="at-track" title="'+esc(a.status)+'">'+steps.map((s,i)=>'<i class="'+(i<at||a.status==='Done'?'d':i===at?'c':'')+'"></i>').join('')+'</div>'+
+    (acts?'<div class="at-foot">'+acts+'</div>':'')+'<span class="at-open">›</span></div>';
 }
 archMine=function(me){
   const A=Object.values(S.arch||{});
@@ -3780,8 +3803,8 @@ archMine=function(me){
   let out='';
   if(reqs.length) out+='<div class="qgroup"><h3>Requests to Decide <span class="chip warn">'+reqs.length+'</span></h3><div class="qlist">'+reqs.map(qItem).join('')+'</div></div>';
   if(L.length||recent.length){
-    const pg=pageOf('archmine:'+(S.viewAs||''),L,3);
-    out+='<div class="aq"><div class="aq-h"><div><h3>Architecture Help</h3><span class="muted">'+L.length+' open'+(recent.length?' · '+recent.length+' finished in the last two weeks':'')+'</span></div>'+(S.canWrite?'<button class="btn sm" type="button" id="archnew2">+ Ask for Architecture Help</button>':'')+'</div>'+
+    const pg=pageOf('archmine:'+(S.viewAs||''),L,4);
+    out+='<div class="aq"><div class="aq-h"><h3>Architecture Help</h3><span class="muted">'+L.length+' open'+(recent.length?' · '+recent.length+' finished in the last two weeks':'')+'</span>'+(S.canWrite?'<button class="btn sm" type="button" id="archnew2">+ Ask for Architecture Help</button>':'')+'</div>'+
       (L.length?'<div class="aq-grid">'+pg.items.map(([a,r])=>archTile(a,r)).join('')+'</div>'+pg.bar:'')+
       (recent.length?'<div class="aq-done">'+recent.map(a=>'<button type="button" class="aq-d" data-archopen="'+esc(a.id)+'"><span class="okdot">✓</span><b>'+esc(a.id)+'</b> '+esc(a.title)+'<em>done '+esc(fmtS(a.done))+'</em></button>').join('')+'</div>':'')+'</div>';
   } else if(S.canWrite&&!S.viewAs&&(S.people.facilitators||[]).some(p=>sameName(p.name,me.name))) {
