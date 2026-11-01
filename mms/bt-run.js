@@ -25,7 +25,14 @@ function fakeForm(rows,F,name){ const keys=Object.keys(HDR), col=k=>String.fromC
 /* every decision event: a decided form, paired with what was submitted */
 function events(recs){
   const R=recs.filter(r=>r.rows&&r.rows.length).map(r=>Object.assign({},r,{dc:r.rows.filter(x=>normDec(x.dec)).length}));
-  const seen=new Set(); const uniq=R.filter(r=>{ const k=r.fn+'|'+r.rows.length; if(seen.has(k)) return false; seen.add(k); return true; });
+  const seen=new Set(); let uniq=R.filter(r=>{ const k=r.fn+'|'+r.rows.length; if(seen.has(k)) return false; seen.add(k); return true; });
+  // the same form is often posted more than once (renamed, re-uploaded, another folder): keep the latest copy
+  const sig=r=>new Set(r.rows.map(nameOf).filter(Boolean));
+  uniq.sort((a,b)=>b.d.localeCompare(a.d)); const kept=[];
+  uniq.forEach(r=>{ const a=sig(r); if(!a.size){ kept.push(r); return; } const decided=r.dc>=r.rows.length*0.5;
+    const dup=kept.some(k=>{ if((k.dc>=k.rows.length*0.5)!==decided) return false; if(Math.abs(k.rows.length-r.rows.length)>Math.max(3,r.rows.length*0.15)) return false; const b=sig(k); let n=0; a.forEach(x=>{ if(b.has(x)) n++; }); return n>=a.size*0.8&&days(r.d,k.d)<=365; });
+    if(!dup) kept.push(r); });
+  uniq=kept; uniq.forEach(r=>{ if(r.fmt==='v1') r.rows.forEach(x=>{ delete x.xp; }); });
   const byWr={}; uniq.forEach(r=>{ const k=r.wr||('t:'+String(r.t||r.fn).toLowerCase().replace(/[\d_.\-]+/g,' ').replace(/\s+/g,' ').trim().slice(0,40)); (byWr[k]=byWr[k]||[]).push(r); });
   const ev=[];
   Object.entries(byWr).forEach(([wr,L])=>{ L.sort((a,b)=>a.d.localeCompare(b.d)); const decided=L.filter(r=>r.dc>=Math.max(1,r.rows.length*0.5));

@@ -671,6 +671,8 @@ function imDraftRows(P,findings,ai){
     let dec='Approved as Submitted', rule='', why=[], sug='', look=false;
     const bump=(d,ru,txt)=>{ if((IM_RANK[d]||0)>(IM_RANK[dec]||0)){ dec=d; rule=ru; } if(txt) why.push(txt); };
     F.forEach(f=>{ const ru=f.rule||'';
+      // learned: a check IM usually lets through (approved as submitted most of the time) only adds a note
+      const ls=st[ru]; if(ls&&ls.n>=10&&ls.keep/ls.n>=0.6&&!IM_RULE.deny.includes(ru)){ why.push('(IM usually approves these as submitted) '+f.issue); return; }
       if(IM_RULE.deny.includes(ru)) bump('Denied',ru,f.issue+' '+f.suggestion);
       else if(IM_RULE.ret.includes(ru)||(ru==='need'&&f.sev==='fix')) bump('Returned',ru,f.issue+' '+f.suggestion);
       else if(IM_RULE.mod.includes(ru)){ const s=st[ru]; if(s&&s.n>=5&&s.keep/s.n>=0.6){ why.push('(Not usually changed by IM) '+f.issue); return; } bump('Approved with Modification',ru,f.issue+' '+f.suggestion); if(ru==='template'&&!sug) sug=f.suggestion.replace(/^Start with:\s*/,''); }
@@ -682,7 +684,7 @@ function imDraftRows(P,findings,ai){
     const k=imKind(row); if(S.imauto&&S.imauto[k]&&!look) row.auto=true;
     return row; });
 }
-function imRuleStats(){ const st={}; Object.values(S.iml||{}).forEach(x=>{ if(!x||!x.rule) return; const s=st[x.rule]=st[x.rule]||{n:0,keep:0,agree:0}; s.n++; if(x.final==='Approved as Submitted') s.keep++; if(x.agreed) s.agree++; }); return st; }
+function imRuleStats(){ const st={}; ((S.imBt&&S.imBt.draft&&S.imBt.draft.byRule)||[]).forEach(r=>{ st[r.rule]={n:r.n||0,keep:r.keep||0,agree:r.agree||0}; }); Object.values(S.iml||{}).forEach(x=>{ if(!x||!x.rule) return; const s=st[x.rule]=st[x.rule]||{n:0,keep:0,agree:0}; s.n++; if(x.final==='Approved as Submitted') s.keep++; if(x.agreed) s.agree++; }); return st; }
 
 window.__bt={S,rvReadXlsx,rvParseForm,rvImChecks,rvRmChecks,rmLoad,rmFactsFor,imDraftRows,imRuleStats,imKind,IM_RULE,IM_RANK,rvAiIm:typeof rvAiIm==='function'?rvAiIm:null,useRM:R=>{ if(typeof RM!=='undefined') RM=R; }};
 })();
