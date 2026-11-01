@@ -202,7 +202,6 @@ body.railmini .hq .mast-right #theme-btn{margin-top:4px;padding-top:10px;border-
 body{min-height:100vh}
 .santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
 html[data-season="december"] .santa{display:block}
-.hq nav button .nb{margin-left:auto;font-size:11px;font-weight:700;background:var(--sky);color:var(--navy-deep);border-radius:9px;padding:0 7px;line-height:18px}
 body.railmini .hq nav button .nb{display:none}
 .help h3{font-size:15px;margin:0 0 8px}
 .help ol,.help ul{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;line-height:1.5}
@@ -242,14 +241,6 @@ h1{font-size:25px;font-weight:700;margin:0 0 4px}
 .hs span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.7)}
 .hs b{display:block;font-size:26px;line-height:1.15}
 .hs em{display:block;font-style:normal;font-size:12px;color:rgba(255,255,255,.6)}
-.hq{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:12px}
-.hq-h{font-size:11px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
-.hq a{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:rgba(255,255,255,.06);border-radius:6px;padding:9px 11px;margin-bottom:6px;color:#fff;text-decoration:none}
-.hq a:hover{background:rgba(255,255,255,.13)}
-.hq a b{font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hq a i{font-style:normal;font-size:12px;color:var(--sky);font-weight:700;white-space:nowrap}
-.hq a em{grid-column:1/-1;font-style:normal;font-size:12px;color:rgba(255,255,255,.62)}
-.hq .none{font-size:13px;color:rgba(255,255,255,.75);padding:8px 2px}
 @media(max-width:900px){.hero{grid-template-columns:1fr}}
 
 /* submission rows */
@@ -524,6 +515,9 @@ kbd{display:inline-block;min-width:18px;text-align:center;font:600 11px var(--di
 .hb-k{white-space:nowrap}
 .hb-r:hover .hb-k{color:var(--accent)}
 @media(max-width:560px){.hb{grid-template-columns:20px 1fr auto}.hb-k{white-space:normal}.hb-t{grid-column:2/4}}
+.splinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.hq nav button .nb{margin-left:auto;font-size:11px;font-weight:700;background:var(--sky);color:var(--navy-deep);border-radius:9px;padding:0 7px;line-height:18px}
+body.railmini .hq nav button .nb{display:none}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -806,7 +800,7 @@ function desk(doc){ if(doc.hist) return histDesk(doc);
   const nChg=R.filter(r=>r.final&&!r.final.agreed).length;
   const tools='<div class="dtools"><div class="seg" role="tablist">'+[["look","Needs a Look",looks.length],["clean","Clean",clean.length],["all","All Rows",R.length]].concat(nChg?[["changed","Changed by IM",nChg]]:[]).map(([k,l,n])=>'<button type="button" data-f="'+k+'" aria-pressed="'+(F===k)+'">'+l+'<b>'+n+'</b></button>').join("")+'</div><span class="sp"></span>'+
     (can&&shownAll.some(r=>!r.final)&&F!=="changed"?'<button class="btn sm" data-all="'+F+'">Agree With All '+shownAll.filter(r=>!r.final).length+(F==="all"?' Remaining':' Shown')+'</button>':"")+'</div>';
-  return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div></div>'+
+  return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div>'+((q.form&&q.form.u)||q.folder?'<div class="splinks">'+(q.form&&q.form.u?'<a class="btn sm" href="'+esc(q.form.u)+'" target="_blank" rel="noopener">Open the Submission Form in SharePoint ↗</a>':'')+(q.folder?'<a class="btn sm ghost" href="'+esc(q.folder)+'" target="_blank" rel="noopener">Work Request Folder ↗</a>':'')+'</div>':'')+'</div>'+
     '<div class="prog"><b>'+done+' of '+R.length+'</b><span>rows decided</span><div class="pb"><i style="width:'+pct(done,R.length)+'%"></i></div></div></div>'+
     (decided?'<div class="card" style="border-left:4px solid var(--good)"><b>Decided '+esc(fmtD(doc.decidedAt))+' by '+esc(doc.decidedBy||"")+'.</b> <span class="muted">'+Object.entries(tally(R)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span></div>':'')+
     (!canReview()&&!decided?'<div class="card">You can follow this review here. IM reviewers make the decisions.</div>':'')+
