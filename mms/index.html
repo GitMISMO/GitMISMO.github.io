@@ -1605,6 +1605,10 @@ button.hp-t{cursor:pointer}button.hp-t:hover{background:rgba(255,255,255,.12)}
 .hp-dots i{width:9px;height:9px;border-radius:50%;background:var(--sky)}
 @media(max-width:1000px){.hpulse{margin-top:0}}
 @media(max-width:560px){.hpulse{grid-template-columns:1fr 1fr 1fr;gap:6px}.hp-t{padding:9px 9px 10px}.hp-v{font-size:21px}.hp-k{font-size:9.5px;letter-spacing:.03em;white-space:normal;overflow:visible}.hp-s{font-size:11px;white-space:normal}.hp-spark,.hp-dots{display:none}}
+/* lane cards: action buttons wrap inside narrow cards instead of bleeding out */
+.t2-acts{display:flex;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%}
+.t2-acts .btn{white-space:normal;min-width:0;max-width:100%;text-align:center;line-height:1.25}
+.tk2{min-width:0;overflow:hidden}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3354,7 +3358,7 @@ VIEWS.mine=function(){
     const ppl=[...pm.values()].map(p=>Object.assign(p,{r:p.rs.join(' · ')})).filter(p=>!sameName(p.name,S.me.name));
     const rows=ppl.map(p=>{ const q=liveTickets().filter(t=>waitingOn(t,p)); const live=myFacTickets(p).length; return {p,q,live}; }).filter(x=>x.q.length||x.live).sort((a,b)=>b.q.length-a.q.length||a.p.name.localeCompare(b.p.name));
     if(rows.length) team='<div class="secthead"><h2>Everyone’s Queue</h2><span class="muted" style="font-size:12.5px">Click a person to see their queue the way they see it.</span></div><div class="team">'+rows.map(x=>{ const late=x.q.filter(pastTarget).length, old=x.q.reduce((m,t)=>Math.max(m,stageAge(t)||0),0);
-      return '<button type="button" class="tm" data-peek="'+esc(x.p.name)+'">'+av(x.p.name)+'<span class="tm-n"><b>'+esc(x.p.name)+'</b><em>'+esc(x.p.r)+'</em></span><span class="tm-q'+(x.q.length?' on':'')+'" title="'+x.q.length+' work request'+(x.q.length===1?' is':'s are')+' waiting on '+esc(firstName(x.p.name))+' to do the next step"><b>'+x.q.length+'</b>waiting on '+esc(firstName(x.p.name))+'</span><span class="tm-s">'+[late?'<b class="bad">'+late+' past target</b>':'',x.q.length&&old?'oldest '+ageTxt(old):'',x.live?x.live+' live work request'+(x.live===1?'':'s')+' in all':''].filter(Boolean).join(' · ')+'</span></button>'; }).join('')+'</div>';
+      return '<button type="button" class="tm" data-peek="'+esc(x.p.name)+'">'+av(x.p.name)+'<span class="tm-n"><b>'+esc(x.p.name)+'</b><em>'+esc(x.p.r)+'</em></span><span class="tm-q'+(x.q.length?' on':'')+'" title="'+x.q.length+' work request'+(x.q.length===1?' is':'s are')+' waiting on '+esc(firstName(x.p.name))+' to do the next step"><b>'+x.q.length+'</b>waiting on '+esc(firstName(x.p.name))+'</span><span class="tm-s">'+[late?'<b class="bad">'+late+' past target</b>':'',x.live?x.live+' live work request'+(x.live===1?'':'s')+' in all':''].filter(Boolean).join(' · ')+'</span></button>'; }).join('')+'</div>';
   }
   const showLanes=yours.length+later.length+facT.length>0;
   const lanes=showLanes?'<div class="secthead"><h2>'+(S.viewAs?esc(who)+'’s':'Your')+' Work, Wherever It Is</h2>'+qSortBar(me)+'</div>'+lanesHtml('mine',[
@@ -5304,6 +5308,7 @@ renderPanel=function(){ _renderPanelSS(); const P=$('#panel'); if(!S.panel||Stri
    config/imauto (the kinds of rows that arrive already approved).
    ===================================================================== */
 ROLE_LABEL.imreview='IM Reviewer';
+const IMR_URL_NAV='https://resources.mismo.org/im-review/';
 const IM_DEC=['Approved as Submitted','Approved with Modification','Returned','Denied','Withdrawn','Deferred'];
 const IM_RANK={'Approved as Submitted':0,'Approved with Modification':1,'Deferred':2,'Returned':3,'Withdrawn':3,'Denied':4};
 const IM_RULE={deny:['rm-exists','rm-cn-exists','rm-enum-exists','rm-ac-exists'],
@@ -5315,7 +5320,7 @@ function imEnsureQ(){ if(S.cfgDocs&&S.cfgDocs.imauto) S.imauto=S.cfgDocs.imauto;
 function imColl(tid){ return ('imr-'+String(tid)).replace(/[^A-Za-z0-9_.-]/g,'_').slice(0,40); }
 function imEnsureR(tid){ const c=imColl(tid); if(imSubs[c]) return; imSubs[c]=1; try{ Store.sub(c,o=>{ Object.values(o||{}).forEach(d=>{ if(d&&d.rep) S.imr[d.rep]=d; }); if(S.view==='imreview') renderAll(); }); }catch(e){} }
 function imIsReviewer(){ return S.isStaff||isRole('imreview',S.me); }
-function imCount(){ const n=Object.values(S.imq||{}).filter(q=>q.status==='awaiting').length; const b=$('#nav-imreview'); if(b){ b.textContent=n||''; b.hidden=!n; } const btn=$('#nav button[data-hq="imreview"]'); if(btn) btn.hidden=!imIsReviewer(); }
+function imCount(){ const n=Object.values(S.imq||{}).filter(q=>q.status==='awaiting').length; const b=$('#nav-imreview'); if(b){ b.textContent=n||''; b.hidden=!n; } const btn=$('#nav button[data-hq="imreview"]'); if(btn) btn.hidden=!(S.isStaff||isRole('imreview',S.me)||isRole('facilitator',S.me)||(S.people&&(S.people.facilitators||[]).some(p=>sameName(p.name,S.me.name)))); }
 
 /* ---------- 1. the draft: a decision for every row ---------- */
 function imKind(row){ return [row.draft.dec,row.draft.rule||'clean',String(row.tt||'').toLowerCase()].join('|'); }
@@ -5347,7 +5352,7 @@ async function imCreateDraft(t,rep,P,findings,ai){
 function imTally(rows){ const c={}; rows.forEach(r=>{ const d=(r.final&&r.final.dec)||r.draft.dec; c[d]=(c[d]||0)+1; }); return c; }
 
 /* ---------- 2. learning ---------- */
-function imRuleStats(){ const st={}; Object.values(S.iml||{}).forEach(x=>{ if(!x||!x.rule) return; const s=st[x.rule]=st[x.rule]||{n:0,keep:0,agree:0}; s.n++; if(x.final==='Approved as Submitted') s.keep++; if(x.agreed) s.agree++; }); return st; }
+function imRuleStats(){ const st={}; ((S.imBt&&S.imBt.draft&&S.imBt.draft.byRule)||[]).forEach(r=>{ st[r.rule]={n:r.n||0,keep:r.keep||0,agree:r.agree||0}; }); Object.values(S.iml||{}).forEach(x=>{ if(!x||!x.rule) return; const s=st[x.rule]=st[x.rule]||{n:0,keep:0,agree:0}; s.n++; if(x.final==='Approved as Submitted') s.keep++; if(x.agreed) s.agree++; }); return st; }
 function imKindStats(){ const st={}; Object.values(S.iml||{}).forEach(x=>{ if(!x||!x.kind) return; const s=st[x.kind]=st[x.kind]||{n:0,agree:0}; s.n++; if(x.agreed) s.agree++; }); return st; }
 function imLessons(n){ return Object.values(S.iml||{}).filter(x=>x&&!x.agreed).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,n||12)
   .map(x=>'['+x.tt+' '+rvTrim(x.name,40)+'] draft said '+x.draft+(x.draftCom?' ('+rvTrim(x.draftCom,80)+')':'')+'; IM decided '+x.final+(x.finalCom?': '+rvTrim(x.finalCom,120):'')); }
@@ -5408,7 +5413,7 @@ async function imSend(t,rep){ imEnsureQ(); imEnsureR(t.id); const doc=S.imr[rep.
   const q={rep:rep.id,ticket:t.id,wr:t.wr,name:t.name,at:rep.at,status:'awaiting',sentAt:new Date().toISOString(),sentBy:S.me.name||'',rows:rows.length,look,clean:rows.length-look}; S.imq[rep.id]=q; await write('imqueue',rep.id,q);
   if(doc){ doc.status='awaiting'; await imSaveDoc(doc); }
   const to=peopleFor('imreview').map(p=>p.email).filter(Boolean);
-  if(to.length) await queueMail({to,subject:'IM review ready: '+t.wr+' '+t.name,body:t.wr+' '+t.name+' is ready for IM: '+rows.length+' rows, '+look+' to look at and '+(rows.length-look)+' with no issues found.\n\nOpen it in the MMS: https://resources.mismo.org/mms/#imreview',kind:'imreview',key:'imreview-'+rep.id});
+  if(to.length) await queueMail({to,subject:'IM review ready: '+t.wr+' '+t.name,body:t.wr+' '+t.name+' is ready for IM: '+rows.length+' rows, '+look+' to look at and '+(rows.length-look)+' with no issues found.\n\nOpen it in IM Review: https://resources.mismo.org/im-review/#/review/'+encodeURIComponent(rep.id)+'',kind:'imreview',key:'imreview-'+rep.id});
   const x=clone(S.tickets[t.id]||t); hist(x,'IM Pre-Review sent to IM reviewers ('+rows.length+' rows, '+look+' to look at)'); await saveTicket(x,'Sent to IM');
 }
 function imExport(doc){ const head=['Item #','Change Type','Change Target Type','Parent CONTAINER Name','CONTAINER Name','Data Point Name','Enumeration Name','Definition','Review Decision','Review Comments','Suggested Definition or Name','Draft Decision','IM Agreed With Draft'];
@@ -5444,9 +5449,46 @@ rvShow=function(rep){ _rvShowIM(rep); if(rep.kind!=='im'||!rep.imDraft) return; 
   const foot=$('footer',box); if(foot&&!q&&t&&!S.viewAs){ const b=document.createElement('button'); b.type='button'; b.className='btn pri'; b.textContent='Send to IM Reviewers'; b.title='IM reviewers get the draft decision for every row and agree or correct it'; b.onclick=async()=>{ b.disabled=true; await imSend(t,rep); b.textContent='Sent to IM'; toast('Sent to the IM reviewers'); }; foot.appendChild(b); }
   else if(foot&&q){ const s=document.createElement('span'); s.className='muted'; s.style.marginRight='auto'; s.textContent=q.status==='decided'?'IM decided this '+fmtS(String(q.decidedAt||'').slice(0,10)):'With the IM reviewers since '+fmtS(String(q.sentAt||'').slice(0,10)); foot.insertBefore(s,foot.firstChild); } };
 /* nav: IM Review sits after the Review Desk */
-(function(){ const nav=$('#nav'); if(!nav||$('[data-hq="imreview"]',nav)) return; const after=$('[data-hq="reviews"]',nav); const b=document.createElement('button'); b.type='button'; b.dataset.hq='imreview'; b.title='IM Review'; b.hidden=true; b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9l2.5 2.5L16 7"/></svg><span>IM Review</span><b id="nav-imreview" hidden></b>'; b.onclick=()=>go('imreview'); if(after) after.after(b); else nav.appendChild(b); })();
+(function(){ const nav=$('#nav'); if(!nav||$('[data-hq="imreview"]',nav)) return; const after=$('[data-hq="reviews"]',nav); const b=document.createElement('button'); b.type='button'; b.dataset.hq='imreview'; b.title='IM Review'; b.hidden=true; b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9l2.5 2.5L16 7"/></svg><span>IM Review</span><b id="nav-imreview" hidden></b>'; b.onclick=()=>window.open(IMR_URL_NAV,'_blank','noopener'); if(after) after.after(b); else nav.appendChild(b); })();
 const _counts_im=typeof counts==='function'?counts:null;
 if(_counts_im){ counts=function(){ _counts_im(); try{ imEnsureQ(); imCount(); }catch(e){} }; }
+
+/* ---------- the IM Review portal (resources.mismo.org/im-review) ----------
+   IM reviewers work in their own portal. The MMS sends each submission there
+   (queue + rev-<report>), reads back what IM decided (ticket history, the
+   decided rows) and learns from the portal's learn-<year> and backtest. */
+const IMR_URL='https://resources.mismo.org/im-review/', IMR='im-review';
+const imrSafe=x=>String(x).replace(/[^A-Za-z0-9_-]/g,'_').slice(0,80);
+async function imrPut(name,content,sha){ const tok=window.ResourcesSession&&ResourcesSession.token(); if(!RELAY()||!tok) throw new Error('signed out'); return fetch(RELAY()+'/'+IMR+'/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content,sha:sha||undefined})}); }
+async function imrUpdate(name,fn){ for(let i=0;i<5;i++){ const g=await rGet(IMR,name); const next=fn(g&&g.data?JSON.parse(JSON.stringify(g.data)):null); const r=await imrPut(name,next,g&&g.sha); if(r.ok) return next; if(r.status===403||r.status===401) throw new Error('no access'); await new Promise(x=>setTimeout(x,300+i*400)); } throw new Error('busy'); }
+async function imPush(rep){ const q=S.imq[rep], doc=S.imr[rep]; if(!q||!doc) return false; const t=S.tickets[q.ticket]||{}; const fac=personByName(t.facilitator)||{};
+  const item=Object.assign({},q,{wg:t.workgroup||'',resub:/IMSub[2-9]|resub/i.test(doc.file||''),fac:{name:t.facilitator||'',email:fac.email||''},flow:(S.notify&&S.notify.flowUrl)||'',from:(S.notify&&S.notify.from)||''});
+  try{ await imrUpdate('rev-'+imrSafe(rep),cur=>cur&&cur.status==='decided'?cur:Object.assign({},doc,{status:'awaiting'}));
+    await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!(o.items[rep]&&o.items[rep].status==='decided')) o.items[rep]=item; return o; });
+    q.pushed=true; await write('imqueue',rep,q); return true; }catch(e){ return false; } }
+let imSyncing=false, imSynced=0;
+async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<60000) return; imSyncing=true; imSynced=Date.now();
+  try{ const yr=new Date().getFullYear();
+    const [q,l1,l0,cfg,bt]=await Promise.all(['queue','learn-'+yr,'learn-'+(yr-1),'config','backtest'].map(n=>rGet(IMR,n).catch(()=>null)));
+    if(bt&&bt.data) S.imBt=bt.data; if(cfg&&cfg.data&&cfg.data.imauto) S.imauto=cfg.data.imauto;
+    [l0,l1].forEach(l=>{ if(l&&l.data&&l.data.rows) S.iml=Object.assign({},S.iml,l.data.rows); });
+    if(!S.canWrite) return;
+    // who decides in the portal: People and Roles › IM Reviewer
+    const rv=[...new Set(peopleFor('imreview').map(p=>String(p.email||'').toLowerCase()).filter(Boolean))].sort();
+    if(rv.length&&S.isStaff&&JSON.stringify(rv)!==JSON.stringify(((cfg&&cfg.data&&cfg.data.reviewers)||[]).map(x=>String(x).toLowerCase()).sort())){ try{ await imrUpdate('config',cur=>Object.assign({},cur||{},{reviewers:rv})); }catch(e){} }
+    // sent from the MMS but not yet in the portal (the sender had no portal access): push it now
+    for(const x of Object.values(S.imq||{})) if(x.status==='awaiting'&&!x.pushed){ imEnsureR(x.ticket); if(S.imr[x.rep]) await imPush(x.rep); }
+    // decided in the portal: bring the decisions home
+    const items=(q&&q.data&&q.data.items)||{};
+    for(const it of Object.values(items)){ if(it.status!=='decided') continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
+      const d=await rGet(IMR,'rev-'+imrSafe(it.rep)); if(!d||!d.data) continue; const doc=d.data; S.imr[it.rep]=doc; await write(imColl(doc.ticket),it.rep,doc);
+      const nq=Object.assign({},mine||{},{rep:it.rep,ticket:doc.ticket,wr:doc.wr,name:doc.name,status:'decided',decidedBy:it.decidedBy,decidedAt:it.decidedAt,agree:it.agree,counts:it.counts,pushed:true}); S.imq[it.rep]=nq; await write('imqueue',it.rep,nq);
+      const t=S.tickets[doc.ticket]; if(t){ const sum=Object.entries(it.counts||imTally(doc.rows||[])).map(([k,n])=>n+' '+k.toLowerCase()).join(', '); const x=clone(t); hist(x,'IM decision ('+(doc.rows||[]).length+' rows): '+sum+'. Reviewed by '+(it.decidedBy||'IM')+' in IM Review.'); await saveTicket(x,'IM decision brought in'); } }
+  }catch(e){ console.warn('im sync',e); } finally{ imSyncing=false; } }
+const _imSend0=imSend;
+imSend=async function(t,rep){ await _imSend0(t,rep); const ok=await imPush(rep.id); toast(ok?'Sent to IM Review':'Saved; it goes to IM Review as soon as Erin or MISMO staff open the MMS'); };
+const _imEnsureQ0=imEnsureQ;
+imEnsureQ=function(){ _imEnsureQ0(); setTimeout(imSync,1500); };
 
 /* ---------- settings ---------- */
 let setTab='process';
