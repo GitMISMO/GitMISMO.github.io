@@ -229,6 +229,14 @@ button.b:focus-visible{outline:2px solid var(--sky);outline-offset:1px}
 .hfaq span{font-size:13px;color:var(--ink-2);line-height:1.5}
 .helpbody .btn{margin-top:4px;align-self:flex-start}
 @media(max-width:900px){.helpgrid{grid-template-columns:1fr}.helpnav{flex-direction:row;overflow-x:auto}.hsteps,.hfaq{grid-template-columns:1fr}}
+.cd-body{padding:14px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.cd-how{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.5}
+.cd-zone{border:2px dashed var(--border-strong);border-radius:8px;padding:16px;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:13.5px;color:var(--ink-2);background:var(--surface-2)}
+.cd-zone.over{border-color:var(--sky);background:color-mix(in srgb,var(--sky) 12%,var(--surface))}
+.cd-zone b{color:var(--ink)}
+.cd-msg{font-size:13px;color:var(--ink-2)}.cd-msg:empty{display:none}
+.cd-act{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.cd-act[hidden]{display:none}
+.cd-sum{font-size:13.5px;color:var(--ink-2);margin-right:auto}
 /* pager, instead of an endless list */
 .pager{display:flex;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3);margin-top:auto}
 .pager button{border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:5px;padding:4px 10px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
@@ -372,6 +380,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <div class="tiles" id="case-tiles"></div>
     <div class="band" id="band" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1.1fr) minmax(0,1fr)"></div>
     <div class="panel" style="margin-top:16px" id="case-panel"><div class="ph" id="case-h"></div><div class="rows cgrid" id="case-list"></div><div class="pager" id="case-pager"></div></div>
+    <div class="panel" style="margin-top:16px" id="case-drop" hidden></div>
   </section>
 </main>
 
@@ -388,6 +397,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 (function(){
   const RELAY="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws",PROJECT="membership-desk",URL=p=>RELAY+"/"+PROJECT+"/data/"+p;
   const RS=()=>window.ResourcesSession||null,tok=()=>{try{return RS().token();}catch(e){return "";}};
+  window.__deskAdmin=()=>{try{return RS().role(PROJECT)==="admin";}catch(e){return false;}};
+  window.__deskSaveCases=async data=>{for(let i=0;i<3;i++){const g=await get("cases");const r=await put("cases",data,g.sha);if(r.ok)return true;if(r.status!==409)throw new Error("save "+r.status);}throw new Error("busy");};
   window.__deskMe=()=>{try{const c=RS().current()||{};return {name:c.name||"",email:c.email||""};}catch(e){return {name:"",email:""};}};
   const get=async p=>{const r=await fetch(URL(p),{headers:{Authorization:"Bearer "+tok()},cache:"no-store"});if(!r.ok)throw new Error(p+" "+r.status);const j=await r.json();return {data:j&&j.data,sha:j&&j.sha};};
   const put=async(p,content,sha)=>fetch(URL(p),{method:"PUT",headers:{"Content-Type":"application/json",Authorization:"Bearer "+tok()},body:JSON.stringify({content,sha:sha||undefined})});
@@ -539,6 +550,39 @@ const caseIn=(x,skip)=>{if(CF.m&&skip!=="m"&&x.d.slice(0,7)!==CF.m)return false;
 const tally=(rows,f)=>{const m={};rows.forEach(x=>{m[x[f]]=(m[x[f]]||0)+1;});return m;};
 const monLab=m=>MON[+m.slice(5)-1]+" "+m.slice(0,4);
 function caseSet(k,v){CF[k]=CF[k]===v?"":v;cpage=0;renderCases(true);}
+/* ---------- Weekly case update (Jonna, Nov 1, 2026): export the Aptify view "Member 360 - MISMO Cases" to Excel and drop it on the
+   Case Management page. Only cases whose Aptify Case Category is MISMO are counted; anything else in the file is left out and said so.
+   Nothing is saved until Save These Cases. Shown to the desk's administrators only. ---------- */
+const CD_KEY=k=>String(k||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+function cdDate(v){if(v==null||v==="")return "";const d=v instanceof Date?v:new Date(String(v).replace(/(\d)(AM|PM)$/i,"$1 $2"));if(isNaN(d))return "";return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+function cdTopic(s){s=String(s||"").replace(/\s+/g," ").trim();if(!s)return "Not Set";s=s.replace(/^(MISMO|Membership|Education|Conferences):\s*/i,"");if(/^login\s*\/\s*password help$/i.test(s))return "Login / Password Help";return s;}
+function cdBuild(rows){const pick=(r,ks)=>{for(const k of ks){if(r[k]!=null&&r[k]!=="")return r[k];}return "";};
+  const R=rows.map(o=>{const r={};Object.keys(o).forEach(k=>{r[CD_KEY(k)]=o[k];});return r;});
+  if(!R.length||!R.some(r=>"casecategory" in r||"category" in r))throw new Error("That file doesn't look like the Aptify case view (no Case Category column).");
+  const mismo=R.filter(r=>/mismo/i.test(String(pick(r,["casecategory","category"])))),left=R.length-mismo.length;
+  const cs=mismo.map(r=>({id:+pick(r,["id","caseid"])||0,d:cdDate(pick(r,["datereported","daterecorded","datestarted","datecreated"])),closed:cdDate(pick(r,["dateclosed"])),t:cdTopic(pick(r,["subcategory","casesubcategory"])),c:String(pick(r,["casereportmethod","reportmethod","method"])||"Not Set").trim()||"Not Set",b:String(pick(r,["recordedby"])||"Not Set").trim()||"Not Set",nm:String(pick(r,["company"])||pick(r,["contact"])||"").replace(/\s+/g," ").trim().slice(0,34),ti:String(pick(r,["title","summary"])||"").replace(/\s+/g," ").trim().slice(0,36)})).filter(x=>x.d);
+  const now=new Date(),yr=String(now.getFullYear()),months={},mon=[];{let y=now.getFullYear(),m=now.getMonth()+1;for(let i=0;i<18;i++){mon.unshift(y+"-"+String(m).padStart(2,"0"));m--;if(!m){m=12;y--;}}}
+  mon.forEach(m=>months[m]=0);cs.forEach(x=>{const m=x.d.slice(0,7);if(m in months)months[m]++;});
+  const Y=cs.filter(x=>x.d.slice(0,4)===yr),tally=f=>{const o={};Y.forEach(x=>{o[x[f]]=(o[x[f]]||0)+1;});return o;};
+  const closed=Y.filter(x=>x.closed),same=closed.filter(x=>x.closed===x.d);
+  const win=cs.filter(x=>x.d>=mon[0]+"-01").sort((a,b)=>b.d.localeCompare(a.d)||b.id-a.id),T=[],C=[],B=[],ix=(a,v)=>{let i=a.indexOf(v);if(i<0){a.push(v);i=a.length-1;}return i;};
+  const list={T,C,B,R:win.map(x=>[x.id,x.d.slice(2).replace(/-/g,""),ix(T,x.t),ix(C,x.c),ix(B,x.b),x.nm,x.ti])};
+  const latest=cs.map(x=>x.d).sort().pop()||"";
+  return {data:{asOf:cdDate(now),total:cs.length,months,topicsY:tally("t"),channelY:tally("c"),byY:tally("b"),sameDay:same.length,closed:closed.length,list,latest,source:"Aptify view Member 360 - MISMO Cases (Case Category = MISMO)",writtenAt:now.toISOString(),writtenBy:((window.__deskMe&&window.__deskMe().name)||"")},left,inYear:Y.length,latest};}
+function cdLib(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";s.onload=()=>ok(window.XLSX);s.onerror=()=>no(new Error("Couldn't load the Excel reader. Check the connection and try again."));document.head.appendChild(s);});}
+function caseDrop(){const box=$("case-drop");if(!box)return;box.hidden=!(window.__deskAdmin&&window.__deskAdmin());if(box.hidden||box.dataset.ready)return;box.dataset.ready="1";
+  const msg=h("div",{class:"cd-msg"}),inp=h("input",{type:"file",accept:".xlsx,.xls,.csv",hidden:""}),pick=h("button",{type:"button",class:"link",style:"margin:0"},"choose the file"),zone=h("div",{class:"cd-zone"},h("b",null,"Drop this week's case export here"),h("span",null,"or ",pick));
+  let pend=null;const act=h("div",{class:"cd-act",hidden:""});
+  const show=r=>{pend=r;msg.textContent="";act.hidden=false;act.textContent="";
+    act.append(h("div",{class:"cd-sum"},h("b",null,r.data.total.toLocaleString("en-US")+" MISMO cases")," in the file · ",h("b",null,String(r.inYear))," in "+String(new Date().getFullYear())+" · latest "+fmt(r.latest)+(r.left?" · "+r.left+" non-MISMO left out":"")),
+      h("button",{type:"button",class:"btn",onclick:async e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Saving…";try{await window.__deskSaveCases(pend.data);msg.textContent="Saved. Reloading…";setTimeout(()=>location.reload(),900);}catch(x){console.error(x);b.disabled=false;b.textContent="Save These Cases";msg.textContent="That didn't save. Please try again.";}}},"Save These Cases"),
+      h("button",{type:"button",class:"btn ghost",onclick:()=>{pend=null;act.hidden=true;msg.textContent="";}},"Cancel"));};
+  const go=async f=>{if(!f)return;msg.textContent="Reading "+f.name+"…";act.hidden=true;try{const X=await cdLib(),wb=X.read(await f.arrayBuffer(),{type:"array",cellDates:true}),rows=X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});show(cdBuild(rows));}catch(e){console.error(e);msg.textContent=e.message||"Couldn't read that file.";}};
+  pick.addEventListener("click",()=>inp.click());inp.addEventListener("change",()=>{go(inp.files[0]);inp.value="";});
+  zone.addEventListener("dragover",e=>{e.preventDefault();zone.classList.add("over");});zone.addEventListener("dragleave",()=>zone.classList.remove("over"));zone.addEventListener("drop",e=>{e.preventDefault();zone.classList.remove("over");go(e.dataTransfer.files[0]);});
+  box.append(h("div",{class:"ph"},h("h2",null,"Weekly Case Update"),h("span",{class:"hint"},"Last updated "+fmt(D.cases.asOf)+(D.cases.writtenBy?" by "+D.cases.writtenBy:""))),
+    h("div",{class:"cd-body"},h("p",{class:"cd-how"},"In Aptify, open the view ",h("b",null,"Member 360 - MISMO Cases"),", export it to Excel, and drop the file here. Only cases with the Case Category MISMO are counted. Nothing is saved until you select Save These Cases."),zone,inp,msg,act));}
+
 function renderCases(keep){const C=D.cases,yr=TODAY.slice(0,4),ytd=caseYTD(),cm=TODAY.slice(5,7),pm=Object.keys(C.months).filter(m=>m.startsWith(String(+yr-1))&&m.slice(5)<cm).map(m=>m.slice(5)),py=pm.reduce((a,mm)=>a+C.months[(+yr-1)+"-"+mm],0),cy=pm.reduce((a,mm)=>a+(C.months[yr+"-"+mm]||0),0),span=pm.length?MON[+pm[0]-1]+"–"+MON[+pm[pm.length-1]-1]:"",nmo=Object.keys(C.months).filter(m=>m.startsWith(yr)).length||1;
  const anim=!keep;
  $("cases-sub").textContent="MISMO cases only (Aptify Case Category: MISMO), as of "+fmt(C.asOf)+". Select any month, topic, way in or person to narrow the list.";
@@ -577,7 +621,7 @@ function renderCases(keep){const C=D.cases,yr=TODAY.slice(0,4),ytd=caseYTD(),cm=
  const CL=$("case-list");CL.textContent="";
  rows.slice(cpage*CPER,cpage*CPER+CPER).forEach(x=>CL.appendChild(h("div",{class:"row r2",style:"--k:"+(CC[x.c]||"#9fb3c8")+";cursor:default"},h("span",{class:"dot"}),h("span",{class:"nm",title:(x.nm||"No company or contact")+" · "+x.ti},x.nm||h("span",{style:"color:var(--ink-3);font-weight:500"},"No company or contact"),h("small",null,fmtS(x.d)+(x.d.slice(0,4)!==yr?", "+x.d.slice(0,4):"")+" · "+x.t+" · "+x.ti)),h("span",{class:"age"},x.c+" · "+x.b.split(" ")[0]))));
  if(!rows.length)CL.appendChild(h("div",{class:"empty"},"No MISMO cases match. Select a highlighted item again to let it go."));
- const pg=$("case-pager");pg.textContent="";if(pages>1)pg.append(h("button",{type:"button",disabled:cpage===0?"":null,onclick:()=>{cpage--;renderCases(true);}},"← Newer"),h("button",{type:"button",disabled:cpage>=pages-1?"":null,onclick:()=>{cpage++;renderCases(true);}},"Older →"),h("span",{class:"sp"},(cpage*CPER+1)+"–"+Math.min(rows.length,cpage*CPER+CPER)+" of "+rows.length));pg.hidden=pages<2;}
+ const pg=$("case-pager");pg.textContent="";if(pages>1)pg.append(h("button",{type:"button",disabled:cpage===0?"":null,onclick:()=>{cpage--;renderCases(true);}},"← Newer"),h("button",{type:"button",disabled:cpage>=pages-1?"":null,onclick:()=>{cpage++;renderCases(true);}},"Older →"),h("span",{class:"sp"},(cpage*CPER+1)+"–"+Math.min(rows.length,cpage*CPER+CPER)+" of "+rows.length));pg.hidden=pages<2;try{caseDrop();}catch(e){console.error(e);}}
 
 
 /* ---------- Help: the whole process, one topic at a time ---------- */
