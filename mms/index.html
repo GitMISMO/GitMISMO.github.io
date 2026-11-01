@@ -1448,6 +1448,13 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 @media (max-width:600px){.wh-tabs button span{display:none}.wh-tabs button[aria-selected="true"] span{display:inline}}
 .wh .track{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px 3px}
 .wh .track .tst{min-width:0}
+/* choice lists in forms: tidy, even tiles (radio and check boxes keep their natural size) */
+.fld input[type="radio"],.fld input[type="checkbox"],.kv .f input[type="radio"],.kv .f input[type="checkbox"]{width:auto;padding:0;border:0;background:none;flex:0 0 auto;margin:0;accent-color:var(--accent)}
+.fld .radios{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:8px}
+.fld .radios label{display:flex;align-items:center;gap:9px;text-align:left;min-height:40px;padding:8px 12px;line-height:1.3;font-weight:500}
+.fld .radios label:has(input:checked){font-weight:600}
+.t2-age{white-space:nowrap}
+.t2-top{flex-wrap:wrap;row-gap:2px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4221,6 +4228,10 @@ function wrHub(P,t){
   (secs.stage||[]).forEach(s=>ov.insertBefore(s,ov.children[1]||null));
   grid.replaceWith(...TABS.map(([k])=>W[k]));
   pb.classList.add('wh-on');
+  // say what each one-off button does, on hover
+  const TIPS={moveto:'Jump it to any stage. For one-off fixes; the move is logged in History.',hold:'Pause it. It moves to On Hold until someone resumes it.',close:'End it as finished or folded into other work. It stays in All Work under Closed.',cancel:'Stop it for good. It stays in All Work under Canceled, with the reason.',
+    rhold:'Sends MISMO staff a request. Nothing changes until they approve it.',rclose:'Sends MISMO staff a request. Nothing changes until they approve it.',rcancel:'Sends MISMO staff a request. Nothing changes until they approve it.',arch:'Ask the Architect for help. The Program Manager approves it first, then it goes to the Architect’s queue.'};
+  $$('[data-x]',pb).forEach(b=>{ if(TIPS[b.dataset.x]&&!b.title) b.title=TIPS[b.dataset.x]; });
   // switching tabs
   const show=(k,scrollTo)=>{ S.ptab=k; $$('.wh-tabs [data-ptab]',pb).forEach(b=>b.setAttribute('aria-selected',b.dataset.ptab===k)); $$('.wtab',pb).forEach(w=>w.hidden=w.dataset.wtab!==k);
     const tabs=$('.wh-tabs',pb); if(pb.scrollTop>tabs.offsetTop) pb.scrollTop=tabs.offsetTop;
