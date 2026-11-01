@@ -8,6 +8,13 @@
            "group": "Planning",
            "path": "/member-360/"
          },
+             {
+           "key": "membership-desk",
+           "label": "Membership Desk",
+           "colour": "#1D7FB8",
+           "group": "Planning",
+           "path": "/membership-desk/"
+         },
     {
       "key": "hub",
       "label": "Initiative Hub",
