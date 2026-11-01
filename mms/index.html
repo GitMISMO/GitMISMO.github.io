@@ -1117,7 +1117,7 @@ span.bad{color:var(--bad)}
 .cp .pgr{margin:10px -18px -16px;border-radius:0 0 8px 8px}
 .bd-b .pgr{margin:12px -14px -12px}
 @keyframes flipin{from{opacity:0;transform:translateX(14px)}to{opacity:1;transform:none}}
-main.flip .tk2,main.flip .ar,main.flip .fr,main.flip .feed li,main.flip .dk,main.flip .tl li,main.flip .mi,main.flip .cp-row,main.flip .arc,main.flip .mcard,main.flip .t2 tbody tr{animation:flipin .28s cubic-bezier(.2,.7,.2,1) both}
+.flip .tk2,.flip .ar,.flip .fr,.flip .feed li,.flip .dk,.flip .tl li,.flip .mi,.flip .cp-row,.flip .arc,.flip .mcard,.flip .t2 tbody tr{animation:flipin .28s cubic-bezier(.2,.7,.2,1) both}
 /* Needs Attention: four equal counters instead of cut-off tabs */
 .att4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:10px 12px 2px}
 .att4 button{display:flex;flex-direction:column;align-items:flex-start;gap:0;border:1px solid var(--border);background:var(--surface-2);border-radius:6px;padding:6px 8px;cursor:pointer;color:var(--ink-2);font:inherit;text-align:left;min-width:0;transition:border-color .15s,background .15s}
@@ -1181,6 +1181,28 @@ main.flip .tk2,main.flip .ar,main.flip .fr,main.flip .feed li,main.flip .dk,main
 .cmt-f{display:flex;gap:6px;justify-content:flex-end;align-items:center;margin-top:6px}
 .dg-days input{width:14px!important;height:14px;margin:0;padding:0;flex:0 0 auto}
 .dg-days label{width:auto!important}
+
+/* Architecture Help opens up */
+.arc[data-archopen]{cursor:pointer;transition:transform .14s,box-shadow .14s,border-color .14s}
+.arc[data-archopen]:hover,.arc[data-archopen]:focus-visible{transform:translateY(-2px);box-shadow:var(--shadow),0 6px 18px rgba(13,49,76,.10);border-color:var(--border-strong);outline:none}
+.archrow{display:block;width:100%;text-align:left;border:0;border-top:1px solid var(--rule);background:none;padding:6px 2px;cursor:pointer;color:var(--ink);font:inherit;font-size:13px;position:relative;padding-right:56px}
+.archrow:hover{background:var(--accent-soft)}
+.archgo{position:absolute;right:4px;top:6px;font-size:12px;font-weight:600;color:var(--accent)}
+.atrack{display:flex;gap:4px;margin-top:12px}
+.ats{flex:1;display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--ink-3)}
+.ats i{height:5px;border-radius:3px;background:var(--surface-3)}
+.ats.done i{background:var(--sky)}.ats.cur i{background:var(--navy)}
+:root[data-theme="dark"] .ats.cur i{background:var(--sky)}
+.ats b{color:var(--ink-2);font-size:12px}.ats.cur b{color:var(--ink)}
+.ats small{font-size:11px;color:var(--ink-3);min-height:14px}
+.aacts{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.atext{white-space:pre-line;font-size:13.5px;line-height:1.55}
+.atext.good{border-left:3px solid var(--good);padding-left:10px}
+.anew{display:flex;gap:8px;align-items:flex-start;margin-bottom:10px}
+.anew textarea{flex:1;font:inherit;font-size:13px;border:1px solid var(--border-strong);border-radius:6px;padding:7px 9px;background:var(--surface);color:var(--ink);resize:vertical}
+.anote{font-size:12.5px;color:var(--ink-2);white-space:pre-line;margin-top:2px}
+.ph .ats i{background:rgba(255,255,255,.18)}.ph .ats.done i{background:var(--sky)}.ph .ats.cur i{background:#fff}
+.ph .ats b{color:#a9d8f3}.ph .ats.cur b{color:#fff}.ph .ats small{color:#8fb3cc}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3254,9 +3276,9 @@ function lineWire(m){
   $$('[data-stage]',m).forEach(b=>b.onclick=()=>{ S.bSel=b.dataset.stage; go('board'); });
   $$('[data-fac]',m).forEach(b=>b.onclick=()=>{ S.filters.fac=b.dataset.fac==='Unassigned'?'':b.dataset.fac; S.bSel=''; go('board'); });
   $$('[data-bs]',m).forEach(b=>b.onclick=()=>{ S.bSort=b.dataset.bs; renderAll(); });
-  $$('[data-pg2]',m).forEach(b=>b.onclick=e=>{ e.stopPropagation(); const id=b.dataset.pg2; S.pg[id]=(S.pg[id]||0)+(+b.dataset.d); S._flip=b.closest('section,.pane,.lane,.bdetail,.tcard,.card,.mlist'); renderAll(); });
-  $$('[data-pgto]',m).forEach(b=>b.onclick=e=>{ e.stopPropagation(); S.pg[b.dataset.pgto]=+b.dataset.k; renderAll(); });
-  if(S._flip){ S._flip=null; m.classList.remove('flip'); void m.offsetWidth; m.classList.add('flip'); clearTimeout(m._ft); m._ft=setTimeout(()=>m.classList.remove('flip'),450); }
+  $$('[data-pg2]',m).forEach(b=>b.onclick=e=>{ e.stopPropagation(); const id=b.dataset.pg2; S.pg[id]=(S.pg[id]||0)+(+b.dataset.d); S._flip=id; renderAll(); });
+  $$('[data-pgto]',m).forEach(b=>b.onclick=e=>{ e.stopPropagation(); S.pg[b.dataset.pgto]=+b.dataset.k; S._flip=b.dataset.pgto; renderAll(); });
+  if(S._flip){ const fid=S._flip; S._flip=null; const pb=$$('[data-pg2],[data-pgto]',m).find(x=>(x.dataset.pg2||x.dataset.pgto)===fid); const box=pb&&pb.closest('.pane,.lane,.bdetail,.tcard,.card,.mlist,section'); if(box){ box.classList.add('flip'); setTimeout(()=>box.classList.remove('flip'),450); } }
   // drag a card onto a stop
   const bd=$('#board3',m), mt=$('.metro.can-drop',m);
   if(bd&&mt&&S.canWrite&&S.isStaff){
@@ -3445,6 +3467,90 @@ hubSync=async function(){ await _hubSync1(); try{ await loadComments(); }catch(e
 const _wireMain2=wireMain;
 wireMain=function(m){ _wireMain2(m); wireCst(m); if(S.view==='settings'){ wireDigest(m); const fg=$('#feedgo',m); if(fg) fg.onclick=async()=>{ await publishFeed(true); renderAll(); toast(S.feedState&&!S.feedState.error?'Published to the website':'Not published: '+((S.feedState||{}).error||'')); }; } };
 setInterval(()=>{ try{ if(S.ready){ publishFeed(); digestAuto(); } }catch(e){} },60000);
+
+/* =====================================================================
+   Architecture Help: every task opens into its own panel, wherever it shows.
+   ===================================================================== */
+const _archCard0=archCard;
+archCard=function(a,acts){ return _archCard0(a,acts).replace('<div class="arc">','<div class="arc" role="button" tabindex="0" data-archopen="'+esc(a.id)+'" title="Open '+esc(a.id)+'">'); };
+const _archBanner0=archBanner;
+archBanner=function(t){
+  const L=Object.values(S.arch||{}).filter(a=>a.ticket===t.id).sort((a,b)=>b.id.localeCompare(a.id)); if(!L.length) return '';
+  return '<div class="archb"><div class="eyebrow">Architecture Help</div>'+L.map(a=>'<button type="button" class="archrow" data-archopen="'+esc(a.id)+'"><span class="chip '+archTone(a.status)+'">'+esc(a.status)+'</span> <b>'+esc(a.id)+'</b> '+esc(a.title)+' <span class="muted">· '+esc(a.type||'')+(a.needBy&&a.status!=='Done'?' · target '+esc(fmtS(a.needBy)):'')+(a.done?' · done '+esc(fmtS(a.done)):'')+'</span><span class="archgo">Open ›</span></button>').join('')+'</div>';
+};
+function archTone(s){ return {Requested:'warn',Done:'good',Declined:'bad','On Hold':'hold'}[s]||'info'; }
+function archActs(a){
+  const pm=isRole('pm')||S.isStaff, ar=isRole('architect')||S.isStaff, B=(to,l,c)=>'<button class="btn '+(c||'')+'" data-arch="'+esc(a.id)+'" data-to="'+to+'" type="button">'+l+'</button>';
+  if(!S.canWrite) return '';
+  const out=[];
+  if(a.status==='Requested'&&pm) out.push(B('Approved','Approve for the Architect →','pri'),B('Declined','Decline'));
+  if(a.status==='Approved'&&ar) out.push(B('In Progress','Start Work →','pri'),B('On Hold','Put on Hold'));
+  if(a.status==='In Progress'&&ar) out.push(B('Done','Mark Done →','pri'),B('On Hold','Put on Hold'));
+  if(a.status==='On Hold'&&ar) out.push(B('In Progress','Resume Work →','pri'));
+  if(a.status==='Done'&&a.further&&!Object.values(S.arch).some(x=>x.followUpOf===a.id)) out.push('<button class="btn pri" type="button" id="archfollow">Start the Follow-Up →</button>');
+  const mine=sameName(a.requestedBy,S.me.name)||S.isStaff;
+  if(mine&&!['Done','Declined'].includes(a.status)) out.push('<button class="btn" type="button" id="archedit">Edit the Request</button>');
+  return out.join('');
+}
+function archPanelHtml(a){
+  const steps=['Requested','Approved','In Progress','Done'];
+  const at=a.status==='On Hold'?2:a.status==='Declined'?0:steps.indexOf(a.status);
+  const track='<div class="atrack">'+steps.map((s,i)=>'<div class="ats '+(i<at||a.status==='Done'?'done':(i===at?'cur':''))+'"><i></i><b>'+esc(s)+'</b><small>'+esc(fmtS({Requested:a.requested,Approved:a.approved,'In Progress':a.started,Done:a.done}[s]||''))+'</small></div>').join('')+'</div>'+
+    (a.status==='On Hold'?'<div class="banner hold" style="margin:10px 0 0"><b>On hold.</b> '+esc(a.holdWhy||'')+(a.needBy?' Check back '+esc(fmt(a.needBy))+'.':'')+'</div>':'')+
+    (a.status==='Declined'?'<div class="banner" style="margin:10px 0 0;border-color:var(--bad)"><b>Declined.</b> '+esc(((a.log||[]).slice().reverse().find(l=>l.text==='Declined')||{}).note||'')+'</div>':'');
+  const late=a.needBy&&a.needBy<today()&&!['Done','Declined'].includes(a.status);
+  const kv=(k,v)=>v?'<div class="f"><label>'+esc(k)+'</label><div>'+v+'</div></div>':'';
+  const t=a.ticket&&S.tickets[a.ticket];
+  const facts='<div class="kv">'+kv('Type of Help',esc(a.type||''))+kv('Priority','<span class="chip '+({High:'bad',Medium:'info',Low:''}[a.priority]||'')+'">'+esc(a.priority||'Medium')+'</span>')+kv('Target Date',a.needBy?'<span'+(late?' class="bad"':'')+'>'+esc(fmt(a.needBy))+(late?' (past)':'')+'</span>':'')+
+    kv('Architect',esc(a.assignedTo||''))+kv('Requested By',esc((a.requestedBy||'')+(a.requested?' · '+fmtS(a.requested):'')))+kv('Approved By',a.approvedBy?esc(a.approvedBy+(a.approved?' · '+fmtS(a.approved):'')):'')+
+    kv('Estimated Effort',a.hours?esc(a.hours)+' hours':'')+kv('Hours Spent',a.hoursSpent?esc(a.hoursSpent)+' hours':'')+kv('Work Product',esc(a.product||''))+kv('MISMO Version',esc(a.version||''))+
+    kv('Workgroup Call',a.meeting?'Needed':'')+kv('Work Request',t?'<a href="#" data-open="'+esc(t.id)+'">'+esc(t.wr+' '+t.name)+'</a>':(a.wr?esc(a.wr):''))+kv('Workgroup',!t?esc(a.workgroup||''):'')+
+    kv('Files or Links',a.links?(/^https?:/i.test(a.links)?'<a href="'+esc(a.links)+'" target="_blank" rel="noopener">'+esc(a.links)+'</a>':esc(a.links)):'')+
+    kv('Follow-Up Of',a.followUpOf?'<a href="#" data-archopen="'+esc(a.followUpOf)+'">'+esc(a.followUpOf)+'</a>':'')+
+    kv('Follow-Up',Object.values(S.arch).filter(x=>x.followUpOf===a.id).map(x=>'<a href="#" data-archopen="'+esc(x.id)+'">'+esc(x.id)+'</a>').join(', '))+'</div>';
+  const block=(h,txt,cls)=>txt?'<div class="psec full"><h4>'+esc(h)+'</h4><div class="atext'+(cls?' '+cls:'')+'">'+esc(txt)+'</div></div>':'';
+  const log=(a.log||[]).slice().reverse().map(l=>'<li><div class="when">'+esc(fmtS(l.at?ymd(new Date(l.at)):''))+' · '+esc(l.by||'')+'</div><b>'+esc(l.text||'')+'</b>'+(l.note?'<div class="anote">'+esc(l.note)+'</div>':'')+'</li>').join('');
+  const acts=archActs(a);
+  return '<div class="ph"><div class="row1"><span class="wr">'+esc(a.id)+'</span><span class="chip '+archTone(a.status)+'">'+esc(a.status)+'</span>'+(late?'<span class="chip bad">Past Target</span>':'')+'<button class="x" type="button" id="pclose" aria-label="Close">×</button></div><h2>'+esc(a.title)+'</h2><div class="sub">Architecture Help'+(a.type?' · '+esc(a.type):'')+(a.assignedTo?' · '+esc(a.assignedTo):'')+'</div>'+track+'</div>'+
+    '<div class="pb">'+(acts?'<div class="actbar aacts">'+acts+'</div>':'')+
+    '<div class="pgrid"><div class="psec full"><h4>The Request</h4>'+facts+'</div>'+block('What the Architect Should Do',a.details)+block('Additional Information',a.info)+
+    (a.status==='Done'?block('What Was Done',a.result,'good'):'')+block('Further Work Needed',a.further)+
+    '<div class="psec full"><h4>Notes and Activity</h4>'+(S.canWrite?'<div class="anew"><textarea id="anote" rows="2" placeholder="Add a note for the architect, Program Manager or requester"></textarea><button class="btn sm pri" id="anotego" type="button">Add Note</button></div>':'')+(log?'<ul class="hist">'+log+'</ul>':'<div class="lead-empty">Nothing yet.</div>')+'</div></div></div>';
+}
+function openArch(id){ if(!S.arch[id]) return; openPanel('arch:'+id); }
+const _renderPanel2=renderPanel;
+renderPanel=function(){
+  const id=String(S.panel||'');
+  if(id.indexOf('arch:')===0){
+    const a=S.arch[id.slice(5)], P=$('#panel'); if(!a){ P.innerHTML=''; return; }
+    P.innerHTML=archPanelHtml(a);
+    $('#pclose',P).onclick=closePanel;
+    $$('[data-open]',P).forEach(x=>x.onclick=e=>{ e.preventDefault(); openPanel(x.dataset.open); });
+    $$('[data-archopen]',P).forEach(x=>x.onclick=e=>{ e.preventDefault(); openArch(x.dataset.archopen); });
+    $$('[data-arch]',P).forEach(b=>b.onclick=()=>archMove(b.dataset.arch,b.dataset.to));
+    const fu=$('#archfollow',P); if(fu) fu.onclick=()=>archRequest(a.ticket?S.tickets[a.ticket]:null,a);
+    const ed=$('#archedit',P); if(ed) ed.onclick=()=>archEdit(a.id);
+    const ng=$('#anotego',P); if(ng) ng.onclick=async()=>{ const txt=$('#anote',P).value.trim(); if(!txt) return; const x=clone(S.arch[a.id]); x.log=[...(x.log||[]),{at:new Date().toISOString(),by:S.me.name||'',text:'Note',note:txt}]; S.arch[x.id]=x; await write('arch',x.id,x); toast('Note added'); renderPanel(); };
+    return;
+  }
+  _renderPanel2();
+  $$('#panel [data-archopen]').forEach(x=>x.onclick=e=>{ e.preventDefault(); e.stopPropagation(); openArch(x.dataset.archopen); });
+};
+async function archEdit(id){
+  const a=clone(S.arch[id]); if(!a) return;
+  const v=await modal({title:'Edit '+a.id,ok:'Save Changes',body:fld('Request',inp('title',a.title))+fld('Type of Help',radios('type',ARCH_TYPES,a.type))+fld('Description of the Work',ta('details',a.details))+fld('Additional Information or Instructions',ta('info',a.info))+fld('Work Product or Deliverable',inp('product',a.product))+fld('MISMO Version',inp('version',a.version))+fld('Priority',radios('pri',['Low','Medium','High'],a.priority||'Medium'))+fld('Target Date',dateField('need',a.needBy||''))+fld('Estimated Effort (Hours)',inp('hours',a.hours))+fld('Files or Links',inp('links',a.links)),validate:x=>!x.title?'Name the request':(!x.details?'Describe the work':'')});
+  if(!v) return;
+  const changed=['title','type','details','info','product','version','links','hours'].filter(k=>(v[k]||'')!==(a[k]||'')).concat((v.pri!==a.priority)?['priority']:[]).concat((v.need||'')!==(a.needBy||'')?['target date']:[]);
+  Object.assign(a,{title:v.title,type:v.type,details:v.details,info:v.info,product:v.product,version:v.version,priority:v.pri,needBy:v.need||'',hours:v.hours,links:v.links});
+  if(changed.length) a.log=[...(a.log||[]),{at:new Date().toISOString(),by:S.me.name||'',text:'Edited',note:'Changed '+changed.join(', ')}];
+  S.arch[id]=a; await write('arch',id,a); toast('Saved'); renderAll();
+}
+/* every Architecture Help card on every page opens its task */
+const _wireMain3=wireMain;
+wireMain=function(m){ _wireMain3(m);
+  $$('[data-archopen]',m).forEach(el=>{ const go=e=>{ if(e.target.closest('button:not([data-archopen]),a,[data-open],input,textarea,select')) return; e.preventDefault(); e.stopPropagation(); openArch(el.dataset.archopen); };
+    el.addEventListener('click',go); el.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target===el) go(e); }); });
+};
 
 /* ---------- settings ---------- */
 let setTab='process';
