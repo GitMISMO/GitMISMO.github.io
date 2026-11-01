@@ -359,6 +359,7 @@ h1{font-size:25px;font-weight:700;margin:0 0 4px}
 .sub{overflow-wrap:anywhere}
 @media(max-width:560px){.plan{grid-template-columns:1fr 1fr;gap:8px}.plan .step:nth-child(3){display:none}.step p{display:none}.step b{font-size:19px}.step .btn{white-space:normal;text-align:left}.prog{min-width:0;width:100%}.dtools .seg button{padding:7px 9px;font-size:12.5px}.foot{padding:8px 10px}.foot span{font-size:12px}}
 details.nums{margin-top:10px;font-size:12.5px}details.nums summary{cursor:pointer;color:var(--accent);font-weight:600}details.nums .tbl{margin-top:8px;font-size:12px}
+.finds{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;line-height:1.5}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -653,22 +654,25 @@ function trendsView(){ const B=S.bt;
       '<div class="card"><h3>By Community of Practice<small>rows and share approved as submitted</small></h3><div class="tw"><table class="tbl"><thead><tr><th>Community</th><th>Subs</th><th>Rows</th><th>As Submitted</th></tr></thead><tbody>'+(B.cop||[]).slice(0,12).map(c=>'<tr><td>'+esc(c.cop)+'</td><td class="n">'+c.subs+'</td><td class="n">'+c.rows.toLocaleString()+'</td><td><span class="meter"><i style="width:'+pct(c.as,c.rows)+'%"></i></span>'+pct(c.as,c.rows)+'%</td></tr>').join("")+'</tbody></table></div></div></div>':'')+
     (B.notes&&B.notes.length?'<div class="card" style="margin-top:18px"><h3>How These Were Counted</h3>'+B.notes.map(n=>'<p class="note">'+esc(n)+'</p>').join("")+'</div>':'');
 }
-function draftView(){ const B=S.bt, D=B&&B.draft, ks=kindStats();
+function draftView(){ const B=S.bt, D=B&&B.draft, C=B&&B.claude, E=B&&B.edits, ks=kindStats();
   const lv=Object.values(S.learn), la=lv.filter(x=>x.agreed).length;
   const k=(t,v,s,c)=>'<div class="k" style="--kc:'+c+'"><span>'+t+'</span><b>'+v+'</b><em>'+s+'</em></div>';
   const rows=Object.entries(ks).map(([kind,s])=>({kind,n:(s.n||0)+(s.hn||0),a:(s.agree||0)+(s.hagree||0),live:s.live||0})).filter(x=>x.n>=5).sort((a,b)=>b.n-a.n).slice(0,40);
   const label=kind=>{ const [d,ru,tt]=kind.split("|"); return '<b>'+esc(d)+'</b> · '+esc(RULE_NAME[ru]||ru)+' · '+esc(tt||"any row"); };
+  const cb=C&&C.both;
   return '<div class="head"><div><h1>How the Draft Is Doing</h1><div class="sub">The draft is right when IM keeps its decision. When a kind of row has matched IM 95% of the time or more over at least 30 rows, it can arrive already approved, so reviewers only see the exceptions. Reviewers can still change any row.</div></div></div>'+
     '<div class="kp">'+k("Agreed Here",lv.length?pct(la,lv.length)+"%":"—",lv.length?la+" of "+lv.length+" rows reviewed in this portal":"fills in as you review","var(--c1)")+
-      (D?k("Matched IM in History",pct(D.exact,D.rows)+"%","of "+D.rows.toLocaleString()+" past rows, same decision","var(--c3)")+
-        k("Clean Rows IM Kept",pct(D.cleanKept,D.cleanRows)+"%","of "+D.cleanRows.toLocaleString()+" rows the draft found clean","var(--good)")+
-        k("Left for a Reviewer",pct(D.lookRows,D.rows)+"%","of rows would need a look today","var(--c4)"):"")+'</div>'+
-    (D&&D.byYear&&D.byYear.length?'<div class="g2"><div class="card"><h3>The Draft Against IM, Year by Year<small>trained only on earlier years</small></h3>'+lineChart(D.byYear.map(y=>({label:String(y.y),y})),[{name:"Same decision as IM",c:"var(--c3)",v:p=>pct(p.y.agree,p.y.n),extra:p=>' of '+p.y.n+' rows'},{name:"Clean rows IM kept",c:"var(--good)",v:p=>p.y.cleanRows?pct(p.y.cleanKept,p.y.cleanRows):null}],{unit:"%",max:112})+'<p class="note">Each year is scored by a draft that only knew the years before it, the way it works for real.</p></div>'+
-      '<div class="card"><h3>Where the Draft Misses<small>what IM decided instead</small></h3>'+hbars((D.misses||[]).slice(0,8).map(m=>({k:m.k,v:m.n,c:"var(--c2)"})))+'</div></div>':'')+
+      (cb?k("IM Changes Spotted",pct(cb.caught,cb.changed)+"%",cb.caught+" of "+cb.changed+" rows IM changed, "+esc(C.period),"var(--c2)")+
+        k("When the Draft Says Clean",pct(cb.cleanKept,cb.clean)+"%","IM approved as submitted (any row: "+pct(C.base,cb.rows)+"%)","var(--good)")+
+        k("Left for a Reviewer",pct(cb.flagged,cb.rows)+"%","of rows flagged for a look","var(--c4)"):"")+'</div>'+
+    (B&&B.findings?'<div class="card"><h3>What the Analysis Found<small>'+esc(fmtD(B.asOf))+'</small></h3><ul class="finds">'+B.findings.map(f=>'<li>'+esc(f)+'</li>').join("")+'</ul></div>':'')+
+    (C?'<div class="g2"><div class="card"><h3>Spotting the Rows IM Changes<small>'+esc(C.period)+', '+C.software.changed+' rows changed</small></h3>'+hbars([{k:"Software checks alone",v:pct(C.software.caught,C.software.changed),tip:C.software.caught+" of "+C.software.changed+" rows"},{k:"Claude’s read",v:pct(C.claude.caught,C.claude.changed),tip:C.claude.caught+" of "+C.claude.changed+" rows"},{k:"Both together (the draft)",v:pct(cb.caught,cb.changed),tip:cb.caught+" of "+cb.changed+" rows",c:"var(--c3)"}],{unit:"%"})+'<p class="note">The software checks settle the form and the Reference Model; IM’s judgment calls are where Claude’s read and your corrections come in.</p></div>'+
+      (E?'<div class="card"><h3>How IM Edits Definitions<small>'+esc(E.period)+', '+E.total+' definitions</small></h3>'+hbars(E.kinds.slice(0,7).map(x=>({k:x.k.charAt(0).toUpperCase()+x.k.slice(1),v:x.n,c:"var(--c1)"})))+'<p class="note">IM edits lightly. The draft now suggests IM-style light edits instead of rewrites.</p></div>':'')+'</div>':'')+
+    (D&&D.byYear&&D.byYear.length?'<div class="g2" style="margin-top:18px"><div class="card"><h3>Software Checks Against IM, Year by Year<small>learning only from earlier years</small></h3>'+lineChart(D.byYear.map(y=>({label:String(y.y),y})),[{name:"Same decision as IM",c:"var(--c3)",v:p=>pct(p.y.agree,p.y.n),extra:p=>' of '+p.y.n+' rows'},{name:"Clean rows IM kept",c:"var(--good)",v:p=>p.y.cleanRows?pct(p.y.cleanKept,p.y.cleanRows):null}],{unit:"%",max:112})+'<p class="note">Both lines fall after 2022 because IM changes more rows than it used to (see Trends), mostly with light wording edits.</p></div>'+
+      '<div class="card"><h3>Where the Software Checks Miss<small>what IM decided instead, all years</small></h3>'+hbars((D.misses||[]).slice(0,6).map(m=>({k:m.k,v:m.n,c:"var(--c2)"})))+'</div></div>':'')+
     '<div class="card" style="margin-top:18px"><h3>Kinds of Rows<small>history and reviews here combined</small></h3>'+(rows.length?'<div class="tw"><table class="tbl"><thead><tr><th>Draft Decision · Reason · Row</th><th>Rows</th><th>IM Agreed</th><th>Arrives Approved</th></tr></thead><tbody>'+rows.map(x=>{ const p=pct(x.a,x.n), ok=p>=95&&x.n>=30, on=!!(S.cfg.imauto||{})[x.kind];
       return '<tr><td>'+label(x.kind)+'</td><td class="n">'+x.n.toLocaleString()+'</td><td><span class="meter"><i style="width:'+p+'%"></i></span>'+p+'%</td><td>'+(isAdmin()&&(ok||on)?'<label class="tog"><input type="checkbox" data-auto="'+esc(x.kind)+'"'+(on?" checked":"")+'> '+(on?"On":"Turn on")+'</label>':on?'On':ok?'<span class="muted">Ready (staff turn it on)</span>':'<span class="muted">Not yet</span>')+'</td></tr>'; }).join("")+'</tbody></table></div>':'<div class="empty">This fills in as IM reviews drafts.</div>')+'</div>';
 }
-
 
 function helpView(){ const step=(n,t,d)=>'<li><b>'+t+'</b> '+d+'</li>';
   return '<div class="head"><div><h1>Help</h1><div class="sub">How IM Review works, and what each part of the page means.</div></div></div><div class="help">'+
