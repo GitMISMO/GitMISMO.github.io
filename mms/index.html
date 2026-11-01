@@ -1550,6 +1550,45 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 .ss-go{color:var(--muted,#5b7287)}
 .wh-wrlink{color:inherit;text-decoration:underline;text-underline-offset:2px}
 @media (max-width:640px){ .ss-tag{display:none} }
+/* IM Review Desk */
+.imq-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:0 0 14px}
+.imq-stat{background:var(--card,#fff);border:1px solid var(--line,#dbe5ee);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px}
+.imq-stat b{font-size:26px;line-height:1.1;color:var(--ink,#0d314c)}
+.imq-stat span{font-size:12.5px;color:var(--muted,#5b7287)}
+.imq-list{display:grid;gap:8px}
+.imq-card{display:grid;grid-template-columns:auto 1fr;gap:2px 12px;text-align:left;font:inherit;color:inherit;background:var(--card,#fff);border:1px solid var(--line,#dbe5ee);border-radius:12px;padding:12px 14px;cursor:pointer}
+.imq-card:hover{border-color:var(--sky,#74bfeb)}
+.imq-wr{grid-row:span 3;align-self:start;font-size:11.5px;font-weight:700;letter-spacing:.04em;background:#e4f2fb;color:#0d314c;border-radius:6px;padding:3px 7px}
+.imq-card b{font-size:14.5px}.imq-m,.imq-d{font-size:12.5px;color:var(--muted,#5b7287)}
+.imq-tog{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;cursor:pointer}
+.imd-prog{min-width:200px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:12.5px;color:var(--muted,#5b7287)}
+.imd-prog b{font-size:18px;color:var(--ink,#0d314c)}
+.imd-bar{width:200px;height:6px;border-radius:99px;background:var(--line,#dbe5ee);overflow:hidden}.imd-bar i{display:block;height:100%;background:#0f7b5c;border-radius:99px}
+.imd-tabs{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 12px}
+.imd-tabs [data-imf]{font:inherit;font-size:13px;font-weight:600;padding:7px 12px;border-radius:999px;border:1px solid var(--line,#dbe5ee);background:var(--card,#fff);color:inherit;cursor:pointer}
+.imd-tabs [data-imf] b{margin-left:4px;font-size:11.5px;background:#e4f2fb;color:#0d314c;border-radius:99px;padding:1px 7px}
+.imd-tabs [data-imf][aria-selected=true]{background:#0d314c;color:#fff;border-color:#0d314c}
+.imd-tabs .sp{flex:1}
+.imr-list{display:grid;gap:10px}
+.imr{background:var(--card,#fff);border:1px solid var(--line,#dbe5ee);border-left:4px solid var(--line,#dbe5ee);border-radius:12px;padding:12px 14px;display:grid;gap:8px}
+.imr.ok{border-left-color:#0f7b5c}.imr.chg{border-left-color:#b86e00}.imr.auto{border-left-color:#74bfeb}
+.imr-h{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.imr-it{font-size:11.5px;font-weight:700;background:#e4f2fb;color:#0d314c;border-radius:6px;padding:2px 7px}
+.imr-ct{font-size:12px;color:var(--muted,#5b7287)}
+.imr-h b{font-size:14.5px}.imr-pc{font-size:12px;color:var(--muted,#5b7287)}
+.imr-def,.imr-dr,.imr-fin,.imr-sug{font-size:13.5px;line-height:1.45}
+.imr em{display:inline-block;min-width:84px;font-style:normal;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted,#5b7287);margin-right:8px}
+.imr-dr,.imr-fin{background:var(--soft,#f3f8fc);border-radius:10px;padding:8px 10px}
+.imr-com{margin-top:4px;color:var(--ink,#0d314c)}
+.imr-sug{margin-top:4px}
+.imd{display:inline-block;font-size:12px;font-weight:700;border-radius:999px;padding:2px 10px;background:#e3f4ea;color:#0f7b5c}
+.imd-1{background:#fff3dc;color:#8a5a00}.imd-2{background:#eef1f5;color:#4a5d70}.imd-3{background:#fde7e7;color:#a32a2a}.imd-4{background:#a32a2a;color:#fff}
+.imd-look{margin-left:8px;font-size:11.5px;font-weight:700;color:#5b3fa0}
+.imr-btns{display:flex;gap:6px;justify-content:flex-end;flex-wrap:wrap}
+.imr-edit{display:grid;gap:4px}
+.imd-foot{position:sticky;bottom:0;display:flex;gap:10px;align-items:center;justify-content:flex-end;background:var(--bg,#f3f8fc);padding:12px 0;margin-top:12px;border-top:1px solid var(--line,#dbe5ee)}
+.imd-foot>span{margin-right:auto;font-size:13px;color:var(--muted,#5b7287)}
+@media (max-width:640px){ .imd-prog{align-items:flex-start;min-width:0}.imd-bar{width:100%} .imr em{display:block;margin-bottom:2px} .imd-foot{flex-wrap:wrap} }
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4775,7 +4814,7 @@ async function rvAiIm(P,ctx,progress){
   const L=RV_IM_LEARNED; const guide='What IM has done with '+L.decided.toLocaleString()+' decided rows (2021–2026): '+Math.round(L.asSubmitted/L.decided*100)+'% approved as submitted, '+Math.round(L.withMod/L.decided*100)+'% approved with modification, '+Math.round(L.withdrawn/L.decided*100)+'% withdrawn, the rest returned or denied. Most common reasons: '+L.themes.map(t=>t[0]).join('; ')+'.\nTypical IM edits (before → after, why):\n'+L.examples.map(e=>'- ['+e[0]+'] '+e[1]+' → '+e[2]+' ('+e[3]+')').join('\n')+'\nTypical IM comments: '+L.comments.join(' | ')+'\nDefinition templates: '+Object.entries(RV_TEMPLATE_TEXT).map(([k,v])=>k+': '+v).join('; ')+'.';
   const parts=[]; for(let i=0;i<rows.length;i+=12) parts.push(rows.slice(i,i+12)); let done=0;
   const got=await rvPool(parts,4,async part=>{
-    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM checks proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if something may already exist, say “may already exist; check the Reference Model for …”. List only rows IM would likely question. Plain, short notes in IM’s voice.'+(typeof rvFbAvoid==='function'&&rvFbAvoid('im').length?' MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('im').join(' | ')+'.':'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows as [item, change, container, name, definition, facts from the '+(ctx.rm||'Reference Model (not loaded)')+']. When facts say EXISTS, the item is already in the model: IM would deny the add and ask to reuse it. When facts list similar items, judge whether one could be reused. Existing values are the Type’s current enumerations: '+JSON.stringify(part)+'\n\nAnswer in this compact JSON only: {"s":"one sentence","r":[["item","as submitted|with modification|returned|denied","what IM would say","suggested definition or empty","suggested name or empty"]]}. At most 6 rows; each string under 25 words. Answer right away.';
+    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM checks proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if something may already exist, say “may already exist; check the Reference Model for …”. List only rows IM would likely question. Plain, short notes in IM’s voice.'+(typeof imLessons==='function'&&imLessons(10).length?' What IM reviewers corrected in recent drafts (follow their lead): '+imLessons(10).join(' | ')+'.':'')+(typeof rvFbAvoid==='function'&&rvFbAvoid('im').length?' MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('im').join(' | ')+'.':'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows as [item, change, container, name, definition, facts from the '+(ctx.rm||'Reference Model (not loaded)')+']. When facts say EXISTS, the item is already in the model: IM would deny the add and ask to reuse it. When facts list similar items, judge whether one could be reused. Existing values are the Type’s current enumerations: '+JSON.stringify(part)+'\n\nAnswer in this compact JSON only: {"s":"one sentence","r":[["item","as submitted|with modification|returned|denied","what IM would say","suggested definition or empty","suggested name or empty"]]}. At most 6 rows; each string under 25 words. Answer right away.';
     const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+Math.min(rows.length,done*12)+' of '+rows.length+' rows…'); return r; });
   const out=[], sums=[]; let errs=0;
   got.forEach(r=>{ if(!r||r.__err){ errs++; return; } (r.r||[]).forEach(x=>Array.isArray(x)?out.push({item:x[0],likely:x[1],note:x[2],suggestedDefinition:x[3],suggestedName:x[4]}):out.push(x)); if(r.s) sums.push(r.s); });
@@ -4817,7 +4856,8 @@ function rvReportHtml(rep,forWord){
   const sec=(t2,body)=>body?'<h3>'+e(t2)+'</h3>'+body:'';
   h+=sec('Must Fix Before Submitting',tbl(['Area','Where','What’s Wrong','What to Do'],fx.map(f=>({key:f._k,cells:[e(f.area),e(f.where),e(f.issue)+(f.fb?'<div class="rv-fbnote">'+e(f.fb)+'</div>':''),e(f.suggestion)]}))));
   if(rep.kind==='editor') h+=sec('Editorial Corrections',tbl(['Category','Where','Issue','Suggestion'],(rep.corrections||[]).map((c,i)=>({key:'c'+i,cells:[e(c.category||''),e(c.where),e(c.issue),e(c.suggestion)]}))));
-  if(rep.kind==='im') h+=sec('Rows IM May Question',tbl(['Item','Likely Outcome','What IM Would Say','Suggested Definition or Name'],(rep.rows||[]).map((r,i)=>({key:'r'+i,cells:[e(r.item),e(r.likely),e(r.note),e([r.name,r.def].filter(Boolean).join(' — '))]}))));
+  if(rep.kind==='im') if(rep.kind==='im'&&rep.imCounts) h+=sec('Draft IM Decisions','<p>'+Object.entries(rep.imCounts).map(([d,n])=>'<b>'+n+'</b> '+e(d.toLowerCase())).join(' · ')+'. IM reviewers see a draft decision for every row and agree or correct it.</p>');
+  h+=sec('Rows IM May Question',tbl(['Item','Likely Outcome','What IM Would Say','Suggested Definition or Name'],(rep.rows||[]).map((r,i)=>({key:'r'+i,cells:[e(r.item),e(r.likely),e(r.note),e([r.name,r.def].filter(Boolean).join(' — '))]}))));
   h+=sec('Recommended',tbl(['Area','Where','Recommendation','Suggestion'],[...rc.map(f=>({key:f._k,cells:[e(f.area),e(f.where),e(f.issue)+(f.fb?'<div class="rv-fbnote">'+e(f.fb)+'</div>':''),e(f.suggestion)]})),...(rep.recommendations||[]).map((c,i)=>({key:'m'+i,cells:['Editorial',e(c.where),e(c.issue),e(c.suggestion)]}))]));
   h+=sec('Questions for the Facilitator',(rep.questions||[]).length?'<ol>'+rep.questions.map(q=>'<li>'+e(q)+'</li>').join('')+'</ol>':'');
   if(rep.kind==='im'&&rep.form) h+=sec('What IM Has Done Before','<p>Across '+RV_IM_LEARNED.decided.toLocaleString()+' decided rows since 2021, '+Math.round(RV_IM_LEARNED.asSubmitted/RV_IM_LEARNED.decided*100)+'% were approved as submitted and '+Math.round(RV_IM_LEARNED.withMod/RV_IM_LEARNED.decided*100)+'% with modification. The most common reasons for changes: '+RV_IM_LEARNED.themes.slice(0,5).map(t=>t[0].toLowerCase()).join(', ')+'.</p>');
@@ -5121,9 +5161,10 @@ function rvRun(t,kind){
       const ctx={t,boiler:kind==='editor'?$('#rvbp',box).value:exp,note:kind==='editor'?$('#rvnote',box).value.trim():''};
       let findings, ai; rvFbEnsure();
       if(kind==='editor'){ say('Checking boilerplate, copyright, layout and setup…'); findings=rvEditorChecks(read,ctx); ai=await rvAiEditor(read,ctx,m=>say(esc(m))); }
-      else { const x=read[0]; if(x.kind!=='excel') throw new Error('Choose the IM Submission Form (an Excel file).'); say('Loading the current MISMO Reference Model…'); const R=await rmLoad(); say('Checking the Face Page and '+'Reference Model rows'+(R?' against the '+esc(R.label):'')+'…'); const r=rvImChecks(x,ctx); findings=r.out.concat(rvRmChecks(r.P)); ctx.formStats={rows:r.P.rows.length}; ctx.rm=R?R.label:''; ai=await rvAiIm(r.P,ctx,m=>say(esc(m))); }
+      else { const x=read[0]; if(x.kind!=='excel') throw new Error('Choose the IM Submission Form (an Excel file).'); say('Loading the current MISMO Reference Model…'); const R=await rmLoad(); say('Checking the Face Page and '+'Reference Model rows'+(R?' against the '+esc(R.label):'')+'…'); const r=rvImChecks(x,ctx); findings=r.out.concat(rvRmChecks(r.P)); ctx.P=r.P; ctx.formStats={rows:r.P.rows.length}; ctx.rm=R?R.label:''; ai=await rvAiIm(r.P,ctx,m=>say(esc(m))); }
       findings=rvApplyFeedback(findings);
       const rep=rvBuildReport(kind,t,read,findings,ai,ctx);
+      if(kind==='im'&&typeof imCreateDraft==='function'){ say('Drafting IM’s decision for every row…'); try{ await imCreateDraft(t,rep,ctx.P,findings,ai); }catch(e){ console.warn(e); } }
       say('Saving the report…'); await rvSave(t,rep);
       // keep the AI Review stage moving the way it did
       if(kind==='editor'&&S.tickets[t.id]){ const x=clone(S.tickets[t.id]); const round={at:rep.at,by:rep.by,verdict:rep.readiness==='ready'?'ready':'fix',summary:rep.readinessLabel+(rep.summary?': '+rep.summary:''),checks:[],edits:[],files:rep.files,report:rep.id};
@@ -5214,6 +5255,161 @@ renderPanel=function(){ _renderPanelSS(); const P=$('#panel'); if(!S.panel||Stri
   if(S.ptab==='files') $$('.wtab',pb).forEach(w=>w.hidden=w.dataset.wtab!=='files');
   b.onclick=e=>{ e.preventDefault(); S.ptab='files'; $$('.wh-tabs [data-ptab]',pb).forEach(x=>x.setAttribute('aria-selected',x.dataset.ptab==='files')); $$('.wtab',pb).forEach(w=>w.hidden=w.dataset.wtab!=='files'); };
 };
+/* =====================================================================
+   IM Review Desk. The IM Pre-Review drafts IM's decision for every row of the
+   IM Submission Form (decision, comment, suggested wording). IM reviewers
+   (People and Roles › IM Reviewer) open the draft, agree or correct each row,
+   and finish. Their corrections teach the next draft; once a kind of row has
+   matched IM's decisions often enough, staff can let those rows arrive
+   already approved so reviewers only look at the exceptions.
+   Data: imqueue/<report id> (the list), imr-<ticket>/<report id> (rows and
+   decisions), imlearn-<year>/<report id>_<row> (what IM did with each draft),
+   config/imauto (the kinds of rows that arrive already approved).
+   ===================================================================== */
+ROLE_LABEL.imreview='IM Reviewer';
+const IM_DEC=['Approved as Submitted','Approved with Modification','Returned','Denied','Withdrawn','Deferred'];
+const IM_RANK={'Approved as Submitted':0,'Approved with Modification':1,'Deferred':2,'Returned':3,'Withdrawn':3,'Denied':4};
+const IM_RULE={deny:['rm-exists','rm-cn-exists','rm-enum-exists','rm-ac-exists'],
+  ret:['rm-missing','rm-cn-missing','rm-parent','rm-enum-dp','rm-enum-missing','rm-xpath','rm-rename-taken','ct','rm-type-enums','other-desc','xpath'],
+  mod:['template','def-acr','def-impl','abbr','classword','normal-english','def-period','def-repeat','neg-ind','rm-old-def','dup'],
+  look:['rm-similar','rm-enum-near','rm-deprecated','rm-already-there','rm-dep-already']};
+S.imq=S.imq||{}; S.imr=S.imr||{}; S.iml=S.iml||{}; S.imauto=S.imauto||{}; const imSubs={};
+function imEnsureQ(){ if(S.cfgDocs&&S.cfgDocs.imauto) S.imauto=S.cfgDocs.imauto; if(imSubs.q) return; imSubs.q=1; try{ Store.sub('imqueue',o=>{ S.imq=o||{}; if(S.ready){ imCount(); if(S.view==='imreview') renderAll(); } }); Store.sub('imlearn-'+new Date().getFullYear(),o=>{ S.iml=Object.assign({},S.iml,o||{}); }); Store.sub('imlearn-'+(new Date().getFullYear()-1),o=>{ S.iml=Object.assign({},o||{},S.iml); }); }catch(e){} }
+function imColl(tid){ return ('imr-'+String(tid)).replace(/[^A-Za-z0-9_.-]/g,'_').slice(0,40); }
+function imEnsureR(tid){ const c=imColl(tid); if(imSubs[c]) return; imSubs[c]=1; try{ Store.sub(c,o=>{ Object.values(o||{}).forEach(d=>{ if(d&&d.rep) S.imr[d.rep]=d; }); if(S.view==='imreview') renderAll(); }); }catch(e){} }
+function imIsReviewer(){ return S.isStaff||isRole('imreview',S.me); }
+function imCount(){ const n=Object.values(S.imq||{}).filter(q=>q.status==='awaiting').length; const b=$('#nav-imreview'); if(b){ b.textContent=n||''; b.hidden=!n; } const btn=$('#nav button[data-hq="imreview"]'); if(btn) btn.hidden=!imIsReviewer(); }
+
+/* ---------- 1. the draft: a decision for every row ---------- */
+function imKind(row){ return [row.draft.dec,row.draft.rule||'clean',String(row.tt||'').toLowerCase()].join('|'); }
+function imDraftRows(P,findings,ai){
+  const AI={}; ((ai&&ai.rows)||[]).forEach(x=>{ AI[String(x.item)]=x; });
+  const st=imRuleStats();
+  return P.rows.map((r,i)=>{ const it=String(r.item||('row '+r._row)); const F=findings.filter(f=>String(f.item||'')===it||String(f.item||'')===String(r.item||''));
+    let dec='Approved as Submitted', rule='', why=[], sug='', look=false;
+    const bump=(d,ru,txt)=>{ if((IM_RANK[d]||0)>(IM_RANK[dec]||0)){ dec=d; rule=ru; } if(txt) why.push(txt); };
+    F.forEach(f=>{ const ru=f.rule||'';
+      if(IM_RULE.deny.includes(ru)) bump('Denied',ru,f.issue+' '+f.suggestion);
+      else if(IM_RULE.ret.includes(ru)||(ru==='need'&&f.sev==='fix')) bump('Returned',ru,f.issue+' '+f.suggestion);
+      else if(IM_RULE.mod.includes(ru)){ const s=st[ru]; if(s&&s.n>=5&&s.keep/s.n>=0.6){ why.push('(Not usually changed by IM) '+f.issue); return; } bump('Approved with Modification',ru,f.issue+' '+f.suggestion); if(ru==='template'&&!sug) sug=f.suggestion.replace(/^Start with:\s*/,''); }
+      else if(IM_RULE.look.includes(ru)||f.sev==='question'){ look=true; why.push(f.issue+' '+f.suggestion); } });
+    const a=AI[it]||AI[String(r.item||'')];
+    if(a){ const l=String(a.likely||'').toLowerCase(); const d=/denied/.test(l)?'Denied':/returned/.test(l)?'Returned':/modif/.test(l)?'Approved with Modification':''; if(d) bump(d,rule||'ai',''); if(a.note) why.push(a.note); if(a.suggestedDefinition&&!/^\s*$/.test(a.suggestedDefinition)) sug=a.suggestedDefinition; if(a.suggestedName) sug=(sug?sug+' — ':'')+'Name: '+a.suggestedName; if(d&&!F.length) look=true; }
+    const row={i,item:it,ct:r.ct||'',tt:r.tt||'',name:r.en||r.dp||r.at||r.cn||r.ac||'',pc:r.pc||'',cn:r.cn||'',dp:r.dp||'',en:r.en||'',xp:r.xp||'',def:r.def||'',old:r.old||'',
+      draft:{dec,com:[...new Set(why)].map(s=>rvTrim(s,260)).join(' ').slice(0,700),sug:rvTrim(sug,500),rule:rule||(dec==='Approved as Submitted'?'':'ai'),look}};
+    const k=imKind(row); if(S.imauto&&S.imauto[k]&&!look) row.auto=true;
+    return row; });
+}
+async function imCreateDraft(t,rep,P,findings,ai){
+  if(!P||!P.rows||!P.rows.length) return;
+  const rows=imDraftRows(P,findings,ai);
+  const doc={rep:rep.id,ticket:t.id,wr:t.wr,name:t.name,at:rep.at,by:rep.by,rm:rep.rm||'',file:(rep.files||[])[0]||'',status:'draft',rows};
+  S.imr[rep.id]=doc; await write(imColl(t.id),rep.id,doc);
+  rep.imDraft=true; rep.imCounts=imTally(rows);
+}
+function imTally(rows){ const c={}; rows.forEach(r=>{ const d=(r.final&&r.final.dec)||r.draft.dec; c[d]=(c[d]||0)+1; }); return c; }
+
+/* ---------- 2. learning ---------- */
+function imRuleStats(){ const st={}; Object.values(S.iml||{}).forEach(x=>{ if(!x||!x.rule) return; const s=st[x.rule]=st[x.rule]||{n:0,keep:0,agree:0}; s.n++; if(x.final==='Approved as Submitted') s.keep++; if(x.agreed) s.agree++; }); return st; }
+function imKindStats(){ const st={}; Object.values(S.iml||{}).forEach(x=>{ if(!x||!x.kind) return; const s=st[x.kind]=st[x.kind]||{n:0,agree:0}; s.n++; if(x.agreed) s.agree++; }); return st; }
+function imLessons(n){ return Object.values(S.iml||{}).filter(x=>x&&!x.agreed).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,n||12)
+  .map(x=>'['+x.tt+' '+rvTrim(x.name,40)+'] draft said '+x.draft+(x.draftCom?' ('+rvTrim(x.draftCom,80)+')':'')+'; IM decided '+x.final+(x.finalCom?': '+rvTrim(x.finalCom,120):'')); }
+
+/* ---------- 3. the desk ---------- */
+S.imOpen=S.imOpen||''; S.imFilter=S.imFilter||'look';
+function imState(doc){ const R=doc.rows||[]; const done=R.filter(r=>r.final).length; return {n:R.length,done,look:R.filter(r=>!r.final&&(r.draft.look||r.draft.dec!=='Approved as Submitted')&&!r.auto).length}; }
+VIEWS.imreview=function(){ imEnsureQ(); imCount();
+  if(!imIsReviewer()) return '<div class="pagehead"><div><h1>IM Review</h1><div class="sub">For IM reviewers. Ask MISMO staff to add you under People and Roles › IM Reviewer.</div></div></div>';
+  if(S.imOpen){ const q=S.imq[S.imOpen]; if(q) imEnsureR(q.ticket); const doc=S.imr[S.imOpen]; if(doc) return imDeskHtml(doc); return '<div class="pagehead"><div><h1>IM Review</h1></div></div><div class="card"><div class="lead-empty">Opening the review…</div></div>'; }
+  const L=Object.values(S.imq||{}).sort((a,b)=>String(b.sentAt||b.at).localeCompare(String(a.sentAt||a.at)));
+  const aw=L.filter(q=>q.status==='awaiting'), dn=L.filter(q=>q.status==='decided').slice(0,20);
+  const ks=imKindStats(), all=Object.values(S.iml||{}); const agree=all.length?Math.round(all.filter(x=>x.agreed).length/all.length*100):null;
+  const card=q=>'<button type="button" class="imq-card" data-imopen="'+esc(q.rep)+'"><span class="imq-wr">'+esc(q.wr)+'</span><b>'+esc(q.name)+'</b><span class="imq-m">'+esc(q.rows+' rows · '+(q.look||0)+' to look at · '+(q.clean||0)+' clean')+'</span><span class="imq-d">'+(q.status==='decided'?'Decided '+esc(fmtS(String(q.decidedAt||'').slice(0,10)))+' · '+esc((q.decidedBy||'').split(' ')[0])+(q.agree!=null?' · '+q.agree+'% agreed with the draft':''):'Sent '+esc(fmtS(String(q.sentAt||q.at).slice(0,10)))+(q.sentBy?' by '+esc(q.sentBy.split(' ')[0]):''))+'</span></button>';
+  return '<div class="pagehead"><div><h1>IM Review</h1><div class="sub">Each submission arrives with a draft decision for every row. Agree, or correct what the draft got wrong; every correction teaches the next draft.</div></div></div>'+
+    '<div class="imq-stats"><div class="imq-stat"><b>'+aw.length+'</b><span>waiting for IM</span></div><div class="imq-stat"><b>'+(agree==null?'—':agree+'%')+'</b><span>of draft decisions IM agreed with'+(all.length?' ('+all.length+' rows)':'')+'</span></div><div class="imq-stat"><b>'+Object.keys(S.imauto||{}).filter(k=>S.imauto[k]).length+'</b><span>kinds of rows that arrive already approved</span></div></div>'+
+    '<div class="card"><h3>Waiting for IM</h3>'+(aw.length?'<div class="imq-list">'+aw.map(card).join('')+'</div>':'<div class="lead-empty">Nothing waiting. A submission lands here when the facilitator sends their IM Pre-Review to IM.</div>')+'</div>'+
+    (dn.length?'<div class="card"><h3>Decided</h3><div class="imq-list">'+dn.map(card).join('')+'</div></div>':'')+
+    (S.isStaff?imAutoHtml(ks):'');
+};
+function imAutoHtml(ks){ const rows=Object.entries(ks).filter(([k,s])=>s.n>=5).sort((a,b)=>b[1].n-a[1].n).slice(0,30);
+  return '<div class="card"><h3>Getting to Fully Automatic<span class="sp muted" style="font-size:12px;font-weight:500">MISMO staff only</span></h3><p class="muted" style="font-size:13px;margin:0 0 8px">How often IM agreed with each kind of draft. When a kind is at 95% or better over 30 or more rows, it can arrive already approved, so reviewers only see the exceptions. Reviewers can still change any row.</p>'+
+    (rows.length?'<div class="tblwrap"><table class="tbl"><thead><tr><th>Kind of Row</th><th>Rows</th><th>IM Agreed</th><th>Arrives Approved</th></tr></thead><tbody>'+rows.map(([k,s])=>{ const [d,ru,tt]=k.split('|'); const p=Math.round(s.agree/s.n*100); const ok=p>=95&&s.n>=30; return '<tr><td>'+esc(d)+' · '+esc(ru==='clean'?'no issues found':ru==='ai'?'Claude’s read':ru)+' · '+esc(tt||'any')+'</td><td>'+s.n+'</td><td>'+p+'%</td><td>'+(ok||S.imauto[k]?'<label class="imq-tog"><input type="checkbox" data-imauto="'+esc(k)+'"'+(S.imauto[k]?' checked':'')+'> '+(S.imauto[k]?'On':'Turn on')+'</label>':'<span class="muted">Not yet</span>')+'</td></tr>'; }).join('')+'</tbody></table></div>':'<div class="lead-empty">This fills in as IM reviews drafts.</div>')+'</div>'; }
+function imDeskHtml(doc){
+  const s=imState(doc), q=S.imq[doc.rep]||{}; const decided=doc.status==='decided'; const F=S.imFilter;
+  const vis=r=>F==='all'||(F==='look'?((r.draft.look||r.draft.dec!=='Approved as Submitted')&&!r.auto):(!r.draft.look&&r.draft.dec==='Approved as Submitted')||r.auto);
+  const chip=d=>'<span class="imd imd-'+(IM_RANK[d]||0)+'">'+esc(d)+'</span>';
+  const row=r=>{ const f=r.final; const ed=S.imEdit===r.i&&!decided;
+    return '<div class="imr'+(f?(f.agreed?' ok':' chg'):'')+(r.auto&&!f?' auto':'')+'" data-imrow="'+r.i+'"><div class="imr-h"><span class="imr-it">'+esc(r.item)+'</span><span class="imr-ct">'+esc([r.ct,r.tt].filter(Boolean).join(' · '))+'</span><b>'+esc(r.name)+'</b>'+(r.pc?'<span class="imr-pc">in '+esc(r.pc)+'</span>':'')+'</div>'+
+      (r.def?'<div class="imr-def"><em>Submitted</em>'+esc(r.def)+'</div>':'')+
+      '<div class="imr-dr"><em>'+(r.auto?'Arrives approved':'Draft')+'</em>'+chip(r.draft.dec)+(r.draft.look?'<span class="imd-look">Needs IM’s judgment</span>':'')+(r.draft.com?'<div class="imr-com">'+esc(r.draft.com)+'</div>':'')+(r.draft.sug?'<div class="imr-sug"><em>Suggested</em>'+esc(r.draft.sug)+'</div>':'')+'</div>'+
+      (f&&!ed?'<div class="imr-fin"><em>'+(f.agreed?'IM agreed':'IM decided')+'</em>'+chip(f.dec)+(f.com&&!f.agreed?'<div class="imr-com">'+esc(f.com)+'</div>':'')+(f.missed?'<div class="imr-com">Missed by the draft: '+esc(f.missed)+'</div>':'')+'</div>':'')+
+      (ed?'<div class="imr-edit">'+fld('IM Decision',sel('imdec',IM_DEC,(f&&f.dec)||r.draft.dec))+fld('Review Comment',ta('imcom',(f&&!f.agreed&&f.com)||r.draft.com))+fld('Suggested Definition or Name',ta('imsug',(f&&f.sug)||r.draft.sug))+fld('What the Draft Missed or Got Wrong (optional)',ta('immiss',(f&&f.missed)||'','This is what teaches the next draft'))+'<div class="imr-btns"><button type="button" class="btn sm" data-imcancel="1">Cancel</button><button type="button" class="btn sm pri" data-imsave="'+r.i+'">Save</button></div></div>':'')+
+      (!decided&&!ed?'<div class="imr-btns">'+(f?'<button type="button" class="btn sm ghost" data-imundo="'+r.i+'">Undo</button>':'')+'<button type="button" class="btn sm" data-imchg="'+r.i+'">'+(f&&!f.agreed?'Edit':'Change or Add Something')+'</button>'+(!f||!f.agreed?'<button type="button" class="btn sm pri" data-imok="'+r.i+'">Agree</button>':'')+'</div>':'')+'</div>'; };
+  const R=(doc.rows||[]).filter(vis);
+  const nLook=(doc.rows||[]).filter(r=>(r.draft.look||r.draft.dec!=='Approved as Submitted')&&!r.auto).length, nClean=(doc.rows||[]).length-nLook;
+  const pending=(doc.rows||[]).filter(r=>!r.final).length;
+  return '<div class="pagehead"><div><button type="button" class="btn sm ghost" data-imback="1">‹ All Submissions</button><h1 style="margin-top:6px">'+esc(doc.wr+' '+doc.name)+'</h1><div class="sub">'+esc((doc.file||'IM Submission Form')+' · drafted '+fmtS(String(doc.at).slice(0,10))+(doc.rm?' · checked against the '+doc.rm:''))+'</div></div>'+
+    '<div class="imd-prog"><b>'+(s.done)+' of '+s.n+'</b><span>rows decided</span><div class="imd-bar"><i style="width:'+(s.n?Math.round(s.done/s.n*100):0)+'%"></i></div></div></div>'+
+    '<div class="imd-tabs" role="tablist">'+[['look','Needs a Look',nLook],['clean','Clean',nClean],['all','All Rows',(doc.rows||[]).length]].map(([k,l,n])=>'<button type="button" role="tab" data-imf="'+k+'" aria-selected="'+(F===k)+'">'+l+' <b>'+n+'</b></button>').join('')+
+      (decided?'':'<span class="sp"></span><button type="button" class="btn sm" data-imall="'+F+'">Agree With All '+(F==='look'?'Shown':F==='clean'?'Clean Rows':'Remaining')+'</button>')+'</div>'+
+    '<div class="imr-list">'+(R.length?R.map(row).join(''):'<div class="lead-empty">Nothing here.</div>')+'</div>'+
+    '<div class="imd-foot">'+(decided?'<span>Decided '+esc(fmtS(String(q.decidedAt||'').slice(0,10)))+' by '+esc(q.decidedBy||'')+'</span><button type="button" class="btn" data-imxl="1">Download the Decided Form</button>':'<span>'+(pending?pending+' row'+(pending===1?'':'s')+' still to decide':'Every row is decided')+'</span><button type="button" class="btn" data-imxl="1">Download for Excel</button><button type="button" class="btn pri" data-imfinish="1"'+(pending?' disabled':'')+'>Finish IM Review</button>')+'</div>';
+}
+async function imSaveDoc(doc){ S.imr[doc.rep]=doc; await write(imColl(doc.ticket),doc.rep,doc); }
+async function imFinish(doc){
+  const by=S.me.name||'', at=new Date().toISOString(); doc.status='decided'; doc.decidedBy=by; doc.decidedAt=at;
+  const R=doc.rows||[]; const agreed=R.filter(r=>r.final&&r.final.agreed).length; const pct=R.length?Math.round(agreed/R.length*100):0;
+  await imSaveDoc(doc);
+  const yr=new Date().getFullYear(); await Promise.all(R.map(r=>write('imlearn-'+yr,(doc.rep+'_'+r.i).replace(/[^A-Za-z0-9_-]/g,'_').slice(0,120),{rep:doc.rep,wr:doc.wr,at,tt:r.tt,ct:r.ct,name:rvTrim(r.name,80),kind:imKind(r),rule:r.draft.rule||'',draft:r.draft.dec,draftCom:rvTrim(r.draft.com,240),final:r.final.dec,finalCom:rvTrim(r.final.com||'',240),missed:rvTrim(r.final.missed||'',240),agreed:!!r.final.agreed,auto:!!r.auto})));
+  const q=Object.assign({},S.imq[doc.rep]||{},{status:'decided',decidedBy:by,decidedAt:at,agree:pct,counts:imTally(R)}); S.imq[doc.rep]=q; await write('imqueue',doc.rep,q);
+  const t=S.tickets[doc.ticket]; const c=imTally(R); const sum=Object.entries(c).map(([d,n])=>n+' '+d.toLowerCase()).join(', ');
+  if(t){ const x=clone(t); hist(x,'IM decision ('+R.length+' rows): '+sum+'. Reviewed by '+by+'.'); await saveTicket(x,'IM decision saved');
+    const fac=personByName(t.facilitator); if(fac&&fac.email) await queueMail({to:[fac.email],subject:'IM decision: '+t.wr+' '+t.name,body:'IM has decided '+t.wr+' '+t.name+': '+sum+'.\n\nOpen it in the MMS: https://resources.mismo.org/mms/#wr='+t.id,kind:'imdecision',key:'imdecision-'+doc.rep}); }
+  toast('IM review finished: '+sum);
+}
+async function imSend(t,rep){ imEnsureQ(); imEnsureR(t.id); const doc=S.imr[rep.id]; const rows=(doc&&doc.rows)||[]; const look=rows.filter(r=>(r.draft.look||r.draft.dec!=='Approved as Submitted')&&!r.auto).length;
+  const q={rep:rep.id,ticket:t.id,wr:t.wr,name:t.name,at:rep.at,status:'awaiting',sentAt:new Date().toISOString(),sentBy:S.me.name||'',rows:rows.length,look,clean:rows.length-look}; S.imq[rep.id]=q; await write('imqueue',rep.id,q);
+  if(doc){ doc.status='awaiting'; await imSaveDoc(doc); }
+  const to=peopleFor('imreview').map(p=>p.email).filter(Boolean);
+  if(to.length) await queueMail({to,subject:'IM review ready: '+t.wr+' '+t.name,body:t.wr+' '+t.name+' is ready for IM: '+rows.length+' rows, '+look+' to look at and '+(rows.length-look)+' with no issues found.\n\nOpen it in the MMS: https://resources.mismo.org/mms/#imreview',kind:'imreview',key:'imreview-'+rep.id});
+  const x=clone(S.tickets[t.id]||t); hist(x,'IM Pre-Review sent to IM reviewers ('+rows.length+' rows, '+look+' to look at)'); await saveTicket(x,'Sent to IM');
+}
+function imExport(doc){ const head=['Item #','Change Type','Change Target Type','Parent CONTAINER Name','CONTAINER Name','Data Point Name','Enumeration Name','Definition','Review Decision','Review Comments','Suggested Definition or Name','Draft Decision','IM Agreed With Draft'];
+  const rows=(doc.rows||[]).map(r=>{ const f=r.final||{}; return [r.item,r.ct,r.tt,r.pc,r.cn,r.dp,r.en,r.def,f.dec||r.draft.dec,(f.agreed?r.draft.com:f.com)||r.draft.com||'',f.sug||r.draft.sug||'',r.draft.dec,f.dec?(f.agreed?'Yes':'No'):'']; });
+  const name='IM Review - '+doc.wr+' - '+String(doc.decidedAt||doc.at).slice(0,10);
+  if(window.XLSX){ const ws=XLSX.utils.aoa_to_sheet([head,...rows]); ws['!cols']=head.map((h,i)=>({wch:[8,16,16,22,22,28,24,60,24,60,50,24,10][i]})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Reference Model Changes'); XLSX.writeFile(wb,name+'.xlsx'); return; }
+  const csv=[head,...rows].map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿',csv],{type:'text/csv'})); a.download=name+'.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
+
+/* ---------- wiring ---------- */
+const _wireMainIM=wireMain;
+wireMain=function(m){ _wireMainIM(m); if(S.view!=='imreview') return;
+  $$('[data-imopen]',m).forEach(b=>b.onclick=()=>{ S.imOpen=b.dataset.imopen; S.imEdit=null; const q=S.imq[S.imOpen]; if(q) imEnsureR(q.ticket); S.imFilter=(q&&q.look)?'look':'all'; renderAll(); });
+  $$('[data-imback]',m).forEach(b=>b.onclick=()=>{ S.imOpen=''; renderAll(); });
+  $$('[data-imf]',m).forEach(b=>b.onclick=()=>{ S.imFilter=b.dataset.imf; renderAll(); });
+  $$('[data-imauto]',m).forEach(c=>c.onchange=async()=>{ S.imauto=Object.assign({},S.imauto,{[c.dataset.imauto]:c.checked}); await write('config','imauto',S.imauto); toast(c.checked?'Those rows will arrive already approved':'Those rows will need a reviewer again'); renderAll(); });
+  const doc=S.imr[S.imOpen]; if(!doc) return;
+  const keep=()=>{ const y=window.scrollY; return ()=>window.scrollTo(0,y); };
+  $$('[data-imok]',m).forEach(b=>b.onclick=async()=>{ const r=doc.rows[+b.dataset.imok]; r.final={dec:r.draft.dec,com:r.draft.com,sug:r.draft.sug,agreed:true,by:S.me.name||'',at:new Date().toISOString()}; const back=keep(); await imSaveDoc(doc); renderAll(); back(); });
+  $$('[data-imundo]',m).forEach(b=>b.onclick=async()=>{ delete doc.rows[+b.dataset.imundo].final; const back=keep(); await imSaveDoc(doc); renderAll(); back(); });
+  $$('[data-imchg]',m).forEach(b=>b.onclick=()=>{ S.imEdit=+b.dataset.imchg; const back=keep(); renderAll(); back(); });
+  $$('[data-imcancel]',m).forEach(b=>b.onclick=()=>{ S.imEdit=null; const back=keep(); renderAll(); back(); });
+  $$('[data-imsave]',m).forEach(b=>b.onclick=async()=>{ const box=b.closest('.imr'); const r=doc.rows[+b.dataset.imsave]; const v=k=>($('[name='+k+']',box)||{}).value||'';
+    const dec=v('imdec'), com=v('imcom').trim(), sug=v('imsug').trim(), missed=v('immiss').trim();
+    const agreed=dec===r.draft.dec&&com===r.draft.com&&sug===r.draft.sug&&!missed;
+    r.final={dec,com,sug,missed,agreed,by:S.me.name||'',at:new Date().toISOString()}; S.imEdit=null; const back=keep(); await imSaveDoc(doc); renderAll(); back(); });
+  $$('[data-imall]',m).forEach(b=>b.onclick=async()=>{ const F=b.dataset.imall; let n=0; doc.rows.forEach(r=>{ if(r.final) return; const look=(r.draft.look||r.draft.dec!=='Approved as Submitted')&&!r.auto; if(F==='look'&&!look) return; if(F==='clean'&&look) return; r.final={dec:r.draft.dec,com:r.draft.com,sug:r.draft.sug,agreed:true,by:S.me.name||'',at:new Date().toISOString()}; n++; }); await imSaveDoc(doc); toast('Agreed with '+n+' row'+(n===1?'':'s')); renderAll(); });
+  $$('[data-imfinish]',m).forEach(b=>b.onclick=async()=>{ b.disabled=true; await imFinish(doc); renderAll(); });
+  $$('[data-imxl]',m).forEach(b=>b.onclick=()=>imExport(doc));
+};
+/* the IM report gets a "Send to IM" button and shows the draft decisions */
+const _rvShowIM=rvShow;
+rvShow=function(rep){ _rvShowIM(rep); if(rep.kind!=='im'||!rep.imDraft) return; const box=$('#modal-root .rv-rep'); if(!box) return; const t=S.tickets[rep.ticket]; imEnsureQ(); const q=S.imq[rep.id];
+  const foot=$('footer',box); if(foot&&!q&&t&&!S.viewAs){ const b=document.createElement('button'); b.type='button'; b.className='btn pri'; b.textContent='Send to IM Reviewers'; b.title='IM reviewers get the draft decision for every row and agree or correct it'; b.onclick=async()=>{ b.disabled=true; await imSend(t,rep); b.textContent='Sent to IM'; toast('Sent to the IM reviewers'); }; foot.appendChild(b); }
+  else if(foot&&q){ const s=document.createElement('span'); s.className='muted'; s.style.marginRight='auto'; s.textContent=q.status==='decided'?'IM decided this '+fmtS(String(q.decidedAt||'').slice(0,10)):'With the IM reviewers since '+fmtS(String(q.sentAt||'').slice(0,10)); foot.insertBefore(s,foot.firstChild); } };
+/* nav: IM Review sits after the Review Desk */
+(function(){ const nav=$('#nav'); if(!nav||$('[data-hq="imreview"]',nav)) return; const after=$('[data-hq="reviews"]',nav); const b=document.createElement('button'); b.type='button'; b.dataset.hq='imreview'; b.title='IM Review'; b.hidden=true; b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9l2.5 2.5L16 7"/></svg><span>IM Review</span><b id="nav-imreview" hidden></b>'; b.onclick=()=>go('imreview'); if(after) after.after(b); else nav.appendChild(b); })();
+const _counts_im=typeof counts==='function'?counts:null;
+if(_counts_im){ counts=function(){ _counts_im(); try{ imEnsureQ(); imCount(); }catch(e){} }; }
 
 /* ---------- settings ---------- */
 let setTab='process';
