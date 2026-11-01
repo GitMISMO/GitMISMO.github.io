@@ -46,7 +46,7 @@
     ] }
   ];
   D.DEFAULTS = {
-    on: false, days: [1, 2, 3, 4, 5], hour: 16, cc: ['pwilliams@mba.org'], ccNames: 'Perry Williams',
+    on: false, days: [1, 2, 3, 4, 5], hour: 16, cc: ['pwilliams@mba.org', 'jcritchley@mba.org'], ccNames: 'Perry Williams, Jonna Critchley',
     skipEmpty: true, targetSoonDays: 14, staleDays: 45, attendanceDays: 60,
     sections: { yourMove: true, overdue: true, targetUpdate: true, stalled: true, cpToday: true, cpTomorrow: true, cpWeek: true, cpOpening: false, cpAll: false,
       comments: true, attendance: true, asks: true, arch: true, media: false, movedToday: true,
