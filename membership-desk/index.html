@@ -414,6 +414,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       cases:C.data||{asOf:today(),total:0,months:{},topicsY:{},channelY:{},byY:{},sameDay:0,closed:0,list:{T:[],C:[],B:[],R:[]}},
       mine:items.slice().sort((a,b)=>String(b.at).localeCompare(String(a.at))).map(x=>({x:{kind:x.kind,name:x.name,id:x.id,level:x.level,special:x.special,price:x.price},cid:x.cid,order:x.order,person:x.person,note:x.note,at:x.at,by:x.by,byName:x.byName,entry:x.entry}))};
     if(card){card.remove();card=null;}
+    const hv=document.getElementById("v-home");if(hv)hv.hidden=false;
     window.__deskBoot();}
   function start(){const rs=RS();if(!rs){setTimeout(start,100);return;}
     rs.requireAccess(PROJECT,{toolName:"Membership Desk",eyebrow:"Programs & Operations"}).then(load).catch(e=>{console.error("desk",e);});}
