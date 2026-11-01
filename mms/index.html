@@ -4040,7 +4040,7 @@ S.ptab=S.ptab||'over'; let _ptabFor=null;
 let mtLite=null, mtLiteAt=0, mtLoading=false;
 async function loadMtLite(){
   if(S.mode!=='relay'||mtLoading) return;
-  if(mtLite&&Date.now()-mtLiteAt<15*60000) return;
+  if(Date.now()-mtLiteAt<(mtLite&&Object.keys(mtLite).length?15*60000:60000)) return;
   mtLoading=true;
   try{
     const groups={}, sched={};
@@ -4049,16 +4049,30 @@ async function loadMtLite(){
     const sd=await rGet('meeting-trackers','sched'); Object.entries(((sd&&sd.data.docs['sched/all'])||{}).items||{}).forEach(([k,v])=>{ sched[k]=v.removed?{removed:true}:Object.assign({},sched[k]||{},v); });
     const gd=await rGet('meeting-trackers','groups'); Object.entries(((gd&&gd.data.docs['groups/all'])||{}).items||{}).forEach(([k,v])=>{ groups[k]=Object.assign({},groups[k]||{},v); });
     const G={}; Object.entries(sched).forEach(([k,v])=>{ const g=groups[k]||{}; G[k]={key:k,name:g.name||v.sheetName||k,rule:v.rule,st:v.st||v.start||'',en:v.en||'',time:v.time||'',zoom:v.zoom||'',off:!!(v.removed||g.hold||g.archived||/inactive|paused|hold/i.test(v.status||''))}; });
-    mtLite=G; mtLiteAt=Date.now();
+    mtLite=G; // empty means sign-in wasn't ready yet: the check above tries again after a minute
   }catch(e){ mtLite=mtLite||{}; }
-  mtLoading=false; if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel();
+  mtLiteAt=Date.now(); mtLoading=false; if(Object.keys(mtLite||{}).length&&S.panel&&!String(S.panel).startsWith('arch:')) renderPanel();
 }
 function etYmd(off){ const n=new Date(Date.now()+(off||0)*864e5); return new Intl.DateTimeFormat('en-CA',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit'}).format(n); }
 function meetsOnRule(rule,ymd){ if(!rule) return false; const d=new Date(ymd+'T12:00:00Z'); if(rule.dow!==d.getUTCDay()) return false; if(rule.weeks==='*') return true; return (rule.weeks||[]).includes(Math.floor((d.getUTCDate()-1)/7)+1); }
+// Meeting Trackers and the MMS don't always spell a workgroup the same way
+// ("VA Docs to Data DWG" vs "VA Documents to Data DWG"), so match on the words.
+const MT_STOP=new Set(['the','and','of','to','for','a','an','in','on','cop','dwg','workgroup','community','practice','development','task','force','group','wg']);
+function mtWords(s){ return String(s||'').toLowerCase().replace(/\(.*?\)/g,' ').replace(/&/g,' and ').split(/[^a-z0-9]+/).filter(w=>w&&!MT_STOP.has(w)).map(w=>w.slice(0,3)); }
+function mtGroupFor(t){
+  if(!mtLite||!t.workgroup) return null;
+  const L=Object.values(mtLite).filter(x=>x.rule&&!x.off); const mk=MT_KEY(t.workgroup), k=gnorm(t.workgroup);
+  const exact=L.find(x=>x.key===mk||gnorm(x.name)===k||gnorm(x.key)===k); if(exact) return exact;
+  const A=new Set(mtWords(t.workgroup)); if(!A.size) return null;
+  let best=null, bs=0;
+  L.forEach(x=>{ const B=new Set(mtWords(x.name)); if(!B.size) return; let n=0; A.forEach(w=>{ if(B.has(w)) n++; }); let sc=n/(A.size+B.size-n); if(sc>bs){ bs=sc; best=x; } });
+  return bs>=.75?best:null;
+}
 function nextMeeting(t){
-  if(!mtLite||!t.workgroup) return null; const k=gnorm(t.workgroup); if(!k) return null;
-  const mk=MT_KEY(t.workgroup); const g=Object.values(mtLite).find(x=>!x.off&&x.rule&&(x.key===mk||gnorm(x.name)===k||gnorm(x.key)===k)); if(!g) return null;
-  for(let i=0;i<75;i++){ const d=etYmd(i); if(meetsOnRule(g.rule,d)) return {date:d,name:/^[a-z0-9]+$/.test(g.name)?t.workgroup:g.name,st:g.st,en:g.en,time:g.time,zoom:g.zoom}; }
+  const g=mtGroupFor(t); if(!g) return null;
+  const nowMin=(()=>{ const p=new Intl.DateTimeFormat('en-US',{timeZone:'America/New_York',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).formatToParts(new Date()); const v=k=>+(p.find(x=>x.type===k)||{}).value||0; return v('hour')*60+v('minute'); })();
+  const endMin=(m=>m?(+m[1])*60+(+m[2]):17*60)(String(g.en||'').match(/^(\d{1,2}):(\d{2})/));
+  for(let i=0;i<75;i++){ const d=etYmd(i); if(i===0&&nowMin>=endMin) continue; if(meetsOnRule(g.rule,d)) return {date:d,name:/^[a-z0-9]+$/.test(g.name)?t.workgroup:g.name,st:g.st,en:g.en,time:g.time,zoom:g.zoom}; }
   return null;
 }
 function hm(s){ const m=String(s||'').match(/^(\d{1,2}):(\d{2})/); if(!m) return ''; let h=+m[1]; const ap=h>=12?'PM':'AM'; h=h%12||12; return h+(m[2]!=='00'?':'+m[2]:'')+' '+ap; }
