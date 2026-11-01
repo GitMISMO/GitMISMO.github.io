@@ -68,8 +68,18 @@
          "origin": "https://resources.mismo.org",
          "writable": [
            "data/"
-         ]
-       }, 
+         ],
+    "ask": true
+  },
+  "awg-review": {
+         "repo": "GitMISMO/awg-review-data",
+         "branch": "main",
+         "origin": "https://resources.mismo.org",
+         "writable": [
+           "data/"
+         ],
+    "ask": true
+  }, 
        "marketing-hq": {
          "repo": "GitMISMO/marketing-hq-data",
          "branch": "main",
