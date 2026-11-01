@@ -453,7 +453,7 @@ const KINDS={
  square:{name:"Square Set-Up",plural:"Square Set-Ups",k:"#74bfeb",from:"MISMO Money",what:"Paid through Square for a special rate. Set the company up in Aptify as a MISMO member."},
  members:{name:"New Member",plural:"New Members",k:"#5fd39a",from:"Member 360",what:"Signed by the MISMO team. Set the company up in Aptify with the level and dates shown."},
  free:{name:"Free Membership",plural:"Free Memberships",k:"#b79cff",from:"Member 360",what:"A complimentary membership. Set it up in Aptify with no invoice."},
- iif:{name:"IIF Lender",plural:"IIF Lenders",k:"#f0b94a",from:"MISMO Money",what:"Paid $1,000 or more to the Innovation Investment Fund. Turn the lender on as a MISMO member."}};
+ iif:{name:"IIF Lender",plural:"IIF Lenders",k:"#f0b94a",from:"Member 360",what:"Paid $1,000 or more to the Innovation Investment Fund. Turn the lender on as a MISMO member."}};
 const slug=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const TODO=[];Object.keys(KINDS).forEach(k=>(D.todo[k]||[]).forEach(x=>TODO.push(Object.assign({kind:k,id:(k==="members"?"m":k==="square"?"sq":k)+"-"+(x.cid||slug(x.name))},x))));
 const FIN=(D.mine||[]).slice();/* finished on this desk, newest first (from the shared record) */
@@ -468,9 +468,9 @@ function finished(){const out=[];
 const KC=k=>k==="case"?"#9fb3c8":KINDS[k].k;
 
 /* ---------- rows ---------- */
-function ageTag(x){const w=days(x.sold||x.paid||TODAY,TODAY);return h("span",{class:"age"+(w>14?" late":w<=2?" ok":"")},w?w+(w===1?" day":" days"):"Today");}
-function todoRow(x){return h("button",{type:"button",class:"row",style:"--k:"+KINDS[x.kind].k,onclick:()=>openPane(x)},h("span",{class:"dot"}),h("span",{class:"nm",title:x.name},x.name),h("span",{class:"wh"},KINDS[x.kind].name+" · "+(x.special?x.special+" · ":"")+x.level+" · "+money(x.price)),h("span",{class:"dt"},"Paid "+fmtS(x.paid)),ageTag(x));}
-function todoRow2(x){return h("button",{type:"button",class:"row r2",style:"--k:"+KINDS[x.kind].k,onclick:()=>openPane(x)},h("span",{class:"dot"}),h("span",{class:"nm",title:x.name},x.name,h("small",null,KINDS[x.kind].name+" · "+(x.special?x.special+" · ":"")+x.level+" · paid "+fmtS(x.paid))),ageTag(x));}
+function ageTag(x){if(!(x.sold||x.paid))return h("span",{class:"age ok"},"New");const w=days(x.sold||x.paid,TODAY);return h("span",{class:"age"+(w>14?" late":w<=2?" ok":"")},w?w+(w===1?" day":" days"):"Today");}
+function todoRow(x){return h("button",{type:"button",class:"row",style:"--k:"+KINDS[x.kind].k,onclick:()=>openPane(x)},h("span",{class:"dot"}),h("span",{class:"nm",title:x.name},x.name),h("span",{class:"wh"},KINDS[x.kind].name+" · "+(x.special?x.special+" · ":"")+x.level+" · "+money(x.price)),h("span",{class:"dt"},x.paid?"Paid "+fmtS(x.paid):""),ageTag(x));}
+function todoRow2(x){return h("button",{type:"button",class:"row r2",style:"--k:"+KINDS[x.kind].k,onclick:()=>openPane(x)},h("span",{class:"dot"}),h("span",{class:"nm",title:x.name},x.name,h("small",null,KINDS[x.kind].name+" · "+(x.special?x.special+" · ":"")+x.level+(x.paid?" · paid "+fmtS(x.paid):""))),ageTag(x));}
 function doneRow2(r){return h(r.cs?"button":"div",{type:r.cs?"button":null,class:"row r2",style:"--k:"+KC(r.kind)+(r.cs?"":";cursor:default"),onclick:r.cs?()=>openCase(r.cs):null},h("span",{class:"dot"}),h("span",{class:"nm",title:r.nm+" · "+r.wh},r.nm,h("small",null,fmtS(r.d)+" · "+r.wh)),h("span",{class:"age"},r.by.split(" · ")[0]));}
 function doneRow(r){return h(r.cs?"button":"div",{type:r.cs?"button":null,class:"row",style:"--k:"+KC(r.kind)+(r.cs?"":";cursor:default"),onclick:r.cs?()=>openCase(r.cs):null},h("span",{class:"dot"}),h("span",{class:"nm",title:r.nm},r.nm),h("span",{class:"wh",title:r.wh},r.wh),h("span",{class:"dt"},fmt(r.d)),h("span",{class:"age"},r.by.split(" · ")[0]));}
 
@@ -478,9 +478,9 @@ function doneRow(r){return h(r.cs?"button":"div",{type:r.cs?"button":null,class:
 function tiles(box,list){box.textContent="";list.forEach(t=>{const b=h("button",{type:"button",class:"tile",style:"--k:"+t.k,onclick:t.go},h("b",null,"0"),h("span",{class:"lab"},t.lab),h("span",{class:"sub"},t.sub));count(b.querySelector("b"),t.v,t.f||(v=>Math.round(v).toLocaleString("en-US")));box.appendChild(b);});}
 function caseYTD(){const yr=TODAY.slice(0,4);return Object.entries(D.cases.months).filter(([m])=>m.startsWith(yr)).reduce((a,[,v])=>a+v,0);}
 function renderHome(){const hr=new Date().getHours();$("hello").textContent=(hr<12?"Good Morning":hr<17?"Good Afternoon":"Good Evening")+", "+(((window.__deskMe&&window.__deskMe().name)||"").split(" ")[0]||"Membership Team");
- const oldest=TODO.map(x=>x.sold||x.paid).sort()[0],fin=finished().filter(r=>r.grp==="setup"&&r.d.slice(0,7)===TODAY.slice(0,7)).length,C=D.cases;
+ const oldest=TODO.map(x=>x.sold||x.paid).filter(Boolean).sort()[0],fin=finished().filter(r=>r.grp==="setup"&&r.d.slice(0,7)===TODAY.slice(0,7)).length,C=D.cases;
  tiles($("home-tiles"),[
-  {k:"#ff8f7d",lab:"Waiting on You",v:TODO.length,sub:TODO.length?"oldest from "+fmtS(oldest):"you're all caught up",go:()=>go("todo")},
+  {k:"#ff8f7d",lab:"Waiting on You",v:TODO.length,sub:TODO.length?(oldest?"oldest from "+fmtS(oldest):"see the To Do page"):"you're all caught up",go:()=>go("todo")},
   {k:"#5fd39a",lab:"Set Up Recently",v:finished().filter(r=>r.grp==="setup").length,sub:"Square, new members and IIF since "+fmtS(finished().filter(r=>r.grp==="setup").map(r=>r.d).sort()[0]||TODAY),go:()=>go("done")},
   {k:"#74bfeb",lab:"MISMO Cases in "+TODAY.slice(0,4),v:caseYTD(),sub:(C.months[TODAY.slice(0,7)]||C.months[Object.keys(C.months).sort().pop()])+" last month in Aptify",go:()=>go("cases")},
   {k:"#b79cff",lab:"Closed the Same Day",v:Math.round(100*C.sameDay/C.closed),sub:C.sameDay+" of "+C.closed+" cases this year",go:()=>go("cases"),f:v=>Math.round(v)+"%"}]);
@@ -502,7 +502,7 @@ function renderTodo(){const by=k=>TODO.filter(x=>x.kind===k);
 
 /* ---------- the right-hand panel: what to set up, and the boxes to fill in ---------- */
 let cur=null;
-function openPane(x){cur=x;const K=KINDS[x.kind];$("pane-t").textContent=x.name;$("pane-s").textContent=K.name+" · from "+K.from+" · waiting "+Math.max(0,days(x.sold||x.paid,TODAY))+" days";
+function openPane(x){cur=x;const K=KINDS[x.kind];$("pane-t").textContent=x.name;$("pane-s").textContent=K.name+" · from "+K.from+((x.sold||x.paid)?" · waiting "+Math.max(0,days(x.sold||x.paid,TODAY))+" days":"");
  const B=$("pane-b");B.textContent="";
  const kv=(rows)=>h("div",{class:"kv"},...rows.flatMap(r=>[h("div",null,r[0]),h("div",null,r[1])]));
  const left=h("div",{class:"pcol"});B.appendChild(left);left.appendChild(h("div",{class:"sect"},h("h3",null,"Set Up in Aptify"),kv([["Company",x.name],["Aptify Company ID",x.cid||"New to Aptify, or not known"],["Level",x.level],["Price",money(x.price)],x.special?["Special",x.special+" (put it in the order line's description)"]:null,["Membership Starts",fmt(x.start)],["Membership Through",fmt(x.end)]].filter(Boolean))));
@@ -589,7 +589,7 @@ function caseDrop(){const box=$("case-drop");if(!box)return;box.hidden=!(window.
   let pend=null;const act=h("div",{class:"cd-act",hidden:""});
   const show=r=>{pend=r;msg.textContent="";act.hidden=false;act.textContent="";
     act.append(h("div",{class:"cd-sum"},h("b",null,r.data.total.toLocaleString("en-US")+" MISMO cases")," in the file · ",h("b",null,String(r.inYear))," in "+String(new Date().getFullYear())+" · latest "+fmt(r.latest)+(r.left?" · "+r.left+" non-MISMO left out":"")),
-      h("button",{type:"button",class:"btn",onclick:async e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Saving…";try{await window.__deskSaveCases(pend.data);msg.textContent="Saved. Reloading…";setTimeout(()=>location.reload(),900);}catch(x){console.error(x);b.disabled=false;b.textContent="Save These Cases";msg.textContent="That didn't save. Please try again.";}}},"Save These Cases"),
+      h("button",{type:"button",class:"btn",onclick:async e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Saving…";try{await window.__deskSaveCases(pend.data);msg.textContent="Saved. Reloading…";setTimeout(()=>{try{history.replaceState(null,"","#cases");}catch(e){}location.reload();},900);}catch(x){console.error(x);b.disabled=false;b.textContent="Save These Cases";msg.textContent="That didn't save. Please try again.";}}},"Save These Cases"),
       h("button",{type:"button",class:"btn ghost",onclick:()=>{pend=null;act.hidden=true;msg.textContent="";}},"Cancel"));};
   const go=async f=>{if(!f)return;msg.textContent="Reading "+f.name+"…";act.hidden=true;try{const X=await cdLib(),wb=X.read(await f.arrayBuffer(),{type:"array",cellDates:true}),rows=X.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:""});show(cdBuild(rows));}catch(e){console.error(e);msg.textContent=e.message||"Couldn't read that file.";}};
   pick.addEventListener("click",()=>inp.click());inp.addEventListener("change",()=>{go(inp.files[0]);inp.value="";});
@@ -706,7 +706,7 @@ $("asof").textContent="As of "+fmt(TODAY);
 window.__desk={todo:()=>TODO,finished,open:openPane,go};
 renderHome();
 /* a link from an email opens the set-up straight away: #todo/<id> */
-function fromHash(){const m=/^#todo\/(.+)$/.exec(location.hash||"");if(m){const x=TODO.find(t=>t.id===decodeURIComponent(m[1]));go("todo");if(x)setTimeout(()=>openPane(x),150);}}
+function fromHash(){const v=/^#(home|todo|cases|done|help)$/.exec(location.hash||"");if(v){go(v[1]);return;}const m=/^#todo\/(.+)$/.exec(location.hash||"");if(m){const x=TODO.find(t=>t.id===decodeURIComponent(m[1]));go("todo");if(x)setTimeout(()=>openPane(x),150);}}
 fromHash();window.addEventListener("hashchange",fromHash);
 if(new Date().getMonth()===11)document.documentElement.setAttribute("data-season","december");
 };
@@ -750,7 +750,7 @@ if(new Date().getMonth()===11)document.documentElement.setAttribute("data-season
     const out=[];
     const score=(name)=>{ const n=norm(name); return n===t ? 3 : n.indexOf(t)===0 ? 2 : n.indexOf(t)>=0 ? 1 : 0; };
     const push=(group,name,where,go)=>{ if(out.length<60) out.push({group,name,where,go,s:score(name)}); };
-    try{ (window.__desk.todo()||[]).forEach(x=>{ if(norm(x.name).indexOf(t)<0) return; push('Waiting on You', x.name, x.level+' · paid '+x.paid, ()=>{ window.__desk.go('todo'); setTimeout(()=>window.__desk.open(x),150); }); }); }catch(e){}
+    try{ (window.__desk.todo()||[]).forEach(x=>{ if(norm(x.name).indexOf(t)<0) return; push('Waiting on You', x.name, x.level+(x.paid?' · paid '+new Date(x.paid+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''), ()=>{ window.__desk.go('todo'); setTimeout(()=>window.__desk.open(x),150); }); }); }catch(e){}
     try{ (window.__desk.finished()||[]).forEach(r=>{ if(norm(r.nm+' '+r.wh).indexOf(t)<0) return; push(r.grp==='case'?'Aptify Cases':'Completed', r.nm, r.wh, ()=>{ window.__desk.go('done'); }); }); }catch(e){}
     const best={}; out.forEach(h=>{ best[h.group]=Math.max(best[h.group]||0, h.s); });
     const ORDER=['Waiting on You','Completed','Aptify Cases'];
