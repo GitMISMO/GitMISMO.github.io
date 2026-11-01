@@ -5485,7 +5485,7 @@ rvShow=function(rep){ _rvShowIM(rep); if(rep.kind!=='im'||!rep.imDraft) return; 
   const foot=$('footer',box); if(foot&&!q&&t&&!S.viewAs){ const b=document.createElement('button'); b.type='button'; b.className='btn pri'; b.textContent='Send to IM Reviewers'; b.title='IM reviewers get the draft decision for every row and agree or correct it'; b.onclick=async()=>{ b.disabled=true; await imSend(t,rep); b.textContent='Sent to IM'; toast('Sent to the IM reviewers'); }; foot.appendChild(b); }
   else if(foot&&q){ const s=document.createElement('span'); s.className='muted'; s.style.marginRight='auto'; s.textContent=q.status==='decided'?'IM decided this '+fmtS(String(q.decidedAt||'').slice(0,10)):'With the IM reviewers since '+fmtS(String(q.sentAt||'').slice(0,10)); foot.insertBefore(s,foot.firstChild); } };
 /* nav: IM Review sits after the Review Desk */
-(function(){ const nav=$('#nav'); if(!nav||$('[data-hq="imreview"]',nav)) return; const after=$('[data-hq="reviews"]',nav); const b=document.createElement('button'); b.type='button'; b.dataset.hq='imreview'; b.title='IM Review'; b.hidden=true; b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9l2.5 2.5L16 7"/></svg><span>IM Review</span><b id="nav-imreview" hidden></b>'; b.onclick=()=>window.open(IMR_URL_NAV,'_blank','noopener'); if(after) after.after(b); else nav.appendChild(b); })();
+(function(){ const nav=$('#nav'); if(!nav||$('[data-hq="imreview"]',nav)) return; const after=$('[data-hq="reviews"]',nav); const b=document.createElement('button'); b.type='button'; b.dataset.hq='imreview'; b.title='IM Review'; b.hidden=true; b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9l2.5 2.5L16 7"/></svg><span>IM Review</span><b id="nav-imreview" hidden></b>'; b.onclick=()=>{ if(location.hostname==='resources.mismo.org') location.href=IMR_URL_NAV; else window.open(IMR_URL_NAV,'_blank','noopener'); }; if(after) after.after(b); else nav.appendChild(b); })();
 const _counts_im=typeof counts==='function'?counts:null;
 if(_counts_im){ counts=function(){ _counts_im(); try{ imEnsureQ(); imCount(); }catch(e){} }; }
 
@@ -5530,10 +5530,8 @@ imSend=async function(t,rep){ await _imSend0(t,rep); const ok=await imPush(rep.i
 const _imEnsureQ0=imEnsureQ;
 imEnsureQ=function(){ _imEnsureQ0(); setTimeout(imSync,1500); };
 
-/* the old in-MMS desk now points at the portal */
-VIEWS.imreview=function(){ imEnsureQ(); const L=Object.values(S.imPortalQ||{}), aw=L.filter(q=>q.status==='awaiting').length;
-  return '<div class="pagehead"><div><h1>IM Review</h1><div class="sub">IM reviews happen in their own page now, where Colleen and Erin decide each row and facilitators and staff can follow along.</div></div><div class="acts"><a class="btn pri" href="'+IMR_URL+'" target="_blank" rel="noopener">Open IM Review ↗</a></div></div>'+
-    '<div class="card"><b>'+aw+'</b> submission'+(aw===1?' is':'s are')+' waiting for IM. '+L.filter(q=>q.status==='decided').length+' decisions are on record there, back to 2020.</div>'; };
+/* the old in-MMS desk is gone: landing on it (a bookmark, the back button) shows the Overview */
+VIEWS.imreview=function(){ setTimeout(()=>{ if(S.view==='imreview') go('home'); },0); return VIEWS.home(); };
 /* each work request shows IM's decisions on record, with a link to every row */
 function imDecHtml(t){ const L=Object.values(S.imPortalQ||{}).filter(q=>q.ticket===t.id&&q.status==='decided').sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
   if(!L.length) return ''; const c=q=>Object.entries(q.counts||{}).map(([d,n])=>n+' '+d.replace(/^Approved /,'').toLowerCase()).join(', ');
