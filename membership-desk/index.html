@@ -250,6 +250,8 @@ button.b:focus-visible{outline:2px solid var(--sky);outline-offset:1px}
 .pane-h .ps{font-size:13px;color:var(--ink-2);margin-top:3px}
 .pane-x{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:5px;width:30px;height:30px;font-size:17px;cursor:pointer;flex:none}
 .pane-b{padding:18px 22px;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px;align-content:start}
+.pane-b{grid-auto-rows:max-content}.pcol>.sect,.pane-b>.sect{flex-shrink:0;min-height:max-content}
+.steps div{padding:12px 14px 14px}
 .sect{border:1px solid var(--border);border-radius:8px;overflow:hidden}
 .sect h3{margin:0;padding:9px 14px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);border-bottom:2px solid var(--sky)}
 .kv{display:grid;grid-template-columns:150px minmax(0,1fr);gap:0}
@@ -505,20 +507,20 @@ function openPane(x){cur=x;const K=KINDS[x.kind];$("pane-t").textContent=x.name;
  const kv=(rows)=>h("div",{class:"kv"},...rows.flatMap(r=>[h("div",null,r[0]),h("div",null,r[1])]));
  const left=h("div",{class:"pcol"});B.appendChild(left);left.appendChild(h("div",{class:"sect"},h("h3",null,"Set Up in Aptify"),kv([["Company",x.name],["Aptify Company ID",x.cid||"New to Aptify, or not known"],["Level",x.level],["Price",money(x.price)],x.special?["Special",x.special+" (put it in the order line's description)"]:null,["Membership Starts",fmt(x.start)],["Membership Through",fmt(x.end)]].filter(Boolean))));
  const cid=h("input",{id:"f-cid",inputmode:"numeric",autocomplete:"off",value:x.cid||"",placeholder:"e.g. 9741822"}),ord=h("input",{id:"f-ord",inputmode:"numeric",autocomplete:"off",placeholder:"e.g. 6284606"}),per=h("input",{id:"f-per",inputmode:"numeric",autocomplete:"off",placeholder:"if a person record was added"}),note=h("textarea",{id:"f-note",rows:"2",placeholder:"Anything MISMO should know"});
- const say=h("span",{class:"saynote"},"Saves to MISMO Money and Member 360. Aptify stays the record.");
+ const say=h("span",{class:"saynote"},x.kind==="square"?"Saves with your name, and MISMO Money picks it up. Aptify stays the record.":"Saves with your name and the date. Aptify stays the record.");
  const save=h("button",{type:"button",class:"btn",onclick:()=>{const c=cid.value.trim(),o=ord.value.trim();cid.classList.toggle("bad",!/^\d{5,9}$/.test(c));ord.classList.toggle("bad",!!o&&!/^\d{5,9}$/.test(o));
    if(!/^\d{5,9}$/.test(c)){say.textContent="Enter the Aptify Company ID (numbers only).";cid.focus();return;}
    if(o&&!/^\d{5,9}$/.test(o)){say.textContent="The order number is numbers only.";ord.focus();return;}
    markDone(x,c,o,per.value.trim(),note.value.trim());}},"Mark Set Up");
  B.appendChild(h("div",{class:"sect"},h("h3",null,"When It's Set Up"),h("div",{class:"form"},
    h("div",{class:"fld"},h("label",{for:"f-cid"},"Aptify Company ID"),cid,h("small",null,"Required")),
-   h("div",{class:"fld"},h("label",{for:"f-ord"},"Aptify Order Number"),ord,h("small",null,"So MISMO Money can tie the payment")),
+   h("div",{class:"fld"},h("label",{for:"f-ord"},"Aptify Order Number"),ord,h("small",null,x.kind==="square"?"So MISMO Money can tie the payment":"From the membership order in Aptify")),
    h("div",{class:"fld"},h("label",{for:"f-per"},"Aptify Person ID"),per,h("small",null,"Optional")),
    h("div",{class:"fld"},h("label",null,"Set Up By"),h("input",{value:((window.__deskMe&&window.__deskMe().name)||""),disabled:""}),h("small",null,"From your sign-in")),
    h("div",{class:"fld wide"},h("label",{for:"f-note"},"Note"),note),
    h("div",{class:"acts"},save,h("button",{type:"button",class:"btn ghost",onclick:closePane},"Cancel"),say))));
  left.appendChild(h("div",{class:"sect"},h("h3",null,"Why It's Here"),h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)"},K.what+(x.paid?" Paid "+fmt(x.paid)+".":""))));
- const st=[["Email",K.from+" emailed the membership team with a link to this page."],["Set Up in Aptify","Add the company, the membership order and the dates shown."],["Enter the IDs Here","The Aptify Company ID and order number, then Mark Set Up."],["Everyone Sees It",x.kind==="square"?"MISMO Money ties the Square payment to the order; Member 360 updates.":"Member 360 marks it Updated in Aptify and fills in the IDs."]];
+ const st=[x.kind==="square"?["Email","MISMO Money emailed the membership team with a link to this set-up."]:["On To Do",K.from+" added it here when it needed setting up in Aptify."],["Set Up in Aptify","Add the company, the membership order and the dates shown."],["Enter the IDs Here","The Aptify Company ID and order number, then Mark Set Up."],["Everyone Sees It",x.kind==="square"?"MISMO Money ties the Square payment to the order the next time it's opened.":"It moves to Completed with your name and the date, and Jonna, Amy and Kelly can see it."]];
  B.appendChild(h("div",{class:"sect",style:"grid-column:1/-1"},h("h3",null,"How This Works"),h("div",{class:"steps"},...st.map((s,i)=>h("div",{class:i===2?"now":""},h("b",null,h("i",null,String(i+1)),s[0]),s[1])))));
  $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");setTimeout(()=>cid.focus(),240);}
 
