@@ -47,7 +47,7 @@
   ];
   D.DEFAULTS = {
     on: false, days: [1, 2, 3, 4, 5], hour: 16, cc: ['pwilliams@mba.org', 'jcritchley@mba.org'], ccNames: 'Perry Williams, Jonna Critchley',
-    skipEmpty: true, targetSoonDays: 14, staleDays: 45, attendanceDays: 60,
+    skipEmpty: true, actionOnly: true, targetSoonDays: 14, staleDays: 45, attendanceDays: 60,
     sections: { yourMove: true, overdue: true, targetUpdate: true, stalled: true, cpToday: true, cpTomorrow: true, cpWeek: true, cpOpening: false, cpAll: false,
       comments: true, attendance: true, asks: true, arch: true, media: false, movedToday: true,
       wkOn: true, wkMoved: true, wkPublished: true, wkComment: true, wkNext: true, wkOverdue: true, hours: true },
@@ -255,7 +255,11 @@
     var intro = friday ? 'Here’s how the week went for your work, and what’s coming next week.'
       : (S.length ? (count.todo ? 'You have <b>' + count.todo + '</b> work request' + (count.todo === 1 ? '' : 's') + ' waiting on you' + (count.late ? ', and <b>' + count.late + '</b> ' + (count.late === 1 ? 'is' : 'are') + ' past target' : '') + '.' : 'Nothing is waiting on you right now. Here’s what’s happening with your work.') : 'Nothing needs you today. Nice work.');
     var html = D.html({ first: first, title: friday ? 'Your Week in Review' : (monday ? 'Your Monday Start' : 'Your Day in the MMS'), dateLine: fl(today), intro: intro, sections: S });
-    return { name: person.name, email: person.email || '', kind: kind, subject: subject, html: html, text: D.text(first, intro, S), sections: S.length, counts: count, empty: !S.length };
+    /* a daily (or Monday) digest goes out only when there is something for them to do; the Friday wrap-up always goes */
+    var ACT = { yourMove: 1, overdue: 1, targetUpdate: 1, attendance: 1, comments: 1, hours: 1 };
+    var acts = S.filter(function (x) { return ACT[x.key]; }).length;
+    var empty = friday ? !S.length : (cfg.actionOnly === false ? !S.length : !acts);
+    return { name: person.name, email: person.email || '', kind: kind, subject: subject, html: html, text: D.text(first, intro, S), sections: S.length, actions: acts, counts: count, empty: empty };
   };
 
   D.build = function (input) {

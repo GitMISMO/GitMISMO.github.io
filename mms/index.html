@@ -1884,7 +1884,7 @@ function whoseMove(t){
       return {role:'imawg',label:'IM/AWG Facilitator',text:sub==='in-review'?nm+' is reviewing':t.stage==='im'?'Run the IM Pre-Review and send it to IM Review':'Waiting for '+nm+' Review'};
     }
     case 'designation':
-      if(sub==='vps') return {role:'vps',label:'VPs',text:'Agree with the Director’s designation'};
+      if(sub==='vps') return {role:'vps',label:'VPs',text:t.designation&&t.designation.auto?'Agree with the recommended designation':'Agree with the Director’s designation'};
       if(sub==='director'||sub==='discuss') return {role:'director',label:'Director',text:sub==='discuss'?'Talk with the VPs and update the designation':'Recommend the designation'};
       return {role:'facilitator',label:'Facilitator',text:'Send to designation with the comment length and page name'};
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
@@ -2979,7 +2979,7 @@ function wireArch(m){
   ];
   D.DEFAULTS = {
     on: false, days: [1, 2, 3, 4, 5], hour: 16, cc: ['pwilliams@mba.org', 'jcritchley@mba.org'], ccNames: 'Perry Williams, Jonna Critchley',
-    skipEmpty: true, targetSoonDays: 14, staleDays: 45, attendanceDays: 60,
+    skipEmpty: true, actionOnly: true, targetSoonDays: 14, staleDays: 45, attendanceDays: 60,
     sections: { yourMove: true, overdue: true, targetUpdate: true, stalled: true, cpToday: true, cpTomorrow: true, cpWeek: true, cpOpening: false, cpAll: false,
       comments: true, attendance: true, asks: true, arch: true, media: false, movedToday: true,
       wkOn: true, wkMoved: true, wkPublished: true, wkComment: true, wkNext: true, wkOverdue: true, hours: true },
@@ -3187,7 +3187,11 @@ function wireArch(m){
     var intro = friday ? 'Here’s how the week went for your work, and what’s coming next week.'
       : (S.length ? (count.todo ? 'You have <b>' + count.todo + '</b> work request' + (count.todo === 1 ? '' : 's') + ' waiting on you' + (count.late ? ', and <b>' + count.late + '</b> ' + (count.late === 1 ? 'is' : 'are') + ' past target' : '') + '.' : 'Nothing is waiting on you right now. Here’s what’s happening with your work.') : 'Nothing needs you today. Nice work.');
     var html = D.html({ first: first, title: friday ? 'Your Week in Review' : (monday ? 'Your Monday Start' : 'Your Day in the MMS'), dateLine: fl(today), intro: intro, sections: S });
-    return { name: person.name, email: person.email || '', kind: kind, subject: subject, html: html, text: D.text(first, intro, S), sections: S.length, counts: count, empty: !S.length };
+    /* a daily (or Monday) digest goes out only when there is something for them to do; the Friday wrap-up always goes */
+    var ACT = { yourMove: 1, overdue: 1, targetUpdate: 1, attendance: 1, comments: 1, hours: 1 };
+    var acts = S.filter(function (x) { return ACT[x.key]; }).length;
+    var empty = friday ? !S.length : (cfg.actionOnly === false ? !S.length : !acts);
+    return { name: person.name, email: person.email || '', kind: kind, subject: subject, html: html, text: D.text(first, intro, S), sections: S.length, actions: acts, counts: count, empty: empty };
   };
 
   D.build = function (input) {
@@ -3824,7 +3828,7 @@ function digestSettingsHtml(){
     '<div class="f wide"><label>Copy (CC) on Every Digest</label><input id="dgcc" value="'+esc((c.cc||[]).join(', '))+'"></div>'+
     '<div class="f"><label>Target Nudge (Days Ahead)</label><input id="dgtd" value="'+esc(c.targetSoonDays)+'"></div><div class="f"><label>Stalled After (Days)</label><input id="dgsd" value="'+esc(c.staleDays)+'"></div><div class="f"><label>Attendance Look-Back (Days)</label><input id="dgad" value="'+esc(c.attendanceDays)+'"></div>'+
     '<div class="f"><label>Sent By</label><select id="dgsender"><option value="mms"'+(c.sender!=='action'?' selected':'')+'>The MMS, when MISMO staff have it open</option><option value="action"'+(c.sender==='action'?' selected':'')+'>The scheduled sender on GitHub</option></select></div>'+
-    '<label class="dg-ck" style="align-self:end"><input type="checkbox" id="dgskip"'+(c.skipEmpty?' checked':'')+'><span><b>Skip anyone with nothing to report</b></span></label></div></div>'+
+    '<label class="dg-ck" style="align-self:end"><input type="checkbox" id="dgskip"'+(c.skipEmpty?' checked':'')+'><span><b>Only send the daily digest when they have something to do</b> <em>(the Friday wrap-up always goes)</em></span></label></div></div>'+
     '<div class="dg-grid"><div class="card"><h3>What Goes in the Email</h3>'+MMSDigest.SECTIONS.map(g=>'<div class="dg-g"><div class="dg-gh">'+esc(g.group)+'</div>'+g.items.map(x=>tick(x[0],x[1],x[2])).join('')+'</div>').join('')+
     '<div class="dg-g"><div class="dg-gh">Who Gets It</div>'+F.map(p=>'<label class="dg-ck"><input type="checkbox" data-dgwho="'+esc(p.name)+'"'+(c.skip[p.name]?'':' checked')+'><span><b>'+esc(p.name)+'</b><em>'+(p.email?esc(p.email):'<span class="bad">No email on file: add it in People and Roles</span>')+'</em></span></label>').join('')+'</div></div>'+
     '<div class="card dg-prev"><h3>Preview<span class="sp"><select id="dgwho">'+F.map(p=>'<option'+(p.name===who?' selected':'')+'>'+esc(p.name)+'</option>').join('')+'</select><select id="dgas"><option value="today"'+(S.dgPrev.as==='today'?' selected':'')+'>As Today</option><option value="fri"'+(S.dgPrev.as==='fri'?' selected':'')+'>As a Friday Wrap-Up</option><option value="mon"'+(S.dgPrev.as==='mon'?' selected':'')+'>As a Monday</option></select></span></h3>'+
@@ -5575,7 +5579,8 @@ async function imDecided(t,doc,it){ const o=imOutcome(doc,it), sum=Object.entrie
   if(t.stage!=='im'){ const x=clone(t); hist(x,'IM decision ('+(doc.rows||[]).length+' rows): '+sum+'. Reviewed by '+who+'.'); await saveTicket(x,'IM decision brought in'); return; }
   if(o.ret||!o.ok){ await setSub(t,'updates','IM decision '+fmt(d)+': '+sum+'. Updates needed before it goes back to IM. Reviewed by '+who+'.',{im:Object.assign({},t.im,{status:'Returned'}),dates:Object.assign({},t.dates,{imDecision:d})}); return; }
   const x=clone(t); x.im=Object.assign({},x.im,{status:'Approved'}); x.dates=Object.assign({},x.dates,{imDecision:d}); const nx=nextStage(x);
-  const moved=await move(x,nx,{sub:nx==='designation'?'prep':(nx==='awg'?'new':''),text:'IM approved '+fmt(d)+' ('+sum+'); moved to '+stageDef(nx).name+'. Reviewed by '+who+'.'});
+  let txt='IM approved '+fmt(d)+' ('+sum+'); moved to '+stageDef(nx).name+'. Reviewed by '+who+'.', y=x; if(nx==='designation'){ const a=withAutoDesignation(x); y=a.x; txt+=' '+a.text; }
+  const moved=await move(y,nx,{sub:nx==='designation'?'vps':(nx==='awg'?'new':''),text:txt});
   if(nx==='awg') try{ await awgPushFromIm(moved||x,doc,it); }catch(e){ console.warn('awg push',e); } }
 /* what IM approved goes to AWG Review: the rows IM approved, with IM's wording, the documents and the facilitator */
 async function awgUpdate(name,fn){ for(let i=0;i<5;i++){ const g=await rGet(AWGR,name); const next=fn(g&&g.data?JSON.parse(JSON.stringify(g.data)):null); const tok=window.ResourcesSession&&ResourcesSession.token(); const r=await fetch(RELAY()+'/'+AWGR+'/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content:next,sha:(g&&g.sha)||undefined})}); if(r.ok) return next; if(r.status===401||r.status===403) throw new Error('no access'); await new Promise(z=>setTimeout(z,300+i*400)); } throw new Error('busy'); }
@@ -5604,12 +5609,23 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
     // AWG decided: move the work request
     for(const it of Object.values(S.awgPortalQ)){ if(it.status!=='decided'||it.hist||it.test||it.home) continue; const t=S.tickets[it.ticket]||liveTickets().find(x=>x.wr===it.wr); if(!t) continue;
       const d=String(it.decidedAt||today()).slice(0,10), who=(it.decidedBy||'AWG')+' in AWG Review', out=it.outcome||'';
-      if(t.stage==='awg'){ if(/^(Approved|Conditional|Passed)/.test(out)){ const x=clone(t); x.awg=Object.assign({},x.awg,{status:out,voteMethod:'Meeting'}); x.dates=Object.assign({},x.dates,{awgDecision:d}); const nx=nextStage(x); await move(x,nx,{sub:nx==='designation'?'prep':'',text:'AWG '+out.toLowerCase()+' '+fmt(d)+(it.conds?' (conditions: '+it.conds+')':'')+'; moved to '+stageDef(nx).name+'. Recorded by '+who+'.'}); }
+      if(t.stage==='awg'){ if(/^(Approved|Conditional|Passed)/.test(out)){ const x=clone(t); x.awg=Object.assign({},x.awg,{status:out,voteMethod:'Meeting'}); x.dates=Object.assign({},x.dates,{awgDecision:d}); const nx=nextStage(x); let txt='AWG '+out.toLowerCase()+' '+fmt(d)+(it.conds?' (conditions: '+it.conds+')':'')+'; moved to '+stageDef(nx).name+'. Recorded by '+who+'.', y=x; if(nx==='designation'){ const a=withAutoDesignation(x); y=a.x; txt+=' '+a.text; } await move(y,nx,{sub:nx==='designation'?'vps':'',text:txt}); }
         else if(/^Returned to IM/.test(out)){ const x=clone(t); x.awg=Object.assign({},x.awg,{status:out}); await move(x,'im',{sub:'updates',text:'AWG returned it to IM '+fmt(d)+'. Recorded by '+who+'.'}); }
         else if(/^Returned/.test(out)) await setSub(t,'updates','AWG returned it to the workgroup '+fmt(d)+'. Recorded by '+who+'.',{awg:Object.assign({},t.awg,{status:out}),dates:Object.assign({},t.dates,{awgDecision:d})}); }
       try{ S.awgPortalQ=(await awgUpdate('queue',cur=>{ if(cur&&cur.items&&cur.items[it.rep]) cur.items[it.rep].home=true; return cur; })).items; }catch(e){} }
   }catch(e){ console.warn('awg sync',e); } finally{ awgSyncing=false; } }
 const _imEnsureQ1=imEnsureQ; imEnsureQ=function(){ _imEnsureQ1(); setTimeout(awgSync,2500); };
+
+/* ---------- after approval: the designation is recommended automatically and goes to the VPs ---------- */
+function autoDesignation(t){ const mode=a=>{ const c={}; a.filter(Boolean).forEach(v=>c[v]=(c[v]||0)+1); return Object.entries(c).sort((x,y)=>y[1]-x[1])[0]; };
+  const past=Object.values(S.tickets||{}).filter(x=>x.id!==t.id&&x.designation&&x.designation.license);
+  const same=past.filter(x=>(x.classification||'')===(t.classification||'')&&(x.workgroup||'')===(t.workgroup||'')), like=same.length>=2?same:past.filter(x=>(x.classification||'')===(t.classification||''));
+  const base=like.length?like:past; const pick=k=>{ const m=mode(base.map(x=>x.designation[k])); return m?m[0]:''; };
+  const ds={type:pick('type')||'Public',license:pick('license')||'Commercial Distributor',royalty:pick('royalty')||'Public for Free',availableTo:pick('availableTo')||'Public'};
+  return {ds,basis:base.length?base.length+' earlier '+(same.length>=2?(t.workgroup||'')+' ':'')+'work product'+(base.length===1?'':'s'):'MISMO’s usual designation'}; }
+function withAutoDesignation(x){ const a=autoDesignation(x), days=(proc().commentDays||[30]); x.classification=x.classification||'Standard'; x.commentDays=x.commentDays||days[0]; x.releasePriority=x.releasePriority||'Medium'; x.productPageName=x.productPageName||x.name;
+  x.designation=Object.assign({},x.designation||{},a.ds,{auto:true,basis:a.basis,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
+  return {x,text:'Designation recommended automatically from '+a.basis+': '+[a.ds.type,x.classification,a.ds.license,a.ds.royalty,a.ds.availableTo].filter(Boolean).join(', ')+'. Sent to the VPs for agreement.'}; }
 
 /* ---------- settings ---------- */
 let setTab='process';
