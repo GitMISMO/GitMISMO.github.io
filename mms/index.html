@@ -1510,6 +1510,23 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 .rvr ol{margin:0;padding-left:20px;font-size:13px;line-height:1.55}
 @media(max-width:700px){.rvt thead{display:none}.rvt tr{display:block;border-bottom:1px solid var(--border);padding:6px 0}.rvt td{display:block;border:0;padding:2px 4px}.rvt td:first-child{white-space:normal}}
 .rv-rep footer,.rv-box footer{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);z-index:2}
+/* review feedback, terms list */
+.rvt .rv-fbh,.rvt .rv-fbc{width:86px;text-align:center;white-space:nowrap}
+.rv-fb{display:inline-flex;gap:4px}
+.rv-fbb{font:inherit;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line,#c9d6e2);background:transparent;color:inherit;cursor:pointer}
+.rv-fbb:hover{border-color:var(--sky,#74bfeb)}
+.rv-fbb.on{background:#0f7b5c;border-color:#0f7b5c;color:#fff}
+.rv-fbb.no.on{background:#b4232c;border-color:#b4232c;color:#fff}
+.rv-fbnote{margin-top:4px;font-size:11.5px;color:#9a5b00}
+.terms-card .terms-find{margin:4px 0 10px}
+.terms-card .terms-find input{width:100%;max-width:420px}
+.terms-card h4.terms-g{margin:14px 0 6px;font-size:13px;letter-spacing:.02em}
+.terms-tbl td:first-child{white-space:nowrap}
+@media (max-width:640px){ .terms-tbl td:first-child{white-space:normal} .rvt .rv-fbh,.rvt .rv-fbc{width:auto} }
+.rvt tr.rv-why td{background:var(--soft,#f3f8fc)}
+.rv-why label{display:block;font-size:12.5px}
+.rv-whyrow{display:flex;gap:6px;margin-top:4px}
+.rv-whyrow input{flex:1;min-width:0}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4420,7 +4437,13 @@ async function rvReadDocx(buf){
   const com=await z.get('word/comments.xml');
   const fonts={}; (doc.match(/w:ascii="([^"]+)"/g)||[]).forEach(m=>{ const f=m.slice(9,-1); fonts[f]=(fonts[f]||0)+1; });
   const tocText=(()=>{ const i=doc.indexOf('TOC \\'); if(i<0) return null; const end=doc.indexOf('fldCharType="end"',i); return rvTags(rvXml('<r xmlns:w="w">'+doc.slice(i,end>0?end:i+40000).replace(/^[^<]*/,'')+'</r>'),'w:t').map(t=>t.textContent).join(' '); })();
-  return {kind:'word',paras,hf,comments:com?(com.match(/<w:comment /g)||[]).length:0,ins:(doc.match(/<w:ins /g)||[]).length,del:(doc.match(/<w:del /g)||[]).length,fonts,
+  // accessibility: alt text on pictures, real heading styles, table header rows, link text, document title
+  const pics=rvTags(D,'wp:docPr').map(d=>({name:d.getAttribute('name')||'',descr:(d.getAttribute('descr')||d.getAttribute('title')||'').trim(),deco:/decorative val="1"/.test(new XMLSerializer().serializeToString(d))}));
+  const tbls=rvTags(D,'w:tbl').filter(t=>!t.parentNode||t.parentNode.nodeName!=='w:tc'); const tblNoHead=tbls.filter(t=>{ const tr=t.getElementsByTagName('w:tr')[0]; return tr&&!tr.getElementsByTagName('w:tblHeader').length&&t.getElementsByTagName('w:tr').length>3; }).length;
+  const fakeHeads=rvTags(D,'w:p').filter(p=>{ const st=(p.getElementsByTagName('w:pStyle')[0]||{getAttribute:()=>''}).getAttribute('w:val')||''; if(/heading|title|toc|caption|list/i.test(st)) return false; const t=paraText(p).trim(); if(t.length<3||t.length>70||/[.:;,]$/.test(t)) return false; const runs=rvTags(p,'w:r').filter(r=>rvTags(r,'w:t').some(x=>x.textContent.trim())); return runs.length&&runs.every(r=>{ const b=r.getElementsByTagName('w:b')[0]; return b&&b.getAttribute('w:val')!=='0'&&b.getAttribute('w:val')!=='false'; })&&!(p.parentNode&&/w:tc/.test(p.parentNode.nodeName)); }).map(p=>paraText(p).trim());
+  const links=rvTags(D,'w:hyperlink').map(h=>rvTags(h,'w:t').map(t=>t.textContent).join('').trim()).filter(Boolean);
+  const core=await z.get('docProps/core.xml'); const docTitle=core?((core.match(/<dc:title>([^<]*)<\/dc:title>/)||[])[1]||'').trim():'';
+  return {kind:'word',a11y:{pics,tables:tbls.length,tblNoHead,fakeHeads,links,docTitle},paras,hf,comments:com?(com.match(/<w:comment /g)||[]).length:0,ins:(doc.match(/<w:ins /g)||[]).length,del:(doc.match(/<w:del /g)||[]).length,fonts,
     images:z.names.filter(n=>/^word\/media\//.test(n)).length,toc:/TOC \\/.test(doc)||/docPartGallery w:val="Table of Contents"/.test(doc),tocText,titlePg:/<w:titlePg/.test(doc),
     text:paras.map(p=>p.t).join('\n')};
 }
@@ -4445,12 +4468,28 @@ async function rvReadXlsx(buf){
     idx++; }
   return {kind:'excel',sheets,text:sheets.map(s=>'## '+s.name+'\n'+s.rows.map(r=>Object.values(r.c).join(' | ')).join('\n')).join('\n\n')};
 }
+/* PDFs: text only (pdf.js), so layout checks that need Word's structure are skipped */
+let rvPdfLib=null;
+function rvLoadPdfJs(){ if(window.pdfjsLib) return Promise.resolve(window.pdfjsLib); if(rvPdfLib) return rvPdfLib;
+  rvPdfLib=new Promise((res,rej)=>{ const s=document.createElement('script'); s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js'; s.onload=()=>{ try{ window.pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'; res(window.pdfjsLib); }catch(e){ rej(e); } }; s.onerror=()=>{ rvPdfLib=null; rej(new Error('The PDF reader couldn’t load. Save the PDF as Word and try again.')); }; document.head.appendChild(s); });
+  return rvPdfLib; }
+async function rvReadPdf(buf){
+  const lib=await rvLoadPdfJs(); const doc=await lib.getDocument({data:new Uint8Array(buf)}).promise; const paras=[]; const pages=[];
+  for(let i=1;i<=doc.numPages;i++){ const pg=await doc.getPage(i); const tc=await pg.getTextContent(); const lines=[]; let last=null;
+    tc.items.forEach(it=>{ const y=Math.round(it.transform[5]), h=Math.abs(it.transform[3])||10; if(last&&Math.abs(last.y-y)<h*0.5){ last.t+=(last.t.endsWith(' ')||it.str.startsWith(' ')?'':' ')+it.str; } else { last={y,h,t:it.str}; lines.push(last); } });
+    let cur=null; lines.forEach((l,k)=>{ const gap=k?Math.abs(lines[k-1].y-l.y):0; if(!cur||gap>l.h*1.6){ cur={t:l.t.trim(),style:'',page:i}; paras.push(cur); } else cur.t=(cur.t+' '+l.t.trim()).trim(); });
+    pages.push({n:i,top:(lines[0]||{}).t||'',bottom:(lines[lines.length-1]||{}).t||''}); }
+  const body=paras.filter(p=>p.t);
+  const hfLines=pages.map(p=>p.bottom); const pageNums=pages.filter(p=>/^\s*(page\s*)?\d+(\s*of\s*\d+)?\s*$|\b\d+\s*$/i.test(p.bottom)).length;
+  return {kind:'pdf',paras:body,pages:pages.length,pageNums,hf:[{kind:'header',t:pages.map(p=>p.top).join(' '),page:false},{kind:'footer',t:hfLines.join(' '),page:pageNums>=Math.max(1,pages.length-1)}],text:body.map(p=>p.t).join('\n')};
+}
 async function rvReadFile(f){
   const buf=await f.arrayBuffer(), ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(ext==='pdf') return Object.assign(await rvReadPdf(buf),{name:f.name});
   if(ext==='docx') return Object.assign(await rvReadDocx(buf),{name:f.name});
   if(ext==='xlsx'||ext==='xlsm') return Object.assign(await rvReadXlsx(buf),{name:f.name});
   if(ext==='txt'||ext==='md'||ext==='csv') return {kind:'text',name:f.name,text:await f.text()};
-  throw new Error(f.name+': the review reads Word (.docx) and Excel (.xlsx) files. Save a PDF as Word first, or check it by hand.');
+  throw new Error(f.name+': the review reads Word (.docx), Excel (.xlsx) and PDF files.');
 }
 
 /* ---------- small text helpers ---------- */
@@ -4486,7 +4525,7 @@ function rvEditorChecks(files,ctx){
   const exp=ctx.boiler, year=RV_YEAR();
   files.forEach(f=>{
     const W=f.name;
-    if(f.kind==='word'){
+    if(f.kind==='word'||f.kind==='pdf'){ const isW=f.kind==='word';
       const body=f.paras.filter(p=>p.t.trim());
       const text=f.text; const found=rvDetectBoiler(text+' '+f.hf.map(h=>h.t).join(' '));
       // boilerplate: right one, word for word
@@ -4505,10 +4544,10 @@ function rvEditorChecks(files,ctx){
       const years=[...new Set(cp.map(x=>x.match(/\d{4}/)[0]))];
       if(!cp.length) add('fix','Copyright','No MISMO copyright line was found.','Add “©'+year+' Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.” to the footer so it shows on every page.',W,'cp-missing');
       else if(years.some(y=>y!==year)) add('fix','Copyright','The copyright year is '+years.join(' and ')+'.','Work products not yet published use the current year: ©'+year+'.',W,'cp-year');
-      if(cp.length&&!f.hf.some(h=>h.kind==='footer'&&/©|copyright/i.test(h.t))) add('fix','Copyright','The copyright isn’t in the footer, so it won’t show on every page.','Put the copyright line in the footer.',W,'cp-footer');
+      if(isW&&cp.length&&!f.hf.some(h=>h.kind==='footer'&&/©|copyright/i.test(h.t))) add('fix','Copyright','The copyright isn’t in the footer, so it won’t show on every page.','Put the copyright line in the footer.',W,'cp-footer');
       // headers, footers, page numbers, title
       if(!f.hf.some(h=>h.kind==='footer'&&h.page)) add('fix','Header and Footer','No page numbers were found in the footer.','Add page numbers to every page except the title page.',W,'pg');
-      else if(!f.titlePg) add('recommend','Header and Footer','The title page may be showing a page number.','Turn on “Different First Page” so the title page has no number.',W,'pg-title');
+      else if(isW&&!f.titlePg) add('recommend','Header and Footer','The title page may be showing a page number.','Turn on “Different First Page” so the title page has no number.',W,'pg-title');
       const hfText=f.hf.map(h=>h.t).join(' ');
       if(!/(v(ersion)?\s?\d|\b(january|february|march|april|may|june|july|august|september|october|november|december)\b|\d{1,2}\/\d{1,2}\/\d{2,4}|\b20\d\d\b)/i.test(hfText.replace(/©\s?\d{4}/g,''))) add('recommend','Header and Footer','The header and footer don’t show a version date or version number.','Show the title, version date, version number (if used) and page number in the header or footer.',W,'hf-version');
       // TOC
@@ -4519,10 +4558,10 @@ function rvEditorChecks(files,ctx){
       if(f.ins+f.del>0&&!redline) add('fix','Clean Copy','Tracked changes are still in the document ('+(f.ins+f.del)+').','Accept or reject all changes before submitting (or name the file as the redline if that’s intended).',W,'tracked');
       if(f.comments>0&&!redline) add('fix','Clean Copy',f.comments+' comment'+(f.comments===1?' is':'s are')+' still in the document.','Resolve and delete comments before submitting.',W,'comments');
       // fonts
-      const fl=Object.keys(f.fonts).filter(x=>!/symbol|wingdings|cambria math/i.test(x));
+      const fl=Object.keys(f.fonts||{}).filter(x=>!/symbol|wingdings|cambria math/i.test(x));
       if(fl.length>2) add('recommend','Formatting','Uses '+fl.length+' fonts: '+fl.slice(0,6).join(', ')+'.','Use the template’s font throughout, unless a different font is intentional (a title or a feature).',W,'fonts');
       // logo
-      if(!f.images) add('question','Branding','No images were found, so the MISMO logo may be missing.','Is the current MISMO logo on the title page? (MISMO Logos)',W,'logo');
+      if(isW&&!f.images) add('question','Branding','No images were found, so the MISMO logo may be missing.','Is the current MISMO logo on the title page? (MISMO Logos)',W,'logo');
       // stance and trademarks
       const st=[]; body.forEach(p=>{ (p.t.match(RV_STANCE)||[]).forEach(m=>st.push([m,p.t])); });
       st.slice(0,6).forEach(([m,p])=>add('recommend','MISMO Voice','MISMO doesn’t mandate or advocate: '+rvQ(m)+'.','Reword so the document describes rather than directs (for example “Implementers may…” or “The standard supports…”).',rvQ(p),'stance'));
@@ -4538,7 +4577,16 @@ function rvEditorChecks(files,ctx){
         pos+=s.length; });
       const never=[], late=[]; Object.entries(firstUse).forEach(([k,u])=>{ if(defAt[k]==null) never.push(k); else if(defAt[k]>u.pos+60) late.push(k); });
       if(late.length) add('fix','Acronyms','Defined after their first use: '+late.slice(0,12).join(', ')+'.','Spell each one out the first time it’s used, followed by the acronym in parentheses.',W,'acr-late');
-      if(never.length) add('recommend','Acronyms','Never spelled out: '+never.slice(0,16).join(', ')+(never.length>16?' and '+(never.length-16)+' more':'')+'.','Spell out each acronym at first use, e.g. “Government-Sponsored Enterprise (GSE)”.',W,'acr-never');
+      if(never.length){ const ex=never.map(a=>[a,rvExpand(a)]).filter(x=>x[1]).slice(0,8); add('recommend','Acronyms','Never spelled out: '+never.slice(0,16).join(', ')+(never.length>16?' and '+(never.length-16)+' more':'')+'.',ex.length?'Spell each out at first use, for example '+ex.map(([a,d])=>d+' ('+a+')').join('; ')+'.':'Spell out each acronym at first use, e.g. “government-sponsored enterprise (GSE)”.',W,'acr-never'); }
+      // MISMO terms and product names
+      rvTermChecks(bodyT,W,add);
+      // accessibility (Word only: PDFs don’t carry this reliably)
+      if(isW&&f.a11y){ const A=f.a11y; const noAlt=A.pics.filter(x=>!x.descr&&!x.deco);
+        if(noAlt.length) add('fix','Accessibility',noAlt.length+' picture'+(noAlt.length===1?' has':'s have')+' no alt text'+(noAlt[0].name?' (for example '+rvQ(noAlt[0].name)+')':'')+'.','Right-click each picture → View Alt Text, and describe it (or mark it decorative). Screen readers read this text.',W,'a11y-alt');
+        if(A.fakeHeads.length>=3) add('recommend','Accessibility',A.fakeHeads.length+' headings are bold text instead of heading styles (for example '+rvQ(A.fakeHeads[0])+').','Apply Heading 1, 2 or 3 so screen readers, the navigation pane and the table of contents see them.',W,'a11y-headings');
+        if(A.tblNoHead) add('recommend','Accessibility',A.tblNoHead+' table'+(A.tblNoHead===1?'':'s')+' don’t mark a header row.','Select the first row → Table Properties → Row → “Repeat as header row at the top of each page”. Screen readers use it to name columns.',W,'a11y-table');
+        const vague=A.links.filter(l=>/^(click here|here|link|this link|read more|more)$/i.test(l)||/^https?:\/\//i.test(l)); if(vague.length) add('recommend','Accessibility','Link text doesn’t say where it goes: '+vague.slice(0,3).map(rvQ).join(', ')+'.','Use descriptive link text, for example “MISMO Engineering Guidelines” instead of “click here” or a bare web address.',W,'a11y-links');
+        if(!A.docTitle) add('recommend','Accessibility','The document has no title in its properties.','File → Info → Title: add the work product name (screen readers and PDF exports show it).',W,'a11y-title'); }
       // obvious typing slips
       const dbl=bodyT.match(/\b(\w+)\s+\1\b/gi)||[]; const dup=[...new Set(dbl.filter(x=>!/^(that that|had had)$/i.test(x)))];
       if(dup.length) add('fix','Spelling and Grammar','Repeated words: '+dup.slice(0,6).map(rvQ).join(', ')+'.','Remove the repeated word.',W,'dup-word');
@@ -4560,6 +4608,7 @@ function rvEditorChecks(files,ctx){
       const oldCp=S.filter(s=>{ const m=(s.footer+' '+s.rows.map(r=>Object.values(r.c).join(' ')).join(' ')).match(/©\s?(\d{4})/); return m&&m[1]!==yr; }); if(oldCp.length) add('fix','Copyright','Copyright year isn’t '+yr+' on: '+oldCp.map(s=>s.name).slice(0,6).join(', ')+'.','Update the copyright year to '+yr+'.',W,'xl-cp-year');
       const noHead=S.filter(s=>!s.header.trim()&&!/cover|title/i.test(s.name)); if(noHead.length) add('recommend','Excel Setup','No printed header with the title on: '+noHead.map(s=>s.name).slice(0,6).join(', ')+'.','Print the artifact title in each sheet’s header (except a cover page that already has it).',W,'xl-header');
       const zooms=[...new Set(S.map(s=>s.zoom))]; if(zooms.length>1) add('recommend','Excel Setup','Tabs are saved at different zoom levels ('+zooms.join('%, ')+'%).','Save every tab at the same zoom.',W,'xl-zoom');
+      rvTermChecks(f.text,W,add);
       const hid=f.sheets.filter(s=>s.state!=='visible'); if(hid.length) add('question','Excel Setup','Hidden tabs: '+hid.map(s=>s.name).join(', ')+'.','Should these be published, removed, or left hidden?',W,'xl-hidden');
     }
   });
@@ -4678,11 +4727,11 @@ async function rvPool(items,n,fn){ const out=new Array(items.length); let k=0; a
 function rvChunks(text,max){ const out=[]; let cur=''; String(text).split(/\n/).forEach(l=>{ while(l.length>max){ out.push(l.slice(0,max)); l=l.slice(max); } if((cur+l).length>max&&cur){ out.push(cur); cur=''; } cur+=l+'\n'; }); if(cur.trim()) out.push(cur); return out; }
 async function rvAiEditor(files,ctx,progress){
   if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
-  const all=files.map(f=>'# FILE: '+f.name+' ('+(f.kind==='excel'?'Excel workbook':'Word document')+')\n'+f.text).join('\n\n');
+  const all=files.map(f=>'# FILE: '+f.name+' ('+(f.kind==='excel'?'Excel workbook':f.kind==='pdf'?'PDF':'Word document')+')\n'+f.text).join('\n\n');
   const parts=rvChunks(all,5000), use=parts.slice(0,30); let done=0;
   const res={corrections:[],recommendations:[],questions:[],summaries:[],readiness:[]};
   const got=await rvPool(use,4,async(part,i)=>{
-    const prompt=RV_EDITOR_PERSONA+'\n\n'+RV_EDITOR_RULES+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nStage: '+stageDef(ctx.t.stage).name+'\nFacilitator note: '+(ctx.note||'none')+'\nThis is part '+(i+1)+' of '+use.length+'.\n'+
+    const prompt=RV_EDITOR_PERSONA+'\n\n'+RV_EDITOR_RULES+(typeof rvEditorExtra==='function'?rvEditorExtra():'')+(typeof rvFbAvoid==='function'&&rvFbAvoid('editor').length?'\n- MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('editor').join(' | '):'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nStage: '+stageDef(ctx.t.stage).name+'\nFacilitator note: '+(ctx.note||'none')+'\nThis is part '+(i+1)+' of '+use.length+'.\n'+
       '\nAnswer in this compact JSON only (no other text): {"s":"one sentence on this part","r":"ready|minor|needs","c":[["exact short quote","what is wrong","the fix","category"]],"m":[["where","recommendation","suggestion"]],"q":["question for the facilitator"]}. At most 6 items in c, 2 in m, 1 in q; most important first; each string under 20 words. Answer right away.\n\nTEXT:\n'+part;
     const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+done+' of '+use.length+' part'+(use.length===1?'':'s')+'…'); return r; });
   let errs=0;
@@ -4698,12 +4747,12 @@ async function rvAiEditor(files,ctx,progress){
 }
 async function rvAiIm(P,ctx,progress){
   if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
-  const rows=P.rows.filter(r=>/add|modify|rename/i.test(r.ct||'')).map(r=>[String(r.item||r._row),(r.ct||'')+' '+(r.tt||''),r.cn||r.pc||'',r.dp||r.en||r.at||r.ac||r.cn||'',r.def||'']);
+  const rows=P.rows.filter(r=>/add|modify|rename/i.test(r.ct||'')).map(r=>[String(r.item||r._row),(r.ct||'')+' '+(r.tt||''),r.cn||r.pc||'',r.dp||r.en||r.at||r.ac||r.cn||'',r.def||'',(typeof rmFactsFor==='function'?rmFactsFor(r):'')]);
   if(!rows.length) return {rows:[]};
   const L=RV_IM_LEARNED; const guide='What IM has done with '+L.decided.toLocaleString()+' decided rows (2021–2026): '+Math.round(L.asSubmitted/L.decided*100)+'% approved as submitted, '+Math.round(L.withMod/L.decided*100)+'% approved with modification, '+Math.round(L.withdrawn/L.decided*100)+'% withdrawn, the rest returned or denied. Most common reasons: '+L.themes.map(t=>t[0]).join('; ')+'.\nTypical IM edits (before → after, why):\n'+L.examples.map(e=>'- ['+e[0]+'] '+e[1]+' → '+e[2]+' ('+e[3]+')').join('\n')+'\nTypical IM comments: '+L.comments.join(' | ')+'\nDefinition templates: '+Object.entries(RV_TEMPLATE_TEXT).map(([k,v])=>k+': '+v).join('; ')+'.';
   const parts=[]; for(let i=0;i<rows.length;i+=12) parts.push(rows.slice(i,i+12)); let done=0;
   const got=await rvPool(parts,4,async part=>{
-    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM checks proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if something may already exist, say “may already exist; check the Reference Model for …”. List only rows IM would likely question. Plain, short notes in IM’s voice.\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows as [item, change, container, name, definition]: '+JSON.stringify(part)+'\n\nAnswer in this compact JSON only: {"s":"one sentence","r":[["item","as submitted|with modification|returned|denied","what IM would say","suggested definition or empty","suggested name or empty"]]}. At most 6 rows; each string under 25 words. Answer right away.';
+    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM checks proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if something may already exist, say “may already exist; check the Reference Model for …”. List only rows IM would likely question. Plain, short notes in IM’s voice.'+(typeof rvFbAvoid==='function'&&rvFbAvoid('im').length?' MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('im').join(' | ')+'.':'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows as [item, change, container, name, definition, facts from the '+(ctx.rm||'Reference Model (not loaded)')+']. When facts say EXISTS, the item is already in the model: IM would deny the add and ask to reuse it. When facts list similar items, judge whether one could be reused. Existing values are the Type’s current enumerations: '+JSON.stringify(part)+'\n\nAnswer in this compact JSON only: {"s":"one sentence","r":[["item","as submitted|with modification|returned|denied","what IM would say","suggested definition or empty","suggested name or empty"]]}. At most 6 rows; each string under 25 words. Answer right away.';
     const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+Math.min(rows.length,done*12)+' of '+rows.length+' rows…'); return r; });
   const out=[], sums=[]; let errs=0;
   got.forEach(r=>{ if(!r||r.__err){ errs++; return; } (r.r||[]).forEach(x=>Array.isArray(x)?out.push({item:x[0],likely:x[1],note:x[2],suggestedDefinition:x[3],suggestedName:x[4]}):out.push(x)); if(r.s) sums.push(r.s); });
@@ -4723,28 +4772,30 @@ function rvBuildReport(kind,t,files,findings,ai,ctx){
   const [rk,rl]=kind==='im'?rvImReadiness(findings,ai):rvReadiness(findings,ai);
   const rep={id:kind+'-'+t.id+'-'+Date.now().toString(36),kind,ticket:t.id,wr:t.wr,name:t.name,at:new Date().toISOString(),by:S.me.name||'',files:files.map(f=>f.name),boiler:ctx.boiler,
     readiness:rk,readinessLabel:rl,summary:((ai&&ai.summaries)||[]).join(' ')||'',aiNote:(ai&&(ai.skipped||ai.error||ai.note))||'',
-    findings:findings.slice(0,160).map(f=>({sev:f.sev,area:f.area,issue:rvTrim(f.issue,400),suggestion:rvTrim(f.suggestion,400),where:rvTrim(f.where,180),item:f.item||'',src:f.src}))};
+    findings:findings.slice(0,160).map(f=>({sev:f.sev,area:f.area,issue:rvTrim(f.issue,400),suggestion:rvTrim(f.suggestion,400),where:rvTrim(f.where,180),item:f.item||'',src:f.src,rule:f.rule||'',fb:f.fb||''}))};
   if(kind==='editor'){ rep.corrections=((ai&&ai.corrections)||[]).slice(0,80).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300),category:rvTrim(c.category,30)}));
     rep.recommendations=((ai&&ai.recommendations)||[]).slice(0,24).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300)}));
     rep.questions=[...findings.filter(f=>f.sev==='question').map(f=>f.issue+' '+f.suggestion),...((ai&&ai.questions)||[])].slice(0,20).map(q=>rvTrim(q,300)); }
   else { rep.rows=((ai&&ai.rows)||[]).slice(0,150).map(r=>({item:String(r.item||''),likely:rvTrim(r.likely,24),note:rvTrim(r.note,300),def:rvTrim(r.suggestedDefinition,400),name:rvTrim(r.suggestedName,120)}));
-    rep.questions=findings.filter(f=>f.sev==='question').map(f=>rvTrim(f.issue+' '+f.suggestion,300)); rep.form=ctx.formStats||null; }
+    rep.questions=findings.filter(f=>f.sev==='question').map(f=>rvTrim(f.issue+' '+f.suggestion,300)); rep.form=ctx.formStats||null; rep.rm=ctx.rm||''; if(!ctx.rm) rep.aiNote=[rep.aiNote,'The Reference Model couldn’t be loaded here, so “already exists” and XPATH checks didn’t run. Run the review on the live MMS at resources.mismo.org.'].filter(Boolean).join(' '); }
   return rep;
 }
 function rvReportHtml(rep,forWord){
   const e=esc; const sevL={fix:'Must Fix',recommend:'Recommended',question:'Question'};
-  const tbl=(head,rows)=>rows.length?'<table class="rvt"><thead><tr>'+head.map(h=>'<th>'+e(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'';
-  const F=rep.findings||[], fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
+  // rows carry a key so people can mark each note right or wrong (not in the Word copy)
+  const fbOn=!forWord&&typeof rvFbCell==='function';
+  const tbl=(head,rows)=>rows.length?'<table class="rvt"><thead><tr>'+head.map(h=>'<th>'+e(h)+'</th>').join('')+(fbOn?'<th class="rv-fbh">Right?</th>':'')+'</tr></thead><tbody>'+rows.map(r=>{ const k=r.key; const cells=r.cells||r; return '<tr>'+cells.map(c=>'<td>'+c+'</td>').join('')+(fbOn?'<td class="rv-fbc">'+(k?rvFbCell(rep,k):'')+'</td>':'')+'</tr>'; }).join('')+'</tbody></table>':'';
+  const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'f'+i},f)), fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
   const title=rep.kind==='im'?'IM Pre-Review Report':'Editor and Readiness Review Report';
-  let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(rep.at.slice(0,10)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):'')+'</div>'+
+  let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(rep.at.slice(0,10)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):(rep.rm?' · Checked against the '+e(rep.rm):''))+'</div>'+
     '<div class="rvr-score rv-'+e(rep.readiness)+'"><b>'+e(rep.readinessLabel)+'</b><span>'+fx.length+' must fix · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
     (rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
     '<p class="rvr-note">This report recommends; it doesn’t change the work product. '+(rep.kind==='editor'?'Editorial suggestions are judgment calls: the facilitator and workgroup decide.':'IM makes the final decision on every row.')+'</p></div>';
   const sec=(t2,body)=>body?'<h3>'+e(t2)+'</h3>'+body:'';
-  h+=sec('Must Fix Before Submitting',tbl(['Area','Where','What’s Wrong','What to Do'],fx.map(f=>[e(f.area),e(f.where),e(f.issue),e(f.suggestion)])));
-  if(rep.kind==='editor') h+=sec('Editorial Corrections',tbl(['Category','Where','Issue','Suggestion'],(rep.corrections||[]).map(c=>[e(c.category||''),e(c.where),e(c.issue),e(c.suggestion)])));
-  if(rep.kind==='im') h+=sec('Rows IM May Question',tbl(['Item','Likely Outcome','What IM Would Say','Suggested Definition or Name'],(rep.rows||[]).map(r=>[e(r.item),e(r.likely),e(r.note),e([r.name,r.def].filter(Boolean).join(' — '))])));
-  h+=sec('Recommended',tbl(['Area','Where','Recommendation','Suggestion'],[...rc.map(f=>[e(f.area),e(f.where),e(f.issue),e(f.suggestion)]),...(rep.recommendations||[]).map(c=>['Editorial',e(c.where),e(c.issue),e(c.suggestion)])]));
+  h+=sec('Must Fix Before Submitting',tbl(['Area','Where','What’s Wrong','What to Do'],fx.map(f=>({key:f._k,cells:[e(f.area),e(f.where),e(f.issue)+(f.fb?'<div class="rv-fbnote">'+e(f.fb)+'</div>':''),e(f.suggestion)]}))));
+  if(rep.kind==='editor') h+=sec('Editorial Corrections',tbl(['Category','Where','Issue','Suggestion'],(rep.corrections||[]).map((c,i)=>({key:'c'+i,cells:[e(c.category||''),e(c.where),e(c.issue),e(c.suggestion)]}))));
+  if(rep.kind==='im') h+=sec('Rows IM May Question',tbl(['Item','Likely Outcome','What IM Would Say','Suggested Definition or Name'],(rep.rows||[]).map((r,i)=>({key:'r'+i,cells:[e(r.item),e(r.likely),e(r.note),e([r.name,r.def].filter(Boolean).join(' — '))]}))));
+  h+=sec('Recommended',tbl(['Area','Where','Recommendation','Suggestion'],[...rc.map(f=>({key:f._k,cells:[e(f.area),e(f.where),e(f.issue)+(f.fb?'<div class="rv-fbnote">'+e(f.fb)+'</div>':''),e(f.suggestion)]})),...(rep.recommendations||[]).map((c,i)=>({key:'m'+i,cells:['Editorial',e(c.where),e(c.issue),e(c.suggestion)]}))]));
   h+=sec('Questions for the Facilitator',(rep.questions||[]).length?'<ol>'+rep.questions.map(q=>'<li>'+e(q)+'</li>').join('')+'</ol>':'');
   if(rep.kind==='im'&&rep.form) h+=sec('What IM Has Done Before','<p>Across '+RV_IM_LEARNED.decided.toLocaleString()+' decided rows since 2021, '+Math.round(RV_IM_LEARNED.asSubmitted/RV_IM_LEARNED.decided*100)+'% were approved as submitted and '+Math.round(RV_IM_LEARNED.withMod/RV_IM_LEARNED.decided*100)+'% with modification. The most common reasons for changes: '+RV_IM_LEARNED.themes.slice(0,5).map(t=>t[0].toLowerCase()).join(', ')+'.</p>');
   h+='</div>';
@@ -4752,6 +4803,235 @@ function rvReportHtml(rep,forWord){
   return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+e(title)+'</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#0d314c}h2{font-size:16pt;margin:4pt 0}h3{font-size:13pt;margin:14pt 0 4pt;color:#0d314c}.rvr-k{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#456179}.rvr-m,.rvr-note{font-size:9.5pt;color:#456179}.rvr-score b{font-size:13pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #adc4d6;padding:4pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#e4f2fb}</style></head><body>'+h+'<p class="rvr-note">©'+RV_YEAR()+' Mortgage Industry Standards Maintenance Organization, Inc. Prepared by the MISMO Manufacturing System.</p></body></html>';
 }
 function rvDownload(rep){ const html=rvReportHtml(rep,true); const blob=new Blob(['\ufeff',html],{type:'application/msword'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(rep.kind==='im'?'IM Pre-Review':'Editor and Readiness Review')+' - '+rep.wr+' - '+rep.at.slice(0,10)+'.doc'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
+/* ============================================================================
+   The MISMO Reference Model (Logical Data Dictionary) for the IM Pre-Review.
+   Loaded from the private mms-data repo (rm-meta + rm-dp1..n), which holds a
+   compact copy of the current LDD taken from the Resource Library package.
+   ============================================================================ */
+let RM=null, rmLoading=null;
+const rmKey=s=>String(s==null?'':s).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]/g,'');
+async function rmLoad(){
+  if(RM) return RM; if(rmLoading) return rmLoading;
+  rmLoading=(async()=>{
+    if(S.mode!=='relay'||typeof rGet!=='function') return null;
+    const docOf=f=>f&&f.data&&f.data.docs&&f.data.docs.data;
+    const meta=docOf(await rGet('mms','rm-meta')); if(!meta||!meta.s) return null;
+    const M=Object.assign({},meta,JSON.parse(meta.s)); delete M.s;
+    const parts=await Promise.all(Array.from({length:M.dpParts||0},(_, i)=>rGet('mms','rm-dp'+(i+1))));
+    const dp=[]; parts.forEach(p=>{ const d=docOf(p); if(d&&d.s) JSON.parse(d.s).forEach(x=>dp.push(x)); });
+    if(!dp.length) return null;
+    RM=rmBuild(M,dp); return RM;
+  })().catch(e=>{ console.warn('Reference Model not loaded',e); return null; }).finally(()=>{ rmLoading=null; });
+  return rmLoading;
+}
+function rmBuild(M,dp){
+    const R={meta:M,dp:new Map(),cn:new Map(),ac:new Map(),depDp:new Set((M.depDp||[]).map(rmKey)),depCn:new Set((M.depCn||[]).map(rmKey)),byClass:new Map(),inCn:new Map()};
+    dp.forEach(x=>{ const e={name:x[0],def:x[1],type:x[2],cns:x[3]||[],enums:x[4]||[],partial:!!x[5]}; R.dp.set(rmKey(x[0]),e);
+      const cw=(x[0].match(/[A-Z][a-z0-9]*$/)||[''])[0]; if(cw){ if(!R.byClass.has(cw)) R.byClass.set(cw,[]); R.byClass.get(cw).push(e); }
+      e.cns.forEach(c=>{ const k=rmKey(c); if(!R.inCn.has(k)) R.inCn.set(k,new Set()); R.inCn.get(k).add(rmKey(x[0])); }); });
+    (M.cn||[]).forEach(x=>R.cn.set(rmKey(x[0]),{name:x[0],def:x[1],parents:(x[2]||[]).map(rmKey)}));
+    (M.ac||[]).forEach(x=>R.ac.set(String(x[0]).toUpperCase(),x[1]));
+    R.label='MISMO Reference Model '+rmVersion(M);
+    return R;
+}
+function rmVersion(M){ const vh=(M.versionHistory||[]).slice(-1)[0]; const fromFile=(String(M.ldd||'').match(/v(\d+\.\d+\.\d+)_?(B\d+)?/i)||[]); return fromFile[1]?('v'+fromFile[1]+(fromFile[2]?' '+fromFile[2]:'')):(vh?String(vh[1]):''); }
+/* names in the form are normal English ("Loan Amount"); the LDD uses upper camel case and UPPER_SNAKE containers */
+function rmCamel(s){ return String(s||'').replace(/[^A-Za-z0-9 ]/g,' ').split(/\s+/).filter(Boolean).map(w=>w[0].toUpperCase()+w.slice(1)).join(''); }
+function rmWordsOf(s){ return String(s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>2&&!RM_STOP.has(w)); }
+const RM_STOP=new Set('the and for that this with which from are was were has have its his her their into upon when true indicates value mismo prescribed list represents identifies identifying field free form text describing amount dollar date number specified specific associated used being been not any all per one two other'.split(' '));
+function rmSim(a,b){ const A=new Set(a), B=new Set(b); if(!A.size||!B.size) return 0; let n=0; A.forEach(w=>{ if(B.has(w)) n++; }); return n/Math.min(A.size,B.size); }
+/* existing data points that look like this proposed one: same class word, overlapping name and definition words */
+function rmSimilar(name,def,n){
+  if(!RM) return []; const nm=rmCamel(name); const cw=(nm.match(/[A-Z][a-z0-9]*$/)||[''])[0]; const pool=RM.byClass.get(cw)||[];
+  const nw=rmWordsOf(String(name).replace(/([a-z])([A-Z])/g,'$1 $2')), dw=rmWordsOf(def); const self=rmKey(name);
+  return pool.map(e=>{ if(rmKey(e.name)===self) return null; if(!e._w){ e._nw=rmWordsOf(e.name.replace(/([a-z])([A-Z])/g,'$1 $2')); e._dw=rmWordsOf(e.def); e._w=1; }
+      const s=0.55*rmSim(nw,e._nw)+0.45*(dw.length?rmSim(dw,e._dw):rmSim(nw,e._nw)); return s>=0.6?{e,s}:null; })
+    .filter(Boolean).sort((a,b)=>b.s-a.s).slice(0,n||3).map(x=>x.e);
+}
+function rmDescribe(e){ return e.name+(e.def?' — '+rvTrim(e.def,160):''); }
+
+/* ---------- the checks ---------- */
+function rvRmChecks(P){
+  const out=[]; if(!RM) return out;
+  const add=(sev,issue,suggestion,where,rule,item)=>out.push({sev,area:'Reference Model',issue,suggestion:suggestion||'',where:where||'',rule:rule||'',item:item||'',src:'rm'});
+  const V=RM.label;
+  // what this submission itself adds, so later rows can rely on it
+  const newCn=new Set(), newDp=new Set(), newEn={};
+  P.rows.forEach(r=>{ const ct=String(r.ct||'').toLowerCase(), tt=String(r.tt||'').toLowerCase(); if(!/add/.test(ct)) return;
+    if(/container/.test(tt)&&r.cn) newCn.add(rmKey(r.cn)); if(/data point/.test(tt)&&r.dp) newDp.add(rmKey(r.dp)); if(/enumeration/.test(tt)&&r.dp&&r.en){ (newEn[rmKey(r.dp)]=newEn[rmKey(r.dp)]||[]).push(r.en); } });
+  const cnKnown=k=>RM.cn.has(k)||newCn.has(k), dpKnown=k=>RM.dp.has(k)||newDp.has(k);
+  const typeAdds=new Set();
+  P.rows.forEach(r=>{
+    const it=r.item||('row '+r._row), ct=String(r.ct||'').toLowerCase().replace(/&/,'and').trim(), tt=String(r.tt||'').toLowerCase().replace(/^data point.*/,'data point').trim();
+    const nm=r.en||r.dp||r.at||r.cn||r.ac||''; const where='Item '+it+(nm?' · '+nm:'');
+    const dpk=rmKey(r.dp), cnk=rmKey(r.cn), pck=rmKey(r.pc), enk=rmKey(r.en);
+    const dpE=RM.dp.get(dpk), cnE=RM.cn.get(cnk);
+    if(tt==='data point'&&r.dp){
+      if(/add/.test(ct)){
+        if(dpE&&RM.depDp.has(dpk)) add('question',rvQ(r.dp)+' is in the '+V+' but deprecated ('+dpE.name+').','Is bringing it back intended? Say why in the Submitter Comments, or reuse its replacement.',where,'rm-deprecated',it);
+        else if(dpE) add('fix',rvQ(r.dp)+' is already in the '+V+' ('+dpE.name+').','Reuse the existing data point instead of adding it again'+(dpE.cns.length?' (it’s in '+dpE.cns.slice(0,4).join(', ')+(dpE.cns.length>4?' and '+(dpE.cns.length-4)+' more':'')+')':'')+'. Its definition: '+rvTrim(dpE.def,200),where,'rm-exists',it);
+        else if(RM.depDp.has(dpk)) add('question',rvQ(r.dp)+' was deprecated in an earlier version of the Reference Model.','Is bringing it back intended? Say why in the Submitter Comments.',where,'rm-deprecated',it);
+        else { const sim=rmSimilar(r.dp,r.def,2); if(sim.length) add('recommend','Similar data point'+(sim.length>1?'s are':' is')+' already in the '+V+'.','Check whether one can be reused before adding '+rvQ(r.dp)+': '+sim.map(rmDescribe).join(' | '),where,'rm-similar',it); }
+        if(/Type$/.test(rmCamel(r.dp))&&!dpE) typeAdds.add(dpk);
+      }
+      if(/reuse|move/.test(ct)&&!dpE&&!newDp.has(dpk)) add('fix','There’s no data point named '+rvQ(r.dp)+' in the '+V+' to '+(/move/.test(ct)?'move':'reuse')+'.','Check the spelling against the LDD, or change the row to Add and Define.',where,'rm-missing',it);
+      if(/reuse/.test(ct)&&dpE&&r.pc&&(RM.inCn.get(pck)||new Set()).has(dpk)) add('recommend',rvQ(r.dp)+' is already in '+rvQ(r.pc)+'.','No change is needed for this row; remove it or pick a different container.',where,'rm-already-there',it);
+      if(/modify|rename|deprecate/.test(ct)){ const old=/rename/.test(ct)?RM.dp.get(rmKey(r.old)):dpE; if(!old) add('fix','The data point '+rvQ(/rename/.test(ct)?r.old:r.dp)+' isn’t in the '+V+'.','Use the exact LDD name of the data point you are changing.',where,'rm-missing',it);
+        else if(/deprecate/.test(ct)&&RM.depDp.has(dpk)) add('recommend',rvQ(r.dp)+' is already deprecated.','Remove this row.',where,'rm-dep-already',it);
+        if(/rename/.test(ct)&&dpE) add('fix','The new name '+rvQ(r.dp)+' is already used in the '+V+'.','Pick a name that isn’t already in the LDD.',where,'rm-rename-taken',it);
+        if(/modify definition/.test(ct)&&old&&r.old&&rmKey(r.old)!==rmKey(old.def)&&rvSim(r.old,old.def)<0.85) add('recommend','The Original/Old Value doesn’t match the current definition in the '+V+'.','Paste the current definition: '+rvTrim(old.def,220),where,'rm-old-def',it); }
+    }
+    if(tt==='container'&&r.cn){
+      if(/add/.test(ct)&&cnE) add('fix','The container '+rvQ(r.cn)+' is already in the '+V+' ('+cnE.name+').','Reuse the existing container instead of adding it again.',where,'rm-cn-exists',it);
+      if(/reuse|move|modify|rename|deprecate/.test(ct)&&!/rename/.test(ct)&&!cnE&&!newCn.has(cnk)) add('fix','There’s no container named '+rvQ(r.cn)+' in the '+V+'.','Check the spelling against the LDD (the container list), or change the row to Add and Define.',where,'rm-cn-missing',it);
+      if(/rename/.test(ct)){ if(!RM.cn.has(rmKey(r.old))) add('fix','The container '+rvQ(r.old)+' isn’t in the '+V+'.','Use the exact LDD name of the container you are renaming.',where,'rm-cn-missing',it); if(cnE) add('fix','The new container name '+rvQ(r.cn)+' is already used.','Pick a name that isn’t already in the LDD.',where,'rm-rename-taken',it); }
+    }
+    if(r.pc&&/container|data point/.test(tt)&&/add|reuse|move/.test(ct)&&!cnKnown(pck)) add('fix','The parent container '+rvQ(r.pc)+' isn’t in the '+V+' or added by this submission.','Check the spelling against the LDD, or add the parent container first.',where,'rm-parent',it);
+    if(tt==='enumeration'&&r.en&&r.dp){
+      if(!dpKnown(dpk)) add('fix','The enumeration is for '+rvQ(r.dp)+', which isn’t in the '+V+' or added by this submission.','Use the exact LDD name of the Type data point.',where,'rm-enum-dp',it);
+      else if(dpE&&/add/.test(ct)){
+        const have=dpE.enums.map(rmKey);
+        if(have.includes(enk)) add('fix',rvQ(r.en)+' is already a value of '+dpE.name+'.','Remove this row; the value already exists.',where,'rm-enum-exists',it);
+        else if(!dpE.partial){ const near=dpE.enums.filter(v=>{ const k=rmKey(v); return k.length>3&&enk.length>3&&(k.startsWith(enk)||enk.startsWith(k)||rmSim(rmWordsOf(v.replace(/([a-z])([A-Z])/g,'$1 $2')),rmWordsOf(r.en))>=0.75); }).slice(0,3);
+          if(near.length) add('recommend','Close to existing value'+(near.length>1?'s':'')+' of '+dpE.name+': '+near.join(', ')+'.','Check whether an existing value already covers '+rvQ(r.en)+' (IM asks submitters to double-check existing enumerations).',where,'rm-enum-near',it); }
+      }
+      if(dpE&&/modify|rename|deprecate/.test(ct)&&!dpE.partial){ const tgt=/rename/.test(ct)?r.old:r.en; if(tgt&&!dpE.enums.map(rmKey).includes(rmKey(tgt))) add('fix',rvQ(tgt)+' isn’t a value of '+dpE.name+' in the '+V+'.','Use the exact LDD enumeration value you are changing.',where,'rm-enum-missing',it); }
+    }
+    if(tt==='acronym'&&r.ac&&/add/.test(ct)&&RM.ac.has(String(r.ac).toUpperCase())) add('fix','The acronym '+rvQ(r.ac)+' is already in the LDD ('+RM.ac.get(String(r.ac).toUpperCase())+').','Remove this row.',where,'rm-ac-exists',it);
+    // XPATH: every container must exist, and each step must be a parent → child pair in the model
+    if(r.xp){ const seg=r.xp.replace(/\s+/g,'').replace(/^\/+|\/+$/g,'').split('/').filter(Boolean); const bad=[];
+      seg.forEach((s,i)=>{ const k=rmKey(s); if(i===0&&k==='message') return; if(!cnKnown(k)){ bad.push(s+' isn’t a container'); return; }
+        const e=RM.cn.get(k), pk=i>0?rmKey(seg[i-1]):''; if(e&&pk&&pk!=='message'&&e.parents.length&&!e.parents.includes(pk)&&!newCn.has(k)) bad.push(seg[i-1]+'/'+s+' isn’t a parent/child pair'); });
+      if(bad.length) add('fix','The XPATH doesn’t match the '+V+': '+bad.slice(0,3).join('; ')+(bad.length>3?'; and '+(bad.length-3)+' more':'')+'.','Copy the XPATH from the LDD for the parent container, then add the new container at the end.',where,'rm-xpath',it); }
+  });
+  typeAdds.forEach(k=>{ if(!(newEn[k]||[]).length){ const r=P.rows.find(x=>rmKey(x.dp)===k&&/add/i.test(x.ct||'')); add('fix','A new Type data point is added without any enumerations.','List each enumeration value as its own Add and Define row, each with a unique definition.',r?'Item '+(r.item||r._row)+' · '+r.dp:'','rm-type-enums',r&&r.item); } });
+  return out;
+}
+/* short facts about each row for Claude, so it judges reuse against the real model instead of guessing */
+function rmFactsFor(r){
+  if(!RM) return ''; const tt=String(r.tt||'').toLowerCase(); const f=[];
+  if(/data point/.test(tt)&&r.dp){ const e=RM.dp.get(rmKey(r.dp)); if(e) f.push('EXISTS: '+rvTrim(e.def,120)); else { const s=rmSimilar(r.dp,r.def,2); if(s.length) f.push('similar: '+s.map(x=>x.name+' = '+rvTrim(x.def,90)).join(' | ')); } }
+  if(/enumeration/.test(tt)&&r.dp){ const e=RM.dp.get(rmKey(r.dp)); if(e) f.push('existing values: '+e.enums.slice(0,25).join(', ')+(e.enums.length>25?'…':'')); }
+  if(/container/.test(tt)&&r.cn){ const e=RM.cn.get(rmKey(r.cn)); if(e) f.push('EXISTS: '+rvTrim(e.def,120)); }
+  return f.join(' ; ');
+}
+
+window.__mmsRm={use:(M,dp)=>{ RM=rmBuild(M,dp); return RM.label; },checks:P=>rvRmChecks(P),facts:r=>rmFactsFor(r),similar:(n,d)=>rmSimilar(n,d,3).map(e=>e.name),parse:x=>rvParseForm(x),load:()=>rmLoad().then(R=>R&&R.label),im:(x,t)=>{ const r=rvImChecks(x,{t:t||{wr:''}}); return r.out.concat(rvRmChecks(r.P)); }};
+/* =====================================================================
+   MISMO Terms and Product Names: how MISMO writes its own names.
+   Built Nov 1, 2026 from the Resource Library (299 published entries), the
+   MISMO Reference Model v3.6.3 LDD (its acronym list loads with the model),
+   the Editor Process and Guidance and the Boilerplate Guidance.
+   Each entry: [preferred form, group, note, forms to flag (regex source)].
+   The editor review flags the "forms to flag" and suggests the preferred one.
+   ===================================================================== */
+const RV_TERMS=[
+  // trademarks
+  ['MISMO®','Trademarks','Registered trademark. Use ® at least at the first mention in the body.',''],
+  ['Mortgage Industry Standards Maintenance Organization, Inc.','Trademarks','MISMO’s full legal name, as in the copyright line.','Mortgage Industry Standard Maintenance Organization|Mortgage Industry Standards Maintenance Org\\b'],
+  ['SMART Doc®','Trademarks','Registered trademark. Capital SMART, then Doc.','Smart ?Docs?\\b(?!®)|SmartDoc|SMART ?DOC\\b|SMARTDoc|Smart Document','Smart Doc, SmartDoc, SMART DOC, Smart Document'],
+  ['MERS®','Trademarks','Registered trademark of MERSCORP Holdings. Use ® with MERS.',''],
+  ['MERS® eRegistry','Trademarks','The registry for eNotes run by MERSCORP Holdings.','MERS e-Registry|MERS E-Registry|MERS eregistry'],
+  // the reference model and its artifacts
+  ['MISMO Reference Model','Reference Model','Capital R and M. Give the version when it matters, for example Version 3.6.3.','MISMO reference model|Ref\\.? Model'],
+  ['Logical Data Dictionary (LDD)','Reference Model','Spell out at first use.','Logical Data Directory|logical data dictionary'],
+  ['Enhanced Logical Data Dictionary (ELDD)','Reference Model','Spell out at first use.',''],
+  ['Logical Data Model (LDM)','Reference Model','Spell out at first use.',''],
+  ['Version Comparison Report','Reference Model','Published with each Reference Model version.',''],
+  ['MISMO Unique Identifier (MISMO Unique ID)','Reference Model','As in the MISMO Unique Identifiers Implementation Guide.',''],
+  ['XPath','Reference Model','Capital X and P in documents. (The IM Submission Form column is labeled XPATH.)','Xpath\\b|X-Path|X-path'],
+  ['XML Schema','Reference Model','Capital S when naming the MISMO XML Schema.',''],
+  ['data point','Reference Model','Two words, lowercase in running text.','datapoint'],
+  ['enumeration','Reference Model','Lowercase in running text; “enumerated value” is also used.',''],
+  ['MISMO Engineering Guideline (MEG)','Reference Model','Cite by number and name, for example MISMO Engineering Guideline 0007 (Class Words and Definition Guidelines). Plural: MEGs.','MISMO Engineering Guidelines \\(MEG\\)'],
+  ['Business Glossary','Reference Model','The MISMO Business Glossary; capital B and G.',''],
+  ['BPM+ MISMO Reference Model','Reference Model','As published in the Resource Library.','BPM\\+? \\+ Reference Model','BPM + Reference Model'],
+  // datasets and work products
+  ['dataset','Work Products','One word, as in the published work products (Mortgage Compliance Dataset, Housing Counseling Dataset).','data set\\b|Data Set\\b'],
+  ['Industry Loan Application Dataset (iLAD)','Work Products','Lowercase i, then LAD.','\\bILAD\\b|\\bI-LAD\\b|\\bIlad\\b'],
+  ['Mortgage Compliance Dataset (MCD)','Work Products','',''],
+  ['Industry Transfer of Servicing Dataset (ITSD)','Work Products','',''],
+  ['Housing Counseling Dataset','Work Products','',''],
+  ['Appraisal Procurement Dataset','Work Products','',''],
+  ['Adverse Action Notice Dataset','Work Products','',''],
+  ['Title and Closing Dataset','Work Products','',''],
+  ['Federal Government Housing Agency Servicing Dataset','Work Products','',''],
+  ['Commercial eNotes Data Glossary','Work Products','',''],
+  ['Consumer-Facing Charge and Fee Guide','Work Products','',''],
+  ['MISMO Life of Loan','Work Products','Capital L and L.',''],
+  ['API Toolkit','Work Products','The MISMO API Toolkit; API in capitals.','Api Toolkit|API toolkit'],
+  ['Remote Online Notarization (RON)','Work Products','Spell out at first use.',''],
+  ['Implementation Guide','Work Products','Spell out in titles and text.','\\bI-?Guide\\b|\\biGuide\\b|Impl\\.? Guide'],
+  ['FRAME','Work Products','MISMO’s framework for responsible AI use in mortgage; all capitals.','\\bFrame framework\\b'],
+  ['MISMO Link','Work Products','',''],
+  // the e-words
+  ['eMortgage','eMortgage Terms','Lowercase e, capital M, no hyphen.','\\be-[Mm]ortgage|\\bE-?[Mm]ortgage(?=s?\\b)|\\bemortgage'],
+  ['eNote','eMortgage Terms','Lowercase e, capital N, no hyphen.','\\be-[Nn]ote|\\bE-?Note\\b|\\benote\\b'],
+  ['eClosing','eMortgage Terms','Lowercase e, capital C, no hyphen.','\\be-[Cc]losing|\\bE-?Closing|\\beclosing\\b'],
+  ['eVault','eMortgage Terms','Lowercase e, capital V, no hyphen.','\\be-[Vv]ault|\\bE-?Vault|\\bevault\\b'],
+  ['eSignature','eMortgage Terms','Lowercase e, capital S, no hyphen.','\\be-[Ss]ignature|\\bE-?Signature|\\besignature\\b'],
+  ['eRecording','eMortgage Terms','Lowercase e, capital R, no hyphen.','\\be-[Rr]ecording|\\bE-?Recording'],
+  ['eHELOC','eMortgage Terms','Lowercase e, then HELOC (Home Equity Line of Credit).','\\be-HELOC|\\bE-?HELOC'],
+  ['eModification','eMortgage Terms','Lowercase e, capital M, no hyphen.','\\be-[Mm]odification|\\bE-?Modification'],
+  ['eEligibility','eMortgage Terms','Lowercase e, capital E; MISMO’s 2021 webinar wrote e-Eligibility, so pick one form and keep it.',''],
+  // how MISMO works
+  ['workgroup','Process and Groups','One word, lowercase in running text (Workgroup in a group’s name).','\\bwork group\\b|\\bWork Group\\b(?! Chair| Facilitator)','work group, Work Group'],
+  ['Community of Practice (CoP)','Process and Groups','Capital C and P, lowercase o.','\\bCOP\\b|\\bCOPs\\b'],
+  ['Development Workgroup (DWG)','Process and Groups','',''],
+  ['Information Management (IM)','Process and Groups','The IM workgroup reviews Reference Model changes.',''],
+  ['Architecture Workgroup (AWG)','Process and Groups','',''],
+  ['Residential Standards Governance Committee (RSGC)','Process and Groups','',''],
+  ['work request','Process and Groups','Lowercase in running text; a specific one is cited by number, for example WR2025_05.',''],
+  ['Candidate Recommendation','Process and Groups','A work product status; capitalize when naming the status.','candidate recommendation status'],
+  ['Recommendation','Process and Groups','A work product status; capitalize when naming the status.',''],
+  ['comment period','Process and Groups','Lowercase in running text; the boilerplate heading is IPR/COMMENT PERIOD.',''],
+  ['Intellectual Property Rights (IPR) Policy','Process and Groups','MISMO’s 2018 Intellectual Property Rights (IPR) Policy.',''],
+  // industry names MISMO documents use
+  ['Fannie Mae','Industry Names','Use the name in text, not FNMA.','\\bFNMA\\b'],
+  ['Freddie Mac','Industry Names','Use the name in text, not FHLMC.','\\bFHLMC\\b'],
+  ['Ginnie Mae','Industry Names','Use the name in text, not GNMA (GNMA is fine as a data value).',''],
+  ['government-sponsored enterprise (GSE)','Industry Names','Spell out at first use.',''],
+  ['Federal Housing Finance Agency (FHFA)','Industry Names','',''],
+  ['Consumer Financial Protection Bureau (CFPB)','Industry Names','',''],
+  ['Department of Housing and Urban Development (HUD)','Industry Names','',''],
+  ['Uniform Residential Loan Application (URLA)','Industry Names','',''],
+  ['Uniform Loan Application Dataset (ULAD)','Industry Names','',''],
+  ['Uniform Appraisal Dataset (UAD)','Industry Names','',''],
+  ['Uniform Closing Dataset (UCD)','Industry Names','',''],
+  ['Home Mortgage Disclosure Act (HMDA)','Industry Names','',''],
+  // style
+  ['Version 3.6.3','Style','Write versions as Version 3.6.3 in titles and v3.6.3 in tables; don’t mix Ver. and V in one document.','\\bVer\\.\\s?\\d|\\bV\\s\\d\\.\\d','Ver. 3.6, V 3.6'],
+  ['American spelling','Style','For example organization, standardize, license (noun and verb), center.','\\borgani[s]ation\\b|\\bstandardis(e|ed|ing)\\b|\\blicence\\b|\\bcentre\\b|\\bbehaviour\\b|\\bcolour\\b|\\bcatalogue\\b','organisation, standardise, licence, centre, behaviour, colour']
+];
+/* expansions for acronyms: MISMO's names first, then the LDD's acronym list when the Reference Model is loaded */
+function rvExpand(a){ a=String(a||'').toUpperCase(); for(const t of RV_TERMS){ const m=t[0].match(/^(.*) \(([^)]+)\)$/); if(m&&m[2].toUpperCase()===a) return m[1]; }
+  if(typeof RM!=='undefined'&&RM&&RM.ac&&RM.ac.has(a)) return RM.ac.get(a); return ''; }
+function rvTermChecks(text,W,add){
+  const hits=[];
+  RV_TERMS.forEach(([pref,grp,note,bad])=>{ if(!bad) return; let re; try{ re=new RegExp(bad,'g'); }catch(e){ return; }
+    const m=String(text).match(re); if(m&&m.length) hits.push([pref,grp,note,[...new Set(m)]]); });
+  hits.slice(0,10).forEach(([pref,grp,note,m])=>add(/Trademarks|eMortgage/.test(grp)?'fix':'recommend','Terms and Names','Uses '+m.slice(0,4).map(rvQ).join(', ')+(m.length>4?' and more':'')+'; MISMO writes '+rvQ(pref)+'.',note||('Change to '+pref+'.'),W,'term:'+pref));
+}
+/* the forms to flag, written out for people */
+function termShow(bad,show){ if(show) return show; if(!bad) return ''; return [...new Set(String(bad).split('|').map(a=>a.replace(/\(\?[=!][^)]*\)/g,'').replace(/\\b/g,'').replace(/\[([A-Za-z])[A-Za-z]\]/g,'$1').replace(/\\s\?/g,' ').replace(/\\d/g,'3').replace(/\\\.\??/g,'.').replace(/\\([()+])/g,'$1').replace(/-\?/g,'-').replace(/\?/g,'').replace(/\\/g,'').replace(/\s+/g,' ').trim()).filter(Boolean))].slice(0,4).join(', '); }
+/* Resource Center: the list itself, searchable */
+function termsCardHtml(){
+  const groups=[...new Set(RV_TERMS.map(t=>t[1]))];
+  const row=t=>'<tr data-term="'+esc((t[0]+' '+t[2]+' '+t[1]).toLowerCase())+'"><td><b>'+esc(t[0])+'</b></td><td>'+esc(t[2]||'')+'</td><td class="muted">'+esc(termShow(t[3],t[4]))+'</td></tr>';
+  const ac=(typeof RM!=='undefined'&&RM&&RM.ac)?[...RM.ac.entries()].sort((a,b)=>a[0].localeCompare(b[0])):[];
+  return '<div class="card terms-card" id="termscard"><h3>MISMO Terms and Product Names<span class="sp muted" style="font-size:12px;font-weight:500">How MISMO writes its own names. The Editor and Readiness Review checks for these.</span></h3>'+
+    '<div class="terms-find"><input type="search" id="termsq" placeholder="Find a term (for example eNote, dataset, CoP)" aria-label="Find a term"></div>'+
+    groups.map(g=>'<h4 class="terms-g">'+esc(g)+'</h4><div class="tblwrap"><table class="tbl terms-tbl"><thead><tr><th>Write It As</th><th>Note</th><th>Not</th></tr></thead><tbody>'+RV_TERMS.filter(t=>t[1]===g).map(row).join('')+'</tbody></table></div>').join('')+
+    '<h4 class="terms-g">Acronyms in the Reference Model</h4>'+(ac.length?'<div class="tblwrap"><table class="tbl terms-tbl"><thead><tr><th>Acronym</th><th>Stands For</th><th></th></tr></thead><tbody>'+ac.map(([a,d])=>'<tr data-term="'+esc((a+' '+d).toLowerCase())+'"><td><b>'+esc(a)+'</b></td><td>'+esc(d)+'</td><td></td></tr>').join('')+'</tbody></table></div>':'<p class="muted" id="termsac">Loading the '+esc('Reference Model')+' acronym list…</p>')+'</div>';
+}
+const _resourcesView1=VIEWS.resources;
+VIEWS.resources=function(){ if(!(typeof RM!=='undefined'&&RM)&&typeof rmLoad==='function'&&S.mode==='relay') rmLoad().then(R=>{ if(R&&S.view==='resources') renderAll(); }); return _resourcesView1()+termsCardHtml(); };
+const _wireMain9=wireMain;
+wireMain=function(m){ _wireMain9(m); const q=$('#termsq',m); if(q) q.oninput=()=>{ const v=q.value.trim().toLowerCase(); $$('#termscard tr[data-term]',m).forEach(tr=>tr.hidden=!!v&&!tr.dataset.term.includes(v)); $$('#termscard .tblwrap',m).forEach(w=>{ const any=$$('tr[data-term]',w).some(tr=>!tr.hidden); w.hidden=!any; const h=w.previousElementSibling; if(h&&h.classList.contains('terms-g')) h.hidden=!any; }); }; };
+
+/* what Claude is told about MISMO's names (kept short: the relay caps each answer) */
+function rvEditorExtra(){ const names=RV_TERMS.filter(t=>!/Style|Industry/.test(t[1])).map(t=>t[0].replace(/ \([^)]*\)$/,'')).slice(0,40);
+  return '\n- MISMO writes its names this way: '+names.join(', ')+'. Flag other spellings as corrections (category: terms).'+(typeof RV_EDITOR_LEARNED!=='undefined'&&RV_EDITOR_LEARNED.length?'\n- What MISMO’s editor has corrected before: '+RV_EDITOR_LEARNED.join(' | '):''); }
 
 /* =====================================================================
    The review screens: run a review, read the report, keep every report on
@@ -4764,8 +5044,24 @@ function rvEnsure(t){ const c=rvShard(t); if(rvSubs[c]) return; rvSubs[c]=1; try
 function rvFor(t){ return Object.values(S.reviews).filter(r=>r.ticket===t.id).sort((a,b)=>String(b.at).localeCompare(String(a.at))); }
 async function rvSave(t,rep){ S.reviews[rep.id]=rep; rvEnsure(t); return write(rvShard(t),rep.id,rep); }
 
-const RV_KIND={editor:{title:'Editor and Readiness Review',short:'Editor and Readiness',accept:'.docx,.xlsx,.xlsm',multiple:true,
-    intro:'Add the work product files (Word and Excel). Software checks the boilerplate word for word, copyright, page numbers, Excel setup and more; Claude adds an editor’s read for spelling, grammar, terms, acronyms and MISMO voice. Nothing in your files is changed or stored.'},
+/* ---------- "Was this right?": people mark each note, and the reviews learn from it ---------- */
+S.rvfb=S.rvfb||{}; let rvFbSub=false;
+function rvFbEnsure(){ if(rvFbSub) return; rvFbSub=true; try{ Store.sub('rvfeedback',o=>{ S.rvfb=o||{}; }); }catch(e){} }
+function rvFbId(rep,k){ return (rep.id+'_'+k).replace(/[^A-Za-z0-9_-]/g,'_').slice(0,120); }
+function rvFbCell(rep,k){ const v=(S.rvfb[rvFbId(rep,k)]||{}).verdict||''; return '<span class="rv-fb" data-fbk="'+esc(k)+'"><button type="button" class="rv-fbb'+(v==='right'?' on':'')+'" data-fbv="right" aria-pressed="'+(v==='right')+'" title="This note was right">Yes</button><button type="button" class="rv-fbb no'+(v==='wrong'?' on':'')+'" data-fbv="wrong" aria-pressed="'+(v==='wrong')+'" title="This note was wrong or not useful">No</button></span>'; }
+function rvFbItem(rep,k){ const n=+k.slice(1); const t=k[0]; if(t==='f') return Object.assign({src:'check'},(rep.findings||[])[n]); if(t==='c') return Object.assign({src:'ai',area:'Editorial'},(rep.corrections||[])[n]); if(t==='m') return Object.assign({src:'ai',area:'Editorial'},(rep.recommendations||[])[n]); if(t==='r') return Object.assign({src:'ai',area:'IM'},(rep.rows||[])[n]); return {}; }
+async function rvFbSave(rep,k,verdict){ const id=rvFbId(rep,k), cur=S.rvfb[id]||{}; const it=rvFbItem(rep,k);
+  if(cur.verdict===verdict){ S.rvfb[id]=Object.assign({},cur,{verdict:'',at:new Date().toISOString()}); }
+  else S.rvfb[id]={rep:rep.id,kind:rep.kind,wr:rep.wr,key:k,src:it.src||'',rule:it.rule||'',area:it.area||'',text:rvTrim(it.issue||it.note||'',220),verdict,by:S.me.name||'',at:new Date().toISOString()};
+  await write('rvfeedback',id,S.rvfb[id]); return S.rvfb[id].verdict==='wrong'&&cur.verdict!=='wrong'; }
+/* a software rule that people keep marking wrong drops from Must Fix to Recommended, with a note */
+function rvFbStats(){ const st={}; Object.values(S.rvfb||{}).forEach(f=>{ if(!f||!f.rule||!f.verdict) return; const s=st[f.rule]=st[f.rule]||{right:0,wrong:0}; s[f.verdict]++; }); return st; }
+function rvApplyFeedback(findings){ const st=rvFbStats(); return findings.map(f=>{ const s=st[f.rule]; if(!s||s.wrong<3||s.wrong<=s.right*2) return f; return Object.assign({},f,{sev:f.sev==='fix'?'recommend':f.sev,fb:'People marked this check wrong '+s.wrong+' of '+(s.wrong+s.right)+' times. Check it before acting on it.'}); }); }
+/* notes Claude made that people marked wrong, so it doesn't repeat them */
+function rvFbAvoid(kind){ return Object.values(S.rvfb||{}).filter(f=>f&&f.kind===kind&&f.src==='ai'&&f.verdict==='wrong'&&f.text).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,8).map(f=>f.text+(f.why?' (why: '+f.why+')':'')); }
+
+const RV_KIND={editor:{title:'Editor and Readiness Review',short:'Editor and Readiness',accept:'.docx,.xlsx,.xlsm,.pdf',multiple:true,
+    intro:'Add the work product files (Word, Excel or PDF). Software checks the boilerplate word for word, copyright, page numbers, Excel setup and more; Claude adds an editor’s read for spelling, grammar, terms, acronyms and MISMO voice. Nothing in your files is changed or stored.'},
   im:{title:'IM Pre-Review',short:'IM Pre-Review',accept:'.xlsx,.xlsm',multiple:false,
     intro:'Add the IM/AWG Submission Form (July 2026 version). It checks the Face Page and every Reference Model row the way IM reads them: required columns, class words and definition templates, names, XPATHs and the Proposed Structure tab. Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided. Nothing in the form is changed or stored.'}};
 
@@ -4787,9 +5083,10 @@ function rvRun(t,kind){
       say('Reading '+files.length+' file'+(files.length===1?'':'s')+'…');
       const read=[]; for(const f of files) read.push(await rvReadFile(f));
       const ctx={t,boiler:kind==='editor'?$('#rvbp',box).value:exp,note:kind==='editor'?$('#rvnote',box).value.trim():''};
-      let findings, ai;
+      let findings, ai; rvFbEnsure();
       if(kind==='editor'){ say('Checking boilerplate, copyright, layout and setup…'); findings=rvEditorChecks(read,ctx); ai=await rvAiEditor(read,ctx,m=>say(esc(m))); }
-      else { const x=read[0]; if(x.kind!=='excel') throw new Error('Choose the IM Submission Form (an Excel file).'); say('Checking the Face Page and '+'Reference Model rows…'); const r=rvImChecks(x,ctx); findings=r.out; ctx.formStats={rows:r.P.rows.length}; ai=await rvAiIm(r.P,ctx,m=>say(esc(m))); }
+      else { const x=read[0]; if(x.kind!=='excel') throw new Error('Choose the IM Submission Form (an Excel file).'); say('Loading the current MISMO Reference Model…'); const R=await rmLoad(); say('Checking the Face Page and '+'Reference Model rows'+(R?' against the '+esc(R.label):'')+'…'); const r=rvImChecks(x,ctx); findings=r.out.concat(rvRmChecks(r.P)); ctx.formStats={rows:r.P.rows.length}; ctx.rm=R?R.label:''; ai=await rvAiIm(r.P,ctx,m=>say(esc(m))); }
+      findings=rvApplyFeedback(findings);
       const rep=rvBuildReport(kind,t,read,findings,ai,ctx);
       say('Saving the report…'); await rvSave(t,rep);
       // keep the AI Review stage moving the way it did
@@ -4805,6 +5102,12 @@ function rvShow(rep){
   const root=$('#modal-root');
   root.innerHTML='<div class="modal"><div class="box rv-rep">'+rvReportHtml(rep,false)+'<footer><button class="btn" data-m="cancel" type="button">Close</button><button class="btn" id="rvdl" type="button">Download for Word</button></footer></div></div>';
   const box=$('.modal',root); $('[data-m=cancel]',box).onclick=()=>root.innerHTML=''; $('#rvdl',box).onclick=()=>rvDownload(rep);
+  rvFbEnsure(); box.addEventListener('click',async e=>{ const b=e.target.closest('[data-fbv]'); if(!b) return; e.preventDefault(); if(S.viewAs) return; const k=b.closest('[data-fbk]').dataset.fbk; const askWhy=await rvFbSave(rep,k,b.dataset.fbv); const cell=b.closest('.rv-fbc'), tr=b.closest('tr'); if(cell) cell.innerHTML=rvFbCell(rep,k);
+    const old=tr&&tr.nextElementSibling&&tr.nextElementSibling.classList.contains('rv-why')?tr.nextElementSibling:null; if(old) old.remove();
+    if(askWhy&&tr){ const n=tr.children.length; tr.insertAdjacentHTML('afterend','<tr class="rv-why"><td colspan="'+n+'"><label>What was wrong? <span class="muted">(optional, helps the review learn)</span><span class="rv-whyrow"><input type="text" maxlength="300" placeholder="For example: the copyright is in a text box in the footer"><button type="button" class="btn sm">Save</button></span></label></td></tr>');
+      const w=tr.nextElementSibling, inp=$('input',w); inp.focus(); const done=async()=>{ const id=rvFbId(rep,k); if(inp.value.trim()&&S.rvfb[id]){ S.rvfb[id]=Object.assign({},S.rvfb[id],{why:inp.value.trim().slice(0,300)}); await write('rvfeedback',id,S.rvfb[id]); } w.remove(); toast('Thanks. The review learns from this.'); };
+      $('button',w).onclick=done; inp.onkeydown=ev=>{ if(ev.key==='Enter'){ ev.preventDefault(); done(); } }; }
+    else toast('Thanks. The review learns from this.'); });
   box.addEventListener('click',e=>{ if(e.target===box) root.innerHTML=''; });
 }
 aiReview=function(t){ rvRun(t,'editor'); };
