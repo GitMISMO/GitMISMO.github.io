@@ -5510,7 +5510,7 @@ if(_counts_im){ counts=function(){ _counts_im(); try{ imEnsureQ(); imCount(); }c
    (queue + rev-<report>), reads back what IM decided (ticket history, the
    decided rows) and learns from the portal's learn-<year> and backtest. */
 const IMR_URL='https://resources.mismo.org/im-review/', IMR='im-review';
-const imrSafe=x=>String(x).replace(/[^A-Za-z0-9_-]/g,'_').slice(0,80);
+const imrSafe=x=>String(x).toLowerCase().replace(/[^a-z0-9-]/g,'-').slice(0,80);
 async function imrPut(name,content,sha){ const tok=window.ResourcesSession&&ResourcesSession.token(); if(!RELAY()||!tok) throw new Error('signed out'); return fetch(RELAY()+'/'+IMR+'/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content,sha:sha||undefined})}); }
 async function imrUpdate(name,fn){ for(let i=0;i<5;i++){ const g=await rGet(IMR,name); const next=fn(g&&g.data?JSON.parse(JSON.stringify(g.data)):null); const r=await imrPut(name,next,g&&g.sha); if(r.ok) return next; if(r.status===403||r.status===401) throw new Error('no access'); await new Promise(x=>setTimeout(x,300+i*400)); } throw new Error('busy'); }
 async function imPush(rep){ const q=S.imq[rep], doc=S.imr[rep]; if(!q||!doc) return false; const t=S.tickets[q.ticket]||{}; const fac=personByName(t.facilitator)||{};
@@ -5537,7 +5537,7 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
     for(const x of Object.values(S.imq||{})) if(x.status==='awaiting'&&!x.pushed){ imEnsureR(x.ticket); if(S.imr[x.rep]) await imPush(x.rep); }
     // decided in the portal: bring the decisions home
     const items=(q&&q.data&&q.data.items)||{};
-    for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
+    for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist||it.test) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
       const d=await rGet(IMR,'rev-'+imrSafe(it.rep)); if(!d||!d.data) continue; const doc=d.data; S.imr[it.rep]=doc; await write(imColl(doc.ticket),it.rep,doc);
       const nq=Object.assign({},mine||{},{rep:it.rep,ticket:doc.ticket,wr:doc.wr,name:doc.name,status:'decided',decidedBy:it.decidedBy,decidedAt:it.decidedAt,agree:it.agree,counts:it.counts,pushed:true}); S.imq[it.rep]=nq; await write('imqueue',it.rep,nq);
       const t=S.tickets[doc.ticket]; if(t){ const sum=Object.entries(it.counts||imTally(doc.rows||[])).map(([k,n])=>n+' '+k.toLowerCase()).join(', '); const x=clone(t); hist(x,'IM decision ('+(doc.rows||[]).length+' rows): '+sum+'. Reviewed by '+(it.decidedBy||'IM')+' in IM Review.'); await saveTicket(x,'IM decision brought in'); } }
