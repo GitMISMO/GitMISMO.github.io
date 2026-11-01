@@ -1439,6 +1439,15 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 :root[data-theme="dark"] .wh-fi{color:var(--sky)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .wh-fi{color:var(--sky)}}
 :root[data-theme="dark"] .wh-tabs button[aria-selected="true"] b{background:var(--surface-3);color:var(--ink)}
+.wh-join{margin-left:auto;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#fff;color:var(--navy);flex:0 0 auto}
+.wh-join:hover{background:var(--sky)}
+.wh-join svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linejoin:round}
+.wh .track{flex-wrap:wrap;overflow:visible;row-gap:10px}
+.wh .track>*{flex:1 0 76px}
+@media (max-width:900px){.wh-tabs button span{display:inline}}
+@media (max-width:600px){.wh-tabs button span{display:none}.wh-tabs button[aria-selected="true"] span{display:inline}}
+.wh .track{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:10px 3px}
+.wh .track .tst{min-width:0}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4039,7 +4048,7 @@ async function loadMtLite(){
     if(B){ const gks=B.groups.map(x=>MT_KEY(x[0])); B.groups.forEach((x,i)=>{ groups[gks[i]]={name:x[0],archived:!!x[2],facilitator:x[3]||''}; }); Object.assign(sched,B.sched||{}); }
     const sd=await rGet('meeting-trackers','sched'); Object.entries(((sd&&sd.data.docs['sched/all'])||{}).items||{}).forEach(([k,v])=>{ sched[k]=v.removed?{removed:true}:Object.assign({},sched[k]||{},v); });
     const gd=await rGet('meeting-trackers','groups'); Object.entries(((gd&&gd.data.docs['groups/all'])||{}).items||{}).forEach(([k,v])=>{ groups[k]=Object.assign({},groups[k]||{},v); });
-    const G={}; Object.entries(sched).forEach(([k,v])=>{ const g=groups[k]||{}; G[k]={name:g.name||v.sheetName||k,rule:v.rule,st:v.st||v.start||'',en:v.en||'',off:!!(v.removed||g.hold||g.archived)}; });
+    const G={}; Object.entries(sched).forEach(([k,v])=>{ const g=groups[k]||{}; G[k]={key:k,name:g.name||v.sheetName||k,rule:v.rule,st:v.st||v.start||'',en:v.en||'',time:v.time||'',zoom:v.zoom||'',off:!!(v.removed||g.hold||g.archived||/inactive|paused|hold/i.test(v.status||''))}; });
     mtLite=G; mtLiteAt=Date.now();
   }catch(e){ mtLite=mtLite||{}; }
   mtLoading=false; if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel();
@@ -4048,8 +4057,8 @@ function etYmd(off){ const n=new Date(Date.now()+(off||0)*864e5); return new Int
 function meetsOnRule(rule,ymd){ if(!rule) return false; const d=new Date(ymd+'T12:00:00Z'); if(rule.dow!==d.getUTCDay()) return false; if(rule.weeks==='*') return true; return (rule.weeks||[]).includes(Math.floor((d.getUTCDate()-1)/7)+1); }
 function nextMeeting(t){
   if(!mtLite||!t.workgroup) return null; const k=gnorm(t.workgroup); if(!k) return null;
-  const g=Object.values(mtLite).find(x=>!x.off&&x.rule&&gnorm(x.name)===k); if(!g) return null;
-  for(let i=0;i<75;i++){ const d=etYmd(i); if(meetsOnRule(g.rule,d)) return {date:d,name:g.name,st:g.st,en:g.en}; }
+  const mk=MT_KEY(t.workgroup); const g=Object.values(mtLite).find(x=>!x.off&&x.rule&&(x.key===mk||gnorm(x.name)===k||gnorm(x.key)===k)); if(!g) return null;
+  for(let i=0;i<75;i++){ const d=etYmd(i); if(meetsOnRule(g.rule,d)) return {date:d,name:/^[a-z0-9]+$/.test(g.name)?t.workgroup:g.name,st:g.st,en:g.en,time:g.time,zoom:g.zoom}; }
   return null;
 }
 function hm(s){ const m=String(s||'').match(/^(\d{1,2}):(\d{2})/); if(!m) return ''; let h=+m[1]; const ap=h>=12?'PM':'AM'; h=h%12||12; return h+(m[2]!=='00'?':'+m[2]:'')+' '+ap; }
@@ -4152,7 +4161,8 @@ function wrHub(P,t){
   const track=$('.track',ph), prev=$('.prevfac',ph);
   const chips=[...$$('.row1 .chip',ph)].map(c=>c.outerHTML).join('');
   const mt=nextMeeting(t);
-  const meet=mt?dateTile(mt.date,mt.name.replace(/\s*\(.*?\)\s*/g,' ').trim(),esc(relDays(mt.date))+(mt.st&&mt.en?' · '+esc(hm(mt.st).replace(/ (AM|PM)$/,m=>hm(mt.en).endsWith(m)?'':m))+'–'+esc(hm(mt.en))+' ET':mt.en?' · ends '+esc(hm(mt.en))+' ET':''),'meet','<span class="wh-dk">'+whIc('vid')+'Workgroup Meeting</span>'):'';
+  const tm=mt?(mt.time?mt.time.replace(/(\d)(AM|PM)/,'$1 $2'):(mt.st&&mt.en?hm(mt.st).replace(/ (AM|PM)$/,m=>hm(mt.en).endsWith(m)?'':m)+'–'+hm(mt.en):'')):'';
+  const meet=mt?dateTile(mt.date,mt.name.replace(/\s*\(.*?\)\s*/g,' ').trim(),esc(relDays(mt.date))+(tm?' · '+esc(tm)+' ET':''),'meet','<span class="wh-dk">Next Meeting</span>'+(mt.zoom&&/^https:\/\/[a-z0-9.-]*zoom\.us\//i.test(mt.zoom)?'<a class="wh-join" href="'+esc(mt.zoom)+'" target="_blank" rel="noopener" title="Join on Zoom" aria-label="Join on Zoom">'+whIc('vid')+'</a>':'')):'';
   const kd=keyDate(t);
   // tabs and what goes in them
   const secs={}; $$('.pgrid > .psec',pb).forEach(s=>{ const id=s.dataset.sec||(/^Comments Received/.test(($('h4',s)||{}).textContent||'')?'cmts':/^Current Leadership/.test(($('h4',s)||{}).textContent||'')?'lead':'over'); (secs[id]=secs[id]||[]).push(s); });
