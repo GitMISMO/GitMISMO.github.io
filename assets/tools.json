@@ -51,6 +51,14 @@
       "path": "/mms/"
     },
     {
+      "key": "im-review",
+      "label": "IM Review",
+      "menu": "IM Review (Information Management)",
+      "colour": "#2477B8",
+      "group": "Standards & Tools",
+      "path": "/im-review/"
+    },
+    {
       "key": "qr",
       "label": "QR Code Manager",
       "colour": "#2477B8",
