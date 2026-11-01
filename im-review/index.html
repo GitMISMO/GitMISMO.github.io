@@ -555,6 +555,31 @@ body.railmini .hq nav button .nb{display:none}
 .nw{white-space:nowrap}
 .resub{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
 .rs-why{flex-basis:100%;font-size:12.5px;color:var(--ink-3)}
+
+/* the IM call and roster */
+.card.imcall{padding:12px 16px}
+.ic-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ic-h h3{margin:0}
+.ic-h select.inp.sel{min-width:0;width:auto}
+.q{font-size:12px;font-weight:700;padding:2px 8px;border-radius:4px;white-space:nowrap}
+.q.ok{background:var(--good-bg);color:var(--good)}.q.no{background:var(--warn-bg);color:var(--warn)}
+.ic-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:5px;margin-top:10px}
+.ic-m{display:flex;align-items:center;gap:9px;padding:6px 9px;border:1px solid var(--rule);border-radius:5px;background:var(--surface-2);cursor:pointer;font-size:13px;min-width:0}
+.ic-m.on{border-color:var(--good);background:var(--surface)}
+.ic-m input{width:16px;height:16px;accent-color:var(--good);flex:0 0 auto}
+.ic-m span{display:flex;flex-direction:column;min-width:0}.ic-m b{font-weight:600;white-space:nowrap}.ic-m em{font-style:normal;font-size:11.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ros{display:grid;gap:6px}
+.ros-r{display:grid;grid-template-columns:1.2fr 1fr 1fr auto;gap:6px}
+.ros-r .inp,.ros-l .inp{min-width:0;width:100%}
+.ros-l{display:grid;grid-template-columns:110px 1fr;align-items:center;gap:8px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.calls{display:grid;gap:4px}
+.call-r{display:flex;align-items:center;gap:10px;padding:7px 10px;border:1px solid var(--rule);border-radius:5px;font-size:13px}
+.call-r.past{opacity:.6}
+.card .racts .inp{min-width:0;flex:1}
+@media(max-width:560px){.ros-r{grid-template-columns:1fr 1fr}.ros-r .inp:first-child{grid-column:1/-1}}
+
+.nw{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
+@media(max-width:560px){.q{white-space:normal}}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -599,6 +624,9 @@ body.railmini .hq nav button .nb{display:none}
     <button type="button" data-hq="draft" title="How the Draft Is Doing">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>
       <span>How the Draft Is Doing</span></button>
+    <button type="button" data-hq="setup" title="Roster and Calls">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0111 0"/><path d="M16 4.5a3 3 0 010 6M17.5 14a5 5 0 013.5 5"/></svg>
+      <span>Roster and Calls</span></button>
     <button type="button" data-hq="help" title="Help">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 015 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17.2v.1"/></svg>
       <span>Help</span></button>
@@ -687,6 +715,7 @@ async function load(role){
   S.up=(up&&up.data&&up.data.items)||[]; S.upAt=(up&&up.data&&up.data.asOf)||"";
   S.queue=(q.data&&q.data.items)||{}; S.cfg=Object.assign({imauto:{}},cfg.data||{}); S.bt=bt.data||null;
   S.learn=Object.assign({},(l0.data&&l0.data.rows)||{},(l1.data&&l1.data.rows)||{});
+  try{ const a=await get("attendance"); S.att=a.data||{}; }catch(e){ S.att={}; }
   S.loaded=true; render();
 }
 async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=g.data; return S.docs[rep]||null; }
@@ -697,7 +726,7 @@ async function saveDoc(doc){
   S.docs[doc.rep]=doc;
   const merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv) return doc; const out=clone(srv);
     (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; const a=r.final, b=o.final; if(r._undo&&!b) {} if(a&&(!b||String(a.at)>=String(b.at))) o.final=a; else if(!a&&b&&r._undoAt&&String(r._undoAt)>String(b.at)) delete o.final; });
-    if(doc.final) out.final=doc.final;
+    if(doc.final) out.final=doc.final; if(doc.call) out.call=doc.call;
     if(doc.status==="decided"){ out.status="decided"; out.decidedBy=doc.decidedBy; out.decidedAt=doc.decidedAt; }
     return out; });
   merged.rows.forEach(r=>{ delete r._undoAt; }); S.docs[doc.rep]=merged; queueProgress(merged); return merged;
@@ -714,7 +743,7 @@ function shell(body){ const r=route(), w=Object.values(S.queue).filter(q=>q.stat
 window.__imrSearch=function(){ const out=[]; const go=h=>()=>{ location.hash=h; };
   Object.values(S.queue).forEach(q=>out.push({group:q.status==="decided"?"Decided":"Waiting for IM",name:(q.wr||"")+" "+(q.name||""),where:q.status==="decided"?"Decided "+fmtS(q.decidedAt)+(q.decidedBy?" by "+q.decidedBy:""):(q.look||0)+" to look at · "+(q.rows||0)+" rows",go:go("#/review/"+encodeURIComponent(q.rep))}));
   const r=route(), d=r.view==="review"&&S.docs[r.rep]; if(d) (d.rows||[]).forEach(x=>out.push({group:"Rows in This Submission",name:"Item "+x.item+" · "+(x.name||""),where:[x.ct,x.tt,x.final?"decided: "+x.final.dec:"draft: "+x.draft.dec].filter(Boolean).join(" · "),go:()=>{ S.filter="all"; render(); setTimeout(()=>{ const el=document.querySelector('[data-row="'+x.i+'"]'); if(el){ el.scrollIntoView({block:"center"}); el.style.outline="2px solid var(--sky)"; setTimeout(()=>el.style.outline="",1600); } },60); }}));
-  [["Waiting for IM","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
+  [["Waiting for IM","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Roster and Calls","#/setup"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
   return out; };
 function render(){ if(!S.loaded) return; const r=route();
   if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d) return shell(desk(d)); shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(route().rep===r.rep) shell(x?desk(x):'<div class="empty">That submission isn’t here. It may have been withdrawn.</div>'); }); return; }
@@ -722,6 +751,7 @@ function render(){ if(!S.loaded) return; const r=route();
   if(r.view==="trends") return shell(trendsView());
   if(r.view==="draft") return shell(draftView());
   if(r.view==="help") return shell(helpView());
+  if(r.view==="setup") return shell(setupView());
   shell(home()); }
 
 function subCard(q){ const n=q.rows||0, look=q.look||0, done=q.status==="decided";
@@ -849,7 +879,7 @@ function desk(doc){ if(doc.hist) return histDesk(doc);
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: agree, change rows, finish. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
     (decided?'<div class="card" style="border-left:4px solid var(--good)"><b>Decided '+esc(fmtD(doc.decidedAt))+' by '+esc(doc.decidedBy||"")+'.</b> <span class="muted">'+Object.entries(tally(R)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span></div>':'')+
     (!canReview()&&!decided?'<div class="card">You can follow this review here. IM reviewers make the decisions.</div>':'')+
-    earlierHtml(doc)+(!R.length?docOnlyHtml(doc,can):plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):'')+
+    earlierHtml(doc)+callCard(doc,can)+(!R.length?docOnlyHtml(doc,can):plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):'')+
     '<div class="foot"><span>'+(decided?"Decided "+esc(fmtD(doc.decidedAt)):(R.length-done)?(R.length-done)+" row"+(R.length-done===1?"":"s")+" still to decide":"Every row is decided")+'</span><span class="sp"></span><button class="btn" data-xl="1">Download for Excel</button>'+(can?'<button class="btn pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':'')+'</div>');
 }
 /* the work request's documents: each opens the file itself in a new tab (PDF in the browser, Word and Excel in Office online) */
@@ -887,6 +917,7 @@ function rowHtml(r,can){ const f=r.final, ed=S.edit===r.i&&can, lk=isLook(r);
 
 async function finish(doc){
   const by=S.me.name||S.me.email||"", at=new Date().toISOString(); doc.status="decided"; doc.decidedBy=by; doc.decidedAt=at;
+  if(doc.call){ const V=imVoters(), here=V.filter(m=>(doc.call.present||[]).includes(m.name)); doc.call=Object.assign({},doc.call,{need:imNeed(),seats:V.length,quorum:here.length>=imNeed(),by,at}); try{ S.att=await update("attendance",cur=>{ const o=cur||{}; o[doc.call.date]={present:doc.call.present||[],others:doc.call.others||[],by,at}; return o; }); }catch(e){} }
   const R=doc.rows||[], agreed=R.filter(r=>r.final&&r.final.agreed).length, c=R.length?tally(R):(doc.final?{[doc.final.dec]:1}:{});
   await saveDoc(doc);
   const yr=new Date().getFullYear(), recs={};
@@ -990,6 +1021,35 @@ function helpView(){ const step=(n,t,d)=>'<li><b>'+t+'</b> '+d+'</li>';
     '<div class="g2" style="margin-top:18px"><div class="card"><h3>Trends and the Draft</h3><ul><li><b>Trends</b> shows what IM has decided each year since 2020, read from the submission forms in the IM library: decisions, rows, days to approval, resubmissions and the reasons IM changes rows.</li><li><b>How the Draft Is Doing</b> shows how often IM agreed with each kind of draft, in history and here. MISMO staff can let a kind of row arrive already approved once IM has agreed with it 95% of the time over 30 or more rows.</li></ul></div>'+
     '<div class="card"><h3>Who Can Do What</h3><ul><li>IM reviewers make the decisions. They are set in the MMS under Settings › People and Roles › IM Reviewer.</li><li>Facilitators and MISMO staff can open every submission and follow along, but not decide.</li><li>Access to this page is granted in People &amp; Access.</li><li>Shortcuts: <b>\\</b> narrows the menu; <b>Ctrl+K</b> (or ⌘K) searches.</li></ul></div></div></div>'; }
 
+
+/* ---------- the IM call: who was there and quorum (Vote Tabulate on the form) ---------- */
+const IM_ROSTER0={chair:"Colleen Flaxington (Freddie Mac)",vice:"Becky Griswold (PhoenixTeam)",fac:"Erin Bittenbender",members:[
+  {cop:"API CoP",name:"Michael McCarthy",org:"Guidehouse"},{cop:"Artificial Intelligence CoP",name:"Angela Sella",org:"MGIC"},{cop:"Business Glossary CoP",name:"Kristie Flores",org:"Raineri Solutions"},{cop:"Business Process Model CoP",name:"Kenny Chenault",org:"PrimeLending"},
+  {cop:"Credit Reporting CoP",name:"Ron Carlson",org:"Certified Credit"},{cop:"Data Governance and Management CoP",name:"Howard Ellison",org:"UWM"},{cop:"Decision Modeling CoP",name:"Karen Baldwin",org:"Actualize Consulting"},{cop:"Digital Interoperability CoP",name:"Sandeep Gupta",org:"First American"},
+  {cop:"eMortgage CoP",name:"Tim Cooper",org:"Falcon Capital Advisors"},{cop:"Mortgage Insurance (MI) CoP",name:"Sherry Gajeski",org:"Radian"},{cop:"Origination CoP",name:"Sandra Griebe-Martz",org:""},{cop:"Property & Valuation Services CoP",name:"Justin Greer",org:"Fannie Mae"},
+  {cop:"Secondary CoP",name:"Joe Fernandes",org:"Wells Fargo"},{cop:"Servicing CoP",name:"Jay Arneja",org:"nCino"},{cop:"Title & Closing CoP",name:"Christopher Vos",org:"Independent"}],vacant:["TIE CoP","HERO CoP"]};
+const IM_CALLS0=["2026-11-02","2026-11-09","2026-11-16","2026-11-23"];
+const DAYN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const fmtL=s=>{ const d=new Date(String(s).slice(0,10)+"T12:00:00"); return isNaN(d)?"":DAYN[d.getDay()]+", "+MON[d.getMonth()]+" "+d.getDate(); };
+const todayS=()=>new Date().toISOString().slice(0,10);
+const imRoster=()=>S.cfg.roster||IM_ROSTER0, imVoters=()=>(imRoster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name)), imNeed=()=>Math.floor(imVoters().length/2)+1;
+/* the next IM calls: the dates kept on Roster and Calls, then every Monday */
+function imCalls(n){ const L=(S.cfg.calls||IM_CALLS0).filter(d=>d>=todayS()).sort(); let last=L[L.length-1]||(S.cfg.calls||IM_CALLS0).slice(-1)[0]||todayS(); while(L.length<n){ const d=new Date(last+"T12:00:00"); d.setDate(d.getDate()+7); last=d.toISOString().slice(0,10); if(last>=todayS()) L.push(last); } return L.slice(0,n); }
+function callCard(doc,can){ if(doc.hist) return ''; const decided=doc.status==="decided"; const c=doc.call||(doc.call={date:imCalls(1)[0],present:[],others:[]});
+  if(!(c.present||[]).length&&!decided){ const a=(S.att||{})[c.date]; if(a){ c.present=(a.present||[]).slice(); c.others=(a.others||[]).slice(); } }
+  const V=imVoters(), here=V.filter(m=>(c.present||[]).includes(m.name)), q=here.length>=imNeed(), open=S.callOpen===doc.rep, ed=can&&!decided;
+  const dates=[...new Set([c.date].concat(imCalls(4)))].filter(Boolean).sort();
+  return '<div class="card imcall"><div class="ic-h"><h3>The IM Call</h3>'+(ed?'<select class="inp sel" data-icdate="1" aria-label="Call date">'+dates.map(d=>'<option value="'+d+'"'+(d===c.date?' selected':'')+'>'+esc(fmtL(d))+'</option>').join('')+'</select>':'<b>'+esc(fmtL(c.date))+'</b>')+
+    '<span class="q '+(q?'ok':'no')+'">'+here.length+' of '+V.length+' voting members · '+imNeed()+' needed · '+(q?'Quorum ✓':'No quorum yet')+'</span><span class="sp"></span>'+(ed?'<button type="button" class="btn sm ghost" data-icall="1">Everyone Was There</button>':'')+'<button type="button" class="btn sm" data-icopen="1">'+(open?'Hide Attendance':'Attendance')+'</button></div>'+
+    (open?'<div class="ic-list">'+V.map(m=>{ const on=(c.present||[]).includes(m.name); return '<label class="ic-m'+(on?' on':'')+'"><input type="checkbox" data-icp="'+esc(m.name)+'"'+(on?' checked':'')+(ed?'':' disabled')+'><span><b>'+esc(m.name)+'</b><em>'+esc(m.cop)+(m.org?' · '+esc(m.org):'')+'</em></span></label>'; }).join('')+
+      [["chair",imRoster().chair+" · Chair"],["vice",imRoster().vice+" · Vice Chair"],["fac",imRoster().fac+" · Facilitator"]].filter(x=>x[1]&&!/^undefined/.test(x[1])).map(([k,l])=>{ const nm=l.split(" · ")[0], on=(c.others||[]).includes(nm); return '<label class="ic-m sm'+(on?' on':'')+'"><input type="checkbox" data-ico="'+esc(nm)+'"'+(on?' checked':'')+(ed?'':' disabled')+'><span><b>'+esc(nm)+'</b><em>'+esc(l.split(" · ")[1])+'</em></span></label>'; }).join('')+'</div><p class="note">Attendance is shared: tick it once and every other submission on the same call starts with it.</p>':'')+'</div>'; }
+function setupView(){ const R=imRoster(), ed=isAdmin()||S.role==="staff", dis=ed?'':' disabled', C=(S.cfg.calls||IM_CALLS0).slice().sort();
+  return '<div class="head"><div><h1>Roster and Calls</h1><div class="sub">IM’s voting members (one per Community of Practice), the chair, vice chair and facilitator, and the IM call dates. Quorum is a majority of the assigned voting members. '+(ed?'Changes save for everyone.':'MISMO staff keep this current.')+'</div></div></div>'+
+    '<div class="g2"><div class="card"><h3>Voting Members<small>'+imVoters().length+' assigned · '+imNeed()+' needed for quorum</small></h3><div class="ros">'+(R.members||[]).map((m,i)=>'<div class="ros-r"><input class="inp" data-ros="'+i+'|cop" value="'+esc(m.cop)+'" aria-label="Community of Practice"'+dis+'><input class="inp" data-ros="'+i+'|name" value="'+esc(m.name)+'" aria-label="Name"'+dis+'><input class="inp" data-ros="'+i+'|org" value="'+esc(m.org||"")+'" aria-label="Company"'+dis+'>'+(ed?'<button type="button" class="btn sm ghost" data-rosdel="'+i+'" aria-label="Remove">×</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><button type="button" class="btn sm" data-rosadd="1">Add a Voting Member</button><button type="button" class="btn sm pri" data-rossave="1">Save the Roster</button></div>':'')+
+      '<h3 style="margin-top:16px">Chair, Vice Chair and Facilitator</h3><div class="ros">'+[["chair","Chair"],["vice","Vice Chair"],["fac","Facilitator"]].map(([k,l])=>'<label class="ros-l">'+l+'<input class="inp" data-rk="'+k+'" value="'+esc(R[k]||"")+'"'+dis+'></label>').join("")+'</div>'+(R.vacant&&R.vacant.length?'<p class="note">Vacant seats: '+esc(R.vacant.join(", "))+'.</p>':'')+'</div>'+
+    '<div class="card"><h3>IM Calls<small>Mondays, 2:00–3:00 pm ET</small></h3><div class="calls">'+C.map(d=>'<div class="call-r'+(d<todayS()?' past':'')+'"><b>'+esc(fmtL(d))+'</b><span class="muted">'+(d<todayS()?'held':d===todayS()?'today':'')+'</span><span class="sp"></span>'+(ed?'<button type="button" class="btn sm ghost" data-calldel="'+d+'">Remove</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><input type="date" class="inp" id="calladd"><button type="button" class="btn sm pri" data-calladd="1">Add a Call</button></div>':'')+'<p class="note">After the last date here, IM Review assumes every Monday.</p></div></div>'; }
+async function saveCfg(fn,msg){ try{ const o=await update("config",cur=>fn(cur||{})); S.cfg=o; toast(msg||"Saved"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); }
+
 /* ---------- wiring ---------- */
 let tt; function toast(m){ let t=$(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; document.body.appendChild(t); } t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,3200); }
 function keep(fn){ const y=window.scrollY; return async(...a)=>{ await fn(...a); window.scrollTo(0,y); }; }
@@ -1008,6 +1068,13 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-months]",m).forEach(b=>b.onclick=()=>{ S.homeMonths=+b.dataset.months; seenView.waiting=1; render(); });
   $$("[data-upall]",m).forEach(b=>b.onclick=()=>{ S.upAll=!S.upAll; seenView.waiting=1; render(); });
   $$("[data-docsall]",m).forEach(b=>b.onclick=()=>{ S.docsAll=S.docsAll===b.dataset.docsall?"":b.dataset.docsall; render(); });
+  const R0=()=>clone(imRoster());
+  $$("[data-rossave]",m).forEach(b=>b.onclick=()=>{ const r=R0(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); $$("[data-rk]",m).forEach(inp=>r[inp.dataset.rk]=inp.value.trim()); r.members=r.members.filter(x=>x.cop||x.name); saveCfg(c=>Object.assign(c,{roster:r}),"Roster saved"); });
+  $$("[data-rosadd]",m).forEach(b=>b.onclick=()=>{ const r=R0(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); r.members.push({cop:"",name:"",org:""}); S.cfg.roster=r; render(); });
+  $$("[data-rosdel]",m).forEach(b=>b.onclick=()=>{ const r=R0(); r.members.splice(+b.dataset.rosdel,1); saveCfg(c=>Object.assign(c,{roster:r}),"Removed"); });
+  $$("[data-calldel]",m).forEach(b=>b.onclick=()=>saveCfg(c=>Object.assign(c,{calls:(c.calls||IM_CALLS0).filter(d=>d!==b.dataset.calldel)}),"Call removed"));
+  $$("[data-calladd]",m).forEach(b=>b.onclick=()=>{ const d=($("#calladd",m)||{}).value; if(!d) return toast("Pick a date first"); saveCfg(c=>Object.assign(c,{calls:[...new Set((c.calls||IM_CALLS0).concat([d]))].sort()}),"Call added"); });
+  $$("[data-icopen]",m).forEach(b=>b.onclick=keep(async()=>{ const rp=route().rep; S.callOpen=S.callOpen===rp?"":rp; render(); }));
   const pgState=key=>{ if(key==="dec") return S.dec; const k=key.slice(5); return S.rowPg[k]||(S.rowPg[k]={page:0,size:10}); };
   $$("[data-pg]",m).forEach(b=>b.onclick=()=>{ const i=b.dataset.pg.lastIndexOf("|"), key=b.dataset.pg.slice(0,i); pgState(key).page=+b.dataset.pg.slice(i+1); S.focus=-1; render(); const t=$(".dtools",$("#main"))||$("#main"); t.scrollIntoView({block:"start",behavior:"smooth"}); });
   $$("[data-pgsize]",m).forEach(sel=>sel.onchange=()=>{ const st=pgState(sel.dataset.pgsize); st.size=+sel.value; st.page=0; render(); });
@@ -1032,6 +1099,11 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
     toast("Agreed with "+n+" row"+(n===1?"":"s")); render(); save(); });
   $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ if(!confirm("Finish the IM review of "+doc.wr+"? The facilitator gets the decisions.")) return; b.disabled=true; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } celebrate(); render(); });
   $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
+  const cc=doc.call; let ccT; const ccSave=()=>{ clearTimeout(ccT); ccT=setTimeout(()=>saveDoc(doc).catch(()=>{}),1000); };
+  $$("[data-icdate]",m).forEach(el=>el.onchange=()=>{ cc.date=el.value; cc.present=[]; cc.others=[]; render(); ccSave(); });
+  $$("[data-icp]",m).forEach(el=>el.onchange=keep(async()=>{ const n=el.dataset.icp; cc.present=(cc.present||[]).filter(x=>x!==n); if(el.checked) cc.present.push(n); render(); ccSave(); }));
+  $$("[data-ico]",m).forEach(el=>el.onchange=keep(async()=>{ const n=el.dataset.ico; cc.others=(cc.others||[]).filter(x=>x!==n); if(el.checked) cc.others.push(n); render(); ccSave(); }));
+  $$("[data-icall]",m).forEach(b=>b.onclick=keep(async()=>{ cc.present=imVoters().map(x=>x.name); S.callOpen=doc.rep; render(); ccSave(); }));
   $$("[data-dfinish]",m).forEach(b=>b.onclick=async()=>{ const box=b.closest(".edit"); const dec=$("[name=ddec]",box).value, com=$("[name=dcom]",box).value.trim(); if(!confirm("Finish the IM review of "+doc.wr+": "+dec+"? The facilitator gets the decision.")) return; b.disabled=true; doc.final={dec,com,by:S.me.name||S.me.email,at:new Date().toISOString()}; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } celebrate(); render(); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
