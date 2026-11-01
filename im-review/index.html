@@ -545,6 +545,12 @@ body.railmini .hq nav button .nb{display:none}
 .dl-n b{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .dl-n em{font-style:normal;font-size:11.5px;color:var(--ink-3)}
 .dl-go{color:var(--ink-3);font-size:13px}
+
+.resub{margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
+.wc-doc,.wc-rs{display:block;font-size:12.5px;color:var(--ink-2);margin:6px 0 2px}
+.wc-rs{color:var(--c1);font-weight:600}
+.card.doconly .edit{margin-top:12px}
+.card.earlier .subs{margin-top:4px}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -683,6 +689,7 @@ async function saveDoc(doc){
   S.docs[doc.rep]=doc;
   const merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv) return doc; const out=clone(srv);
     (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; const a=r.final, b=o.final; if(r._undo&&!b) {} if(a&&(!b||String(a.at)>=String(b.at))) o.final=a; else if(!a&&b&&r._undoAt&&String(r._undoAt)>String(b.at)) delete o.final; });
+    if(doc.final) out.final=doc.final;
     if(doc.status==="decided"){ out.status="decided"; out.decidedBy=doc.decidedBy; out.decidedAt=doc.decidedAt; }
     return out; });
   merged.rows.forEach(r=>{ delete r._undoAt; }); S.docs[doc.rep]=merged; queueProgress(merged); return merged;
@@ -723,7 +730,7 @@ function ring(parts,center,sub){ const tot=parts.reduce((s,p)=>s+p.v,0), R=56, C
 function waitCard(q,i){ const n=q.rows||0, look=q.look||0, done=q.done||0, age=Math.floor((Date.now()-new Date(q.sentAt||q.at||Date.now()))/864e5), heat=age>=14?"hot":age>=7?"warm":"";
   const mins=Math.max(5,Math.round(look*1.2+(n-look)*0.05)); const dc=q.draftCounts||{};
   return '<a class="wc rise '+heat+'" style="--i:'+i+'" href="#/review/'+encodeURIComponent(q.rep)+'"><span class="wc-top"><span class="wr">'+esc(q.wr||"")+(q.wg?" · "+esc(q.wg):"")+'</span><span class="wc-age" title="Sent '+esc(fmtD(q.sentAt))+'">'+(age<=0?"Sent today":"Waiting "+ago(q.sentAt))+'</span></span><b class="wc-n">'+esc(q.name||"")+'</b>'+
-    '<span class="wc-nums"><span><b data-count="'+look+'">'+look+'</b><em>need a look</em></span><span><b data-count="'+(n-look)+'">'+(n-look)+'</b><em>clean</em></span><span><b>~'+mins+'</b><em>minutes</em></span></span>'+
+    (n?'<span class="wc-nums"><span><b data-count="'+look+'">'+look+'</b><em>need a look</em></span><span><b data-count="'+(n-look)+'">'+(n-look)+'</b><em>clean</em></span><span><b>~'+mins+'</b><em>minutes</em></span></span>':'<span class="wc-doc">'+esc(q.category||'Documentation submission')+' · '+((q.docs||[]).length+(q.form?1:0))+' documents to read</span>')+(q.resub?'<span class="wc-rs">Resubmission'+(q.prior?' · IM decided it before on '+esc(fmtS(q.prior)):'')+'</span>':'')+
     (Object.keys(dc).length?'<span class="wc-mix" title="What the draft suggests">'+DEC.filter(d=>dc[d]).map(d=>'<i style="flex:'+dc[d]+';background:'+DCOL[d]+'" title="'+esc(dc[d]+" "+d)+'"></i>').join("")+'</span>':'')+
     '<span class="wc-prog"><i style="--w:'+pct(done,n)+'%"></i></span><span class="wc-f">'+(done?done+' of '+n+' decided'+(q.lastBy?' · '+esc(first(q.lastBy))+' '+esc(ago(q.lastAt))+' ago':''):'Not started')+(q.fac&&q.fac.name?' · Facilitator '+esc(q.fac.name):'')+'<span class="wc-go">'+(done?'Resume':'Start')+' ›</span></span></a>'; }
 const daysTo=d=>Math.round((new Date(d+"T12:00:00")-new Date(new Date().toISOString().slice(0,10)+"T12:00:00"))/864e5);
@@ -828,14 +835,14 @@ function desk(doc){ if(doc.hist) return histDesk(doc);
   const nChg=R.filter(r=>r.final&&!r.final.agreed).length;
   const tools='<div class="dtools"><div class="seg" role="tablist">'+[["look","Needs a Look",looks.length],["clean","Clean",clean.length],["all","All Rows",R.length]].concat(nChg?[["changed","Changed by IM",nChg]]:[]).map(([k,l,n])=>'<button type="button" data-f="'+k+'" aria-pressed="'+(F===k)+'">'+l+'<b>'+n+'</b></button>').join("")+'</div><span class="sp"></span>'+
     (can&&shownAll.some(r=>!r.final)&&F!=="changed"?'<button class="btn sm" data-all="'+F+'">Agree With All '+shownAll.filter(r=>!r.final).length+(F==="all"?' Remaining':' Shown')+'</button>':"")+'</div>';
-  return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div>'+'</div>'+
-    '<div class="prog"><b>'+done+' of '+R.length+'</b><span>rows decided</span><div class="pb"><i style="width:'+pct(done,R.length)+'%"></i></div></div></div>'+
+  return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div>'+(doc.resub?'<div class="resub"><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span>'+esc([doc.resub.first?'first submitted '+fmtD(doc.resub.first):'',doc.resub.date?'resubmitted '+fmtD(doc.resub.date):'',doc.resub.why].filter(Boolean).join(' · '))+'</div>':'')+'</div>'+
+    (R.length?'<div class="prog"><b>'+done+' of '+R.length+'</b><span>rows decided</span><div class="pb"><i style="width:'+pct(done,R.length)+'%"></i></div></div>':'<div class="prog"><b>'+(doc.final?'Decided':'To decide')+'</b><span>'+esc(doc.category||'documentation submission')+'</span></div>')+'</div>'+
     docsHtml(q,doc.rep)+
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: agree, change rows, finish. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
     (decided?'<div class="card" style="border-left:4px solid var(--good)"><b>Decided '+esc(fmtD(doc.decidedAt))+' by '+esc(doc.decidedBy||"")+'.</b> <span class="muted">'+Object.entries(tally(R)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span></div>':'')+
     (!canReview()&&!decided?'<div class="card">You can follow this review here. IM reviewers make the decisions.</div>':'')+
-    plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):'')+
-    '<div class="foot"><span>'+(decided?"Decided "+esc(fmtD(doc.decidedAt)):(R.length-done)?(R.length-done)+" row"+(R.length-done===1?"":"s")+" still to decide":"Every row is decided")+'</span><span class="sp"></span><button class="btn" data-xl="1">Download for Excel</button>'+(can?'<button class="btn pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':'')+'</div>';
+    earlierHtml(doc)+(!R.length?docOnlyHtml(doc,can):plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):'')+
+    '<div class="foot"><span>'+(decided?"Decided "+esc(fmtD(doc.decidedAt)):(R.length-done)?(R.length-done)+" row"+(R.length-done===1?"":"s")+" still to decide":"Every row is decided")+'</span><span class="sp"></span><button class="btn" data-xl="1">Download for Excel</button>'+(can?'<button class="btn pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':'')+'</div>');
 }
 /* the work request's documents: each opens the file itself in a new tab (PDF in the browser, Word and Excel in Office online) */
 const DOC_IC={doc:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h6',xls:'M4 4h16v16H4zM4 10h16M10 4v16',pdf:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 15h2a1.5 1.5 0 0 0 0-3H8v6',zip:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M11 7v2M11 11v2M11 15v2',file:'M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6'};
@@ -845,6 +852,15 @@ function docsHtml(q,key){ const L=[]; if(q.form&&q.form.u) L.push({n:q.form.n||'
   if(!L.length) return ''; const all=S.docsAll===key, show=all?L:L.slice(0,6);
   return '<div class="card docs"><h3>Documents<small>'+L.length+' · click one to open it in a new tab</small><span class="sp"></span>'+(L.length>6?'<button type="button" class="btn sm" data-docsall="'+esc(key)+'">'+(all?'Show Fewer':'Show All '+L.length)+'</button>':'')+'</h3><div class="dl">'+
     show.map(d=>{ const k=d.k||docKind(d.n); return '<a class="dl-f'+(d.main?' main':'')+'" href="'+esc(d.u)+'" target="_blank" rel="noopener"><span class="dl-i dl-'+k+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(DOC_IC[k]||DOC_IC.file)+'"/></svg></span><span class="dl-n"><b title="'+esc(d.n)+'">'+esc(d.n)+'</b><em>'+esc([d.tag,d.d?fmtS(d.d)+(String(d.d).slice(0,4)!==YR?' '+String(d.d).slice(0,4):''):''].filter(Boolean).join(' · '))+'</em></span><span class="dl-go">↗</span></a>'; }).join('')+'</div></div>'; }
+/* IM's earlier decisions on the same work request: the history a resubmission builds on */
+function earlierHtml(doc){ if(!doc.wr) return ''; const L=Object.values(S.queue).filter(q=>q.rep!==doc.rep&&q.wr===doc.wr&&q.status==="decided").sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt))); if(!L.length) return '';
+  return '<div class="card earlier"><h3>Earlier IM Decisions on '+esc(doc.wr)+'<small>'+L.length+' on record</small></h3><div class="subs">'+L.map(subCard).join('')+'</div></div>'; }
+/* a documentation submission (I-Guide, white paper, mapping) has no Reference Model rows: IM decides the submission as a whole */
+function docOnlyHtml(doc,can){ const f=doc.final||{}; const D=doc.draft||{};
+  return '<div class="card doconly"><h3>IM’s Decision on the Submission<small>no Reference Model rows on this form</small></h3><p class="muted">'+esc(doc.category||'A documentation submission')+'. Open the documents above (the redline shows what changed since IM last saw it), then record IM’s decision.</p>'+
+    (D.com?'<div class="box"><span class="lbl">The draft</span>'+chip(D.dec||'Approved as Submitted')+'<div class="why">'+esc(D.com)+'</div></div>':'')+
+    (can?'<div class="edit"><label>IM Decision<select name="ddec">'+DEC.map(d=>'<option'+((f.dec||D.dec||'Approved as Submitted')===d?' selected':'')+'>'+esc(d)+'</option>').join('')+'</select></label><label>Review Comments<textarea name="dcom">'+esc(f.com||'')+'</textarea></label><div class="racts"><button class="btn pri" data-dfinish="1">Finish IM Review</button></div></div>':
+    f.dec?'<div class="box"><span class="lbl">IM decided'+(f.by?' · '+esc(first(f.by)):'')+'</span>'+chip(f.dec)+(f.com?'<div class="why">'+esc(f.com)+'</div>':'')+'</div>':'')+'</div>'; }
 function tally(R){ const c={}; R.forEach(r=>{ const d=(r.final&&r.final.dec)||r.draft.dec; c[d]=(c[d]||0)+1; }); return c; }
 function rowHtml(r,can){ const f=r.final, ed=S.edit===r.i&&can, lk=isLook(r);
   const conf=confidence(r);
@@ -863,7 +879,7 @@ function rowHtml(r,can){ const f=r.final, ed=S.edit===r.i&&can, lk=isLook(r);
 
 async function finish(doc){
   const by=S.me.name||S.me.email||"", at=new Date().toISOString(); doc.status="decided"; doc.decidedBy=by; doc.decidedAt=at;
-  const R=doc.rows||[], agreed=R.filter(r=>r.final&&r.final.agreed).length, c=tally(R);
+  const R=doc.rows||[], agreed=R.filter(r=>r.final&&r.final.agreed).length, c=R.length?tally(R):(doc.final?{[doc.final.dec]:1}:{});
   await saveDoc(doc);
   const yr=new Date().getFullYear(), recs={};
   R.forEach(r=>{ recs[safe(doc.rep)+"_"+r.i]={rep:doc.rep,wr:doc.wr,at,tt:r.tt||"",ct:r.ct||"",name:String(r.name||"").slice(0,80),kind:kindOf(r),rule:r.draft.rule||"",draft:r.draft.dec,draftCom:String(r.draft.com||"").slice(0,240),final:r.final.dec,finalCom:String(r.final.com||"").slice(0,240),missed:String(r.final.missed||"").slice(0,240),agreed:!!r.final.agreed,auto:!!r.auto,by:r.final.by||by}; });
@@ -1008,6 +1024,7 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
     toast("Agreed with "+n+" row"+(n===1?"":"s")); render(); save(); });
   $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ if(!confirm("Finish the IM review of "+doc.wr+"? The facilitator gets the decisions.")) return; b.disabled=true; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } celebrate(); render(); });
   $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
+  $$("[data-dfinish]",m).forEach(b=>b.onclick=async()=>{ const box=b.closest(".edit"); const dec=$("[name=ddec]",box).value, com=$("[name=dcom]",box).value.trim(); if(!confirm("Finish the IM review of "+doc.wr+": "+dec+"? The facilitator gets the decision.")) return; b.disabled=true; doc.final={dec,com,by:S.me.name||S.me.email,at:new Date().toISOString()}; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } celebrate(); render(); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
 window.addEventListener("hashchange",()=>{ S.edit=null; S.focus=-1; const r=route(); if(r.view==="review") S.filter=String(r.rep||"").charAt(0)==="h"?"changed":"look"; window.scrollTo(0,0); render(); });
