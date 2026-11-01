@@ -523,6 +523,8 @@ body.railmini .hq nav button .nb{display:none}
 .we-i{width:26px;height:26px;border-radius:6px;background:var(--good-bg);display:grid;place-items:center;flex:0 0 auto}
 .we-i svg{width:16px;height:16px;fill:none;stroke:var(--good);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:560px){.wait-empty{flex-wrap:wrap}}
+.pill.tst{background:var(--hold-bg);color:var(--hold);margin-right:auto;margin-left:8px}
+.tst-b{border-left:4px solid var(--hold);background:var(--hold-bg)}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -608,7 +610,8 @@ const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","De
 const fmtD=s=>{ const m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})/); return m?MON[+m[2]-1]+" "+(+m[3])+", "+m[1]:""; };
 const fmtS=s=>{ const m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})/); return m?MON[+m[2]-1]+" "+(+m[3]):""; };
 const first=n=>String(n||"").trim().split(/\s+/)[0]||"";
-const safe=s=>String(s).replace(/[^A-Za-z0-9_-]/g,"_").slice(0,80);
+/* the relay takes lowercase letters, digits and hyphens in a file name */
+const safe=s=>String(s).toLowerCase().replace(/[^a-z0-9-]/g,"-").slice(0,80);
 const pct=(a,b)=>b?Math.round(a/b*100):0;
 
 /* ---------- the relay ---------- */
@@ -807,6 +810,7 @@ function desk(doc){ if(doc.hist) return histDesk(doc);
     (can&&shownAll.some(r=>!r.final)&&F!=="changed"?'<button class="btn sm" data-all="'+F+'">Agree With All '+shownAll.filter(r=>!r.final).length+(F==="all"?' Remaining':' Shown')+'</button>':"")+'</div>';
   return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div>'+((q.form&&q.form.u)||q.folder?'<div class="splinks">'+(q.form&&q.form.u?'<a class="btn sm" href="'+esc(q.form.u)+'" target="_blank" rel="noopener">Open the Submission Form in SharePoint ↗</a>':'')+(q.folder?'<a class="btn sm ghost" href="'+esc(q.folder)+'" target="_blank" rel="noopener">Work Request Folder ↗</a>':'')+'</div>':'')+'</div>'+
     '<div class="prog"><b>'+done+' of '+R.length+'</b><span>rows decided</span><div class="pb"><i style="width:'+pct(done,R.length)+'%"></i></div></div></div>'+
+    (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: agree, change rows, finish. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
     (decided?'<div class="card" style="border-left:4px solid var(--good)"><b>Decided '+esc(fmtD(doc.decidedAt))+' by '+esc(doc.decidedBy||"")+'.</b> <span class="muted">'+Object.entries(tally(R)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span></div>':'')+
     (!canReview()&&!decided?'<div class="card">You can follow this review here. IM reviewers make the decisions.</div>':'')+
     plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):'')+
@@ -834,12 +838,12 @@ async function finish(doc){
   await saveDoc(doc);
   const yr=new Date().getFullYear(), recs={};
   R.forEach(r=>{ recs[safe(doc.rep)+"_"+r.i]={rep:doc.rep,wr:doc.wr,at,tt:r.tt||"",ct:r.ct||"",name:String(r.name||"").slice(0,80),kind:kindOf(r),rule:r.draft.rule||"",draft:r.draft.dec,draftCom:String(r.draft.com||"").slice(0,240),final:r.final.dec,finalCom:String(r.final.com||"").slice(0,240),missed:String(r.final.missed||"").slice(0,240),agreed:!!r.final.agreed,auto:!!r.auto,by:r.final.by||by}; });
-  await update("learn-"+yr,cur=>{ const o=cur||{rows:{}}; o.rows=Object.assign(o.rows||{},recs); return o; });
+  if(!doc.test) await update("learn-"+yr,cur=>{ const o=cur||{rows:{}}; o.rows=Object.assign(o.rows||{},recs); return o; });
   Object.assign(S.learn,recs);
   const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",decidedBy:by,decidedAt:at,agree:pct(agreed,R.length),counts:c}); return o; });
   S.queue=q.items;
   const it=S.queue[doc.rep]||{}, sum=Object.entries(c).map(([d,n])=>n+" "+d.toLowerCase()).join(", ");
-  if(it.flow&&it.fac&&it.fac.email){ try{ await fetch(it.flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"IM decision: "+doc.wr+" "+doc.name,body:"IM has decided "+doc.wr+" "+doc.name+": "+sum+". Reviewed by "+by+".\n\nSee every row: https://resources.mismo.org/im-review/#/review/"+encodeURIComponent(doc.rep)+"\nThe decisions are also on the work request in the MMS.",html:"",from:it.from||""})}); }catch(e){} }
+  if(!doc.test&&it.flow&&it.fac&&it.fac.email){ try{ await fetch(it.flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"IM decision: "+doc.wr+" "+doc.name,body:"IM has decided "+doc.wr+" "+doc.name+": "+sum+". Reviewed by "+by+".\n\nSee every row: https://resources.mismo.org/im-review/#/review/"+encodeURIComponent(doc.rep)+"\nThe decisions are also on the work request in the MMS.",html:"",from:it.from||""})}); }catch(e){} }
   toast("IM review finished: "+sum);
 }
 function exportXl(doc){ const head=["Item #","Change Type","Change Target Type","Parent CONTAINER Name","CONTAINER Name","Data Point Name","Enumeration Name","Definition","Review Decision","Review Comments","Suggested Definition or Name","Draft Decision","IM Agreed With Draft"];
