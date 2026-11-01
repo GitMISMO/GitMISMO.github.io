@@ -525,6 +525,12 @@ body.railmini .hq nav button .nb{display:none}
 @media(max-width:560px){.wait-empty{flex-wrap:wrap}}
 .pill.tst{background:var(--hold-bg);color:var(--hold);margin-right:auto;margin-left:8px}
 .tst-b{border-left:4px solid var(--hold);background:var(--hold-bg)}
+
+/* ring: thin band, number and label sit well inside it */
+.hero-r .donut{width:168px;height:168px}
+.dn-c{top:16px;height:168px}
+.dn-c b{font-size:30px;line-height:1}
+.dn-c span{font-size:9.5px;letter-spacing:.06em;margin-top:5px}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -697,9 +703,9 @@ function subCard(q){ const n=q.rows||0, look=q.look||0, done=q.status==="decided
 const ago=iso=>{ if(!iso) return ""; const d=Math.floor((Date.now()-new Date(iso))/864e5); return d<=0?"today":d===1?"1 day":d+" days"; };
 const YR=String(new Date().getFullYear());
 /* a ring split into parts, Summit HQ style */
-function ring(parts,center,sub){ const tot=parts.reduce((s,p)=>s+p.v,0), R=50, C=2*Math.PI*R; let off=0;
-  const segs=tot?parts.filter(p=>p.v).map(p=>{ const len=p.v/tot*C, gap=parts.filter(x=>x.v).length>1?2.5:0; const el='<circle r="'+R+'" cx="64" cy="64" fill="none" stroke="'+p.c+'" stroke-width="12" stroke-linecap="butt" stroke-dasharray="'+Math.max(0,len-gap)+' '+C+'" stroke-dashoffset="'+(-off)+'" class="dn-seg"><title>'+esc(p.v.toLocaleString()+' '+p.k)+'</title></circle>'; off+=len; return el; }).join(""):'';
-  return '<svg class="donut" viewBox="0 0 128 128" role="img" aria-label="'+esc(center+' '+sub)+'"><circle r="'+R+'" cx="64" cy="64" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="12"/>'+segs+'</svg><div class="dn-c"><b data-count="'+(+String(center).replace(/\D/g,'')||0)+'">'+esc(center)+'</b><span>'+esc(sub)+'</span></div>'; }
+function ring(parts,center,sub){ const tot=parts.reduce((s,p)=>s+p.v,0), R=56, C=2*Math.PI*R; let off=0;
+  const segs=tot?parts.filter(p=>p.v).map(p=>{ const len=p.v/tot*C, gap=parts.filter(x=>x.v).length>1?2.5:0; const el='<circle r="'+R+'" cx="64" cy="64" fill="none" stroke="'+p.c+'" stroke-width="9" stroke-linecap="butt" stroke-dasharray="'+Math.max(0,len-gap)+' '+C+'" stroke-dashoffset="'+(-off)+'" class="dn-seg"><title>'+esc(p.v.toLocaleString()+' '+p.k)+'</title></circle>'; off+=len; return el; }).join(""):'';
+  return '<svg class="donut" viewBox="0 0 128 128" role="img" aria-label="'+esc(center+' '+sub)+'"><circle r="'+R+'" cx="64" cy="64" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/>'+segs+'</svg><div class="dn-c"><b data-count="'+(+String(center).replace(/\D/g,'')||0)+'">'+esc(center)+'</b><span>'+esc(sub)+'</span></div>'; }
 function waitCard(q,i){ const n=q.rows||0, look=q.look||0, done=q.done||0, age=Math.floor((Date.now()-new Date(q.sentAt||q.at||Date.now()))/864e5), heat=age>=14?"hot":age>=7?"warm":"";
   const mins=Math.max(5,Math.round(look*1.2+(n-look)*0.05)); const dc=q.draftCounts||{};
   return '<a class="wc rise '+heat+'" style="--i:'+i+'" href="#/review/'+encodeURIComponent(q.rep)+'"><span class="wc-top"><span class="wr">'+esc(q.wr||"")+(q.wg?" · "+esc(q.wg):"")+'</span><span class="wc-age" title="Sent '+esc(fmtD(q.sentAt))+'">'+(age<=0?"Sent today":"Waiting "+ago(q.sentAt))+'</span></span><b class="wc-n">'+esc(q.name||"")+'</b>'+
@@ -780,7 +786,7 @@ function pagerHtml(page,pages,n,size,key){ if(n<=10&&pages<=1) return '<div clas
   return '<div class="pager"><span class="muted">'+(page*size+1)+'–'+Math.min(n,(page+1)*size)+' of '+n+'</span><span class="sp"></span><button type="button" class="btn sm" data-pg="'+key+'|'+(page-1)+'"'+(page<=0?' disabled':'')+'>‹ Back</button>'+nums.map(i=>i==="…"?'<span class="pg-gap">…</span>':'<button type="button" class="btn sm pg'+(i===page?' on':'')+'" data-pg="'+key+'|'+i+'"'+(i===page?' aria-current="page"':'')+'>'+(i+1)+'</button>').join("")+'<button type="button" class="btn sm" data-pg="'+key+'|'+(page+1)+'"'+(page>=pages-1?' disabled':'')+'>Next ›</button><label class="pg-size">Show <select data-pgsize="'+key+'">'+[10,25,50,100].map(s=>'<option'+(s===size?' selected':'')+'>'+s+'</option>').join("")+'</select></label></div>'; }
 
 /* a decision from the IM library: what was submitted, what IM decided and why */
-function histDesk(doc){ const R=doc.rows||[], F=S.filter==="all"?"all":"changed"; const ch=R.filter(r=>r.dec!=="Approved as Submitted"); const shownAll=F==="all"?R:ch; const RP=S.rowPg[doc.rep+F]||{page:0,size:25}; const pages=Math.max(1,Math.ceil(shownAll.length/RP.size)); if(RP.page>=pages) RP.page=pages-1; const shown=shownAll.slice(RP.page*RP.size,RP.page*RP.size+RP.size); const link=(S.queue[doc.rep]||{}).url||"";
+function histDesk(doc){ const R=doc.rows||[], F=S.filter==="all"?"all":"changed"; const ch=R.filter(r=>r.dec!=="Approved as Submitted"); const shownAll=F==="all"?R:ch; const RP=S.rowPg[doc.rep+F]||{page:0,size:10}; const pages=Math.max(1,Math.ceil(shownAll.length/RP.size)); if(RP.page>=pages) RP.page=pages-1; const shown=shownAll.slice(RP.page*RP.size,RP.page*RP.size+RP.size); const link=(S.queue[doc.rep]||{}).url||"";
   const c={}; R.forEach(r=>{ c[r.dec]=(c[r.dec]||0)+1; });
   const row=r=>'<div class="row'+(r.dec==="Approved as Submitted"?" ok":" chg")+'"><div class="rh"><span class="it">Item '+esc(r.item)+'</span><span class="ct">'+esc([r.ct,r.tt].filter(Boolean).join(" · "))+'</span><b>'+esc(r.name||"")+'</b>'+(r.pc?'<span class="pc">in '+esc(r.pc)+'</span>':'')+'</div>'+
     (r.old?'<div class="def"><span class="lbl">Original or Old Value</span>'+esc(r.old)+'</div>':'')+
@@ -798,7 +804,7 @@ function desk(doc){ if(doc.hist) return histDesk(doc);
   const looks=R.filter(isLook), clean=R.filter(r=>!isLook(r)), done=R.filter(r=>r.final).length;
   const lookLeft=looks.filter(r=>!r.final).length, cleanLeft=clean.filter(r=>!r.final).length;
   const vis=r=>F==="all"||(F==="look"?isLook(r):F==="clean"?!isLook(r):F==="changed"?(r.final&&!r.final.agreed):true);
-  const shownAll=R.filter(vis); const RP=S.rowPg[doc.rep+F]||(S.rowPg[doc.rep+F]={page:0,size:50}); const pages=Math.max(1,Math.ceil(shownAll.length/RP.size)); if(RP.page>=pages) RP.page=pages-1; const shown=shownAll.slice(RP.page*RP.size,RP.page*RP.size+RP.size);
+  const shownAll=R.filter(vis); const RP=S.rowPg[doc.rep+F]||(S.rowPg[doc.rep+F]={page:0,size:10}); const pages=Math.max(1,Math.ceil(shownAll.length/RP.size)); if(RP.page>=pages) RP.page=pages-1; const shown=shownAll.slice(RP.page*RP.size,RP.page*RP.size+RP.size);
   const can=canReview()&&!decided;
   const step=(k,n,t,btn,cur)=>'<div class="step'+(cur?" cur":"")+'"><span class="sk">'+k+'</span><b>'+n+'</b><p>'+t+'</p>'+(btn||"")+'</div>';
   const plan=decided?'':'<div class="plan">'+
@@ -954,7 +960,7 @@ document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.tagName==="I
 function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-months]",m).forEach(b=>b.onclick=()=>{ S.homeMonths=+b.dataset.months; seenView.waiting=1; render(); });
   $$("[data-upall]",m).forEach(b=>b.onclick=()=>{ S.upAll=!S.upAll; seenView.waiting=1; render(); });
-  const pgState=key=>{ if(key==="dec") return S.dec; const k=key.slice(5); return S.rowPg[k]||(S.rowPg[k]={page:0,size:25}); };
+  const pgState=key=>{ if(key==="dec") return S.dec; const k=key.slice(5); return S.rowPg[k]||(S.rowPg[k]={page:0,size:10}); };
   $$("[data-pg]",m).forEach(b=>b.onclick=()=>{ const i=b.dataset.pg.lastIndexOf("|"), key=b.dataset.pg.slice(0,i); pgState(key).page=+b.dataset.pg.slice(i+1); S.focus=-1; render(); const t=$(".dtools",$("#main"))||$("#main"); t.scrollIntoView({block:"start",behavior:"smooth"}); });
   $$("[data-pgsize]",m).forEach(sel=>sel.onchange=()=>{ const st=pgState(sel.dataset.pgsize); st.size=+sel.value; st.page=0; render(); });
   $$("[data-dyear]",m).forEach(b=>b.onclick=()=>{ S.dec.year=b.dataset.dyear; S.dec.page=0; render(); });
