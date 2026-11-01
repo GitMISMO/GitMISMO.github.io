@@ -59,7 +59,7 @@
          "branch": "main",
          "origin": "https://resources.mismo.org",
          "writable": [
-           "data/desk-"
+           "desk/"
          ]
        }, 
        "marketing-hq": {
