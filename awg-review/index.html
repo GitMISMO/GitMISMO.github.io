@@ -635,6 +635,9 @@ select.inp.sel{min-width:0;width:auto}
 
 .nw{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 @media(max-width:560px){.q{white-space:normal}}
+
+.cp-out{grid-template-columns:minmax(0,1fr)}
+.cp-out .seg{max-width:100%;box-sizing:border-box}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -861,7 +864,7 @@ async function claudeRead(form,soft,progress){
   const rows=form.rows; const pick=rows.filter(r=>isAwgRow(r)||(r.flags||[]).length||/container|relationship|attribute/i.test(r.tt||""));
   const use=(pick.length?pick:rows).slice(0,400); const chunks=[]; let cur=[]; let len=0;
   use.forEach(r=>{ const l=rowLine(r); if(len+l.length>2600&&cur.length){ chunks.push(cur); cur=[]; len=0; } cur.push(l); len+=l.length+1; }); if(cur.length) chunks.push(cur);
-  const head="Submission: "+(form.wr||"")+" "+(form.name||"")+"\nCategory: "+(form.category||"")+" · Artifacts: "+(form.artifacts||"")+" · Workgroup: "+(form.wg||"")+"\nSummary: "+String(form.summary||"").slice(0,700)+"\nRows: "+rows.length+" in all; "+rows.filter(isAwgRow).length+" marked Approval Body AWG.\nThe software checks found: "+(soft.notes.map(n=>n.area+": "+n.t+" (items "+n.items.slice(0,8).join(", ")+")").join("; ")||"nothing")+".";
+  const head="Submission: "+(form.wr||"")+" "+(form.name||"")+"\nCategory: "+(form.category||"")+" · Artifacts: "+(form.artifacts||"")+" · Workgroup: "+(form.wg||"")+"\nSummary: "+String(form.summary||"").slice(0,700)+"\nRows: "+rows.length+" in all; "+rows.filter(isAwgRow).length+" marked Approval Body AWG. By change: "+Object.entries(rows.reduce((c,r)=>{ const k=(r.ct||"?")+" "+(r.tt||"?"); c[k]=(c[k]||0)+1; return c; },{})).map(([k,n])=>n+" "+k).join(", ")+".\nYou are shown "+(pick.length?"only the "+Math.min(pick.length,400)+" rows the software flagged or that touch structure; the software checked every row, so do not ask for the rest":"every row")+".\nThe software checks found: "+(soft.notes.map(n=>n.area+": "+n.t+" (items "+n.items.slice(0,8).join(", ")+")").join("; ")||"nothing")+".";
   const out=[]; let k=0;
   for(const c of chunks.slice(0,8)){ k++; if(progress) progress(k,Math.min(8,chunks.length));
     const p=AWG_PERSONA+"\n\n"+head+"\n\nRows "+(chunks.length>1?"(part "+k+" of "+Math.min(8,chunks.length)+")":"")+", one per line: item | approval body | change type | target type | details\n"+c.join("\n")+
