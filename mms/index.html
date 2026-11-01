@@ -1203,6 +1203,24 @@ span.bad{color:var(--bad)}
 .anote{font-size:12.5px;color:var(--ink-2);white-space:pre-line;margin-top:2px}
 .ph .ats i{background:rgba(255,255,255,.18)}.ph .ats.done i{background:var(--sky)}.ph .ats.cur i{background:#fff}
 .ph .ats b{color:#a9d8f3}.ph .ats.cur b{color:#fff}.ph .ats small{color:#8fb3cc}
+
+/* fixes: tooltips sit at one height and above their neighbors; panel reaches the menu */
+.mn:hover,.mn:focus-visible{z-index:60}
+.mn-tip{top:112px}
+.panel{width:calc(100vw - var(--rail-w));max-width:none}
+body.railmini .panel{width:calc(100vw - var(--rail-mini))}
+@media(max-width:900px){.panel,body.railmini .panel{width:100vw}}
+.bd-on{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:11.5px;color:var(--ink-3);font-weight:600;margin:-2px 0 10px}
+/* review desk drag and drop */
+.rv-drag .lane[data-lanekey]{outline:2px dashed transparent;outline-offset:-2px;transition:outline-color .12s,background .12s}
+.rv-drag .lane.over{outline-color:var(--accent);background:var(--accent-soft)}
+.rv-next{display:none;margin:0 0 16px;padding:16px;border:2px dashed var(--border-strong);border-radius:9px;text-align:center;font-weight:700;color:var(--ink-2);background:var(--surface-2)}
+.rv-drag .rv-next{display:block}
+.rv-next.over{border-color:var(--good);background:var(--good-bg);color:var(--good)}
+.prevfac{font-size:12px;color:var(--sky-soft);margin-top:2px}
+.wgf td{vertical-align:middle}
+.wgf select{font-size:12.5px}
+.wgf .mtsay{font-size:12px;color:var(--warn)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3193,10 +3211,9 @@ VIEWS.board=function(){
       '<div class="bd-b">'+(ts.length?'<div class="cgrid">'+bpg(ts,'sel:'+sel).items.map(t=>card2(t,{drag,next:true,act:true,i:i++})).join('')+'</div>'+bpg(ts,'sel:'+sel).bar:'<div class="lane-e"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing at this stop'+(f.fac||f.q?' for these filters':'')+'.</div>')+'</div>';
   } else {
     const flat=[]; stages().forEach(s=>L.filter(t=>t.stage===s.key).sort(srt).forEach(t=>flat.push(t)));
-    const P=bpg(flat,'all'); let lastS='', buf=[]; const out=[];
-    const flush=()=>{ if(!lastS) return; const s=stageDef(lastS), all=L.filter(t=>t.stage===lastS), lateN=all.filter(t=>heatLevel(t)===2).length;
-      out.push('<section class="bg2" style="--sc:'+s.color+'"><button type="button" class="bg2-h" data-mst="'+s.key+'"><i></i><b>'+esc(s.name)+'</b><span class="bg2-n">'+all.length+'</span><span class="muted">'+esc(ownerName(s))+'</span>'+(lateN?'<span class="chip bad">'+lateN+' overdue</span>':'')+'<span class="bg2-go">Open this stop ›</span></button><div class="cgrid">'+buf.map(t=>card2(t,{drag,i:i++})).join('')+'</div></section>'); buf=[]; };
-    P.items.forEach(t=>{ if(t.stage!==lastS){ flush(); lastS=t.stage; } buf.push(t); }); flush();
+    const P=bpg(flat,'all');
+    const onPage=[...new Set(P.items.map(t=>t.stage))].map(k=>'<button type="button" class="lsc" data-mst="'+k+'" style="--sc:'+stageDef(k).color+'"><i></i>'+esc(stageDef(k).name)+'<b>'+L.filter(t=>t.stage===k).length+'</b></button>').join('');
+    const out=['<div class="bd-on">On this page: '+onPage+'</div><div class="cgrid">'+P.items.map(t=>card2(t,{drag,stage:true,i:i++})).join('')+'</div>'];
     const groups=out.join('')+P.bar;
     detail='<div class="bd-bar"><span class="muted"><b style="color:var(--ink)">Every stop</b> · '+L.length+' live'+(late?' · <span class="bad">'+late+' overdue</span>':'')+(hold?' · '+hold+' on hold':'')+'</span>'+sortSeg+'</div><div class="bd-b">'+(groups||'<div class="lane-e">Nothing matches these filters.</div>')+'</div>';
   }
@@ -3206,7 +3223,7 @@ VIEWS.board=function(){
     '<div class="bdetail" id="board3">'+detail+'</div>';
 };
 
-function bpg(list,key){ const f=S.filters, w=(($('#main')||{}).clientWidth||1100)-60, cols=Math.max(1,Math.floor((w+10)/260)), rows=Math.max(2,Math.floor((window.innerHeight-(S.bSel?560:520))/150));
+function bpg(list,key){ const f=S.filters, w=(($('#main')||{}).clientWidth||1100)-60, cols=Math.max(1,Math.floor((w+10)/260)), rows=4;
   return pageOf('board:'+key+':'+[f.q,f.fac,f.wg,f.size,f.type,S.bSort].join('|'),list,cols*rows); }
 /* ---------------- Overview ---------------- */
 function relTime(iso){ if(!iso) return ''; const ms=Date.now()-new Date(iso).getTime(); const m=Math.round(ms/6e4); if(m<1) return 'just now'; if(m<60) return m+'m ago'; const h=Math.round(m/60); if(h<24) return h+'h ago'; const d=Math.round(h/24); if(d<7) return d+'d ago'; return fmtS(iso.slice(0,10)); }
@@ -3550,6 +3567,102 @@ const _wireMain3=wireMain;
 wireMain=function(m){ _wireMain3(m);
   $$('[data-archopen]',m).forEach(el=>{ const go=e=>{ if(e.target.closest('button:not([data-archopen]),a,[data-open],input,textarea,select')) return; e.preventDefault(); e.stopPropagation(); openArch(el.dataset.archopen); };
     el.addEventListener('click',go); el.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&e.target===el) go(e); }); });
+};
+
+/* =====================================================================
+   Dates and links that fill themselves in, facilitator hand-overs,
+   and drag and drop on the Review Desk.
+   ===================================================================== */
+/* The date each stop is reached, written the moment a work request arrives there
+   (only if nobody has entered one already). Same fields the panel's Key Dates show. */
+const REACHED={approved:'bet',cfp:'cfpPublished',kickoff:'kickoffGc',work:'workStart',aireview:'aiSubmitted',im:'imSubmitted',awg:'awgSubmitted',designation:'designation','gc-comment':'gcComment',post:'commentEnd','gc-publish':'postGc',release:'release',published:'published'};
+const nkWG=s=>String(s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
+function autoLinks(t){
+  const L=Object.assign({},t.links||{}), filled=[];
+  const set=(k,v)=>{ if(v&&!L[k]){ L[k]=v; filled.push(k); } };
+  /* anything the same workgroup already has on another work request */
+  const sib=allTickets().filter(x=>x.id!==t.id&&x.workgroup&&x.workgroup===t.workgroup&&x.links);
+  ['workgroupPage','connect'].forEach(k=>{ const hit=sib.find(x=>x.links[k]); if(hit) set(k,hit.links[k]); });
+  /* the product page, when its name is already a web address */
+  if(/^https?:\/\//i.test(t.productPageName||'')) set('productPage',t.productPageName);
+  /* announcements, from MISMO Media once they carry a link */
+  Object.values(S.media||{}).filter(m=>m.ticket===t.id&&m.link).forEach(m=>{ if(/comment/i.test(m.kind+' '+m.text)) set('newsComment',m.link); else if(/release|final|publish|announce/i.test(m.kind+' '+m.text)) set('newsFinal',m.link); });
+  /* the comment form, for anything at or past comment */
+  if(['comment','post','gc-publish','release','published'].includes(t.stage)||t.state==='published') set('commentForm','https://resources.mismo.org/forms/comment/?wr='+encodeURIComponent(t.wr));
+  if(t.hubId) set('hub','https://resources.mismo.org/initiative-hub/work-requests.html#'+encodeURIComponent(t.hubId));
+  return filled.length?{links:L,filled}:null;
+}
+const _move1=move;
+move=async function(t0,to,opts){
+  opts=Object.assign({},opts||{}); const d=Object.assign({},t0.dates||{}), f=REACHED[to];
+  if(f&&!d[f]&&!(opts.dates&&opts.dates[f])) opts.dates=Object.assign({},opts.dates||{},{[f]:today()});
+  const al=autoLinks(Object.assign({},t0,{stage:to}));
+  if(al) opts.patch=Object.assign({},opts.patch||{},{links:Object.assign({},al.links,(opts.patch||{}).links||{})});
+  return _move1(t0,to,opts);
+};
+/* fill in links on open work requests once, quietly, when MISMO staff open the MMS */
+let linksSwept=false;
+async function sweepLinks(){
+  if(linksSwept||!S.isStaff||!S.canWrite||!S.ready) return; linksSwept=true;
+  for(const t of liveTickets()){ const al=autoLinks(t); if(!al) continue; const x=clone(t); x.links=al.links; S.tickets[x.id]=x; await write('tickets',x.id,x); }
+}
+
+/* ---------- facilitators: hand-overs keep the history ---------- */
+function addPrev(t,name){ if(!name) return; const P=(t.prevFacilitators||[]).slice(); const last=P[P.length-1]; if(!(last&&sameName(last.name,name))) P.push({name,until:today()}); t.prevFacilitators=P; }
+const _saveTicket1=saveTicket;
+saveTicket=async function(t,msg,before){
+  if(before&&before.facilitator&&t.facilitator!==before.facilitator&&!sameName(t.facilitator,before.facilitator)){ addPrev(t,before.facilitator); hist(t,'Facilitator changed from '+before.facilitator+' to '+(t.facilitator||'no one')); }
+  return _saveTicket1(t,msg,before);
+};
+async function reassignWorkgroup(wg,to){
+  const L=allTickets().filter(t=>t.workgroup===wg&&!sameName(t.facilitator,to));
+  for(const t0 of L){ const t=clone(t0); if(t.facilitator) addPrev(t,t.facilitator); hist(t,'Facilitator changed from '+(t.facilitator||'no one')+' to '+to+' (the workgroup was handed over)'); t.facilitator=to; t.updatedAt=new Date().toISOString(); t.updatedBy=S.me.name||''; S.tickets[t.id]=t; await write('tickets',t.id,t); }
+  toast(L.length+' work request'+(L.length===1?'':'s')+' for '+wg+(L.length===1?' now shows ':' now show ')+to); renderAll();
+}
+function mtFacFor(wg){ const G=digestSrc&&digestSrc.mt&&digestSrc.mt.groups; if(!G) return ''; const k=nkWG(wg); const g=G[k]||Object.values(G).find(x=>nkWG(x.name)===k); return g&&!g.removed&&!g.archived?(g.fac||''):''; }
+function workgroupCard(){
+  const facs=(S.people.facilitators||[]).map(p=>p.name).sort();
+  const W={}; allTickets().forEach(t=>{ if(!t.workgroup) return; const w=W[t.workgroup]=W[t.workgroup]||{live:0,done:0,fac:{}}; if(t.state==='active'||t.state==='hold') w.live++; else w.done++; if(t.facilitator) w.fac[t.facilitator]=(w.fac[t.facilitator]||0)+((t.state==='active'||t.state==='hold')?100:1); });
+  const scope=S.wgScope||'live';
+  const E=Object.entries(W).filter(([wg,w])=>scope==='all'||w.live).map(([wg,w])=>{ const cur=Object.entries(w.fac).sort((a,b)=>b[1]-a[1]).map(x=>x[0]); const mt=mtFacFor(wg); return [wg,w,mt&&!sameName(mt,cur[0]||'')]; })
+    .sort((a,b)=>(b[2]-a[2])||a[0].localeCompare(b[0]));
+  const pg=pageOf('wgf:'+scope,E,10);
+  const rows=pg.items.map(([wg,w])=>{ const cur=Object.entries(w.fac).sort((a,b)=>b[1]-a[1]).map(x=>x[0]); const now=cur[0]||''; const mt=mtFacFor(wg); const differs=mt&&!sameName(mt,now);
+    return '<tr><td><b>'+esc(wg)+'</b><div class="muted" style="font-size:12px">'+w.live+' live · '+w.done+' closed or published</div></td><td>'+esc(now||'—')+(cur.length>1?'<div class="muted" style="font-size:12px">also '+esc(cur.slice(1).join(', '))+'</div>':'')+(differs?'<div class="mtsay">Meeting Trackers says '+esc(mt)+'</div>':'')+'</td>'+
+      (S.canWrite?'<td class="nowrap"><select data-wgsel="'+esc(wg)+'">'+facs.map(n=>'<option'+(sameName(n,differs?mt:now)?' selected':'')+'>'+esc(n)+'</option>').join('')+'</select> <button type="button" class="btn sm'+(differs?' pri':'')+'" data-wgset="'+esc(wg)+'">Hand Over</button></td>':'')+'</tr>'; }).join('');
+  return '<div class="card"><h3>Workgroups and Their Facilitators</h3><p class="muted" style="font-size:12.5px;margin:-4px 0 10px">Handing a workgroup over moves every one of its work requests, live and closed, to the new facilitator. Each one keeps who facilitated it before.</p><div class="seg sm" style="margin-bottom:8px">'+[['live','With Live Work'],['all','Every Workgroup']].map(([k,l])=>'<button type="button" data-wgscope="'+k+'" aria-pressed="'+(scope===k)+'">'+l+' <b>'+Object.values(W).filter(w=>k==='all'||w.live).length+'</b></button>').join('')+'</div><table class="tbl wgf"><thead><tr><th>Workgroup</th><th>Facilitator Now</th>'+(S.canWrite?'<th>Hand Over To</th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table>'+pg.bar+'</div>';
+}
+setTimeout(()=>{ const _settingsView1=VIEWS.settings;
+VIEWS.settings=function(){ let h=_settingsView1(); if(S.isStaff&&/data-plist="facilitators"/.test(h)){ h+=workgroupCard(); if(!digestSrc&&S.mode==='relay') loadDigestSources().then(()=>{ if(S.view==='settings') renderAll(); }); } return h; }; },0);
+
+/* the panel: who facilitated it before, and links that filled in */
+const _renderPanel3=renderPanel;
+renderPanel=function(){ _renderPanel3(); const t=S.tickets[S.panel]; if(!t) return;
+  const P=t.prevFacilitators||[]; const sub=$('#panel .ph .sub');
+  if(P.length&&sub&&!sub.querySelector('.prevfac')) sub.insertAdjacentHTML('beforeend','<div class="prevfac">Previously facilitated by '+P.map(p=>esc(p.name)+(p.until?' (until '+esc(fmtS(p.until))+')':'')).join(', ')+'</div>');
+  const L=t.links||{}; const kv=$('#panel [data-k="links.newsFinal"]'); const box=kv&&kv.closest('.kv');
+  if(box&&!box.querySelector('[data-extra]')) box.insertAdjacentHTML('beforeend',[['Comment Form','commentForm'],['Initiative Hub Request','hub']].filter(([,k])=>L[k]).map(([l,k])=>'<div class="f" data-extra><label>'+esc(l)+' <a href="'+esc(L[k])+'" target="_blank" rel="noopener" style="text-transform:none;letter-spacing:0">Open</a></label><div class="ro" style="font-size:12px;word-break:break-all">'+esc(L[k])+'</div></div>').join(''));
+};
+
+/* ---------- Review Desk: drag a card to the next review, or on to the next stop ---------- */
+function wireReviewDrag(m){
+  const box=$('[data-lanes="rev"]',m); if(!box||!S.isStaff||!S.canWrite) return;
+  let next=$('#rvnext',m); if(!next){ box.insertAdjacentHTML('afterend','<div class="rv-next" id="rvnext">Drop here to send it on</div>'); next=$('#rvnext',m); }
+  let dragId=null;
+  $$('.tk2[data-open]',box).forEach(c=>{ c.setAttribute('draggable','true');
+    c.addEventListener('dragstart',e=>{ dragId=c.dataset.open; const t=S.tickets[dragId]; c.classList.add('dragging'); m.classList.add('rv-drag'); next.textContent='Drop here to send it on to '+stageDef(nextStage(t)).name; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragId); }catch(x){} });
+    c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); m.classList.remove('rv-drag'); $$('.lane.over,.rv-next.over',m).forEach(x=>x.classList.remove('over')); }); });
+  const drop=async(el,to)=>{ el.classList.remove('over'); m.classList.remove('rv-drag'); const t=S.tickets[dragId]; if(!t) return; const dest=to||nextStage(t); if(dest===t.stage) return; await move(t,dest,{text:'Moved on the Review Desk from '+stageDef(t.stage).name+' to '+stageDef(dest).name}); };
+  $$('.lane[data-lanekey]',box).forEach(l=>{ l.addEventListener('dragover',e=>{ e.preventDefault(); l.classList.add('over'); }); l.addEventListener('dragleave',e=>{ if(!l.contains(e.relatedTarget)) l.classList.remove('over'); }); l.addEventListener('drop',e=>{ e.preventDefault(); drop(l,l.dataset.lanekey); }); });
+  next.addEventListener('dragover',e=>{ e.preventDefault(); next.classList.add('over'); }); next.addEventListener('dragleave',()=>next.classList.remove('over')); next.addEventListener('drop',e=>{ e.preventDefault(); drop(next,null); });
+}
+const _wireMain4=wireMain;
+wireMain=function(m){ _wireMain4(m);
+  if(S.view==='reviews') wireReviewDrag(m);
+  if(S.view==='settings') $$('[data-wgscope]',m).forEach(b=>b.onclick=()=>{ S.wgScope=b.dataset.wgscope; renderAll(); });
+  if(S.view==='settings'){ $$('[data-wgset]',m).forEach(b=>b.onclick=async()=>{ const wg=b.dataset.wgset, to=$('[data-wgsel="'+CSS.escape(wg)+'"]',m).value; const n=allTickets().filter(t=>t.workgroup===wg&&!sameName(t.facilitator,to)).length; if(!n){ toast(wg+' already shows '+to); return; }
+    const ok=await modal({title:'Hand '+wg+' Over to '+to+'?',body:'<p style="margin:0">'+n+' work request'+(n===1?'':'s')+', live and closed, will show '+esc(to)+' as the facilitator. Each keeps who facilitated it before, and '+esc(to.split(' ')[0])+' will see them all.</p>',ok:'Hand Over'}); if(ok) reassignWorkgroup(wg,to); }); }
+  sweepLinks();
 };
 
 /* ---------- settings ---------- */
