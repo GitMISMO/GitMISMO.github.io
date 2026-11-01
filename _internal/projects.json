@@ -51,7 +51,16 @@
          "branch": "main",
          "origin": "https://resources.mismo.org",
          "writable": [
-           "data/"
+           "data/",
+           "desk/"
+         ]
+       }, 
+       "membership-desk": {
+         "repo": "GitMISMO/member-360-data",
+         "branch": "main",
+         "origin": "https://resources.mismo.org",
+         "writable": [
+           "desk/"
          ]
        }, 
        "marketing-hq": {
