@@ -1616,6 +1616,21 @@ button.hp-t{cursor:pointer}button.hp-t:hover{background:rgba(255,255,255,.12)}
 .bd-late.on{background:var(--bad-bg);border-radius:6px;padding:4px 8px;margin:-4px -8px}
 .tm-gh{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin:14px 0 8px}
 .tm-gh:first-of-type{margin-top:4px}
+.imdec-l{display:grid;gap:6px}
+.imdec-r{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;padding:9px 12px;border:1px solid var(--border);border-left:3px solid var(--good);border-radius:6px;background:var(--surface);color:var(--ink);text-decoration:none}
+.imdec-r:hover{background:var(--surface-2)}
+.imdec-d{font-size:12px;font-weight:700;color:var(--ink-3);white-space:nowrap}
+.imdec-m{min-width:0;display:flex;flex-direction:column}.imdec-m b{font-size:13px}.imdec-m em{font-style:normal;font-size:12px;color:var(--ink-2)}
+.imdec-go{font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap}
+/* squared corners for link chips and toggles (no pill shapes) */
+.wh-chip{border-radius:5px}
+.pv-pstrip{border-radius:6px}.pv-pstrip button{border-radius:4px}
+.rv-fbb,.imd-tabs [data-imf],.imd{border-radius:4px}
+.imd-tabs [data-imf] b{border-radius:3px}
+/* timeline: how long each stretch took, under the line */
+.tl-gap{position:absolute;top:70px;transform:translateX(-50%);font-size:10.5px;font-weight:600;color:var(--ink-3);background:var(--surface);padding:0 5px;border-radius:3px;white-space:nowrap;z-index:1}
+.tl:before{display:none}
+.tl-track{position:absolute;right:0;top:58px;height:4px;border-radius:2px;background:var(--surface-3)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4326,9 +4341,15 @@ function wrTimeline(t){
   const tgt=d.targetIM&&!d.imSubmitted?d.targetIM:null;
   if(!ev.length&&!tgt) return '';
   const all=[...ev.map(e=>e.d),tgt,td].filter(Boolean).sort();
-  const lo=addDays(all[0],-30), hi=addDays(all[all.length-1],45), span=Math.max(1,daysBetween(lo,hi));
-  const X=x=>Math.max(0,Math.min(100,daysBetween(lo,x)/span*100));
+  const lo=addDays(all[0],-10), hi=addDays(all[all.length-1],14);
+  // time runs left to right, but long quiet stretches are shortened and close events get room,
+  // so a few busy weeks followed by months of work don't squash into one end
+  const pts=[...new Set([lo,...all,hi])].sort(), gaps=pts.slice(1).map((p,i)=>Math.max(1,daysBetween(pts[i],p))), wts=gaps.map(g=>Math.max(2.2,Math.sqrt(g)));
+  const tot=wts.reduce((a,b)=>a+b,0), acc=[0]; wts.forEach(w=>acc.push(acc[acc.length-1]+w/tot*100));
+  const X=x=>{ if(x<=pts[0]) return 0; for(let i=1;i<pts.length;i++){ if(x<=pts[i]) return acc[i-1]+(acc[i]-acc[i-1])*(daysBetween(pts[i-1],x)/Math.max(1,gaps[i-1])); } return 100; };
   const years=[]; for(let y=+lo.slice(0,4)+1;y<=+hi.slice(0,4);y++) years.push(y);
+  const durTxt=n=>n>=365?(Math.round(n/36.5)/10)+' yr':n>=60?Math.round(n/30.4)+' mo':n>=14?Math.round(n/7)+' wk':n+' d';
+  const gapLabs=all.slice(1).map((p,i)=>{ const n=daysBetween(all[i],p); if(n<45||all[i]===p) return ''; const a=X(all[i]), b=X(p); if(b-a<9) return ''; return '<span class="tl-gap" style="left:'+((a+b)/2)+'%">'+durTxt(n)+'</span>'; }).join('');
   const startD=(ev.find(e=>e.k==='workStart')||ev.find(e=>e.k==='bet')||ev[0]||{}).d||td;
   const endD=d.published||td;
   const items=ev.slice(); if(tgt) items.push({k:'tgt',l:'Target to IM',c:'tgt'+(pastTarget(t)?' late':''),d:tgt});
@@ -4343,7 +4364,7 @@ function wrTimeline(t){
       '<span class="tl-lab r'+(gi%2)+edge+(A.some(e=>/late/.test(e.c))?' late':'')+'" style="left:'+cx+'%" title="'+esc(A.map(e=>e.l+' '+fmt(e.d)).join(' · '))+'">'+lbl+'<small>'+when+'</small></span>'; }).join('');
   return '<div class="psec full wh-tl"><h4>Progress Over Time<span class="sp tl-key"><span><i class="k-start"></i>Work started</span><span><i class="k-dia"></i>Comment</span><span><i class="k-ring"></i>Review</span><span><i class="k-fin"></i>Published</span><span><i class="k-tgt"></i>Target</span></span></h4>'+
     '<div class="tl"><div class="tl-yrs">'+years.map(y=>'<span style="left:'+X(y+'-01-01')+'%">'+y+'</span>').join('')+'</div>'+
-    '<div class="tl-bar" style="left:'+X(startD)+'%;width:'+Math.max(.5,X(endD)-X(startD))+'%"></div>'+marks+
+    '<div class="tl-track" style="left:'+X(all[0])+'%"></div><div class="tl-bar" style="left:'+X(startD)+'%;width:'+Math.max(.5,X(endD)-X(startD))+'%"></div>'+gapLabs+marks+
     (!d.published?'<span class="tl-today" style="left:'+X(td)+'%"><b>Today</b></span>':'')+'</div></div>';
 }
 
@@ -5485,9 +5506,13 @@ let imSyncing=false, imSynced=0;
 async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<60000) return; imSyncing=true; imSynced=Date.now();
   try{ const yr=new Date().getFullYear();
     const [q,l1,l0,cfg,bt]=await Promise.all(['queue','learn-'+yr,'learn-'+(yr-1),'config','backtest'].map(n=>rGet(IMR,n).catch(()=>null)));
-    if(bt&&bt.data) S.imBt=bt.data; if(cfg&&cfg.data&&cfg.data.imauto) S.imauto=cfg.data.imauto;
+    if(bt&&bt.data) S.imBt=bt.data; if(q&&q.data&&q.data.items){ S.imPortalQ=q.data.items; if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel(); } if(cfg&&cfg.data&&cfg.data.imauto) S.imauto=cfg.data.imauto;
     [l0,l1].forEach(l=>{ if(l&&l.data&&l.data.rows) S.iml=Object.assign({},S.iml,l.data.rows); });
     if(!S.canWrite) return;
+    // what is coming to IM: Target to Submit to IM in the next 60 days (or past it and not yet sent)
+    try{ const td=today(), end=addDays(td,60); const items=liveTickets().filter(t=>t.state==='active'&&['approved','work','aireview'].includes(t.stage)&&t.dates&&t.dates.targetIM&&t.dates.targetIM<=end&&!t.dates.imSubmitted&&!t.split&&!t.rides).map(t=>({wr:t.wr,name:t.name,wg:t.workgroup||'',fac:t.facilitator||'',targetIM:t.dates.targetIM,stage:stageDef(t.stage).name})).sort((a,b)=>a.targetIM.localeCompare(b.targetIM));
+      const up=await rGet(IMR,'upcoming'); const prev=JSON.stringify(((up&&up.data&&up.data.items)||[]));
+      if(S.isStaff&&(prev!==JSON.stringify(items)||!(up&&up.data&&up.data.asOf===td))) await imrUpdate('upcoming',()=>({asOf:td,items})); }catch(e){}
     // who decides in the portal: People and Roles › IM Reviewer
     const rv=[...new Set(peopleFor('imreview').map(p=>String(p.email||'').toLowerCase()).filter(Boolean))].sort();
     if(rv.length&&S.isStaff&&JSON.stringify(rv)!==JSON.stringify(((cfg&&cfg.data&&cfg.data.reviewers)||[]).map(x=>String(x).toLowerCase()).sort())){ try{ await imrUpdate('config',cur=>Object.assign({},cur||{},{reviewers:rv})); }catch(e){} }
@@ -5495,7 +5520,7 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
     for(const x of Object.values(S.imq||{})) if(x.status==='awaiting'&&!x.pushed){ imEnsureR(x.ticket); if(S.imr[x.rep]) await imPush(x.rep); }
     // decided in the portal: bring the decisions home
     const items=(q&&q.data&&q.data.items)||{};
-    for(const it of Object.values(items)){ if(it.status!=='decided') continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
+    for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
       const d=await rGet(IMR,'rev-'+imrSafe(it.rep)); if(!d||!d.data) continue; const doc=d.data; S.imr[it.rep]=doc; await write(imColl(doc.ticket),it.rep,doc);
       const nq=Object.assign({},mine||{},{rep:it.rep,ticket:doc.ticket,wr:doc.wr,name:doc.name,status:'decided',decidedBy:it.decidedBy,decidedAt:it.decidedAt,agree:it.agree,counts:it.counts,pushed:true}); S.imq[it.rep]=nq; await write('imqueue',it.rep,nq);
       const t=S.tickets[doc.ticket]; if(t){ const sum=Object.entries(it.counts||imTally(doc.rows||[])).map(([k,n])=>n+' '+k.toLowerCase()).join(', '); const x=clone(t); hist(x,'IM decision ('+(doc.rows||[]).length+' rows): '+sum+'. Reviewed by '+(it.decidedBy||'IM')+' in IM Review.'); await saveTicket(x,'IM decision brought in'); } }
@@ -5504,6 +5529,17 @@ const _imSend0=imSend;
 imSend=async function(t,rep){ await _imSend0(t,rep); const ok=await imPush(rep.id); toast(ok?'Sent to IM Review':'Saved; it goes to IM Review as soon as Erin or MISMO staff open the MMS'); };
 const _imEnsureQ0=imEnsureQ;
 imEnsureQ=function(){ _imEnsureQ0(); setTimeout(imSync,1500); };
+
+/* the old in-MMS desk now points at the portal */
+VIEWS.imreview=function(){ imEnsureQ(); const L=Object.values(S.imPortalQ||{}), aw=L.filter(q=>q.status==='awaiting').length;
+  return '<div class="pagehead"><div><h1>IM Review</h1><div class="sub">IM reviews happen in their own page now, where Colleen and Erin decide each row and facilitators and staff can follow along.</div></div><div class="acts"><a class="btn pri" href="'+IMR_URL+'" target="_blank" rel="noopener">Open IM Review ↗</a></div></div>'+
+    '<div class="card"><b>'+aw+'</b> submission'+(aw===1?' is':'s are')+' waiting for IM. '+L.filter(q=>q.status==='decided').length+' decisions are on record there, back to 2020.</div>'; };
+/* each work request shows IM's decisions on record, with a link to every row */
+function imDecHtml(t){ const L=Object.values(S.imPortalQ||{}).filter(q=>q.ticket===t.id&&q.status==='decided').sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
+  if(!L.length) return ''; const c=q=>Object.entries(q.counts||{}).map(([d,n])=>n+' '+d.replace(/^Approved /,'').toLowerCase()).join(', ');
+  return '<div class="psec full imdec"><h4>IM Decisions<span class="sp muted" style="font-size:12px;font-weight:500">'+L.length+' on record</span></h4><div class="imdec-l">'+L.map(q=>'<a class="imdec-r" href="'+IMR_URL+'#/review/'+encodeURIComponent(q.rep)+'" target="_blank" rel="noopener"><span class="imdec-d">'+esc(fmtS(String(q.decidedAt).slice(0,10)))+(String(q.decidedAt).slice(0,4)!==String(new Date().getFullYear())?' '+esc(String(q.decidedAt).slice(0,4)):'')+'</span><span class="imdec-m"><b>'+esc((q.rows||0)+' rows'+(q.resub?' · resubmission':''))+'</b><em>'+esc(c(q))+'</em></span><span class="imdec-go">Every row ↗</span></a>').join('')+'</div></div>'; }
+const _renderPanelIMD=renderPanel;
+renderPanel=function(){ _renderPanelIMD(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const pane=$('[data-wtab="rev"]',P); if(!pane||$('.imdec',pane)) return; const h=imDecHtml(t); if(h) pane.insertAdjacentHTML('afterbegin',h); };
 
 /* ---------- settings ---------- */
 let setTab='process';
