@@ -1589,6 +1589,22 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 .imd-foot{position:sticky;bottom:0;display:flex;gap:10px;align-items:center;justify-content:flex-end;background:var(--bg,#f3f8fc);padding:12px 0;margin-top:12px;border-top:1px solid var(--line,#dbe5ee)}
 .imd-foot>span{margin-right:auto;font-size:13px;color:var(--muted,#5b7287)}
 @media (max-width:640px){ .imd-prog{align-items:flex-start;min-width:0}.imd-bar{width:100%} .imr em{display:block;margin-bottom:2px} .imd-foot{flex-wrap:wrap} }
+
+/* home hero: the pulse fills the greeting side so the hero has no empty well */
+.hero2{align-items:stretch}
+.hero2 .hero-l{display:flex;flex-direction:column}
+.hpulse{margin-top:auto;padding-top:18px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.hp-t{position:relative;display:flex;flex-direction:column;gap:1px;text-align:left;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:11px 13px 12px;color:#fff;font:inherit;min-width:0}
+button.hp-t{cursor:pointer}button.hp-t:hover{background:rgba(255,255,255,.12)}
+.hp-k{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hp-v{font-size:26px;font-weight:700;line-height:1.15;color:#fff}
+.hp-s{font-size:12px;color:rgba(255,255,255,.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hp-spark{position:absolute;right:12px;top:30px;display:flex;align-items:flex-end;gap:2px;height:26px;width:62px}
+.hp-spark i{flex:1;background:rgba(116,191,235,.35);border-radius:1px}.hp-spark i.w{background:var(--sky)}
+.hp-dots{position:absolute;right:12px;top:34px;display:flex;gap:4px;flex-wrap:wrap;max-width:60px;justify-content:flex-end}
+.hp-dots i{width:9px;height:9px;border-radius:50%;background:var(--sky)}
+@media(max-width:1000px){.hpulse{margin-top:0}}
+@media(max-width:560px){.hpulse{grid-template-columns:1fr 1fr 1fr;gap:6px}.hp-t{padding:9px 9px 10px}.hp-v{font-size:21px}.hp-k{font-size:9.5px;letter-spacing:.03em;white-space:normal;overflow:visible}.hp-s{font-size:11px;white-space:normal}.hp-spark,.hp-dots{display:none}}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3651,7 +3667,18 @@ VIEWS.home=function(){
   const nowIso=new Date().toISOString(), recent=[]; allTickets().forEach(t=>(t.history||[]).forEach(hh=>{ if(hh.at&&hh.at<=nowIso&&!/^Brought over/.test(hh.text||'')) recent.push([hh,t]); })); recent.sort((a,b)=>b[0].at.localeCompare(a[0].at));
   const fdp=pageOf('feed',recent.slice(0,60),6);
   const feed='<section class="pane"><header><h3>Latest Moves</h3><span class="live-dot" title="Updates as work moves"></span></header><div class="pane-b">'+(recent.length?'<ol class="feed">'+fdp.items.map(([hh,t])=>'<li data-open="'+esc(t.id)+'">'+av(hh.by||'','xs')+'<span><b>'+esc(t.wr)+'</b> '+esc(hh.text)+'<em>'+esc(hh.by||'')+' · '+esc(relTime(hh.at))+'</em></span></li>').join('')+'</ol>':'<div class="lane-e">Moves show here as work goes through.</div>')+'</div>'+fdp.bar+'</section>';
-  return '<div class="hero hero2"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}))+'</div><h2>'+g+(first?', '+esc(first):'')+'</h2><p>'+line+'</p></div>'+plateHtml+'</div>'+kpis+lineCard+'<div class="home3">'+att+fl+feed+'</div>';
+  // the pulse: what changed lately, so the greeting side carries the week too
+  const wkAgo=addDays(td,-6), yr=td.slice(0,4), byDay={}; for(let i=13;i>=0;i--) byDay[addDays(td,-i)]=0;
+  const movedT=new Set(); recent.forEach(([hh,t])=>{ const d=String(hh.at).slice(0,10); if(d in byDay) byDay[d]++; if(d>=wkAgo) movedT.add(t.id); });
+  const closing=inC.filter(t=>t.dates&&t.dates.commentEnd&&t.dates.commentEnd>=td&&t.dates.commentEnd<=addDays(td,7));
+  const pubYr=allTickets().filter(t=>t.state==='published'&&String((t.dates&&t.dates.published)||'').slice(0,4)===yr);
+  const dv=Object.values(byDay), dmax=Math.max(1,...dv);
+  const spark='<span class="hp-spark" aria-hidden="true">'+dv.map((n,i)=>'<i style="height:'+Math.max(8,Math.round(n/dmax*100))+'%"'+(i>=7?' class="w"':'')+'></i>').join('')+'</span>';
+  const pt=(k,v,s,vis,goTo)=>'<'+(goTo?'button type="button" data-go="'+goTo+'"':'div')+' class="hp-t"><span class="hp-k">'+k+'</span><span class="hp-v">'+v+'</span><span class="hp-s">'+s+'</span>'+(vis||'')+'</'+(goTo?'button':'div')+'>';
+  const pulse='<div class="hpulse">'+pt('Closing in 7 Days',closing.length,closing.length?closing.length===1?'comment period':'comment periods':'none this week','<span class="hp-dots">'+closing.slice(0,8).map(()=>'<i></i>').join('')+'</span>','comment')+
+    pt('Moved This Week',movedT.size,movedT.size===1?'work request':'work requests',spark)+
+    pt('Published',pubYr.length,(pubYr.length===1?'work product':'work products')+' in '+yr,'')+'</div>';
+  return '<div class="hero hero2"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}))+'</div><h2>'+g+(first?', '+esc(first):'')+'</h2><p>'+line+'</p>'+pulse+'</div>'+plateHtml+'</div>'+kpis+lineCard+'<div class="home3">'+att+fl+feed+'</div>';
 };
 
 /* ---------------- wiring ---------------- */
