@@ -173,7 +173,7 @@
         .sort(function (a, b) { return (pastTarget(b[0], today) - pastTarget(a[0], today)) || ((stageAge(b[0], today) || 0) - (stageAge(a[0], today) || 0)); });
       count.todo = ym.length;
       if (ym.length) S.push({ key: 'yourMove', title: 'Your Move', note: ym.length + ' waiting on you', tone: 'warn',
-        rows: ym.map(function (x) { var a = stageAge(x[0], today); return row(x[0], stageName(P, x[0].stage) + ': ' + x[1], a != null ? ageTxt(a) + ' at this stage' : '', a != null && a > cfg.staleDays ? 'bad' : ''); }) });
+        rows: ym.map(function (x) { var a = stageAge(x[0], today); return row(x[0], stageName(P, x[0].stage) + ': ' + x[1], a != null ? ageTxt(a) + ' at this stage' : '', pastTarget(x[0], today) ? 'bad' : (a != null && a > cfg.staleDays ? 'warn' : '')); }) });
     }
     var late = act.filter(function (t) { return pastTarget(t, today); });
     count.late = late.length;

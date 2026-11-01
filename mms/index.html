@@ -2662,7 +2662,7 @@ function wireArch(m){
         .sort(function (a, b) { return (pastTarget(b[0], today) - pastTarget(a[0], today)) || ((stageAge(b[0], today) || 0) - (stageAge(a[0], today) || 0)); });
       count.todo = ym.length;
       if (ym.length) S.push({ key: 'yourMove', title: 'Your Move', note: ym.length + ' waiting on you', tone: 'warn',
-        rows: ym.map(function (x) { var a = stageAge(x[0], today); return row(x[0], stageName(P, x[0].stage) + ': ' + x[1], a != null ? ageTxt(a) + ' at this stage' : '', a != null && a > cfg.staleDays ? 'bad' : ''); }) });
+        rows: ym.map(function (x) { var a = stageAge(x[0], today); return row(x[0], stageName(P, x[0].stage) + ': ' + x[1], a != null ? ageTxt(a) + ' at this stage' : '', pastTarget(x[0], today) ? 'bad' : (a != null && a > cfg.staleDays ? 'warn' : '')); }) });
     }
     var late = act.filter(function (t) { return pastTarget(t, today); });
     count.late = late.length;
@@ -2828,7 +2828,7 @@ function avHue(n){ let h=0; for(const c of String(n||'')) h=(h*31+c.charCodeAt(0
 function av(n,cls){ return '<span class="av'+(cls?' '+cls:'')+'" style="--av:'+(n?avHue(n):'#7794aa')+'" title="'+esc(n||'Unassigned')+'">'+esc(n?initials(n):'?')+'</span>'; }
 const firstName=n=>String(n||'').split(' ')[0];
 function ageTxt(n){ if(n==null) return ''; if(n<60) return n+'d'; if(n<730) return Math.round(n/30.4)+' mo'; return (n/365).toFixed(1).replace(/\.0$/,'')+' yr'; }
-function heatLevel(t){ const a=stageAge(t); if(a==null||t.state!=='active') return -1; if(pastTarget(t)||stalled(t)) return 2;
+function heatLevel(t){ const a=stageAge(t); if(a==null||t.state!=='active') return -1; if(pastTarget(t)) return 2; if(stalled(t)) return 1;
   const lim=t.stage==='work'?(SIZE_DAYS[t.size]||120):(t.stage==='comment'?(+t.commentDays||30):21); return a>lim*.6?1:0; }
 function heat(t){ const a=stageAge(t), l=heatLevel(t); if(l<0) return ''; return '<span class="heat h'+l+'" title="'+a+' days at '+esc(stageDef(t.stage).name)+'"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>'+ageTxt(a)+'</span>'; }
 function tags(t){ return [t.kind?'<span class="chip">'+esc(t.kind)+'</span>':'', t.rides?'<span class="chip info">Moves With '+esc((S.tickets[t.rides]||{}).wr||'')+'</span>':'', ridersOf(t.id).length?'<span class="chip info">'+ridersOf(t.id).length+' Riding</span>':'', t.request?'<span class="chip warn">Asked to '+esc(t.request.kind)+'</span>':'', subChip(t), stateChip(t), pastTarget(t)?'<span class="chip bad">Past Target</span>':''].join(''); }
