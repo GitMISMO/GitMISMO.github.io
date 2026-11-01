@@ -635,7 +635,14 @@ function load(){
     if (o && o.answers) A = o.answers; submitted = !!(o && o.submitted); } } catch(e){}
 }
 function persist(){
-  try { localStorage.setItem(KEY, JSON.stringify({ answers: A, submitted: submitted, at: new Date().toISOString() })); } catch(e){}
+  try { localStorage.setItem(KEY, JSON.stringify({ answers: A, submitted: submitted, at: new Date().toISOString() })); return; } catch(e){}
+  /* A large attachment can be more than this browser will keep. The typed answers are still kept
+     then, without the files, so nothing else is lost; a file is attached again after a reload. */
+  try {
+    var lite = JSON.parse(JSON.stringify(A));
+    Object.keys(lite.files || {}).forEach(function(k){ lite.files[k] = []; });
+    localStorage.setItem(KEY, JSON.stringify({ answers: lite, submitted: submitted, at: new Date().toISOString() }));
+  } catch(e){}
 }
 function setPath(path, value){
   var parts = path.split("."), o = A;
@@ -1009,6 +1016,9 @@ function blockers(){
     if (open) out.push("Step " + stepOf("script") + ": answer " + (open === 1 ? "the last certification script question." : "the " + open + " certification script questions still blank."));
   }
   if (A.signer.keep === undefined) out.push("Step " + stepOf("signer") + ": confirm who signs for your company.");
+  /* With no email on file for the signer, "That is still right" would leave MISMO nobody to send the
+     signing request to (stress test, 1 Nov 2026). */
+  if (A.signer.keep === true && !(R.signer && R.signer.email)) out.push("Step " + stepOf("signer") + ": we have no email address for your signer, so choose \u201cSomeone else signs now\u201d and give the signer\u2019s name and email, even if it is the same person.");
   if (A.signer.keep === false) {
     if (!(A.signer.name || "").trim()) out.push("Step " + stepOf("signer") + ": give the new signer’s name.");
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((A.signer.email || "").trim())) out.push("Step " + stepOf("signer") + ": give the new signer’s email.");
