@@ -4647,33 +4647,62 @@ const RV_IM_LEARNED={decided:3709,asSubmitted:2486,withMod:695,withdrawn:435,ret
 /* ---------- Claude's part ---------- */
 const RV_EDITOR_PERSONA='You are a meticulous senior editor for MISMO (Mortgage Industry Standards Maintenance Organization) work products. You review draft, comment-period, candidate recommendation, recommendation and final work products for editorial quality, consistency, branding, formatting, boilerplate language, copyright, trademarks and publication readiness. You identify spelling, grammar, punctuation, terminology, acronym, template, logo, header, footer, pagination and accessibility issues while preserving the author\'s technical meaning. You compare the work product against the MISMO Editor Process and Guidance and the MISMO Work Product Boilerplate Language and Guidance. You do not validate XPath mappings, data-point mappings, XML schemas, YAML files or technical implementation logic. You never invent legal language, classifications, dates, approvals or licensing decisions; when something like that is unclear you ask the facilitator.';
 const RV_EDITOR_RULES='Rules:\n- Never rewrite the work product. Report what to change; the facilitator decides. Editor review is subjective: label taste-level suggestions as recommendations, not corrections.\n- Quote the exact text in "where" (15 words or fewer) so the facilitator can find it.\n- Corrections are clear errors: spelling, grammar, punctuation, wrong or inconsistent terms, inconsistent capitalization of MISMO terms, undefined acronyms, broken numbering, mismatched cross-references, inconsistent names or versions of MISMO products.\n- MISMO voice: MISMO does not mandate, require or advocate. Flag “MISMO strongly believes”, “MISMO thinks the industry should”, “must use”.\n- Use American spelling. Use registered trademarks where they apply (MISMO®, MERS®).\n- Accessibility: descriptive link text, meaning not carried by color alone, tables with header rows, alt text for images if mentioned.\n- Software already checked boilerplate wording, copyright year, page numbers, tracked changes, comments and fonts. Don’t repeat those.\n- Don’t comment on XPaths, mappings, schemas or technical logic.';
-function rvChunks(text,max){ const out=[]; let cur=''; String(text).split(/\n/).forEach(l=>{ if((cur+l).length>max&&cur){ out.push(cur); cur=''; } cur+=l+'\n'; }); if(cur.trim()) out.push(cur); return out; }
+/* Claude answers through the save relay, which caps each answer at about a page.
+   So the work goes in small pieces, a few at a time, in a compact answer format,
+   and an answer that runs long is repaired rather than thrown away. */
+function rvRepairJson(t){
+  t=String(t||''); const a=t.indexOf('{'); if(a<0) return null; t=t.slice(a);
+  try{ return JSON.parse(t.slice(0,t.lastIndexOf('}')+1)); }catch(e){}
+  const st=[]; let inS=false, esc2=false, lastSafe=-1, safeStack=null;
+  for(let i=0;i<t.length;i++){ const c=t[i];
+    if(inS){ if(esc2) esc2=false; else if(c==='\\') esc2=true; else if(c==='"') inS=false; continue; }
+    if(c==='"'){ inS=true; continue; }
+    if(c==='{'||c==='[') st.push(c==='{'?'}':']');
+    else if(c==='}'||c===']'){ st.pop(); if(st.length){ lastSafe=i; safeStack=st.slice(); } } }
+  if(lastSafe<0) return null;
+  try{ return JSON.parse(t.slice(0,lastSafe+1)+safeStack.reverse().join('')); }catch(e){ return null; }
+}
+async function rvAsk(prompt){
+  let txt='';
+  if(typeof S.sample==='function'){ const r=await S.sample(prompt,{modelTier:'complex'}); txt=typeof r==='string'?r:(r&&(r.text||r.content))||''; }
+  else if(S.sample&&typeof S.sample.text==='function'){ const r=await S.sample.text(prompt,{modelTier:'complex'}); txt=typeof r==='string'?r:(r&&(r.text||r.content))||''; }
+  else return await S.sample.json(prompt,{modelTier:'complex'});
+  const j=rvRepairJson(txt); if(!j) throw new Error('Claude’s answer couldn’t be read'); return j; }
+async function rvPool(items,n,fn){ const out=new Array(items.length); let k=0; await Promise.all(Array.from({length:Math.min(n,items.length)},async()=>{ while(k<items.length){ const i=k++; try{ out[i]=await fn(items[i],i); }catch(e){ out[i]={__err:(e&&e.message)||'failed'}; } } })); return out; }
+function rvChunks(text,max){ const out=[]; let cur=''; String(text).split(/\n/).forEach(l=>{ while(l.length>max){ out.push(l.slice(0,max)); l=l.slice(max); } if((cur+l).length>max&&cur){ out.push(cur); cur=''; } cur+=l+'\n'; }); if(cur.trim()) out.push(cur); return out; }
 async function rvAiEditor(files,ctx,progress){
   if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
-  let cap=60000; try{ const lim=await S.sample.limits(); if(lim&&lim.inputBytes) cap=Math.max(15000,Math.min(cap,Math.floor(lim.inputBytes*0.75)-6000)); }catch(e){}
   const all=files.map(f=>'# FILE: '+f.name+' ('+(f.kind==='excel'?'Excel workbook':'Word document')+')\n'+f.text).join('\n\n');
-  const parts=rvChunks(all,cap), use=parts.slice(0,4), res={corrections:[],recommendations:[],questions:[],summaries:[],readiness:[]};
-  for(let i=0;i<use.length;i++){ progress&&progress('Claude is reading part '+(i+1)+' of '+use.length+'…');
-    const prompt=RV_EDITOR_PERSONA+'\n\n'+RV_EDITOR_RULES+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nStage: '+stageDef(ctx.t.stage).name+' (boilerplate needed now: '+RV_BP_LABEL[ctx.boiler]+')\nFacilitator note: '+(ctx.note||'none')+'\n'+(use.length>1?'This is part '+(i+1)+' of '+use.length+' of the submission.\n':'')+
-      '\nReturn ONLY JSON: {"summary":"two sentences on editorial quality","readiness":"ready"|"minor"|"needs-updates","corrections":[{"where":"exact short quote","issue":"what is wrong","suggestion":"the fix","category":"Spelling|Grammar|Punctuation|Terminology|Acronyms|Capitalization|Consistency|Numbering|Cross-reference|Accessibility|Branding|Other"}],"recommendations":[{"where":"","issue":"","suggestion":""}],"questions":["question for the facilitator"]}. Up to 40 corrections and 12 recommendations, most important first.\n\nSUBMISSION:\n'+use[i];
-    try{ const r=await S.sample.json(prompt,{modelTier:'complex'}); (r.corrections||[]).forEach(c=>res.corrections.push(c)); (r.recommendations||[]).forEach(c=>res.recommendations.push(c)); (r.questions||[]).forEach(q=>res.questions.push(q)); if(r.summary) res.summaries.push(r.summary); if(r.readiness) res.readiness.push(r.readiness); }
-    catch(e){ res.error=(e&&e.message)||'Claude didn’t finish'; break; } }
+  const parts=rvChunks(all,12000), use=parts.slice(0,12); let done=0;
+  const res={corrections:[],recommendations:[],questions:[],summaries:[],readiness:[]};
+  const got=await rvPool(use,3,async(part,i)=>{
+    const prompt=RV_EDITOR_PERSONA+'\n\n'+RV_EDITOR_RULES+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nStage: '+stageDef(ctx.t.stage).name+'\nFacilitator note: '+(ctx.note||'none')+'\nThis is part '+(i+1)+' of '+use.length+'.\n'+
+      '\nAnswer in this compact JSON only (no other text): {"s":"one sentence on this part","r":"ready|minor|needs","c":[["exact short quote","what is wrong","the fix","category"]],"m":[["where","recommendation","suggestion"]],"q":["question for the facilitator"]}. At most 12 items in c, 4 in m, 2 in q; most important first; keep each string short.\n\nTEXT:\n'+part;
+    const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+done+' of '+use.length+' part'+(use.length===1?'':'s')+'…'); return r; });
+  let errs=0;
+  got.forEach(r=>{ if(!r||r.__err){ errs++; return; }
+    (r.c||[]).forEach(x=>Array.isArray(x)?res.corrections.push({where:x[0],issue:x[1],suggestion:x[2],category:x[3]}):res.corrections.push(x));
+    (r.m||[]).forEach(x=>Array.isArray(x)?res.recommendations.push({where:x[0],issue:x[1],suggestion:x[2]}):res.recommendations.push(x));
+    (r.q||[]).forEach(q=>res.questions.push(q)); if(r.s) res.summaries.push(r.s); if(r.r) res.readiness.push(r.r==='needs'?'needs-updates':r.r); });
+  const seen=new Set(); res.corrections=res.corrections.filter(c=>{ const k=rvNorm(c.where)+'|'+rvNorm(c.issue).slice(0,30); if(seen.has(k)) return false; seen.add(k); return true; });
+  res.summaries=res.summaries.slice(0,3);
+  if(errs) res.error=errs+' of '+use.length+' parts didn’t come back from Claude; the rest are below.';
   if(parts.length>use.length) res.note='Claude read the first '+use.length+' of '+parts.length+' parts; the software checks covered everything.';
   return res;
 }
 async function rvAiIm(P,ctx,progress){
   if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
-  const rows=P.rows.filter(r=>/add|modify|rename/i.test(r.ct||'')).map(r=>({item:r.item||r._row,change:(r.ct||'')+' '+(r.tt||''),container:r.cn||r.pc||'',name:r.dp||r.en||r.at||r.ac||r.cn||'',old:r.old||'',defType:r.dt||'',definition:r.def||''}));
+  const rows=P.rows.filter(r=>/add|modify|rename/i.test(r.ct||'')).map(r=>[String(r.item||r._row),(r.ct||'')+' '+(r.tt||''),r.cn||r.pc||'',r.dp||r.en||r.at||r.ac||r.cn||'',r.def||'']);
   if(!rows.length) return {rows:[]};
-  const L=RV_IM_LEARNED; const guide='What IM has done with 3,709 decided rows (2021–2026): '+Math.round(L.asSubmitted/L.decided*100)+'% approved as submitted, '+Math.round(L.withMod/L.decided*100)+'% approved with modification, '+Math.round(L.withdrawn/L.decided*100)+'% withdrawn, the rest returned or denied. Most common reasons: '+L.themes.map(t=>t[0]).join('; ')+'.\nTypical IM edits (before → after, why):\n'+L.examples.map(e=>'- ['+e[0]+'] '+e[1]+' → '+e[2]+' ('+e[3]+')').join('\n')+'\nTypical IM comments: '+L.comments.join(' | ')+'\nDefinition templates by class word: '+Object.entries(RV_TEMPLATE_TEXT).map(([k,v])=>k+': '+v).join('; ')+'.';
-  const out=[]; const size=120;
-  for(let i=0;i<rows.length;i+=size){ const part=rows.slice(i,i+size); progress&&progress('Claude is reading rows '+(i+1)+'–'+(i+part.length)+' of '+rows.length+'…');
-    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM reviews proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear and well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if you think something may already exist, say “may already exist; check the Reference Model for …”. Only list rows IM would likely question. Keep notes short and in IM’s plain voice.\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows (JSON): '+JSON.stringify(part)+'\n\nReturn ONLY JSON: {"summary":"two sentences","rows":[{"item":"item #","likely":"as submitted"|"with modification"|"returned"|"denied","note":"what IM would say","suggestedDefinition":"optional","suggestedName":"optional"}]}';
-    try{ const r=await S.sample.json(prompt,{modelTier:'complex'}); (r.rows||[]).forEach(x=>out.push(x)); if(r.summary) (out.summaries=out.summaries||[]).push(r.summary); }
-    catch(e){ return {rows:out,error:(e&&e.message)||'Claude didn’t finish'}; } }
-  return {rows:out,summaries:out.summaries||[]};
+  const L=RV_IM_LEARNED; const guide='What IM has done with '+L.decided.toLocaleString()+' decided rows (2021–2026): '+Math.round(L.asSubmitted/L.decided*100)+'% approved as submitted, '+Math.round(L.withMod/L.decided*100)+'% approved with modification, '+Math.round(L.withdrawn/L.decided*100)+'% withdrawn, the rest returned or denied. Most common reasons: '+L.themes.map(t=>t[0]).join('; ')+'.\nTypical IM edits (before → after, why):\n'+L.examples.map(e=>'- ['+e[0]+'] '+e[1]+' → '+e[2]+' ('+e[3]+')').join('\n')+'\nTypical IM comments: '+L.comments.join(' | ')+'\nDefinition templates: '+Object.entries(RV_TEMPLATE_TEXT).map(([k,v])=>k+': '+v).join('; ')+'.';
+  const parts=[]; for(let i=0;i<rows.length;i+=30) parts.push(rows.slice(i,i+30)); let done=0;
+  const got=await rvPool(parts,3,async part=>{
+    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM checks proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if something may already exist, say “may already exist; check the Reference Model for …”. List only rows IM would likely question. Plain, short notes in IM’s voice.\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows as [item, change, container, name, definition]: '+JSON.stringify(part)+'\n\nAnswer in this compact JSON only: {"s":"one sentence","r":[["item","as submitted|with modification|returned|denied","what IM would say","suggested definition or empty","suggested name or empty"]]}. At most 10 rows; keep strings short.';
+    const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+Math.min(rows.length,done*30)+' of '+rows.length+' rows…'); return r; });
+  const out=[], sums=[]; let errs=0;
+  got.forEach(r=>{ if(!r||r.__err){ errs++; return; } (r.r||[]).forEach(x=>Array.isArray(x)?out.push({item:x[0],likely:x[1],note:x[2],suggestedDefinition:x[3],suggestedName:x[4]}):out.push(x)); if(r.s) sums.push(r.s); });
+  return {rows:out,summaries:sums.slice(0,2),error:errs?errs+' of '+parts.length+' groups of rows didn’t come back from Claude; the rest are below.':''};
 }
-
 /* ---------- the report ---------- */
 function rvReadiness(findings,ai){
   const fix=findings.filter(f=>f.sev==='fix').length, ai3=(ai&&ai.readiness)||[];
