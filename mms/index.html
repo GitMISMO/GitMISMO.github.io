@@ -5319,8 +5319,8 @@ function ssTabHtml(t){ ssEnsure(); const D=ssFor(t);
   const row=f=>{ const k=f.url&&!f.p?'link':ssKind(f.n); const tag=ssTag(f.n);
     return '<a class="ss-f" href="'+esc(ssUrl(f))+'" target="_blank" rel="noopener"><span class="ss-i ss-'+k+'">'+ssIc(k)+'</span><span class="ss-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',f.b||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span>'+(tag?'<span class="chip ss-tag">'+esc(tag)+'</span>':'')+'<span class="ss-go">↗</span></a>'; };
   const L=(D.links||[]);
-  return '<div class="psec full ss-tab"><h4>Files<span class="sp muted" style="font-size:12px;font-weight:500">'+F.length+' from Smartsheet · kept in SharePoint</span></h4>'+
-    (F.length?groups.map(g=>'<div class="ss-g">'+esc(g)+'</div><div class="ss-list">'+F.filter(f=>yr(f)===g).map(row).join('')+'</div>').join(''):'<div class="lead-empty">No files were attached in Smartsheet.</div>')+'</div>'+
+  return '<div class="psec full ss-tab"><h4>Documents<span class="sp muted" style="font-size:12px;font-weight:500">'+F.length+' in SharePoint · click one to open it in a new tab</span></h4>'+
+    (F.length?groups.map(g=>'<div class="ss-g">'+esc(g)+'</div><div class="ss-list">'+F.filter(f=>yr(f)===g).map(row).join('')+'</div>').join(''):'<div class="lead-empty">No documents yet. Save them in this work request’s SharePoint folder.</div>')+'</div>'+
     (L.length?'<div class="psec full ss-tab"><h4>Links From Smartsheet</h4><div class="wh-chips">'+L.map(l=>'<a class="wh-chip" href="'+esc(l.u)+'" target="_blank" rel="noopener">'+whIc('link')+esc(l.n||l.col||l.u)+'<span>↗</span></a>').join('')+'</div></div>':''); }
 const _renderPanelSS=renderPanel;
 renderPanel=function(){ _renderPanelSS(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const pb=$('.pb',P); if(!pb||!$('.wh-tabs',pb)||$('[data-wtab="files"]',pb)) return;
@@ -5339,13 +5339,13 @@ renderPanel=function(){ _renderPanelSS(); const P=$('#panel'); if(!S.panel||Stri
 function ssFolderPath(t){ const D=ssFor(t); const f=D&&(D.files||[]).find(x=>x.p&&String(x.p).includes('/')); const name=f?String(f.p).replace(/^\/?(sites\/Facilitators\/Shared Documents\/MMS Smartsheet Files\/)?/,'').split('/')[0]:String(t.wr||'').replace(/\s/g,''); return SS_ROOT+name; }
 function ssFolderUrl(t){ return SP_HOST+'/sites/Facilitators/Shared%20Documents/Forms/AllItems.aspx?id='+encodeURIComponent(ssFolderPath(t)); }
 function rvSpPick(t){ ssEnsure(); const D=ssFor(t); const F=((D&&D.files)||[]).filter(f=>/\.xls[xm]?$/i.test(f.n)).sort((a,b)=>(ssTag(b.n)==='IM Submission')-(ssTag(a.n)==='IM Submission')||String(b.u||'').localeCompare(String(a.u||'')));
-  return fld('The Form in SharePoint','<div class="rv-sp"><select id="rvsp"><option value="">Pick the form from this work request’s folder…</option>'+F.map((f,i)=>'<option value="'+i+'">'+esc(f.n)+(f.u?' · '+esc(fmtS(String(f.u).slice(0,10))):'')+'</option>').join('')+'<option value="link">Another file: paste its SharePoint link</option></select><input type="url" id="rvspu" placeholder="https://mortgagebankersassociation.sharepoint.com/…" hidden><a class="btn sm ghost" href="'+esc(ssFolderUrl(t))+'" target="_blank" rel="noopener">Open the folder ↗</a></div>','So IM reviewers can open the original from SharePoint, the same way assessors open documents in the CMS. Save the form in the work request’s folder first.'); }
+  return fld('The Form in SharePoint','<div class="rv-sp"><select id="rvsp"><option value="">Pick the form from this work request’s folder…</option>'+F.map((f,i)=>'<option value="'+i+'">'+esc(f.n)+(f.u?' · '+esc(fmtS(String(f.u).slice(0,10))):'')+'</option>').join('')+'<option value="link">Another file: paste its SharePoint link</option></select><input type="url" id="rvspu" placeholder="https://mortgagebankersassociation.sharepoint.com/…" hidden></div>','IM reviewers open it, and the work request’s other documents, straight from IM Review. Save the form in the work request’s SharePoint folder first.'); }
 function rvSpRead(box,t){ const sel=$('#rvsp',box); if(!sel||!sel.value) return null; if(sel.value==='link'){ const u=($('#rvspu',box).value||'').trim(); return /^https:\/\/[a-z0-9-]+\.sharepoint\.com\//i.test(u)?{n:decodeURIComponent(u.split('?')[0].split('/').pop()||'Submission form'),u,folder:ssFolderUrl(t)}:null; }
   const D=ssFor(t); const F=((D&&D.files)||[]).filter(f=>/\.xls[xm]?$/i.test(f.n)).sort((a,b)=>(ssTag(b.n)==='IM Submission')-(ssTag(a.n)==='IM Submission')||String(b.u||'').localeCompare(String(a.u||''))); const f=F[+sel.value]; return f?{n:f.n,u:ssUrl(f),folder:ssFolderUrl(t)}:null; }
 document.addEventListener('change',e=>{ if(e.target&&e.target.id==='rvsp'){ const u=document.getElementById('rvspu'); if(u) u.hidden=e.target.value!=='link'; } });
-/* the Files tab opens the folder too */
-const _ssTabHtml0=ssTabHtml;
-ssTabHtml=function(t){ return '<div class="psec full ss-folder"><a class="btn sm" href="'+esc(ssFolderUrl(t))+'" target="_blank" rel="noopener">'+whIc('box')+' Open This Work Request’s Folder in SharePoint ↗</a><span class="muted">Anyone with access to the MISMO Facilitator Team site can open these.</span></div>'+_ssTabHtml0(t); };
+/* documents a review portal can open: every file in the work request's SharePoint folder, newest first,
+   each opening the file itself in a new tab (PDFs in the browser, Word and Excel in Office online), as the CMS does */
+function ssDocs(t,max){ ssEnsure(); const D=ssFor(t); return ((D&&D.files)||[]).filter(f=>f.p||f.url).slice().sort((a,b)=>String(b.u||'').localeCompare(String(a.u||''))).slice(0,max||80).map(f=>({n:f.n,u:ssUrl(f),d:String(f.u||'').slice(0,10),tag:ssTag(f.n),k:ssKind(f.n)})); }
 /* =====================================================================
    IM Review Desk. The IM Pre-Review drafts IM's decision for every row of the
    IM Submission Form (decision, comment, suggested wording). IM reviewers
@@ -5515,7 +5515,7 @@ async function imrPut(name,content,sha){ const tok=window.ResourcesSession&&Reso
 async function imrUpdate(name,fn){ for(let i=0;i<5;i++){ const g=await rGet(IMR,name); const next=fn(g&&g.data?JSON.parse(JSON.stringify(g.data)):null); const r=await imrPut(name,next,g&&g.sha); if(r.ok) return next; if(r.status===403||r.status===401) throw new Error('no access'); await new Promise(x=>setTimeout(x,300+i*400)); } throw new Error('busy'); }
 async function imPush(rep){ const q=S.imq[rep], doc=S.imr[rep]; if(!q||!doc) return false; const t=S.tickets[q.ticket]||{}; const fac=personByName(t.facilitator)||{};
   const rp=(S.reviews&&S.reviews[rep])||{}; const sp=rp.sp||null;
-  const item=Object.assign({},q,{form:sp?{n:sp.n,u:sp.u}:null,folder:(sp&&sp.folder)||(typeof ssFolderUrl==='function'&&S.tickets[q.ticket]?ssFolderUrl(S.tickets[q.ticket]):''),wg:t.workgroup||'',resub:/IMSub[2-9]|resub/i.test(doc.file||''),fac:{name:t.facilitator||'',email:fac.email||''},flow:(S.notify&&S.notify.flowUrl)||'',from:(S.notify&&S.notify.from)||''});
+  const item=Object.assign({},q,{form:sp?{n:sp.n,u:sp.u}:null,docs:t.id&&typeof ssDocs==='function'?ssDocs(t):[],folder:(sp&&sp.folder)||(typeof ssFolderUrl==='function'&&S.tickets[q.ticket]?ssFolderUrl(S.tickets[q.ticket]):''),wg:t.workgroup||'',resub:/IMSub[2-9]|resub/i.test(doc.file||''),fac:{name:t.facilitator||'',email:fac.email||''},flow:(S.notify&&S.notify.flowUrl)||'',from:(S.notify&&S.notify.from)||''});
   try{ await imrUpdate('rev-'+imrSafe(rep),cur=>cur&&cur.status==='decided'?cur:Object.assign({},doc,{status:'awaiting'}));
     await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!(o.items[rep]&&o.items[rep].status==='decided')) o.items[rep]=item; return o; });
     q.pushed=true; await write('imqueue',rep,q); return true; }catch(e){ return false; } }
@@ -5535,6 +5535,9 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
     if(rv.length&&S.isStaff&&JSON.stringify(rv)!==JSON.stringify(((cfg&&cfg.data&&cfg.data.reviewers)||[]).map(x=>String(x).toLowerCase()).sort())){ try{ await imrUpdate('config',cur=>Object.assign({},cur||{},{reviewers:rv})); }catch(e){} }
     // sent from the MMS but not yet in the portal (the sender had no portal access): push it now
     for(const x of Object.values(S.imq||{})) if(x.status==='awaiting'&&!x.pushed){ imEnsureR(x.ticket); if(S.imr[x.rep]) await imPush(x.rep); }
+    // waiting items carry the work request's documents (refreshed as files are added)
+    try{ const pq=(q&&q.data&&q.data.items)||{}; const upd={}; Object.values(pq).forEach(it=>{ if(it.hist||it.status==='decided'||!it.ticket) return; const t=S.tickets[it.ticket]; if(!t||typeof ssDocs!=='function') return; const d=ssDocs(t); if(JSON.stringify(d)!==JSON.stringify(it.docs||[])) upd[it.rep]=d; });
+      if(S.isStaff&&Object.keys(upd).length) await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; Object.entries(upd).forEach(([r,d])=>{ if(o.items&&o.items[r]) o.items[r].docs=d; }); return o; }); }catch(e){}
     // decided in the portal: bring the decisions home
     const items=(q&&q.data&&q.data.items)||{};
     for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist||it.test) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
