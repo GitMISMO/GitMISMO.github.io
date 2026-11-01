@@ -699,7 +699,7 @@ function upCard(u,i){ const dd=daysTo(u.targetIM); return '<div class="up rise" 
 function roadHtml(){ const td=new Date(); const lo=new Date(td.getTime()-150*864e5), hi=new Date(td.getTime()+62*864e5); const span=hi-lo, X=d=>Math.max(0,Math.min(100,(new Date(d+(String(d).length===10?"T12:00:00":""))-lo)/span*100));
   const L=Object.values(S.queue), dec=L.filter(q=>q.status==="decided"&&q.decidedAt&&new Date(q.decidedAt)>=lo), aw=L.filter(q=>q.status==="awaiting"), up=(S.up||[]);
   const lane=(y,lab)=>'<div class="rd-lane" style="top:'+y+'px"><span>'+lab+'</span></div>';
-  const stack={}; const dot=(x,lane,cls,tip,href,sz)=>{ const k=lane+':'+Math.round(x*1.5); const n=stack[k]=(stack[k]||0)+1; const o=(n%2?-1:1)*Math.ceil((n-1)/2)*11;
+  const stack={}; const dot=(x,lane,cls,tip,href,sz)=>{ const k=lane+':'+Math.round(x*1.5); const n=stack[k]=(stack[k]||0)+1; const ix=n-1, o=[0,-9,9][ix%3], step=[0,-1,1,-2,2,-3,3,-4,4][Math.floor(ix/3)]||0; x=Math.min(99.5,Math.max(0.5,x+step*1.2));
     return '<'+(href?'a href="'+href+'"':'span')+' class="rd-dot '+cls+'" style="left:'+x+'%;top:'+(lane===0?30:lane===1?74:118)+'px;--o:'+o+'px;--s:'+(sz||12)+'px" data-tip="'+esc(tip)+'" tabindex="0"></'+(href?'a':'span')+'>'; };
   let marks='';
   dec.forEach(q=>{ const c=q.counts||{}; marks+=dot(X(String(q.decidedAt).slice(0,10)),0,'rd-dec','<b>'+esc((q.wr?q.wr+' ':'')+(q.wrName||q.name||''))+'</b><br>Decided '+esc(fmtD(q.decidedAt))+' · '+(q.rows||0)+' rows<br>'+Object.entries(c).filter(x=>x[1]).map(([d,v])=>v+' '+esc(d.toLowerCase())).join(', '),'#/review/'+encodeURIComponent(q.rep),Math.max(10,Math.min(22,8+Math.sqrt(q.rows||1)*1.3))); });
