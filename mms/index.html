@@ -3365,7 +3365,7 @@ VIEWS.mine=function(){
     const ppl=[...pm.values()].map(p=>Object.assign(p,{r:p.rs.join(' · ')}));
     const byFirst=(a,b)=>firstName(a.p.name).localeCompare(firstName(b.p.name))||a.p.name.localeCompare(b.p.name);
     const all=ppl.map(p=>{ const q=liveTickets().filter(t=>waitingOn(t,p)); const live=myFacTickets(p).length; return {p,q,live,fac:p.rs.includes('Facilitator')}; });
-    const facs=all.filter(x=>x.fac&&(x.q.length||x.live)).sort(byFirst), staff=all.filter(x=>!x.fac).sort(byFirst);
+    const facs=all.filter(x=>x.fac&&(x.q.length||x.live)).sort(byFirst), staff=all.filter(x=>!x.fac&&!x.p.rs.every(r=>['Architect','IM Reviewer','Workgroup'].includes(r))).sort(byFirst); // architects work in Architecture Help, IM reviewers in IM Review
     const card=x=>{ const late=x.q.filter(pastTarget).length, me=sameName(x.p.name,S.me.name);
       return '<button type="button" class="tm" data-peek="'+(me?'':esc(x.p.name))+'">'+av(x.p.name)+'<span class="tm-n"><b>'+esc(x.p.name)+(me?' (you)':'')+'</b><em>'+esc(x.p.r)+'</em></span><span class="tm-q'+(x.q.length?' on':'')+'" title="'+x.q.length+' work request'+(x.q.length===1?' is':'s are')+' waiting on '+esc(firstName(x.p.name))+' to do the next step"><b>'+x.q.length+'</b>waiting on '+esc(me?'you':firstName(x.p.name))+'</span><span class="tm-s">'+[late?'<b class="bad">'+late+' past target</b>':'',x.live?x.live+' live work request'+(x.live===1?'':'s')+' in all':''].filter(Boolean).join(' · ')+'</span></button>'; };
     if(facs.length||staff.length) team='<div class="secthead"><h2>Everyone’s Queue</h2><span class="muted" style="font-size:12.5px">Click a person to see their queue the way they see it.</span></div>'+
