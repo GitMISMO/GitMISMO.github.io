@@ -329,8 +329,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <nav aria-label="Membership Desk">
     <button type="button" data-hq="home" aria-current="page" title="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Home</span></button>
     <button type="button" data-hq="todo" title="To Do"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg><span>To Do</span><b class="nb" id="nb-todo"></b></button>
-    <button type="button" data-hq="done" title="Finished"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Finished</span></button>
     <button type="button" data-hq="cases" title="Case Management"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Case Management</span></button>
+    <button type="button" data-hq="done" title="Completed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Completed</span></button>
     <button type="button" data-hq="help" title="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2v.1"/></svg><span>Help</span></button>
   </nav>
   <div class="mast-right">
@@ -357,7 +357,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   </section>
 
   <section class="view" id="v-done" hidden>
-    <div class="vhead"><div><h1>Finished</h1><div class="vsub">Set-ups marked here, the ones MISMO Money and Aptify confirmed, and your MISMO cases.</div></div></div>
+    <div class="vhead"><div><h1>Completed</h1><div class="vsub">Set-ups marked here, the ones MISMO Money and Aptify confirmed, and your MISMO cases.</div></div></div>
     <div class="chips" id="done-chips"></div>
     <div class="panel"><div class="rows" id="done-list"></div><div class="pager" id="done-pager"></div></div>
   </section>
@@ -520,7 +520,7 @@ function markDone(x,cid,order,person,note){const i=TODO.indexOf(x);if(i<0)return
  $("toast-t").textContent=x.name+" marked set up";$("toast").classList.add("on");clearTimeout(tt);tt=setTimeout(()=>$("toast").classList.remove("on"),6000);}
 $("toast-u").addEventListener("click",()=>{if(!last)return;const L=last;TODO.splice(L.i,0,L.x);FIN.splice(FIN.indexOf(L.f),1);last=null;$("toast").classList.remove("on");renderAll();window.__deskUndo(L.f).catch(e=>console.error("desk undo",e));});
 
-/* ---------- Finished: a page at a time ---------- */
+/* ---------- Completed: a page at a time ---------- */
 let dgrp="all",dpage=0;const PER=12;
 function renderDone(){const all=finished(),cnt=g=>g==="all"?all.length:all.filter(r=>r.grp===g).length;
  const chips=$("done-chips");chips.textContent="";[["all","Everything","#74bfeb"],["setup","Set-Ups","#5fd39a"],["case","Aptify Cases","#9fb3c8"]].forEach(([v,l,k])=>chips.appendChild(h("button",{type:"button",class:"chipb"+(dgrp===v?" on":""),style:"--k:"+k,onclick:()=>{dgrp=v;dpage=0;renderDone();}},h("i",null),l,h("em",null,String(cnt(v))))));
@@ -586,7 +586,7 @@ const HELP=[
   steps:[["An Email Arrives","MISMO Money or Member 360 emails membership@mismo.org when something needs setting up. The email has an Open in the Membership Desk button."],
    ["Open It Here","The button opens that exact item on the To Do page, with everything you need on the left: company, level, price, special rate and membership dates. Sign in with your own MISMO sign-in if asked."],
    ["Set It Up in Aptify","Add or find the company in Aptify and create the membership order with the level, price and dates shown. Put any special rate (TMC, Broker, ACUMA) in the order line's description."],
-   ["Record the IDs and Mark Set Up","Back here, enter the Aptify Company ID (required), the Aptify order number and, if you added a person, the Aptify Person ID. Select Mark Set Up. It moves to Finished."]],
+   ["Record the IDs and Mark Set Up","Back here, enter the Aptify Company ID (required), the Aptify order number and, if you added a person, the Aptify Person ID. Select Mark Set Up. It moves to Completed."]],
   notes:["<b>Marked one by mistake?</b> Select Undo in the message at the bottom of the screen right after. Later than that, email Jonna and she'll reopen it.","<b>Nothing arrives by email?</b> Everything waiting is always on the To Do page, oldest first, so you can work straight from there."]},
  {id:"square",k:"#74bfeb",name:"Square Set-Ups",lead:"A company paid MISMO through Square for a special rate (TMC, Broker or ACUMA). MISMO Money sees the payment and sends the set-up here.",
   steps:[["Check the Details","The left side shows the company, the level, the special rate, what they paid and the membership dates."],
@@ -612,15 +612,15 @@ const HELP=[
    ["Record the IDs","Enter the Aptify Company ID and select Mark Set Up."],
    ["What Happens Next","Member 360's IIF numbers and member counts pick them up on the next Aptify pull."]],
   notes:[]},
- {id:"finished",k:"#9fb3c8",name:"Finished",lead:"Finished keeps everything that's been set up: what you marked here, the Square set-ups MISMO Money confirmed, IIF lenders and new members Aptify shows, and your MISMO cases.",
-  steps:[["Filter It","Use Everything, Set-Ups or Aptify Cases at the top."],["Page Through It","Twelve at a time, newest first. Use Newer and Older at the bottom."]],
-  notes:["<b>Who else sees it?</b> Jonna, Amy and Kelly see the same To Do and Finished lists in Member 360, so they can follow along."]},
- {id:"cases",k:"#9fb3c8",name:"Case Management",lead:"Your MISMO cases from Aptify Case Management. Only cases with the Aptify Case Category MISMO are included, so nothing from MBA or anyone else is counted.",
+  {id:"cases",k:"#9fb3c8",name:"Case Management",lead:"Your MISMO cases from Aptify Case Management. Only cases with the Aptify Case Category MISMO are included, so nothing from MBA or anyone else is counted.",
   steps:[["Read the Numbers","The figure boxes show cases this year, how many were closed the same day, the most common topic and how many came in by phone."],
    ["Narrow It Down","Select any month, topic, way in (Email, Phone, Web) or person. The other charts and the list below update. Select it again, or the × on its label, to let it go."],
    ["See the Cases","The list below shows the matching cases, twelve at a time."],
    ["How Often It Updates","The case numbers are refreshed from Aptify each week, along with the weekly Aptify pull."]],
   notes:[]},
+{id:"finished",k:"#9fb3c8",name:"Completed",lead:"Completed keeps everything that's been set up: what you marked here, the Square set-ups MISMO Money confirmed, IIF lenders and new members Aptify shows, and your MISMO cases.",
+  steps:[["Filter It","Use Everything, Set-Ups or Aptify Cases at the top."],["Page Through It","Twelve at a time, newest first. Use Newer and Older at the bottom."]],
+  notes:["<b>Who else sees it?</b> Jonna, Amy and Kelly see the same To Do and Completed lists in Member 360, so they can follow along."]},
  {id:"faq",k:"#ff8f7d",name:"Questions",faq:[
   ["Where do I find the Aptify Company ID?","It's the ID on the company's record in Aptify. For a new company, add it in Aptify first and use the ID it's given."],
   ["Where do I find the order number?","It's the ID of the membership order you created in Aptify for this set-up."],
@@ -693,9 +693,9 @@ if(new Date().getMonth()===11)document.documentElement.setAttribute("data-season
     const score=(name)=>{ const n=norm(name); return n===t ? 3 : n.indexOf(t)===0 ? 2 : n.indexOf(t)>=0 ? 1 : 0; };
     const push=(group,name,where,go)=>{ if(out.length<60) out.push({group,name,where,go,s:score(name)}); };
     try{ (window.__desk.todo()||[]).forEach(x=>{ if(norm(x.name).indexOf(t)<0) return; push('Waiting on You', x.name, x.level+' · paid '+x.paid, ()=>{ window.__desk.go('todo'); setTimeout(()=>window.__desk.open(x),150); }); }); }catch(e){}
-    try{ (window.__desk.finished()||[]).forEach(r=>{ if(norm(r.nm+' '+r.wh).indexOf(t)<0) return; push(r.grp==='case'?'Aptify Cases':'Finished', r.nm, r.wh, ()=>{ window.__desk.go('done'); }); }); }catch(e){}
+    try{ (window.__desk.finished()||[]).forEach(r=>{ if(norm(r.nm+' '+r.wh).indexOf(t)<0) return; push(r.grp==='case'?'Aptify Cases':'Completed', r.nm, r.wh, ()=>{ window.__desk.go('done'); }); }); }catch(e){}
     const best={}; out.forEach(h=>{ best[h.group]=Math.max(best[h.group]||0, h.s); });
-    const ORDER=['Waiting on You','Finished','Aptify Cases'];
+    const ORDER=['Waiting on You','Completed','Aptify Cases'];
     out.sort((a,b)=>(best[b.group]-best[a.group])||(ORDER.indexOf(a.group)-ORDER.indexOf(b.group))||(b.s-a.s)||String(a.name).localeCompare(String(b.name)));
     return out;
   }
