@@ -518,6 +518,11 @@ kbd{display:inline-block;min-width:18px;text-align:center;font:600 11px var(--di
 .splinks{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
 .hq nav button .nb{margin-left:auto;font-size:11px;font-weight:700;background:var(--sky);color:var(--navy-deep);border-radius:9px;padding:0 7px;line-height:18px}
 body.railmini .hq nav button .nb{display:none}
+.wait-empty{display:flex;align-items:center;gap:12px;padding:12px 18px;border-left:4px solid var(--good)}
+.wait-empty b{font-size:15px;white-space:nowrap}.wait-empty .muted{font-size:13px}
+.we-i{width:26px;height:26px;border-radius:6px;background:var(--good-bg);display:grid;place-items:center;flex:0 0 auto}
+.we-i svg{width:16px;height:16px;fill:none;stroke:var(--good);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:560px){.wait-empty{flex-wrap:wrap}}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -751,7 +756,7 @@ function home(){
   return '<div class="hero rise"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}))+'</div><h2>'+g+(S.me.name?", "+esc(first(S.me.name)):"")+'</h2><p>'+line+'</p>'+
     (aw.length?'<div class="hero-acts"><a class="btn hero-go" href="#/review/'+encodeURIComponent(aw[0].rep)+'">'+((aw[0].done||0)?'Resume ':'Start With ')+esc(aw[0].wr)+' ›</a><span class="hero-k">In a review, <kbd>J</kbd>/<kbd>K</kbd> move, <kbd>A</kbd> agrees</span></div>':'')+
     '<div class="hstats">'+tiles+'</div></div>'+ringBox+'</div>'+
-    (aw.length?'<div class="card"><h3>Waiting for IM<small>oldest first</small></h3><div class="wcs">'+aw.map(waitCard).join("")+'</div></div>':'')+
+    (aw.length?'<div class="card"><h3>Waiting for IM<small>oldest first</small></h3><div class="wcs">'+aw.map(waitCard).join("")+'</div></div>':'<div class="card wait-empty"><span class="we-i"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg></span><b>Waiting for IM</b><span class="muted">Nothing right now. New submissions land here when a facilitator sends one from the MMS, and IM reviewers get an email.</span></div>')+
     (U.length?'<div class="card"><h3>Coming to IM<small>Target to Submit to IM in the next 60 days'+(S.upAt?' · as of '+esc(fmtS(S.upAt)):'')+'</small><span class="sp"></span>'+(U.length>6?'<button type="button" class="btn sm" data-upall="1">'+(S.upAll?'Show Fewer':'Show All '+U.length)+'</button>':'')+'</h3><div class="ups">'+U.slice(0,upN).map(upCard).join("")+'</div></div>':'')+
     '<div class="showcase rise"><div class="sc-h"><div><span class="sc-e">IM Activity</span><h3>Rows IM Decided, Month by Month</h3></div><span class="seg sm dark" id="months">'+[12,24,36,72].map(m=>'<button type="button" data-months="'+m+'" aria-pressed="'+(M===m)+'">'+(m>=24?(m/12)+' yr':m+' mo')+'</button>').join("")+'</span></div>'+A.html+'</div>'+
     (dn.length?'<div class="card"><h3>Recently Decided<small><a href="#/decided">See all '+dn.length+'</a></small></h3><div class="subs">'+dn.slice(0,3).map(subCard).join("")+'</div></div>':'');
