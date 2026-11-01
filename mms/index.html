@@ -4937,9 +4937,12 @@ const RV_TERMS=[
   // trademarks
   ['MISMO®','Trademarks','Registered trademark. Use ® at least at the first mention in the body.',''],
   ['Mortgage Industry Standards Maintenance Organization, Inc.','Trademarks','MISMO’s full legal name, as in the copyright line.','Mortgage Industry Standard Maintenance Organization|Mortgage Industry Standards Maintenance Org\\b'],
-  ['SMART Doc®','Trademarks','Registered trademark. Capital SMART, then Doc.','Smart ?Docs?\\b(?!®)|SmartDoc|SMART ?DOC\\b|SMARTDoc|Smart Document','Smart Doc, SmartDoc, SMART DOC, Smart Document'],
+  ['SMART Doc®','Trademarks','Registered trademark. Capital SMART, then Doc.','Smart ?Docs?\\b(?!®)|SmartDoc|SMART ?DOC\\b|SMARTDoc|Smart Document|SMART Document','Smart Doc, SmartDoc, SMART DOC, SMART Document'],
+  ['SMART Doc® V3 Specification','Trademarks','Capital V for the version (V3, V1.02), and Specification capitalized with it.','SMART Doc®? v\\d','SMART Doc v3'],
   ['MERS®','Trademarks','Registered trademark of MERSCORP Holdings. Use ® with MERS.',''],
+  ['MERSCORP Holdings, Inc.','Trademarks','The full legal name, exactly.','MERSCORP(?! Holdings)|MERSCORP Holdings(?!, Inc)','MERSCORP, MERSCORP Holdings'],
   ['MERS® eRegistry','Trademarks','The registry for eNotes run by MERSCORP Holdings.','MERS e-Registry|MERS E-Registry|MERS eregistry'],
+  ['AcroForm','Reference Model','PDF form fields; capital A and F, the same way throughout.','Acroform\\b|ACROFORM','Acroform'],
   // the reference model and its artifacts
   ['MISMO Reference Model','Reference Model','Capital R and M. Give the version when it matters, for example Version 3.6.3.','MISMO reference model|Ref\\.? Model'],
   ['Logical Data Dictionary (LDD)','Reference Model','Spell out at first use.','Logical Data Directory|logical data dictionary'],
@@ -5018,7 +5021,9 @@ const RV_TERMS=[
   ['American spelling','Style','For example organization, standardize, license (noun and verb), center.','\\borgani[s]ation\\b|\\bstandardis(e|ed|ing)\\b|\\blicence\\b|\\bcentre\\b|\\bbehaviour\\b|\\bcolour\\b|\\bcatalogue\\b','organisation, standardise, licence, centre, behaviour, colour']
 ];
 /* what reviewers changed in IM-stage documents (tracked changes in 120 Word files in the IM library, 2021–2026: 1,162 before/after edits) */
-const RV_EDITOR_LEARNED=['generic nouns lowercased mid-sentence (Data Point → data point, Container → container, Document → document)','commas added after introductory phrases and in series','& → and','plain verbs: assist → help, describes → provides, you will find → includes, will be reflected → are specified (present tense, no second person)','docs → documents','straight quotes → curly quotes','old version numbers and dates updated to the current ones','attribute/element → data point when MISMO means a data point'];
+/* MISMO's editor (Erin Bittenbender, who also does the readiness review and facilitates IM): her tracked changes and comments
+   in 41 Word files in the IM library, 2021–2026 (570 before/after edits, 20 distinct editor comments) */
+const RV_EDITOR_LEARNED=['generic nouns lowercased mid-sentence (Data Point → data point, Container → container, Documents → documents, Company → company)','current names used: Logical Data Model → MISMO Reference Model when the model is meant; SMART Document® → SMART Doc®','versions with a capital V (V3, V1.02) and Specification capitalized with them (SMART Doc® V3 Specification); a date dropped when the version is already given','legal names exact (MERSCORP Holdings, Inc.)','the same term written the same way throughout (AcroForm, not Acroform)','commas after introductory phrases (In these cases, … / If yes, …); en dash for ranges; curly quotes and apostrophes','& → and; Docs → documents; will need to → must in requirements; Yes → true for indicator values','vague “it” replaced with the thing it means','font size checked on the cover and for subsection headings','technical facts questioned when they look off (for example UCD vs. Closing Disclosure, trail vs. trial)'];
 /* expansions for acronyms: MISMO's names first, then the LDD's acronym list when the Reference Model is loaded */
 function rvExpand(a){ a=String(a||'').toUpperCase(); for(const t of RV_TERMS){ const m=t[0].match(/^(.*) \(([^)]+)\)$/); if(m&&m[2].toUpperCase()===a) return m[1]; }
   if(typeof RM!=='undefined'&&RM&&RM.ac&&RM.ac.has(a)) return RM.ac.get(a); return ''; }
@@ -5026,7 +5031,7 @@ function rvTermChecks(text,W,add){
   const hits=[];
   RV_TERMS.forEach(([pref,grp,note,bad])=>{ if(!bad) return; let re; try{ re=new RegExp(bad,'g'); }catch(e){ return; }
     const m=String(text).match(re); if(m&&m.length) hits.push([pref,grp,note,[...new Set(m)]]); });
-  hits.slice(0,10).forEach(([pref,grp,note,m])=>add(/Trademarks|eMortgage/.test(grp)?'fix':'recommend','Terms and Names','Uses '+m.slice(0,4).map(rvQ).join(', ')+(m.length>4?' and more':'')+'; MISMO writes '+rvQ(pref)+'.',note||('Change to '+pref+'.'),W,'term:'+pref));
+  hits.slice(0,10).forEach(([pref,grp,note,m])=>add(/Trademarks/.test(grp)?'fix':'recommend','Terms and Names','Uses '+m.slice(0,4).map(rvQ).join(', ')+(m.length>4?' and more':'')+'; MISMO writes '+rvQ(pref)+'.',note||('Change to '+pref+'.'),W,'term:'+pref));
 }
 /* the forms to flag, written out for people */
 function termShow(bad,show){ if(show) return show; if(!bad) return ''; return [...new Set(String(bad).split('|').map(a=>a.replace(/\(\?[=!][^)]*\)/g,'').replace(/\\b/g,'').replace(/\[([A-Za-z])[A-Za-z]\]/g,'$1').replace(/\\s\?/g,' ').replace(/\\d/g,'3').replace(/\\\.\??/g,'.').replace(/\\([()+])/g,'$1').replace(/-\?/g,'-').replace(/\?/g,'').replace(/\\/g,'').replace(/\s+/g,' ').trim()).filter(Boolean))].slice(0,4).join(', '); }
@@ -5047,7 +5052,7 @@ wireMain=function(m){ _wireMain9(m); const q=$('#termsq',m); if(q) q.oninput=()=
 
 /* what Claude is told about MISMO's names (kept short: the relay caps each answer) */
 function rvEditorExtra(){ const names=RV_TERMS.filter(t=>!/Style|Industry/.test(t[1])).map(t=>t[0].replace(/ \([^)]*\)$/,'')).slice(0,40);
-  return '\n- MISMO writes its names this way: '+names.join(', ')+'. Flag other spellings as corrections (category: terms).'+(typeof RV_EDITOR_LEARNED!=='undefined'&&RV_EDITOR_LEARNED.length?'\n- What reviewers have corrected in past MISMO documents: '+RV_EDITOR_LEARNED.join(' | '):''); }
+  return '\n- MISMO writes its names this way: '+names.join(', ')+'. Flag other spellings as corrections (category: terms).'+(typeof RV_EDITOR_LEARNED!=='undefined'&&RV_EDITOR_LEARNED.length?'\n- What MISMO’s editor has corrected and asked before (follow the same habits): '+RV_EDITOR_LEARNED.join(' | '):''); }
 
 /* =====================================================================
    The review screens: run a review, read the report, keep every report on
@@ -5077,7 +5082,7 @@ function rvApplyFeedback(findings){ const st=rvFbStats(); return findings.map(f=
 function rvFbAvoid(kind){ return Object.values(S.rvfb||{}).filter(f=>f&&f.kind===kind&&f.src==='ai'&&f.verdict==='wrong'&&f.text).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,8).map(f=>f.text+(f.why?' (why: '+f.why+')':'')); }
 
 const RV_KIND={editor:{title:'Editor and Readiness Review',short:'Editor and Readiness',accept:'.docx,.xlsx,.xlsm,.pdf',multiple:true,
-    intro:'Add the work product files (Word, Excel or PDF). Software checks the boilerplate word for word, copyright, page numbers, Excel setup and more; Claude adds an editor’s read for spelling, grammar, terms, acronyms and MISMO voice. Nothing in your files is changed or stored.'},
+    intro:'Add the work product files (Word, Excel or PDF). Software checks the boilerplate word for word, copyright, page numbers, Excel setup and more; Claude adds an editor’s read for spelling, grammar, terms, acronyms and MISMO voice, following the habits of MISMO’s editor (Erin) from her past reviews. Nothing in your files is changed or stored.'},
   im:{title:'IM Pre-Review',short:'IM Pre-Review',accept:'.xlsx,.xlsm',multiple:false,
     intro:'Add the IM/AWG Submission Form (July 2026 version). It checks the Face Page and every Reference Model row the way IM reads them: required columns, class words and definition templates, names, XPATHs and the Proposed Structure tab. Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided. Nothing in the form is changed or stored.'}};
 
