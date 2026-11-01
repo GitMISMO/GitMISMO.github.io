@@ -1527,6 +1527,14 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 .rv-why label{display:block;font-size:12.5px}
 .rv-whyrow{display:flex;gap:6px;margin-top:4px}
 .rv-whyrow input{flex:1;min-width:0}
+@media (max-width:640px){
+  .terms-tbl thead{display:none}
+  .terms-tbl,.terms-tbl tbody,.terms-tbl tr,.terms-tbl td{display:block;width:auto}
+  .terms-tbl tr{padding:8px 10px;border-bottom:1px solid var(--line,#dbe5ee)}
+  .terms-tbl td{border:0!important;padding:1px 0!important}
+  .terms-tbl td:empty{display:none}
+  .terms-tbl td:nth-child(3):not(:empty)::before{content:'Not: ';font-weight:600}
+}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4658,16 +4666,16 @@ function rvImChecks(file,ctx){
     const nm=r.en||r.dp||r.at||r.cn||r.ac||''; const where='Item '+it+(nm?' · '+nm:'');
     if(!ct||!tt){ add('fix','Reference Model Changes','Change Type or Change Target Type is blank.','Pick both from the dropdowns.',where,'ct',it); return; }
     if(/container|data point|attribute/.test(tt)&&/add|move|rename|reuse/.test(ct)) needPS=true;
-    const need=((RV_NEED[ct]||{})[tt])||[]; const blank=need.filter(k=>!r[k]); if(blank.length) add('fix','Reference Model Changes','This '+r.ct+' · '+r.tt+' row is missing: '+blank.map(k=>RV_FIELD[k]).join(', ')+'.','Fill in the columns this change needs (see the form’s instructions tab).',where,'need',it);
+    const need=((RV_NEED[ct]||{})[tt])||[]; const blank=need.filter(k=>!r[k]); if(blank.length) add(blank.includes('def')||blank.includes('dp')||blank.includes('en')||blank.includes('cn')?'fix':'recommend','Reference Model Changes','This '+r.ct+' · '+r.tt+' row is missing: '+blank.map(k=>RV_FIELD[k]).join(', ')+'.','Fill in the columns this change needs (see the form’s instructions tab).',where,'need',it);
     // normal English names, no abbreviations
-    [['cn','CONTAINER Name'],['dp','Data Point Name'],['en','Enumeration Name'],['pc','Parent CONTAINER Name']].forEach(([k,l])=>{ const v=r[k]; if(!v) return; if(/_/.test(v)||(/[a-z][A-Z]/.test(v)&&!/\s/.test(v)&&k!=='en')) add('fix','Names',l+' '+rvQ(v)+' isn’t in normal English.','Use spaces between words; no underscores or upper camel case (only the XPATH uses those).',where,'normal-english',it); if(RV_ABBR.test(v)) add('fix','Names',l+' '+rvQ(v)+' uses an abbreviation.','Spell out the word (IM sends back abbreviations such as Condo, Amt, Info).',where,'abbr',it); });
+    [['dp','Data Point Name'],['en','Enumeration Name']].forEach(([k,l])=>{ const v=r[k]; if(!v) return; if(/_/.test(v)||(/[a-z][A-Z]/.test(v)&&!/\s/.test(v)&&k!=='en')) add('fix','Names',l+' '+rvQ(v)+' isn’t in normal English.','Use spaces between words; no underscores or upper camel case (only the XPATH uses those).',where,'normal-english',it); if(RV_ABBR.test(v)) add('fix','Names',l+' '+rvQ(v)+' uses an abbreviation.','Spell out the word (IM sends back abbreviations such as Condo, Amt, Info).',where,'abbr',it); });
     // definition basics
     const def=String(r.def||'');
-    if(def){ if(!/[.)]\s*$/.test(def)) add('fix','Definitions','The definition doesn’t end with a period.','End the definition with a period.',where,'def-period',it);
+    if(def){ if(!/[.)]\s*$/.test(def)) add('recommend','Definitions','The definition doesn’t end with a period.','End the definition with a period.',where,'def-period',it);
       if(/\b(must|shall|should)\b|\bsystem will\b|\bscreen\b|\bdrop-?down\b|\bfield on\b/i.test(def)) add('recommend','Definitions','The definition reads like implementation guidance ('+rvQ((def.match(/\b(must|shall|should)\b|\bsystem will\b|\bscreen\b|\bdrop-?down\b|\bfield on\b/i)||[''])[0])+').','IM removes process and implementation language from definitions; say what the data is, not how a system uses it.',where,'def-impl',it);
       (def.match(/\b[A-Z]{2,6}\b/g)||[]).filter(a=>!/^(MISMO|LDD|ID|US|LLC|UPB)$/.test(a)&&!new RegExp('\\('+a+'\\)').test(def)).slice(0,1).forEach(a=>add('recommend','Definitions','The acronym '+a+' isn’t spelled out in the definition.','Spell it out, then give the acronym in parentheses.',where,'def-acr',it));
-      if(/^(a|an|the)\s/i.test(nm)===false&&rvNorm(def).replace(/[.]/g,'')===rvNorm(nm)) add('fix','Definitions','The definition only repeats the name.','Describe what the data means.',where,'def-repeat',it); }
-    else if(/add|modify/.test(ct)&&tt!=='relationship') add('fix','Definitions','No definition.','Every added or modified '+r.tt+' needs a definition (IM approves fewer rows that arrive without one).',where,'def-missing',it);
+      if(tt==='data point'&&rvNorm(def).replace(/[.]/g,'')===rvNorm(nm)) add('recommend','Definitions','The definition only repeats the name.','Describe what the data means.',where,'def-repeat',it); }
+    else if(/add|modify/.test(ct)&&tt!=='relationship') add('recommend','Definitions','No definition.','Every added or modified '+r.tt+' needs a definition (IM approves fewer rows that arrive without one).',where,'def-missing',it);
     // class word templates
     if(tt==='data point'&&r.dp&&def&&/add|modify/.test(ct)){ const cw=Object.keys(RV_TEMPLATES).find(k=>new RegExp('\\b'+k+'$','i').test(r.dp.trim().replace(/Other Description$/i,'Description'))); if(!cw&&!/Other Description$/i.test(r.dp)) add('fix','Names','The data point name '+rvQ(r.dp)+' doesn’t end with a class word.','End it with a MISMO class word (Amount, Date, Indicator, Type, Description…) per MEG 0007.',where,'classword',it);
       else if(cw&&!RV_TEMPLATES[cw].test(def.trim())) add('fix','Definitions',(/^[AEIOU]/.test(cw)?'An ':'A ')+cw+' data point should follow the '+cw+' definition template.','Start with: '+RV_TEMPLATE_TEXT[cw],where,'template',it);
@@ -4676,7 +4684,7 @@ function rvImChecks(file,ctx){
     // duplicates inside the submission
     const key=(tt+'|'+(r.pc||'')+'|'+nm).toLowerCase(); if(nm&&/add/.test(ct)){ if(seen[key]) add('recommend','Reference Model Changes','Added twice in this submission ('+seen[key]+' and '+it+').','Add and define it once, then reuse it at other XPaths.',where,'dup',it); else seen[key]=it; }
     // XPATH
-    if(r.xp&&!/^MESSAGE\/([A-Z0-9_]+\/)+$/.test(r.xp.replace(/\s+/g,''))) add('fix','XPATH','The XPATH isn’t in the expected form.','Use upper-case container names separated by slashes, starting with MESSAGE/ and ending with /.',where,'xpath',it);
+    if(r.xp&&!/^\/{0,2}[A-Z][A-Z0-9_]*(\/[A-Z][A-Z0-9_]*)*\/?$/.test(r.xp.replace(/\s+/g,''))) add('fix','XPATH','The XPATH isn’t a path of container names.','Use the container names in capitals, separated by slashes (for example /DOCUMENT/DEAL_SETS/DEAL_SET/…).',where,'xpath',it);
   });
   if(needPS&&P.psFilled<1) add('fix','Proposed Structure','Containers, data points or attributes change, but the Proposed Structure tab is empty.','Complete the Proposed Structure tab so IM sees the changes in the context of the Reference Model.','Proposed Structure','ps');
   if(!P.rows.length) add('question','Reference Model Changes','No Reference Model changes are listed.','Is this a documents-only submission? If so, say so in the Submission Summary.','Reference Model Changes','no-rows');
@@ -4900,8 +4908,8 @@ function rvRmChecks(P){
     if(tt==='acronym'&&r.ac&&/add/.test(ct)&&RM.ac.has(String(r.ac).toUpperCase())) add('fix','The acronym '+rvQ(r.ac)+' is already in the LDD ('+RM.ac.get(String(r.ac).toUpperCase())+').','Remove this row.',where,'rm-ac-exists',it);
     // XPATH: every container must exist, and each step must be a parent → child pair in the model
     if(r.xp){ const seg=r.xp.replace(/\s+/g,'').replace(/^\/+|\/+$/g,'').split('/').filter(Boolean); const bad=[];
-      seg.forEach((s,i)=>{ const k=rmKey(s); if(i===0&&k==='message') return; if(!cnKnown(k)){ bad.push(s+' isn’t a container'); return; }
-        const e=RM.cn.get(k), pk=i>0?rmKey(seg[i-1]):''; if(e&&pk&&pk!=='message'&&e.parents.length&&!e.parents.includes(pk)&&!newCn.has(k)) bad.push(seg[i-1]+'/'+s+' isn’t a parent/child pair'); });
+      seg.forEach((s,i)=>{ const k=rmKey(s); if(i===0&&(k==='message'||k==='document')&&!RM.cn.has(k)) return; if(!cnKnown(k)){ bad.push(s+' isn’t a container'); return; }
+        const e=RM.cn.get(k), pk=i>0?rmKey(seg[i-1]):''; if(e&&pk&&pk!=='message'&&!(i===1&&!RM.cn.has(pk))&&e.parents.length&&!e.parents.includes(pk)&&!newCn.has(k)) bad.push(seg[i-1]+'/'+s+' isn’t a parent/child pair'); });
       if(bad.length) add('fix','The XPATH doesn’t match the '+V+': '+bad.slice(0,3).join('; ')+(bad.length>3?'; and '+(bad.length-3)+' more':'')+'.','Copy the XPATH from the LDD for the parent container, then add the new container at the end.',where,'rm-xpath',it); }
   });
   typeAdds.forEach(k=>{ if(!(newEn[k]||[]).length){ const r=P.rows.find(x=>rmKey(x.dp)===k&&/add/i.test(x.ct||'')); add('fix','A new Type data point is added without any enumerations.','List each enumeration value as its own Add and Define row, each with a unique definition.',r?'Item '+(r.item||r._row)+' · '+r.dp:'','rm-type-enums',r&&r.item); } });
@@ -5002,9 +5010,11 @@ const RV_TERMS=[
   // style
   ['Version 3.6.3','Style','Write versions as Version 3.6.3 in titles and v3.6.3 in tables; don’t mix Ver. and V in one document.','\\bVer\\.\\s?\\d|\\bV\\s\\d\\.\\d','Ver. 3.6, V 3.6'],
   ['and','Style','Write “and” in running text; keep & only inside a name (for example Q&A).','\\s&\\s'],
-  ['use, help, includes','Style','Plain words: use (not utilize), help (not assist), includes (not you will find).','\\butiliz(e|es|ed|ing|ation)\\b|\\b[Yy]ou will find\\b','utilize, you will find'],
-  ['documents, information','Style','Spell out short forms in running text.','\\bdocs\\b|\\binfo\\b','docs, info'],
-  ['data point, container, document','Style','Lowercase generic MISMO nouns in running text; capitalize only in headings or a product name.','(?<![.!?]\\s|^|\\n)(?<=[a-z,;]\\s)(Data Points?|Containers?)\\b(?! [A-Z])','Data Point, Container (mid-sentence)'],
+  ['use','Style','Plain words: use, not utilize.','\\butiliz(e|es|ed|ing|ation)\\b','utilize'],
+  ['includes','Style','Say what the document includes; MISMO documents don’t address the reader as you.','\\b[Yy]ou will find\\b','you will find'],
+  ['documents','Style','Spell out short forms in running text.','\\bdocs\\b','docs'],
+  ['information','Style','Spell out short forms in running text.','\\binfo\\b','info'],
+  ['data point, container (lowercase mid-sentence)','Style','Lowercase generic MISMO nouns in running text; capitalize only in headings or a product name.','(?<![.!?]\\s|^|\\n)(?<=[a-z,;]\\s)(Data Points?|Containers?)\\b(?! [A-Z])','Data Point, Container (mid-sentence)'],
   ['American spelling','Style','For example organization, standardize, license (noun and verb), center.','\\borgani[s]ation\\b|\\bstandardis(e|ed|ing)\\b|\\blicence\\b|\\bcentre\\b|\\bbehaviour\\b|\\bcolour\\b|\\bcatalogue\\b','organisation, standardise, licence, centre, behaviour, colour']
 ];
 /* what reviewers changed in IM-stage documents (tracked changes in 120 Word files in the IM library, 2021–2026: 1,162 before/after edits) */
