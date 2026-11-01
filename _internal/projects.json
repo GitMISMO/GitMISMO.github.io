@@ -51,8 +51,7 @@
          "branch": "main",
          "origin": "https://resources.mismo.org",
          "writable": [
-           "data/",
-           "desk/"
+           "data/"
          ]
        }, 
        "membership-desk": {
@@ -60,7 +59,7 @@
          "branch": "main",
          "origin": "https://resources.mismo.org",
          "writable": [
-           "desk/"
+           "data/desk-"
          ]
        }, 
        "marketing-hq": {
