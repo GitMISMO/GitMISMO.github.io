@@ -1880,7 +1880,8 @@ function whoseMove(t){
       const nm=t.stage==='im'?'IM':'AWG';
       if(sub==='updates') return {role:'facilitator',label:'Facilitator',text:'Make the '+nm+' updates, then resubmit'};
       if(sub==='prep') return {role:'facilitator',label:'Facilitator',text:'Submit to '+nm+' through MISMO Connect'};
-      return {role:'imawg',label:'IM/AWG Facilitator',text:sub==='in-review'?nm+' is reviewing':(sub==='resubmitted'?'Review the '+nm+' resubmission':'Start the '+nm+' review')};
+      const pq=typeof portalItemFor==='function'?portalItemFor(t,t.stage):null; if(pq) return {role:'imawg',label:nm+' Review',text:pq.status==='carried'?'Carried to the next AWG call':(t.stage==='awg'?'On the AWG agenda':'With the IM reviewers'+(pq.rows&&pq.done?': '+pq.done+' of '+pq.rows+' rows decided':''))};
+      return {role:'imawg',label:'IM/AWG Facilitator',text:sub==='in-review'?nm+' is reviewing':t.stage==='im'?'Run the IM Pre-Review and send it to IM Review':'Waiting for '+nm+' Review'};
     }
     case 'designation':
       if(sub==='vps') return {role:'vps',label:'VPs',text:'Agree with the Director’s designation'};
@@ -2276,9 +2277,12 @@ function stageActions(t){
     case 'im': case 'awg': {
       const k=t.stage, nm=k==='im'?'IM':'AWG';
       if(sub==='prep') add('Submitted to '+nm+' →',()=>setSub(t,'new','Submitted to '+nm+' through MISMO Connect',{dates:Object.assign({},t.dates,{[k+'Submitted']:today()})}),'pri');
-      if(sub==='new'||sub==='resubmitted') add('Start '+nm+' Review',()=>setSub(t,'in-review',nm+' review started',{dates:Object.assign({},t.dates,{[k+'Review']:today()})}),'pri');
       if(sub==='updates') add('Resubmit to '+nm,()=>{ const x=clone(t[k]||{}); x.resubs=(x.resubs||0)+1; return setSub(t,'resubmitted','Resubmitted to '+nm,{[k]:x,dates:Object.assign({},t.dates,{[k+'Resubmitted']:today()})}); },'pri');
-      if(sub!=='updates'&&sub!=='prep'){ add(nm+' Decision →',()=>reviewDecision(t),sub==='in-review'?'pri':''); add('Updates Needed',()=>updatesNeeded(t)); }
+      /* the review itself happens in IM Review / AWG Review; its decision moves the work request */
+      if(sub!=='updates'&&sub!=='prep'){ const pq=typeof portalItemFor==='function'?portalItemFor(t,k):null;
+        if(pq) add('Open in '+nm+' Review ↗',()=>portalOpen(k,pq.rep),'pri');
+        else if(k==='im') add('Run the IM Pre-Review →',()=>{ S.ptab='reviews'; rvRun(t,'im'); },'pri');
+        else add('Open AWG Review ↗',()=>portalOpen('awg',''),'pri'); }
       add('Not Required: Skip',()=>move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)'})},text:nm+' review not required; skipped'}),'ghost');
       break; }
     case 'designation':
@@ -4767,7 +4771,7 @@ const RV_NEED={'add and define':{acronym:['dt','def','ac'],attribute:['at','dt',
   'reuse':{container:['pc','cn'],'data point':['pc','dp']}};
 const RV_FIELD={item:'Item #',xp:'XPATH',pc:'Parent CONTAINER Name',cn:'CONTAINER Name',dp:'Data Point Name',at:'Attribute Name',en:'Enumeration Name',dt:'Definition Type',def:'Definition',ac:'Acronym Name',old:'Original/Old Value',ct:'Change Type',tt:'Change Target Type'};
 function rvColMap(hdr){ const m={}; Object.entries(hdr).forEach(([k,v])=>{ const s=String(v).toLowerCase().replace(/\s+/g,' ').trim();
-  if(/review decision/.test(s)) m.dec=k; else if(/review comments/.test(s)) m.com=k; else if(/^item/.test(s)) m.item=k; else if(/^change type/.test(s)) m.ct=k; else if(/change target type/.test(s)) m.tt=k; else if(/original\/old value/.test(s)) m.old=k; else if(/xpath/.test(s)) m.xp=k; else if(/^parent container/.test(s)) m.pc=k; else if(/^container name/.test(s)) m.cn=k; else if(/^alias container/.test(s)) m.alias=k; else if(/^data point name/.test(s)) m.dp=k; else if(/^attribute name/.test(s)) m.at=k; else if(/enumeration name/.test(s)) m.en=k; else if(/definition type template/.test(s)) m.dtt=k; else if(/^definition type/.test(s)) m.dt=k; else if(/^definition$/.test(s)) m.def=k; else if(/^acronym/.test(s)) m.ac=k; else if(/verb phrase/.test(s)) m.vp=k; else if(/submitter comments/.test(s)) m.sc=k; }); return m; }
+  if(/approval body/.test(s)) m.body=k; else if(/choice group/.test(s)) m.cg=k; else if(/relationship: ?from/.test(s)) m.rf=k; else if(/relationship: ?to/.test(s)) m.rt=k; else if(/review decision/.test(s)) m.dec=k; else if(/review comments/.test(s)) m.com=k; else if(/^item/.test(s)) m.item=k; else if(/^change type/.test(s)) m.ct=k; else if(/change target type/.test(s)) m.tt=k; else if(/original\/old value/.test(s)) m.old=k; else if(/xpath/.test(s)) m.xp=k; else if(/^parent container/.test(s)) m.pc=k; else if(/^container name/.test(s)) m.cn=k; else if(/^alias container/.test(s)) m.alias=k; else if(/^data point name/.test(s)) m.dp=k; else if(/^attribute name/.test(s)) m.at=k; else if(/enumeration name/.test(s)) m.en=k; else if(/definition type template/.test(s)) m.dtt=k; else if(/^definition type/.test(s)) m.dt=k; else if(/^definition$/.test(s)) m.def=k; else if(/^acronym/.test(s)) m.ac=k; else if(/verb phrase/.test(s)) m.vp=k; else if(/submitter comments/.test(s)) m.sc=k; }); return m; }
 function rvParseForm(x){
   const face=x.sheets.find(s=>/^face page$/i.test(s.name.trim()));
   const rm=x.sheets.find(s=>/^reference model changes$/i.test(s.name.trim()));
@@ -5390,6 +5394,7 @@ function imDraftRows(P,findings,ai){
     const a=AI[it]||AI[String(r.item||'')];
     if(a){ const l=String(a.likely||'').toLowerCase(); const d=/denied/.test(l)?'Denied':/returned/.test(l)?'Returned':/modif/.test(l)?'Approved with Modification':''; if(d) bump(d,rule||'ai',''); if(a.note) why.push(a.note); if(a.suggestedDefinition&&!/^\s*$/.test(a.suggestedDefinition)) sug=a.suggestedDefinition; if(a.suggestedName) sug=(sug?sug+' — ':'')+'Name: '+a.suggestedName; if(d&&!F.length) look=true; }
     const row={i,item:it,ct:r.ct||'',tt:r.tt||'',name:r.en||r.dp||r.at||r.cn||r.ac||'',pc:r.pc||'',cn:r.cn||'',dp:r.dp||'',en:r.en||'',xp:r.xp||'',def:r.def||'',old:r.old||'',
+      ...Object.fromEntries([['body',r.body],['at',r.at],['alias',r.alias],['cg',r.cg],['rel',r.vp],['rf',r.rf],['rt',r.rt],['sc',r.sc]].filter(x=>x[1]).map(x=>[x[0],String(x[1]).slice(0,600)])),
       draft:{dec,com:[...new Set(why)].map(s=>rvTrim(s,260)).join(' ').slice(0,700),sug:rvTrim(sug,500),rule:rule||(dec==='Approved as Submitted'?'':'ai'),look}};
     const k=imKind(row); if(S.imauto&&S.imauto[k]&&!look) row.auto=true;
     return row; });
@@ -5518,7 +5523,7 @@ async function imPush(rep){ const q=S.imq[rep], doc=S.imr[rep]; if(!q||!doc) ret
   const item=Object.assign({},q,{form:sp?{n:sp.n,u:sp.u}:null,docs:t.id&&typeof ssDocs==='function'?ssDocs(t):[],folder:(sp&&sp.folder)||(typeof ssFolderUrl==='function'&&S.tickets[q.ticket]?ssFolderUrl(S.tickets[q.ticket]):''),wg:t.workgroup||'',resub:/IMSub[2-9]|resub/i.test(doc.file||''),fac:{name:t.facilitator||'',email:fac.email||''},flow:(S.notify&&S.notify.flowUrl)||'',from:(S.notify&&S.notify.from)||''});
   try{ await imrUpdate('rev-'+imrSafe(rep),cur=>cur&&cur.status==='decided'?cur:Object.assign({},doc,{status:'awaiting'}));
     await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!(o.items[rep]&&o.items[rep].status==='decided')) o.items[rep]=item; return o; });
-    q.pushed=true; await write('imqueue',rep,q); return true; }catch(e){ return false; } }
+    q.pushed=true; await write('imqueue',rep,q); if(!q.test&&t.id&&t.stage==='im'&&t.sub!=='in-review') try{ await setSub(t,'in-review','Sent to IM Review'); }catch(e){} return true; }catch(e){ return false; } }
 let imSyncing=false, imSynced=0;
 async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<60000) return; imSyncing=true; imSynced=Date.now();
   try{ const yr=new Date().getFullYear();
@@ -5543,7 +5548,7 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
     for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist||it.test) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
       const d=await rGet(IMR,'rev-'+imrSafe(it.rep)); if(!d||!d.data) continue; const doc=d.data; S.imr[it.rep]=doc; await write(imColl(doc.ticket),it.rep,doc);
       const nq=Object.assign({},mine||{},{rep:it.rep,ticket:doc.ticket,wr:doc.wr,name:doc.name,status:'decided',decidedBy:it.decidedBy,decidedAt:it.decidedAt,agree:it.agree,counts:it.counts,pushed:true}); S.imq[it.rep]=nq; await write('imqueue',it.rep,nq);
-      const t=S.tickets[doc.ticket]; if(t){ const sum=Object.entries(it.counts||imTally(doc.rows||[])).map(([k,n])=>n+' '+k.toLowerCase()).join(', '); const x=clone(t); hist(x,'IM decision ('+(doc.rows||[]).length+' rows): '+sum+'. Reviewed by '+(it.decidedBy||'IM')+' in IM Review.'); await saveTicket(x,'IM decision brought in'); } }
+      const t=S.tickets[doc.ticket]; if(t) await imDecided(t,doc,it); }
   }catch(e){ console.warn('im sync',e); } finally{ imSyncing=false; } }
 const _imSend0=imSend;
 imSend=async function(t,rep){ await _imSend0(t,rep); const ok=await imPush(rep.id); toast(ok?'Sent to IM Review':'Saved; it goes to IM Review as soon as Erin or MISMO staff open the MMS'); };
@@ -5558,6 +5563,53 @@ function imDecHtml(t){ const L=Object.values(S.imPortalQ||{}).filter(q=>q.ticket
   return '<div class="psec full imdec"><h4>IM Decisions<span class="sp muted" style="font-size:12px;font-weight:500">'+L.length+' on record</span></h4><div class="imdec-l">'+L.map(q=>'<a class="imdec-r" href="'+IMR_URL+'#/review/'+encodeURIComponent(q.rep)+'" target="_blank" rel="noopener"><span class="imdec-d">'+esc(fmtS(String(q.decidedAt).slice(0,10)))+(String(q.decidedAt).slice(0,4)!==String(new Date().getFullYear())?' '+esc(String(q.decidedAt).slice(0,4)):'')+'</span><span class="imdec-m"><b>'+esc((q.rows||0)+' rows'+(q.resub?' · resubmission':''))+'</b><em>'+esc(c(q))+'</em></span><span class="imdec-go">Every row ↗</span></a>').join('')+'</div></div>'; }
 const _renderPanelIMD=renderPanel;
 renderPanel=function(){ _renderPanelIMD(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const pane=$('[data-wtab="rev"]',P); if(!pane||$('.imdec',pane)) return; const h=imDecHtml(t); if(h) pane.insertAdjacentHTML('afterbegin',h); };
+
+
+/* ---------- IM decides in IM Review; the decision moves the work request ---------- */
+const AWGR='awg-review', AWGR_URL='https://resources.mismo.org/awg-review/';
+function portalItemFor(t,k){ const Q=k==='im'?S.imPortalQ:S.awgPortalQ; return Object.values(Q||{}).filter(q=>!q.hist&&(q.status==='awaiting'||q.status==='carried')&&(q.ticket===t.id||(!q.ticket&&q.wr===t.wr))).sort((a,b)=>(a.test?1:0)-(b.test?1:0))[0]||null; }
+function portalOpen(k,rep){ window.open((k==='im'?IMR_URL:AWGR_URL)+(rep?'#/review/'+encodeURIComponent(rep):''),k==='im'?'imreview':'awgreview'); }
+function imOutcome(doc,it){ const c=it.counts||imTally(doc.rows||[]); if(!(doc.rows||[]).length&&doc.final) c[doc.final.dec]=1; const ok=(c['Approved as Submitted']||0)+(c['Approved with Modification']||0); return {c,ok,ret:(c['Returned']||0)+(c['Deferred']||0),den:c['Denied']||0}; }
+async function imDecided(t,doc,it){ const o=imOutcome(doc,it), sum=Object.entries(o.c).filter(x=>x[1]).map(([k,n])=>n+' '+k.toLowerCase()).join(', ');
+  const who=(it.decidedBy||'IM')+' in IM Review', d=String(it.decidedAt||today()).slice(0,10);
+  if(t.stage!=='im'){ const x=clone(t); hist(x,'IM decision ('+(doc.rows||[]).length+' rows): '+sum+'. Reviewed by '+who+'.'); await saveTicket(x,'IM decision brought in'); return; }
+  if(o.ret||!o.ok){ await setSub(t,'updates','IM decision '+fmt(d)+': '+sum+'. Updates needed before it goes back to IM. Reviewed by '+who+'.',{im:Object.assign({},t.im,{status:'Returned'}),dates:Object.assign({},t.dates,{imDecision:d})}); return; }
+  const x=clone(t); x.im=Object.assign({},x.im,{status:'Approved'}); x.dates=Object.assign({},x.dates,{imDecision:d}); const nx=nextStage(x);
+  const moved=await move(x,nx,{sub:nx==='designation'?'prep':(nx==='awg'?'new':''),text:'IM approved '+fmt(d)+' ('+sum+'); moved to '+stageDef(nx).name+'. Reviewed by '+who+'.'});
+  if(nx==='awg') try{ await awgPushFromIm(moved||x,doc,it); }catch(e){ console.warn('awg push',e); } }
+/* what IM approved goes to AWG Review: the rows IM approved, with IM's wording, the documents and the facilitator */
+async function awgUpdate(name,fn){ for(let i=0;i<5;i++){ const g=await rGet(AWGR,name); const next=fn(g&&g.data?JSON.parse(JSON.stringify(g.data)):null); const tok=window.ResourcesSession&&ResourcesSession.token(); const r=await fetch(RELAY()+'/'+AWGR+'/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content:next,sha:(g&&g.sha)||undefined})}); if(r.ok) return next; if(r.status===401||r.status===403) throw new Error('no access'); await new Promise(z=>setTimeout(z,300+i*400)); } throw new Error('busy'); }
+async function awgPushFromIm(t,doc,it){ const rep=imrSafe((t.wr||'wr')+'-'+String(it.decidedAt||today()).slice(0,10).replace(/-/g,''));
+  const rows=(doc.rows||[]).filter(r=>{ const d=(r.final&&r.final.dec)||r.draft.dec; return /^Approved/.test(d); }).map((r,i)=>{ const f=r.final||{}; const o={i,item:r.item,ct:r.ct,tt:r.tt,name:r.name,pc:r.pc,cn:r.cn,dp:r.dp,en:r.en,xp:r.xp,def:(f.sug&&!f.agreed?f.sug:r.def)||'',old:r.old||'',dec:f.dec||r.draft.dec,com:f.agreed?'':(f.com||'')};
+    ['body','at','alias','cg','rel','rf','rt','sc'].forEach(k=>{ if(r[k]) o[k]=r[k]; }); return o; });
+  const fac=personByName(t.facilitator)||{}; const docs=typeof ssDocs==='function'?ssDocs(t):[];
+  const at=new Date().toISOString(); const nc=(((S.awgCfg||{}).calls)||[]).filter(x=>x>=today()).sort()[0]||'';
+  const adoc={rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',file:doc.file||'',at,by:'IM Review',fromIm:{rep:doc.rep,decidedAt:it.decidedAt,decidedBy:it.decidedBy,counts:it.counts||{}},imOutcome:'Approved',imDate:String(it.decidedAt||'').slice(0,10),resub:doc.resub||null,rows,status:'awaiting',calls:[],call:{date:nc,method:'Standard Meeting',present:[],others:[],votes:{},outcome:'',conditions:'',notes:''}};
+  await awgUpdate('rev-'+rep,cur=>cur&&cur.status==='decided'?cur:adoc);
+  await awgUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!(o.items[rep]&&o.items[rep].status==='decided')) o.items[rep]={rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',status:'awaiting',sentAt:at,sentBy:'IM Review',rows:rows.length,awgRows:rows.filter(r=>/awg/i.test(r.body||'')).length,resub:!!doc.resub,fac:{name:t.facilitator||'',email:fac.email||''},docs,flow:(S.notify&&S.notify.flowUrl)||'',from:(S.notify&&S.notify.from)||'',fromIm:true}; return o; }); }
+
+/* ---------- AWG Review: what's coming, the documents, and AWG's decisions coming home ---------- */
+let awgSyncing=false, awgSynced=0;
+async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<60000) return; awgSyncing=true; awgSynced=Date.now();
+  try{ const [q,cfg]=await Promise.all(['queue','config'].map(n=>rGet(AWGR,n).catch(()=>null))); S.awgPortalQ=(q&&q.data&&q.data.items)||{}; S.awgCfg=(cfg&&cfg.data)||{};
+    if(!S.canWrite||!S.isStaff) return;
+    // the email flow the portal uses to tell the facilitator
+    const fl=(S.notify&&S.notify.flowUrl)||'', fr=(S.notify&&S.notify.from)||''; if(fl&&(S.awgCfg.flow!==fl||S.awgCfg.from!==fr)) try{ S.awgCfg=await awgUpdate('config',c=>Object.assign({},c||{},{flow:fl,from:fr})); }catch(e){}
+    // coming to AWG: work requests at IM now
+    try{ const items=liveTickets().filter(t=>t.state==='active'&&t.stage==='im'&&!t.split&&!t.rides).map(t=>({wr:t.wr,name:t.name,wg:t.workgroup||'',fac:t.facilitator||'',stage:'At IM · '+(({new:'waiting','in-review':'in review',resubmitted:'resubmitted',updates:'updates needed',prep:'facilitator prep'})[t.sub]||'waiting'),stageShort:'IM',when:t.dates&&t.dates.imSubmitted?'since '+fmtS(t.dates.imSubmitted):''})).sort((a,b)=>a.wr.localeCompare(b.wr));
+      const up=await rGet(AWGR,'upcoming'); if(JSON.stringify(((up&&up.data&&up.data.items)||[]))!==JSON.stringify(items)) await awgUpdate('upcoming',()=>({asOf:today(),items})); }catch(e){}
+    // each waiting submission carries the work request's documents
+    try{ const upd={}; Object.values(S.awgPortalQ).forEach(it=>{ if(it.hist||it.status==='decided') return; const t=S.tickets[it.ticket]||liveTickets().find(x=>x.wr===it.wr); if(!t||typeof ssDocs!=='function') return; const d=ssDocs(t); if(JSON.stringify(d)!==JSON.stringify(it.docs||[])||!it.ticket) upd[it.rep]={docs:d,ticket:t.id}; });
+      if(Object.keys(upd).length) S.awgPortalQ=(await awgUpdate('queue',cur=>{ const o=cur||{items:{}}; Object.entries(upd).forEach(([r,v])=>{ if(o.items&&o.items[r]) Object.assign(o.items[r],v); }); return o; })).items; }catch(e){}
+    // AWG decided: move the work request
+    for(const it of Object.values(S.awgPortalQ)){ if(it.status!=='decided'||it.hist||it.test||it.home) continue; const t=S.tickets[it.ticket]||liveTickets().find(x=>x.wr===it.wr); if(!t) continue;
+      const d=String(it.decidedAt||today()).slice(0,10), who=(it.decidedBy||'AWG')+' in AWG Review', out=it.outcome||'';
+      if(t.stage==='awg'){ if(/^(Approved|Conditional|Passed)/.test(out)){ const x=clone(t); x.awg=Object.assign({},x.awg,{status:out,voteMethod:'Meeting'}); x.dates=Object.assign({},x.dates,{awgDecision:d}); const nx=nextStage(x); await move(x,nx,{sub:nx==='designation'?'prep':'',text:'AWG '+out.toLowerCase()+' '+fmt(d)+(it.conds?' (conditions: '+it.conds+')':'')+'; moved to '+stageDef(nx).name+'. Recorded by '+who+'.'}); }
+        else if(/^Returned to IM/.test(out)){ const x=clone(t); x.awg=Object.assign({},x.awg,{status:out}); await move(x,'im',{sub:'updates',text:'AWG returned it to IM '+fmt(d)+'. Recorded by '+who+'.'}); }
+        else if(/^Returned/.test(out)) await setSub(t,'updates','AWG returned it to the workgroup '+fmt(d)+'. Recorded by '+who+'.',{awg:Object.assign({},t.awg,{status:out}),dates:Object.assign({},t.dates,{awgDecision:d})}); }
+      try{ S.awgPortalQ=(await awgUpdate('queue',cur=>{ if(cur&&cur.items&&cur.items[it.rep]) cur.items[it.rep].home=true; return cur; })).items; }catch(e){} }
+  }catch(e){ console.warn('awg sync',e); } finally{ awgSyncing=false; } }
+const _imEnsureQ1=imEnsureQ; imEnsureQ=function(){ _imEnsureQ1(); setTimeout(awgSync,2500); };
 
 /* ---------- settings ---------- */
 let setTab='process';
