@@ -1221,6 +1221,49 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 .wgf td{vertical-align:middle}
 .wgf select{font-size:12.5px}
 .wgf .mtsay{font-size:12px;color:var(--warn)}
+
+/* My Queue drag */
+.tk2.can-drag{cursor:grab}
+.tk2.can-drag:active{cursor:grabbing}
+.mq-next b{color:var(--ink)}
+.mq-ic{display:inline-block;margin-right:6px;font-size:16px}
+/* Architecture Help in the queue */
+.aq{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:22px;position:relative;overflow:hidden}
+.aq:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:linear-gradient(90deg,var(--c1),var(--sky),var(--c3))}
+.aq-h{display:flex;align-items:flex-start;gap:12px;margin-bottom:12px}
+.aq-h>div{flex:1}.aq-h h3{font-size:17px;margin:0}.aq-h .muted{font-size:12.5px}
+.aq-empty{display:flex;align-items:center;gap:14px;justify-content:space-between}.aq-empty h3{margin:0 0 2px;font-size:16px}
+.aq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.atile{--ac:var(--c1);position:relative;display:flex;flex-direction:column;gap:9px;background:linear-gradient(180deg,color-mix(in srgb,var(--ac) 7%,var(--surface)),var(--surface) 55%);border:1px solid var(--border);border-top:4px solid var(--ac);border-radius:10px;padding:13px 14px 12px;cursor:pointer;transition:transform .15s,box-shadow .15s;outline:none}
+.atile:hover,.atile:focus-visible{transform:translateY(-3px);box-shadow:var(--shadow),0 12px 28px rgba(13,49,76,.13)}
+.atile.s-requested{--ac:var(--c4)}.atile.s-approved{--ac:var(--c1)}.atile.s-in-progress{--ac:var(--c3)}.atile.s-on-hold{--ac:var(--hold)}
+.at-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.at-id{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--ink-3)}
+.at-role{margin-left:auto;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ac)}
+.at-main{display:flex;gap:12px;align-items:flex-start}
+.at-txt{flex:1;min-width:0}
+.at-t{font-size:15px;font-weight:700;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.at-wr{display:block;font-size:12.5px;font-weight:600;color:var(--accent);margin-top:3px;text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.at-wr:hover{text-decoration:underline}
+.at-wr0{font-size:12.5px;color:var(--ink-2);margin-top:3px}
+.at-type{font-size:12px;color:var(--ink-3);margin-top:2px}
+.at-ring{--p:0;flex:0 0 auto;width:62px;height:62px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(closest-side,var(--surface) 78%,transparent 80% 100%),conic-gradient(var(--ac) calc(var(--p)*1%),var(--surface-3) 0)}
+.at-ring b{font-size:17px;line-height:1}.at-ring em{font-style:normal;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-3);text-align:center;line-height:1.1;max-width:46px}
+.at-ring.soon{--ac:var(--c4)}.at-ring.late{--ac:var(--bad)}.at-ring.late b{color:var(--bad)}
+.at-ring.none{background:var(--surface-2)}.at-ring.none b{color:var(--ink-3)}
+.at-track{display:flex;gap:3px}
+.at-track i{flex:1;height:6px;border-radius:3px;background:var(--surface-3)}
+.at-track i.d{background:var(--sky)}.at-track i.c{background:var(--ac);box-shadow:0 0 0 2px color-mix(in srgb,var(--ac) 25%,transparent)}
+.at-who{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+.at-note{font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border-left:3px solid var(--border-strong);border-radius:0 6px 6px 0;padding:6px 9px;line-height:1.4}
+.at-note b{color:var(--ink)}
+.at-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:auto}
+.at-open{margin-left:auto;font-size:12.5px;font-weight:700;color:var(--accent);opacity:.75;transition:opacity .15s,transform .15s}
+.atile:hover .at-open{opacity:1;transform:translateX(2px)}
+.aq-done{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;padding-top:12px;border-top:1px dashed var(--border)}
+.aq-d{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--good-bg);border-radius:6px;padding:5px 10px;font:inherit;font-size:12.5px;color:var(--ink);cursor:pointer}
+.aq-d em{font-style:normal;color:var(--ink-3);font-size:11.5px}
+.okdot{display:inline-flex;width:16px;height:16px;border-radius:50%;background:var(--good);color:#fff;font-size:10px;align-items:center;justify-content:center}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3303,7 +3346,7 @@ function lineWire(m){
     $$('[data-drag]',bd).forEach(c=>{ c.addEventListener('dragstart',e=>{ dragId=c.dataset.drag; c.classList.add('dragging'); mt.classList.add('dragging'); const t=S.tickets[dragId]; $$('.mn',mt).forEach(n=>n.classList.toggle('cur',!!t&&n.dataset.mst===t.stage)); try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragId); }catch(x){} if(window.scrollY>40) window.scrollTo({top:0,behavior:'smooth'}); });
       c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); mt.classList.remove('dragging'); $$('.mn',mt).forEach(n=>n.classList.remove('over','cur')); }); });
     $$('.mn[data-mst]',mt).forEach(n=>{ n.addEventListener('dragover',e=>{ e.preventDefault(); n.classList.add('over'); }); n.addEventListener('dragleave',()=>n.classList.remove('over'));
-      n.addEventListener('drop',async e=>{ e.preventDefault(); mt.classList.remove('dragging'); n.classList.remove('over'); const t=S.tickets[dragId], to=n.dataset.mst; if(!t||t.stage===to) return; await move(t,to,{text:'Moved on the board from '+stageDef(t.stage).name+' to '+stageDef(to).name}); }); });
+      n.addEventListener('drop',async e=>{ e.preventDefault(); mt.classList.remove('dragging'); n.classList.remove('over'); const t=S.tickets[dragId], to=n.dataset.mst; if(!t||t.stage===to) return; await dragMove(t,to,'Pipeline Board'); }); });
   }
 }
 const _wireMain1=wireMain;
@@ -3652,7 +3695,7 @@ function wireReviewDrag(m){
   $$('.tk2[data-open]',box).forEach(c=>{ c.setAttribute('draggable','true');
     c.addEventListener('dragstart',e=>{ dragId=c.dataset.open; const t=S.tickets[dragId]; c.classList.add('dragging'); m.classList.add('rv-drag'); next.textContent='Drop here to send it on to '+stageDef(nextStage(t)).name; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragId); }catch(x){} });
     c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); m.classList.remove('rv-drag'); $$('.lane.over,.rv-next.over',m).forEach(x=>x.classList.remove('over')); }); });
-  const drop=async(el,to)=>{ el.classList.remove('over'); m.classList.remove('rv-drag'); const t=S.tickets[dragId]; if(!t) return; const dest=to||nextStage(t); if(dest===t.stage) return; await move(t,dest,{text:'Moved on the Review Desk from '+stageDef(t.stage).name+' to '+stageDef(dest).name}); };
+  const drop=async(el,to)=>{ el.classList.remove('over'); m.classList.remove('rv-drag'); const t=S.tickets[dragId]; if(!t) return; const dest=to||nextStage(t); if(dest===t.stage) return; await dragMove(t,dest,'Review Desk'); };
   $$('.lane[data-lanekey]',box).forEach(l=>{ l.addEventListener('dragover',e=>{ e.preventDefault(); l.classList.add('over'); }); l.addEventListener('dragleave',e=>{ if(!l.contains(e.relatedTarget)) l.classList.remove('over'); }); l.addEventListener('drop',e=>{ e.preventDefault(); drop(l,l.dataset.lanekey); }); });
   next.addEventListener('dragover',e=>{ e.preventDefault(); next.classList.add('over'); }); next.addEventListener('dragleave',()=>next.classList.remove('over')); next.addEventListener('drop',e=>{ e.preventDefault(); drop(next,null); });
 }
@@ -3663,6 +3706,95 @@ wireMain=function(m){ _wireMain4(m);
   if(S.view==='settings'){ $$('[data-wgset]',m).forEach(b=>b.onclick=async()=>{ const wg=b.dataset.wgset, to=$('[data-wgsel="'+CSS.escape(wg)+'"]',m).value; const n=allTickets().filter(t=>t.workgroup===wg&&!sameName(t.facilitator,to)).length; if(!n){ toast(wg+' already shows '+to); return; }
     const ok=await modal({title:'Hand '+wg+' Over to '+to+'?',body:'<p style="margin:0">'+n+' work request'+(n===1?'':'s')+', live and closed, will show '+esc(to)+' as the facilitator. Each keeps who facilitated it before, and '+esc(to.split(' ')[0])+' will see them all.</p>',ok:'Hand Over'}); if(ok) reassignWorkgroup(wg,to); }); }
   sweepLinks();
+};
+
+/* =====================================================================
+   Drag and drop does the whole job, and the queue's Architecture Help.
+   ===================================================================== */
+/* A drag records what the buttons would have recorded: the review it leaves is
+   marked passed, a governance stop logs the approval, and comment closes. */
+async function dragMove(t0,to,where){
+  const from=t0.stage, fwd=to==='published'||stageIndex(to)>stageIndex(from), td=today(), patch={}, dates={};
+  if(fwd){
+    if(from==='aireview'){ patch.ai=Object.assign({},t0.ai,{status:'Passed'}); dates.aiDecision=td; }
+    if(from==='im'||from==='awg'){ patch[from]=Object.assign({},t0[from],{status:'Passed'}); dates[from+'Decision']=td; }
+    if(from==='designation') patch.designation=Object.assign({},t0.designation,{status:'Approved',approvedOn:td});
+    if(GOV_STAGES.includes(from)) patch.votes=[...(t0.votes||[]),{stage:from,outcome:'Approved',date:td,method:'Recorded by '+(S.me.name||'MISMO staff')+' on the '+where}];
+    if(from==='comment'&&(!(t0.dates||{}).commentEnd||t0.dates.commentEnd>td)) dates.commentEnd=td;
+  }
+  return move(t0,to,{text:'Moved on the '+where+' from '+stageDef(from).name+' to '+stageDef(to).name+(fwd?'':' (sent back)'),patch,dates});
+}
+
+/* ---------- My Queue: drag a card to do its next step ---------- */
+function primaryAct(t){ if(!canAct(t)) return null; return stageActions(t).find(a=>a.cls==='pri'&&!/^Split/.test(a.label))||null; }
+function wireQueueDrag(m){
+  const box=$('[data-lanes="mine"]',m); if(!box||!S.canWrite) return;
+  let zone=$('#mqnext',m); if(!zone){ box.insertAdjacentHTML('afterend','<div class="rv-next mq-next" id="mqnext"></div>'); zone=$('#mqnext',m); }
+  let dragId=null, from=null;
+  $$('.tk2[data-open]',box).forEach(c=>{ const t=S.tickets[c.dataset.open]; const a=t&&primaryAct(t); if(!a) return;
+    c.setAttribute('draggable','true'); c.classList.add('can-drag');
+    c.addEventListener('dragstart',e=>{ dragId=t.id; from=c.closest('.lane'); c.classList.add('dragging'); m.classList.add('rv-drag'); zone.innerHTML='<span class="mq-ic">↧</span> Drop here to <b>'+esc(a.label.replace(/\s*→$/,''))+'</b>'; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragId); }catch(x){} });
+    c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); m.classList.remove('rv-drag'); $$('.lane.over,.rv-next.over',m).forEach(x=>x.classList.remove('over')); }); });
+  const run=async el=>{ el.classList.remove('over'); m.classList.remove('rv-drag'); const t=S.tickets[dragId]; const a=t&&primaryAct(t); if(a) await a.fn(); };
+  $$('.lane[data-lanekey]',box).forEach(l=>{ l.addEventListener('dragover',e=>{ if(l===from) return; e.preventDefault(); l.classList.add('over'); }); l.addEventListener('dragleave',e=>{ if(!l.contains(e.relatedTarget)) l.classList.remove('over'); }); l.addEventListener('drop',e=>{ e.preventDefault(); if(l!==from) run(l); }); });
+  zone.addEventListener('dragover',e=>{ e.preventDefault(); zone.classList.add('over'); }); zone.addEventListener('dragleave',()=>zone.classList.remove('over')); zone.addEventListener('drop',e=>{ e.preventDefault(); run(zone); });
+}
+
+/* ---------- Architecture Help in the queue ---------- */
+function archWho(a){
+  const pm=peopleFor('pm').map(p=>p.name)[0]||'the Program Manager', ar=a.assignedTo||(peopleFor('architect')[0]||{}).name||'the Architect';
+  return {Requested:['Waiting on '+pm+' to approve',pm],Approved:['In '+ar.split(' ')[0]+'’s queue',ar],'In Progress':[ar.split(' ')[0]+' is working on it',ar],'On Hold':['On hold'+(a.holdWhy?': '+a.holdWhy:''),ar],Done:['Done',ar],Declined:['Declined',pm]}[a.status]||['',''];
+}
+function archTile(a,role){
+  const steps=['Requested','Approved','In Progress','Done'], at=a.status==='On Hold'?2:steps.indexOf(a.status);
+  const [say,who]=archWho(a), td=today();
+  const left=a.needBy?daysBetween(td,a.needBy):null, late=left!=null&&left<0;
+  const pc={High:'bad',Medium:'info',Low:''}[a.priority]||'info';
+  const last=(a.log||[]).slice().reverse().find(l=>l.note);
+  const t=a.ticket&&S.tickets[a.ticket];
+  const span=a.needBy&&a.requested?Math.max(1,daysBetween(a.requested,a.needBy)):null, used=span?Math.max(0,Math.min(100,Math.round(daysBetween(a.requested,td)/span*100))):0;
+  const ring=a.needBy?'<span class="at-ring'+(late?' late':left<=7?' soon':'')+'" style="--p:'+(late?100:used)+'" title="Target '+esc(fmt(a.needBy))+'"><b>'+(late?Math.abs(left):left)+'</b><em>'+(late?'days late':left===1?'day left':'days left')+'</em></span>':'<span class="at-ring none"><b>—</b><em>no target</em></span>';
+  const btn=(to,l,c)=>'<button class="btn sm '+(c||'')+'" data-arch="'+esc(a.id)+'" data-to="'+to+'" type="button">'+l+'</button>';
+  let acts='';
+  if(S.canWrite&&role==='pm'&&a.status==='Requested') acts=btn('Approved','Approve →','pri')+btn('Declined','Decline');
+  if(S.canWrite&&role==='architect'){ if(a.status==='Approved') acts=btn('In Progress','Start →','pri'); if(a.status==='In Progress') acts=btn('Done','Mark Done →','pri')+btn('On Hold','Hold'); if(a.status==='On Hold') acts=btn('In Progress','Resume →','pri'); }
+  return '<div class="atile s-'+esc(a.status.replace(/\s+/g,'-').toLowerCase())+'" role="button" tabindex="0" data-archopen="'+esc(a.id)+'">'+
+    '<div class="at-top"><span class="at-id">'+esc(a.id)+'</span><span class="chip '+pc+'">'+esc(a.priority||'Medium')+'</span><span class="chip '+archTone(a.status)+'">'+esc(a.status)+'</span>'+(role?'<span class="at-role">'+(role==='pm'?'For you to approve':role==='architect'?'In your queue':'You asked')+'</span>':'')+'</div>'+
+    '<div class="at-main"><div class="at-txt"><div class="at-t">'+esc(a.title)+'</div>'+
+      (t?'<a href="#" class="at-wr" data-open="'+esc(t.id)+'">'+esc(t.wr)+' '+esc(t.name)+'</a>':(a.workgroup?'<div class="at-wr0">'+esc(a.workgroup)+'</div>':''))+
+      '<div class="at-type">'+esc(a.type||'')+(a.hours?' · '+esc(a.hours)+' hrs est.':'')+'</div></div>'+ring+'</div>'+
+    '<div class="at-track">'+steps.map((s,i)=>'<i class="'+(i<at||a.status==='Done'?'d':i===at?'c':'')+(a.status==='On Hold'&&i===at?' h':'')+'" title="'+esc(s)+'"></i>').join('')+'</div>'+
+    '<div class="at-who">'+av(who,'sm')+'<span>'+esc(say)+'</span></div>'+
+    (last?'<div class="at-note"><b>'+esc(String(last.by||'').split(' ')[0])+':</b> '+esc(last.note.length>140?last.note.slice(0,140)+'…':last.note)+'</div>':'')+
+    '<div class="at-foot">'+acts+'<span class="at-open">Open →</span></div></div>';
+}
+archMine=function(me){
+  const A=Object.values(S.arch||{});
+  const tagged=[];
+  if(isRole('pm',me)) A.filter(a=>a.status==='Requested').forEach(a=>tagged.push([a,'pm']));
+  if(isRole('architect',me)) A.filter(a=>['Approved','In Progress','On Hold'].includes(a.status)&&sameName(a.assignedTo,me.name)).forEach(a=>tagged.push([a,'architect']));
+  A.filter(a=>(sameName(a.requestedBy,me.name)||sameName(a.facilitator,me.name))&&!['Done','Declined'].includes(a.status)).forEach(a=>tagged.push([a,'']));
+  const seen=new Set(), L=tagged.filter(([a])=>!seen.has(a.id)&&seen.add(a.id));
+  const recent=A.filter(a=>(sameName(a.requestedBy,me.name)||sameName(a.facilitator,me.name))&&a.status==='Done'&&a.done&&daysBetween(a.done,today())<=14);
+  const reqs=liveTickets().filter(t=>t.request&&S.isStaff&&!S.viewAs);
+  let out='';
+  if(reqs.length) out+='<div class="qgroup"><h3>Requests to Decide <span class="chip warn">'+reqs.length+'</span></h3><div class="qlist">'+reqs.map(qItem).join('')+'</div></div>';
+  if(L.length||recent.length){
+    const pg=pageOf('archmine:'+(S.viewAs||''),L,3);
+    out+='<div class="aq"><div class="aq-h"><div><h3>Architecture Help</h3><span class="muted">'+L.length+' open'+(recent.length?' · '+recent.length+' finished in the last two weeks':'')+'</span></div>'+(S.canWrite?'<button class="btn sm" type="button" id="archnew2">+ Ask for Architecture Help</button>':'')+'</div>'+
+      (L.length?'<div class="aq-grid">'+pg.items.map(([a,r])=>archTile(a,r)).join('')+'</div>'+pg.bar:'')+
+      (recent.length?'<div class="aq-done">'+recent.map(a=>'<button type="button" class="aq-d" data-archopen="'+esc(a.id)+'"><span class="okdot">✓</span><b>'+esc(a.id)+'</b> '+esc(a.title)+'<em>done '+esc(fmtS(a.done))+'</em></button>').join('')+'</div>':'')+'</div>';
+  } else if(S.canWrite&&!S.viewAs&&(S.people.facilitators||[]).some(p=>sameName(p.name,me.name))) {
+    out+='<div class="aq aq-empty"><div><h3>Architecture Help</h3><span class="muted">Need Mark on something? Ask, and Perry routes it to his queue.</span></div><button class="btn sm" type="button" id="archnew2">+ Ask for Architecture Help</button></div>';
+  }
+  return out;
+};
+
+const _wireMain5=wireMain;
+wireMain=function(m){ _wireMain5(m);
+  if(S.view==='mine') wireQueueDrag(m);
+  const an=$('#archnew2',m); if(an) an.onclick=()=>archRequest(null);
+  $$('.atile [data-open]',m).forEach(x=>x.addEventListener('click',e=>{ e.preventDefault(); e.stopPropagation(); openPanel(x.dataset.open); }));
 };
 
 /* ---------- settings ---------- */
