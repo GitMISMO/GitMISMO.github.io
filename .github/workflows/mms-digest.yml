@@ -1,0 +1,44 @@
+name: MMS Daily Digest
+
+# Sends each facilitator their end-of-day MMS email. Runs at 37 minutes past each
+# afternoon hour on weekdays; the script itself only sends in the hour chosen in
+# MMS Settings > Daily Digest (Eastern time), so daylight saving needs no change here.
+# Turned on by two repository secrets: MMS_DATA_TOKEN and MMS_MAIL_FLOW_URL.
+
+on:
+  schedule:
+    - cron: '37 18-23 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build the emails and send nothing'
+        type: boolean
+        default: true
+      force:
+        description: 'Ignore the day and hour in Settings'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: mms-digest
+  cancel-in-progress: false
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Build and send the digests
+        working-directory: mms
+        env:
+          MMS_DATA_TOKEN: ${{ secrets.MMS_DATA_TOKEN }}
+          MMS_MAIL_FLOW_URL: ${{ secrets.MMS_MAIL_FLOW_URL }}
+          DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
+          FORCE: ${{ inputs.force && '1' || '0' }}
+        run: node digest-run.mjs
