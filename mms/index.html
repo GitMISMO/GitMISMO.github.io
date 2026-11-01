@@ -1455,6 +1455,19 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 .fld .radios label:has(input:checked){font-weight:600}
 .t2-age{white-space:nowrap}
 .t2-top{flex-wrap:wrap;row-gap:2px}
+/* previewing someone else's view */
+.pv-strip{display:flex;align-items:center;gap:12px;margin:0 0 16px;padding:10px 14px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);background:color-mix(in srgb,var(--accent) 9%,var(--surface));border-radius:9px;font-size:13px;color:var(--ink-2)}
+.pv-strip b{color:var(--ink)}
+.pv-strip>div{flex:1}
+.pv-eye{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--accent);color:#fff;flex:0 0 auto}
+.pv-eye svg,.pv-pstrip svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2}
+.pv-pstrip{display:inline-flex;align-items:center;gap:8px;margin:0 0 10px;padding:4px 6px 4px 10px;border-radius:20px;background:rgba(116,191,235,.18);border:1px solid rgba(116,191,235,.45);color:#fff;font-size:12px;font-weight:600}
+.pv-pstrip button{border:0;border-radius:14px;background:#fff;color:var(--navy);font:700 11.5px var(--display);padding:4px 10px;cursor:pointer}
+.pv-pstrip button:hover{background:var(--sky)}
+@media(max-width:700px){.pv-strip{flex-wrap:wrap}}
+.roles-tbl td{font-size:13px;vertical-align:top}
+.roles-tbl td:first-child{font-weight:600;color:var(--ink)}
+.roles-tbl td.rno{color:var(--ink-3)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4246,6 +4259,56 @@ renderPanel=function(){ _renderPanel5(); const P=$('#panel'); const x=$('#pclose
   if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return;
   if(_ptabFor!==t.id){ S.ptab='over'; _ptabFor=t.id; }
   wrHub(P,t); const x2=$('#pclose2',P); if(x2) x2.hidden=false; };
+
+/* =====================================================================
+   Roles. Everyone sees every page; what you can do depends on your role.
+   When staff look at someone's queue (Everyone's Queue), the MMS shows it
+   exactly as that person sees it: their buttons, their options. It's a
+   preview, so the buttons don't act; "Open as Myself" switches back.
+   ===================================================================== */
+function personIsStaff(name){ const L=(S.people.roles&&S.people.roles.staff)||[]; return L.some(p=>sameName(p.name,name)); }
+function applyLens(){ if(S.realStaff==null) return; S.isStaff=S.viewAs?personIsStaff(S.viewAs):S.realStaff; }
+const _computeRole0=computeRole;
+computeRole=function(){ _computeRole0(); S.realStaff=S.isStaff; applyLens(); };
+const _renderAll0=renderAll;
+renderAll=function(){ if(S.realStaff==null&&S.ready) S.realStaff=S.isStaff; applyLens(); _renderAll0(); };
+const PREVIEW_ACT='[data-act],[data-x],[data-x2],[data-qa],[data-arch],[data-req],[data-save],[data-cst],#noteadd,#archnew2,[data-qsort-save]';
+function previewNote(){ toast('This is '+firstName(S.viewAs)+'’s view, so the buttons are shown but don’t act here. Use Open as Myself to make the change.'); }
+document.addEventListener('click',e=>{
+  if(!S.viewAs) return; const b=e.target.closest(PREVIEW_ACT); if(!b||!b.closest('#main,#panel')) return;
+  e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation(); previewNote();
+},true);
+document.addEventListener('dragstart',e=>{ if(!S.viewAs||!e.target.closest||!e.target.closest('#main')) return; e.preventDefault(); previewNote(); },true);
+function exitPreview(reopen){ S.viewAs=''; const s=$('#viewas'); if(s) s.value=''; applyLens(); renderAll(); if(reopen) openPanel(reopen); }
+// a strip on the queue and on the work request while previewing
+const _wireMain6=wireMain;
+wireMain=function(m){ _wireMain6(m);
+  if(S.viewAs&&S.view==='mine'&&!$('.pv-strip',m)){ const ph=$('.pagehead',m); if(ph) ph.insertAdjacentHTML('afterend','<div class="pv-strip"><span class="pv-eye">'+whIc('over')+'</span><div><b>You’re seeing '+esc(S.viewAs)+'’s queue the way '+(personIsStaff(S.viewAs)?'they see':'a facilitator sees')+' it.</b> Their buttons are shown so you know what they see, but they don’t act here.</div><button class="btn sm" type="button" data-peek="">Back to My Own Queue</button></div>'); $$('.pv-strip [data-peek]',m).forEach(b=>b.onclick=()=>exitPreview()); }
+};
+const _renderPanel6=renderPanel;
+renderPanel=function(){ _renderPanel6(); const P=$('#panel'); if(!S.viewAs||!S.panel||String(S.panel).startsWith('arch:')) return;
+  const wh=$('.wh',P); if(!wh||$('.pv-pstrip',P)) return;
+  wh.insertAdjacentHTML('afterbegin','<div class="pv-pstrip">'+whIc('over')+'<span>'+esc(firstName(S.viewAs))+'’s view</span><button type="button" id="pvme">Open as Myself</button></div>');
+  const id=S.panel; $('#pvme',P).onclick=()=>exitPreview(id); };
+
+/* ---------- Resource Center: who can do what ---------- */
+const ROLE_ROWS=[
+  ['See every page and every work request','Yes','Yes'],
+  ['Do the next step on their own work (Submit for AI Review, etc.)','Yes, on work waiting on them','Yes, on any work request'],
+  ['Drag cards in My Queue','Yes: reorder, or drop to do the next step','Yes'],
+  ['Drag cards on the Pipeline Board and Review Desk','No','Yes: moves it and records the approval'],
+  ['Move To any stage','No','Yes, for one-off fixes (logged)'],
+  ['Put on Hold, Close, Cancel','Ask to… (staff approve or decline)','Yes, right away'],
+  ['Approve or decline a facilitator’s ask','No','Yes'],
+  ['Request Architecture Help','Yes','Yes'],
+  ['Mark comments addressed','Yes','Yes'],
+  ['Record governance approvals','No','Yes'],
+  ['Settings (stages, people, digest, website feed)','No','Yes'],
+  ['See someone else’s queue as they see it','No','Yes, from Everyone’s Queue (preview only)']
+];
+const _resourcesView0=VIEWS.resources;
+VIEWS.resources=function(){ return _resourcesView0()+'<div class="card roles-card"><h3>Who Can Do What<span class="sp muted" style="font-size:12px;font-weight:500">Everyone sees everything. Your role decides your buttons.</span></h3><div class="tblwrap"><table class="tbl roles-tbl"><thead><tr><th>What</th><th>Facilitators</th><th>MISMO Staff</th></tr></thead><tbody>'+
+  ROLE_ROWS.map(([w,f,s])=>'<tr><td>'+esc(w)+'</td><td'+(/^No$/.test(f)?' class="rno"':'')+'>'+esc(f)+'</td><td>'+esc(s)+'</td></tr>').join('')+'</tbody></table></div><p class="muted" style="font-size:12.5px;margin:10px 0 0">The Program Manager approves architecture requests, and the Architect works them from the Architecture Help queue. You’re '+(S.realStaff||S.isStaff?'set up as MISMO staff':'set up as a facilitator')+'.</p></div>'; };
 
 /* ---------- settings ---------- */
 let setTab='process';
