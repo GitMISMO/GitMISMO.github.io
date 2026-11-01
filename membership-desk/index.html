@@ -479,7 +479,7 @@ function renderHome(){const hr=new Date().getHours();$("hello").textContent=(hr<
  const oldest=TODO.map(x=>x.sold||x.paid).sort()[0],fin=finished().filter(r=>r.grp==="setup"&&r.d.slice(0,7)===TODAY.slice(0,7)).length,C=D.cases;
  tiles($("home-tiles"),[
   {k:"#ff8f7d",lab:"Waiting on You",v:TODO.length,sub:TODO.length?"oldest from "+fmtS(oldest):"you're all caught up",go:()=>go("todo")},
-  {k:"#5fd39a",lab:"Set Up This Season",v:finished().filter(r=>r.grp==="setup"&&!r.fresh).length+FIN.length,sub:"Square, new members and IIF",go:()=>go("done")},
+  {k:"#5fd39a",lab:"Set Up Recently",v:finished().filter(r=>r.grp==="setup").length,sub:"Square, new members and IIF since "+fmtS(finished().filter(r=>r.grp==="setup").map(r=>r.d).sort()[0]||TODAY),go:()=>go("done")},
   {k:"#74bfeb",lab:"MISMO Cases in "+TODAY.slice(0,4),v:caseYTD(),sub:(C.months[TODAY.slice(0,7)]||C.months[Object.keys(C.months).sort().pop()])+" last month in Aptify",go:()=>go("cases")},
   {k:"#b79cff",lab:"Closed the Same Day",v:Math.round(100*C.sameDay/C.closed),sub:C.sameDay+" of "+C.closed+" cases this year",go:()=>go("cases"),f:v=>Math.round(v)+"%"}]);
  const t=$("home-todo");t.textContent="";const L=TODO.slice().sort((a,b)=>String(a.sold||a.paid).localeCompare(String(b.sold||b.paid)));
