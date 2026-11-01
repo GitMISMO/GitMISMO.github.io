@@ -1,0 +1,514 @@
+<!doctype html>
+<html lang="en" data-rs-gate>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>IM Review · MISMO</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>:root{
+  --navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
+  --ground:#f1f6fa;--surface:#ffffff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;
+  --border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
+  --ink:#0d314c;--ink-2:#456179;--ink-3:#7794aa;
+  --good:#0f7b5c;--bad:#b3372c;--warn:#a2701a;
+  --good-bg:#e3f4ed;--bad-bg:#fbe9e7;--warn-bg:#fbf1dc;--info-bg:#e4f2fb;--hold-bg:#efe9f7;--hold:#6b4fa0;
+  --accent:#2477b8;--accent-soft:#e4f2fb;
+  --c1:#2477b8;--c2:#eb6834;--c3:#1baf7a;--c4:#eda100;--c5:#e87ba4;--c6:#008300;
+  --display:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --ui:var(--display);--mono:var(--display);
+  --hq-h:64px;--rail-w:240px;--rail-mini:62px;
+  --shadow:0 1px 2px rgba(13,49,76,.06),0 4px 14px rgba(13,49,76,.06);
+  --r:6px;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#0a2130;
+  --border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;
+  --ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;
+  --good:#4fc79b;--bad:#f08579;--warn:#e0a83c;
+  --good-bg:#0f3a30;--bad-bg:#432423;--warn-bg:#3d3017;--info-bg:#123a55;--hold-bg:#2c2545;--hold:#b9a3e8;
+  --accent:#3987e5;--accent-soft:#173c52;
+  --c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#2f9e2f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#0a2130;
+  --border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;
+  --ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;
+  --good:#4fc79b;--bad:#f08579;--warn:#e0a83c;
+  --good-bg:#0f3a30;--bad-bg:#432423;--warn-bg:#3d3017;--info-bg:#123a55;--hold-bg:#2c2545;--hold:#b9a3e8;
+  --accent:#3987e5;--accent-soft:#173c52;
+  --c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#2f9e2f;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25);
+  color-scheme:dark;}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--display);font-size:14px;line-height:1.45;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{letter-spacing:-.012em;margin:0;color:var(--ink)}
+a{color:var(--accent)}
+button{font-family:inherit}
+[hidden]{display:none!important}
+/* ── IM Review portal ── */
+body{min-height:100vh}
+.top{position:sticky;top:0;z-index:50;height:64px;background:var(--navy);color:#fff;display:flex;align-items:center;padding:0 22px;box-shadow:0 1px 0 rgba(80,164,219,.28)}
+.logoplate{background:#fff;border-radius:7px;padding:8px 14px;display:flex;align-items:center;line-height:0;flex:0 0 auto}
+.logoplate .wordmark{height:24px;width:auto;display:block}
+.mastrule{display:block;width:2px;height:34px;margin-inline:20px;border-radius:1px;background:var(--sky);flex:0 0 auto}
+.tname{font-size:15.5px;font-weight:700;color:var(--sky);white-space:nowrap}
+.top-r{margin-left:auto;display:flex;align-items:center;gap:13px}
+.eyebrow-m{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
+#rs-account{display:inline-flex;align-items:center}
+.tabs{position:sticky;top:64px;z-index:40;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:2px;padding:0 22px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs a{display:inline-flex;align-items:center;gap:7px;padding:13px 14px 11px;font-size:13.5px;font-weight:600;color:var(--ink-2);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
+.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--sky)}
+.tabs a b{font-size:11px;background:var(--warn);color:#fff;border-radius:9px;padding:1px 7px;line-height:1.4}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 22px 60px}
+h1{font-size:25px;font-weight:700;margin:0 0 4px}
+.sub{color:var(--ink-2);font-size:14px;max-width:760px}
+.head{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.head .sp{flex:1}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:var(--shadow);padding:16px 18px;margin-bottom:18px}
+.card h3{font-size:15px;margin:0 0 10px;display:flex;align-items:baseline;gap:10px}
+.card h3 small{font-size:12px;font-weight:500;color:var(--ink-3)}
+.muted{color:var(--ink-3)}
+.empty{color:var(--ink-3);font-size:13.5px;padding:18px 4px;text-align:center}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:5px;padding:7px 13px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;line-height:1.3;font-family:inherit;text-decoration:none}
+.btn:hover{background:var(--surface-3)}
+.btn.pri{background:var(--navy);border-color:var(--navy);color:#fff}
+.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--accent)}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.btn:disabled{opacity:.45;cursor:default}
+:root[data-theme="dark"] .btn.pri{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.pri{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}}
+
+/* hero */
+.hero{background:linear-gradient(135deg,#0d314c 0%,#14486e 100%);color:#fff;border-radius:10px;padding:22px 26px;margin-bottom:18px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:24px;align-items:center}
+.hero-go{align-self:flex-start;margin-top:14px;background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}
+.hero-go:hover{background:#8fd0f3}
+.hero .date{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sky);font-weight:700}
+.hero h2{color:#fff;font-size:26px;margin:6px 0}
+.hero p{margin:0;color:rgba(255,255,255,.85);font-size:14.5px}
+.hero p b{color:var(--sky)}
+.hero-l{display:flex;flex-direction:column}
+.hstats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hs{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:11px 13px}
+.hs span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.7)}
+.hs b{display:block;font-size:26px;line-height:1.15}
+.hs em{display:block;font-style:normal;font-size:12px;color:rgba(255,255,255,.6)}
+.hq{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:12px}
+.hq-h{font-size:11px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;margin-bottom:8px}
+.hq a{display:grid;grid-template-columns:1fr auto;gap:2px 10px;background:rgba(255,255,255,.06);border-radius:6px;padding:9px 11px;margin-bottom:6px;color:#fff;text-decoration:none}
+.hq a:hover{background:rgba(255,255,255,.13)}
+.hq a b{font-size:13.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hq a i{font-style:normal;font-size:12px;color:var(--sky);font-weight:700;white-space:nowrap}
+.hq a em{grid-column:1/-1;font-style:normal;font-size:12px;color:rgba(255,255,255,.62)}
+.hq .none{font-size:13px;color:rgba(255,255,255,.75);padding:8px 2px}
+@media(max-width:900px){.hero{grid-template-columns:1fr}}
+
+/* submission rows */
+.subs{display:grid;gap:10px}
+.sc{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) auto;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:8px;padding:13px 16px;color:var(--ink);text-decoration:none}
+.sc:hover{border-color:var(--border-strong);background:var(--surface-2)}
+.sc.done{border-left-color:var(--good)}
+.sc-t{display:flex;flex-direction:column;gap:2px;min-width:0}
+.sc .wr{font-size:11.5px;font-weight:700;color:var(--ink-3);letter-spacing:.03em}
+.sc b{font-size:15px;line-height:1.3}
+.sc-m{display:flex;flex-direction:column;gap:7px;min-width:0}
+.sc .m{display:flex;gap:6px;flex-wrap:wrap}
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:600;border-radius:10px;padding:2px 9px;background:var(--surface-3);color:var(--ink-2);white-space:nowrap}
+.pill.look{background:var(--warn-bg);color:var(--warn)}
+.pill.ok{background:var(--good-bg);color:var(--good)}
+.pill.bad{background:var(--bad-bg);color:var(--bad)}
+.sc .bar{height:6px;border-radius:3px;display:flex;overflow:hidden;gap:2px}
+.sc .bar i{display:block;height:100%}
+.sc .f{font-size:12px;color:var(--ink-3)}
+.sc-go{font-size:13px;font-weight:700;color:var(--accent);white-space:nowrap}
+@media(max-width:760px){.sc{grid-template-columns:1fr;gap:8px}.sc-go{justify-self:start}}
+
+/* the desk */
+.dhead{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;margin-bottom:14px}
+.dhead .t{flex:1;min-width:260px}
+.back{font-size:13px;font-weight:600;color:var(--accent);text-decoration:none}
+.prog{min-width:220px;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 14px}
+.prog b{font-size:20px}
+.prog span{font-size:12.5px;color:var(--ink-3);margin-left:6px}
+.prog .pb{height:7px;border-radius:4px;background:var(--surface-3);margin-top:7px;overflow:hidden}
+.prog .pb i{display:block;height:100%;background:var(--good);border-radius:4px}
+.plan{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.step{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.step .sk{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3)}
+.step b{font-size:22px;line-height:1.1}
+.step p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.step .btn{align-self:flex-start;margin-top:4px}
+.step.cur{border-color:var(--sky);box-shadow:0 0 0 2px var(--sky-wash)}
+.seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:7px 12px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;font-family:inherit;white-space:nowrap}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.seg button b{font-weight:700;opacity:.8;margin-left:4px}
+.dtools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.dtools .sp{flex:1}
+.rows{display:grid;gap:10px}
+.row{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--border-strong);border-radius:8px;padding:12px 14px}
+.row.look{border-left-color:var(--warn)}
+.row.ok{border-left-color:var(--good);opacity:.92}
+.row.chg{border-left-color:var(--accent)}
+.rh{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.rh .it{font-size:11.5px;font-weight:700;color:var(--ink-3)}
+.rh .ct{font-size:11.5px;color:var(--ink-3)}
+.rh b{font-size:14.5px}
+.rh .pc{font-size:12px;color:var(--ink-3)}
+.lbl{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin-bottom:2px}
+.def{margin-top:8px;font-size:13.5px}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:10px}
+.cols.one{grid-template-columns:1fr}
+.box{background:var(--surface-2);border:1px solid var(--rule);border-radius:6px;padding:9px 11px;font-size:13px}
+.box .why{margin-top:5px;color:var(--ink-2)}
+.box .sug{margin-top:6px;padding-top:6px;border-top:1px dashed var(--border)}
+.dec{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;border-radius:4px;padding:2px 8px;background:var(--good-bg);color:var(--good)}
+.dec.d1{background:var(--info-bg);color:var(--accent)}
+.dec.d2,.dec.d3{background:var(--warn-bg);color:var(--warn)}
+.dec.d4{background:var(--bad-bg);color:var(--bad)}
+.conf{font-size:11.5px;color:var(--ink-3);margin-left:6px}
+.racts{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
+.edit{margin-top:10px;display:grid;gap:10px}
+.edit label{display:grid;gap:4px;font-size:12.5px;font-weight:600;color:var(--ink-2)}
+.edit select,.edit textarea{font:inherit;font-size:13.5px;border:1px solid var(--border-strong);border-radius:5px;padding:7px 9px;background:var(--surface);color:var(--ink);width:100%}
+.edit textarea{min-height:64px;resize:vertical}
+.quick{display:flex;gap:6px;flex-wrap:wrap}
+.quick button{border:1px solid var(--border);background:var(--surface-2);border-radius:12px;padding:3px 10px;font-size:12px;cursor:pointer;color:var(--ink-2);font-family:inherit}
+.foot{position:sticky;bottom:0;z-index:30;margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;box-shadow:0 -4px 14px rgba(13,49,76,.08);padding:10px 14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.foot .sp{flex:1}
+.foot span{font-size:13px;color:var(--ink-2)}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:6px;font-size:13.5px;z-index:99;box-shadow:var(--shadow)}
+
+/* trends */
+.kp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}
+.k{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:13px 15px;border-top:3px solid var(--kc,var(--c1))}
+.k span{display:block;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3)}
+.k b{display:block;font-size:27px;line-height:1.15}
+.k em{display:block;font-style:normal;font-size:12px;color:var(--ink-2)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g2 .card{margin-bottom:0}
+.chart{position:relative}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart .ax{font-size:11px;fill:var(--ink-3)}
+.chart .gl{stroke:var(--rule);stroke-width:1}
+.chart .base{stroke:var(--border-strong);stroke-width:1}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin:2px 0 8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.tip{position:absolute;pointer-events:none;background:var(--navy-deep);color:#fff;font-size:12px;border-radius:5px;padding:7px 9px;box-shadow:var(--shadow);white-space:nowrap;z-index:5;line-height:1.45}
+.tip b{color:var(--sky)}
+.note{font-size:12.5px;color:var(--ink-2);margin:10px 0 0}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);font-weight:700;padding:7px 9px;border-bottom:1px solid var(--navy);background:var(--surface-3);white-space:nowrap}
+.tbl td{padding:8px 9px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl td.n{text-align:right;font-variant-numeric:tabular-nums}
+.tw{overflow-x:auto}
+.meter{display:inline-block;width:70px;height:7px;border-radius:4px;background:var(--surface-3);vertical-align:middle;margin-right:6px;overflow:hidden}
+.meter i{display:block;height:100%;background:var(--good)}
+.tog{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer}
+@media(max-width:900px){.g2{grid-template-columns:1fr}.kp{grid-template-columns:1fr 1fr}.plan{grid-template-columns:1fr}.cols{grid-template-columns:1fr}}
+@media(max-width:560px){.top{padding:0 12px}.mastrule{margin-inline:12px}.eyebrow-m{display:none}.tabs{padding:0 8px}.wrap{padding:16px 16px 50px}.hero{padding:18px}.hero h2{font-size:22px}.hstats{gap:6px}.hs{padding:9px}.hs b{font-size:21px}.hs span{font-size:9.5px;letter-spacing:.03em}.hs em{font-size:11px}.subs{grid-template-columns:1fr}h1{font-size:21px}}
+.sub{overflow-wrap:anywhere}
+@media(max-width:560px){.plan{grid-template-columns:1fr 1fr;gap:8px}.plan .step:nth-child(3){display:none}.step p{display:none}.step b{font-size:19px}.step .btn{white-space:normal;text-align:left}.prog{min-width:0;width:100%}.dtools .seg button{padding:7px 9px;font-size:12.5px}.foot{padding:8px 10px}.foot span{font-size:12px}}
+</style>
+<script src="/assets/session.js"></script>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320 c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20 -297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243 -4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198 0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3 -104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245 -337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17 246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49 203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12 26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57 187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44 -204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288 -20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92 -51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12 -24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297 3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146 -106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0 -356 -14z"></path></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263 13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19 -16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20 -222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0 46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"></path></g></symbol><symbol id="mismo-hat" viewBox="0 0 100 100"><path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41 C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/><path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z" fill="#0d314c" opacity=".17"/><rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/><rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/><circle cx="86" cy="45" r="11.5" fill="#ffffff"/></symbol></defs></svg>
+
+<header class="top">
+  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
+  <span class="mastrule"></span>
+  <span class="tname">IM Review</span>
+  <span class="top-r"><span class="eyebrow-m">Governance · Information Management</span><div id="rs-account"></div></span>
+</header>
+<nav class="tabs" aria-label="IM Review">
+  <a href="#/" data-v="waiting" id="tab-w">Waiting for IM <b hidden></b></a>
+  <a href="#/decided" data-v="decided">Decided</a>
+  <a href="#/trends" data-v="trends">Trends</a>
+  <a href="#/draft" data-v="draft">How the Draft Is Doing</a>
+</nav>
+<main class="wrap" id="main"><div class="empty">Loading…</div></main>
+
+<script>
+/* =====================================================================
+   IM Review: the portal for MISMO's Information Management reviewers.
+   Each IM submission arrives from the MMS with a draft decision for every
+   row. Reviewers agree, or correct what the draft got wrong; each correction
+   teaches the next draft. Trends and the draft's track record come from the
+   IM library (2020 on) and from every review finished here.
+   Data (GitMISMO/im-review-data, through the relay):
+     queue            {items:{rep:{...}}}   what's waiting and what's decided
+     rev-<rep>        one submission: rows, the draft, IM's decisions
+     learn-<year>     {rows:{id:{kind,rule,draft,final,agreed,...}}}
+     config           {imauto:{kind:true}, reviewers:[emails]}
+     backtest         trends and the draft's track record from history
+   ===================================================================== */
+(function(){
+"use strict";
+const RELAY="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws", PROJECT="im-review";
+const RS=()=>window.ResourcesSession||null, tok=()=>{ try{ return RS().token(); }catch(e){ return ""; } };
+const U=n=>RELAY+"/"+PROJECT+"/data/"+encodeURIComponent(n);
+const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>[...(r||document).querySelectorAll(s)];
+const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const clone=o=>JSON.parse(JSON.stringify(o));
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const fmtD=s=>{ const m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})/); return m?MON[+m[2]-1]+" "+(+m[3])+", "+m[1]:""; };
+const fmtS=s=>{ const m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})/); return m?MON[+m[2]-1]+" "+(+m[3]):""; };
+const first=n=>String(n||"").trim().split(/\s+/)[0]||"";
+const safe=s=>String(s).replace(/[^A-Za-z0-9_-]/g,"_").slice(0,80);
+const pct=(a,b)=>b?Math.round(a/b*100):0;
+
+/* ---------- the relay ---------- */
+async function get(n){ const r=await fetch(U(n),{headers:{Authorization:"Bearer "+tok()},cache:"no-store"}); if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw new Error(n+" "+r.status); const j=await r.json(); return {data:(j&&j.data)||null,sha:(j&&j.sha)||null}; }
+async function put(n,content,sha){ return fetch(U(n),{method:"PUT",headers:{"Content-Type":"application/json",Authorization:"Bearer "+tok()},body:JSON.stringify({content,sha:sha||undefined})}); }
+/* read, change, write; on a clash (someone saved first) read again and redo the change */
+async function update(n,fn){ for(let i=0;i<5;i++){ const g=await get(n); const next=fn(g.data?clone(g.data):null); const r=await put(n,next,g.sha); if(r.ok) return next; if(r.status!==409&&r.status!==422) throw new Error("save "+r.status); await new Promise(s=>setTimeout(s,300+i*400)); } throw new Error("busy"); }
+
+/* ---------- decisions ---------- */
+const DEC=["Approved as Submitted","Approved with Modification","Returned","Denied","Withdrawn","Deferred"];
+const RANK={"Approved as Submitted":0,"Approved with Modification":1,"Deferred":2,"Returned":3,"Withdrawn":3,"Denied":4};
+const DCOL={"Approved as Submitted":"var(--good)","Approved with Modification":"var(--c1)","Returned":"var(--warn)","Denied":"var(--bad)","Withdrawn":"var(--ink-3)","Deferred":"var(--hold)"};
+const chip=d=>'<span class="dec d'+(RANK[d]||0)+'">'+esc(d)+'</span>';
+const isLook=r=>(r.draft.look||r.draft.dec!=="Approved as Submitted")&&!r.auto;
+const kindOf=r=>[r.draft.dec,r.draft.rule||"clean",String(r.tt||"").toLowerCase()].join("|");
+const RULE_NAME={clean:"no issues found",ai:"Claude’s read",template:"definition template","def-acr":"acronym not spelled out","def-impl":"implementation language",abbr:"abbreviation",classword:"class word","normal-english":"name not in normal English","def-period":"definition punctuation","def-repeat":"definition repeats the name","neg-ind":"negative indicator",dup:"added twice","rm-exists":"already in the Reference Model","rm-cn-exists":"container already exists","rm-enum-exists":"enumeration already exists","rm-ac-exists":"acronym already exists","rm-missing":"not in the Reference Model","rm-cn-missing":"container not in the model","rm-parent":"parent container","rm-enum-dp":"enumeration’s data point","rm-enum-missing":"enumeration not in the model","rm-xpath":"XPATH not in the model","rm-rename-taken":"new name already taken",ct:"change type blank","rm-type-enums":"Type without enumerations","other-desc":"Other without Other Description",xpath:"XPATH format",need:"required columns blank","rm-similar":"similar to an existing data point","rm-enum-near":"similar enumeration","rm-deprecated":"deprecated in the model","rm-already-there":"already in the model","rm-old-def":"old definition doesn’t match"};
+const QUICK=["Already in the model; reuse the existing data point.","Improve the definition.","Enumerations need definitions.","Correct the XPATH.","Spell out the acronym, then give it in parentheses.","Use the class word definition template.","Remove implementation language from the definition.","Coordinate with the other workgroup first."];
+
+/* ---------- state ---------- */
+const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{imauto:{}},bt:null,filter:"look",edit:null,loaded:false};
+/* everyone with access can read; IM reviewers (People and Roles › IM Reviewer in
+   the MMS, copied into config.reviewers) and admins make the decisions */
+const canEdit=()=>{ try{ if(RS()&&RS().canEdit) return !!RS().canEdit(PROJECT); }catch(e){} return S.role==="admin"||S.role==="staff"; };
+const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const L=(S.cfg.reviewers||[]).map(x=>String(x).toLowerCase()); return !L.length||L.includes(String(S.me.email||"").toLowerCase()); };
+const isAdmin=()=>S.role==="admin";
+const route=()=>{ const h=location.hash.replace(/^#\/?/,""); const [a,b]=h.split("/"); return {view:a||"waiting",rep:b?decodeURIComponent(b):""}; };
+
+/* how often IM agreed with each kind of draft: live reviews first, history behind them */
+function kindStats(){ const st={}; Object.values(S.learn).forEach(x=>{ if(!x||!x.kind) return; const s=st[x.kind]=st[x.kind]||{n:0,agree:0,live:0}; s.n++; s.live++; if(x.agreed) s.agree++; });
+  ((S.bt&&S.bt.draft&&S.bt.draft.byKind)||[]).forEach(k=>{ const s=st[k.kind]=st[k.kind]||{n:0,agree:0,live:0}; s.hn=k.n; s.hagree=k.agree; });
+  return st; }
+function confidence(r){ const s=kindStats()[kindOf(r)]; if(!s) return ""; const n=(s.n||0)+(s.hn||0), a=(s.agree||0)+(s.hagree||0); if(n<5) return ""; return "IM agreed with this kind of draft "+pct(a,n)+"% of "+n+" times"; }
+
+/* ---------- loading ---------- */
+async function load(role){
+  S.role=role||""; const c=(RS()&&RS().current())||{}; S.me={name:c.name||"",email:c.email||""};
+  const yr=new Date().getFullYear();
+  const [q,cfg,bt,l1,l0]=await Promise.all(["queue","config","backtest","learn-"+yr,"learn-"+(yr-1)].map(n=>get(n).catch(()=>({data:null}))));
+  S.queue=(q.data&&q.data.items)||{}; S.cfg=Object.assign({imauto:{}},cfg.data||{}); S.bt=bt.data||null;
+  S.learn=Object.assign({},(l0.data&&l0.data.rows)||{},(l1.data&&l1.data.rows)||{});
+  S.loaded=true; render();
+}
+async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=g.data; return S.docs[rep]||null; }
+async function refreshQueue(){ try{ const q=await get("queue"); S.queue=(q.data&&q.data.items)||{}; }catch(e){} }
+
+/* save one submission: on a clash keep everyone's newest decision for each row */
+async function saveDoc(doc){
+  S.docs[doc.rep]=doc;
+  const merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv) return doc; const out=clone(srv);
+    (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; const a=r.final, b=o.final; if(r._undo&&!b) {} if(a&&(!b||String(a.at)>=String(b.at))) o.final=a; else if(!a&&b&&r._undoAt&&String(r._undoAt)>String(b.at)) delete o.final; });
+    if(doc.status==="decided"){ out.status="decided"; out.decidedBy=doc.decidedBy; out.decidedAt=doc.decidedAt; }
+    return out; });
+  merged.rows.forEach(r=>{ delete r._undoAt; }); S.docs[doc.rep]=merged; return merged;
+}
+
+/* ---------- views ---------- */
+function shell(body){ const r=route(), w=Object.values(S.queue).filter(q=>q.status==="awaiting").length;
+  $$(".tabs a").forEach(a=>a.setAttribute("aria-current",a.dataset.v===(r.view==="review"?"waiting":r.view)?"page":"false"));
+  const b=$("#tab-w b"); if(b){ b.textContent=w; b.hidden=!w; }
+  $("#main").innerHTML=body; wire(); }
+function render(){ if(!S.loaded) return; const r=route();
+  if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d) return shell(desk(d)); shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(route().rep===r.rep) shell(x?desk(x):'<div class="empty">That submission isn’t here. It may have been withdrawn.</div>'); }); return; }
+  if(r.view==="decided") return shell(decidedView());
+  if(r.view==="trends") return shell(trendsView());
+  if(r.view==="draft") return shell(draftView());
+  shell(home()); }
+
+function subCard(q){ const n=q.rows||0, look=q.look||0, done=q.status==="decided";
+  const cnt=q.counts||{}; const bar=done?'<span class="bar">'+DEC.filter(d=>cnt[d]).map(d=>'<i style="flex:'+cnt[d]+';background:'+DCOL[d]+'" title="'+esc(cnt[d]+" "+d)+'"></i>').join("")+'</span>':'<span class="bar"><i style="flex:'+look+';background:var(--warn)"></i><i style="flex:'+(n-look)+';background:var(--good)"></i></span>';
+  return '<a class="sc'+(done?" done":"")+'" href="#/review/'+encodeURIComponent(q.rep)+'"><span class="sc-t"><span class="wr">'+esc(q.wr||"")+(q.wg?" · "+esc(q.wg):"")+'</span><b>'+esc(q.name||"")+'</b><span class="f">'+(done?'Decided '+esc(fmtD(q.decidedAt))+' by '+esc(q.decidedBy||""):'Sent '+esc(fmtS(q.sentAt))+(q.sentBy?' by '+esc(q.sentBy):'')+(q.fac&&q.fac.name&&q.fac.name!==q.sentBy?' · Facilitator '+esc(q.fac.name):''))+'</span></span>'+
+    '<span class="sc-m"><span class="m">'+(done?Object.entries(cnt).sort((a,b)=>(RANK[a[0]]||0)-(RANK[b[0]]||0)).map(([d,v])=>'<span class="pill">'+v+' '+esc(d.replace(/^Approved /,"").toLowerCase())+'</span>').join("")+(q.agree!=null?'<span class="pill ok">'+q.agree+'% agreed with the draft</span>':''):'<span class="pill look">'+look+' need'+(look===1?'s':'')+' a look</span><span class="pill ok">'+(n-look)+' clean</span>'+(q.resub?'<span class="pill">Resubmission</span>':''))+'</span>'+bar+'</span>'+
+    '<span class="sc-go">'+(done?'Open':'Start Review')+' ›</span></a>'; }
+function home(){
+  const L=Object.values(S.queue), aw=L.filter(q=>q.status==="awaiting").sort((a,b)=>String(a.sentAt).localeCompare(String(b.sentAt))), dn=L.filter(q=>q.status==="decided").sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
+  const rows=aw.reduce((s,q)=>s+(q.rows||0),0), look=aw.reduce((s,q)=>s+(q.look||0),0);
+  const h=new Date().getHours(), g=h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+  const lv=Object.values(S.learn), agree=lv.length?pct(lv.filter(x=>x.agreed).length,lv.length):null, hist=S.bt&&S.bt.draft;
+  const line=aw.length?'<b>'+aw.length+'</b> submission'+(aw.length===1?' is':'s are')+' waiting for IM: <b>'+rows+'</b> rows, and <b>'+look+'</b> need your judgment. The draft found nothing to change on the other '+(rows-look)+'.':'Nothing is waiting for IM right now. When a facilitator sends a submission, it lands here with a draft decision for every row.';
+  const st=(k,v,s)=>'<div class="hs"><span>'+k+'</span><b>'+v+'</b><em>'+s+'</em></div>';
+  const autoN=Object.values(S.cfg.imauto||{}).filter(Boolean).length;
+  const yr=String(new Date().getFullYear()), dnY=dn.filter(q=>String(q.decidedAt).slice(0,4)===yr);
+  return '<div class="hero"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}))+'</div><h2>'+g+(S.me.name?", "+esc(first(S.me.name)):"")+'</h2><p>'+line+'</p>'+
+    (aw.length?'<a class="btn hero-go" href="#/review/'+encodeURIComponent(aw[0].rep)+'">Start With '+esc(aw[0].wr)+' ›</a>':'')+'</div>'+
+    '<div class="hstats">'+st("Need a Look",look,"rows waiting")+st("Clean",rows-look,"rows, one click each submission")+
+      st("Draft Agreement",agree!=null?agree+"%":(hist&&hist.rows?pct(hist.exact,hist.rows)+"%":"—"),agree!=null?"of "+lv.length+" rows reviewed here":(hist&&hist.rows?"on "+hist.rows.toLocaleString()+" past rows":"fills in as you review"))+
+      st("Decided in "+yr,dnY.length,(dnY.length===1?"submission":"submissions")+(autoN?" · "+autoN+" kinds arrive approved":""))+'</div></div>'+
+    '<div class="card"><h3>Waiting for IM<small>oldest first</small></h3>'+(aw.length?'<div class="subs">'+aw.map(subCard).join("")+'</div>':'<div class="empty">Nothing waiting.</div>')+'</div>'+
+    (dn.length?'<div class="card"><h3>Recently Decided<small><a href="#/decided">See all</a></small></h3><div class="subs">'+dn.slice(0,3).map(subCard).join("")+'</div></div>':'');
+}
+function decidedView(){ const dn=Object.values(S.queue).filter(q=>q.status==="decided").sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
+  return '<div class="head"><div><h1>Decided</h1><div class="sub">Every submission IM has finished here, newest first. Open one to see the decisions or download the decided form.</div></div></div>'+
+    '<div class="card">'+(dn.length?'<div class="subs">'+dn.map(subCard).join("")+'</div>':'<div class="empty">Nothing decided here yet.</div>')+'</div>'; }
+
+/* ---------- the desk ---------- */
+function desk(doc){
+  const R=doc.rows||[], decided=doc.status==="decided", q=S.queue[doc.rep]||{}, F=S.filter;
+  const looks=R.filter(isLook), clean=R.filter(r=>!isLook(r)), done=R.filter(r=>r.final).length;
+  const lookLeft=looks.filter(r=>!r.final).length, cleanLeft=clean.filter(r=>!r.final).length;
+  const vis=r=>F==="all"||(F==="look"?isLook(r):F==="clean"?!isLook(r):F==="changed"?(r.final&&!r.final.agreed):true);
+  const shown=R.filter(vis);
+  const can=canReview()&&!decided;
+  const step=(k,n,t,btn,cur)=>'<div class="step'+(cur?" cur":"")+'"><span class="sk">'+k+'</span><b>'+n+'</b><p>'+t+'</p>'+(btn||"")+'</div>';
+  const plan=decided?'':'<div class="plan">'+
+    step("1 · Your Judgment",lookLeft?lookLeft+" left":"Done",looks.length?looks.length+" row"+(looks.length===1?"":"s")+" where the draft suggests a change or isn’t sure. Agree or correct each one.":"The draft found nothing that needs your judgment.",lookLeft&&F!=="look"?'<button class="btn sm" data-f="look">Show Them</button>':"",lookLeft>0)+
+    step("2 · Clean Rows",cleanLeft?cleanLeft+" left":"Done",clean.length+" row"+(clean.length===1?"":"s")+" with no issues found. Skim them if you like, then agree with all of them at once.",cleanLeft&&can?'<button class="btn sm good" data-all="clean">Agree With All '+cleanLeft+' Clean Rows</button>':"",!lookLeft&&cleanLeft>0)+
+    step("3 · Finish",done+" of "+R.length,"When every row is decided, finish. The facilitator gets the decisions and the draft learns from your changes.",can?'<button class="btn sm pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':"",done===R.length&&!decided)+'</div>';
+  const nChg=R.filter(r=>r.final&&!r.final.agreed).length;
+  const tools='<div class="dtools"><div class="seg" role="tablist">'+[["look","Needs a Look",looks.length],["clean","Clean",clean.length],["all","All Rows",R.length]].concat(nChg?[["changed","Changed by IM",nChg]]:[]).map(([k,l,n])=>'<button type="button" data-f="'+k+'" aria-pressed="'+(F===k)+'">'+l+'<b>'+n+'</b></button>').join("")+'</div><span class="sp"></span>'+
+    (can&&shown.some(r=>!r.final)&&F!=="changed"?'<button class="btn sm" data-all="'+F+'">Agree With All '+shown.filter(r=>!r.final).length+' Shown</button>':"")+'</div>';
+  return '<div class="dhead"><div class="t"><a class="back" href="#/">‹ All Submissions</a><h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+esc([doc.file||"IM Submission Form",doc.at?"drafted "+fmtD(doc.at):"",doc.rm?"checked against the "+doc.rm:"",q.sentBy?"sent by "+q.sentBy:""].filter(Boolean).join(" · "))+'</div></div>'+
+    '<div class="prog"><b>'+done+' of '+R.length+'</b><span>rows decided</span><div class="pb"><i style="width:'+pct(done,R.length)+'%"></i></div></div></div>'+
+    (decided?'<div class="card" style="border-left:4px solid var(--good)"><b>Decided '+esc(fmtD(doc.decidedAt))+' by '+esc(doc.decidedBy||"")+'.</b> <span class="muted">'+Object.entries(tally(R)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span></div>':'')+
+    (!canReview()&&!decided?'<div class="card">You can follow this review here. IM reviewers make the decisions.</div>':'')+
+    plan+tools+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+
+    '<div class="foot"><span>'+(decided?"Decided "+esc(fmtD(doc.decidedAt)):(R.length-done)?(R.length-done)+" row"+(R.length-done===1?"":"s")+" still to decide":"Every row is decided")+'</span><span class="sp"></span><button class="btn" data-xl="1">Download for Excel</button>'+(can?'<button class="btn pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':'')+'</div>';
+}
+function tally(R){ const c={}; R.forEach(r=>{ const d=(r.final&&r.final.dec)||r.draft.dec; c[d]=(c[d]||0)+1; }); return c; }
+function rowHtml(r,can){ const f=r.final, ed=S.edit===r.i&&can, lk=isLook(r);
+  const conf=confidence(r);
+  const draft='<div class="box"><span class="lbl">'+(r.auto?"Arrives approved":"The draft")+'</span>'+chip(r.draft.dec)+(r.draft.look?' <span class="pill look">Needs IM’s judgment</span>':'')+(conf?'<span class="conf">'+esc(conf)+'</span>':'')+
+    (r.draft.com?'<div class="why">'+esc(r.draft.com)+'</div>':'')+(r.draft.sug?'<div class="sug"><span class="lbl">Suggested</span>'+esc(r.draft.sug)+'</div>':'')+'</div>';
+  const fin=f&&!ed?'<div class="box"><span class="lbl">'+(f.agreed?"IM agreed":"IM decided")+(f.by?" · "+esc(first(f.by)):"")+'</span>'+chip(f.dec)+(f.com&&!f.agreed?'<div class="why">'+esc(f.com)+'</div>':'')+(f.sug&&!f.agreed?'<div class="sug"><span class="lbl">Suggested</span>'+esc(f.sug)+'</div>':'')+(f.missed?'<div class="why"><b>The draft missed:</b> '+esc(f.missed)+'</div>':'')+'</div>':'';
+  const editor=ed?'<div class="edit"><label>IM Decision<select name="dec">'+DEC.map(d=>'<option'+(((f&&f.dec)||r.draft.dec)===d?" selected":"")+'>'+esc(d)+'</option>').join("")+'</select></label>'+
+    '<label>Review Comment<textarea name="com">'+esc((f&&!f.agreed&&f.com)||r.draft.com||"")+'</textarea></label><div class="quick">'+QUICK.map(t=>'<button type="button" data-q="'+esc(t)+'">'+esc(t)+'</button>').join("")+'</div>'+
+    '<label>Suggested Definition or Name<textarea name="sug">'+esc((f&&f.sug)||r.draft.sug||"")+'</textarea></label>'+
+    '<label>What the Draft Missed or Got Wrong (optional; this is what teaches it)<textarea name="miss">'+esc((f&&f.missed)||"")+'</textarea></label>'+
+    '<div class="racts"><button class="btn sm" data-cancel="1">Cancel</button><button class="btn sm pri" data-save="'+r.i+'">Save</button></div></div>':'';
+  const acts=can&&!ed?'<div class="racts">'+(f?'<button class="btn sm ghost" data-undo="'+r.i+'">Undo</button>':'')+'<button class="btn sm" data-chg="'+r.i+'">'+(f&&!f.agreed?"Edit":"Change or Add Something")+'</button>'+(!f?'<button class="btn sm pri" data-ok="'+r.i+'">Agree</button>':'')+'</div>':'';
+  return '<div class="row'+(f?(f.agreed?" ok":" chg"):lk?" look":"")+'" data-row="'+r.i+'"><div class="rh"><span class="it">Item '+esc(r.item)+'</span><span class="ct">'+esc([r.ct,r.tt].filter(Boolean).join(" · "))+'</span><b>'+esc(r.name||"")+'</b>'+(r.pc?'<span class="pc">in '+esc(r.pc)+'</span>':'')+'</div>'+
+    (r.old?'<div class="def"><span class="lbl">Original or Old Value</span>'+esc(r.old)+'</div>':'')+(r.def?'<div class="def"><span class="lbl">Submitted Definition</span>'+esc(r.def)+'</div>':'')+(r.xp?'<div class="def muted" style="font-size:12px;word-break:break-all">'+esc(r.xp)+'</div>':'')+
+    ((fin||editor)?'<div class="cols">'+draft+(fin||editor)+'</div>':'<div class="cols one">'+draft+'</div>')+(fin&&ed?editor:'')+acts+'</div>'; }
+
+async function finish(doc){
+  const by=S.me.name||S.me.email||"", at=new Date().toISOString(); doc.status="decided"; doc.decidedBy=by; doc.decidedAt=at;
+  const R=doc.rows||[], agreed=R.filter(r=>r.final&&r.final.agreed).length, c=tally(R);
+  await saveDoc(doc);
+  const yr=new Date().getFullYear(), recs={};
+  R.forEach(r=>{ recs[safe(doc.rep)+"_"+r.i]={rep:doc.rep,wr:doc.wr,at,tt:r.tt||"",ct:r.ct||"",name:String(r.name||"").slice(0,80),kind:kindOf(r),rule:r.draft.rule||"",draft:r.draft.dec,draftCom:String(r.draft.com||"").slice(0,240),final:r.final.dec,finalCom:String(r.final.com||"").slice(0,240),missed:String(r.final.missed||"").slice(0,240),agreed:!!r.final.agreed,auto:!!r.auto,by:r.final.by||by}; });
+  await update("learn-"+yr,cur=>{ const o=cur||{rows:{}}; o.rows=Object.assign(o.rows||{},recs); return o; });
+  Object.assign(S.learn,recs);
+  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",decidedBy:by,decidedAt:at,agree:pct(agreed,R.length),counts:c}); return o; });
+  S.queue=q.items;
+  const it=S.queue[doc.rep]||{}, sum=Object.entries(c).map(([d,n])=>n+" "+d.toLowerCase()).join(", ");
+  if(it.flow&&it.fac&&it.fac.email){ try{ await fetch(it.flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"IM decision: "+doc.wr+" "+doc.name,body:"IM has decided "+doc.wr+" "+doc.name+": "+sum+". Reviewed by "+by+".\n\nSee every row: https://resources.mismo.org/im-review/#/review/"+encodeURIComponent(doc.rep)+"\nThe decisions are also on the work request in the MMS.",html:"",from:it.from||""})}); }catch(e){} }
+  toast("IM review finished: "+sum);
+}
+function exportXl(doc){ const head=["Item #","Change Type","Change Target Type","Parent CONTAINER Name","CONTAINER Name","Data Point Name","Enumeration Name","Definition","Review Decision","Review Comments","Suggested Definition or Name","Draft Decision","IM Agreed With Draft"];
+  const rows=(doc.rows||[]).map(r=>{ const f=r.final||{}; return [r.item,r.ct,r.tt,r.pc,r.cn,r.dp,r.en,r.def,f.dec||r.draft.dec,(f.agreed?r.draft.com:f.com)||r.draft.com||"",(f.agreed?r.draft.sug:f.sug)||"",r.draft.dec,f.dec?(f.agreed?"Yes":"No"):""]; });
+  const name="IM Review - "+doc.wr+" - "+String(doc.decidedAt||doc.at||"").slice(0,10);
+  const go=()=>{ const ws=XLSX.utils.aoa_to_sheet([head,...rows]); ws["!cols"]=head.map((h,i)=>({wch:[8,16,16,22,22,28,24,60,24,60,50,24,10][i]})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Reference Model Changes"); XLSX.writeFile(wb,name+".xlsx"); };
+  if(window.XLSX) return go(); const s=document.createElement("script"); s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"; s.onload=go; s.onerror=()=>toast("Couldn’t load the Excel writer. Try again."); document.head.appendChild(s); }
+
+/* ---------- charts (small, plain SVG, with a hover tip) ---------- */
+function tipOn(el){ const box=el.closest(".chart"); let t=$(".tip",box); if(!t){ t=document.createElement("div"); t.className="tip"; t.hidden=true; box.appendChild(t); }
+  $$("[data-tip]",el).forEach(m=>{ m.addEventListener("mouseenter",()=>{ t.innerHTML=m.dataset.tip; t.hidden=false; }); m.addEventListener("mousemove",e=>{ const b=box.getBoundingClientRect(); let x=e.clientX-b.left+12; if(x+t.offsetWidth>b.width) x=e.clientX-b.left-t.offsetWidth-12; t.style.left=Math.max(0,x)+"px"; t.style.top=(e.clientY-b.top-10-t.offsetHeight)+"px"; }); m.addEventListener("mouseleave",()=>t.hidden=true); m.addEventListener("focus",()=>{ t.innerHTML=m.dataset.tip; t.hidden=false; t.style.left="10px"; t.style.top="0px"; }); m.addEventListener("blur",()=>t.hidden=true); }); }
+/* 100% stacked columns, one per period */
+function stackChart(periods,keys,cols,valOf,{h=210,fmtTip}={}){ const W=560,H=h,pl=34,pb=24,pt=8,cw=(W-pl)/periods.length, bw=Math.min(46,cw*0.62);
+  let g='<line class="base" x1="'+pl+'" x2="'+W+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'"/>'; [0,50,100].forEach(v=>{ const y=H-pb-(H-pb-pt)*v/100; g+='<text class="ax" x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end">'+v+'%</text>'+(v?'<line class="gl" x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'"/>':''); });
+  periods.forEach((p,i)=>{ const tot=keys.reduce((s,k)=>s+(valOf(p,k)||0),0); if(!tot) return; let y=H-pb; const x=pl+i*cw+(cw-bw)/2;
+    const segs=keys.filter(k=>valOf(p,k));
+    segs.forEach((k,j)=>{ const v=valOf(p,k), hh=(H-pb-pt)*v/tot; const top=j===segs.length-1; y-=hh; g+='<rect x="'+x+'" y="'+(y+(j?0:0))+'" width="'+bw+'" height="'+Math.max(0,hh-2)+'" rx="'+(top?3:0)+'" fill="'+cols[k]+'"/>'; });
+    const tip='<b>'+esc(p.label)+'</b> · '+tot.toLocaleString()+' rows<br>'+keys.filter(k=>valOf(p,k)).map(k=>esc(k)+': '+valOf(p,k).toLocaleString()+' ('+pct(valOf(p,k),tot)+'%)').join("<br>");
+    g+='<rect x="'+(pl+i*cw)+'" y="'+pt+'" width="'+cw+'" height="'+(H-pb-pt)+'" fill="transparent" data-tip="'+esc(tip)+'" tabindex="0"/>';
+    g+='<text class="ax" x="'+(x+bw/2)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(p.label)+'</text>'; });
+  return '<div class="legend">'+keys.map(k=>'<span><i style="background:'+cols[k]+'"></i>'+esc(k)+'</span>').join("")+'</div><div class="chart"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Share of rows by decision, by year">'+g+'</svg></div>'; }
+/* one or more lines over periods, a crosshair tip per period */
+function lineChart(periods,series,{h=190,unit="",max}={}){ const W=560,H=h,pl=40,pb=24,pt=12, n=periods.length, cw=(W-pl-14)/Math.max(1,n-1);
+  const all=series.flatMap(s=>periods.map(p=>s.v(p)).filter(v=>v!=null)); const top=max||Math.max(1,...all)*1.12; const Y=v=>H-pb-(H-pb-pt)*v/top, X=i=>pl+i*cw;
+  let g='<line class="base" x1="'+pl+'" x2="'+W+'" y1="'+(H-pb)+'" y2="'+(H-pb)+'"/>'; [0.5,1].forEach(f=>{ const v=top*f/1.12; const y=Y(v); g+='<line class="gl" x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'"/><text class="ax" x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end">'+Math.round(v)+unit+'</text>'; });
+  const used=[]; series.forEach(s=>{ const pts=periods.map((p,i)=>[i,s.v(p)]).filter(x=>x[1]!=null); g+='<polyline fill="none" stroke="'+s.c+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" points="'+pts.map(([i,v])=>X(i)+","+Y(v)).join(" ")+'"/>'+pts.map(([i,v])=>'<circle cx="'+X(i)+'" cy="'+Y(v)+'" r="4" fill="'+s.c+'" stroke="var(--surface)" stroke-width="2"/>').join("");
+    const lp=pts[pts.length-1]; if(lp&&series.length<=4){ let ly=Y(lp[1])-10; while(used.some(u=>Math.abs(u-ly)<14)) ly+=26; used.push(ly); g+='<text x="'+(X(lp[0])-8)+'" y="'+ly+'" text-anchor="end" style="font-size:11.5px;font-weight:700;fill:var(--ink)">'+Math.round(lp[1])+unit+'</text>'; } });
+  periods.forEach((p,i)=>{ g+='<text class="ax" x="'+X(i)+'" y="'+(H-6)+'" text-anchor="middle">'+esc(p.label)+'</text>';
+    const tip='<b>'+esc(p.label)+'</b><br>'+series.map(s=>{ const v=s.v(p); return esc(s.name)+': '+(v==null?'—':Math.round(v)+unit)+(s.extra?s.extra(p):''); }).join("<br>");
+    g+='<rect x="'+(X(i)-cw/2)+'" y="'+pt+'" width="'+cw+'" height="'+(H-pb-pt)+'" fill="transparent" data-tip="'+esc(tip)+'" tabindex="0"/>'; });
+  return (series.length>1?'<div class="legend">'+series.map(s=>'<span><i style="background:'+s.c+'"></i>'+esc(s.name)+'</span>').join("")+'</div>':'')+'<div class="chart"><svg viewBox="0 0 '+W+' '+H+'" role="img">'+g+'</svg></div>'; }
+/* horizontal bars for a ranked list */
+function hbars(items,{c="var(--c1)",unit=""}={}){ const mx=Math.max(1,...items.map(x=>x.v));
+  return '<div class="chart"><div style="display:grid;gap:7px">'+items.map(x=>'<div data-tip="'+esc('<b>'+esc(x.k)+'</b><br>'+(x.tip||x.v+unit))+'" tabindex="0" style="display:grid;grid-template-columns:minmax(120px,38%) 1fr auto;gap:10px;align-items:center;font-size:13px"><span>'+esc(x.k)+'</span><span style="height:10px;background:var(--surface-3);border-radius:0 3px 3px 0"><i style="display:block;height:100%;width:'+Math.max(2,x.v/mx*100)+'%;background:'+(x.c||c)+';border-radius:0 3px 3px 0"></i></span><b style="font-size:12.5px;min-width:34px;text-align:right">'+x.v.toLocaleString()+unit+'</b></div>').join("")+'</div></div>'; }
+
+function trendsView(){ const B=S.bt;
+  if(!B||!B.years) return '<div class="head"><div><h1>Trends</h1><div class="sub">The history of IM’s decisions loads here once the analysis of the IM library is published.</div></div></div><div class="card"><div class="empty">No trend data yet.</div></div>';
+  const Y=B.years.filter(y=>y.rows>0), per=Y.map(y=>({label:String(y.y),y}));
+  const keys=["Approved as Submitted","Approved with Modification","Returned","Denied","Withdrawn"], kmap={"Approved as Submitted":"as","Approved with Modification":"mod","Returned":"ret","Denied":"den","Withdrawn":"wd"};
+  const last=Y[Y.length-1]||{}, prev=Y[Y.length-2]||{};
+  const asP=y=>pct(y.dec.as,y.rows), chg=(a,b)=>a==null||b==null?'':(a>=b?'up ':'down ')+Math.abs(a-b)+' pts from '+prev.y;
+  const k=(t,v,s,c)=>'<div class="k" style="--kc:'+c+'"><span>'+t+'</span><b>'+v+'</b><em>'+s+'</em></div>';
+  const tot=Y.reduce((s,y)=>s+y.rows,0), subs=Y.reduce((s,y)=>s+y.subs,0);
+  return '<div class="head"><div><h1>Trends</h1><div class="sub">What IM has decided since '+esc(Y[0]&&Y[0].y)+', from '+subs.toLocaleString()+' decided submissions and '+tot.toLocaleString()+' Reference Model rows in the IM library'+(B.asOf?', as of '+esc(fmtD(B.asOf)):'')+'. Hover any chart for the numbers.</div></div></div>'+
+    '<div class="kp">'+k("Approved as Submitted, "+last.y,asP(last)+"%",chg(asP(last),prev.rows?asP(prev):null)||"of "+last.rows+" rows","var(--good)")+
+      k("Rows Reviewed, "+last.y,(last.rows||0).toLocaleString(),(last.subs||0)+" submissions","var(--c1)")+
+      k("Days to IM Approval",last.medDays!=null?last.medDays:"—",last.medDays!=null?"median in "+last.y+(prev.medDays!=null?" ("+prev.medDays+" in "+prev.y+")":""):"not enough dates","var(--c4)")+
+      k("Resubmitted",pct(last.resub||0,last.wrs||0)+"%","of "+(last.wrs||0)+" work requests in "+last.y,"var(--c2)")+'</div>'+
+    '<div class="g2"><div class="card"><h3>What IM Decides<small>share of rows, by year</small></h3>'+stackChart(per,keys,DCOL,(p,kk)=>p.y.dec[kmap[kk]]||0)+'</div>'+
+      '<div class="card"><h3>Approved as Submitted<small>share of rows, by year</small></h3>'+lineChart(per,[{name:"Approved as submitted",c:"var(--good)",v:p=>asP(p.y),extra:p=>' of '+p.y.rows+' rows'}],{unit:"%",max:112})+'<p class="note">The higher this line, the less there is for IM to change. It is also the share of rows the draft can clear without a reviewer once it has earned trust.</p></div></div>'+
+    '<div class="g2" style="margin-top:18px"><div class="card"><h3>Rows Reviewed<small>by year</small></h3>'+lineChart(per,[{name:"Rows",c:"var(--c1)",v:p=>p.y.rows,extra:p=>' in '+p.y.subs+' submissions'}])+'</div>'+
+      '<div class="card"><h3>Days From First Submission to IM Approval<small>median, by year approved</small></h3>'+lineChart(per,[{name:"Median days",c:"var(--c4)",v:p=>p.y.medDays,extra:p=>p.y.nDays?' ('+p.y.nDays+' work requests)':''}])+'</div></div>'+
+    (B.themes&&B.themes.length?'<div class="g2" style="margin-top:18px"><div class="card"><h3>Why IM Changes a Row<small>from IM’s comments, all years</small></h3>'+hbars(B.themes.slice(0,10).map(t=>({k:t.k,v:t.n,tip:t.n+' rows'+(t.recent!=null?'<br>'+t.recent+' in the last two years':'')})))+'</div>'+
+      '<div class="card"><h3>By Community of Practice<small>rows and share approved as submitted</small></h3><div class="tw"><table class="tbl"><thead><tr><th>Community</th><th>Subs</th><th>Rows</th><th>As Submitted</th></tr></thead><tbody>'+(B.cop||[]).slice(0,12).map(c=>'<tr><td>'+esc(c.cop)+'</td><td class="n">'+c.subs+'</td><td class="n">'+c.rows.toLocaleString()+'</td><td><span class="meter"><i style="width:'+pct(c.as,c.rows)+'%"></i></span>'+pct(c.as,c.rows)+'%</td></tr>').join("")+'</tbody></table></div></div></div>':'')+
+    (B.notes&&B.notes.length?'<div class="card" style="margin-top:18px"><h3>How These Were Counted</h3>'+B.notes.map(n=>'<p class="note">'+esc(n)+'</p>').join("")+'</div>':'');
+}
+function draftView(){ const B=S.bt, D=B&&B.draft, ks=kindStats();
+  const lv=Object.values(S.learn), la=lv.filter(x=>x.agreed).length;
+  const k=(t,v,s,c)=>'<div class="k" style="--kc:'+c+'"><span>'+t+'</span><b>'+v+'</b><em>'+s+'</em></div>';
+  const rows=Object.entries(ks).map(([kind,s])=>({kind,n:(s.n||0)+(s.hn||0),a:(s.agree||0)+(s.hagree||0),live:s.live||0})).filter(x=>x.n>=5).sort((a,b)=>b.n-a.n).slice(0,40);
+  const label=kind=>{ const [d,ru,tt]=kind.split("|"); return '<b>'+esc(d)+'</b> · '+esc(RULE_NAME[ru]||ru)+' · '+esc(tt||"any row"); };
+  return '<div class="head"><div><h1>How the Draft Is Doing</h1><div class="sub">The draft is right when IM keeps its decision. When a kind of row has matched IM 95% of the time or more over at least 30 rows, it can arrive already approved, so reviewers only see the exceptions. Reviewers can still change any row.</div></div></div>'+
+    '<div class="kp">'+k("Agreed Here",lv.length?pct(la,lv.length)+"%":"—",lv.length?la+" of "+lv.length+" rows reviewed in this portal":"fills in as you review","var(--c1)")+
+      (D?k("Matched IM in History",pct(D.exact,D.rows)+"%","of "+D.rows.toLocaleString()+" past rows, same decision","var(--c3)")+
+        k("Clean Rows IM Kept",pct(D.cleanKept,D.cleanRows)+"%","of "+D.cleanRows.toLocaleString()+" rows the draft found clean","var(--good)")+
+        k("Left for a Reviewer",pct(D.lookRows,D.rows)+"%","of rows would need a look today","var(--c4)"):"")+'</div>'+
+    (D&&D.byYear&&D.byYear.length?'<div class="g2"><div class="card"><h3>The Draft Against IM, Year by Year<small>trained only on earlier years</small></h3>'+lineChart(D.byYear.map(y=>({label:String(y.y),y})),[{name:"Same decision as IM",c:"var(--c3)",v:p=>pct(p.y.agree,p.y.n),extra:p=>' of '+p.y.n+' rows'},{name:"Clean rows IM kept",c:"var(--good)",v:p=>p.y.cleanRows?pct(p.y.cleanKept,p.y.cleanRows):null}],{unit:"%",max:112})+'<p class="note">Each year is scored by a draft that only knew the years before it, the way it works for real.</p></div>'+
+      '<div class="card"><h3>Where the Draft Misses<small>what IM decided instead</small></h3>'+hbars((D.misses||[]).slice(0,8).map(m=>({k:m.k,v:m.n,c:"var(--c2)"})))+'</div></div>':'')+
+    '<div class="card" style="margin-top:18px"><h3>Kinds of Rows<small>history and reviews here combined</small></h3>'+(rows.length?'<div class="tw"><table class="tbl"><thead><tr><th>Draft Decision · Reason · Row</th><th>Rows</th><th>IM Agreed</th><th>Arrives Approved</th></tr></thead><tbody>'+rows.map(x=>{ const p=pct(x.a,x.n), ok=p>=95&&x.n>=30, on=!!(S.cfg.imauto||{})[x.kind];
+      return '<tr><td>'+label(x.kind)+'</td><td class="n">'+x.n.toLocaleString()+'</td><td><span class="meter"><i style="width:'+p+'%"></i></span>'+p+'%</td><td>'+(isAdmin()&&(ok||on)?'<label class="tog"><input type="checkbox" data-auto="'+esc(x.kind)+'"'+(on?" checked":"")+'> '+(on?"On":"Turn on")+'</label>':on?'On':ok?'<span class="muted">Ready (staff turn it on)</span>':'<span class="muted">Not yet</span>')+'</td></tr>'; }).join("")+'</tbody></table></div>':'<div class="empty">This fills in as IM reviews drafts.</div>')+'</div>';
+}
+
+/* ---------- wiring ---------- */
+let tt; function toast(m){ let t=$(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; document.body.appendChild(t); } t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,3200); }
+function keep(fn){ const y=window.scrollY; return async(...a)=>{ await fn(...a); window.scrollTo(0,y); }; }
+function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn);
+  $$("[data-auto]",m).forEach(c=>c.onchange=async()=>{ const kd=c.dataset.auto; try{ const o=await update("config",cur=>{ const x=cur||{}; x.imauto=Object.assign({},x.imauto||{},{[kd]:c.checked}); return x; }); S.cfg=o; toast(c.checked?"Those rows will arrive already approved":"Those rows will need a reviewer again"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); });
+  const r=route(); if(r.view!=="review") return; const doc=S.docs[r.rep]; if(!doc) return;
+  const save=keep(async()=>{ try{ await saveDoc(doc); }catch(e){ toast("Couldn’t save. Check your connection and try again."); } render(); });
+  $$("[data-f]",m).forEach(b=>b.onclick=()=>{ S.filter=b.dataset.f; S.edit=null; render(); });
+  $$("[data-ok]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.ok]; x.final={dec:x.draft.dec,com:x.draft.com,sug:x.draft.sug,agreed:true,by:S.me.name||S.me.email,at:new Date().toISOString()}; render(); save(); });
+  $$("[data-undo]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.undo]; delete x.final; x._undoAt=new Date().toISOString(); render(); save(); });
+  $$("[data-chg]",m).forEach(b=>b.onclick=keep(async()=>{ S.edit=+b.dataset.chg; render(); }));
+  $$("[data-cancel]",m).forEach(b=>b.onclick=keep(async()=>{ S.edit=null; render(); }));
+  $$("[data-q]",m).forEach(b=>b.onclick=()=>{ const ta=$("textarea[name=com]",b.closest(".edit")); ta.value=(ta.value.trim()?ta.value.trim()+" ":"")+b.dataset.q; ta.focus(); });
+  $$("[data-save]",m).forEach(b=>b.onclick=()=>{ const box=b.closest(".edit"), x=doc.rows[+b.dataset.save], v=n=>($("[name="+n+"]",box)||{}).value||"";
+    const dec=v("dec"), com=v("com").trim(), sug=v("sug").trim(), missed=v("miss").trim();
+    const agreed=dec===x.draft.dec&&com===String(x.draft.com||"").trim()&&sug===String(x.draft.sug||"").trim()&&!missed;
+    x.final={dec,com,sug,missed,agreed,by:S.me.name||S.me.email,at:new Date().toISOString()}; S.edit=null; render(); save(); });
+  $$("[data-all]",m).forEach(b=>b.onclick=()=>{ const F=b.dataset.all; let n=0; const now=new Date().toISOString();
+    doc.rows.forEach(x=>{ if(x.final) return; const lk=isLook(x); if(F==="look"&&!lk) return; if(F==="clean"&&lk) return; x.final={dec:x.draft.dec,com:x.draft.com,sug:x.draft.sug,agreed:true,by:S.me.name||S.me.email,at:now}; n++; });
+    toast("Agreed with "+n+" row"+(n===1?"":"s")); render(); save(); });
+  $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ if(!confirm("Finish the IM review of "+doc.wr+"? The facilitator gets the decisions.")) return; b.disabled=true; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } render(); });
+  $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
+}
+window.addEventListener("hashchange",()=>{ S.edit=null; const r=route(); if(r.view==="review") S.filter="look"; window.scrollTo(0,0); render(); });
+setInterval(async()=>{ if(document.hidden||route().view==="review") return; await refreshQueue(); render(); },60000);
+
+/* ---------- start: sign in, then the gate decides who gets in ---------- */
+function start(){ const rs=RS(); if(!rs){ setTimeout(start,100); return; }
+  rs.requireAccess(PROJECT,{toolName:"IM Review",eyebrow:"Governance · Information Management"}).then(load).catch(e=>{ console.error("im-review",e); }); }
+window.__imr={S,load,render};
+if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else start();
+})();
+
+</script>
+</body>
+</html>
