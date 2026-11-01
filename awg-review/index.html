@@ -852,7 +852,7 @@ function softDraft(form){ const rows=form.rows; rows.forEach(r=>{ r.flags=rowFla
   return {rec,why,notes}; }
 
 /* ---------- Claude's architecture read ---------- */
-const AWG_PERSONA="You are a senior data architect on MISMO’s Architecture Workgroup (AWG). AWG reviews Reference Model submissions after Information Management (IM) has approved the business definitions. AWG checks architecture only: fit with the MISMO Engineering Guidelines (MEGs), container structure and hierarchy, reuse of existing containers, relationships (From, verb phrase, To), attributes, XPATH locations, choice groups, and backward compatibility (breaking changes such as deletes, renames, moves or type changes). Do not comment on definition wording; IM did that.";
+const AWG_PERSONA="Quick first read for MISMO’s Architecture Workgroup (AWG), which checks Reference Model submissions after IM for structure and containers, reuse, relationships, attributes, XPATHs, choice groups, MEG guidance and breaking changes (deletes, renames, moves, deprecations). Not definition wording; IM did that. Give your first impression; do not deliberate at length.";
 function rowLine(r){ return [r.item||r.i+1,r.body,r.ct,r.tt,r.pc&&("parent "+r.pc),r.cn&&("container "+r.cn),r.dp&&("dp "+r.dp),r.at&&("attr "+r.at),r.en&&("enum "+r.en),r.rel&&("rel "+[r.rf,r.rel,r.rt].join(" ")),r.old&&("old "+String(r.old).slice(0,80)),r.xp&&("xpath "+r.xp),r.cg&&("choice "+r.cg),r.sc&&("note "+String(r.sc).slice(0,140))].filter(Boolean).join(" | "); }
 function repairJson(t){ const a=t.indexOf("{"); if(a<0) return null; let s=t.slice(a); const b=s.lastIndexOf("}"); try{ return JSON.parse(s.slice(0,b+1)); }catch(e){}
   /* cut off mid-answer: close what is open */ let st=[],q=false,e=false,ok=0; for(let i=0;i<s.length;i++){ const c=s[i]; if(q){ if(e) e=false; else if(c==="\\") e=true; else if(c==='"') q=false; continue; } if(c==='"') q=true; else if(c==="{"||c==="[") st.push(c==="{"?"}":"]"); else if(c==="}"||c==="]"){ st.pop(); ok=i; } }
@@ -860,13 +860,13 @@ function repairJson(t){ const a=t.indexOf("{"); if(a<0) return null; let s=t.sli
 async function claudeRead(form,soft,progress){
   const rows=form.rows; const pick=rows.filter(r=>isAwgRow(r)||(r.flags||[]).length||/container|relationship|attribute/i.test(r.tt||""));
   const use=(pick.length?pick:rows).slice(0,400); const chunks=[]; let cur=[]; let len=0;
-  use.forEach(r=>{ const l=rowLine(r); if(len+l.length>5000&&cur.length){ chunks.push(cur); cur=[]; len=0; } cur.push(l); len+=l.length+1; }); if(cur.length) chunks.push(cur);
+  use.forEach(r=>{ const l=rowLine(r); if(len+l.length>2600&&cur.length){ chunks.push(cur); cur=[]; len=0; } cur.push(l); len+=l.length+1; }); if(cur.length) chunks.push(cur);
   const head="Submission: "+(form.wr||"")+" "+(form.name||"")+"\nCategory: "+(form.category||"")+" · Artifacts: "+(form.artifacts||"")+" · Workgroup: "+(form.wg||"")+"\nSummary: "+String(form.summary||"").slice(0,700)+"\nRows: "+rows.length+" in all; "+rows.filter(isAwgRow).length+" marked Approval Body AWG.\nThe software checks found: "+(soft.notes.map(n=>n.area+": "+n.t+" (items "+n.items.slice(0,8).join(", ")+")").join("; ")||"nothing")+".";
   const out=[]; let k=0;
-  for(const c of chunks.slice(0,6)){ k++; if(progress) progress(k,Math.min(6,chunks.length));
-    const p=AWG_PERSONA+"\n\n"+head+"\n\nRows "+(chunks.length>1?"(part "+k+" of "+Math.min(6,chunks.length)+")":"")+", one per line: item | approval body | change type | target type | details\n"+c.join("\n")+
-      "\n\nReply with compact JSON only, no prose: {\"rec\":\"Approve|Approve With Conditions|Send Back\",\"sum\":\"what AWG should know, at most 35 words\",\"notes\":[{\"area\":\"Structure|Relationship|Attribute|XPATH|Breaking Change|MEG|Reuse\",\"t\":\"one point for the AWG call, at most 28 words\",\"items\":[\"item numbers\"]}]} with at most 4 notes, most important first. Only raise real architecture concerns; an empty notes list is fine.";
-    try{ const j=repairJson(await ask(p)); if(j) out.push(j); }catch(e){ if(!out.length&&k===1) throw e; } }
+  for(const c of chunks.slice(0,8)){ k++; if(progress) progress(k,Math.min(8,chunks.length));
+    const p=AWG_PERSONA+"\n\n"+head+"\n\nRows "+(chunks.length>1?"(part "+k+" of "+Math.min(8,chunks.length)+")":"")+", one per line: item | approval body | change type | target type | details\n"+c.join("\n")+
+      "\n\nAnswer with this JSON and nothing else: {\"rec\":\"Approve|Approve With Conditions|Send Back\",\"sum\":\"under 30 words\",\"notes\":[{\"area\":\"Structure|Relationship|Attribute|XPATH|Breaking Change|MEG|Reuse\",\"t\":\"under 25 words\",\"items\":[\"item numbers\"]}]} (at most 3 notes; only real architecture concerns; an empty list is fine).";
+    try{ let j=repairJson(await ask(p)); if(!j) j=repairJson(await ask(p.replace("Give your first impression; do not deliberate at length.","Answer at once with your first impression."))); if(j) out.push(j); }catch(e){ if(!out.length&&k===1) throw e; } }
   if(!out.length) return null;
   const rank=r=>Math.max(0,REC.indexOf(r)); const rec=out.map(o=>o.rec).filter(r=>REC.includes(r)).sort((a,b)=>rank(b)-rank(a))[0]||"Approve";
   const notes=[]; out.forEach(o=>(o.notes||[]).forEach(n=>{ if(n&&n.t&&!notes.some(x=>x.t===n.t)) notes.push({area:n.area||"Structure",t:String(n.t).slice(0,240),items:(n.items||[]).map(String).slice(0,30),src:"claude"}); }));
