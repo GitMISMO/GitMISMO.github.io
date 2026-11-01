@@ -1873,6 +1873,14 @@ function isMine(t,who){
   const w=whoseMove(t); if(!w.role) return false;
   return movers(t).some(p=>sameName(p.name,who.name)||(who.email&&p.email&&p.email.toLowerCase()===who.email.toLowerCase()));
 }
+/* "Waiting on you" means something is due now: a hand-off someone is waiting
+   for (coming out of comment, send for approval, make IM's updates...), or
+   building work whose Target to Submit to IM is this week or already past. */
+function dueNow(t){ const d=t.dates||{}, soon=addDays(today(),7);
+  if(t.state==='hold') return !!(t.holdUntil&&t.holdUntil<=soon);
+  if(t.stage==='work') return !!(d.targetIM&&d.targetIM<=soon);
+  return true; }
+function waitingOn(t,who){ return isMine(t,who)&&dueNow(t); }
 function myFacTickets(who){ who=who||viewer(); return liveTickets().filter(t=>sameName(t.facilitator,who.name)); }
 function viewer(){ if(S.viewAs){ return personByName(S.viewAs)||{name:S.viewAs}; } const p=personByName(S.me.name); return p&&!S.me.email?Object.assign({},S.me,{name:p.name}):S.me; }
 
@@ -2063,7 +2071,7 @@ function renderAll(){
 }
 function counts(){
   const set=(id,n,warn)=>{ const b=$(id); if(!b) return; b.hidden=!n; b.textContent=n; b.classList.toggle('warn',!!warn); };
-  set('#nav-mine',liveTickets().filter(t=>isMine(t)).length,true);
+  set('#nav-mine',liveTickets().filter(t=>waitingOn(t)).length,true);
   set('#nav-reviews',liveTickets().filter(t=>t.state==='active'&&['aireview','im','awg','designation'].includes(t.stage)).length);
   set('#nav-gov',liveTickets().filter(t=>t.state==='active'&&['kickoff','gc-comment','gc-publish'].includes(t.stage)).length);
   set('#nav-media',Object.values(S.media).filter(m=>m.status!=='Done').length);
@@ -3314,8 +3322,9 @@ VIEWS.mine=function(){
   const me=viewer(), nm=me.name||'';
   if(!nm) return '<div class="pagehead"><div><h1>My Queue</h1></div></div><div class="empty">Sign in to see your queue.</div>';
   const who=S.viewAs?firstName(nm):'you';
-  const yours=qSort(liveTickets().filter(t=>isMine(t,me)),me);
-  const facT=qSort(myFacTickets(me).filter(t=>!yours.includes(t)),me);
+  const yours=qSort(liveTickets().filter(t=>waitingOn(t,me)),me);
+  const later=qSort(liveTickets().filter(t=>isMine(t,me)&&!dueNow(t)),me).sort((a,b)=>String((a.dates||{}).targetIM||'9').localeCompare(String((b.dates||{}).targetIM||'9')));
+  const facT=qSort(myFacTickets(me).filter(t=>!yours.includes(t)&&!later.includes(t)),me);
   const act=x=>x.state==='active';
   const withRev=facT.filter(t=>act(t)&&['aireview','im','awg','designation'].includes(t.stage));
   const withGov=facT.filter(t=>act(t)&&GOV_STAGES.includes(t.stage));
@@ -3336,20 +3345,21 @@ VIEWS.mine=function(){
       '<div class="fx-r"><div class="ring" style="--p:'+Math.round(n/Math.max(1,n+facT.length)*100)+'"><b data-n="'+n+'">'+n+'</b><span>waiting on '+esc(who)+'</span></div>'+
       (rest.length?'<div class="fx-then"><div class="fx-th">Then</div>'+rest.map(t=>'<button type="button" class="fx-row" data-open="'+esc(t.id)+'"><i style="background:'+stageDef(t.stage).color+'"></i><span><b>'+esc(t.wr)+'</b> '+esc(t.name)+'</span>'+heat(t)+'</button>').join('')+'</div>':'<div class="fx-then"><div class="fx-th">Also Moving</div><div class="fx-mini"><span><b>'+withRev.length+'</b> with reviewers</span><span><b>'+withGov.length+'</b> with '+esc(govName())+'</span><span><b>'+out.length+'</b> out the door</span></div></div>')+'</div></div>';
   } else {
-    hero='<div class="focus clear"><div class="fx-l"><div class="okmark"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><h2>'+(S.viewAs?esc(who)+' is':'You’re')+' all caught up</h2><p>Nothing is waiting on '+esc(who)+' right now.'+(facT.length?' '+(S.viewAs?'Their':'Your')+' other '+facT.length+' work request'+(facT.length===1?' is':'s are')+' moving with reviewers, '+esc(govName())+' and the website team.':'')+'</p></div></div></div>';
+    hero='<div class="focus clear"><div class="fx-l"><div class="okmark"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></div><div><h2>'+(S.viewAs?esc(who)+' is':'You’re')+' all caught up</h2><p>Nothing is due from '+esc(who)+' this week.'+(later.length?' Next up: <b>'+esc(later[0].wr)+'</b> '+esc(later[0].name)+((later[0].dates||{}).targetIM?', Target to IM '+esc(fmt(later[0].dates.targetIM)):'')+'.':'')+(facT.length?' '+(S.viewAs?'Their':'Your')+' other '+facT.length+' work request'+(facT.length===1?' is':'s are')+' moving with reviewers, '+esc(govName())+' and the website team.':'')+'</p></div></div></div>';
   }
   let team='';
   if(S.isStaff&&!S.viewAs){
     const pm=new Map(); const addP=(p,r)=>{ if(!p||!p.name) return; const k=p.name.toLowerCase(); const x=pm.get(k)||Object.assign({rs:[]},p); if(!x.rs.includes(r)) x.rs.push(r); pm.set(k,x); };
     (S.people.facilitators||[]).forEach(p=>addP(p,'Facilitator')); Object.entries(S.people.roles||{}).forEach(([r,L])=>(L||[]).forEach(p=>addP(p,ROLE_LABEL[r]||r)));
     const ppl=[...pm.values()].map(p=>Object.assign(p,{r:p.rs.join(' · ')})).filter(p=>!sameName(p.name,S.me.name));
-    const rows=ppl.map(p=>{ const q=liveTickets().filter(t=>isMine(t,p)); const live=myFacTickets(p).length; return {p,q,live}; }).filter(x=>x.q.length||x.live).sort((a,b)=>b.q.length-a.q.length||a.p.name.localeCompare(b.p.name));
+    const rows=ppl.map(p=>{ const q=liveTickets().filter(t=>waitingOn(t,p)); const live=myFacTickets(p).length; return {p,q,live}; }).filter(x=>x.q.length||x.live).sort((a,b)=>b.q.length-a.q.length||a.p.name.localeCompare(b.p.name));
     if(rows.length) team='<div class="secthead"><h2>Everyone’s Queue</h2><span class="muted" style="font-size:12.5px">Click a person to see their queue the way they see it.</span></div><div class="team">'+rows.map(x=>{ const late=x.q.filter(pastTarget).length, old=x.q.reduce((m,t)=>Math.max(m,stageAge(t)||0),0);
       return '<button type="button" class="tm" data-peek="'+esc(x.p.name)+'">'+av(x.p.name)+'<span class="tm-n"><b>'+esc(x.p.name)+'</b><em>'+esc(x.p.r)+'</em></span><span class="tm-q'+(x.q.length?' on':'')+'" title="'+x.q.length+' work request'+(x.q.length===1?' is':'s are')+' waiting on '+esc(firstName(x.p.name))+' to do the next step"><b>'+x.q.length+'</b>waiting on '+esc(firstName(x.p.name))+'</span><span class="tm-s">'+[late?'<b class="bad">'+late+' past target</b>':'',x.q.length&&old?'oldest '+ageTxt(old):'',x.live?x.live+' live work request'+(x.live===1?'':'s')+' in all':''].filter(Boolean).join(' · ')+'</span></button>'; }).join('')+'</div>';
   }
-  const showLanes=yours.length+facT.length>0;
+  const showLanes=yours.length+later.length+facT.length>0;
   const lanes=showLanes?'<div class="secthead"><h2>'+(S.viewAs?esc(who)+'’s':'Your')+' Work, Wherever It Is</h2>'+qSortBar(me)+'</div>'+lanesHtml('mine',[
-    {key:'yours',title:'Your Move',n:yours.length,c:'var(--c4)',items:yours.map((t,i)=>card2(t,{next:true,act:true,focus:t===ft,i})),empty:'Nothing waiting'},
+    {key:'yours',title:'Your Move',n:yours.length,c:'var(--c4)',items:yours.map((t,i)=>card2(t,{next:true,act:true,focus:t===ft,i})),empty:'Nothing due this week'},
+    later.length?{key:'later',title:'Coming Up',n:later.length,c:'var(--c1)',sub:'Your next step, not due this week',items:later.map((t,i)=>card2(t,{next:true,act:true,i}))}:null,
     {key:'rev',title:'With Reviewers',n:withRev.length,c:'var(--c3)',sub:'AI Review, IM, AWG, designation',items:withRev.map((t,i)=>card2(t,{next:true,stage:true,i}))},
     {key:'gov',title:'With '+govName(),n:withGov.length,c:'var(--c5)',sub:'Approvals to record',items:withGov.map((t,i)=>card2(t,{next:true,stage:true,i}))},
     {key:'out',title:'Out the Door',n:out.length,c:'var(--c6)',sub:'Comment, release and more',items:out.map((t,i)=>card2(t,{next:true,stage:true,i}))},
@@ -3518,7 +3528,7 @@ function flowWire(m){
   $$('[data-pg]',m).forEach(b=>b.onclick=()=>{ S.page=(S.page||0)+(+b.dataset.pg); renderAll(); const sc=$('.tscroll'); if(sc) sc.scrollTop=0; });
   $$('[data-rcs]',m).forEach(b=>b.onclick=()=>{ S.rcStage=b.dataset.rcs; renderAll(); });
   $$('[data-peek]',m).forEach(b=>b.onclick=()=>{ S.viewAs=b.dataset.peek; S.focusIdx=0; const s=$('#viewas'); if(s) s.value=S.viewAs; S._enter=true; renderAll(); });
-  const sk=$('#fxskip',m); if(sk) sk.onclick=()=>{ S.focusIdx=(S.focusIdx||0)+1; const n=liveTickets().filter(t=>isMine(t)).length; if(S.focusIdx>=n) S.focusIdx=0; renderAll(); };
+  const sk=$('#fxskip',m); if(sk) sk.onclick=()=>{ S.focusIdx=(S.focusIdx||0)+1; const n=liveTickets().filter(t=>waitingOn(t)).length; if(S.focusIdx>=n) S.focusIdx=0; renderAll(); };
   const fc=$('#fclear2',m); if(fc) fc.onclick=()=>{ Object.assign(S.filters,{q:'',fac:'',wg:'',size:'',type:''}); S.bStage=''; renderAll(); };
   const mo=$('details.moref',m); if(mo) mo.addEventListener('toggle',()=>{ S._moreOpen=mo.open; });
   // board drag and drop onto a stage
@@ -3614,7 +3624,7 @@ function bpg(list,key){ const f=S.filters, w=(($('#main')||{}).clientWidth||1100
 function relTime(iso){ if(!iso) return ''; const ms=Date.now()-new Date(iso).getTime(); const m=Math.round(ms/6e4); if(m<1) return 'just now'; if(m<60) return m+'m ago'; const h=Math.round(m/60); if(h<24) return h+'h ago'; const d=Math.round(h/24); if(d<7) return d+'d ago'; return fmtS(iso.slice(0,10)); }
 VIEWS.home=function(){
   const live=liveTickets(), act=live.filter(t=>t.state==='active'), td=today();
-  const me=viewer(), mine=live.filter(t=>isMine(t,me)), first=firstName(me.name);
+  const me=viewer(), mine=live.filter(t=>waitingOn(t,me)), first=firstName(me.name);
   const late=act.filter(pastTarget), inC=act.filter(t=>t.stage==='comment'&&t.sub!=='setup'), gov=act.filter(t=>GOV_STAGES.includes(t.stage)), hold=live.filter(t=>t.state==='hold');
   const soon=inC.filter(t=>t.dates&&t.dates.commentEnd).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))[0];
   const h=new Date().getHours(), g=h<12?'Good morning':(h<17?'Good afternoon':'Good evening');
