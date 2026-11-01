@@ -461,7 +461,7 @@ function finished(){const out=[];
  const wp=new Set((D.done.squareWaitingPay||[]).map(x=>x[0]));D.done.square.filter(x=>!wp.has(x[0])).forEach(x=>out.push({d:x[2],kind:"square",nm:x[0],wh:"Square set-up, "+x[1]+" · paid and in Aptify",by:"MISMO Money",grp:"setup"}));
  D.done.iif.forEach(x=>out.push({d:x[2],kind:"iif",nm:x[0],wh:"Turned on as an IIF member, "+x[1],by:"Aptify",grp:"setup"}));
  D.done.members.forEach(x=>out.push({d:x[2],kind:"members",nm:x[0],wh:"New member set up, "+x[1],by:"Aptify",grp:"setup"}));
- CASES.forEach(c=>out.push({d:c.d,kind:"case",nm:c.nm||"Case "+c.id,wh:c.t+" · "+c.ti,by:c.b.split(" ")[0]+" · "+c.c,grp:"case"}));
+ CASES.forEach(c=>out.push({d:c.d,kind:"case",nm:c.nm||"Case "+c.id,wh:c.t+" · "+c.ti,by:c.b.split(" ")[0]+" · "+c.c,grp:"case",cs:c}));
  return out.sort((a,b)=>b.d.localeCompare(a.d));}
 const KC=k=>k==="case"?"#9fb3c8":KINDS[k].k;
 
@@ -469,8 +469,8 @@ const KC=k=>k==="case"?"#9fb3c8":KINDS[k].k;
 function ageTag(x){const w=days(x.sold||x.paid||TODAY,TODAY);return h("span",{class:"age"+(w>14?" late":w<=2?" ok":"")},w?w+(w===1?" day":" days"):"Today");}
 function todoRow(x){return h("button",{type:"button",class:"row",style:"--k:"+KINDS[x.kind].k,onclick:()=>openPane(x)},h("span",{class:"dot"}),h("span",{class:"nm",title:x.name},x.name),h("span",{class:"wh"},KINDS[x.kind].name+" · "+(x.special?x.special+" · ":"")+x.level+" · "+money(x.price)),h("span",{class:"dt"},"Paid "+fmtS(x.paid)),ageTag(x));}
 function todoRow2(x){return h("button",{type:"button",class:"row r2",style:"--k:"+KINDS[x.kind].k,onclick:()=>openPane(x)},h("span",{class:"dot"}),h("span",{class:"nm",title:x.name},x.name,h("small",null,KINDS[x.kind].name+" · "+(x.special?x.special+" · ":"")+x.level+" · paid "+fmtS(x.paid))),ageTag(x));}
-function doneRow2(r){return h("div",{class:"row r2",style:"--k:"+KC(r.kind)+";cursor:default"},h("span",{class:"dot"}),h("span",{class:"nm",title:r.nm+" · "+r.wh},r.nm,h("small",null,fmtS(r.d)+" · "+r.wh)),h("span",{class:"age"},r.by.split(" · ")[0]));}
-function doneRow(r){return h("div",{class:"row",style:"--k:"+KC(r.kind)+";cursor:default"},h("span",{class:"dot"}),h("span",{class:"nm",title:r.nm},r.nm),h("span",{class:"wh",title:r.wh},r.wh),h("span",{class:"dt"},fmt(r.d)),h("span",{class:"age"},r.by.split(" · ")[0]));}
+function doneRow2(r){return h(r.cs?"button":"div",{type:r.cs?"button":null,class:"row r2",style:"--k:"+KC(r.kind)+(r.cs?"":";cursor:default"),onclick:r.cs?()=>openCase(r.cs):null},h("span",{class:"dot"}),h("span",{class:"nm",title:r.nm+" · "+r.wh},r.nm,h("small",null,fmtS(r.d)+" · "+r.wh)),h("span",{class:"age"},r.by.split(" · ")[0]));}
+function doneRow(r){return h(r.cs?"button":"div",{type:r.cs?"button":null,class:"row",style:"--k:"+KC(r.kind)+(r.cs?"":";cursor:default"),onclick:r.cs?()=>openCase(r.cs):null},h("span",{class:"dot"}),h("span",{class:"nm",title:r.nm},r.nm),h("span",{class:"wh",title:r.wh},r.wh),h("span",{class:"dt"},fmt(r.d)),h("span",{class:"age"},r.by.split(" · ")[0]));}
 
 /* ---------- Home ---------- */
 function tiles(box,list){box.textContent="";list.forEach(t=>{const b=h("button",{type:"button",class:"tile",style:"--k:"+t.k,onclick:t.go},h("b",null,"0"),h("span",{class:"lab"},t.lab),h("span",{class:"sub"},t.sub));count(b.querySelector("b"),t.v,t.f||(v=>Math.round(v).toLocaleString("en-US")));box.appendChild(b);});}
@@ -521,6 +521,18 @@ function openPane(x){cur=x;const K=KINDS[x.kind];$("pane-t").textContent=x.name;
  const st=[["Email",K.from+" emailed the membership team with a link to this page."],["Set Up in Aptify","Add the company, the membership order and the dates shown."],["Enter the IDs Here","The Aptify Company ID and order number, then Mark Set Up."],["Everyone Sees It",x.kind==="square"?"MISMO Money ties the Square payment to the order; Member 360 updates.":"Member 360 marks it Updated in Aptify and fills in the IDs."]];
  B.appendChild(h("div",{class:"sect",style:"grid-column:1/-1"},h("h3",null,"How This Works"),h("div",{class:"steps"},...st.map((s,i)=>h("div",{class:i===2?"now":""},h("b",null,h("i",null,String(i+1)),s[0]),s[1])))));
  $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");setTimeout(()=>cid.focus(),240);}
+
+/* ---------- one case, in the panel on the right (Jonna, Nov 1, 2026): what Aptify's export says about it, and the company's other MISMO cases ---------- */
+function openCase(x){cur=x;const e=x.x||{};$("pane-t").textContent=x.nm||"Case "+x.id;$("pane-s").textContent="Aptify case "+x.id+" · "+fmt(x.d)+" · "+x.t;
+ const B=$("pane-b");B.textContent="";const kv=rows=>h("div",{class:"kv"},...rows.filter(r=>r&&r[1]).flatMap(r=>[h("div",null,r[0]),h("div",null,String(r[1]))]));
+ const left=h("div",{class:"pcol"}),right=h("div",{class:"pcol"});
+ left.appendChild(h("div",{class:"sect"},h("h3",null,"The Case"),kv([["Aptify Case ID",String(x.id)],["Reported",fmt(x.d)],["Closed",e.cl?fmt(e.cl)+(e.cl===x.d?" (same day)":""):"Not in this export"],["What It's About",x.t],["Way In",x.c],["Logged By",x.b],["Status",e.st],["Case Type",e.ty]])));
+ left.appendChild(h("div",{class:"sect"},h("h3",null,"Who It's For"),kv([["Company",e.co||(e.ct?"":x.nm)],["Contact",e.ct],["Case Title",e.ti||x.ti]])));
+ right.appendChild(h("div",{class:"sect"},h("h3",null,"What Was Asked"),h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2);white-space:pre-wrap"},e.su||e.ti||x.ti||"No summary in the Aptify export.")));
+ const same=x.nm?CASES.filter(y=>y!==x&&y.nm===x.nm):[];
+ right.appendChild(h("div",{class:"sect"},h("h3",null,"Other MISMO Cases for "+(x.nm||"Them")),same.length?h("div",{class:"rows"},...same.slice(0,8).map(y=>h("button",{type:"button",class:"row r2",style:"--k:#9fb3c8",onclick:()=>openCase(y)},h("span",{class:"dot"}),h("span",{class:"nm"},fmt(y.d),h("small",null,y.t+" · "+y.ti)),h("span",{class:"age"},y.c)))):h("div",{style:"padding:12px 14px;font-size:13px;color:var(--ink-3)"},x.nm?"No other MISMO cases in the last 18 months.":"No company or contact on this case.")));
+ B.append(left,right,h("div",{class:"sect",style:"grid-column:1/-1"},h("div",{style:"padding:10px 14px;font-size:12.5px;color:var(--ink-3)"},"From the weekly Aptify export. The full case, with its notes and history, is case "+x.id+" in Aptify Case Management.")));
+ $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");}
 function closePane(){$("pane").classList.remove("on");$("pane").setAttribute("aria-hidden","true");cur=null;}
 $("pane-x").addEventListener("click",closePane);
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&cur)closePane();});
@@ -541,7 +553,7 @@ function renderDone(){const all=finished(),cnt=g=>g==="all"?all.length:all.filte
 
 /* ---------- Case Management ---------- */
 /* every MISMO case from the last 18 months (Aptify view "Member 360 - MISMO Cases", Case Category = MISMO) */
-const CASES=(()=>{const L=D.cases.list;return L.R.map(r=>({id:r[0],d:"20"+r[1].slice(0,2)+"-"+r[1].slice(2,4)+"-"+r[1].slice(4,6),t:L.T[r[2]],c:L.C[r[3]],b:L.B[r[4]],nm:r[5],ti:r[6]}));})();
+const CASES=(()=>{const L=D.cases.list;return L.R.map(r=>({id:r[0],d:"20"+r[1].slice(0,2)+"-"+r[1].slice(2,4)+"-"+r[1].slice(4,6),t:L.T[r[2]],c:L.C[r[3]],b:L.B[r[4]],nm:r[5],ti:r[6],x:r[7]||{}}));})();
 /* click a month, a topic, a way in or a person: the charts and the list below narrow to it; click it again to let go */
 let CF={m:"",t:"",c:"",b:""},cpage=0;const CPER=12;
 const caseIn=(x,skip)=>{if(CF.m&&skip!=="m"&&x.d.slice(0,7)!==CF.m)return false;if(skip!=="m"&&!CF.m&&skip!=="list"&&x.d.slice(0,4)!==TODAY.slice(0,4))return false;
@@ -560,13 +572,13 @@ function cdBuild(rows){const pick=(r,ks)=>{for(const k of ks){if(r[k]!=null&&r[k
   const R=rows.map(o=>{const r={};Object.keys(o).forEach(k=>{r[CD_KEY(k)]=o[k];});return r;});
   if(!R.length||!R.some(r=>"casecategory" in r||"category" in r))throw new Error("That file doesn't look like the Aptify case view (no Case Category column).");
   const mismo=R.filter(r=>/mismo/i.test(String(pick(r,["casecategory","category"])))),left=R.length-mismo.length;
-  const cs=mismo.map(r=>({id:+pick(r,["id","caseid"])||0,d:cdDate(pick(r,["datereported","daterecorded","datestarted","datecreated"])),closed:cdDate(pick(r,["dateclosed"])),t:cdTopic(pick(r,["subcategory","casesubcategory"])),c:String(pick(r,["casereportmethod","reportmethod","method"])||"Not Set").trim()||"Not Set",b:String(pick(r,["recordedby"])||"Not Set").trim()||"Not Set",nm:String(pick(r,["company"])||pick(r,["contact"])||"").replace(/\s+/g," ").trim().slice(0,34),ti:String(pick(r,["title","summary"])||"").replace(/\s+/g," ").trim().slice(0,36)})).filter(x=>x.d);
+  const cs=mismo.map(r=>({id:+pick(r,["id","caseid"])||0,d:cdDate(pick(r,["datereported","daterecorded","datestarted","datecreated"])),closed:cdDate(pick(r,["dateclosed"])),t:cdTopic(pick(r,["subcategory","casesubcategory"])),c:String(pick(r,["casereportmethod","reportmethod","method"])||"Not Set").trim()||"Not Set",b:String(pick(r,["recordedby"])||"Not Set").trim()||"Not Set",nm:String(pick(r,["company"])||pick(r,["contact"])||"").replace(/\s+/g," ").trim().slice(0,34),ti:String(pick(r,["title","summary"])||"").replace(/\s+/g," ").trim().slice(0,36),x:{co:String(pick(r,["company"])||"").replace(/\s+/g," ").trim().slice(0,80),ct:String(pick(r,["contact"])||"").replace(/\s+/g," ").trim().slice(0,60),cl:cdDate(pick(r,["dateclosed"])),st:String(pick(r,["casestatus","status"])||"").trim().slice(0,30),ty:String(pick(r,["casetype","type"])||"").replace(/\s+/g," ").trim().slice(0,30),ti:String(pick(r,["title"])||"").replace(/\s+/g," ").trim().slice(0,120),su:String(pick(r,["summary","description"])||"").replace(/\s+/g," ").trim().slice(0,400)}})).filter(x=>x.d);
   const now=new Date(),yr=String(now.getFullYear()),months={},mon=[];{let y=now.getFullYear(),m=now.getMonth()+1;for(let i=0;i<18;i++){mon.unshift(y+"-"+String(m).padStart(2,"0"));m--;if(!m){m=12;y--;}}}
   mon.forEach(m=>months[m]=0);cs.forEach(x=>{const m=x.d.slice(0,7);if(m in months)months[m]++;});
   const Y=cs.filter(x=>x.d.slice(0,4)===yr),tally=f=>{const o={};Y.forEach(x=>{o[x[f]]=(o[x[f]]||0)+1;});return o;};
   const closed=Y.filter(x=>x.closed),same=closed.filter(x=>x.closed===x.d);
   const win=cs.filter(x=>x.d>=mon[0]+"-01").sort((a,b)=>b.d.localeCompare(a.d)||b.id-a.id),T=[],C=[],B=[],ix=(a,v)=>{let i=a.indexOf(v);if(i<0){a.push(v);i=a.length-1;}return i;};
-  const list={T,C,B,R:win.map(x=>[x.id,x.d.slice(2).replace(/-/g,""),ix(T,x.t),ix(C,x.c),ix(B,x.b),x.nm,x.ti])};
+  const list={T,C,B,R:win.map(x=>[x.id,x.d.slice(2).replace(/-/g,""),ix(T,x.t),ix(C,x.c),ix(B,x.b),x.nm,x.ti,Object.fromEntries(Object.entries(x.x).filter(([,v])=>v))])};
   const latest=cs.map(x=>x.d).sort().pop()||"";
   return {data:{asOf:cdDate(now),total:cs.length,months,topicsY:tally("t"),channelY:tally("c"),byY:tally("b"),sameDay:same.length,closed:closed.length,list,latest,source:"Aptify view Member 360 - MISMO Cases (Case Category = MISMO)",writtenAt:now.toISOString(),writtenBy:((window.__deskMe&&window.__deskMe().name)||"")},left,inYear:Y.length,latest};}
 function cdLib(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";s.onload=()=>ok(window.XLSX);s.onerror=()=>no(new Error("Couldn't load the Excel reader. Check the connection and try again."));document.head.appendChild(s);});}
@@ -619,7 +631,7 @@ function renderCases(keep){const C=D.cases,yr=TODAY.slice(0,4),ytd=caseYTD(),cm=
  hd.appendChild(h("span",{class:"hint"},rows.length+" case"+(rows.length===1?"":"s")+(any?"":" in the last 18 months")));
  if(any)hd.appendChild(h("button",{type:"button",class:"link",style:"margin-left:12px",onclick:()=>{CF={m:"",t:"",c:"",b:""};cpage=0;renderCases(true);}},"Clear All"));
  const CL=$("case-list");CL.textContent="";
- rows.slice(cpage*CPER,cpage*CPER+CPER).forEach(x=>CL.appendChild(h("div",{class:"row r2",style:"--k:"+(CC[x.c]||"#9fb3c8")+";cursor:default"},h("span",{class:"dot"}),h("span",{class:"nm",title:(x.nm||"No company or contact")+" · "+x.ti},x.nm||h("span",{style:"color:var(--ink-3);font-weight:500"},"No company or contact"),h("small",null,fmtS(x.d)+(x.d.slice(0,4)!==yr?", "+x.d.slice(0,4):"")+" · "+x.t+" · "+x.ti)),h("span",{class:"age"},x.c+" · "+x.b.split(" ")[0]))));
+ rows.slice(cpage*CPER,cpage*CPER+CPER).forEach(x=>CL.appendChild(h("button",{type:"button",class:"row r2",style:"--k:"+(CC[x.c]||"#9fb3c8"),title:"Open case "+x.id,onclick:()=>openCase(x)},h("span",{class:"dot"}),h("span",{class:"nm",title:(x.nm||"No company or contact")+" · "+x.ti},x.nm||h("span",{style:"color:var(--ink-3);font-weight:500"},"No company or contact"),h("small",null,fmtS(x.d)+(x.d.slice(0,4)!==yr?", "+x.d.slice(0,4):"")+" · "+x.t+" · "+x.ti)),h("span",{class:"age"},x.c+" · "+x.b.split(" ")[0]))));
  if(!rows.length)CL.appendChild(h("div",{class:"empty"},"No MISMO cases match. Select a highlighted item again to let it go."));
  const pg=$("case-pager");pg.textContent="";if(pages>1)pg.append(h("button",{type:"button",disabled:cpage===0?"":null,onclick:()=>{cpage--;renderCases(true);}},"← Newer"),h("button",{type:"button",disabled:cpage>=pages-1?"":null,onclick:()=>{cpage++;renderCases(true);}},"Older →"),h("span",{class:"sp"},(cpage*CPER+1)+"–"+Math.min(rows.length,cpage*CPER+CPER)+" of "+rows.length));pg.hidden=pages<2;try{caseDrop();}catch(e){console.error(e);}}
 
