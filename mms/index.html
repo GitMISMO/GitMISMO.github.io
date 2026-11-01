@@ -1614,6 +1614,8 @@ button.hp-t{cursor:pointer}button.hp-t:hover{background:rgba(255,255,255,.12)}
 .bd-late i{font-style:normal;font-size:11.5px;font-weight:600;color:var(--accent);text-decoration:underline;text-underline-offset:2px}
 .bd-late:hover i,.bd-late.on i{color:var(--bad)}
 .bd-late.on{background:var(--bad-bg);border-radius:6px;padding:4px 8px;margin:-4px -8px}
+.tm-gh{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin:14px 0 8px}
+.tm-gh:first-of-type{margin-top:4px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3360,10 +3362,15 @@ VIEWS.mine=function(){
   if(S.isStaff&&!S.viewAs){
     const pm=new Map(); const addP=(p,r)=>{ if(!p||!p.name) return; const k=p.name.toLowerCase(); const x=pm.get(k)||Object.assign({rs:[]},p); if(!x.rs.includes(r)) x.rs.push(r); pm.set(k,x); };
     (S.people.facilitators||[]).forEach(p=>addP(p,'Facilitator')); Object.entries(S.people.roles||{}).forEach(([r,L])=>(L||[]).forEach(p=>addP(p,ROLE_LABEL[r]||r)));
-    const ppl=[...pm.values()].map(p=>Object.assign(p,{r:p.rs.join(' · ')})).filter(p=>!sameName(p.name,S.me.name));
-    const rows=ppl.map(p=>{ const q=liveTickets().filter(t=>waitingOn(t,p)); const live=myFacTickets(p).length; return {p,q,live}; }).filter(x=>x.q.length||x.live).sort((a,b)=>b.q.length-a.q.length||a.p.name.localeCompare(b.p.name));
-    if(rows.length) team='<div class="secthead"><h2>Everyone’s Queue</h2><span class="muted" style="font-size:12.5px">Click a person to see their queue the way they see it.</span></div><div class="team">'+rows.map(x=>{ const late=x.q.filter(pastTarget).length, old=x.q.reduce((m,t)=>Math.max(m,stageAge(t)||0),0);
-      return '<button type="button" class="tm" data-peek="'+esc(x.p.name)+'">'+av(x.p.name)+'<span class="tm-n"><b>'+esc(x.p.name)+'</b><em>'+esc(x.p.r)+'</em></span><span class="tm-q'+(x.q.length?' on':'')+'" title="'+x.q.length+' work request'+(x.q.length===1?' is':'s are')+' waiting on '+esc(firstName(x.p.name))+' to do the next step"><b>'+x.q.length+'</b>waiting on '+esc(firstName(x.p.name))+'</span><span class="tm-s">'+[late?'<b class="bad">'+late+' past target</b>':'',x.live?x.live+' live work request'+(x.live===1?'':'s')+' in all':''].filter(Boolean).join(' · ')+'</span></button>'; }).join('')+'</div>';
+    const ppl=[...pm.values()].map(p=>Object.assign(p,{r:p.rs.join(' · ')}));
+    const byFirst=(a,b)=>firstName(a.p.name).localeCompare(firstName(b.p.name))||a.p.name.localeCompare(b.p.name);
+    const all=ppl.map(p=>{ const q=liveTickets().filter(t=>waitingOn(t,p)); const live=myFacTickets(p).length; return {p,q,live,fac:p.rs.includes('Facilitator')}; });
+    const facs=all.filter(x=>x.fac&&(x.q.length||x.live)).sort(byFirst), staff=all.filter(x=>!x.fac).sort(byFirst);
+    const card=x=>{ const late=x.q.filter(pastTarget).length, me=sameName(x.p.name,S.me.name);
+      return '<button type="button" class="tm" data-peek="'+(me?'':esc(x.p.name))+'">'+av(x.p.name)+'<span class="tm-n"><b>'+esc(x.p.name)+(me?' (you)':'')+'</b><em>'+esc(x.p.r)+'</em></span><span class="tm-q'+(x.q.length?' on':'')+'" title="'+x.q.length+' work request'+(x.q.length===1?' is':'s are')+' waiting on '+esc(firstName(x.p.name))+' to do the next step"><b>'+x.q.length+'</b>waiting on '+esc(me?'you':firstName(x.p.name))+'</span><span class="tm-s">'+[late?'<b class="bad">'+late+' past target</b>':'',x.live?x.live+' live work request'+(x.live===1?'':'s')+' in all':''].filter(Boolean).join(' · ')+'</span></button>'; };
+    if(facs.length||staff.length) team='<div class="secthead"><h2>Everyone’s Queue</h2><span class="muted" style="font-size:12.5px">Click a person to see their queue the way they see it.</span></div>'+
+      (facs.length?'<div class="tm-gh">Facilitators</div><div class="team">'+facs.map(card).join('')+'</div>':'')+
+      (staff.length?'<div class="tm-gh">MISMO Staff and Approvers</div><div class="team">'+staff.map(card).join('')+'</div>':'');
   }
   const showLanes=yours.length+later.length+facT.length>0;
   const lanes=showLanes?'<div class="secthead"><h2>'+(S.viewAs?esc(who)+'’s':'Your')+' Work, Wherever It Is</h2>'+qSortBar(me)+'</div>'+lanesHtml('mine',[
@@ -5337,6 +5344,8 @@ function imDraftRows(P,findings,ai){
     let dec='Approved as Submitted', rule='', why=[], sug='', look=false;
     const bump=(d,ru,txt)=>{ if((IM_RANK[d]||0)>(IM_RANK[dec]||0)){ dec=d; rule=ru; } if(txt) why.push(txt); };
     F.forEach(f=>{ const ru=f.rule||'';
+      // learned: a check IM usually lets through (approved as submitted most of the time) only adds a note
+      const ls=st[ru]; if(ls&&ls.n>=10&&ls.keep/ls.n>=0.6&&!IM_RULE.deny.includes(ru)){ why.push('(IM usually approves these as submitted) '+f.issue); return; }
       if(IM_RULE.deny.includes(ru)) bump('Denied',ru,f.issue+' '+f.suggestion);
       else if(IM_RULE.ret.includes(ru)||(ru==='need'&&f.sev==='fix')) bump('Returned',ru,f.issue+' '+f.suggestion);
       else if(IM_RULE.mod.includes(ru)){ const s=st[ru]; if(s&&s.n>=5&&s.keep/s.n>=0.6){ why.push('(Not usually changed by IM) '+f.issue); return; } bump('Approved with Modification',ru,f.issue+' '+f.suggestion); if(ru==='template'&&!sug) sug=f.suggestion.replace(/^Start with:\s*/,''); }

@@ -685,6 +685,11 @@ function imDraftRows(P,findings,ai){
     return row; });
 }
 function imRuleStats(){ const st={}; ((S.imBt&&S.imBt.draft&&S.imBt.draft.byRule)||[]).forEach(r=>{ st[r.rule]={n:r.n||0,keep:r.keep||0,agree:r.agree||0}; }); Object.values(S.iml||{}).forEach(x=>{ if(!x||!x.rule) return; const s=st[x.rule]=st[x.rule]||{n:0,keep:0,agree:0}; s.n++; if(x.final==='Approved as Submitted') s.keep++; if(x.agreed) s.agree++; }); return st; }
+function imLessons(n){ return Object.values(S.iml||{}).filter(x=>x&&!x.agreed).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,n||12)
+  .map(x=>'['+x.tt+' '+rvTrim(x.name,40)+'] draft said '+x.draft+(x.draftCom?' ('+rvTrim(x.draftCom,80)+')':'')+'; IM decided '+x.final+(x.finalCom?': '+rvTrim(x.finalCom,120):'')); }
+
+
+function rvFbAvoid(){ return ''; }
 
 window.__bt={S,rvReadXlsx,rvParseForm,rvImChecks,rvRmChecks,rmLoad,rmFactsFor,imDraftRows,imRuleStats,imKind,IM_RULE,IM_RANK,rvAiIm:typeof rvAiIm==='function'?rvAiIm:null,useRM:R=>{ if(typeof RM!=='undefined') RM=R; }};
 })();
