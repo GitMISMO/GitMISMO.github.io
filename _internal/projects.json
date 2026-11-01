@@ -61,6 +61,14 @@
          "writable": [
            "data/"
          ]
+       },
+       "im-review": {
+         "repo": "GitMISMO/im-review-data",
+         "branch": "main",
+         "origin": "https://resources.mismo.org",
+         "writable": [
+           "data/"
+         ]
        }, 
        "marketing-hq": {
          "repo": "GitMISMO/marketing-hq-data",
