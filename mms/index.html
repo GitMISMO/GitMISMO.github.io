@@ -4176,7 +4176,7 @@ function wrHub(P,t){
   const chips=[...$$('.row1 .chip',ph)].map(c=>c.outerHTML).join('');
   const mt=nextMeeting(t);
   const tm=mt?(mt.time?mt.time.replace(/(\d)(AM|PM)/,'$1 $2'):(mt.st&&mt.en?hm(mt.st).replace(/ (AM|PM)$/,m=>hm(mt.en).endsWith(m)?'':m)+'–'+hm(mt.en):'')):'';
-  const meet=mt?dateTile(mt.date,mt.name.replace(/\s*\(.*?\)\s*/g,' ').trim(),esc(relDays(mt.date))+(tm?' · '+esc(tm)+' ET':''),'meet','<span class="wh-dk">Next Meeting</span>'+(mt.zoom&&/^https:\/\/[a-z0-9.-]*zoom\.us\//i.test(mt.zoom)?'<a class="wh-join" href="'+esc(mt.zoom)+'" target="_blank" rel="noopener" title="Join on Zoom" aria-label="Join on Zoom">'+whIc('vid')+'</a>':'')):'';
+  const meet=mt?dateTile(mt.date,'Next Workgroup Meeting',esc(relDays(mt.date))+(tm?' · '+esc(tm)+' ET':''),'meet',(mt.zoom&&/^https:\/\/[a-z0-9.-]*zoom\.us\//i.test(mt.zoom)?'<a class="wh-join" href="'+esc(mt.zoom)+'" target="_blank" rel="noopener" title="Join on Zoom" aria-label="Join on Zoom">'+whIc('vid')+'</a>':'')):'';
   const kd=keyDate(t);
   // tabs and what goes in them
   const secs={}; $$('.pgrid > .psec',pb).forEach(s=>{ const id=s.dataset.sec||(/^Comments Received/.test(($('h4',s)||{}).textContent||'')?'cmts':/^Current Leadership/.test(($('h4',s)||{}).textContent||'')?'lead':'over'); (secs[id]=secs[id]||[]).push(s); });
