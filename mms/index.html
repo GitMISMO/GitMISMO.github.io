@@ -4814,11 +4814,11 @@ async function rmLoad(){
   if(RM) return RM; if(rmLoading) return rmLoading;
   rmLoading=(async()=>{
     if(S.mode!=='relay'||typeof rGet!=='function') return null;
-    const docOf=f=>f&&f.data&&f.data.docs&&f.data.docs.data;
-    const meta=docOf(await rGet('mms','rm-meta')); if(!meta||!meta.s) return null;
+    const docOf=(f,c)=>{ const d=f&&f.data&&f.data.docs; return d&&(d[c+'/data']||d.data); };
+    const meta=docOf(await rGet('mms','rm-meta'),'rm-meta'); if(!meta||!meta.s) return null;
     const M=Object.assign({},meta,JSON.parse(meta.s)); delete M.s;
     const parts=await Promise.all(Array.from({length:M.dpParts||0},(_, i)=>rGet('mms','rm-dp'+(i+1))));
-    const dp=[]; parts.forEach(p=>{ const d=docOf(p); if(d&&d.s) JSON.parse(d.s).forEach(x=>dp.push(x)); });
+    const dp=[]; parts.forEach((p,i)=>{ const d=docOf(p,'rm-dp'+(i+1)); if(d&&d.s) JSON.parse(d.s).forEach(x=>dp.push(x)); });
     if(!dp.length) return null;
     RM=rmBuild(M,dp); return RM;
   })().catch(e=>{ console.warn('Reference Model not loaded',e); return null; }).finally(()=>{ rmLoading=null; });
@@ -5001,8 +5001,14 @@ const RV_TERMS=[
   ['Home Mortgage Disclosure Act (HMDA)','Industry Names','',''],
   // style
   ['Version 3.6.3','Style','Write versions as Version 3.6.3 in titles and v3.6.3 in tables; don’t mix Ver. and V in one document.','\\bVer\\.\\s?\\d|\\bV\\s\\d\\.\\d','Ver. 3.6, V 3.6'],
+  ['and','Style','Write “and” in running text; keep & only inside a name (for example Q&A).','\\s&\\s'],
+  ['use, help, includes','Style','Plain words: use (not utilize), help (not assist), includes (not you will find).','\\butiliz(e|es|ed|ing|ation)\\b|\\b[Yy]ou will find\\b','utilize, you will find'],
+  ['documents, information','Style','Spell out short forms in running text.','\\bdocs\\b|\\binfo\\b','docs, info'],
+  ['data point, container, document','Style','Lowercase generic MISMO nouns in running text; capitalize only in headings or a product name.','(?<![.!?]\\s|^|\\n)(?<=[a-z,;]\\s)(Data Points?|Containers?)\\b(?! [A-Z])','Data Point, Container (mid-sentence)'],
   ['American spelling','Style','For example organization, standardize, license (noun and verb), center.','\\borgani[s]ation\\b|\\bstandardis(e|ed|ing)\\b|\\blicence\\b|\\bcentre\\b|\\bbehaviour\\b|\\bcolour\\b|\\bcatalogue\\b','organisation, standardise, licence, centre, behaviour, colour']
 ];
+/* what reviewers changed in IM-stage documents (tracked changes in 120 Word files in the IM library, 2021–2026: 1,162 before/after edits) */
+const RV_EDITOR_LEARNED=['generic nouns lowercased mid-sentence (Data Point → data point, Container → container, Document → document)','commas added after introductory phrases and in series','& → and','plain verbs: assist → help, describes → provides, you will find → includes, will be reflected → are specified (present tense, no second person)','docs → documents','straight quotes → curly quotes','old version numbers and dates updated to the current ones','attribute/element → data point when MISMO means a data point'];
 /* expansions for acronyms: MISMO's names first, then the LDD's acronym list when the Reference Model is loaded */
 function rvExpand(a){ a=String(a||'').toUpperCase(); for(const t of RV_TERMS){ const m=t[0].match(/^(.*) \(([^)]+)\)$/); if(m&&m[2].toUpperCase()===a) return m[1]; }
   if(typeof RM!=='undefined'&&RM&&RM.ac&&RM.ac.has(a)) return RM.ac.get(a); return ''; }
@@ -5031,7 +5037,7 @@ wireMain=function(m){ _wireMain9(m); const q=$('#termsq',m); if(q) q.oninput=()=
 
 /* what Claude is told about MISMO's names (kept short: the relay caps each answer) */
 function rvEditorExtra(){ const names=RV_TERMS.filter(t=>!/Style|Industry/.test(t[1])).map(t=>t[0].replace(/ \([^)]*\)$/,'')).slice(0,40);
-  return '\n- MISMO writes its names this way: '+names.join(', ')+'. Flag other spellings as corrections (category: terms).'+(typeof RV_EDITOR_LEARNED!=='undefined'&&RV_EDITOR_LEARNED.length?'\n- What MISMO’s editor has corrected before: '+RV_EDITOR_LEARNED.join(' | '):''); }
+  return '\n- MISMO writes its names this way: '+names.join(', ')+'. Flag other spellings as corrections (category: terms).'+(typeof RV_EDITOR_LEARNED!=='undefined'&&RV_EDITOR_LEARNED.length?'\n- What reviewers have corrected in past MISMO documents: '+RV_EDITOR_LEARNED.join(' | '):''); }
 
 /* =====================================================================
    The review screens: run a review, read the report, keep every report on
