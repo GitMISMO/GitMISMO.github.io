@@ -48,21 +48,166 @@ h1,h2,h3,h4{letter-spacing:-.012em;margin:0;color:var(--ink)}
 a{color:var(--accent)}
 button{font-family:inherit}
 [hidden]{display:none!important}
+:root{--hq-h:64px;--rail-w:240px;--rail-mini:62px}
+/* the masthead, across the top, as every MISMO page wears it */
+.hqtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:97;height:var(--hq-h);
+  background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;
+  padding:0 22px;box-shadow:0 1px 0 rgba(80,164,219,.28);
+  margin-left:calc(0px - var(--rail-w));width:calc(100% + var(--rail-w));
+  transition:margin-left .2s cubic-bezier(.4,0,.2,1), width .2s cubic-bezier(.4,0,.2,1)}
+body.railmini .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}
+@media (prefers-reduced-motion:reduce){ .hqtop{transition:none} }
+.hqtop .mastrule{display:block;width:2px;height:34px;flex:0 0 auto;
+  margin-inline:20px;border-radius:1px;background:var(--sky)}
+.hqtop .hqname{font-family:var(--display);font-size:15.5px;font-weight:700;
+  letter-spacing:-.005em;color:var(--sky);white-space:nowrap}
+.hqtop-r{margin-left:auto;display:flex;align-items:center;gap:13px}
+.hqtop .eyebrow-m{font-family:var(--display);font-size:10.5px;letter-spacing:.11em;
+  text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
+@media(max-width:700px){.hqtop .eyebrow-m{display:none}}
+.logoplate{background:#fff;border-radius:7px;padding:8px 14px;display:flex;
+  align-items:center;line-height:0;flex:0 0 auto;position:relative}
+.logoplate .wordmark{height:24px;width:auto;display:block}
+
+/* the sections, down the left, beneath it */
+.hq.rail{position:fixed;left:0;top:calc(var(--hq-h) + env(safe-area-inset-top,0px));bottom:0;width:var(--rail-w);z-index:95;
+  background:var(--navy);color:#fff;display:flex;flex-direction:column;
+  gap:0;padding:0;overflow:hidden auto;overscroll-behavior:contain;
+  box-shadow:1px 0 0 rgba(80,164,219,.22), 4px 0 18px rgba(6,32,47,.14);
+  transition:width .2s cubic-bezier(.4,0,.2,1)}
+body{padding-left:var(--rail-w);transition:padding-left .2s cubic-bezier(.4,0,.2,1)}
+@media (prefers-reduced-motion:reduce){ .hq.rail,body{transition:none} }
+
+/* ── Narrowed: the icons and nothing else ── */
+body.railmini{padding-left:var(--rail-mini)}
+body.railmini .hq.rail{width:var(--rail-mini)}
+body.railmini .rail-top{justify-content:center;padding:10px 0 9px}
+body.railmini .rail-lbl{display:none}
+body.railmini .railhide{margin:0}
+body.railmini .railhide svg{transform:scaleX(-1)}
+body.railmini .railfind{padding:9px 0 2px;display:flex;justify-content:center}
+body.railmini .railfind .fi,
+body.railmini .railfind input,
+body.railmini .railq-x,
+body.railmini .railhits{display:none}
+body.railmini .railfind-b{display:flex}
+body.railmini .hq nav{padding:6px 0 4px;align-items:center;gap:4px}
+body.railmini .hq nav button{width:42px;padding:10px 0;justify-content:center;
+  border-radius:9px;box-shadow:none}
+body.railmini .hq nav button span{display:none}
+body.railmini .hq nav button svg{width:19px;height:19px}
+body.railmini .hq nav button[aria-current]{background:var(--sky);color:var(--navy-deep,#06202f)}
+body.railmini .hq nav button[aria-current] svg{stroke:var(--navy-deep,#06202f);opacity:1}
+body.railmini .railsum{display:none}
+body.railmini .hq .mast-right{gap:3px;padding:8px 0 11px;align-items:center}
+body.railmini .hq .mast-right .theme-btn{width:42px;padding:9px 0;font-size:0;
+  justify-content:center;border-radius:9px}
+body.railmini .hq .mast-right .theme-btn .ti{width:19px;height:19px}
+body.railmini .hq .mast-right .theme-btn span{display:none}
+body.railmini .hq .mast-right #theme-btn{margin-top:4px;padding-top:10px;border-radius:9px}
+
+/* the magnifier that stands in for the search box when it is narrow */
+.railfind-b{display:none;width:34px;height:30px;border:1px solid rgba(255,255,255,.18);
+  border-radius:7px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);
+  align-items:center;justify-content:center;padding:0}
+.railfind-b svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.railfind-b:hover{background:rgba(255,255,255,.18);color:#fff}
+
+.rail-top{display:flex;align-items:center;gap:8px;padding:11px 10px 9px;
+  border-bottom:1px solid rgba(80,164,219,.2);flex:0 0 auto}
+.rail-lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  font-weight:700;color:rgba(255,255,255,.55);padding-left:3px}
+.railhide{margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.18);
+  border-radius:5px;color:rgba(255,255,255,.75);width:24px;height:24px;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;padding:0}
+.railhide svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round}
+.railhide:hover{background:rgba(255,255,255,.14);color:#fff}
+
+/* search */
+.railfind{position:relative;padding:11px 12px 3px;flex:0 0 auto}
+.railfind .fi{position:absolute;left:21px;top:20px;width:14px;height:14px;
+  fill:none;stroke:rgba(255,255,255,.5);stroke-width:2;stroke-linecap:round;pointer-events:none}
+.railfind input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);
+  border-radius:6px;color:#fff;font:inherit;font-size:12.5px;padding:6px 26px 6px 30px}
+.railfind input::placeholder{color:rgba(255,255,255,.5)}
+.railfind input:focus{outline:2px solid var(--sky);outline-offset:-1px;background:rgba(255,255,255,.16)}
+.railfind input::-webkit-search-cancel-button{display:none}
+.railq-x{position:absolute;right:17px;top:16px;width:20px;height:20px;border:0;border-radius:4px;
+  background:transparent;color:rgba(255,255,255,.6);font-size:15px;line-height:1;padding:0}
+.railq-x:hover{background:rgba(255,255,255,.16);color:#fff}
+.railhits{margin-top:7px;background:var(--surface);border:1px solid var(--border-strong,#adc4d6);
+  border-radius:6px;box-shadow:0 10px 26px rgba(6,32,47,.3);overflow:hidden auto;
+  max-height:min(52vh,420px)}
+.railhits .rh-g{font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;
+  font-weight:700;color:var(--ink-3);background:var(--sunk);padding:4px 10px;
+  border-bottom:1px solid var(--line);position:sticky;top:0}
+.railhits .rh{display:block;width:100%;text-align:left;background:none;border:0;
+  border-bottom:1px solid var(--line);padding:6px 10px;color:var(--ink);font-family:var(--ui)}
+.railhits .rh:last-child{border-bottom:0}
+.railhits .rh:hover,.railhits .rh.on{background:var(--accent-soft)}
+.railhits .rh b{display:block;font-size:12.5px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.railhits .rh i{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;
+  letter-spacing:.03em;color:var(--ink-3);margin-top:1px;overflow-wrap:anywhere}
+.railhits .rh-none{padding:10px;font-size:12px;color:var(--ink-3)}
+
+.hq nav{display:flex;flex-direction:column;gap:1px;padding:8px 8px 4px;flex:0 0 auto}
+.hq nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  background:none;border:0;border-radius:6px;color:rgba(255,255,255,.76);
+  padding:8px 10px;font:inherit;font-family:var(--display);font-size:13px;font-weight:500;
+  cursor:pointer;white-space:nowrap}
+.hq nav button svg{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.hq nav button:hover{color:#fff;background:rgba(255,255,255,.09)}
+.hq nav button[aria-current]{color:#fff;font-weight:600;background:var(--navy-mid,#14486e);
+  box-shadow:inset 3px 0 0 var(--sky)}
+.hq nav button[aria-current] svg{opacity:1;stroke:var(--sky)}
+.hq nav button:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
+
+/* the foot: theme toggle (and anything else, like Undo/Backup, above it) */
+.hq .mast-right{margin-top:auto;display:flex;flex-direction:column;align-items:stretch;gap:1px;
+  padding:8px 8px 10px;border-top:1px solid rgba(80,164,219,.2);flex:0 0 auto}
+.theme-btn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;
+  background:none;border:0;border-radius:6px;color:rgba(255,255,255,.76);
+  padding:8px 10px;font:inherit;font-family:var(--display);font-size:13px;font-weight:500;
+  cursor:pointer;white-space:nowrap}
+.theme-btn .ti{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.theme-btn .ti-sun{display:none}
+:root[data-theme="dark"] .theme-btn .ti-moon{display:none}
+:root[data-theme="dark"] .theme-btn .ti-sun{display:block}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]) .theme-btn .ti-moon{display:none}
+  :root:not([data-theme="light"]) .theme-btn .ti-sun{display:block} }
+.theme-btn:hover:not(:disabled){color:#fff;background:rgba(255,255,255,.09)}
+.theme-btn:disabled{opacity:.4;cursor:not-allowed}
+.theme-btn:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
+.hq .mast-right #theme-btn{margin-top:5px;padding-top:11px;
+  border-top:1px solid rgba(80,164,219,.18);border-radius:0 0 6px 6px}
+
+/* on a narrow screen the rail covers the page rather than squeezing it */
+.railscrim{position:fixed;inset:0;z-index:94;background:rgba(6,32,47,.42);border:0;padding:0;display:none}
+@media(max-width:900px){
+  body:not(.railmini){padding-left:var(--rail-mini)}
+  body:not(.railmini) .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}
+  body:not(.railmini) .hq.rail{box-shadow:4px 0 26px rgba(6,32,47,.4)}
+  body:not(.railmini) .railscrim{display:block}
+}
+
+/* sign-in, access and connection notices (resources.mismo.org) */
+/* account button: squared corners, same as Team HQ */
+#rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
+#rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
 /* ── IM Review portal ── */
 body{min-height:100vh}
-.top{position:sticky;top:0;z-index:50;height:64px;background:var(--navy);color:#fff;display:flex;align-items:center;padding:0 22px;box-shadow:0 1px 0 rgba(80,164,219,.28)}
-.logoplate{background:#fff;border-radius:7px;padding:8px 14px;display:flex;align-items:center;line-height:0;flex:0 0 auto}
-.logoplate .wordmark{height:24px;width:auto;display:block}
-.mastrule{display:block;width:2px;height:34px;margin-inline:20px;border-radius:1px;background:var(--sky);flex:0 0 auto}
-.tname{font-size:15.5px;font-weight:700;color:var(--sky);white-space:nowrap}
-.top-r{margin-left:auto;display:flex;align-items:center;gap:13px}
-.eyebrow-m{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
-#rs-account{display:inline-flex;align-items:center}
-.tabs{position:sticky;top:64px;z-index:40;background:var(--surface);border-bottom:1px solid var(--border);display:flex;gap:2px;padding:0 22px;overflow-x:auto;scrollbar-width:none}
-.tabs::-webkit-scrollbar{display:none}
-.tabs a{display:inline-flex;align-items:center;gap:7px;padding:13px 14px 11px;font-size:13.5px;font-weight:600;color:var(--ink-2);text-decoration:none;border-bottom:3px solid transparent;white-space:nowrap}
-.tabs a[aria-current="page"]{color:var(--ink);border-bottom-color:var(--sky)}
-.tabs a b{font-size:11px;background:var(--warn);color:#fff;border-radius:9px;padding:1px 7px;line-height:1.4}
+.santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
+html[data-season="december"] .santa{display:block}
+.hq nav button .nb{margin-left:auto;font-size:11px;font-weight:700;background:var(--sky);color:var(--navy-deep);border-radius:9px;padding:0 7px;line-height:18px}
+body.railmini .hq nav button .nb{display:none}
+.help h3{font-size:15px;margin:0 0 8px}
+.help ol,.help ul{margin:0;padding-left:20px;display:grid;gap:7px;font-size:14px;line-height:1.5}
+.help p{font-size:14px;line-height:1.55;margin:0 0 8px;max-width:820px}
+.help .g2 .card{margin-bottom:0}
 .wrap{max-width:1180px;margin:0 auto;padding:22px 22px 60px}
 h1{font-size:25px;font-weight:700;margin:0 0 4px}
 .sub{color:var(--ink-2);font-size:14px;max-width:760px}
@@ -210,27 +355,67 @@ h1{font-size:25px;font-weight:700;margin:0 0 4px}
 .meter i{display:block;height:100%;background:var(--good)}
 .tog{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;cursor:pointer}
 @media(max-width:900px){.g2{grid-template-columns:1fr}.kp{grid-template-columns:1fr 1fr}.plan{grid-template-columns:1fr}.cols{grid-template-columns:1fr}}
-@media(max-width:560px){.top{padding:0 12px}.mastrule{margin-inline:12px}.eyebrow-m{display:none}.tabs{padding:0 8px}.wrap{padding:16px 16px 50px}.hero{padding:18px}.hero h2{font-size:22px}.hstats{gap:6px}.hs{padding:9px}.hs b{font-size:21px}.hs span{font-size:9.5px;letter-spacing:.03em}.hs em{font-size:11px}.subs{grid-template-columns:1fr}h1{font-size:21px}}
+@media(max-width:560px){.hqtop{padding:0 12px}.hqtop .mastrule{margin-inline:12px}.wrap{padding:16px 16px 50px}.hero{padding:18px}.hero h2{font-size:22px}.hstats{gap:6px}.hs{padding:9px}.hs b{font-size:21px}.hs span{font-size:9.5px;letter-spacing:.03em}.hs em{font-size:11px}.subs{grid-template-columns:1fr}h1{font-size:21px}}
 .sub{overflow-wrap:anywhere}
 @media(max-width:560px){.plan{grid-template-columns:1fr 1fr;gap:8px}.plan .step:nth-child(3){display:none}.step p{display:none}.step b{font-size:19px}.step .btn{white-space:normal;text-align:left}.prog{min-width:0;width:100%}.dtools .seg button{padding:7px 9px;font-size:12.5px}.foot{padding:8px 10px}.foot span{font-size:12px}}
+details.nums{margin-top:10px;font-size:12.5px}details.nums summary{cursor:pointer;color:var(--accent);font-weight:600}details.nums .tbl{margin-top:8px;font-size:12px}
 </style>
 <script src="/assets/session.js"></script>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320 c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20 -297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243 -4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198 0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3 -104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245 -337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17 246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49 203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12 26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57 187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44 -204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288 -20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92 -51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12 -24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297 3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146 -106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0 -356 -14z"></path></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263 13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19 -16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20 -222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0 46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"></path></g></symbol><symbol id="mismo-hat" viewBox="0 0 100 100"><path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41 C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/><path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z" fill="#0d314c" opacity=".17"/><rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/><rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/><circle cx="86" cy="45" r="11.5" fill="#ffffff"/></symbol></defs></svg>
 
-<header class="top">
-  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
+<header class="hqtop">
+  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg><svg class="santa" viewBox="0 0 100 100" aria-hidden="true"><use href="#mismo-hat"/></svg></span>
   <span class="mastrule"></span>
-  <span class="tname">IM Review</span>
-  <span class="top-r"><span class="eyebrow-m">Governance · Information Management</span><div id="rs-account"></div></span>
+  <span class="hqname">IM Review</span>
+  <span class="hqtop-r"><span class="eyebrow-m">Programs &amp; Operations</span>
+    <!-- The shared account bubble every tool shows in this spot (session.js fills it). -->
+    <div id="rs-account"></div></span>
 </header>
-<nav class="tabs" aria-label="IM Review">
-  <a href="#/" data-v="waiting" id="tab-w">Waiting for IM <b hidden></b></a>
-  <a href="#/decided" data-v="decided">Decided</a>
-  <a href="#/trends" data-v="trends">Trends</a>
-  <a href="#/draft" data-v="draft">How the Draft Is Doing</a>
-</nav>
+
+<aside class="hq rail" id="rail">
+  <div class="rail-top">
+    <span class="rail-lbl">Sections</span>
+    <button class="railhide" id="rail-hide" type="button" aria-label="Narrow the menu" title="Narrow the menu (backslash)">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+    </button>
+  </div>
+  <div class="railfind">
+    <button class="railfind-b" id="rail-qb" type="button" aria-label="Search" title="Search" tabindex="-1">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+    </button>
+    <svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+    <input type="search" id="rail-q" autocomplete="off" spellcheck="false" placeholder="Search" aria-label="Search submissions, work requests and rows">
+    <button class="railq-x" id="rail-qx" type="button" aria-label="Clear the search" hidden>×</button>
+    <div class="railhits" id="rail-hits" hidden></div>
+  </div>
+  <nav aria-label="IM Review">
+    <button type="button" data-hq="waiting" aria-current="page" title="Waiting for IM">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9l2.5 2.5L16 7"/></svg>
+      <span>Waiting for IM</span><b class="nb" id="nb-wait" hidden></b></button>
+    <button type="button" data-hq="decided" title="Decided">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+      <span>Decided</span></button>
+    <button type="button" data-hq="trends" title="Trends">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20h18"/><path d="M5 16l4-5 4 3 6-8"/></svg>
+      <span>Trends</span></button>
+    <button type="button" data-hq="draft" title="How the Draft Is Doing">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>
+      <span>How the Draft Is Doing</span></button>
+    <button type="button" data-hq="help" title="Help">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 015 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17.2v.1"/></svg>
+      <span>Help</span></button>
+  </nav>
+  <div class="mast-right">
+    <button class="theme-btn" id="theme-btn" type="button">
+      <svg class="ti ti-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6.4 6.4 0 009 9 9 9 0 11-9-9z"/></svg>
+      <svg class="ti ti-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+      <span id="theme-lab">Dark Mode</span>
+    </button>
+  </div>
+</aside>
+<div class="railscrim" id="rail-scrim"></div>
 <main class="wrap" id="main"><div class="empty">Loading…</div></main>
 
 <script>
@@ -316,15 +501,22 @@ async function saveDoc(doc){
 }
 
 /* ---------- views ---------- */
-function shell(body){ const r=route(), w=Object.values(S.queue).filter(q=>q.status==="awaiting").length;
-  $$(".tabs a").forEach(a=>a.setAttribute("aria-current",a.dataset.v===(r.view==="review"?"waiting":r.view)?"page":"false"));
-  const b=$("#tab-w b"); if(b){ b.textContent=w; b.hidden=!w; }
+function shell(body){ const r=route(), w=Object.values(S.queue).filter(q=>q.status==="awaiting").length, v=r.view==="review"?"waiting":r.view;
+  $$(".hq nav button[data-hq]").forEach(b=>{ if(b.dataset.hq===v) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
+  const b=$("#nb-wait"); if(b){ b.textContent=w; b.hidden=!w; }
   $("#main").innerHTML=body; wire(); }
+/* the rail's search: submissions, decided ones, the rows of the open submission, and the pages */
+window.__imrSearch=function(){ const out=[]; const go=h=>()=>{ location.hash=h; };
+  Object.values(S.queue).forEach(q=>out.push({group:q.status==="decided"?"Decided":"Waiting for IM",name:(q.wr||"")+" "+(q.name||""),where:q.status==="decided"?"Decided "+fmtS(q.decidedAt)+(q.decidedBy?" by "+q.decidedBy:""):(q.look||0)+" to look at · "+(q.rows||0)+" rows",go:go("#/review/"+encodeURIComponent(q.rep))}));
+  const r=route(), d=r.view==="review"&&S.docs[r.rep]; if(d) (d.rows||[]).forEach(x=>out.push({group:"Rows in This Submission",name:"Item "+x.item+" · "+(x.name||""),where:[x.ct,x.tt,x.final?"decided: "+x.final.dec:"draft: "+x.draft.dec].filter(Boolean).join(" · "),go:()=>{ S.filter="all"; render(); setTimeout(()=>{ const el=document.querySelector('[data-row="'+x.i+'"]'); if(el){ el.scrollIntoView({block:"center"}); el.style.outline="2px solid var(--sky)"; setTimeout(()=>el.style.outline="",1600); } },60); }}));
+  [["Waiting for IM","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
+  return out; };
 function render(){ if(!S.loaded) return; const r=route();
   if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d) return shell(desk(d)); shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(route().rep===r.rep) shell(x?desk(x):'<div class="empty">That submission isn’t here. It may have been withdrawn.</div>'); }); return; }
   if(r.view==="decided") return shell(decidedView());
   if(r.view==="trends") return shell(trendsView());
   if(r.view==="draft") return shell(draftView());
+  if(r.view==="help") return shell(helpView());
   shell(home()); }
 
 function subCard(q){ const n=q.rows||0, look=q.look||0, done=q.status==="decided";
@@ -452,7 +644,8 @@ function trendsView(){ const B=S.bt;
       k("Rows Reviewed, "+last.y,(last.rows||0).toLocaleString(),(last.subs||0)+" submissions","var(--c1)")+
       k("Days to IM Approval",last.medDays!=null?last.medDays:"—",last.medDays!=null?"median in "+last.y+(prev.medDays!=null?" ("+prev.medDays+" in "+prev.y+")":""):"not enough dates","var(--c4)")+
       k("Resubmitted",pct(last.resub||0,last.wrs||0)+"%","of "+(last.wrs||0)+" work requests in "+last.y,"var(--c2)")+'</div>'+
-    '<div class="g2"><div class="card"><h3>What IM Decides<small>share of rows, by year</small></h3>'+stackChart(per,keys,DCOL,(p,kk)=>p.y.dec[kmap[kk]]||0)+'</div>'+
+    '<div class="g2"><div class="card"><h3>What IM Decides<small>share of rows, by year</small></h3>'+stackChart(per,keys,DCOL,(p,kk)=>p.y.dec[kmap[kk]]||0)+
+      '<details class="nums"><summary>Show the numbers</summary><div class="tw"><table class="tbl"><thead><tr><th>Year</th><th>Subs</th><th>Rows</th>'+keys.map(k=>'<th>'+esc(k.replace('Approved ',''))+'</th>').join('')+'</tr></thead><tbody>'+Y.map(y=>'<tr><td>'+y.y+'</td><td class="n">'+y.subs+'</td><td class="n">'+y.rows.toLocaleString()+'</td>'+keys.map(k=>'<td class="n">'+(y.dec[kmap[k]]||0).toLocaleString()+'</td>').join('')+'</tr>').join('')+'</tbody></table></div></details></div>'+
       '<div class="card"><h3>Approved as Submitted<small>share of rows, by year</small></h3>'+lineChart(per,[{name:"Approved as submitted",c:"var(--good)",v:p=>asP(p.y),extra:p=>' of '+p.y.rows+' rows'}],{unit:"%",max:112})+'<p class="note">The higher this line, the less there is for IM to change. It is also the share of rows the draft can clear without a reviewer once it has earned trust.</p></div></div>'+
     '<div class="g2" style="margin-top:18px"><div class="card"><h3>Rows Reviewed<small>by year</small></h3>'+lineChart(per,[{name:"Rows",c:"var(--c1)",v:p=>p.y.rows,extra:p=>' in '+p.y.subs+' submissions'}])+'</div>'+
       '<div class="card"><h3>Days From First Submission to IM Approval<small>median, by year approved</small></h3>'+lineChart(per,[{name:"Median days",c:"var(--c4)",v:p=>p.y.medDays,extra:p=>p.y.nDays?' ('+p.y.nDays+' work requests)':''}])+'</div></div>'+
@@ -475,6 +668,15 @@ function draftView(){ const B=S.bt, D=B&&B.draft, ks=kindStats();
     '<div class="card" style="margin-top:18px"><h3>Kinds of Rows<small>history and reviews here combined</small></h3>'+(rows.length?'<div class="tw"><table class="tbl"><thead><tr><th>Draft Decision · Reason · Row</th><th>Rows</th><th>IM Agreed</th><th>Arrives Approved</th></tr></thead><tbody>'+rows.map(x=>{ const p=pct(x.a,x.n), ok=p>=95&&x.n>=30, on=!!(S.cfg.imauto||{})[x.kind];
       return '<tr><td>'+label(x.kind)+'</td><td class="n">'+x.n.toLocaleString()+'</td><td><span class="meter"><i style="width:'+p+'%"></i></span>'+p+'%</td><td>'+(isAdmin()&&(ok||on)?'<label class="tog"><input type="checkbox" data-auto="'+esc(x.kind)+'"'+(on?" checked":"")+'> '+(on?"On":"Turn on")+'</label>':on?'On':ok?'<span class="muted">Ready (staff turn it on)</span>':'<span class="muted">Not yet</span>')+'</td></tr>'; }).join("")+'</tbody></table></div>':'<div class="empty">This fills in as IM reviews drafts.</div>')+'</div>';
 }
+
+
+function helpView(){ const step=(n,t,d)=>'<li><b>'+t+'</b> '+d+'</li>';
+  return '<div class="head"><div><h1>Help</h1><div class="sub">How IM Review works, and what each part of the page means.</div></div></div><div class="help">'+
+    '<div class="card"><h3>What This Is</h3><p>When a facilitator finishes the IM Pre-Review in the MMS and sends the submission to IM, it lands here. Every row of the IM Submission Form arrives with a <b>draft decision</b>: Approved as Submitted, Approved with Modification, Returned or Denied, with the comment and suggested wording IM would likely give. The draft comes from software checks (the form, the MISMO class word templates, the Reference Model) and Claude’s read of each row.</p><p>You stay the decision-maker. Agree with the draft, or change it. Every change you make teaches the next draft, and kinds of rows the draft gets right almost every time can later arrive already approved, so you only see the exceptions.</p></div>'+
+    '<div class="g2"><div class="card"><h3>Reviewing a Submission</h3><ol>'+step(1,'Open it','from Waiting for IM. The oldest is first.')+step(2,'Needs a Look','shows the rows where the draft suggests a change or isn’t sure. Read each one, then click Agree or Change or Add Something.')+step(3,'Clean rows','are rows with no issues found. Skim them if you like, then use Agree With All Clean Rows.')+step(4,'Finish IM Review','when every row is decided. The facilitator gets an email, and the decisions go onto the work request in the MMS.')+'</ol></div>'+
+    '<div class="card"><h3>Changing a Row</h3><ul><li>Pick the decision, edit the comment or use one of the quick comments, and add suggested wording if you have it.</li><li><b>What the draft missed or got wrong</b> is optional, but it is the most useful thing you can write: it is how the draft learns.</li><li>Undo clears a row’s decision. Nothing is final until you click Finish IM Review.</li><li>Download for Excel gives the decided form in the usual Reference Model Changes layout.</li></ul></div></div>'+
+    '<div class="g2" style="margin-top:18px"><div class="card"><h3>Trends and the Draft</h3><ul><li><b>Trends</b> shows what IM has decided each year since 2020, read from the submission forms in the IM library: decisions, rows, days to approval, resubmissions and the reasons IM changes rows.</li><li><b>How the Draft Is Doing</b> shows how often IM agreed with each kind of draft, in history and here. MISMO staff can let a kind of row arrive already approved once IM has agreed with it 95% of the time over 30 or more rows.</li></ul></div>'+
+    '<div class="card"><h3>Who Can Do What</h3><ul><li>IM reviewers make the decisions. They are set in the MMS under Settings › People and Roles › IM Reviewer.</li><li>Facilitators and MISMO staff can open every submission and follow along, but not decide.</li><li>Access to this page is granted in People &amp; Access.</li><li>Shortcuts: <b>\\</b> narrows the menu; <b>Ctrl+K</b> (or ⌘K) searches.</li></ul></div></div></div>'; }
 
 /* ---------- wiring ---------- */
 let tt; function toast(m){ let t=$(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; document.body.appendChild(t); } t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,3200); }
@@ -499,6 +701,7 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn);
   $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ if(!confirm("Finish the IM review of "+doc.wr+"? The facilitator gets the decisions.")) return; b.disabled=true; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } render(); });
   $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
 }
+document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
 window.addEventListener("hashchange",()=>{ S.edit=null; const r=route(); if(r.view==="review") S.filter="look"; window.scrollTo(0,0); render(); });
 setInterval(async()=>{ if(document.hidden||route().view==="review") return; await refreshQueue(); render(); },60000);
 
@@ -507,6 +710,164 @@ function start(){ const rs=RS(); if(!rs){ setTimeout(start,100); return; }
   rs.requireAccess(PROJECT,{toolName:"IM Review",eyebrow:"Governance · Information Management"}).then(load).catch(e=>{ console.error("im-review",e); }); }
 window.__imr={S,load,render};
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else start();
+})();
+
+</script>
+<script>
+(function(){
+  "use strict";
+  const KEY='hq.rail.off';
+  const rail=()=>document.getElementById('rail');
+
+  function set(off, remember){
+    document.body.classList.toggle('railmini', !!off);
+    const h=document.getElementById('rail-hide');
+    if(h){ h.setAttribute('aria-expanded', off?'false':'true');
+      h.setAttribute('aria-label', off?'Open the menu':'Narrow the menu');
+      h.title = (off?'Open the menu':'Narrow the menu')+' (backslash)'; }
+    if(off) close();
+    if(remember!==false){ try{ localStorage.setItem(KEY, off?'1':'0'); }catch(e){} }
+    setTimeout(()=>{ window.dispatchEvent(new Event('resize')); }, 230);
+  }
+  function toggle(){ set(!document.body.classList.contains('railmini')); }
+
+  function start(){
+    let off=null;
+    try{ const v=localStorage.getItem(KEY); if(v!==null) off=(v==='1'); }catch(e){}
+    if(off===null) off = window.matchMedia('(max-width:900px)').matches;
+    set(off, false);
+    const h=document.getElementById('rail-hide'); if(h) h.addEventListener('click',toggle);
+    const sc=document.getElementById('rail-scrim'); if(sc) sc.addEventListener('click',()=>set(true));
+    const qb=document.getElementById('rail-qb');
+    if(qb) qb.addEventListener('click',()=>{ set(false);
+      setTimeout(()=>{ const q=document.getElementById('rail-q'); if(q) q.focus(); },230); });
+    document.querySelectorAll('.hq nav button[data-hq]').forEach(b=>{
+      b.addEventListener('click',()=>{
+        if(window.matchMedia('(max-width:900px)').matches) set(true);
+      });
+    });
+    wireFind();
+  }
+
+  document.addEventListener('keydown',e=>{
+    const t=e.target;
+    const typing = t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable);
+    if(e.key==='\\' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey){ e.preventDefault(); toggle(); }
+    if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){
+      e.preventDefault(); set(false);
+      setTimeout(()=>{ const q=document.getElementById('rail-q');
+        if(q){ q.focus(); q.select(); } }, 230);
+    }
+  });
+
+  const HITS=()=>document.getElementById('rail-hits');
+  let picked=-1, rows=[];
+  function norm(x){ return String(x||'').replace(/\s+/g,' ').trim().toLowerCase(); }
+
+  function gather(q){
+    const t=norm(q); if(t.length<2) return [];
+    const out=[];
+    const score=(name)=>{ const n=norm(name);
+      return n===t ? 3 : n.indexOf(t)===0 ? 2 : n.indexOf(t)>=0 ? 1 : 0; };
+    const push=(group,name,where,go)=>{
+      if(out.length<60) out.push({group,name,where,go,s:score(name)});
+    };
+
+    try{ (window.__imrSearch?window.__imrSearch():[]).forEach(x=>{ if(norm(x.name+' '+(x.where||'')).indexOf(t)<0) return; push(x.group,x.name,x.where,x.go); }); }catch(e){}
+
+    const best={};
+    out.forEach(h=>{ best[h.group]=Math.max(best[h.group]||0, h.s); });
+    const ORDER=['Waiting for IM','Rows in This Submission','Decided','Pages'];
+    out.sort((a,b)=>
+      (best[b.group]-best[a.group])
+      || (ORDER.indexOf(a.group)-ORDER.indexOf(b.group))
+      || (b.s-a.s)
+      || String(a.name).localeCompare(String(b.name)));
+    return out;
+  }
+  function go(tab){
+    const b=document.querySelector('.hq nav button[data-hq="'+tab+'"]');
+    if(b && !b.hasAttribute('aria-current')) b.click();
+  }
+
+  function draw(list){
+    const box=HITS(); if(!box) return;
+    box.textContent=''; rows=[]; picked=-1;
+    if(!list.length){
+      const n=document.createElement('div'); n.className='rh-none';
+      n.textContent='Nothing matches.'; box.appendChild(n); box.hidden=false; return;
+    }
+    let g=null;
+    list.slice(0,24).forEach(h=>{
+      if(h.group!==g){ g=h.group;
+        const hd=document.createElement('div'); hd.className='rh-g'; hd.textContent=g; box.appendChild(hd); }
+      const b=document.createElement('button'); b.type='button'; b.className='rh';
+      const nm=document.createElement('b'); nm.textContent=h.name; b.appendChild(nm);
+      if(h.where){ const w=document.createElement('i'); w.textContent=h.where; b.appendChild(w); }
+      b.addEventListener('click',()=>{ close(); h.go(); });
+      rows.push(b); box.appendChild(b);
+    });
+    box.hidden=false;
+  }
+  function close(){ const b=HITS(); if(b){ b.hidden=true; b.textContent=''; } rows=[]; picked=-1; }
+  function mark(){ rows.forEach((r,i)=>r.classList.toggle('on', i===picked));
+    if(rows[picked]) try{ rows[picked].scrollIntoView({block:'nearest'}); }catch(e){} }
+
+  function wireFind(){
+    const q=document.getElementById('rail-q'), x=document.getElementById('rail-qx');
+    if(!q) return;
+    let tmr=null;
+    const run=()=>{ const v=q.value;
+      if(x) x.hidden = !v;
+      if(norm(v).length<2){ close(); return; }
+      draw(gather(v)); };
+    q.addEventListener('input',()=>{ clearTimeout(tmr); tmr=setTimeout(run,150); });
+    q.addEventListener('focus',()=>{ if(norm(q.value).length>=2) run(); });
+    q.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ close(); q.blur(); return; }
+      if(!rows.length) return;
+      if(e.key==='ArrowDown'){ e.preventDefault(); picked=(picked+1)%rows.length; mark(); }
+      else if(e.key==='ArrowUp'){ e.preventDefault(); picked=(picked-1+rows.length)%rows.length; mark(); }
+      else if(e.key==='Enter'){ e.preventDefault(); (rows[picked]||rows[0]).click(); }
+    });
+    if(x) x.addEventListener('click',()=>{ q.value=''; x.hidden=true; close(); q.focus(); });
+    document.addEventListener('click',e=>{
+      if(!e.target.closest('.railfind')) close();
+    });
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start);
+  else start();
+  window.__rail={ show:()=>set(false), hide:()=>set(true), toggle,
+    mini:()=>document.body.classList.contains('railmini') };
+})();
+
+(function theme(){
+  var btn = document.getElementById("theme-btn");
+  if(!btn) return;
+  function cur(){
+    var t = document.documentElement.getAttribute("data-theme");
+    if(t) return t;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  function paint(){
+    const dark = cur() === "dark";
+    const lab = document.getElementById("theme-lab");
+    if(lab) lab.textContent = dark ? "Light Mode" : "Dark Mode";
+    else btn.textContent = dark ? "Light Mode" : "Dark Mode";
+    btn.title = "Switch to " + (dark ? "light" : "dark") + " mode";
+  }
+  btn.addEventListener("click", function(){
+    document.documentElement.setAttribute("data-theme", cur() === "dark" ? "light" : "dark");
+    paint();
+    try{ localStorage.setItem("mismo.portal.theme", cur()); }catch(e){}
+    window.dispatchEvent(new Event("resize"));
+  });
+  try{
+    var saved = localStorage.getItem("mismo.portal.theme");
+    if(saved) document.documentElement.setAttribute("data-theme", saved);
+  }catch(e){}
+  paint();
 })();
 
 </script>
