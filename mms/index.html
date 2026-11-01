@@ -1471,6 +1471,45 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 /* every action in the next-step bar looks like a button */
 .actbar .btn.ghost{border-color:var(--border-strong);background:var(--surface)}
 .actbar .btn.ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--surface)}
+/* ===== reviews ===== */
+.rv-box{width:min(680px,100%)!important}
+.rv-kick{font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:2px}
+.rv-drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:22px 16px;margin:4px 0 14px;border:2px dashed var(--border-strong);border-radius:10px;background:var(--surface-2);cursor:pointer;text-align:center}
+.rv-drop:hover,.rv-drop.over{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.rv-drop.has{border-style:solid;border-color:var(--good)}
+.rv-drop input{position:absolute;opacity:0;width:1px;height:1px}
+.rv-drop b{font-size:14px;color:var(--ink)}
+.rv-drop span#rvfl{font-size:12.5px;color:var(--ink-2)}
+.rv-di{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--accent)}
+.rv-di svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2}
+.banner.bad{border-color:var(--bad);background:var(--bad-bg);color:var(--bad)}
+.rv-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.rv-card{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;padding:12px 14px;border:1px solid var(--border);border-left:4px solid var(--ink-3);border-radius:9px;background:var(--surface);cursor:pointer;font:inherit;color:var(--ink)}
+.rv-card:hover{border-color:var(--accent);box-shadow:var(--shadow)}
+.rv-card.rv-ready{border-left-color:var(--good)}.rv-card.rv-minor{border-left-color:var(--warn)}.rv-card.rv-needs{border-left-color:var(--bad)}.rv-card.rv-none{border-left-style:dashed;background:var(--surface-2)}
+.rv-ck{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3)}
+.rv-card b{font-size:14.5px}
+.rv-cm,.rv-cd{font-size:12px;color:var(--ink-2)}
+.rv-why{font-size:12.5px;margin:-2px 0 12px}
+.rv-tab h4 .sp{display:flex;gap:6px;flex-wrap:wrap}
+.rv-rep{width:min(1000px,100%)!important;max-height:92vh}
+.rvr{padding:18px 22px 6px}
+.rvr-k{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.rvr h2{font-size:21px;margin:4px 0 2px}
+.rvr-m{font-size:12.5px;color:var(--ink-2)}
+.rvr-score{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin:14px 0 8px;padding:10px 14px;border-radius:8px;border-left:4px solid var(--ink-3);background:var(--surface-2)}
+.rvr-score b{font-size:18px}.rvr-score span{font-size:13px;color:var(--ink-2)}
+.rvr-score.rv-ready{border-left-color:var(--good);background:var(--good-bg)}.rvr-score.rv-minor{border-left-color:var(--warn);background:var(--warn-bg)}.rvr-score.rv-needs{border-left-color:var(--bad);background:var(--bad-bg)}
+.rvr-sum{font-size:14px;line-height:1.55;margin:8px 0}
+.rvr-note{font-size:12.5px;color:var(--ink-3);margin:4px 0}
+.rvr h3{font-size:15px;margin:20px 0 8px}
+.rvt{width:100%;border-collapse:collapse;font-size:12.5px}
+.rvt th{text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);border-bottom:2px solid var(--border);padding:6px 8px}
+.rvt td{border-bottom:1px solid var(--rule);padding:7px 8px;vertical-align:top;line-height:1.45}
+.rvt td:first-child{font-weight:600;white-space:nowrap}
+.rvr ol{margin:0;padding-left:20px;font-size:13px;line-height:1.55}
+@media(max-width:700px){.rvt thead{display:none}.rvt tr{display:block;border-bottom:1px solid var(--border);padding:6px 0}.rvt td{display:block;border:0;padding:2px 4px}.rvt td:first-child{white-space:normal}}
+.rv-rep footer,.rv-box footer{position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--border);z-index:2}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4276,7 +4315,7 @@ const _computeRole0=computeRole;
 computeRole=function(){ _computeRole0(); S.realStaff=S.isStaff; applyLens(); };
 const _renderAll0=renderAll;
 renderAll=function(){ if(S.realStaff==null&&S.ready) S.realStaff=S.isStaff; applyLens(); _renderAll0(); };
-const PREVIEW_ACT='[data-act],[data-x],[data-x2],[data-qa],[data-arch],[data-req],[data-save],[data-cst],#noteadd,#archnew2,[data-qsort-save]';
+const PREVIEW_ACT='[data-act],[data-x],[data-x2],[data-qa],[data-arch],[data-req],[data-save],[data-cst],#noteadd,#archnew2,[data-qsort-save],[data-rvrun]';
 function previewNote(){ toast('This is '+firstName(S.viewAs)+'’s view, so the buttons are shown but don’t act here. Use Open as Myself to make the change.'); }
 document.addEventListener('click',e=>{
   if(!S.viewAs) return; const b=e.target.closest(PREVIEW_ACT); if(!b||!b.closest('#main,#panel')) return;
@@ -4334,6 +4373,433 @@ function stageMailHtml(t,to,ppl){
       rows.length?{key:'facts',title:'At a Glance',noCount:true,rows}:null].filter(Boolean)
   });
 }
+/* ---------- MISMO boilerplate, word for word (How To - MISMO Work Product Boilerplate Language and Guidance, 04/30/2026) ---------- */
+const RV_BOILER={"draft": ["©2026 Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.", "AUTHORIZED USAGE: This MISMO Product (as defined in MISMO’s 2018 Intellectual Property Rights Policy) is in a DRAFT status and usage is restricted to MISMO members and workgroup Participants (as defined in MISMO’s 2018 Intellectual Property Rights Policy) solely for the purpose of advancing development of this MISMO Product. Access by non-MISMO members who are not Participants is not authorized without written express consent from a member of MISMO Staff. If such access is authorized, non-MISMO members who are not Participants will then be subject to the limited usage terms stated here. For a current list of MISMO members see Member Directory | MISMO. Any other use of this MISMO Product, including implementation, is prohibited at this time. Should this MISMO Product proceed to final publication it will be published pursuant to MISMO’s 2018 Intellectual Property Rights Policy and usage terms will apply to all use of this MISMO Product at that time, including payment of applicable royalties.", "PATENT DISCLOSURE REQUEST. MISMO requests that organizations, person, or entities given access to this MISMO Product in DRAFT status provide in writing any patent and or patent applications or other intellectual property rights that might be infringed by an organization that uses or is compliant with this proposed MISMO Product. These disclosures can be sent to info@mismo.org at any time. Use of the IPR Disclosure Form is recommended. A separate and formal request for Participant patent disclosures under MISMO’s 2018 Intellectual Property Rights Policy will be made at the time of publication of this MISMO Product.", "PATENT DISCLAIMER. Attention is drawn to the possibility that some of the elements of this proposed MISMO Product may be the subject of third party patent rights. MISMO will not be held responsible for identifying any or all such patent rights."], "comment": ["©2026 Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.", "AUTHORIZED USAGE / PATENT DISCLOSURE REQUEST: This proposed MISMO Product (as defined in MISMO’s 2018 Intellectual Property Rights Policy) was published on [INSERT DATE] for the purpose of providing an opportunity for comment on the product as well as to afford Participants (as defined in MISMO’s 2018 Intellectual Property Rights Policy) who worked on this MISMO Product at least thirty (30) days’ notice prior to final release of the Product in order to review the product and disclose any applicable Patent Rights (as defined by MISMO’s 2018 Intellectual Property Rights Policy). Disclosures should be submitted using MISMO’s IPR Disclosure Form. Comments should be submitted to info@mismo.org.", "Any other use of this MISMO Product, including implementation, is prohibited at this time.", "At the conclusion of the IPR and Patent Review period, this MISMO Product will be published pursuant to MISMO’s 2018 Intellectual Property Rights Policy and usage terms will apply to all use of this MISMO Product at that time, including payment of applicable royalties.", "ADDITIONAL PATENT DISCLOSURE REQUEST: In addition, MISMO requests that any non-Participant organization that may have any patent and or patent applications, or other intellectual property rights, that might be infringed by an organization that uses or is compliant with this proposed MISMO Product disclose such patents, applications, or intellectual property rights at this time in writing using MISMO’s IPR Disclosure Form.", "PATENT DISCLAIMER. Attention is drawn to the possibility that some of the elements of this proposed MISMO Product may be the subject of third party patent rights. MISMO will not be held responsible for identifying any or all such patent rights."], "commercial-standard": ["©2026 Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.", "NOTE: The above copyright notice must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product that are produced by Distributor.", "AUTHORIZED COMMERCIAL USAGE: This MISMO Product (as defined in MISMO’s 2018 Intellectual Property Rights Policy) is subject to a commercial MISMO Product Distributor License (the “Distributor License”) and grants the licensee the right to use this Product in Commercial transactions in accordance with the terms of that license. Accordingly, the licensee may incorporate this Product, in whole or in part, into material that may be shared outside of the licensee and made available for sale. The applicable royalty fee for this MISMO Product is currently waived but when instituted will be as indicated on mismo.org. MISMO reserves the right to charge royalty fees upon expiration of any waiver. Following such expiration, any further usage of the MISMO Product will be contingent on payment of such fees.", "REQUIRED LEGAL NOTICES: Per Section 8 of the Distributor License, there are Legal Notices that must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product including any software applications developed by Distributor based upon this Product. For details, see Distributor Required Legal Notices.", "MISMO PRODUCT USER REGISTRY: Per Section 8 of the Distributor License, by downloading and using this MISMO Product, each Distributor agrees that, when providing any product or service to its customers or associated businesses that incorporates or utilizes the Product in any way, the Distributor will use commercially reasonable efforts to encourage recipients of such products to register with MISMO as a MISMO Product User.", "DISCLAIMERS. Attention is drawn to the possibility that some of the elements of this MISMO Product may be the subject of patent rights. MISMO will not be held responsible for identifying any or all such patent rights. This MISMO Product is subject to the MISMO Product Distributor License Disclaimer and is provided “as is” with no warranties of any kind."], "commercial-collateral": ["©2026 Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.", "NOTE: The above copyright notice must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product that are produced by Distributor.", "AUTHORIZED COMMERCIAL USAGE: This MISMO Product (as defined in MISMO’s 2018 Intellectual Property Rights Policy) is subject to a MISMO Product Distributor License (the “Distributor License) and grants the licensee the right to use this Product in Commercial transactions in accordance with the terms of that license. Accordingly, the licensee may incorporate this Product, in whole or in part, into material that may be shared outside of the licensee and made available for sale. The applicable royalty fee for this MISMO Product is currently waived but when instituted will be as indicated on mismo.org. MISMO reserves the right to charge royalty fees upon expiration of any waiver. Following such expiration, any further usage of the MISMO Product will be contingent on payment of such fees.", "REQUIRED LEGAL NOTICES: Per Section 8 of the Distributor License, there are Legal Notices that must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product including any software applications developed by Distributor based upon this Product. For details, see Distributor Required Legal Notices.", "In addition, per Section 2 of the Distributor License, all copies of the Collateral (as defined by MISMO’s 2018 Intellectual Property Rights Policy) and any derivative works must attribute all content taken from the original item of Collateral to MISMO and carry the following legend:", "“This work is intended for internal use only by the clients of ____________ [Insert Name of Distributor], a MISMO Collateral Licensee, and includes, in whole or in part, content from the [Insert Name of Collateral ____________________v. __, dated ____] published by the Mortgage Industry Standards Maintenance Organization, Inc. (“MISMO”). Your access through this work to the [name of Collateral], or parts thereof, does not convey to you any other rights to use, distribute, modify, reproduce, sell, sublicense, offer for sale, publish, or make derivative works of that MISMO product, or any portion of the product contained in this work. The right to make derivative works from any MISMO product is restricted by MISMO either to MISMO members and/or to those who pay the appropriate fee. Please contact MISMO for more information.”", "MISMO PRODUCT USER REGISTRY: Per Section 8 of the Distributor License, by downloading and using this MISMO Product, each Distributor agrees that, when providing any product or service to its customers or associated businesses that incorporates or utilizes the Product in any way, the Distributor will use commercially reasonable efforts to encourage recipients of such products to register with MISMO as a MISMO Product User.", "DISCLAIMERS: Attention is drawn to the possibility that some of the elements of this MISMO Product may be the subject of patent rights. MISMO will not be held responsible for identifying any or all such patent rights. This MISMO Product is subject to the MISMO Product Distributor License Disclaimer and is provided “as is” with no warranties of any kind."], "internal-collateral": ["©2026 Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.", "NOTE: The above copyright notice must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product that are produced by End User.", "AUTHORIZED INTERNAL USE ONLY: This MISMO Product (as defined in MISMO’s 2018 Intellectual Property Rights Policy) is subject to a MISMO Product End-User License and grants the licensee the right to use this Product for Internal Use Only in accordance with the terms of that license. Accordingly, this MISMO Product may be used for the development of material used for internal organizational purposes only and may not be shared, in whole or in part, outside of the licensee. The applicable royalty fee for this MISMO Product is currently waived but when instituted will be as indicated on mismo.org. MISMO reserves the right to charge royalty fees upon expiration of any waiver. Following such expiration, any further usage of the MISMO Product will be contingent on payment of such fees.", "REQUIRED LEGAL NOTICES: Per Section 7 of the End-User License, there are Legal Notices that must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product including any software applications developed by Distributor based upon this Product. For details, see End-User License Required Legal Notices.", "In addition, per Section 2 of the End-User License, all copies of the Collateral (as defined by MISMO’s 2018 Intellectual Property Rights Policy) and any derivative works must attribute all content taken from the original item of Collateral to MISMO and carry the following legend:", "“This work is intended for internal use only within ____________ [Insert Name of End-User’s organization], a MISMO Collateral Licensee, and includes, in whole or in part, content from the [Insert Name of Collateral ____________________v. __, dated ____] published by the Mortgage Industry Standards Maintenance Organization, Inc. (“MISMO”). Your access through this work to the [name of Collateral], or parts thereof, does not convey to you any other rights to use, distribute, modify, reproduce, sell, sublicense, offer for sale, publish, or make derivative works of that MISMO product, or any portion of the product contained in this work. The right to make derivative works from any MISMO product is restricted by MISMO either to MISMO members and/or to those who pay the appropriate fee. Please contact MISMO for more information.”", "DISCLAIMERS. Attention is drawn to the possibility that some of the elements of this MISMO Product may be the subject of patent rights. MISMO will not be held responsible for identifying any or all such patent rights. This MISMO Product is subject to the MISMO Product End-User License Disclaimer and is provided “as is” with no warranties of any kind."], "internal-standard": ["©2026 Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.", "NOTE: The above copyright notice must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product that are produced by End User.", "AUTHORIZED INTERNAL USE ONLY: This MISMO Product (as defined in MISMO’s 2018 Intellectual Property Rights Policy) is subject to a MISMO Product End-User License and grants the licensee the right to use this Product for Internal Use Only in accordance with the terms of that license. Accordingly, this MISMO Product may be used for the development of material used for internal organizational purposes only and may not be shared, in whole or in part, outside of the licensee. The applicable royalty fee for this MISMO Product is currently waived but when instituted will be as indicated on mismo.org. MISMO reserves the right to charge royalty fees upon expiration of any waiver. Following such expiration, any further usage of the MISMO Product will be contingent on payment of such fees.", "REQUIRED LEGAL NOTICES: Per Section 7 of the End-User License, there are Legal Notices that must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product including any software applications developed by Distributor based upon this Product. For details, see End-User License Required Legal Notices.", "DISCLAIMERS. Attention is drawn to the possibility that some of the elements of this MISMO Product may be the subject of patent rights. MISMO will not be held responsible for identifying any or all such patent rights. This MISMO Product is subject to the MISMO Product End-User License Disclaimer and is provided “as is” with no warranties of any kind."], "noncommercial-standard": ["©2026 Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.", "NOTE: The above copyright notice must be included in all copies of the MISMO Product and in any derivative works based on the MISMO Product that are produced by Distributor.", "AUTHORIZED NON-COMMERCIAL DISTRIBUTOR USAGE: This MISMO Product (as defined in MISMO’s 2018 Intellectual Property Rights Policy) is subject to a Non-Commercial MISMO Product Distributor License (the “Distributor License”) and grants the licensee the right to use this Product in Business to Business transactions in accordance with the terms of that license. Accordingly, the licensee may incorporate this Product, in whole or in part, into material that may be shared outside of the licensee if there is no resulting direct financial profit from the shared material. The applicable royalty fee for this MISMO Product is currently waived but when instituted will be as indicated on mismo.org. MISMO reserves the right to charge royalty fees upon expiration of any waiver. Following such expiration, any further usage of the MISMO Product will be contingent on payment of such fees.", "REQUIRED LEGAL NOTICES: Per Section 8 of the Distributor License, there are Legal Notices that must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product including any software applications developed by Distributor based upon this Product. For details, see Distributor Required Legal Notices.", "MISMO PRODUCT USER REGISTRY: Per Section 8 of the Distributor License, by downloading and using this MISMO Product, each Distributor agrees that, when providing any product or service to its customers or associated businesses that incorporates or utilizes the Product in any way, the Distributor will use commercially reasonable efforts to encourage recipients of such products to register with MISMO as a MISMO Product User.", "DISCLAIMERS. Attention is drawn to the possibility that some of the elements of this MISMO Product may be the subject of patent rights. MISMO will not be held responsible for identifying any or all such patent rights. This MISMO Product is subject to the MISMO Product Distributor License Disclaimer and is provided “as is” with no warranties of any kind."], "noncommercial-collateral": ["©2026 Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.", "NOTE: The above copyright notice must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product that are produced by Distributor.", "AUTHORIZED NON-COMMERCIAL DISTRIBUTOR USAGE: This MISMO Product (as defined in MISMO’s 2018 Intellectual Property Rights Policy) is subject to a Non-Commercial MISMO Product Distributor License (the “Distributor License”) and grants the licensee the right to use this Product in Business to Business transactions in accordance with the terms of that license. Accordingly, the licensee may incorporate this Product, in whole or in part, into material that may be shared outside of the licensee if there is no resulting direct financial profit from the shared material. The applicable royalty fee for this MISMO Product is currently waived but when instituted will be as indicated on mismo.org. MISMO reserves the right to charge royalty fees upon expiration of any waiver. Following such expiration, any further usage of the MISMO Product will be contingent on payment of such fees.", "REQUIRED LEGAL NOTICES: Per Section 8 of the Distributor License, there are Legal Notices that must be included in all copies of this MISMO Product and in any derivative works based on this MISMO Product including any software applications developed by Distributor based upon this Product. For details, see Distributor Required Legal Notices.", "In addition, per Section 2 of the Distributor License, all copies of the Collateral (as defined by MISMO’s 2018 Intellectual Property Rights Policy) and any derivative works must attribute all content taken from the original item of Collateral to MISMO and carry the following legend:", "“This work is intended for internal use only by the clients of ____________ [Insert Name of Distributor], a MISMO Collateral Licensee, and includes, in whole or in part, content from the [Insert Name of Collateral ____________________v. __, dated ____] published by the Mortgage Industry Standards Maintenance Organization, Inc. (“MISMO”). Your access through this work to the [name of Collateral], or parts thereof, does not convey to you any other rights to use, distribute, modify, reproduce, sell, sublicense, offer for sale, publish, or make derivative works of that MISMO product, or any portion of the product contained in this work. The right to make derivative works from any MISMO product is restricted by MISMO either to MISMO members and/or to those who pay the appropriate fee. Please contact MISMO for more information.”", "MISMO PRODUCT USER REGISTRY: Per Section 8 of the Distributor License, by downloading and using this MISMO Product, each Distributor agrees that, when providing any product or service to its customers or associated businesses that incorporates or utilizes the Product in any way, the Distributor will use commercially reasonable efforts to encourage recipients of such products to register with MISMO as a MISMO Product User.", "DISCLAIMERS: Attention is drawn to the possibility that some of the elements of this MISMO Product may be the subject of patent rights. MISMO will not be held responsible for identifying any or all such patent rights. This MISMO Product is subject to the MISMO Product Distributor License Disclaimer and is provided “as is” with no warranties of any kind."]};
+
+/* =====================================================================
+   Two separate reviews, each with its own report:
+     1. Editor and Readiness Review: the work product itself (Word, Excel).
+     2. IM Pre-Review: the IM Submission Form, row by row, the way IM reads it.
+   Software checks the things that have one right answer (boilerplate word for
+   word, copyright year, page numbers, merged cells, required columns,
+   definition templates). Claude adds the editor's judgment. Neither one ever
+   changes the work product: everything comes back as a report.
+   Built from: MISMO Editor Process and Guidance (2023), Work Product
+   Boilerplate Language and Guidance (04/30/2026), the IM/AWG Submission Form
+   (July 2026), and 3,709 IM-decided rows in the IM library (2021-2026).
+   ===================================================================== */
+
+/* ---------- reading files in the browser (nothing is uploaded or stored) ---------- */
+async function rvUnzip(buf){
+  const u=new Uint8Array(buf), dv=new DataView(buf); let e=u.length-22;
+  while(e>0&&dv.getUint32(e,true)!==0x06054b50) e--;
+  if(e<=0) throw new Error('This file isn’t a Word or Excel file the review can open.');
+  const n=dv.getUint16(e+10,true); let p=dv.getUint32(e+16,true); const files={};
+  for(let i=0;i<n;i++){ const meth=dv.getUint16(p+10,true), csz=dv.getUint32(p+20,true), fnl=dv.getUint16(p+28,true), exl=dv.getUint16(p+30,true), cml=dv.getUint16(p+32,true), lho=dv.getUint32(p+42,true);
+    files[new TextDecoder().decode(u.subarray(p+46,p+46+fnl))]={meth,csz,lho}; p+=46+fnl+exl+cml; }
+  const get=async name=>{ const f=files[name]; if(!f) return null; const l=f.lho, a=l+30+dv.getUint16(l+26,true)+dv.getUint16(l+28,true); const data=u.subarray(a,a+f.csz);
+    if(f.meth===0) return new TextDecoder().decode(data);
+    return await new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text(); };
+  return {names:Object.keys(files),get};
+}
+const rvXml=s=>new DOMParser().parseFromString(s||'<x/>','application/xml');
+const rvTags=(d,t)=>[...d.getElementsByTagName(t)];
+
+async function rvReadDocx(buf){
+  const z=await rvUnzip(buf); const doc=await z.get('word/document.xml'); if(!doc) throw new Error('No document text found.');
+  const D=rvXml(doc);
+  const paraText=p=>rvTags(p,'w:t').map(t=>t.textContent).join('');
+  const paras=rvTags(D,'w:p').map(p=>{ const st=(p.getElementsByTagName('w:pStyle')[0]||{getAttribute:()=>''}).getAttribute('w:val')||''; return {t:paraText(p),style:st}; });
+  const hf=[]; for(const n of z.names.filter(n=>/^word\/(header|footer)\d*\.xml$/.test(n))){ const x=await z.get(n); hf.push({kind:/header/.test(n)?'header':'footer',t:rvTags(rvXml(x),'w:p').map(paraText).join(' ').trim(),page:/PAGE/.test(x)}); }
+  const com=await z.get('word/comments.xml');
+  const fonts={}; (doc.match(/w:ascii="([^"]+)"/g)||[]).forEach(m=>{ const f=m.slice(9,-1); fonts[f]=(fonts[f]||0)+1; });
+  const tocText=(()=>{ const i=doc.indexOf('TOC \\'); if(i<0) return null; const end=doc.indexOf('fldCharType="end"',i); return rvTags(rvXml('<r xmlns:w="w">'+doc.slice(i,end>0?end:i+40000).replace(/^[^<]*/,'')+'</r>'),'w:t').map(t=>t.textContent).join(' '); })();
+  return {kind:'word',paras,hf,comments:com?(com.match(/<w:comment /g)||[]).length:0,ins:(doc.match(/<w:ins /g)||[]).length,del:(doc.match(/<w:del /g)||[]).length,fonts,
+    images:z.names.filter(n=>/^word\/media\//.test(n)).length,toc:/TOC \\/.test(doc)||/docPartGallery w:val="Table of Contents"/.test(doc),tocText,titlePg:/<w:titlePg/.test(doc),
+    text:paras.map(p=>p.t).join('\n')};
+}
+async function rvReadXlsx(buf){
+  const z=await rvUnzip(buf); const ss=[];
+  const sst=await z.get('xl/sharedStrings.xml'); if(sst) rvTags(rvXml(sst),'si').forEach(si=>ss.push(rvTags(si,'t').map(t=>t.textContent).join('')));
+  const wb=rvXml(await z.get('xl/workbook.xml')), rels=rvXml(await z.get('xl/_rels/workbook.xml.rels')); const rmap={};
+  rvTags(rels,'Relationship').forEach(r=>rmap[r.getAttribute('Id')]=r.getAttribute('Target'));
+  const names=rvTags(wb,'definedName').map(d=>({name:d.getAttribute('name'),sheet:d.getAttribute('localSheetId'),v:d.textContent}));
+  const stx=await z.get('xl/styles.xml'); const xfs=stx?rvTags(rvTags(rvXml(stx),'cellXfs')[0]||rvXml(''),'xf').map(x=>{ const a=x.getElementsByTagName('alignment')[0]; return {h:a&&a.getAttribute('horizontal')||'',v:a&&a.getAttribute('vertical')||'bottom',wrap:a&&a.getAttribute('wrapText')==='1'}; }):[];
+  const sheets=[]; let idx=0;
+  for(const s of rvTags(wb,'sheet')){ const path='xl/'+String(rmap[s.getAttribute('r:id')]||'').replace(/^\/?xl\//,''); const x=await z.get(path)||''; const d=rvXml(x);
+    const rows=[]; let textCells=0, offAlign=0;
+    rvTags(d,'row').forEach(r=>{ const row={}; rvTags(r,'c').forEach(c=>{ const col=c.getAttribute('r').replace(/\d+/g,''); const t=c.getAttribute('t'); const vv=c.getElementsByTagName('v')[0]; let v='';
+      if(t==='s') v=vv?ss[+vv.textContent]||'':''; else if(t==='inlineStr') v=rvTags(c,'t').map(x=>x.textContent).join(''); else v=vv?vv.textContent:'';
+      if(v!==''){ row[col]=v; if(t==='s'||t==='inlineStr'){ textCells++; const xf=xfs[+(c.getAttribute('s')||0)]||{}; if((xf.h&&xf.h!=='left'&&xf.h!=='general')||xf.v!=='top') offAlign++; } } });
+      if(Object.keys(row).length) rows.push({n:+r.getAttribute('r'),c:row}); });
+    const ps=d.getElementsByTagName('pageSetup')[0], hf=d.getElementsByTagName('headerFooter')[0], sv=d.getElementsByTagName('sheetView')[0];
+    sheets.push({name:s.getAttribute('name'),state:s.getAttribute('state')||'visible',rows,merged:rvTags(d,'mergeCell').length,
+      orientation:ps&&ps.getAttribute('orientation')||'',fit:!!(d.getElementsByTagName('fitToPage')[0]||(ps&&ps.getAttribute('fitToWidth'))),printArea:names.some(n=>/Print_Area/i.test(n.name)&&+n.sheet===idx),
+      header:hf?rvTags(hf,'oddHeader').map(x=>x.textContent).join(' '):'',footer:hf?rvTags(hf,'oddFooter').map(x=>x.textContent).join(' '):'',zoom:sv&&sv.getAttribute('zoomScale')||'100',textCells,offAlign});
+    idx++; }
+  return {kind:'excel',sheets,text:sheets.map(s=>'## '+s.name+'\n'+s.rows.map(r=>Object.values(r.c).join(' | ')).join('\n')).join('\n\n')};
+}
+async function rvReadFile(f){
+  const buf=await f.arrayBuffer(), ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(ext==='docx') return Object.assign(await rvReadDocx(buf),{name:f.name});
+  if(ext==='xlsx'||ext==='xlsm') return Object.assign(await rvReadXlsx(buf),{name:f.name});
+  if(ext==='txt'||ext==='md'||ext==='csv') return {kind:'text',name:f.name,text:await f.text()};
+  throw new Error(f.name+': the review reads Word (.docx) and Excel (.xlsx) files. Save a PDF as Word first, or check it by hand.');
+}
+
+/* ---------- small text helpers ---------- */
+const rvNorm=s=>String(s||'').replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2013\u2014]/g,'-').replace(/\u00a0/g,' ').replace(/\s+/g,' ').trim().toLowerCase();
+const rvWords=s=>rvNorm(s).replace(/[^a-z0-9' ]/g,' ').split(' ').filter(Boolean);
+function rvSim(a,b){ const A=new Set(rvWords(a)), B=new Set(rvWords(b)); if(!A.size||!B.size) return 0; let n=0; A.forEach(w=>{ if(B.has(w)) n++; }); return n/Math.max(A.size,B.size); }
+function rvWordDiff(expected,actual){ const A=rvWords(actual), E=rvWords(expected); const a=new Set(A), e=new Set(E); return {missing:[...new Set(E.filter(w=>!a.has(w)))].slice(0,12),extra:[...new Set(A.filter(w=>!e.has(w)))].slice(0,12)}; }
+const RV_YEAR=()=>String(new Date().getFullYear());
+const rvQ=s=>'“'+String(s||'').replace(/\s+/g,' ').trim().slice(0,90)+(String(s||'').length>90?'…':'')+'”';
+
+/* ---------- which boilerplate this work request needs now ---------- */
+const RV_BP_LABEL={draft:'DRAFT','comment':'IPR/COMMENT PERIOD','commercial-standard':'Commercial Distributor – Standard','commercial-collateral':'Commercial Distributor – Collateral','internal-standard':'Internal Use Only – Standard','internal-collateral':'Internal Use Only – Collateral','noncommercial-standard':'Non-Commercial Distributor – Standard','noncommercial-collateral':'Non-Commercial Distributor – Collateral'};
+function rvExpectedBoiler(t){
+  const ci=stageIndex('comment'), si=stageIndex(t.stage);
+  if(ci<0||si<0||si<ci) return 'draft';
+  if(t.stage==='comment'||(t.stage==='gc-comment')) return 'comment';
+  const ds=t.designation||{}, lic=String(ds.license||'').toLowerCase(), cls=String(t.classification||(typeof recommend==='function'?(recommend(t)||{}).classification:'')||'').toLowerCase().includes('standard')?'standard':'collateral';
+  const l=/non/.test(lic)?'noncommercial':/internal/.test(lic)?'internal':/commercial/.test(lic)?'commercial':'';
+  return l?l+'-'+cls:'comment';
+}
+function rvDetectBoiler(text){
+  let best=null, bs=0; const T=rvNorm(text);
+  Object.entries(RV_BOILER).forEach(([k,ps])=>{ const key=ps.slice(1).map(p=>rvNorm(p).slice(0,60)); const hits=key.filter(x=>T.includes(x)).length/key.length; if(hits>bs){ bs=hits; best=k; } });
+  return bs>=0.34?best:null;
+}
+
+/* ---------- 1. Editor and Readiness: the checks software can settle ---------- */
+const RV_STANCE=/\bMISMO (strongly )?(believes|thinks|feels|recommends|requires|mandates|expects|insists)\b|\bthe industry should\b|\bmust be used\b|\bis required to use\b|\bshall be used\b/gi;
+const RV_ACR_OK=new Set(['MISMO','US','USA','LLC','INC','NOTE','DRAFT','FINAL','OK','ID','TBD','N/A','FAQ','PDF','URL','I','II','III','IV','V','VI','VII','VIII','IX','X','A','AN']);
+const RV_TM=[['MERS','MERS®'],['MISMO','MISMO®'],['SMART Doc','SMART Doc®'],['eNote','—']];
+function rvEditorChecks(files,ctx){
+  const out=[]; const add=(sev,area,issue,suggestion,where,rule)=>out.push({sev,area,issue,suggestion:suggestion||'',where:where||'',rule:rule||'',src:'check'});
+  const exp=ctx.boiler, year=RV_YEAR();
+  files.forEach(f=>{
+    const W=f.name;
+    if(f.kind==='word'){
+      const body=f.paras.filter(p=>p.t.trim());
+      const text=f.text; const found=rvDetectBoiler(text+' '+f.hf.map(h=>h.t).join(' '));
+      // boilerplate: right one, word for word
+      if(!found) add('fix','Boilerplate','No MISMO boilerplate language was found.','Add the '+RV_BP_LABEL[exp]+' language up front (How To - MISMO Work Product Boilerplate Language and Guidance).',W,'boiler-missing');
+      else if(found!==exp) add('fix','Boilerplate','Has the '+RV_BP_LABEL[found]+' language, but this stage needs the '+RV_BP_LABEL[exp]+' language.','Replace it with the '+RV_BP_LABEL[exp]+' language exactly as written in the Boilerplate Guidance.',W,'boiler-wrong');
+      const ref=RV_BOILER[found&&found!==exp?exp:exp]||[];
+      if(found===exp) ref.slice(1).forEach(p=>{ const want=rvNorm(p); if(rvNorm(text).includes(want.slice(0,Math.min(want.length,400)))) return;
+        let best='', bs=0; body.forEach(x=>{ const s=rvSim(p,x.t); if(s>bs){ bs=s; best=x.t; } });
+        const head=p.split(/[.:]/)[0].slice(0,60);
+        if(bs<0.5) add('fix','Boilerplate','The paragraph beginning '+rvQ(head)+' is missing.','Add it word for word from the Boilerplate Guidance.',W,'boiler-para');
+        else { const d=rvWordDiff(p,best); add('fix','Boilerplate','The paragraph beginning '+rvQ(head)+' doesn’t match the approved wording.',(d.missing.length?'Missing words: '+d.missing.join(', ')+'. ':'')+(d.extra.length?'Words not in the approved text: '+d.extra.join(', ')+'. ':'')+'Copy the paragraph exactly from the Boilerplate Guidance; don’t edit legal language.',rvQ(best),'boiler-wording'); } });
+      if(found==='comment'&&/\[insert date\]/i.test(text)) add('fix','Boilerplate','The comment period publish date is still “[INSERT DATE]”.','Fill in the date it publishes for comment (MISMO staff confirm the date).',W,'boiler-date');
+      if(body.some(p=>/^(draft|comment period)$/i.test(p.t.trim()))) add('recommend','Boilerplate','A heading names the type of boilerplate (for example “DRAFT”).','The guidance says not to add a heading for the boilerplate type.',W,'boiler-heading');
+      // copyright
+      const cp=(text+' '+f.hf.map(h=>h.t).join(' ')).match(/©\s?(\d{4})\s*Mortgage Industry Standards Maintenance Organization/gi)||[];
+      const years=[...new Set(cp.map(x=>x.match(/\d{4}/)[0]))];
+      if(!cp.length) add('fix','Copyright','No MISMO copyright line was found.','Add “©'+year+' Mortgage Industry Standards Maintenance Organization, Inc. All Rights Reserved.” to the footer so it shows on every page.',W,'cp-missing');
+      else if(years.some(y=>y!==year)) add('fix','Copyright','The copyright year is '+years.join(' and ')+'.','Work products not yet published use the current year: ©'+year+'.',W,'cp-year');
+      if(cp.length&&!f.hf.some(h=>h.kind==='footer'&&/©|copyright/i.test(h.t))) add('fix','Copyright','The copyright isn’t in the footer, so it won’t show on every page.','Put the copyright line in the footer.',W,'cp-footer');
+      // headers, footers, page numbers, title
+      if(!f.hf.some(h=>h.kind==='footer'&&h.page)) add('fix','Header and Footer','No page numbers were found in the footer.','Add page numbers to every page except the title page.',W,'pg');
+      else if(!f.titlePg) add('recommend','Header and Footer','The title page may be showing a page number.','Turn on “Different First Page” so the title page has no number.',W,'pg-title');
+      const hfText=f.hf.map(h=>h.t).join(' ');
+      if(!/(v(ersion)?\s?\d|\b(january|february|march|april|may|june|july|august|september|october|november|december)\b|\d{1,2}\/\d{1,2}\/\d{2,4}|\b20\d\d\b)/i.test(hfText.replace(/©\s?\d{4}/g,''))) add('recommend','Header and Footer','The header and footer don’t show a version date or version number.','Show the title, version date, version number (if used) and page number in the header or footer.',W,'hf-version');
+      // TOC
+      if(f.toc&&f.tocText){ const heads=body.filter(p=>/^heading ?[12]$|^Heading[12]$/i.test(p.style)&&p.t.trim().length>2).map(p=>p.t.trim()); const tocN=rvNorm(f.tocText); const miss=heads.filter(h=>!tocN.includes(rvNorm(h).slice(0,40)));
+        if(miss.length) add('fix','Table of Contents','The table of contents is out of date: '+miss.length+' heading'+(miss.length===1?' isn’t':'s aren’t')+' in it (for example '+rvQ(miss[0])+').','Right-click the table of contents and choose Update Field → Update entire table.',W,'toc-stale'); }
+      // left-in markup
+      const redline=/redline|track|markup|compare/i.test(W);
+      if(f.ins+f.del>0&&!redline) add('fix','Clean Copy','Tracked changes are still in the document ('+(f.ins+f.del)+').','Accept or reject all changes before submitting (or name the file as the redline if that’s intended).',W,'tracked');
+      if(f.comments>0&&!redline) add('fix','Clean Copy',f.comments+' comment'+(f.comments===1?' is':'s are')+' still in the document.','Resolve and delete comments before submitting.',W,'comments');
+      // fonts
+      const fl=Object.keys(f.fonts).filter(x=>!/symbol|wingdings|cambria math/i.test(x));
+      if(fl.length>2) add('recommend','Formatting','Uses '+fl.length+' fonts: '+fl.slice(0,6).join(', ')+'.','Use the template’s font throughout, unless a different font is intentional (a title or a feature).',W,'fonts');
+      // logo
+      if(!f.images) add('question','Branding','No images were found, so the MISMO logo may be missing.','Is the current MISMO logo on the title page? (MISMO Logos)',W,'logo');
+      // stance and trademarks
+      const st=[]; body.forEach(p=>{ (p.t.match(RV_STANCE)||[]).forEach(m=>st.push([m,p.t])); });
+      st.slice(0,6).forEach(([m,p])=>add('recommend','MISMO Voice','MISMO doesn’t mandate or advocate: '+rvQ(m)+'.','Reword so the document describes rather than directs (for example “Implementers may…” or “The standard supports…”).',rvQ(p),'stance'));
+      const nb=body.filter(p=>!RV_BOILER.draft.concat(RV_BOILER.comment).some(b=>rvSim(b,p.t)>0.6));
+      const bodyT=nb.map(p=>p.t).join('\n');
+      if(/\bMISMO\b/.test(bodyT)&&!/MISMO®/.test(text)) add('recommend','Trademarks','“MISMO” never appears with ®.','Use MISMO® at least at the first mention in the body (per the MISMO Style Sheet).',W,'tm-mismo');
+      if(/\bMERS\b(?!®)/.test(bodyT)&&!/MERS®/.test(bodyT)) add('fix','Trademarks','“MERS” appears without ®.','Use MERS® (a registered trademark of MERSCORP Holdings).',W,'tm-mers');
+      // acronyms defined at first use
+      const firstUse={}, defAt={}; let pos=0;
+      nb.forEach(p=>{ const s=p.t; if(s===s.toUpperCase()&&s.length<80) { pos+=s.length; return; }
+        (s.match(/\b[A-Z][A-Z0-9&]{1,6}s?\b/g)||[]).forEach(a=>{ const k=a.replace(/s$/,''); if(RV_ACR_OK.has(k)||/^\d/.test(k)) return; if(firstUse[k]==null) firstUse[k]={pos:pos+s.indexOf(a),p:s}; });
+        (s.match(/\(([A-Z][A-Z0-9&]{1,6})s?\)/g)||[]).forEach(m=>{ const k=m.replace(/[()]/g,'').replace(/s$/,''); if(defAt[k]==null) defAt[k]=pos+s.indexOf(m); });
+        pos+=s.length; });
+      const never=[], late=[]; Object.entries(firstUse).forEach(([k,u])=>{ if(defAt[k]==null) never.push(k); else if(defAt[k]>u.pos+60) late.push(k); });
+      if(late.length) add('fix','Acronyms','Defined after their first use: '+late.slice(0,12).join(', ')+'.','Spell each one out the first time it’s used, followed by the acronym in parentheses.',W,'acr-late');
+      if(never.length) add('recommend','Acronyms','Never spelled out: '+never.slice(0,16).join(', ')+(never.length>16?' and '+(never.length-16)+' more':'')+'.','Spell out each acronym at first use, e.g. “Government-Sponsored Enterprise (GSE)”.',W,'acr-never');
+      // obvious typing slips
+      const dbl=bodyT.match(/\b(\w+)\s+\1\b/gi)||[]; const dup=[...new Set(dbl.filter(x=>!/^(that that|had had)$/i.test(x)))];
+      if(dup.length) add('fix','Spelling and Grammar','Repeated words: '+dup.slice(0,6).map(rvQ).join(', ')+'.','Remove the repeated word.',W,'dup-word');
+      const ph=bodyT.match(/\b(TBD|TODO|TK|XXX+|lorem ipsum)\b|\[insert[^\]]*\]/gi)||[];
+      if(ph.length) add('fix','Readiness','Placeholders are still in the text: '+[...new Set(ph)].slice(0,6).join(', ')+'.','Fill in or remove every placeholder before submitting.',W,'placeholder');
+      if(/ {2,}\S/.test(bodyT)) add('recommend','Formatting','Some sentences have double spaces.','Use single spaces between words and sentences.',W,'dbl-space');
+    }
+    if(f.kind==='excel'){
+      const S=f.sheets.filter(s=>s.state==='visible');
+      const merged=S.filter(s=>s.merged>0); if(merged.length) add('fix','Excel Setup','Merged cells on '+merged.map(s=>s.name+' ('+s.merged+')').join(', ')+'.','Don’t use merged cells (they break sorting and filtering).',W,'xl-merged');
+      const unnum=S.filter(s=>!/^\s*\d/.test(s.name)); if(unnum.length) add('recommend','Excel Setup','Tabs aren’t numbered: '+unnum.slice(0,6).map(s=>s.name).join(', ')+(unnum.length>6?'…':'')+'.','Number the tabs (for example “1. Overview”, “2. Mapping”).',W,'xl-tabnum');
+      if(!S.some(s=>/read ?me|overview|instruction|about|description|introduction|contents|cover|notes|purpose/i.test(s.name))) add('recommend','Excel Setup','No tab describes what’s in the workbook.','Add a first tab that describes each worksheet.',W,'xl-describe');
+      const off=S.filter(s=>s.textCells>10&&s.offAlign/s.textCells>0.25); if(off.length) add('recommend','Excel Setup','Text isn’t left- and top-aligned on '+off.map(s=>s.name).slice(0,5).join(', ')+'.','Set text to left and top alignment.',W,'xl-align');
+      const noPrint=S.filter(s=>!s.orientation&&!s.fit&&!s.printArea); if(noPrint.length) add('recommend','Excel Setup','Not set up to print: '+noPrint.map(s=>s.name).slice(0,6).join(', ')+'.','Set the print area, orientation and fit-to-page where content allows.',W,'xl-print');
+      const yr=RV_YEAR(); const bpSheet=S.find(s=>rvDetectBoiler(s.rows.map(r=>Object.values(r.c).join(' ')).join(' ')));
+      if(!bpSheet) add('fix','Boilerplate','No tab carries the MISMO boilerplate language.','Put the '+RV_BP_LABEL[ctx.boiler]+' language on its own tab (Excel) up front.',W,'xl-boiler');
+      else { const k=rvDetectBoiler(bpSheet.rows.map(r=>Object.values(r.c).join(' ')).join(' ')); if(k!==ctx.boiler) add('fix','Boilerplate','The “'+bpSheet.name+'” tab has the '+RV_BP_LABEL[k]+' language; this stage needs '+RV_BP_LABEL[ctx.boiler]+'.','Replace it with the right language from the Boilerplate Guidance.',W,'xl-boiler-wrong'); }
+      const noCp=S.filter(s=>!/©|copyright/i.test(s.footer)&&!(s.rows.some(r=>Object.values(r.c).some(v=>/©\s?\d{4}\s*Mortgage/i.test(v))))); if(noCp.length) add('fix','Copyright','No copyright in the printed footer of: '+noCp.map(s=>s.name).slice(0,6).join(', ')+'.','Add “©'+yr+' Mortgage Industry Standards Maintenance Organization, Inc. All rights reserved.” to each sheet’s footer (Page Layout → Header & Footer).',W,'xl-cp');
+      const oldCp=S.filter(s=>{ const m=(s.footer+' '+s.rows.map(r=>Object.values(r.c).join(' ')).join(' ')).match(/©\s?(\d{4})/); return m&&m[1]!==yr; }); if(oldCp.length) add('fix','Copyright','Copyright year isn’t '+yr+' on: '+oldCp.map(s=>s.name).slice(0,6).join(', ')+'.','Update the copyright year to '+yr+'.',W,'xl-cp-year');
+      const noHead=S.filter(s=>!s.header.trim()&&!/cover|title/i.test(s.name)); if(noHead.length) add('recommend','Excel Setup','No printed header with the title on: '+noHead.map(s=>s.name).slice(0,6).join(', ')+'.','Print the artifact title in each sheet’s header (except a cover page that already has it).',W,'xl-header');
+      const zooms=[...new Set(S.map(s=>s.zoom))]; if(zooms.length>1) add('recommend','Excel Setup','Tabs are saved at different zoom levels ('+zooms.join('%, ')+'%).','Save every tab at the same zoom.',W,'xl-zoom');
+      const hid=f.sheets.filter(s=>s.state!=='visible'); if(hid.length) add('question','Excel Setup','Hidden tabs: '+hid.map(s=>s.name).join(', ')+'.','Should these be published, removed, or left hidden?',W,'xl-hidden');
+    }
+  });
+  return out;
+}
+
+/* ---------- 2. IM Pre-Review: the checks software can settle ---------- */
+const RV_TEMPLATES={Amount:/^the\b.*\b(amount|sum)\b/i,Count:/^the\b.*\bnumber of\b/i,Date:/^the date\b/i,Datetime:/^the date and time\b/i,Day:/^the day of the month\b/i,Description:/^a free-form text field\b/i,Identifier:/^an? unique alphanumeric string\b/i,Indicator:/^when true, indicates\b/i,Month:/^the month\b/i,Name:/^an unstructured name\b/i,Number:/^a numeric value\b/i,Percent:/^a portion of 100\b/i,Rate:/^a decimal value\b/i,Text:/^a free-form alphanumeric string\b/i,Time:/^the time of day\b/i,Type:/^a value from a mismo prescribed list\b/i,Value:/^the specific value of\b/i,Year:/^the calendar year\b/i,Code:/^an? .*(enumerated|coded) value\b/i};
+const RV_TEMPLATE_TEXT={Amount:'The [qualifier] amount of [thing]…',Count:'The [qualifier] number of [thing counted]…',Date:'The date [event or action]…',Datetime:'The date and time [event or action]…',Day:'The day of the month [event]…',Description:'A free-form text field describing [thing]…',Identifier:'A unique alphanumeric string identifying [thing]…',Indicator:'When true, indicates [positive situation]…',Month:'The month in a year that [event]…',Name:'An unstructured name that identifies [person, entity, place or thing]…',Number:'A numeric value that specifies [thing]…',Percent:'A portion of 100 that represents [usage or calculation]…',Rate:'A decimal value representing a fraction of one…',Text:'A free-form alphanumeric string which contains [thing]…',Time:'The time of day [event]…',Type:'A value from a MISMO prescribed list that represents [thing enumerated]…',Value:'The specific value of [thing]…',Year:'The calendar year [event]…',Code:'An [length] enumerated or coded value identifying [thing]…'};
+const RV_ABBR=/\b(amt|nbr|num|pct|info|desc|dt|ind|qty|acct|mgmt|condo|govt|dept|addr|tel|ph|cnt|yr|mo)\b/i;
+const RV_FACE=[['wr','Work Request ID'],['name','Submission Name'],['cop','Primary Community of Practice'],['parent','Parent Community of Practice'],['parentOk','Parent CoP Approval'],['social','Socialized with Other Workgroups'],['chairs','Work Group Chair'],['facs','Work Group Facilitator'],['priority','Change Priority Category'],['category','Submission Category'],['summary','Submission Summary'],['files','Artifact File'],['artifacts','Artifacts are'],['size','Expected Package Review Size'],['ndocs','Number of Documents']];
+// which fields each Change Type + Change Target Type needs (from the form's own instructions tab)
+const RV_NEED={'add and define':{acronym:['dt','def','ac'],attribute:['at','dt','def'],container:['xp','pc','cn','dt','def'],'data point':['pc','dp','dt','def'],enumeration:['dp','en','dt','def'],relationship:['dt','def']},
+  'deprecate':{acronym:['ac'],attribute:['at'],container:['pc','cn'],'data point':['pc','dp'],enumeration:['dp','en']},
+  'modify definition':{acronym:['old','dt','def','ac'],attribute:['old','dt','def'],container:['old','cn','dt','def'],'data point':['old','dp','dt','def'],enumeration:['old','en','dt','def']},
+  'move':{container:['old','pc','cn'],'data point':['old','pc','cn','dp']},'rename':{acronym:['old','ac'],attribute:['old','at'],container:['old','cn'],'data point':['old','dp'],enumeration:['old','dp','en']},
+  'reuse':{container:['pc','cn'],'data point':['pc','dp']}};
+const RV_FIELD={item:'Item #',xp:'XPATH',pc:'Parent CONTAINER Name',cn:'CONTAINER Name',dp:'Data Point Name',at:'Attribute Name',en:'Enumeration Name',dt:'Definition Type',def:'Definition',ac:'Acronym Name',old:'Original/Old Value',ct:'Change Type',tt:'Change Target Type'};
+function rvColMap(hdr){ const m={}; Object.entries(hdr).forEach(([k,v])=>{ const s=String(v).toLowerCase().replace(/\s+/g,' ').trim();
+  if(/review decision/.test(s)) m.dec=k; else if(/review comments/.test(s)) m.com=k; else if(/^item/.test(s)) m.item=k; else if(/^change type/.test(s)) m.ct=k; else if(/change target type/.test(s)) m.tt=k; else if(/original\/old value/.test(s)) m.old=k; else if(/xpath/.test(s)) m.xp=k; else if(/^parent container/.test(s)) m.pc=k; else if(/^container name/.test(s)) m.cn=k; else if(/^alias container/.test(s)) m.alias=k; else if(/^data point name/.test(s)) m.dp=k; else if(/^attribute name/.test(s)) m.at=k; else if(/enumeration name/.test(s)) m.en=k; else if(/definition type template/.test(s)) m.dtt=k; else if(/^definition type/.test(s)) m.dt=k; else if(/^definition$/.test(s)) m.def=k; else if(/^acronym/.test(s)) m.ac=k; else if(/verb phrase/.test(s)) m.vp=k; else if(/submitter comments/.test(s)) m.sc=k; }); return m; }
+function rvParseForm(x){
+  const face=x.sheets.find(s=>/^face page$/i.test(s.name.trim()));
+  const rm=x.sheets.find(s=>/^reference model changes$/i.test(s.name.trim()));
+  const ps=x.sheets.find(s=>/^proposed structure$/i.test(s.name.trim()));
+  const F={}; if(face) face.rows.forEach(r=>{ const cells=Object.entries(r.c).sort((a,b)=>a[0].length-b[0].length||a[0].localeCompare(b[0])); if(!cells.length) return; const label=String(cells[0][1]); const val=cells.slice(1).map(c=>c[1]).filter(v=>!/^(mm\/dd\/yyyy|select|choose)/i.test(String(v))).join(' ').trim();
+    RV_FACE.forEach(([k,l])=>{ if(F[k]==null&&label.toLowerCase().startsWith(l.toLowerCase())) F[k]=val; });
+    if(/^resubmission date/i.test(label)) F.resubDate=val; if(/^resubmission number/i.test(label)) F.resubN=val; if(/^resubmission reason:?$/i.test(label.trim())) F.resubWhy=val; if(/reference model changes:\s*number of rows/i.test(label)) F.rmRows=val; });
+  let rows=[]; if(rm){ const h=rm.rows.find(r=>Object.values(r.c).some(v=>/change type/i.test(v))); if(h){ const m=rvColMap(h.c); rows=rm.rows.filter(r=>r.n>h.n).map(r=>{ const o={_row:r.n}; for(const k in m){ const v=r.c[m[k]]; if(v!=null&&String(v).trim()!==''&&!/^#N\/A$/.test(String(v).trim())) o[k]=String(v).trim(); } return o; }).filter(o=>o.ct||o.tt||o.def||o.dp||o.en||o.cn); } }
+  const psFilled=ps?ps.rows.filter(r=>Object.values(r.c).some(v=>/^[A-Z][A-Z0-9_]{3,}$/.test(String(v).trim()))).length:0;
+  return {F,rows,hasFace:!!face,hasRM:!!rm,psFilled,hasPS:!!ps};
+}
+function rvImChecks(file,ctx){
+  const out=[]; const add=(sev,area,issue,suggestion,where,rule,item)=>out.push({sev,area,issue,suggestion:suggestion||'',where:where||'',rule:rule||'',item:item||'',src:'check'});
+  const P=rvParseForm(file), W=file.name;
+  if(!P.hasFace||!P.hasRM){ add('fix','Submission Form','This doesn’t look like the IM/AWG Submission Form (no '+(!P.hasFace?'Face Page':'Reference Model Changes')+' tab).','Use the current MISMO Submission Review Form (July 2026) from the IM community page.',W,'form'); return {out,P}; }
+  // file name
+  if(!/^(IM|AWG)Sub\d*_WR\d{4}[._]\d{1,2}_.+_\d{6}/i.test(W.replace(/\.xls[xm]$/i,''))) add('recommend','Submission Form','The file name doesn’t follow the IM naming convention.','Name it IMSub_WR#_SubmissionName_MMDDYY (IMSub2_… for a resubmission). Example: IMSub_WR2024.99_iLAD v3.01_052324.',W,'filename');
+  // face page
+  const miss=RV_FACE.filter(([k])=>!P.F[k]).map(([,l])=>l); if(miss.length) add('fix','Face Page','Required fields are empty: '+miss.join('; ')+'.','Fill in every yellow field on the Face Page.','Face Page','face');
+  if(P.F.wr&&ctx.t&&!new RegExp(String(ctx.t.wr||'').replace(/^WR/,'').replace(/[_.]/,'[_.]')).test(P.F.wr)) add('fix','Face Page','The Work Request ID says '+rvQ(P.F.wr)+', but this is '+ctx.t.wr+'.','Correct the Work Request ID.','Face Page','face-wr');
+  const isResub=/IMSub[2-9]|resub/i.test(W)||!!P.F.resubDate; if(isResub&&!(P.F.resubDate&&P.F.resubN&&P.F.resubWhy)) add('fix','Face Page','This is a resubmission, but the resubmission date, number or reason is blank.','Fill in rows 13–16 (the green rows) on the Face Page.','Face Page','face-resub');
+  if(P.F.rmRows&&+P.F.rmRows&&Math.abs(+P.F.rmRows-P.rows.length)>0) add('recommend','Face Page','The Face Page says '+P.F.rmRows+' Reference Model rows; the tab has '+P.rows.length+'.','Update the row count so IM sizes the review correctly.','Face Page','face-count');
+  if(/^(no|n)$/i.test(String(P.F.parentOk||''))) add('question','Face Page','Parent CoP approval is marked No.','Has the parent CoP accepted this submission?','Face Page','face-parent');
+  // rows
+  const seen={}; let needPS=false;
+  P.rows.forEach(r=>{ const it=r.item||('row '+r._row), ct=String(r.ct||'').toLowerCase().replace(/&/,'and').trim(), tt=String(r.tt||'').toLowerCase().replace(/^data point.*/,'data point').trim();
+    const nm=r.en||r.dp||r.at||r.cn||r.ac||''; const where='Item '+it+(nm?' · '+nm:'');
+    if(!ct||!tt){ add('fix','Reference Model Changes','Change Type or Change Target Type is blank.','Pick both from the dropdowns.',where,'ct',it); return; }
+    if(/container|data point|attribute/.test(tt)&&/add|move|rename|reuse/.test(ct)) needPS=true;
+    const need=((RV_NEED[ct]||{})[tt])||[]; const blank=need.filter(k=>!r[k]); if(blank.length) add('fix','Reference Model Changes','This '+r.ct+' · '+r.tt+' row is missing: '+blank.map(k=>RV_FIELD[k]).join(', ')+'.','Fill in the columns this change needs (see the form’s instructions tab).',where,'need',it);
+    // normal English names, no abbreviations
+    [['cn','CONTAINER Name'],['dp','Data Point Name'],['en','Enumeration Name'],['pc','Parent CONTAINER Name']].forEach(([k,l])=>{ const v=r[k]; if(!v) return; if(/_/.test(v)||(/[a-z][A-Z]/.test(v)&&!/\s/.test(v)&&k!=='en')) add('fix','Names',l+' '+rvQ(v)+' isn’t in normal English.','Use spaces between words; no underscores or upper camel case (only the XPATH uses those).',where,'normal-english',it); if(RV_ABBR.test(v)) add('fix','Names',l+' '+rvQ(v)+' uses an abbreviation.','Spell out the word (IM sends back abbreviations such as Condo, Amt, Info).',where,'abbr',it); });
+    // definition basics
+    const def=String(r.def||'');
+    if(def){ if(!/[.)]\s*$/.test(def)) add('fix','Definitions','The definition doesn’t end with a period.','End the definition with a period.',where,'def-period',it);
+      if(/\b(must|shall|should)\b|\bsystem will\b|\bscreen\b|\bdrop-?down\b|\bfield on\b/i.test(def)) add('recommend','Definitions','The definition reads like implementation guidance ('+rvQ((def.match(/\b(must|shall|should)\b|\bsystem will\b|\bscreen\b|\bdrop-?down\b|\bfield on\b/i)||[''])[0])+').','IM removes process and implementation language from definitions; say what the data is, not how a system uses it.',where,'def-impl',it);
+      (def.match(/\b[A-Z]{2,6}\b/g)||[]).filter(a=>!/^(MISMO|LDD|ID|US|LLC|UPB)$/.test(a)&&!new RegExp('\\('+a+'\\)').test(def)).slice(0,1).forEach(a=>add('recommend','Definitions','The acronym '+a+' isn’t spelled out in the definition.','Spell it out, then give the acronym in parentheses.',where,'def-acr',it));
+      if(/^(a|an|the)\s/i.test(nm)===false&&rvNorm(def).replace(/[.]/g,'')===rvNorm(nm)) add('fix','Definitions','The definition only repeats the name.','Describe what the data means.',where,'def-repeat',it); }
+    else if(/add|modify/.test(ct)&&tt!=='relationship') add('fix','Definitions','No definition.','Every added or modified '+r.tt+' needs a definition (IM approves fewer rows that arrive without one).',where,'def-missing',it);
+    // class word templates
+    if(tt==='data point'&&r.dp&&def&&/add|modify/.test(ct)){ const cw=Object.keys(RV_TEMPLATES).find(k=>new RegExp('\\b'+k+'$','i').test(r.dp.trim().replace(/Other Description$/i,'Description'))); if(!cw&&!/Other Description$/i.test(r.dp)) add('fix','Names','The data point name '+rvQ(r.dp)+' doesn’t end with a class word.','End it with a MISMO class word (Amount, Date, Indicator, Type, Description…) per MEG 0007.',where,'classword',it);
+      else if(cw&&!RV_TEMPLATES[cw].test(def.trim())) add('fix','Definitions',(/^[AEIOU]/.test(cw)?'An ':'A ')+cw+' data point should follow the '+cw+' definition template.','Start with: '+RV_TEMPLATE_TEXT[cw],where,'template',it);
+      if(/Indicator$/i.test(r.dp)&&/\bnot\b|\bno\b|\bnon\b/i.test(r.dp)) add('recommend','Names','A negative indicator name: '+rvQ(r.dp)+'.','IM prefers indicators where true means the positive situation.',where,'neg-ind',it); }
+    if(tt==='enumeration'&&r.en&&/add/.test(ct)&&/^other$/i.test(r.en.trim())&&!P.rows.some(x=>/other description$/i.test(x.dp||''))) add('fix','Enumerations','“Other” is added, but no matching Type Other Description data point is added or reused.','Add or reuse the [Data Point] Other Description that goes with this Type.',where,'other-desc',it);
+    // duplicates inside the submission
+    const key=(tt+'|'+(r.pc||'')+'|'+nm).toLowerCase(); if(nm&&/add/.test(ct)){ if(seen[key]) add('recommend','Reference Model Changes','Added twice in this submission ('+seen[key]+' and '+it+').','Add and define it once, then reuse it at other XPaths.',where,'dup',it); else seen[key]=it; }
+    // XPATH
+    if(r.xp&&!/^MESSAGE\/([A-Z0-9_]+\/)+$/.test(r.xp.replace(/\s+/g,''))) add('fix','XPATH','The XPATH isn’t in the expected form.','Use upper-case container names separated by slashes, starting with MESSAGE/ and ending with /.',where,'xpath',it);
+  });
+  if(needPS&&P.psFilled<1) add('fix','Proposed Structure','Containers, data points or attributes change, but the Proposed Structure tab is empty.','Complete the Proposed Structure tab so IM sees the changes in the context of the Reference Model.','Proposed Structure','ps');
+  if(!P.rows.length) add('question','Reference Model Changes','No Reference Model changes are listed.','Is this a documents-only submission? If so, say so in the Submission Summary.','Reference Model Changes','no-rows');
+  return {out,P};
+}
+
+/* ---------- what IM has sent back (from 3,709 decided rows, 2021–2026) ---------- */
+const RV_IM_LEARNED={decided:3709,asSubmitted:2486,withMod:695,withdrawn:435,returned:46,denied:36,
+  themes:[['Definition wording and clarity',136],['Structure, container or XPATH',66],['Already in the model / reuse instead',62],['Naming and class words',62],['Enumerations',54],['Spelling, typos and grammar',38],['Missing definitions, enums or examples',37],['Coordinate with other groups',37],['Breaking changes and deprecations',19],['Submission form format',17]],
+  examples:[
+    ['Data Point','The amount of all recurring expenses incurred by the borrower(s)…','The dollar amount of all recurring expenses incurred by the borrower(s)…','Amount definitions start “The dollar amount of”.'],
+    ['Data Point','A free-form text field describing the name of the person or entity that estimated the repair.','An unstructured name that identifies the person or entity that estimated the repair.','Name data points use the Name template.'],
+    ['Enumeration','Indicates the client has opted in for contact by telephone.','Indicates the party has opted out of contact by text.','Use the general role (party), not a specific one.'],
+    ['Data Point','…the type of Closing Protection Letter the requestor wants to price…','…the type of Closing Protection Letter (CPL) the requestor wants to price…','Spell out the acronym, then give it in parentheses.'],
+    ['Data Point','The date associated with the specified Property Vacancy Registration Status Type.','The date associated with the specified PropertyVacancyRegistrationStatusType.','Refer to other data points by their LDD name.'],
+    ['Enumeration','site condo','site condominium','Names use full words, not abbreviations.'],
+    ['Data Point','…that this item applies to.','…to which this item applies.','Grammar clean-up.'],
+    ['Data Point','The date on which SCRA benefits … expire.','The date on which SCRA benefits … end.','Plain, precise verbs.'],
+    ['Enumeration','Equifax credit score model based on the Fair Isaac FICO 10T scoring algorithm.','(rewritten to be unique to the enumeration)','Each enumeration needs its own unique definition.'],
+    ['Data Point','(new data point)','(denied: “Already in model … use Escrow Account Initial Balance Amount”)','Check the Reference Model for an existing data point first.']],
+  comments:['Improve enum and data point definition.','Enumerations need definitions.','Already in model; reuse the existing data point.','Correct the XPATH and provide a definition.','Pls double-check existing enums to see if one would work.','Ensure data points are organized in alpha order within the container.','Deleted implementation-oriented phrase.','Add acronym after the spelled-out words in the definition.','Recommend making the change consistent with other enums.','Please provide examples.','Do not have a true response result in a negative; change the name.','Breaking change: deprecations must be done together and can’t be approved piecemeal.']};
+
+/* ---------- Claude's part ---------- */
+const RV_EDITOR_PERSONA='You are a meticulous senior editor for MISMO (Mortgage Industry Standards Maintenance Organization) work products. You review draft, comment-period, candidate recommendation, recommendation and final work products for editorial quality, consistency, branding, formatting, boilerplate language, copyright, trademarks and publication readiness. You identify spelling, grammar, punctuation, terminology, acronym, template, logo, header, footer, pagination and accessibility issues while preserving the author\'s technical meaning. You compare the work product against the MISMO Editor Process and Guidance and the MISMO Work Product Boilerplate Language and Guidance. You do not validate XPath mappings, data-point mappings, XML schemas, YAML files or technical implementation logic. You never invent legal language, classifications, dates, approvals or licensing decisions; when something like that is unclear you ask the facilitator.';
+const RV_EDITOR_RULES='Rules:\n- Never rewrite the work product. Report what to change; the facilitator decides. Editor review is subjective: label taste-level suggestions as recommendations, not corrections.\n- Quote the exact text in "where" (15 words or fewer) so the facilitator can find it.\n- Corrections are clear errors: spelling, grammar, punctuation, wrong or inconsistent terms, inconsistent capitalization of MISMO terms, undefined acronyms, broken numbering, mismatched cross-references, inconsistent names or versions of MISMO products.\n- MISMO voice: MISMO does not mandate, require or advocate. Flag “MISMO strongly believes”, “MISMO thinks the industry should”, “must use”.\n- Use American spelling. Use registered trademarks where they apply (MISMO®, MERS®).\n- Accessibility: descriptive link text, meaning not carried by color alone, tables with header rows, alt text for images if mentioned.\n- Software already checked boilerplate wording, copyright year, page numbers, tracked changes, comments and fonts. Don’t repeat those.\n- Don’t comment on XPaths, mappings, schemas or technical logic.';
+function rvChunks(text,max){ const out=[]; let cur=''; String(text).split(/\n/).forEach(l=>{ if((cur+l).length>max&&cur){ out.push(cur); cur=''; } cur+=l+'\n'; }); if(cur.trim()) out.push(cur); return out; }
+async function rvAiEditor(files,ctx,progress){
+  if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
+  let cap=60000; try{ const lim=await S.sample.limits(); if(lim&&lim.inputBytes) cap=Math.max(15000,Math.min(cap,Math.floor(lim.inputBytes*0.75)-6000)); }catch(e){}
+  const all=files.map(f=>'# FILE: '+f.name+' ('+(f.kind==='excel'?'Excel workbook':'Word document')+')\n'+f.text).join('\n\n');
+  const parts=rvChunks(all,cap), use=parts.slice(0,4), res={corrections:[],recommendations:[],questions:[],summaries:[],readiness:[]};
+  for(let i=0;i<use.length;i++){ progress&&progress('Claude is reading part '+(i+1)+' of '+use.length+'…');
+    const prompt=RV_EDITOR_PERSONA+'\n\n'+RV_EDITOR_RULES+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nStage: '+stageDef(ctx.t.stage).name+' (boilerplate needed now: '+RV_BP_LABEL[ctx.boiler]+')\nFacilitator note: '+(ctx.note||'none')+'\n'+(use.length>1?'This is part '+(i+1)+' of '+use.length+' of the submission.\n':'')+
+      '\nReturn ONLY JSON: {"summary":"two sentences on editorial quality","readiness":"ready"|"minor"|"needs-updates","corrections":[{"where":"exact short quote","issue":"what is wrong","suggestion":"the fix","category":"Spelling|Grammar|Punctuation|Terminology|Acronyms|Capitalization|Consistency|Numbering|Cross-reference|Accessibility|Branding|Other"}],"recommendations":[{"where":"","issue":"","suggestion":""}],"questions":["question for the facilitator"]}. Up to 40 corrections and 12 recommendations, most important first.\n\nSUBMISSION:\n'+use[i];
+    try{ const r=await S.sample.json(prompt,{modelTier:'complex'}); (r.corrections||[]).forEach(c=>res.corrections.push(c)); (r.recommendations||[]).forEach(c=>res.recommendations.push(c)); (r.questions||[]).forEach(q=>res.questions.push(q)); if(r.summary) res.summaries.push(r.summary); if(r.readiness) res.readiness.push(r.readiness); }
+    catch(e){ res.error=(e&&e.message)||'Claude didn’t finish'; break; } }
+  if(parts.length>use.length) res.note='Claude read the first '+use.length+' of '+parts.length+' parts; the software checks covered everything.';
+  return res;
+}
+async function rvAiIm(P,ctx,progress){
+  if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
+  const rows=P.rows.filter(r=>/add|modify|rename/i.test(r.ct||'')).map(r=>({item:r.item||r._row,change:(r.ct||'')+' '+(r.tt||''),container:r.cn||r.pc||'',name:r.dp||r.en||r.at||r.ac||r.cn||'',old:r.old||'',defType:r.dt||'',definition:r.def||''}));
+  if(!rows.length) return {rows:[]};
+  const L=RV_IM_LEARNED; const guide='What IM has done with 3,709 decided rows (2021–2026): '+Math.round(L.asSubmitted/L.decided*100)+'% approved as submitted, '+Math.round(L.withMod/L.decided*100)+'% approved with modification, '+Math.round(L.withdrawn/L.decided*100)+'% withdrawn, the rest returned or denied. Most common reasons: '+L.themes.map(t=>t[0]).join('; ')+'.\nTypical IM edits (before → after, why):\n'+L.examples.map(e=>'- ['+e[0]+'] '+e[1]+' → '+e[2]+' ('+e[3]+')').join('\n')+'\nTypical IM comments: '+L.comments.join(' | ')+'\nDefinition templates by class word: '+Object.entries(RV_TEMPLATE_TEXT).map(([k,v])=>k+': '+v).join('; ')+'.';
+  const out=[]; const size=120;
+  for(let i=0;i<rows.length;i+=size){ const part=rows.slice(i,i+size); progress&&progress('Claude is reading rows '+(i+1)+'–'+(i+part.length)+' of '+rows.length+'…');
+    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM reviews proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear and well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if you think something may already exist, say “may already exist; check the Reference Model for …”. Only list rows IM would likely question. Keep notes short and in IM’s plain voice.\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows (JSON): '+JSON.stringify(part)+'\n\nReturn ONLY JSON: {"summary":"two sentences","rows":[{"item":"item #","likely":"as submitted"|"with modification"|"returned"|"denied","note":"what IM would say","suggestedDefinition":"optional","suggestedName":"optional"}]}';
+    try{ const r=await S.sample.json(prompt,{modelTier:'complex'}); (r.rows||[]).forEach(x=>out.push(x)); if(r.summary) (out.summaries=out.summaries||[]).push(r.summary); }
+    catch(e){ return {rows:out,error:(e&&e.message)||'Claude didn’t finish'}; } }
+  return {rows:out,summaries:out.summaries||[]};
+}
+
+/* ---------- the report ---------- */
+function rvReadiness(findings,ai){
+  const fix=findings.filter(f=>f.sev==='fix').length, ai3=(ai&&ai.readiness)||[];
+  if(fix>=5||ai3.includes('needs-updates')) return ['needs','Needs Updates'];
+  if(fix>0||ai3.includes('minor')||((ai&&ai.corrections)||[]).length>3) return ['minor','Ready With Minor Edits'];
+  return ['ready','Ready'];
+}
+function rvImReadiness(findings,ai){ const fix=findings.filter(f=>f.sev==='fix').length; const risky=((ai&&ai.rows)||[]).filter(r=>/returned|denied/.test(r.likely||'')).length;
+  if(fix>=5||risky>=3) return ['needs','Needs Updates Before IM']; if(fix>0||risky>0||((ai&&ai.rows)||[]).length>5) return ['minor','Ready With Minor Edits']; return ['ready','Ready for IM']; }
+function rvTrim(s,n){ s=String(s==null?'':s); return s.length>n?s.slice(0,n-1)+'…':s; }
+function rvBuildReport(kind,t,files,findings,ai,ctx){
+  const [rk,rl]=kind==='im'?rvImReadiness(findings,ai):rvReadiness(findings,ai);
+  const rep={id:kind+'-'+t.id+'-'+Date.now().toString(36),kind,ticket:t.id,wr:t.wr,name:t.name,at:new Date().toISOString(),by:S.me.name||'',files:files.map(f=>f.name),boiler:ctx.boiler,
+    readiness:rk,readinessLabel:rl,summary:((ai&&ai.summaries)||[]).join(' ')||'',aiNote:(ai&&(ai.skipped||ai.error||ai.note))||'',
+    findings:findings.slice(0,160).map(f=>({sev:f.sev,area:f.area,issue:rvTrim(f.issue,400),suggestion:rvTrim(f.suggestion,400),where:rvTrim(f.where,180),item:f.item||'',src:f.src}))};
+  if(kind==='editor'){ rep.corrections=((ai&&ai.corrections)||[]).slice(0,80).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300),category:rvTrim(c.category,30)}));
+    rep.recommendations=((ai&&ai.recommendations)||[]).slice(0,24).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300)}));
+    rep.questions=[...findings.filter(f=>f.sev==='question').map(f=>f.issue+' '+f.suggestion),...((ai&&ai.questions)||[])].slice(0,20).map(q=>rvTrim(q,300)); }
+  else { rep.rows=((ai&&ai.rows)||[]).slice(0,150).map(r=>({item:String(r.item||''),likely:rvTrim(r.likely,24),note:rvTrim(r.note,300),def:rvTrim(r.suggestedDefinition,400),name:rvTrim(r.suggestedName,120)}));
+    rep.questions=findings.filter(f=>f.sev==='question').map(f=>rvTrim(f.issue+' '+f.suggestion,300)); rep.form=ctx.formStats||null; }
+  return rep;
+}
+function rvReportHtml(rep,forWord){
+  const e=esc; const sevL={fix:'Must Fix',recommend:'Recommended',question:'Question'};
+  const tbl=(head,rows)=>rows.length?'<table class="rvt"><thead><tr>'+head.map(h=>'<th>'+e(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table>':'';
+  const F=rep.findings||[], fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
+  const title=rep.kind==='im'?'IM Pre-Review Report':'Editor and Readiness Review Report';
+  let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(rep.at.slice(0,10)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):'')+'</div>'+
+    '<div class="rvr-score rv-'+e(rep.readiness)+'"><b>'+e(rep.readinessLabel)+'</b><span>'+fx.length+' must fix · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
+    (rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
+    '<p class="rvr-note">This report recommends; it doesn’t change the work product. '+(rep.kind==='editor'?'Editorial suggestions are judgment calls: the facilitator and workgroup decide.':'IM makes the final decision on every row.')+'</p></div>';
+  const sec=(t2,body)=>body?'<h3>'+e(t2)+'</h3>'+body:'';
+  h+=sec('Must Fix Before Submitting',tbl(['Area','Where','What’s Wrong','What to Do'],fx.map(f=>[e(f.area),e(f.where),e(f.issue),e(f.suggestion)])));
+  if(rep.kind==='editor') h+=sec('Editorial Corrections',tbl(['Category','Where','Issue','Suggestion'],(rep.corrections||[]).map(c=>[e(c.category||''),e(c.where),e(c.issue),e(c.suggestion)])));
+  if(rep.kind==='im') h+=sec('Rows IM May Question',tbl(['Item','Likely Outcome','What IM Would Say','Suggested Definition or Name'],(rep.rows||[]).map(r=>[e(r.item),e(r.likely),e(r.note),e([r.name,r.def].filter(Boolean).join(' — '))])));
+  h+=sec('Recommended',tbl(['Area','Where','Recommendation','Suggestion'],[...rc.map(f=>[e(f.area),e(f.where),e(f.issue),e(f.suggestion)]),...(rep.recommendations||[]).map(c=>['Editorial',e(c.where),e(c.issue),e(c.suggestion)])]));
+  h+=sec('Questions for the Facilitator',(rep.questions||[]).length?'<ol>'+rep.questions.map(q=>'<li>'+e(q)+'</li>').join('')+'</ol>':'');
+  if(rep.kind==='im'&&rep.form) h+=sec('What IM Has Done Before','<p>Across '+RV_IM_LEARNED.decided.toLocaleString()+' decided rows since 2021, '+Math.round(RV_IM_LEARNED.asSubmitted/RV_IM_LEARNED.decided*100)+'% were approved as submitted and '+Math.round(RV_IM_LEARNED.withMod/RV_IM_LEARNED.decided*100)+'% with modification. The most common reasons for changes: '+RV_IM_LEARNED.themes.slice(0,5).map(t=>t[0].toLowerCase()).join(', ')+'.</p>');
+  h+='</div>';
+  if(!forWord) return h;
+  return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+e(title)+'</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#0d314c}h2{font-size:16pt;margin:4pt 0}h3{font-size:13pt;margin:14pt 0 4pt;color:#0d314c}.rvr-k{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#456179}.rvr-m,.rvr-note{font-size:9.5pt;color:#456179}.rvr-score b{font-size:13pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #adc4d6;padding:4pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#e4f2fb}</style></head><body>'+h+'<p class="rvr-note">©'+RV_YEAR()+' Mortgage Industry Standards Maintenance Organization, Inc. Prepared by the MISMO Manufacturing System.</p></body></html>';
+}
+function rvDownload(rep){ const html=rvReportHtml(rep,true); const blob=new Blob(['\ufeff',html],{type:'application/msword'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(rep.kind==='im'?'IM Pre-Review':'Editor and Readiness Review')+' - '+rep.wr+' - '+rep.at.slice(0,10)+'.doc'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
+
+/* =====================================================================
+   The review screens: run a review, read the report, keep every report on
+   the work request (Reviews tab), download it for Word.
+   Reports are saved in their own files (reviews-<year>) so tickets stay small.
+   ===================================================================== */
+S.reviews=S.reviews||{}; const rvSubs={};
+function rvShard(t){ const m=String(t.id||t.wr||'').match(/(19|20)\d{2}/); return 'reviews-'+(m?m[0]:'other'); }
+function rvEnsure(t){ const c=rvShard(t); if(rvSubs[c]) return; rvSubs[c]=1; try{ Store.sub(c,o=>{ Object.values(o||{}).forEach(r=>{ if(r&&r.id) S.reviews[r.id]=r; }); if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel(); }); }catch(e){} }
+function rvFor(t){ return Object.values(S.reviews).filter(r=>r.ticket===t.id).sort((a,b)=>String(b.at).localeCompare(String(a.at))); }
+async function rvSave(t,rep){ S.reviews[rep.id]=rep; rvEnsure(t); return write(rvShard(t),rep.id,rep); }
+
+const RV_KIND={editor:{title:'Editor and Readiness Review',short:'Editor and Readiness',accept:'.docx,.xlsx,.xlsm',multiple:true,
+    intro:'Add the work product files (Word and Excel). Software checks the boilerplate word for word, copyright, page numbers, Excel setup and more; Claude adds an editor’s read for spelling, grammar, terms, acronyms and MISMO voice. Nothing in your files is changed or stored.'},
+  im:{title:'IM Pre-Review',short:'IM Pre-Review',accept:'.xlsx,.xlsm',multiple:false,
+    intro:'Add the IM/AWG Submission Form (July 2026 version). It checks the Face Page and every Reference Model row the way IM reads them: required columns, class words and definition templates, names, XPATHs and the Proposed Structure tab. Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided. Nothing in the form is changed or stored.'}};
+
+function rvRun(t,kind){
+  const K=RV_KIND[kind], root=$('#modal-root'); const exp=rvExpectedBoiler(t);
+  root.innerHTML='<div class="modal"><div class="box rv-box"><header><div class="rv-kick">'+esc(t.wr)+' · '+esc(t.name)+'</div><h3>'+esc(K.title)+'</h3><p>'+esc(K.intro)+'</p></header><div class="bd">'+
+    '<label class="rv-drop" id="rvdrop"><input type="file" id="rvf" accept="'+K.accept+'"'+(K.multiple?' multiple':'')+'><span class="rv-di">'+whIc('box')+'</span><b>'+(K.multiple?'Choose the work product files':'Choose the IM Submission Form')+'</b><span id="rvfl">or drop '+(K.multiple?'them':'it')+' here</span></label>'+
+    (kind==='editor'?fld('Boilerplate It Should Have','<select id="rvbp">'+Object.entries(RV_BP_LABEL).map(([k,l])=>'<option value="'+k+'"'+(k===exp?' selected':'')+'>'+esc(l)+(k===exp?' (this stage)':'')+'</option>').join('')+'</select>','Set from the stage'+(t.designation&&t.designation.license?' and the license designation':'')+'. Change it only if MISMO staff told you otherwise.')+fld('Note for the Reviewer','<textarea id="rvnote" rows="2" placeholder="Anything the review should know (optional)"></textarea>'):'')+
+    '<div id="rvout"></div></div><footer><button class="btn" data-m="cancel" type="button">Close</button><button class="btn pri" id="rvgo" type="button" disabled>Run '+esc(K.short)+'</button></footer></div></div>';
+  const box=$('.modal',root), inp=$('#rvf',box), go=$('#rvgo',box), out=$('#rvout',box), drop=$('#rvdrop',box); let files=[];
+  const setFiles=L=>{ files=[...L].slice(0,K.multiple?8:1); $('#rvfl',box).textContent=files.length?files.map(f=>f.name).join(', '):'or drop them here'; go.disabled=!files.length; drop.classList.toggle('has',!!files.length); };
+  inp.onchange=()=>setFiles(inp.files);
+  ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.remove('over'); if(ev==='drop'&&e.dataTransfer) setFiles(e.dataTransfer.files); }));
+  $('[data-m=cancel]',box).onclick=()=>root.innerHTML='';
+  const say=(m,cls)=>{ out.innerHTML='<div class="banner'+(cls?' '+cls:' info')+'">'+(cls?'':'<span class="spin"></span> ')+m+'</div>'; };
+  go.onclick=async()=>{ go.disabled=true; inp.disabled=true;
+    try{
+      say('Reading '+files.length+' file'+(files.length===1?'':'s')+'…');
+      const read=[]; for(const f of files) read.push(await rvReadFile(f));
+      const ctx={t,boiler:kind==='editor'?$('#rvbp',box).value:exp,note:kind==='editor'?$('#rvnote',box).value.trim():''};
+      let findings, ai;
+      if(kind==='editor'){ say('Checking boilerplate, copyright, layout and setup…'); findings=rvEditorChecks(read,ctx); ai=await rvAiEditor(read,ctx,m=>say(esc(m))); }
+      else { const x=read[0]; if(x.kind!=='excel') throw new Error('Choose the IM Submission Form (an Excel file).'); say('Checking the Face Page and '+'Reference Model rows…'); const r=rvImChecks(x,ctx); findings=r.out; ctx.formStats={rows:r.P.rows.length}; ai=await rvAiIm(r.P,ctx,m=>say(esc(m))); }
+      const rep=rvBuildReport(kind,t,read,findings,ai,ctx);
+      say('Saving the report…'); await rvSave(t,rep);
+      // keep the AI Review stage moving the way it did
+      if(kind==='editor'&&S.tickets[t.id]){ const x=clone(S.tickets[t.id]); const round={at:rep.at,by:rep.by,verdict:rep.readiness==='ready'?'ready':'fix',summary:rep.readinessLabel+(rep.summary?': '+rep.summary:''),checks:[],edits:[],files:rep.files,report:rep.id};
+        x.ai=Object.assign({},x.ai,{rounds:[...((x.ai&&x.ai.rounds)||[]),round]});
+        if(x.stage==='aireview') await setSub(x,'reviewed','Editor and Readiness Review: '+rep.readinessLabel); else { hist(x,'Editor and Readiness Review: '+rep.readinessLabel); await saveTicket(x,'Review saved'); } }
+      else if(S.tickets[t.id]){ const x=clone(S.tickets[t.id]); hist(x,'IM Pre-Review: '+rep.readinessLabel); await saveTicket(x,'Review saved'); }
+      root.innerHTML=''; rvShow(rep);
+    }catch(e){ say(esc((e&&e.message)||'The review didn’t finish. Try again.'),'bad'); go.disabled=false; inp.disabled=false; }
+  };
+}
+function rvShow(rep){
+  const root=$('#modal-root');
+  root.innerHTML='<div class="modal"><div class="box rv-rep">'+rvReportHtml(rep,false)+'<footer><button class="btn" data-m="cancel" type="button">Close</button><button class="btn" id="rvdl" type="button">Download for Word</button></footer></div></div>';
+  const box=$('.modal',root); $('[data-m=cancel]',box).onclick=()=>root.innerHTML=''; $('#rvdl',box).onclick=()=>rvDownload(rep);
+  box.addEventListener('click',e=>{ if(e.target===box) root.innerHTML=''; });
+}
+aiReview=function(t){ rvRun(t,'editor'); };
+
+/* ---------- on the work request ---------- */
+WH_IC.check='M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11';
+function rvCard(rep){ const F=rep.findings||[]; const fx=F.filter(f=>f.sev==='fix').length;
+  return '<button type="button" class="rv-card rv-'+esc(rep.readiness)+'" data-rvopen="'+esc(rep.id)+'"><span class="rv-ck">'+esc(rep.kind==='im'?'IM Pre-Review':'Editor and Readiness')+'</span><b>'+esc(rep.readinessLabel)+'</b><span class="rv-cm">'+fx+' must fix · '+(rep.kind==='im'?(rep.rows||[]).length+' rows to check':(rep.corrections||[]).length+' corrections')+'</span><span class="rv-cd">'+esc(fmtS(rep.at.slice(0,10)))+' · '+esc(firstName(rep.by||''))+'</span></button>'; }
+function rvTabHtml(t){ rvEnsure(t); const L=rvFor(t), can=canAct(t)||S.isStaff;
+  return '<div class="psec full rv-tab"><h4>Reviews'+(can?'<span class="sp"><button type="button" class="btn sm" data-rvrun="editor">Run Editor and Readiness Review</button><button type="button" class="btn sm" data-rvrun="im">Run IM Pre-Review</button></span>':'')+'</h4>'+
+    '<p class="muted rv-why">Two separate reviews. <b>Editor and Readiness</b> reads the work product; <b>IM Pre-Review</b> reads the IM Submission Form the way IM does. Each one leaves a report here that facilitators and staff can open or download.</p>'+
+    (L.length?'<div class="rv-list">'+L.map(rvCard).join('')+'</div>':'<div class="lead-empty">No reviews yet.</div>')+'</div>'; }
+function rvLatestHtml(t){ rvEnsure(t); const L=rvFor(t); const ed=L.find(r=>r.kind==='editor'), im=L.find(r=>r.kind==='im');
+  if(!ed&&!im&&!['work','aireview','im'].includes(t.stage)) return '';
+  const can=canAct(t)||S.isStaff;
+  return '<div class="psec full rv-latest"><h4>Reviews<span class="sp"><button type="button" class="btn sm ghost" data-ptab="rev">All Reviews</button></span></h4><div class="rv-list">'+
+    (ed?rvCard(ed):(can?'<button type="button" class="rv-card rv-none" data-rvrun="editor"><span class="rv-ck">Editor and Readiness</span><b>Not run yet</b><span class="rv-cm">Run it before submitting to IM</span></button>':''))+
+    (im?rvCard(im):(can?'<button type="button" class="rv-card rv-none" data-rvrun="im"><span class="rv-ck">IM Pre-Review</span><b>Not run yet</b><span class="rv-cm">Check the IM Submission Form first</span></button>':''))+'</div></div>'; }
+const _renderPanel7=renderPanel;
+renderPanel=function(){ _renderPanel7(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const pb=$('.pb',P); if(!pb||!$('.wh-tabs',pb)||$('[data-wtab="rev"]',pb)) return;
+  rvEnsure(t); const n=rvFor(t).length;
+  const tabs=$('.wh-tabs',pb), hist=$('[data-ptab="hist"]',tabs);
+  const b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab'); b.dataset.ptab='rev'; b.setAttribute('aria-selected',S.ptab==='rev'); b.innerHTML=whIc('check')+'<span>Reviews</span>'+(n?'<b>'+n+'</b>':''); tabs.insertBefore(b,hist||null);
+  const pane=document.createElement('div'); pane.className='wtab pgrid'; pane.dataset.wtab='rev'; pane.hidden=S.ptab!=='rev'; pane.innerHTML=rvTabHtml(t); const last=[...pb.querySelectorAll('.wtab')].pop(); last.after(pane);
+  const ov=$('[data-wtab="over"]',pb), tl=ov&&$('.wh-tl',ov); const lh=rvLatestHtml(t); if(ov&&lh){ (tl||ov.lastElementChild).insertAdjacentHTML(tl?'afterend':'beforeend',lh); }
+  const show=k=>{ S.ptab=k; $$('.wh-tabs [data-ptab]',pb).forEach(x=>x.setAttribute('aria-selected',x.dataset.ptab===k)); $$('.wtab',pb).forEach(w=>w.hidden=w.dataset.wtab!==k); const tb=$('.wh-tabs',pb); if(pb.scrollTop>tb.offsetTop) pb.scrollTop=tb.offsetTop; };
+  $$('[data-ptab]',pb).forEach(x=>x.onclick=e=>{ e.preventDefault(); show(x.dataset.ptab); });
+  $$('[data-rvrun]',pb).forEach(x=>x.onclick=e=>{ e.preventDefault(); if(S.viewAs) return; rvRun(t,x.dataset.rvrun); });
+  $$('[data-rvopen]',pb).forEach(x=>x.onclick=e=>{ e.preventDefault(); const r=S.reviews[x.dataset.rvopen]; if(r) rvShow(r); });
+};
 
 /* ---------- settings ---------- */
 let setTab='process';
