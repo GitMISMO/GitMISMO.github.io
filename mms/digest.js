@@ -279,7 +279,7 @@
       return '<tr><td style="padding:0 28px 18px">' +
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-radius:8px;border-collapse:separate;overflow:hidden">' +
         '<tr><td style="' + F + 'padding:11px 16px;background:' + c[1] + ';border-bottom:1px solid #d5e2ed;border-left:4px solid ' + c[0] + '">' +
-        '<span style="font-size:15px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (s.rows ? ' <span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;' + s.rows.length + '</span>' : '') +
+        '<span style="font-size:15px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (s.rows && !s.noCount ? ' <span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;' + s.rows.length + '</span>' : '') +
         (s.note ? '<div style="font-size:12.5px;color:#456179;margin-top:2px">' + esc(s.note) + '</div>' : '') + '</td></tr>' +
         (s.rows || []).map(function (r, i) {
           var rc = TONE[r.tone || ''] || TONE[''];
@@ -305,9 +305,9 @@
       '<tr><td style="' + F + 'padding:24px 28px 6px"><div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7794aa">' + esc(o.dateLine) + '</div>' +
       '<div style="font-size:24px;font-weight:700;color:#0d314c;margin:4px 0 8px">' + esc(o.title) + '</div>' +
       '<div style="font-size:15px;color:#0d314c;line-height:1.5">Hi ' + esc(o.first || 'there') + ',</div><div style="font-size:15px;color:#456179;line-height:1.5;margin-top:4px">' + o.intro + '</div>' +
-      btn(APP + '#mine', 'Open My Queue', true) + '</td></tr>' +
+      btn(o.button ? o.button.href : APP + '#mine', o.button ? o.button.label : 'Open My Queue', true) + '</td></tr>' +
       '<tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>' + sec +
-      '<tr><td style="' + F + 'padding:6px 28px 24px;font-size:12px;color:#7794aa;line-height:1.5;border-top:1px solid #e5eef5">Sent by the MMS to MISMO facilitators at the end of each workday. Click any work request to open it. Questions about this email: <a href="mailto:workrequests@mismo.org" style="color:#2477b8">workrequests@mismo.org</a>.</td></tr>' +
+      '<tr><td style="' + F + 'padding:6px 28px 24px;font-size:12px;color:#7794aa;line-height:1.5;border-top:1px solid #e5eef5">' + (o.footer || 'Sent by the MMS to MISMO facilitators at the end of each workday. Click any work request to open it.') + ' Questions about this email: <a href="mailto:workrequests@mismo.org" style="color:#2477b8">workrequests@mismo.org</a>.</td></tr>' +
       '</table></td></tr></table></body></html>';
   };
   D.text = function (first, intro, S) {

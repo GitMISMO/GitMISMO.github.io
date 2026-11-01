@@ -1805,7 +1805,8 @@ function notifyEnter(t,to){
   if(!ppl.length) return;
   const w=whoseMove(t);
   queueMail({to:ppl.map(p=>p.email),subject:t.wr+' '+t.name+': '+stageDef(to).name,
-    body:t.name+' ('+t.wr+') is now at '+stageDef(to).name+'.\n\nNext: '+(w.text||'')+(w.label?' ('+w.label+')':'')+'\n\nOpen it in the MISMO Manufacturing System.',ticket:t.id,kind:'stage',key:t.id+'-'+to+'-'+today()});
+    body:t.name+' ('+t.wr+') is now at '+stageDef(to).name+'.\n\nNext: '+(w.text||'')+(w.label?' ('+w.label+')':'')+'\n\nOpen it in the MISMO Manufacturing System: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id),
+    html:(typeof stageMailHtml==='function'?stageMailHtml(t,to,ppl):''),ticket:t.id,kind:'stage',key:t.id+'-'+to+'-'+today()});
 }
 async function queueMail(m){
   const id=(m.key||uid()).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,140);
@@ -3036,7 +3037,7 @@ function wireArch(m){
       return '<tr><td style="padding:0 28px 18px">' +
         '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-radius:8px;border-collapse:separate;overflow:hidden">' +
         '<tr><td style="' + F + 'padding:11px 16px;background:' + c[1] + ';border-bottom:1px solid #d5e2ed;border-left:4px solid ' + c[0] + '">' +
-        '<span style="font-size:15px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (s.rows ? ' <span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;' + s.rows.length + '</span>' : '') +
+        '<span style="font-size:15px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (s.rows && !s.noCount ? ' <span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;' + s.rows.length + '</span>' : '') +
         (s.note ? '<div style="font-size:12.5px;color:#456179;margin-top:2px">' + esc(s.note) + '</div>' : '') + '</td></tr>' +
         (s.rows || []).map(function (r, i) {
           var rc = TONE[r.tone || ''] || TONE[''];
@@ -3062,9 +3063,9 @@ function wireArch(m){
       '<tr><td style="' + F + 'padding:24px 28px 6px"><div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7794aa">' + esc(o.dateLine) + '</div>' +
       '<div style="font-size:24px;font-weight:700;color:#0d314c;margin:4px 0 8px">' + esc(o.title) + '</div>' +
       '<div style="font-size:15px;color:#0d314c;line-height:1.5">Hi ' + esc(o.first || 'there') + ',</div><div style="font-size:15px;color:#456179;line-height:1.5;margin-top:4px">' + o.intro + '</div>' +
-      btn(APP + '#mine', 'Open My Queue', true) + '</td></tr>' +
+      btn(o.button ? o.button.href : APP + '#mine', o.button ? o.button.label : 'Open My Queue', true) + '</td></tr>' +
       '<tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>' + sec +
-      '<tr><td style="' + F + 'padding:6px 28px 24px;font-size:12px;color:#7794aa;line-height:1.5;border-top:1px solid #e5eef5">Sent by the MMS to MISMO facilitators at the end of each workday. Click any work request to open it. Questions about this email: <a href="mailto:workrequests@mismo.org" style="color:#2477b8">workrequests@mismo.org</a>.</td></tr>' +
+      '<tr><td style="' + F + 'padding:6px 28px 24px;font-size:12px;color:#7794aa;line-height:1.5;border-top:1px solid #e5eef5">' + (o.footer || 'Sent by the MMS to MISMO facilitators at the end of each workday. Click any work request to open it.') + ' Questions about this email: <a href="mailto:workrequests@mismo.org" style="color:#2477b8">workrequests@mismo.org</a>.</td></tr>' +
       '</table></td></tr></table></body></html>';
   };
   D.text = function (first, intro, S) {
@@ -4312,6 +4313,27 @@ const ROLE_ROWS=[
 const _resourcesView0=VIEWS.resources;
 VIEWS.resources=function(){ return _resourcesView0()+'<div class="card roles-card"><h3>Who Can Do What<span class="sp muted" style="font-size:12px;font-weight:500">Everyone sees everything. Your role decides your buttons.</span></h3><div class="tblwrap"><table class="tbl roles-tbl"><thead><tr><th>What</th><th>Facilitators</th><th>MISMO Staff</th></tr></thead><tbody>'+
   ROLE_ROWS.map(([w,f,s])=>'<tr><td>'+esc(w)+'</td><td'+(/^No$/.test(f)?' class="rno"':'')+'>'+esc(f)+'</td><td>'+esc(s)+'</td></tr>').join('')+'</tbody></table></div><p class="muted" style="font-size:12.5px;margin:10px 0 0">The Program Manager approves architecture requests, and the Architect works them from the Architecture Help queue. You’re '+(S.realStaff||S.isStaff?'set up as MISMO staff':'set up as a facilitator')+'.</p></div>'; };
+
+/* ---------- stage emails, in the same branded look as the digest ---------- */
+function stageMailHtml(t,to,ppl){
+  if(!window.MMSDigest||!MMSDigest.html) return '';
+  const sd=stageDef(to), w=whoseMove(Object.assign({},t,{stage:to})), d=t.dates||{};
+  const one=ppl&&ppl.length===1?firstName(ppl[0].name||''):'';
+  const rows=[];
+  if(t.facilitator) rows.push({lead:'Facilitator',main:t.facilitator});
+  if(t.workgroup) rows.push({lead:'Workgroup',main:t.workgroup});
+  if(d.targetIM&&['approved','cfp','kickoff','work','aireview'].includes(to)) rows.push({lead:'Target to Submit to IM',main:fmt(d.targetIM),badge:pastTarget(t)?'Past Target':'',tone:pastTarget(t)?'bad':''});
+  if(to==='comment'&&d.commentEnd) rows.push({lead:'Comment Period Ends',main:fmt(d.commentEnd)});
+  const href='https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id);
+  return MMSDigest.html({
+    title:t.name, dateLine:t.wr+' · Now at '+sd.name, first:one||'there',
+    intro:'This work request just moved to <b>'+esc(sd.name)+'</b>.'+(sd.desc?' '+esc(sd.desc):''),
+    button:{href,label:'Open the Work Request'},
+    footer:'Sent by the MMS when a work request reaches a new stage.',
+    sections:[{key:'next',title:'What Happens Next',tone:'info',noCount:true,rows:[{lead:w.label||'Next',main:w.text||('Work it at '+sd.name),href}]},
+      rows.length?{key:'facts',title:'At a Glance',noCount:true,rows}:null].filter(Boolean)
+  });
+}
 
 /* ---------- settings ---------- */
 let setTab='process';
