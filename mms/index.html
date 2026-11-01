@@ -3003,7 +3003,7 @@ function wireArch(m){
     if (on.comments && input.comments) {
       var since = add(today, monday ? -3 : -1);
       var mineIds = {}; mine.concat(T.filter(function (t) { return same(t.facilitator, person.name); })).forEach(function (t) { mineIds[t.id] = t; mineIds[t.wr] = t; });
-      var cm = input.comments.filter(function (c) { var t = mineIds[c.ticket] || mineIds[c.wr]; return t && String(c.submittedAt || '').slice(0, 10) >= since; });
+      var cm = input.comments.filter(function (c) { if (String(c.source || '').toLowerCase() === 'test') return false; var t = mineIds[c.ticket] || mineIds[c.wr]; return t && String(c.submittedAt || '').slice(0, 10) >= since; });
       if (cm.length) S.push({ key: 'comments', title: 'New Comments', tone: 'info', note: cm.length + ' new since ' + (monday ? 'Friday' : 'yesterday'),
         rows: cm.map(function (c) { var t = mineIds[c.ticket] || mineIds[c.wr]; return { lead: t.wr, main: (c.name || 'Someone') + (c.company ? ', ' + c.company : ''), sub: String(c.comment || '').slice(0, 160) + (String(c.comment || '').length > 160 ? '…' : ''), badge: f(String(c.submittedAt).slice(0, 10)), href: link(t) }; }) });
     }
@@ -3650,7 +3650,7 @@ async function loadDigestSources(force){
   }catch(e){ out.note.push('Service Orders hours could not be read just now.'); }
   digestSrc=out; digestSrcAt=Date.now(); return out;
 }
-function digestInput(src,now){ return {now:now||new Date(),tickets:S.tickets,process:S.process,people:S.people,arch:S.arch,media:S.media,comments:(src&&src.comments)||S.comments||[],mt:src&&src.mt,hours:src&&src.hours,settings:S.digestCfg}; }
+function digestInput(src,now){ return {now:now||new Date(),tickets:S.tickets,process:S.process,people:S.people,arch:S.arch,media:S.media,comments:((src&&src.comments)||S.comments||[]).filter(c=>!cmIsTest(c)),mt:src&&src.mt,hours:src&&src.hours,settings:S.digestCfg}; }
 async function sendDigests(list,why){
   let n=0; for(const m of list){ if(!m.to.length) continue; if(m.empty&&MMSDigest.settings(S.digestCfg).skipEmpty) continue;
     await queueMail({to:m.to,cc:m.cc,subject:m.subject,body:m.text,html:m.html,kind:'digest',key:'digest-'+m.name+'-'+today()+(why==='test'?'-test-'+Date.now():'')}); n++; }
@@ -3715,8 +3715,14 @@ async function loadComments(){
   if(S.mode!=='relay') return;
   const f=await rGet('mms','comments'); if(!f||!f.data) return;
   const L=Array.isArray(f.data.items)?f.data.items:Object.values(f.data.docs||{});
-  S.comments=L.filter(Boolean).map((c,i)=>Object.assign({id:c.id||('c'+i+'-'+String(c.submittedAt||'').replace(/\D/g,''))},c)).sort((a,b)=>String(b.submittedAt||'').localeCompare(String(a.submittedAt||'')));
+  S.commentsAll=L.filter(Boolean).map((c,i)=>Object.assign({id:c.id||('c'+i+'-'+String(c.submittedAt||'').replace(/\D/g,''))},c)).sort((a,b)=>String(b.submittedAt||'').localeCompare(String(a.submittedAt||'')));
+  S.comments=S.commentsAll.filter(cmCanSee);
 }
+/* test comments (source "test") are seen only by the person who tests the comment flow, and never go in a digest */
+const CM_TESTERS=['jcritchley@mba.org','jcritchley@mismo.org'];
+function cmIsTest(c){ return String((c&&c.source)||'').toLowerCase()==='test'; }
+function cmCanSee(c){ return !cmIsTest(c)||CM_TESTERS.includes(String((S.me&&S.me.email)||'').toLowerCase()); }
+window.__mmsCm={canSee:cmCanSee,isTest:cmIsTest};
 function commentsFor(t){ return (S.comments||[]).filter(c=>c.ticket===t.id||c.wr===t.wr); }
 function commentRow(c,withWr){ const st=(S.cstat||{})[c.id]||{}; const t=S.tickets[c.ticket]||allTickets().find(x=>x.wr===c.wr);
   return '<div class="cmt'+(st.status==='Addressed'?' done':'')+'"><div class="cmt-h">'+av(c.name||'?','sm')+'<span class="cmt-who"><b>'+esc(c.name||'Someone')+'</b><em>'+esc([c.title,c.company].filter(Boolean).join(', '))+(c.email?' · <a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>':'')+'</em></span><span class="cmt-d">'+esc(fmtS(String(c.submittedAt||'').slice(0,10)))+'</span></div>'+

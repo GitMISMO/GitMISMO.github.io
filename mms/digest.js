@@ -206,7 +206,7 @@
     if (on.comments && input.comments) {
       var since = add(today, monday ? -3 : -1);
       var mineIds = {}; mine.concat(T.filter(function (t) { return same(t.facilitator, person.name); })).forEach(function (t) { mineIds[t.id] = t; mineIds[t.wr] = t; });
-      var cm = input.comments.filter(function (c) { var t = mineIds[c.ticket] || mineIds[c.wr]; return t && String(c.submittedAt || '').slice(0, 10) >= since; });
+      var cm = input.comments.filter(function (c) { if (String(c.source || '').toLowerCase() === 'test') return false; var t = mineIds[c.ticket] || mineIds[c.wr]; return t && String(c.submittedAt || '').slice(0, 10) >= since; });
       if (cm.length) S.push({ key: 'comments', title: 'New Comments', tone: 'info', note: cm.length + ' new since ' + (monday ? 'Friday' : 'yesterday'),
         rows: cm.map(function (c) { var t = mineIds[c.ticket] || mineIds[c.wr]; return { lead: t.wr, main: (c.name || 'Someone') + (c.company ? ', ' + c.company : ''), sub: String(c.comment || '').slice(0, 160) + (String(c.comment || '').length > 160 ? '…' : ''), badge: f(String(c.submittedAt).slice(0, 10)), href: link(t) }; }) });
     }
