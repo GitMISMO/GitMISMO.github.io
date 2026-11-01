@@ -1468,6 +1468,9 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 .roles-tbl td{font-size:13px;vertical-align:top}
 .roles-tbl td:first-child{font-weight:600;color:var(--ink)}
 .roles-tbl td.rno{color:var(--ink-3)}
+/* every action in the next-step bar looks like a button */
+.actbar .btn.ghost{border-color:var(--border-strong);background:var(--surface)}
+.actbar .btn.ghost:hover{border-color:var(--accent);color:var(--accent);background:var(--surface)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3207,7 +3210,7 @@ VIEWS.mine=function(){
     const ppl=[...pm.values()].map(p=>Object.assign(p,{r:p.rs.join(' · ')})).filter(p=>!sameName(p.name,S.me.name));
     const rows=ppl.map(p=>{ const q=liveTickets().filter(t=>isMine(t,p)); const live=myFacTickets(p).length; return {p,q,live}; }).filter(x=>x.q.length||x.live).sort((a,b)=>b.q.length-a.q.length||a.p.name.localeCompare(b.p.name));
     if(rows.length) team='<div class="secthead"><h2>Everyone’s Queue</h2><span class="muted" style="font-size:12.5px">Click a person to see their queue the way they see it.</span></div><div class="team">'+rows.map(x=>{ const late=x.q.filter(pastTarget).length, old=x.q.reduce((m,t)=>Math.max(m,stageAge(t)||0),0);
-      return '<button type="button" class="tm" data-peek="'+esc(x.p.name)+'">'+av(x.p.name)+'<span class="tm-n"><b>'+esc(x.p.name)+'</b><em>'+esc(x.p.r)+'</em></span><span class="tm-q'+(x.q.length?' on':'')+'"><b>'+x.q.length+'</b>their move</span><span class="tm-s">'+[late?'<b class="bad">'+late+' past target</b>':'',x.q.length&&old?'oldest '+ageTxt(old):'',x.live?x.live+' facilitating':''].filter(Boolean).join(' · ')+'</span></button>'; }).join('')+'</div>';
+      return '<button type="button" class="tm" data-peek="'+esc(x.p.name)+'">'+av(x.p.name)+'<span class="tm-n"><b>'+esc(x.p.name)+'</b><em>'+esc(x.p.r)+'</em></span><span class="tm-q'+(x.q.length?' on':'')+'" title="'+x.q.length+' work request'+(x.q.length===1?' is':'s are')+' waiting on '+esc(firstName(x.p.name))+' to do the next step"><b>'+x.q.length+'</b>waiting on '+esc(firstName(x.p.name))+'</span><span class="tm-s">'+[late?'<b class="bad">'+late+' past target</b>':'',x.q.length&&old?'oldest '+ageTxt(old):'',x.live?x.live+' live work request'+(x.live===1?'':'s')+' in all':''].filter(Boolean).join(' · ')+'</span></button>'; }).join('')+'</div>';
   }
   const showLanes=yours.length+facT.length>0;
   const lanes=showLanes?'<div class="secthead"><h2>'+(S.viewAs?esc(who)+'’s':'Your')+' Work, Wherever It Is</h2>'+qSortBar(me)+'</div>'+lanesHtml('mine',[
@@ -4283,7 +4286,7 @@ function exitPreview(reopen){ S.viewAs=''; const s=$('#viewas'); if(s) s.value='
 // a strip on the queue and on the work request while previewing
 const _wireMain6=wireMain;
 wireMain=function(m){ _wireMain6(m);
-  if(S.viewAs&&S.view==='mine'&&!$('.pv-strip',m)){ const ph=$('.pagehead',m); if(ph) ph.insertAdjacentHTML('afterend','<div class="pv-strip"><span class="pv-eye">'+whIc('over')+'</span><div><b>You’re seeing '+esc(S.viewAs)+'’s queue the way '+(personIsStaff(S.viewAs)?'they see':'a facilitator sees')+' it.</b> Their buttons are shown so you know what they see, but they don’t act here.</div><button class="btn sm" type="button" data-peek="">Back to My Own Queue</button></div>'); $$('.pv-strip [data-peek]',m).forEach(b=>b.onclick=()=>exitPreview()); }
+  if(S.viewAs&&S.view==='mine'&&!$('.pv-strip',m)){ const ph=$('.pagehead',m); if(ph) ph.insertAdjacentHTML('afterend','<div class="pv-strip"><span class="pv-eye">'+whIc('over')+'</span><div><b>You’re seeing '+esc(S.viewAs)+'’s queue the way '+(personIsStaff(S.viewAs)?'they see':'a facilitator sees')+' it.</b> Their buttons are shown so you know what they see, but they don’t act here.</div><button class="btn sm" type="button" data-peek="">Back to My Own Queue</button></div>'); $$('.pv-strip [data-peek]',m).forEach(b=>b.onclick=()=>exitPreview()); $$('.pagehead [data-peek=""]',m).forEach(b=>{ const a=b.closest('.acts'); (a||b).remove(); }); }
 };
 const _renderPanel6=renderPanel;
 renderPanel=function(){ _renderPanel6(); const P=$('#panel'); if(!S.viewAs||!S.panel||String(S.panel).startsWith('arch:')) return;
