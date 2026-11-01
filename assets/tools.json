@@ -59,6 +59,14 @@
       "path": "/im-review/"
     },
     {
+      "key": "awg-review",
+      "label": "AWG Review",
+      "menu": "AWG Review (Architecture Workgroup)",
+      "colour": "#1F6E8C",
+      "group": "Standards & Tools",
+      "path": "/awg-review/"
+    },
+    {
       "key": "qr",
       "label": "QR Code Manager",
       "colour": "#2477B8",
