@@ -31,6 +31,14 @@
 "h": "/initiative-hub/title-order-dashboard.html"
 },
 {
+"t": "Title and Closing Dataset Specifications",
+"k": "Initiative",
+"o": "hub",
+"d": "Six dataset specifications that let title and closing documents move between parties as data rather than as documents: the ALTA Title Commitment, the…",
+"x": "Title & Closing",
+"h": "/initiative-hub/title-closing-dashboard.html"
+},
+{
 "t": "AVM Testing Guidance and Best Practices",
 "k": "Initiative",
 "o": "hub",
