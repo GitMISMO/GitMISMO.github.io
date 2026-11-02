@@ -1740,7 +1740,7 @@ function parseDate(v){
 const ago=s=>{ const n=daysBetween(s,today()); if(n==null) return ''; if(n<=0) return 'today'; if(n===1) return '1 day'; return n+' days'; };
 
 /* ---------- people & roles ---------- */
-const ROLE_LABEL={facilitator:'Facilitator',staff:'MISMO Staff',media:'MISMO Media',imawg:'IM/AWG Facilitator',director:'Director',vps:'VPs',gov:'Governance',website:'Website Admin',pm:'Program Manager',architect:'Architect',workgroup:'Workgroup',bet:'BET'};
+const ROLE_LABEL={facilitator:'Facilitator',staff:'MISMO Staff',media:'MISMO Media',imawg:'IM/AWG Facilitator',director:'Director',vps:'Designation Approval',gov:'Governance',website:'Website Admin',pm:'Program Manager',architect:'Architect',workgroup:'Workgroup',bet:'BET'};
 const DEFAULT_PEOPLE={
   facilitators:[
     {name:'Erin Bittenbender',email:'ebittenbender@mismo.org'},
@@ -1884,8 +1884,8 @@ function whoseMove(t){
       return {role:'imawg',label:'IM/AWG Facilitator',text:sub==='in-review'?nm+' is reviewing':t.stage==='im'?'Run the IM Pre-Review and send it to IM Review':'Waiting for '+nm+' Review'};
     }
     case 'designation':
-      if(sub==='vps') return {role:'vps',label:'VPs',text:t.designation&&t.designation.auto?'Agree with the recommended designation':'Agree with the Director’s designation'};
-      if(sub==='director'||sub==='discuss') return {role:'director',label:'Director',text:sub==='discuss'?'Talk with the VPs and update the designation':'Recommend the designation'};
+      if(sub==='vps'){ const ap=peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'Designation Approval'; return {role:'vps',label:ap,text:t.designation&&t.designation.auto?'Approve the recommended designation':'Approve the Director’s designation'}; }
+      if(sub==='director'||sub==='discuss') return {role:'director',label:'Director',text:sub==='discuss'?'Talk it over and update the designation':'Recommend the designation'};
       return {role:'facilitator',label:'Facilitator',text:'Send to designation with the comment length and page name'};
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
     case 'comment': return sub==='setup'?{role:'website',label:'Website Admin',text:'Post to the standards page and set the dates'}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)};
@@ -2066,7 +2066,7 @@ function stateChip(t){
 }
 function stageChip(t){ const s=stageDef(t.stage); return '<span class="chip" style="background:color-mix(in srgb,'+s.color+' 16%,transparent);color:var(--ink)"><span class="dot" style="background:'+s.color+'"></span>'+esc(s.name)+'</span>'; }
 function subChip(t){
-  const m={updates:['Updates Needed','warn'],resubmitted:['Resubmitted','info'],'in-review':['In Review','info'],new:['Waiting','info'],reviewed:['Reviewed','good'],setup:['Being Set Up','warn'],prep:['Facilitator Prep','warn'],vps:['With VPs','info'],director:['With Director','info'],discuss:['Needs Discussion','warn'],published:['Published','good']};
+  const m={updates:['Updates Needed','warn'],resubmitted:['Resubmitted','info'],'in-review':['In Review','info'],new:['Waiting','info'],reviewed:['Reviewed','good'],setup:['Being Set Up','warn'],prep:['Facilitator Prep','warn'],vps:['For Approval','info'],director:['With Director','info'],discuss:['Needs Discussion','warn'],published:['Published','good']};
   const x=m[t.sub]; return x?'<span class="chip '+x[1]+'">'+x[0]+'</span>':'';
 }
 const sizeTag=t=>t.size?'<span class="size" title="'+esc((SIZES.find(s=>s[0]===t.size)||[])[1]||'')+'">'+esc(t.size)+'</span>':'';
@@ -2180,7 +2180,7 @@ VIEWS.reviews=function(){
    sec('AI Review','Editor and readiness review in one step.',act.filter(t=>t.stage==='aireview'))+
    sec('IM Review','Information Management.',act.filter(t=>t.stage==='im'))+
    sec('AWG Review','Architecture Workgroup.',act.filter(t=>t.stage==='awg'))+
-   sec('License Designation','Director recommends; VPs agree.',act.filter(t=>t.stage==='designation'));
+   sec('License Designation','Recommended automatically after approval; Jonna approves.',act.filter(t=>t.stage==='designation'));
 };
 VIEWS.governance=function(){
   const act=liveTickets().filter(t=>t.state==='active'); const g=govName();
@@ -2288,7 +2288,7 @@ function stageActions(t){
     case 'designation':
       if(sub==='prep'||!sub) add('Send to Designation →',()=>toDesignation(t),'pri');
       if(sub==='director'||sub==='discuss'){ add('Approve Recommended Designation →',()=>approveRec(t),'pri'); add('Change the Designation',()=>directorRec(t)); }
-      if(sub==='vps') add('Record VP Agreement',()=>vpAgree(t),'pri');
+      if(sub==='vps') add('Approve the Designation',()=>vpAgree(t),'pri');
       break;
     case 'gc-comment': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
     case 'comment':
@@ -2438,13 +2438,13 @@ async function directorRec(t){
 }
 async function vpAgree(t){
   const vps=peopleFor('vps'); const cur=(t.designation&&t.designation.vps)||{};
-  const body=vps.map((p,i)=>fld(p.name,radios('v'+i,['Agree','Needs Discussion','Not Yet'],(cur[p.name]&&cur[p.name].vote)||'Not Yet')+'<input name="n'+i+'" placeholder="Note (optional)" style="margin-top:6px" value="'+esc((cur[p.name]&&cur[p.name].note)||'')+'">')).join('');
-  const v=await modal({title:'VP Agreement',ok:'Save',body:body||'<p>Add the VPs in Settings, People and Roles.</p>'});
+  const body=vps.map((p,i)=>fld(p.name,radios('v'+i,['Approve','Needs Discussion','Not Yet'],((cur[p.name]&&cur[p.name].vote)==='Agree'?'Approve':(cur[p.name]&&cur[p.name].vote))||'Not Yet')+'<input name="n'+i+'" placeholder="Note (optional)" style="margin-top:6px" value="'+esc((cur[p.name]&&cur[p.name].note)||'')+'">')).join('');
+  const v=await modal({title:'Approve the Designation',ok:'Save',body:(t.designation&&t.designation.auto?'<p class="muted">Recommended automatically: '+esc([t.designation.type,t.classification,t.designation.license,t.designation.royalty,t.designation.availableTo].filter(Boolean).join(' · '))+(t.designation.basis?' (from '+esc(t.designation.basis)+')':'')+'.</p>':'')+(body||'<p>Add the designation approver in Settings, People and Roles.</p>')});
   if(!v) return; const x=clone(t); const vs={}; vps.forEach((p,i)=>{ if(v['v'+i]&&v['v'+i]!=='Not Yet') vs[p.name]={vote:v['v'+i],note:v['n'+i]||'',at:today()}; });
   x.designation=Object.assign({},x.designation,{vps:vs});
-  const all=vps.length&&vps.every(p=>vs[p.name]&&vs[p.name].vote==='Agree'), disc=Object.values(vs).some(z=>z.vote==='Needs Discussion');
-  if(all){ x.designation.status='3. Approved'; await move(x,nextStage(x),{text:'VPs agreed with the designation; added to the '+govName()+' agenda'}); }
-  else if(disc){ await setSub(x,'discuss','A VP asked to discuss the designation'); queueMail({to:peopleFor('director').map(p=>p.email),subject:t.wr+' '+t.name+': a VP wants to discuss the designation',body:Object.entries(vs).map(([n,z])=>n+': '+z.vote+(z.note?' ('+z.note+')':'')).join('\n'),ticket:t.id,kind:'stage',key:t.id+'-disc-'+today()}); }
+  const all=vps.length&&vps.every(p=>vs[p.name]&&/^(Agree|Approve)$/.test(vs[p.name].vote)), disc=Object.values(vs).some(z=>z.vote==='Needs Discussion');
+  if(all){ x.designation.status='3. Approved'; await move(x,nextStage(x),{text:'Designation approved ('+vps.map(p=>p.name).join(', ')+'); added to the '+govName()+' agenda'}); }
+  else if(disc){ await setSub(x,'discuss','A VP asked to discuss the designation'); queueMail({to:peopleFor('director').map(p=>p.email),subject:t.wr+' '+t.name+': the designation needs discussion',body:Object.entries(vs).map(([n,z])=>n+': '+z.vote+(z.note?' ('+z.note+')':'')).join('\n'),ticket:t.id,kind:'stage',key:t.id+'-disc-'+today()}); }
   else { hist(x,'VP agreement updated'); await saveTicket(x,'Saved',clone(t)); }
 }
 async function decide(t){
@@ -3416,7 +3416,7 @@ VIEWS.reviews=function(){
   const lane=(key,title,sub,c)=>{ const L=act.filter(t=>t.stage===key).sort((a,b)=>urgency(a)-urgency(b)); return {key,title,n:L.length,c,sub:esc(sub),head:subs(L),items:L.map((t,i)=>card2(t,{next:true,act:true,i})),empty:'Nothing in this review'}; };
   const sd=k=>stageDef(k).color;
   return '<div class="pagehead slim"><div><h1>Review Desk</h1><div class="sub">AI Review, IM, AWG and License Designation side by side. The oldest and most overdue float to the top.</div></div><div class="acts">'+seg+'</div></div>'+
-    (tab==='trends'?trendsCard():lanesHtml('rev',[lane('aireview','AI Review','Editor and readiness review in one step',sd('aireview')),lane('im','IM Review','Information Management',sd('im')),lane('awg','AWG Review','Architecture Workgroup',sd('awg')),lane('designation','License Designation','Director recommends; VPs agree',sd('designation'))],'var(--lt-rev)'));
+    (tab==='trends'?trendsCard():lanesHtml('rev',[lane('aireview','AI Review','Editor and readiness review in one step',sd('aireview')),lane('im','IM Review','Information Management',sd('im')),lane('awg','AWG Review','Architecture Workgroup',sd('awg')),lane('designation','License Designation','Recommended automatically; Jonna approves',sd('designation'))],'var(--lt-rev)'));
 };
 
 /* ---------------- Governance ---------------- */
@@ -5320,14 +5320,14 @@ function ssKind(n){ const e=(String(n).split('.').pop()||'').toLowerCase(); retu
 function ssIc(k){ return '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="'+(SS_IC[k]||SS_IC.file)+'"/></svg>'; }
 function ssTag(n){ const s=String(n); if(/redline|track|markup/i.test(s)) return 'Redline'; if(/^(IM|AWG)Sub|IM Sub|submission form/i.test(s)) return 'IM Submission'; if(/editor|_ER\b/i.test(s)) return 'Editor'; if(/final|_vF\b/i.test(s)) return 'Final'; if(/_vD\b|draft/i.test(s)) return 'Draft'; if(/comment/i.test(s)) return 'Comment'; return ''; }
 function ssTabHtml(t){ ssEnsure(); const D=ssFor(t);
-  if(!D) return '<div class="psec full ss-tab"><h4>Files</h4><div class="lead-empty">Nothing here yet. Save files in this work request’s SharePoint folder.</div></div>';
+  if(!D) return '<div class="psec full ss-tab"><h4>Documents<a class="btn sm" style="margin-left:auto" href="'+esc(ssFolderUrl(t))+'" target="_blank" rel="noopener">Add a Document ↗</a></h4><div class="lead-empty">Nothing here yet. Add a Document opens this work request’s SharePoint folder; drop the files in there.</div></div>';
   const F=(D.files||[]).slice().sort((a,b)=>String(b.u||'').localeCompare(String(a.u||'')));
   const yr=f=>(String(f.u||'').match(/(20\d\d)/)||[])[1]||'Earlier';
   const groups=[...new Set(F.map(yr))];
   const row=f=>{ const k=f.url&&!f.p?'link':ssKind(f.n); const tag=ssTag(f.n);
     return '<a class="ss-f" href="'+esc(ssUrl(f))+'" target="_blank" rel="noopener"><span class="ss-i ss-'+k+'">'+ssIc(k)+'</span><span class="ss-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',f.b||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span>'+(tag?'<span class="chip ss-tag">'+esc(tag)+'</span>':'')+'<span class="ss-go">↗</span></a>'; };
   const L=(D.links||[]);
-  return '<div class="psec full ss-tab"><h4>Documents<span class="sp muted" style="font-size:12px;font-weight:500">'+F.length+' in SharePoint · click one to open it in a new tab</span></h4>'+
+  return '<div class="psec full ss-tab"><h4>Documents<span class="sp muted" style="font-size:12px;font-weight:500">'+F.length+' in SharePoint · click one to open it in a new tab</span><a class="btn sm" style="margin-left:10px" href="'+esc(ssFolderUrl(t))+'" target="_blank" rel="noopener" title="Opens this work request’s SharePoint folder so you can drop new files in">Add a Document ↗</a></h4>'+
     (F.length?groups.map(g=>'<div class="ss-g">'+esc(g)+'</div><div class="ss-list">'+F.filter(f=>yr(f)===g).map(row).join('')+'</div>').join(''):'<div class="lead-empty">No documents yet. Save them in this work request’s SharePoint folder.</div>')+'</div>'+
     (L.length?'<div class="psec full ss-tab"><h4>Links From Smartsheet</h4><div class="wh-chips">'+L.map(l=>'<a class="wh-chip" href="'+esc(l.u)+'" target="_blank" rel="noopener">'+whIc('link')+esc(l.n||l.col||l.u)+'<span>↗</span></a>').join('')+'</div></div>':''); }
 const _renderPanelSS=renderPanel;
