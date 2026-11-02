@@ -1645,6 +1645,215 @@ main.calm .fl-d,main.calm .bd-h,main.calm .okmark,main.calm .rise,main.calm>*{an
 .dg-days{gap:6px}
 .dg-days label{gap:7px!important;padding:5px 10px 5px 8px!important}
 .dg-days input{margin-right:1px!important}
+/* ---------- Help and the Resource Center ---------- */
+.hx-hero,.rc2-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:14px 22px;align-items:end;padding:22px 24px}
+.hx-hero>*,.rc2-hero>*{position:relative;z-index:1}
+.hx-hero h2,.rc2-hero h2{margin:4px 0 4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hx-find{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);border-radius:7px;padding:0 12px;min-width:min(380px,100%)}
+.hx-find svg{width:16px;height:16px;fill:none;stroke:var(--sky);stroke-width:2;flex:none}
+.hx-find input{flex:1;min-width:0;background:none;border:0;color:#fff;font:inherit;font-size:14px;padding:10px 0;outline:none}
+.hx-find input::placeholder{color:rgba(255,255,255,.62)}
+.hx-find:focus-within{border-color:var(--sky);background:rgba(255,255,255,.14)}
+.hx-roles{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.hx-roles button{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);color:rgba(255,255,255,.88);border-radius:6px;padding:8px 10px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left}
+.hx-roles button:hover{background:rgba(255,255,255,.13)}
+.hx-roles button[aria-selected="true"]{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}
+.hx-body{display:grid;grid-template-columns:310px minmax(0,1fr);gap:18px;align-items:start}
+.hx-toc{display:flex;flex-direction:column;gap:3px;position:sticky;top:calc(var(--hq-h) + 14px)}
+.hx-t{display:flex;align-items:center;gap:10px;background:none;border:1px solid transparent;border-radius:7px;padding:8px 10px;font:inherit;font-size:13.5px;color:var(--ink-2);cursor:pointer;text-align:left;white-space:nowrap;overflow:hidden}
+.hx-t span:last-child{overflow:hidden;text-overflow:ellipsis}
+.hx-t:hover{background:var(--surface);border-color:var(--border)}
+.hx-t.on{background:var(--surface);border-color:var(--border-strong);color:var(--ink);font-weight:600;box-shadow:var(--shadow)}
+.hx-n{flex:none;width:22px;height:22px;border-radius:5px;background:var(--surface-3);color:var(--ink-2);display:grid;place-items:center;font-size:11.5px;font-weight:700}
+.hx-t.on .hx-n{background:var(--navy);color:#fff}
+.hx-main{padding:22px 26px;margin:0}
+.hx-art h2{font-size:22px;margin:0 0 8px;color:var(--ink)}
+.hx-lead{font-size:15px;line-height:1.55;color:var(--ink-2);margin:0 0 16px;max-width:760px}
+.hx-steps{counter-reset:hs;list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:8px;max-width:820px}
+.hx-steps li{counter-increment:hs;position:relative;padding:10px 12px 10px 46px;background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;font-size:14px;line-height:1.5;color:var(--ink)}
+.hx-steps li:before{content:counter(hs);position:absolute;left:12px;top:9px;width:22px;height:22px;border-radius:5px;background:var(--accent);color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700}
+.hx-tips{border-left:3px solid var(--sky);background:var(--sky-wash);border-radius:0 7px 7px 0;padding:10px 14px;margin:0 0 16px;max-width:820px}
+.hx-tips b{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--navy-mid)}
+.hx-tips ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;line-height:1.5;color:var(--ink)}
+.hx-acts{display:flex;gap:8px;flex-wrap:wrap}
+.hx-pn,.rc2-pn{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--rule);margin-top:18px;padding-top:14px}
+.hx-pn .btn,.rc2-pn .btn{max-width:48%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc2-hl{min-width:0}
+.rc2-hero p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc2-find{margin-top:14px;max-width:520px}
+.rc2-quick{display:grid;grid-template-columns:repeat(2,minmax(150px,1fr));gap:8px}
+.rc2-q{display:flex;align-items:center;gap:9px;padding:11px 14px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);color:#fff;font:inherit;font-size:13.5px;font-weight:600;text-decoration:none;cursor:pointer;white-space:nowrap}
+.rc2-q svg{width:18px;height:18px;fill:none;stroke:var(--sky);stroke-width:2;flex:none}
+.rc2-q:hover{background:rgba(255,255,255,.16);border-color:var(--sky)}
+.rc2-tabs{margin:0 0 16px;max-width:100%;overflow-x:auto}
+.rc2-cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.rc2-col{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--gc);border-radius:9px;padding:14px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow)}
+.rc2-col h4,.rc2-gh{margin:0 0 2px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.rc2-gh{margin:14px 0 8px}
+.rc2-t{display:flex;align-items:center;gap:11px;padding:10px 11px;border:1px solid var(--rule);border-radius:8px;background:var(--surface-2);color:var(--ink);text-decoration:none;font:inherit;text-align:left;cursor:pointer;min-width:0;width:100%;transition:border-color .15s,transform .15s,box-shadow .15s}
+.rc2-t:hover{border-color:var(--tc);box-shadow:var(--shadow);transform:translateY(-1px)}
+.rc2-t.static{cursor:default}.rc2-t.static:hover{transform:none}
+.rc2-ic{flex:none;width:34px;height:34px;border-radius:8px;background:var(--tc);display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px}
+.rc2-ic svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.rc2-tx{display:flex;flex-direction:column;min-width:0;flex:1}
+.rc2-tx b{font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc2-tx span{font-size:12px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc2-go{flex:none;color:var(--ink-3);font-size:14px}
+.rc2-t:hover .rc2-go{color:var(--tc)}
+.rc2-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.rc2-grid.one{grid-template-columns:1fr}
+.rc2-flow{padding:18px}
+.rc2-sd{border:1px solid var(--border);border-left:4px solid var(--sc);border-radius:8px;padding:14px 16px;background:var(--surface)}
+.rc2-sdh{display:flex;justify-content:space-between;gap:16px;align-items:flex-start}
+.rc2-sdh h3{margin:4px 0 4px;font-size:19px}
+.rc2-sdh p{margin:0;color:var(--ink-2);font-size:14px}
+.rc2-now{flex:none;text-align:center;border:1px solid var(--border);border-radius:8px;padding:8px 14px;background:var(--surface-2)}
+.rc2-now b{display:block;font-size:24px;color:var(--ink)}
+.rc2-now span{font-size:11px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.08em;white-space:nowrap}
+.rc2-how{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.rc2-how>div{background:var(--surface-2);border:1px solid var(--rule);border-radius:7px;padding:10px 12px}
+.rc2-how b{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3)}
+.rc2-how p{margin:4px 0 0;font-size:13.5px;line-height:1.5}
+.rc2-here{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}
+.rc2-wr{border:1px solid var(--rule);background:var(--surface);border-radius:6px;padding:7px 10px;font:inherit;font-size:12.5px;color:var(--ink);text-align:left;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc2-wr:hover{border-color:var(--sc)}
+.rc2-wr.more{color:var(--accent);font-weight:600}
+.rc2-gov{display:grid;grid-template-columns:1.3fr 1fr;gap:16px;align-items:start}
+.rc2-gov .card,.rc2-rolesw .card{margin:0}
+.rc2-gs{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:1px solid var(--rule);border-left:4px solid var(--sc);border-radius:8px;background:var(--surface-2);font:inherit;text-align:left;cursor:pointer;margin-bottom:8px;--tc:var(--sc)}
+.rc2-gs:hover{border-color:var(--sc)}
+.rc2-gs .rc2-tx span{white-space:normal}
+.rc2-c{flex:none;font-size:20px;font-weight:700;color:var(--ink);min-width:32px;text-align:right}
+.rc2-rolesw{display:grid;grid-template-columns:1fr 1.2fr;gap:16px;align-items:start}
+.rc2-roles{display:grid;grid-template-columns:1fr;gap:6px}
+.rc2-role{display:grid;grid-template-columns:150px minmax(0,1fr);gap:2px 12px;padding:9px 11px;border:1px solid var(--rule);border-radius:7px;background:var(--surface-2)}
+.rc2-role b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;grid-row:span 2}
+.rc2-role .muted{font-size:12px}
+.rc2-ppl{font-size:12.5px;color:var(--ink)}
+.rc2-ppl i{color:var(--ink-3)}
+.rc2-res{padding:16px 18px}
+@media(max-width:1250px){.rc2-cols{grid-template-columns:repeat(2,minmax(0,1fr))}.rc2-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:1000px){.hx-hero,.rc2-hero{grid-template-columns:1fr}.rc2-gov,.rc2-rolesw{grid-template-columns:1fr}.rc2-quick{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:820px){.hx-body{grid-template-columns:1fr}.hx-toc{position:static;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.rc2-here{grid-template-columns:1fr 1fr}}
+@media(max-width:600px){.rc2-cols,.rc2-grid,.rc2-how,.rc2-here{grid-template-columns:1fr}.rc2-quick{grid-template-columns:1fr 1fr}.hx-toc{grid-template-columns:1fr}.hx-roles{grid-template-columns:1fr 1fr}.hx-main{padding:16px}.rc2-hero p,.hx-hero h2,.rc2-hero h2{white-space:normal}.rc2-role{grid-template-columns:1fr}.rc2-role b{grid-row:auto}.rc2-sdh{flex-direction:column}}
+.mr-html{flex:1;width:100%;min-height:420px;border:0;background:#fff}
+html.pnl-open,html.pnl-open body{overflow:hidden}
+.wh-x{right:22px}
+/* ---------- Metrics ---------- */
+:root{--k1:#2477b8;--k2:#eb6834;--k3:#1baf7a;--k4:#6b4fa0;--k5:#eda100}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--k1:#3987e5;--k2:#d95926;--k3:#199e70;--k4:#8f74d6;--k5:#c98500}}
+:root[data-theme="dark"]{--k1:#3987e5;--k2:#d95926;--k3:#199e70;--k4:#8f74d6;--k5:#c98500}
+.mx-filters{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:0 0 14px}
+.mx-sel{font:inherit;font-size:12.5px;padding:6px 8px;border:1px solid var(--border-strong);border-radius:5px;background:var(--surface);color:var(--ink);max-width:210px}
+.mx-hero{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px 26px;align-items:center}
+.mx-hero>*{position:relative;z-index:1}
+.mx-big{display:flex;align-items:baseline;gap:8px;margin:6px 0 4px}
+.mx-big b{font-size:56px;line-height:1;font-weight:700;color:#fff}
+.mx-big span{font-size:16px;color:var(--sky);font-weight:600}
+.mx-hero p{max-width:560px}
+.mx-d.up{color:#7fe0b8!important}.mx-d.down{color:#ffb4a8!important}
+.mx-tiles{display:grid;grid-template-columns:repeat(5,minmax(112px,1fr));gap:8px}
+.mx-tile{display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;border-radius:8px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.16);color:#fff;font:inherit;text-align:left;cursor:pointer;min-width:0}
+.mx-tile:hover,.mx-tile:focus-visible{background:rgba(255,255,255,.15);border-color:var(--sky)}
+.mx-tv{font-size:26px;font-weight:700;line-height:1.1}
+.mx-tl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--sky);font-weight:700;white-space:nowrap}
+.mx-ts{font-size:12px;color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.mx-tile.warn{border-color:rgba(237,161,0,.6)}.mx-tile.bad{border-color:rgba(240,133,121,.7)}
+.mx-tabs{margin:0 0 14px;max-width:100%;overflow-x:auto}
+.mx-card{margin:0 0 16px;padding:16px 18px}
+.mx-ch{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:8px}
+.mx-ch h3{margin:0;font-size:15px}
+.mx-ch p{margin:3px 0 0;font-size:12.5px;color:var(--ink-2)}
+.mx-tb{flex:none;font:inherit;font-size:11.5px;font-weight:600;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:4px 9px;cursor:pointer}
+.mx-tb[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.mx-svg{width:100%;height:auto;display:block;overflow:visible}
+.mx-grid{stroke:var(--rule);stroke-width:1}
+.mx-base{stroke:var(--border-strong);stroke-width:1}
+.mx-ref{stroke:var(--ink-2);stroke-width:1.5;stroke-dasharray:0}
+.mx-med{stroke:var(--ink);stroke-width:2}
+.mx-ax{font-size:10.5px;fill:var(--ink-3);font-variant-numeric:tabular-nums}
+.mx-ax.b{fill:var(--ink-2);font-weight:600;font-size:11px}
+.mx-vl{font-size:11px;fill:var(--ink);font-weight:700}
+.mx-m{transition:opacity .15s,filter .15s;outline:none}
+.mx-m:hover,.mx-m:focus{filter:brightness(1.12) drop-shadow(0 0 2px rgba(0,0,0,.25))}
+.mx-hit:hover .mx-m,.mx-hit:focus .mx-m{filter:brightness(1.12)}
+.mx-hitbg{fill:transparent}.mx-hit:hover .mx-hitbg,.mx-hit:focus .mx-hitbg{fill:var(--surface-2)}
+.mx-hit{outline:none}
+.mx-dot{stroke:var(--surface);stroke-width:2;cursor:pointer}.mx-dot:hover{r:6}
+.mx-leg{display:flex;flex-wrap:wrap;gap:6px 14px;margin:0 0 8px;font-size:12px;color:var(--ink-2)}
+.mx-leg span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.mx-leg i{width:10px;height:10px;border-radius:2px;display:inline-block}
+.mx-h2{font-size:15px;margin:22px 0 10px;color:var(--ink);display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline}
+.mx-h2 span{font-size:12.5px;font-weight:500;color:var(--ink-2)}
+.mx-minis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.mx-mini{margin:0;padding:12px 14px}
+.mx-mini header{display:flex;align-items:center;gap:8px;margin-bottom:2px;min-width:0}
+.mx-mini header b{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1;min-width:0}
+.mx-sw{width:10px;height:10px;border-radius:2px;flex:none}
+.mx-mv{font-size:18px;font-weight:700;white-space:nowrap;margin:0 0 4px;overflow:hidden;text-overflow:ellipsis}
+.mx-mv em{font-style:normal;font-weight:500;font-size:11.5px;color:var(--ink-3)}
+.mx-mv i{font-style:normal;font-size:11.5px;margin-left:6px}
+.mx-mv i.up{color:var(--good)}.mx-mv i.down{color:var(--bad)}
+.mx-size{flex:none;width:24px;height:22px;border-radius:5px;background:var(--navy);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center}
+.mx-grid2{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;align-items:start}
+.mx-grid2.even{grid-template-columns:1fr 1fr}
+.mx-grid2>.card,.mx-stack>.card{margin:0}
+.mx-stack{display:flex;flex-direction:column;gap:16px}
+.mx-wait{display:flex;flex-direction:column;gap:4px}
+.mx-wr{display:grid;grid-template-columns:minmax(0,1fr) 110px 40px;gap:10px;align-items:center;padding:6px 8px;border:1px solid transparent;border-radius:6px;background:none;font:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+.mx-wr:hover{background:var(--surface-2);border-color:var(--border)}
+.mx-wn{font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mx-wn em{font-style:normal;color:var(--ink-3);margin-left:6px}
+.mx-wb{height:8px;background:var(--surface-3);border-radius:4px;overflow:hidden}
+.mx-wb i{display:block;height:100%;border-radius:0 4px 4px 0}
+.mx-wd{font-size:13px;font-weight:700;text-align:right;font-variant-numeric:tabular-nums}
+.mx-segbar{display:flex;gap:2px;height:28px;margin:6px 0 10px}
+.mx-segbar span{border-radius:4px;display:flex;align-items:center;padding-left:8px;min-width:3px;cursor:pointer;outline:none}
+.mx-segbar span:hover,.mx-segbar span:focus{filter:brightness(1.12)}
+.mx-segbar b{color:#fff;font-size:12px}
+.mx-wg table th button{background:none;border:0;font:inherit;font-weight:700;color:inherit;cursor:pointer;padding:0;white-space:nowrap}
+.mx-wg tbody tr{cursor:pointer}.mx-wg tbody tr:hover td{background:var(--surface-2)}
+.mx-wg td:first-child{white-space:nowrap}
+.mx-cell{display:grid;grid-template-columns:minmax(40px,1fr) 34px;align-items:center;gap:8px;min-width:110px}
+.mx-cell i{display:block;height:8px;border-radius:0 4px 4px 0}
+.mx-cell b{text-align:right;font-variant-numeric:tabular-nums}
+.mx-tbl td.num{text-align:right;font-variant-numeric:tabular-nums}
+.mx-drill{position:fixed;top:var(--hq-h);right:0;bottom:0;width:min(440px,100vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:-8px 0 30px rgba(6,32,47,.18);z-index:40;display:flex;flex-direction:column;animation:mxin .2s both}
+@keyframes mxin{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+.mx-drill header{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:16px 18px;border-bottom:1px solid var(--rule);position:relative}
+.mx-drill header b{display:block;font-size:15px}
+.mx-drill header span{font-size:12.5px;color:var(--ink-2)}
+.mx-dx{position:static!important;background:var(--surface-2)!important;color:var(--ink)!important;border-color:var(--border)!important;flex:none}
+.mx-dl{overflow:auto;padding:8px 10px 20px;display:flex;flex-direction:column;gap:3px}
+.mx-dr{display:flex;align-items:center;gap:10px;justify-content:space-between;padding:8px 10px;border:1px solid transparent;border-radius:6px;background:none;font:inherit;text-align:left;cursor:pointer;color:var(--ink)}
+.mx-dr:hover{background:var(--surface-2);border-color:var(--border)}
+.mx-dn{font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mx-dn em{display:block;font-style:normal;font-size:11.5px;color:var(--ink-3)}
+.mx-dv{flex:none;font-weight:700;font-variant-numeric:tabular-nums}
+.mx-tip{position:fixed;z-index:60;pointer-events:none;background:var(--navy-deep);color:#fff;border-radius:6px;padding:7px 10px;font-size:12px;display:flex;flex-direction:column;gap:1px;box-shadow:0 6px 18px rgba(0,0,0,.25);max-width:280px}
+.mx-tip b{font-size:14px}
+.mx-tip span{color:rgba(255,255,255,.8)}
+@media(max-width:1300px){.mx-minis{grid-template-columns:repeat(3,minmax(0,1fr))}.mx-tiles{grid-template-columns:repeat(3,minmax(110px,1fr))}}
+@media(max-width:1100px){.mx-hero{grid-template-columns:1fr}.mx-grid2,.mx-grid2.even{grid-template-columns:1fr}.mx-minis,.mx-minis.four{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1301px){.mx-minis.four{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:600px){.mx-minis,.mx-minis.four{grid-template-columns:1fr}.mx-tiles{grid-template-columns:1fr 1fr}.mx-big b{font-size:46px}.mx-sel{max-width:none;flex:1 1 45%}.mx-wr{grid-template-columns:minmax(0,1fr) 60px 34px}}
+.mx-more{margin-top:10px}
+@media(max-width:600px){.mx-sel{flex:1 1 100%;max-width:100%;min-width:0}}
+.rc2-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px}
+.rc2-mini{margin:0;padding:16px 18px;display:flex;flex-direction:column;gap:6px}
+.rc2-mini h3{margin:0 0 4px;font-size:14px}
+.rc2-big{display:flex;align-items:baseline;gap:8px;margin:4px 0 8px}
+.rc2-big b{font-size:40px;line-height:1;color:var(--ink)}
+.rc2-big span{color:var(--ink-2);font-size:13px}
+.rc2-mini .btn{align-self:flex-start}
+.rc2-cl{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:7px 9px;border:1px solid var(--rule);border-radius:6px;background:var(--surface-2);font:inherit;font-size:13px;color:var(--ink);text-align:left;cursor:pointer;min-width:0}
+.rc2-cl span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.rc2-cl em{flex:none;font-style:normal;color:var(--ink-3);font-size:12px}
+.rc2-cl:hover{border-color:var(--border-strong)}
+@media(max-width:1000px){.rc2-row{grid-template-columns:1fr}}
+.hx-sel{display:none}
+@media(max-width:820px){.hx-sel{display:block;width:100%;max-width:none;font-size:14px;padding:9px 10px}.hx-toc{display:none!important}}
+@media(max-width:600px){.hx-roles button{white-space:normal;font-size:12px}}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -1680,6 +1889,7 @@ main.calm .fl-d,main.calm .bd-h,main.calm .okmark,main.calm .rise,main.calm>*{an
     <button type="button" data-hq="home" aria-current="page" title="Overview"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg><span>Overview</span></button>
     <button type="button" data-hq="mine" title="My Queue"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/></svg><span>My Queue</span><b id="nav-mine" hidden></b></button>
     <button type="button" data-hq="board" title="Pipeline Board"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="5" height="16" rx="1"/><rect x="10" y="4" width="5" height="11" rx="1"/><rect x="17" y="4" width="4" height="7" rx="1"/></svg><span>Pipeline Board</span></button>
+    <button type="button" data-hq="metrics" title="Metrics"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Metrics</span></button>
     <button type="button" data-hq="reviews" title="Review Desk"><svg viewBox="0 0 24 24"><path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9"/></svg><span>Review Desk</span><b id="nav-reviews" hidden></b></button>
     <button type="button" data-hq="governance" title="Governance"><svg viewBox="0 0 24 24"><path d="M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6"/></svg><span>Governance</span><b id="nav-gov" hidden></b></button>
     <button type="button" data-hq="comment" title="Comment Periods"><svg viewBox="0 0 24 24"><path d="M21 12a8 8 0 01-11.6 7.1L4 21l1.9-5.4A8 8 0 1121 12z"/></svg><span>Comment Periods</span></button>
@@ -1690,6 +1900,7 @@ main.calm .fl-d,main.calm .bd-h,main.calm .okmark,main.calm .rise,main.calm>*{an
     <button type="button" data-hq="outbox" title="Notifications"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><span>Notifications</span><b id="nav-outbox" hidden></b></button>
     <div class="navgrp">Help</div>
     <button type="button" data-hq="resources" title="Facilitator Resource Center"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z"/><path d="M4 19.5A2.5 2.5 0 006.5 22H20v-5"/></svg><span>Resource Center</span></button>
+    <button type="button" data-hq="help" title="Help"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01"/></svg><span>Help</span></button>
     <button type="button" data-hq="settings" title="Settings" id="nav-settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg><span>Settings</span></button>
   </nav>
   <div class="railsum" id="viewas-wrap" hidden>
@@ -1800,7 +2011,7 @@ function presetNext(){
   return {label:'New Process',gov:'RSGC',commentDays:[30],stages:s};
 }
 const DEFAULT_PROCESS={active:'current',switchOn:'',presets:{current:presetCurrent(),next:presetNext()}};
-const DEFAULT_NOTIFY={flowUrl:'',from:'workrequests@mismo.org',onEnter:{
+const DEFAULT_NOTIFY={holdUntil:'2026-11-20',flowUrl:'',from:'workrequests@mismo.org',onEnter:{
   approved:['staff'],cfp:['media','facilitator'],kickoff:['staff'],work:['facilitator'],aireview:['facilitator'],im:['imawg','facilitator'],awg:['imawg','facilitator'],
   designation:['director'],'gc-comment':['staff'],comment:['website','media','facilitator'],post:['facilitator'],'gc-publish':['staff'],release:['media','website','facilitator']},
   reminders:{targetDays:7,commentEndingDays:3,staleDays:45}};
@@ -1949,6 +2160,7 @@ async function move(t0,to,opts){
   if(to==='published'){ t.dates=t.dates||{}; t.dates.published=t.dates.published||today(); }
   Object.assign(t,opts.patch||{}); if(opts.dates){ t.dates=Object.assign(t.dates||{},opts.dates); }
   hist(t,opts.text||('Moved from '+stageDef(from).name+' to '+stageDef(to).name),{from,to,note:opts.note||''});
+  stampDates(t,from,to);
   onEnter(t,to,from);
   await saveTicket(t,opts.toast||(t.wr+' moved to '+stageDef(to).name),before);
   if(!opts.rider){ for(const r of ridersOf(t.id)){ if(r.stage!==to) await move(r,to,{rider:true,sub:to==='published'?'':t.sub,text:'Moved with '+t.wr+' (Reference Model release) to '+stageDef(to).name,toast:t.wr+' and the work riding with it moved to '+stageDef(to).name}); } }
@@ -1959,6 +2171,12 @@ async function setSub(t0,sub,text,patch,note){
   const t=clone(t0), before=clone(S.tickets[t0.id]||t0); t.sub=sub; Object.assign(t,patch||{}); hist(t,text,{note:note||''});
   await saveTicket(t,text,before); return t;
 }
+/* milestone dates for the metrics: stamped once, the first time a step is done */
+const STAMP_LEAVE={kickoff:'kickoffGc',cfp:'cfpPublished',aireview:'aiDecision',im:'imDecision',awg:'awgDecision',designation:'designation','gc-comment':'gcComment','gc-publish':'postGc'};
+const STAMP_ENTER={work:'workStart',comment:'commentPublished',published:'published'};
+function stampDates(t,from,to){ if(from===to) return; t.dates=t.dates||{}; const d=today();
+  const k1=STAMP_LEAVE[from]; if(k1&&!t.dates[k1]) t.dates[k1]=d;
+  const k2=STAMP_ENTER[to]; if(k2&&!t.dates[k2]) t.dates[k2]=d; }
 /* what happens automatically when a ticket enters a stage */
 function onEnter(t,to){
   t.dates=t.dates||{};
@@ -1991,12 +2209,14 @@ function notifyEnter(t,to){
     body:t.name+' ('+t.wr+') is now at '+stageDef(to).name+'.\n\nNext: '+(w.text||'')+(w.label?' ('+w.label+')':'')+'\n\nOpen it in the MISMO Manufacturing System: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id),
     html:(typeof stageMailHtml==='function'?stageMailHtml(t,to,ppl):''),ticket:t.id,kind:'stage',key:t.id+'-'+to+'-'+today()});
 }
+/* until the system goes live, nothing sends: every email waits in Notifications as a preview */
+function mailHeld(){ const h=S.notify&&S.notify.holdUntil; return !!h&&today()<h; }
 async function queueMail(m){
   const id=(m.key||uid()).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,140);
   if(S.outbox[id]) return;
-  const doc=Object.assign({id,at:new Date().toISOString(),status:'Queued'},m); delete doc.key;
+  const held=mailHeld(); const doc=Object.assign({id,at:new Date().toISOString(),status:held?'Held':'Queued'},m); delete doc.key;
   S.outbox[id]=doc; await write('outbox',id,doc);
-  if(S.notify.flowUrl){ try{ const r=await fetch(S.notify.flowUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:doc.to.join(';'),cc:(doc.cc||[]).join(';'),subject:doc.subject,body:doc.body,html:doc.html||'',from:S.notify.from})}); if(r.ok){ doc.status='Sent'; doc.sentAt=new Date().toISOString(); write('outbox',id,doc); } }catch(e){} }
+  if(!held&&S.notify.flowUrl){ try{ const r=await fetch(S.notify.flowUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:doc.to.join(';'),cc:(doc.cc||[]).join(';'),subject:doc.subject,body:doc.body,html:doc.html||'',from:S.notify.from})}); if(r.ok){ doc.status='Sent'; doc.sentAt=new Date().toISOString(); write('outbox',id,doc); } }catch(e){} }
 }
 
 /* ---------- automations that run whenever the page is open ---------- */
@@ -2128,7 +2348,7 @@ function counts(){
   set('#nav-gov',liveTickets().filter(t=>t.state==='active'&&['kickoff','gc-comment','gc-publish'].includes(t.stage)).length);
   set('#nav-media',Object.values(S.media).filter(m=>m.status!=='Done').length);
   set('#nav-arch',Object.values(S.arch||{}).filter(a=>(a.status==='Requested'&&isRole('pm'))||(['Approved','In Progress'].includes(a.status)&&isRole('architect'))).length,true);
-  set('#nav-outbox',Object.values(S.outbox).filter(m=>m.status==='Queued').length);
+  set('#nav-outbox',Object.values(S.outbox).filter(m=>m.status==='Queued'||m.status==='Held').length);
   $('#nav-settings').hidden=!S.isStaff;
 }
 function go(view){ S.view=view; $$('#nav button[data-hq]').forEach(b=>{ if(b.dataset.hq===view) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); }); try{ history.replaceState(null,'','#'+view); }catch(e){} window.scrollTo(0,0); renderAll(); }
@@ -2275,8 +2495,8 @@ VIEWS.resources=function(){
 };
 
 /* ---------- the ticket panel ---------- */
-function openPanel(id){ S.panel=id; renderPanel(); $('#panel').classList.add('on'); $('#panel').setAttribute('aria-hidden','false'); $('#scrim').classList.add('on'); }
-function closePanel(){ S.panel=null; $('#panel').classList.remove('on'); $('#panel').setAttribute('aria-hidden','true'); $('#scrim').classList.remove('on'); }
+function openPanel(id){ S.panel=id; renderPanel(); $('#panel').classList.add('on'); $('#panel').setAttribute('aria-hidden','false'); $('#scrim').classList.add('on'); document.documentElement.classList.add('pnl-open'); }
+function closePanel(){ S.panel=null; $('#panel').classList.remove('on'); $('#panel').setAttribute('aria-hidden','true'); $('#scrim').classList.remove('on'); document.documentElement.classList.remove('pnl-open'); }
 const GOV_STAGES=['kickoff','gc-comment','gc-publish'];
 
 function stageActions(t){
@@ -3546,14 +3766,15 @@ VIEWS.arch=function(){
 
 /* ---------------- Notifications ---------------- */
 VIEWS.outbox=function(){
-  const all=Object.values(S.outbox).sort((a,b)=>(b.at||'').localeCompare(a.at||'')), mf=S.mailF||'Queued', mq=(S.mailQ||'').toLowerCase();
+  const all=Object.values(S.outbox).sort((a,b)=>(b.at||'').localeCompare(a.at||'')), held=mailHeld(), mf=S.mailF||(all.some(m=>m.status==='Held')?'Held':'Queued'), mq=(S.mailQ||'').toLowerCase();
   const L=all.filter(m=>(mf==='all'||m.status===mf)&&(!mq||((m.subject||'')+' '+(m.to||[]).join(' ')+' '+(m.body||'')).toLowerCase().includes(mq)));
+  S._mailL=L.map(m=>m.id);
   const mlp=pageOf('mail:'+mf+':'+mq,L,fitN(330,66,5));
   const cur=L.find(m=>m.id===S.mailSel)||mlp.items[0];
-  const seg='<div class="seg sm" id="mailf">'+[['Queued','To Send'],['Sent','Sent'],['all','All']].map(([k,l])=>'<button type="button" data-mf="'+k+'" aria-pressed="'+(mf===k)+'">'+l+' <b>'+all.filter(m=>k==='all'||m.status===k).length+'</b></button>').join('')+'</div>';
+  const seg='<div class="seg sm" id="mailf">'+[['Held','Held (Preview)'],['Queued','To Send'],['Sent','Sent'],['all','All']].map(([k,l])=>'<button type="button" data-mf="'+k+'" aria-pressed="'+(mf===k)+'">'+l+' <b>'+all.filter(m=>k==='all'||m.status===k).length+'</b></button>').join('')+'</div>';
   const item=m=>'<button type="button" class="mi'+(cur&&m.id===cur.id?' on':'')+(m.status==='Sent'?' sent':'')+'" data-mail="'+esc(m.id)+'"><span class="mi-dot"></span><span class="mi-m"><span class="mi-t"><b>'+esc((m.to||[]).map(x=>x.split('@')[0]).join(', ')||'No recipient')+'</b><em>'+esc(fmtS((m.at||'').slice(0,10)))+'</em></span><span class="mi-s">'+esc(m.subject||'')+'</span><span class="mi-p">'+esc((m.body||'').slice(0,90))+'</span></span></button>';
-  const read=cur?'<div class="mr-h"><div class="mr-s">'+esc(cur.subject||'')+'</div><div class="mr-to"><span>To</span> '+esc((cur.to||[]).join(', '))+'</div><div class="mr-to"><span>Queued</span> '+esc(fmt((cur.at||'').slice(0,10)))+(cur.ticket&&S.tickets[cur.ticket]?' · <a href="#" data-open="'+esc(cur.ticket)+'">'+esc(S.tickets[cur.ticket].wr)+'</a>':'')+' · <span class="chip '+(cur.status==='Sent'?'good':'warn')+'">'+esc(cur.status==='Queued'?'To Send':cur.status)+'</span></div></div><div class="mr-b">'+esc(cur.body||'')+'</div><div class="mr-a"><a class="btn pri" href="mailto:'+esc((cur.to||[]).join(';'))+'?subject='+encodeURIComponent(cur.subject||'')+'&body='+encodeURIComponent(cur.body||'')+'">Open in Outlook</a>'+(S.canWrite&&cur.status!=='Sent'?'<button class="btn" data-sent="'+esc(cur.id)+'" type="button">Mark Sent</button>':'')+'</div>':'<div class="lane-e" style="margin:auto"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing here</div>';
-  return '<div class="pagehead slim"><div><h1>Notifications</h1><div class="sub">Every email the MMS has lined up. '+(S.notify.flowUrl?'They send automatically through the email flow.':'Until the email flow is connected, open each one to send it from Outlook.')+'</div></div>'+(all.some(m=>m.status==='Queued')&&S.canWrite?'<div class="acts"><button class="btn" id="sentall" type="button">Mark All Sent</button></div>':'')+'</div>'+
+  const read=cur?'<div class="mr-h"><div class="mr-s">'+esc(cur.subject||'')+'</div><div class="mr-to"><span>To</span> '+esc((cur.to||[]).join(', '))+'</div><div class="mr-to"><span>Queued</span> '+esc(fmt((cur.at||'').slice(0,10)))+(cur.ticket&&S.tickets[cur.ticket]?' · <a href="#" data-open="'+esc(cur.ticket)+'">'+esc(S.tickets[cur.ticket].wr)+'</a>':'')+' · <span class="chip '+(cur.status==='Sent'?'good':cur.status==='Held'?'info':'warn')+'">'+esc(cur.status==='Queued'?'To Send':cur.status==='Held'?'Held, not sent':cur.status)+'</span></div></div>'+(cur.html?'<iframe class="mr-html" sandbox="" title="Email preview" srcdoc="'+esc(cur.html)+'"></iframe>':'<div class="mr-b">'+esc(cur.body||'')+'</div>')+'<div class="mr-a"><a class="btn pri" href="mailto:'+esc((cur.to||[]).join(';'))+'?subject='+encodeURIComponent(cur.subject||'')+'&body='+encodeURIComponent(cur.body||'')+'">Open in Outlook</a>'+(S.canWrite&&cur.status==='Queued'?'<button class="btn" data-sent="'+esc(cur.id)+'" type="button">Mark Sent</button>':'')+(S.canWrite&&S.isStaff?'<button class="btn danger" data-mdel="'+esc(cur.id)+'" type="button">Delete</button>':'')+'</div>':'<div class="lane-e" style="margin:auto"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing here</div>';
+  return '<div class="pagehead slim"><div><h1>Notifications</h1><div class="sub">Every email the MMS has lined up. '+(held?'Sending is on hold until '+esc(fmt(S.notify.holdUntil))+'. Nothing goes out; each email waits here as a preview.':S.notify.flowUrl?'They send automatically through the email flow.':'Until the email flow is connected, open each one to send it from Outlook.')+'</div></div><div class="acts">'+(all.some(m=>m.status==='Queued')&&S.canWrite?'<button class="btn" id="sentall" type="button">Mark All Sent</button>':'')+(S.isStaff&&S.canWrite&&L.length?' <button class="btn danger" id="mdelall" type="button" data-n="'+L.length+'">Delete '+(mf==='all'?'All':'These')+' '+L.length+'</button>':'')+'</div></div>'+
     '<div class="mailbox"><section class="mlist"><header>'+seg+'<div class="tsearch sm"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="mq" placeholder="Search emails" value="'+esc(S.mailQ||'')+'"></div></header><div class="ml-b">'+(L.length?mlp.items.map(item).join(''):'<div class="lane-e">No emails here.</div>')+'</div>'+mlp.bar+'</section><section class="mread">'+read+'</section></div>';
 };
 
@@ -3883,7 +4104,7 @@ function wireDigest(m){
 }
 /* sending on its own while staff have the MMS open */
 async function digestAuto(){
-  const c=MMSDigest.settings(S.digestCfg); if(!c.on||c.sender==='action'||!S.isStaff||!S.canWrite||S.mode!=='relay') return;
+  const c=MMSDigest.settings(S.digestCfg), held=mailHeld(); if((!held&&(!c.on||c.sender==='action'))||!S.isStaff||!S.canWrite||S.mode!=='relay') return;
   const n=MMSDigest.et(new Date()); if(!c.days.includes(n.dow)||n.min<c.hour*60) return;
   const log=S.digestLog||{}; if(log.date===n.ymd) return;
   S.digestLog={date:n.ymd,at:new Date().toISOString(),by:S.me.name||'',count:0,how:'automatic'}; await write('config','digestLog',S.digestLog);
@@ -5418,7 +5639,7 @@ function imEnsureQ(){ if(S.cfgDocs&&S.cfgDocs.imauto) S.imauto=S.cfgDocs.imauto;
 function imColl(tid){ return ('imr-'+String(tid)).replace(/[^A-Za-z0-9_.-]/g,'_').slice(0,40); }
 function imEnsureR(tid){ const c=imColl(tid); if(imSubs[c]) return; imSubs[c]=1; try{ Store.sub(c,o=>{ Object.values(o||{}).forEach(d=>{ if(d&&d.rep) S.imr[d.rep]=d; }); if(S.view==='imreview') renderAll(); }); }catch(e){} }
 function imIsReviewer(){ return S.isStaff||isRole('imreview',S.me); }
-function imCount(){ const n=Object.values(S.imq||{}).filter(q=>q.status==='awaiting').length; const b=$('#nav-imreview'); if(b){ b.textContent=n||''; b.hidden=!n; } const btn=$('#nav button[data-hq="imreview"]'); if(btn) btn.hidden=!(S.isStaff||isRole('imreview',S.me)||isRole('facilitator',S.me)||(S.people&&(S.people.facilitators||[]).some(p=>sameName(p.name,S.me.name)))); }
+function imCount(){ const n=Object.values(S.imPortalQ||S.imq||{}).filter(q=>q&&!q.hist&&(q.status==='awaiting'||q.status==='carried')).length; const b=$('#nav-imreview'); if(b){ b.textContent=n||''; b.hidden=!n; } const btn=$('#nav button[data-hq="imreview"]'); if(btn) btn.hidden=!(S.isStaff||isRole('imreview',S.me)||isRole('facilitator',S.me)||(S.people&&(S.people.facilitators||[]).some(p=>sameName(p.name,S.me.name)))); }
 
 /* ---------- 1. the draft: a decision for every row ---------- */
 function imKind(row){ return [row.draft.dec,row.draft.rule||'clean',String(row.tt||'').toLowerCase()].join('|'); }
@@ -5564,7 +5785,7 @@ async function imrPut(name,content,sha){ const tok=window.ResourcesSession&&Reso
 async function imrUpdate(name,fn){ for(let i=0;i<5;i++){ const g=await rGet(IMR,name); const next=fn(g&&g.data?JSON.parse(JSON.stringify(g.data)):null); const r=await imrPut(name,next,g&&g.sha); if(r.ok) return next; if(r.status===403||r.status===401) throw new Error('no access'); await new Promise(x=>setTimeout(x,300+i*400)); } throw new Error('busy'); }
 async function imPush(rep){ const q=S.imq[rep], doc=S.imr[rep]; if(!q||!doc) return false; const t=S.tickets[q.ticket]||{}; const fac=personByName(t.facilitator)||{};
   const rp=(S.reviews&&S.reviews[rep])||{}; const sp=rp.sp||null;
-  const item=Object.assign({},q,{form:sp?{n:sp.n,u:sp.u}:null,docs:t.id&&typeof ssDocs==='function'?ssDocs(t):[],wg:t.workgroup||'',resub:/IMSub[2-9]|resub/i.test(doc.file||''),fac:{name:t.facilitator||'',email:fac.email||''},flow:(S.notify&&S.notify.flowUrl)||'',from:(S.notify&&S.notify.from)||''});
+  const item=Object.assign({},q,{form:sp?{n:sp.n,u:sp.u}:null,docs:t.id&&typeof ssDocs==='function'?ssDocs(t):[],wg:t.workgroup||'',resub:/IMSub[2-9]|resub/i.test(doc.file||''),fac:{name:t.facilitator||'',email:fac.email||''},flow:(S.notify&&S.notify.flowUrl&&!mailHeld()?S.notify.flowUrl:''),from:(S.notify&&S.notify.from)||''});
   try{ await imrUpdate('rev-'+imrSafe(rep),cur=>cur&&cur.status==='decided'?cur:Object.assign({},doc,{status:'awaiting'}));
     await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!(o.items[rep]&&o.items[rep].status==='decided')) o.items[rep]=item; return o; });
     q.pushed=true; await write('imqueue',rep,q); if(!q.test&&t.id&&t.stage==='im'&&t.sub!=='in-review') try{ await setSub(t,'in-review','Sent to IM Review'); }catch(e){} return true; }catch(e){ return false; } }
@@ -5572,7 +5793,7 @@ let imSyncing=false, imSynced=0;
 async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<60000) return; imSyncing=true; imSynced=Date.now();
   try{ const yr=new Date().getFullYear();
     const [q,l1,l0,cfg,bt]=await Promise.all(['queue','learn-'+yr,'learn-'+(yr-1),'config','backtest'].map(n=>rGet(IMR,n).catch(()=>null)));
-    if(bt&&bt.data) S.imBt=bt.data; if(q&&q.data&&q.data.items){ S.imPortalQ=q.data.items; if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel(); } if(cfg&&cfg.data&&cfg.data.imauto) S.imauto=cfg.data.imauto;
+    if(bt&&bt.data) S.imBt=bt.data; if(q&&q.data&&q.data.items){ S.imPortalQ=q.data.items; try{ imCount(); }catch(e){} if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel(); } if(cfg&&cfg.data&&cfg.data.imauto) S.imauto=cfg.data.imauto;
     [l0,l1].forEach(l=>{ if(l&&l.data&&l.data.rows) S.iml=Object.assign({},S.iml,l.data.rows); });
     if(!S.canWrite) return;
     // what is coming to IM: Target to Submit to IM in the next 60 days (or past it and not yet sent)
@@ -5631,7 +5852,7 @@ async function awgPushFromIm(t,doc,it){ const rep=imrSafe((t.wr||'wr')+'-'+Strin
   const at=new Date().toISOString(); const nc=(((S.awgCfg||{}).calls)||[]).filter(x=>x>=today()).sort()[0]||'';
   const adoc={rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',file:doc.file||'',at,by:'IM Review',fromIm:{rep:doc.rep,decidedAt:it.decidedAt,decidedBy:it.decidedBy,counts:it.counts||{}},imOutcome:'Approved',imDate:String(it.decidedAt||'').slice(0,10),resub:doc.resub||null,rows,status:'awaiting',calls:[],call:{date:nc,method:'Standard Meeting',present:[],others:[],votes:{},outcome:'',conditions:'',notes:''}};
   await awgUpdate('rev-'+rep,cur=>cur&&cur.status==='decided'?cur:adoc);
-  await awgUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!(o.items[rep]&&o.items[rep].status==='decided')) o.items[rep]={rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',status:'awaiting',sentAt:at,sentBy:'IM Review',rows:rows.length,awgRows:rows.filter(r=>/awg/i.test(r.body||'')).length,resub:!!doc.resub,fac:{name:t.facilitator||'',email:fac.email||''},docs,flow:(S.notify&&S.notify.flowUrl)||'',from:(S.notify&&S.notify.from)||'',fromIm:true}; return o; }); }
+  await awgUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!(o.items[rep]&&o.items[rep].status==='decided')) o.items[rep]={rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',status:'awaiting',sentAt:at,sentBy:'IM Review',rows:rows.length,awgRows:rows.filter(r=>/awg/i.test(r.body||'')).length,resub:!!doc.resub,fac:{name:t.facilitator||'',email:fac.email||''},docs,flow:(S.notify&&S.notify.flowUrl&&!mailHeld()?S.notify.flowUrl:''),from:(S.notify&&S.notify.from)||'',fromIm:true}; return o; }); }
 
 /* ---------- AWG Review: what's coming, the documents, and AWG's decisions coming home ---------- */
 let awgSyncing=false, awgSynced=0;
@@ -5639,7 +5860,7 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
   try{ const [q,cfg]=await Promise.all(['queue','config'].map(n=>rGet(AWGR,n).catch(()=>null))); S.awgPortalQ=(q&&q.data&&q.data.items)||{}; S.awgCfg=(cfg&&cfg.data)||{};
     if(!S.canWrite||!S.isStaff) return;
     // the email flow the portal uses to tell the facilitator
-    const fl=(S.notify&&S.notify.flowUrl)||'', fr=(S.notify&&S.notify.from)||''; if(fl&&(S.awgCfg.flow!==fl||S.awgCfg.from!==fr)) try{ S.awgCfg=await awgUpdate('config',c=>Object.assign({},c||{},{flow:fl,from:fr})); }catch(e){}
+    const fl=(S.notify&&S.notify.flowUrl&&!mailHeld())?S.notify.flowUrl:'', fr=(S.notify&&S.notify.from)||''; if(fl&&(S.awgCfg.flow!==fl||S.awgCfg.from!==fr)) try{ S.awgCfg=await awgUpdate('config',c=>Object.assign({},c||{},{flow:fl,from:fr})); }catch(e){}
     // coming to AWG: work requests at IM now
     try{ const items=liveTickets().filter(t=>t.state==='active'&&t.stage==='im'&&!t.split&&!t.rides).map(t=>({wr:t.wr,name:t.name,wg:t.workgroup||'',fac:t.facilitator||'',sub:(({new:'waiting','in-review':'in review',resubmitted:'resubmitted',updates:'updates needed',prep:'facilitator prep'})[t.sub]||'waiting'),stageShort:'IM',since:(t.dates&&t.dates.imSubmitted)||''})).sort((a,b)=>a.wr.localeCompare(b.wr));
       const up=await rGet(AWGR,'upcoming'); if(JSON.stringify(((up&&up.data&&up.data.items)||[]))!==JSON.stringify(items)) await awgUpdate('upcoming',()=>({asOf:today(),items})); }catch(e){}
@@ -5705,6 +5926,586 @@ function awgCount(){ const n=Object.values(S.awgPortalQ||{}).filter(q=>!q.hist&&
 const _imCount_awg=imCount; imCount=function(){ _imCount_awg(); awgCount(); };
 const _awgSync0=awgSync; awgSync=async function(){ await _awgSync0(); awgCount(); };
 
+/* ================= Help (by role) and the Resource Center ================= */
+const HELP_ROLES=[
+  ['facilitator','Facilitator','You run a workgroup and move its work requests along.'],
+  ['staff','MISMO Staff','You set up approved work, keep things moving and run Settings.'],
+  ['imawg','IM & AWG Facilitator','You run the IM and AWG calls and record what they voted.'],
+  ['member','IM & AWG Members','You read submissions before the call and vote on it.'],
+  ['approver','Designation Approver','You approve the license designation after AWG.'],
+  ['gov','Governance','Your committee approves kickoff, comment and publishing.'],
+  ['media','MISMO Media','You write the Calls for Participation, posts and announcements.'],
+  ['pm','PM and Architect','You approve and work Architecture Help requests.'],
+  ['website','Website Admin','You post comment periods and releases on mismo.org.']
+];
+/* topic: [title, roles ('*' = everyone), lead, steps, tips, links [[label, view or url]]] */
+const HELP_TOPICS={
+  start:['The MMS in Two Minutes','*',
+    'The MISMO Manufacturing System (MMS) tracks every work request from the day it is approved to the day it is published. It knows whose turn it is, tells them, and hands the work to the next group on its own.',
+    ['A work request is approved, set up by MISMO staff, and gets a Call for Participation if it needs new volunteers.',
+     'The workgroup builds the work product in In Work, then the facilitator sends it to AI Review.',
+     'AI Review checks it the way MISMO’s editor would and lists anything to fix before IM.',
+     'IM reviews it. If IM approves, it goes to AWG by itself. If IM sends it back, it returns to the facilitator.',
+     'AWG reviews it. If AWG approves, the MMS recommends a license designation and sends it to Jonna to approve.',
+     'Governance approves it for comment, it is posted for public comment, then Governance approves it to publish and it is released.'],
+    ['Everyone can see everything. Your role decides which buttons you get.','If something is waiting on you, it is in My Queue and in your daily digest email.'],
+    [['Open My Queue','mine'],['See the Pipeline Board','board']]],
+  find:['Finding Your Way','*',
+    'The MMS lives at resources.mismo.org/mms. Sign in with the same email and password you use for the other MISMO tools.',
+    ['Use the left rail to move between pages. Click the arrow at the top of the rail to open or close the labels.',
+     'Use the search at the top of the rail to find any work request by name, WR number, workgroup or person.',
+     'Click any work request to open its panel on the right. Press Esc or the X to close it.',
+     'Use the moon or sun at the bottom of the rail for dark or light mode.',
+     'Click your name at the top right to change your password or sign out.'],
+    ['IM Review and AWG Review open in their own tab, so the MMS stays where you left it.'],
+    []],
+  path:['How a Work Request Moves','*',
+    'There are five phases and thirteen steps. Each step has an owner, and the MMS shows who that is on every card.',
+    ['Getting Started: Approved – Set Up (MISMO staff), Call for Participation (MISMO Media), Kickoff Approval (Governance).',
+     'Building: In Work and AI Review (facilitator).',
+     'In Review: IM Review and AWG Review (IM & AWG facilitator), License Designation (Jonna).',
+     'Comment: Approval to Comment (Governance), Comment Period (website), Post-Comment (facilitator).',
+     'Publishing: Approval to Publish (Governance), Release (MISMO Media and the website).'],
+    ['Steps that move on their own: IM to AWG, AWG to License Designation, and Comment Period to Post-Comment when the period ends.','The Resource Center has a clickable version of this path with what happens at each step.'],
+    [['Open the step-by-step path','rc:flow']]],
+  queue:['My Queue: What’s Waiting on You','facilitator staff approver media pm website',
+    'My Queue lists every work request where it is your turn, oldest and most overdue first.',
+    ['Open My Queue from the left rail. The number on it is how many are waiting on you.',
+     'Each card says what to do next, such as Submit for AI Review or Approve the recommended designation.',
+     'Click the button on the card to do it, or click the card to see everything about that work request first.',
+     'Drag cards to put them in the order you want to work them.'],
+    ['When the queue is empty, nothing is waiting on you.','MISMO staff can look at anyone’s queue the way that person sees it, from Everyone’s Queue.'],
+    [['Open My Queue','mine']]],
+  panel:['Inside a Work Request','*',
+    'Click any card to open its panel. The tabs across the top hold everything about it.',
+    ['Overview: where it is, whose move it is, and the next step button.',
+     'Details: workgroup, facilitator, size, classification and the rest of its record.',
+     'Key Dates: start, Target to Submit to IM, comment period dates and what actually happened when.',
+     'Documents: every file for this work request in SharePoint. Click one to open it.',
+     'Links: anything else worth keeping with it, such as a draft or a Teams thread.',
+     'History: every move, who made it and when.'],
+    ['Every change is logged in History, so nothing is lost.'],
+    []],
+  docs:['Documents: Opening and Adding Files','facilitator staff imawg member',
+    'Each work request has its own folder in the MISMO Facilitator Team SharePoint (MMS Smartsheet Files). The MMS shows the files, not the folder.',
+    ['Open a work request and click the Documents tab.',
+     'Click a file to open it in a new tab. Word, Excel and PDF all open the file itself.',
+     'To add files, click Add Documents and choose them. They are saved into that work request’s SharePoint folder and show up right away.',
+     'To change a Word or Excel file, open it and edit it in the browser. SharePoint saves as you go and keeps every version.'],
+    ['To see an older version, open the file in SharePoint and use Version History.','Upload a new file only when it is a new document, such as an IM resubmission.'],
+    []],
+  aireview:['AI Review: Getting Ready for IM','facilitator staff',
+    'AI Review is the editor and readiness review in one. Claude reads the submission the way MISMO’s editor would and lists what to fix before IM sees it.',
+    ['When the work product is ready, click Submit for AI Review on the work request.',
+     'The review runs in a few minutes. You get a list of what to fix and what is only a suggestion.',
+     'Make the updates in your documents, then click Resubmit for AI Review to check again.',
+     'When it looks right, send it to IM. It lands in the IM Review queue by itself.'],
+    ['Fixes are things IM will send back. Suggestions are up to you.','Run AI Review Again any time you change the documents.'],
+    [['Open the Review Desk','reviews']]],
+  handoff:['IM, AWG and Designation: What Happens on Its Own','*',
+    'Once a submission is sent to IM, nobody has to move it by hand.',
+    ['IM approves: it goes straight to AWG and shows up on the AWG agenda.',
+     'IM returns it: it goes back to the facilitator as Updates Needed, with IM’s notes.',
+     'AWG approves: the MMS recommends a comment type, classification and license from past designations of the same kind, and sends it to Jonna.',
+     'AWG returns it: it goes back to the facilitator, or back to IM if AWG asks for that.',
+     'Jonna approves the designation: it moves on to Governance for approval to comment.'],
+    ['The facilitator hears about each of these in the daily digest.','The Review Desk shows all four review steps side by side.'],
+    [['Open the Review Desk','reviews']]],
+  asks:['Dates, Holds and Closing','facilitator staff',
+    'Your Target to Submit to IM date drives reminders, the Past Target list and the digest.',
+    ['Open the work request and go to Key Dates to see or change a date.',
+     'If the target is no longer right, change it. The digest reminds you when a target has passed or is close.',
+     'To pause, close or cancel a work request, use Ask to Put on Hold, Ask to Close or Ask to Cancel.',
+     'MISMO staff approve or decline the ask. You see the answer on the work request.'],
+    ['MISMO staff can hold, close or cancel right away; it is still logged.'],
+    []],
+  comments:['Comment Periods and Comments','facilitator staff website gov',
+    'Comment Periods shows what is open for public comment, what just closed and what is approved but not posted yet.',
+    ['Comments sent through the website’s comment form land on the work request, under Comments Received.',
+     'Read each one and mark it addressed when it is handled.',
+     'When the period ends, the work request moves to Post-Comment on its own.',
+     'In Post-Comment, the facilitator reports what came back, then it goes to Governance for approval to publish.'],
+    ['The digest tells facilitators about new comments and periods ending soon.'],
+    [['Open Comment Periods','comment']]],
+  arch:['Asking for Architecture Help','facilitator pm staff',
+    'Architecture Help is how a workgroup asks MISMO’s Architect for help, tied to the work request it supports.',
+    ['Open Architecture Help and click to make a request, or ask from the work request.',
+     'The Program Manager approves or declines it.',
+     'The Architect works approved requests from the same queue and marks them done.'],
+    ['The number on Architecture Help is what is waiting on you, if you are the Program Manager or the Architect.'],
+    [['Open Architecture Help','arch']]],
+  mediareq:['MISMO Media Requests','media staff facilitator',
+    'The MMS asks MISMO Media for a Call for Participation, a LinkedIn post or a release announcement at the right step, on its own.',
+    ['Open MISMO Media to see every request and its status.',
+     'Use the request to start the post, or copy it into the MISMO Media Request Form.',
+     'Mark it done when it is published.'],
+    ['Facilitators can still send any other ask through the MISMO Media Request Form.'],
+    [['Open MISMO Media Requests','media'],['MISMO Media Request Form','https://resources.mismo.org/forms/request/']]],
+  digest:['Your Daily Digest Email','*',
+    'The digest is one short email at the end of the day with what needs you and what is good to know.',
+    ['Needs You comes first: your move, past target, a target to check, new comments, meeting attendance to log, and on Mondays hours still to log.',
+     'Good to Know comes second: comment periods opening or ending, work sitting too long, requests waiting on staff, Architecture Help and MISMO Media requests, and what moved today.',
+     'Each list shows the top few, with a link to the rest in the MMS.',
+     'On days with nothing in Needs You, you get no email. The Friday wrap-up always comes, with the week’s moves, what was published, comment periods and what is coming up.'],
+    ['MISMO staff choose who gets it, which days, and who is copied in Settings › Daily Digest.'],
+    []],
+  notif:['Notifications','staff',
+    'Notifications is the MMS outbox: every email it creates, such as stage-change notices, reminders and digests.',
+    ['Until the system goes live, email is on hold: every email waits under Held (Preview) so you can read exactly what people would get. Held emails are never sent later.',
+     'Delete one with Delete, or clear the list with Delete These. Set or clear the hold date in Settings › Notifications.',
+     'After the hold, until the email flow is connected, emails wait under To Send. Open one and click Open in Outlook to send it from your mailbox.',
+     'Click Mark Sent when it has gone, or Mark All Sent for the whole list.',
+     'Once the Power Automate email flow link is saved in Settings › Notifications, emails send on their own and this page becomes the record of what went out.'],
+    ['Search finds an email by recipient, subject or text.'],
+    [['Open Notifications','outbox']]],
+  board:['The Pipeline Board and Moving Work','staff',
+    'The Pipeline Board shows every live work request by step.',
+    ['Drag a card onto another step to move it. The move and any approval it stands for are logged.',
+     'Use Move To on a work request for one-off fixes, such as putting it back a step.',
+     'Use All Work to sort and filter every work request, live or done.'],
+    ['Facilitators see the board but cannot drag on it.'],
+    [['Open the Pipeline Board','board'],['Open All Work','all']]],
+  approvals:['Approving Facilitator Asks','staff',
+    'When a facilitator asks to hold, resume, close or cancel, it waits for MISMO staff.',
+    ['The ask shows in My Queue and on the work request.',
+     'Approve it to make the change, or decline it with a note.'],
+    ['Either way, the facilitator sees the answer and it is logged.'],
+    [['Open My Queue','mine']]],
+  govrec:['Recording Governance Approvals','staff gov',
+    'Governance approves kickoff, comment and publishing. MISMO staff record those approvals in the MMS.',
+    ['Open Governance to see what is waiting on the committee, grouped by approval.',
+     'After the meeting, record each decision and the votes.',
+     'Approved work moves on to the next step by itself.'],
+    ['The Governance number on the left rail is what is waiting on the committee.'],
+    [['Open Governance','governance']]],
+  settings:['Settings','staff',
+    'Settings changes how the MMS works without changing the page. Only MISMO staff see it.',
+    ['Process: the steps, their owners and descriptions, and comment period lengths.',
+     'People and Roles: facilitators and who fills each role, which decides whose queue a work request lands in and who is emailed.',
+     'Notifications: the email flow link, the sender, and reminder timing.',
+     'Daily Digest: who gets it, which days, who is copied, and which sections are on.',
+     'Website: the feed of open comment periods to mismo.org.',
+     'Import and Backup: bring in or save a copy of the records.'],
+    ['Who can sign in is set in People and Access on resources.mismo.org, not here.'],
+    [['Open Settings','settings']]],
+  mt:['Rosters and Attendance Come From Meeting Trackers','staff imawg',
+    'Meeting Trackers is the source of truth for the IM and AWG rosters, call dates and attendance.',
+    ['Update the roster, voters or call schedule in Meeting Trackers.',
+     'Take attendance in Meeting Trackers as usual.',
+     'The IM Review and AWG Review portals pick up the change within about 30 minutes.'],
+    ['Nothing about the roster or calls is typed into the review portals.'],
+    [['Open Meeting Trackers','https://resources.mismo.org/meeting-trackers/']]],
+  imrun:['Running an IM Review','imawg',
+    'IM Review is its own page. Each submission arrives there on its own when a facilitator sends it to IM.',
+    ['Open IM Review from the left rail. It opens in a new tab.',
+     'Each submission comes with a draft decision for every row. Agree, or correct what the draft got wrong.',
+     'Click a document to open it. Resubmissions link to the earlier decision.',
+     'After the call, record the vote. Attendance and quorum come from Meeting Trackers.',
+     'Finish the decision. Approved work goes to AWG on its own; returned work goes back to the facilitator.'],
+    ['Every correction teaches the next draft.'],
+    [['Open IM Review','https://resources.mismo.org/im-review/']]],
+  awgrun:['Running an AWG Review','imawg',
+    'AWG Review works the same way as IM Review. IM’s approved submissions arrive there on their own.',
+    ['Open AWG Review from the left rail. It opens in a new tab.',
+     'Coming to AWG shows what is still at IM and how long it has been there.',
+     'Each submission has Claude’s first read and a draft. Open the documents and IM’s decision from the submission.',
+     'After the call, Record the AWG Vote: the outcome, any conditions, and objections or abstentions.',
+     'Finish it. Approved work goes to License Designation with a recommendation; returned work goes back.'],
+    ['Attendance and quorum come from Meeting Trackers.'],
+    [['Open AWG Review','https://resources.mismo.org/awg-review/']]],
+  member:['Reading a Submission Before the Call','member',
+    'You do not need to do anything in the MMS. The IM & AWG facilitator records the vote.',
+    ['Open the IM Review or AWG Review link you were sent.',
+     'Pick the submission and click a document to open it.',
+     'Bring questions to the call. The vote and attendance are recorded there.'],
+    ['Attendance is taken in Meeting Trackers.'],
+    [['IM Review','https://resources.mismo.org/im-review/'],['AWG Review','https://resources.mismo.org/awg-review/']]],
+  approve:['Approving the Designation','approver staff',
+    'When AWG approves, the MMS recommends the comment type, classification and license from past designations of the same kind, and sends it to you.',
+    ['Open My Queue. Look for Approve the recommended designation.',
+     'Open the work request to see the recommendation and why.',
+     'Click Approve the Designation and choose Approve, Needs Discussion or Not Yet.',
+     'Approved designations move on to Governance for approval to comment.'],
+    ['Change any part of the recommendation before approving if it is not right.'],
+    [['Open My Queue','mine']]],
+  govmem:['What Governance Sees','gov',
+    'You can look at any work request in the MMS, but you do not have to do anything in it.',
+    ['Governance shows what is waiting on the committee: kickoff, approval to comment and approval to publish.',
+     'Click a work request to read its details and documents before the meeting.',
+     'MISMO staff record the committee’s decision after the meeting.'],
+    [],
+    [['Open Governance','governance']]],
+  web:['Comment Periods on the Website','website staff',
+    'The Comment Period step belongs to the website. Approved work is posted to the standards page and announced.',
+    ['Comment Periods lists what is approved but not posted yet.',
+     'Post it on mismo.org, then the period runs on its own.',
+     'When the period ends, the MMS moves it to Post-Comment.',
+     'The website feed in Settings › Website can post and remove open comment periods on the new mismo.org on its own once it is switched on.'],
+    [],
+    [['Open Comment Periods','comment']]],
+  metrics:['Metrics','*',
+    'Metrics shows how the line is running, worked out from the date stamps the MMS keeps every time work moves.',
+    ['Pick a time range and any filters at the top. Everything on the page follows them.',
+     'The Line shows how long each phase and each step takes, year over year.',
+     'Right Now shows where everything is, what has waited longest and what is coming due at IM.',
+     'Volume shows what came in and went out each year and month. Sizes and Targets compares build time to the size target. Workgroups and People breaks it down by group and facilitator.',
+     'Click any bar, dot or number to see the work requests behind it, then click one to open it.'],
+    ['Median is the typical value and ignores outliers; switch to Average to compare.','Every chart has a Table button for the exact numbers.'],
+    [['Open Metrics','metrics']]],
+  words:['Words We Use','*',
+    'MISMO writes its own names one way. The Resource Center has the full list, and AI Review checks for them.',
+    ['Open the Resource Center and pick MISMO Terms.',
+     'Type a word to find it, for example eNote or CoP.'],
+    [],
+    [['Open MISMO Terms','rc:terms']]]
+};
+const HELP_ORDER={
+  facilitator:['start','queue','panel','docs','aireview','handoff','asks','comments','digest','arch','mediareq','metrics','path','find','words'],
+  staff:['start','queue','board','metrics','approvals','handoff','govrec','settings','mt','notif','digest','panel','docs','path','find'],
+  imawg:['start','imrun','awgrun','mt','handoff','docs','digest','path','find'],
+  member:['start','member','docs','path','find'],
+  approver:['start','approve','queue','handoff','metrics','digest','path','find'],
+  gov:['start','govmem','comments','metrics','path','digest','find'],
+  media:['start','mediareq','queue','digest','path','find'],
+  pm:['start','arch','queue','digest','path','find'],
+  website:['start','web','comments','queue','digest','path','find']
+};
+function helpRoleDefault(){ try{ const r=localStorage.getItem('tools:mms:helpRole'); if(r&&HELP_ORDER[r]) return r; }catch(e){}
+  if(typeof isRole==='function'){ if(isRole('imawg')) return 'imawg'; if(isRole('media')) return 'media'; if(isRole('pm')||isRole('architect')) return 'pm'; if(isRole('website')) return 'website'; }
+  return S.isStaff?'staff':'facilitator'; }
+function helpLink(l){ const [lab,to]=l; if(/^https?:/.test(to)) return '<a class="btn sm" href="'+esc(to)+'" target="_blank" rel="noopener">'+esc(lab)+' ↗</a>'; return '<button type="button" class="btn sm" data-hgo="'+esc(to)+'">'+esc(lab)+' →</button>'; }
+function helpTopicHtml(id){ const T=HELP_TOPICS[id]; if(!T) return ''; const [t,,lead,steps,tips,links]=T;
+  return '<article class="hx-art"><h2>'+esc(t)+'</h2><p class="hx-lead">'+esc(lead)+'</p>'+
+    (steps.length?'<ol class="hx-steps">'+steps.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol>':'')+
+    (tips.length?'<div class="hx-tips"><b>Good to Know</b><ul>'+tips.map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul></div>':'')+
+    (links.length?'<div class="hx-acts">'+links.map(helpLink).join('')+'</div>':'')+'</article>'; }
+VIEWS.help=function(){
+  const role=S.helpRole||(S.helpRole=helpRoleDefault()), order=HELP_ORDER[role]||HELP_ORDER.facilitator, q=(S.helpQ||'').trim().toLowerCase();
+  const R=HELP_ROLES.find(r=>r[0]===role)||HELP_ROLES[0];
+  let list=order, cur=order.includes(S.helpT)?S.helpT:order[0];
+  if(q){ list=Object.keys(HELP_TOPICS).filter(k=>JSON.stringify(HELP_TOPICS[k]).toLowerCase().includes(q)); cur=list.includes(S.helpT)?S.helpT:list[0]; }
+  const roles='<div class="hx-roles" role="tablist" aria-label="Pick your role">'+HELP_ROLES.map(([k,l])=>'<button type="button" role="tab" data-hrole="'+k+'" aria-selected="'+(k===role&&!q)+'">'+esc(l)+'</button>').join('')+'</div>';
+  const toc=list.length?list.map((k,i)=>'<button type="button" class="hx-t'+(k===cur?' on':'')+'" data-htopic="'+k+'"><span class="hx-n">'+(i+1)+'</span><span>'+esc(HELP_TOPICS[k][0])+'</span></button>').join(''):'<div class="lead-empty">Nothing matches that. Try a shorter word.</div>';
+  const idx=list.indexOf(cur), nav=cur?'<div class="hx-pn">'+(idx>0?'<button type="button" class="btn sm" data-htopic="'+list[idx-1]+'">← '+esc(HELP_TOPICS[list[idx-1]][0])+'</button>':'<span></span>')+(idx<list.length-1?'<button type="button" class="btn sm pri" data-htopic="'+list[idx+1]+'">'+esc(HELP_TOPICS[list[idx+1]][0])+' →</button>':'')+'</div>':'';
+  return '<div class="hero hx-hero"><div class="hx-hl"><div class="date">Help and How-To</div><h2>'+(q?'Results for “'+esc(S.helpQ.trim())+'”':'For '+esc(R[1]))+'</h2><p>'+(q?list.length+' topic'+(list.length===1?'':'s')+' across every role.':esc(R[2])+' Here is everything you need, in order.')+'</p></div>'+
+    '<div class="hx-find"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="helpq" placeholder="Search all help (for example digest, documents, vote)" value="'+esc(S.helpQ||'')+'" aria-label="Search help"></div>'+roles+'</div>'+
+    '<div class="hx-body"><select class="hx-sel mx-sel" id="hxsel" aria-label="Topic">'+list.map((k,i)=>'<option value="'+k+'"'+(k===cur?' selected':'')+'>'+(i+1)+'. '+esc(HELP_TOPICS[k][0])+'</option>').join('')+'</select><div class="hx-toc" role="navigation" aria-label="Topics">'+toc+'</div><div class="hx-main card">'+(cur?helpTopicHtml(cur)+nav:'')+'</div></div>';
+};
+
+/* ---------------- Resource Center ---------------- */
+const RC2_GROUPS=[
+  ['Every Week','#2477b8',[
+    ['Meeting Trackers','Attendance, rosters, calls','https://resources.mismo.org/meeting-trackers/','M4 4h16v16H4zM4 9h16M9 4v16'],
+    ['Initiative Hub','Initiatives and monthly updates','https://resources.mismo.org/initiative-hub/','M12 2l9 5-9 5-9-5 9-5zM3 12l9 5 9-5M3 17l9 5 9-5'],
+    ['My Work Requests','Requests you submitted','https://resources.mismo.org/initiative-hub/work-requests.html#mine','M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01']]],
+  ['Start Something','#eb6834',[
+    ['Submit a Work Request','Start a new request','https://resources.mismo.org/initiative-hub/work-requests.html#new','M12 5v14M5 12h14'],
+    ['MISMO Media Request','Posts and announcements','https://resources.mismo.org/forms/request/','M4 11v2a1 1 0 001 1h2l5 4V6L7 10H5a1 1 0 00-1 1z'],
+    ['Architecture Help','Ask the Architect','go:arch','M12 2l9 5-9 5-9-5 9-5zM3 17l9 5 9-5']]],
+  ['Reviews','#1baf7a',[
+    ['IM Review','Submissions and decisions','https://resources.mismo.org/im-review/','M9 11l3 3 8-8M20 12v7a2 2 0 01-2 2H6a2 2 0 01-2-2V5a2 2 0 012-2h9'],
+    ['AWG Review','Agenda and AWG votes','https://resources.mismo.org/awg-review/','M3 21h18M5 21V10M19 21V10M12 21V10M2 10l10-6 10 6'],
+    ['Public Comment Form','Where comments come in','https://resources.mismo.org/forms/comment/','M21 12a8 8 0 01-11.6 7.1L4 21l1.9-5.4A8 8 0 1121 12z']]],
+  ['Look It Up','#6b4fa0',[
+    ['Facilitator Handbook','The core guide (being redone)','https://mortgagebankersassociation.sharepoint.com/:w:/s/Facilitators/EcQiScj33DdBjFYgFsNO7-0B6aZV9Fyi0_eXcH5lEq0DRg','M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5zM4 19.5A2.5 2.5 0 006.5 22H20v-5'],
+    ['Business Glossary','MISMO’s glossary console','https://resources.mismo.org/glossary/console/','M4 6h16M4 12h10M4 18h7'],
+    ['MISMO.org','The public website','https://www.mismo.org/','M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20']]]
+];
+const RC2_STAGE_HOW={
+  approved:['Set the start date, size and Target to Submit to IM; decide on a Call for Participation.','Facilitator and workgroup are told it’s approved.'],
+  cfp:['Write and publish the Call for Participation.','MISMO Media gets the request on its own.'],
+  kickoff:['Approve kicking off the Development Workgroup.','Staff record the decision; approved work moves to In Work.'],
+  work:['Build the work product and keep the target date current.','Reminders before the target and when it passes.'],
+  aireview:['Submit for AI Review, make the fixes, then send it to IM.','Claude reviews it in minutes and lists fixes and suggestions.'],
+  im:['IM reviews each row and votes on the call.','Approved goes to AWG; returned goes back to the facilitator.'],
+  awg:['AWG reviews and votes on the call.','Approved goes to License Designation with a recommendation.'],
+  designation:['Jonna approves the recommended designation.','The recommendation is drawn from past designations of the same kind.'],
+  'gc-comment':['Governance approves it for public comment.','Staff record the vote; approved work goes to the website.'],
+  comment:['Post it on mismo.org and announce it.','Moves to Post-Comment by itself when the period ends.'],
+  post:['Report what came back from the comment period.','Comments from the website form land on the work request.'],
+  'gc-publish':['Governance approves it to publish.','Staff record the vote; approved work goes to Release.'],
+  release:['Announce it and put the pages live.','MISMO Media gets the release request on its own.']
+};
+const GOV_DESC={'Business Executive Team (BET)':'Approves new work and sets priorities.','Residential Standards Governance Committee':'Governs residential standards.','Commercial Standards Governance Committee':'Governs commercial standards.','Council of Chairs':'Workgroup and community chairs.','Education Council':'Guides MISMO education.'};
+function rc2Tile(x,c){ const [n,d,u,ic]=x, int=/^go:/.test(u);
+  return (int?'<button type="button" class="rc2-t" data-hgo="'+esc(u.slice(3))+'"':'<a class="rc2-t" href="'+esc(u)+'" target="_blank" rel="noopener"')+' style="--tc:'+c+'"><span class="rc2-ic"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg></span><span class="rc2-tx"><b>'+esc(n)+'</b><span>'+esc(d)+'</span></span><span class="rc2-go">'+(int?'→':'↗')+'</span>'+(int?'</button>':'</a>'); }
+function rc2Search(q){ const out=[]; q=q.toLowerCase();
+  RC2_GROUPS.forEach(([g,c,L])=>L.forEach(x=>{ if((x[0]+' '+x[1]).toLowerCase().includes(q)) out.push(['Tool',rc2Tile(x,c)]); }));
+  stages().forEach(s=>{ if((s.name+' '+(s.desc||'')).toLowerCase().includes(q)) out.push(['Step','<button type="button" class="rc2-t" data-rcs2="'+s.key+'" style="--tc:'+s.color+'"><span class="rc2-ic n">'+(stageIndex(s.key)+1)+'</span><span class="rc2-tx"><b>'+esc(s.name)+'</b><span>'+esc(s.desc||'')+'</span></span><span class="rc2-go">→</span></button>']); });
+  Object.keys(HELP_TOPICS).forEach(k=>{ const T=HELP_TOPICS[k]; if(JSON.stringify(T).toLowerCase().includes(q)) out.push(['Help','<button type="button" class="rc2-t" data-hq2="'+k+'" style="--tc:#456179"><span class="rc2-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01"/></svg></span><span class="rc2-tx"><b>'+esc(T[0])+'</b><span>'+esc(T[2].slice(0,90))+'…</span></span><span class="rc2-go">→</span></button>']); });
+  (typeof RV_TERMS!=='undefined'?RV_TERMS:[]).forEach(t=>{ if((t[0]+' '+(t[2]||'')).toLowerCase().includes(q)) out.push(['Term','<div class="rc2-t static" style="--tc:#6b4fa0"><span class="rc2-ic"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h7"/></svg></span><span class="rc2-tx"><b>'+esc(t[0])+'</b><span>'+esc(t[2]||t[1])+'</span></span></div>']); });
+  return out; }
+VIEWS.resources=function(){
+  const tab=S.rcTab||'tools', q=(S.rcQ||'').trim(), live=liveTickets(), act=live.filter(t=>t.state==='active');
+  const cp=act.filter(t=>t.stage==='comment').length, rv=act.filter(t=>['aireview','im','awg','designation'].includes(t.stage)).length, gv=act.filter(t=>['kickoff','gc-comment','gc-publish'].includes(t.stage)).length;
+  const TABS=[['tools','Tools and Links'],['flow','How Work Moves'],['gov','Governance'],['roles','Who Does What'],['terms','MISMO Terms']];
+  const hero='<div class="hero rc2-hero"><div class="rc2-hl"><div class="date">Facilitator Resource Center</div><h2>Everything you need to run your workgroup</h2><p><b>'+live.length+'</b> work requests live · <b>'+rv+'</b> in review · <b>'+cp+'</b> open for comment · <b>'+gv+'</b> with Governance</p>'+
+    '<div class="hx-find rc2-find"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="rcq" placeholder="Search tools, steps, help and terms" value="'+esc(S.rcQ||'')+'" aria-label="Search the Resource Center"></div></div>'+
+    '<div class="rc2-quick">'+[['Meeting Trackers','https://resources.mismo.org/meeting-trackers/','M4 4h16v16H4zM4 9h16M9 4v16'],['New Work Request','https://resources.mismo.org/initiative-hub/work-requests.html#new','M12 5v14M5 12h14'],['Handbook',RC2_GROUPS[3][2][0][2],'M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z'],['Help','go:help','M12 3a9 9 0 100 18 9 9 0 000-18zM9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01']].map(([n,u,ic])=>/^go:/.test(u)?'<button type="button" class="rc2-q" data-hgo="'+u.slice(3)+'"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg>'+esc(n)+'</button>':'<a class="rc2-q" href="'+esc(u)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg>'+esc(n)+'</a>').join('')+'</div></div>';
+  if(q){ const R=rc2Search(q); const kinds=['Tool','Step','Help','Term'];
+    return hero+'<div class="card rc2-res"><h3>'+R.length+' result'+(R.length===1?'':'s')+' for “'+esc(q)+'”<span class="sp"><button type="button" class="btn sm" id="rcclear">Clear</button></span></h3>'+(R.length?kinds.filter(k=>R.some(r=>r[0]===k)).map(k=>'<h4 class="rc2-gh">'+k+(k==='Help'?' Topics':k==='Step'?'s':'s')+'</h4><div class="rc2-grid">'+R.filter(r=>r[0]===k).slice(0,12).map(r=>r[1]).join('')+'</div>').join(''):'<div class="lead-empty">Nothing matches. Try a shorter word.</div>')+'</div>'; }
+  const seg='<div class="seg rc2-tabs" role="tablist">'+TABS.map(([k,l])=>'<button type="button" role="tab" data-rctab="'+k+'" aria-pressed="'+(k===tab)+'">'+l+'</button>').join('')+'</div>';
+  let body='';
+  if(tab==='tools'){ const td=today(), mine=typeof waitingOn==='function'?live.filter(t=>waitingOn(t)):[], soon=act.filter(t=>t.stage==='comment'&&t.dates&&t.dates.commentEnd&&t.dates.commentEnd>=td).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd)).slice(0,4);
+    const role=helpRoleDefault(), pop=(HELP_ORDER[role]||HELP_ORDER.facilitator).slice(1,6);
+    body='<div class="rc2-cols">'+RC2_GROUPS.map(([g,c,L])=>'<section class="rc2-col" style="--gc:'+c+'"><h4>'+esc(g)+'</h4>'+L.map(x=>rc2Tile(x,c)).join('')+'</section>').join('')+'</div>'+
+    '<div class="rc2-row"><section class="card rc2-mini"><h3>Waiting on You</h3><div class="rc2-big"><b>'+mine.length+'</b><span>work request'+(mine.length===1?'':'s')+' in My Queue</span></div><button type="button" class="btn sm pri" data-hgo="mine">Open My Queue →</button></section>'+
+    '<section class="card rc2-mini"><h3>Comment Periods Closing</h3>'+(soon.length?soon.map(t=>'<button type="button" class="rc2-cl" data-open="'+esc(t.id)+'"><span><b>'+esc(t.wr||'')+'</b> '+esc(t.name||'')+'</span><em>'+esc(fmtS(t.dates.commentEnd))+'</em></button>').join(''):'<div class="lead-empty">Nothing open for comment.</div>')+'</section>'+
+    '<section class="card rc2-mini"><h3>Help for '+esc((HELP_ROLES.find(r=>r[0]===role)||HELP_ROLES[0])[1])+'</h3>'+pop.map(k=>'<button type="button" class="rc2-cl" data-hq2="'+k+'"><span>'+esc(HELP_TOPICS[k][0])+'</span><em>→</em></button>').join('')+'</section></div>'; }
+  else if(tab==='flow'){ const sel=S.rcStage&&stageDef(S.rcStage)&&stages().some(s=>s.key===S.rcStage)?S.rcStage:stages()[0].key, sd=stageDef(sel), idx=stageIndex(sel), n=act.filter(t=>t.stage===sel), how=RC2_STAGE_HOW[sel]||['',''];
+    const flow='<div class="flow">'+PHASES.filter(ph=>phaseStages(ph).length).map(ph=>'<div class="fl-ph" style="--lc:'+ph.c+'"><div class="fl-pn">'+esc(ph.name)+'</div><div class="fl-st">'+phaseStages(ph).map(s=>'<button type="button" class="fl-s'+(s.key===sel?' on':'')+'" data-rcs="'+s.key+'" style="--sc:'+s.color+'"><span class="fl-n">'+(stageIndex(s.key)+1)+'</span>'+esc(s.name)+'</button>').join('')+'</div></div>').join('<span class="fl-a">›</span>')+'</div>';
+    const own=sd.owner==='gov'?govName():(ROLE_LABEL[sd.owner]||'');
+    body='<div class="card rc2-flow">'+flow+'<div class="rc2-sd" style="--sc:'+sd.color+'"><div class="rc2-sdh"><div><div class="fl-dk">Step '+(idx+1)+' of '+stages().length+' · '+esc(own)+'</div><h3>'+esc(sd.name)+'</h3><p>'+esc(sd.desc||'')+'</p></div><div class="rc2-now"><b>'+n.length+'</b><span>here now</span></div></div>'+
+      '<div class="rc2-how"><div><b>What People Do</b><p>'+esc(how[0])+'</p></div><div><b>What Happens on Its Own</b><p>'+esc(how[1])+'</p></div></div>'+
+      (n.length?'<div class="rc2-here">'+n.slice(0,6).map(t=>'<button type="button" class="rc2-wr" data-open="'+esc(t.id)+'"><b>'+esc(t.wr||'')+'</b> '+esc(t.name||'')+'</button>').join('')+(n.length>6?'<button type="button" class="rc2-wr more" data-hgo="board">+'+(n.length-6)+' more on the board</button>':'')+'</div>':'')+
+      '<div class="rc2-pn">'+(idx>0?'<button type="button" class="btn sm" data-rcs="'+stages()[idx-1].key+'">← '+esc(stages()[idx-1].name)+'</button>':'<span></span>')+(idx<stages().length-1?'<button type="button" class="btn sm pri" data-rcs="'+stages()[idx+1].key+'">'+esc(stages()[idx+1].name)+' →</button>':'')+'</div></div></div>'; }
+  else if(tab==='gov'){ const steps=stages().filter(s=>s.owner==='gov');
+    body='<div class="rc2-gov"><div class="card"><h3>Where Governance Steps In<span class="sp"><button type="button" class="btn sm" data-hgo="governance">Open Governance →</button></span></h3>'+steps.map(s=>{ const c=act.filter(t=>t.stage===s.key).length; return '<button type="button" class="rc2-gs" data-rcs2="'+s.key+'" style="--sc:'+s.color+'"><span class="rc2-ic n">'+(stageIndex(s.key)+1)+'</span><span class="rc2-tx"><b>'+esc(s.name)+'</b><span>'+esc(s.desc||'')+'</span></span><span class="rc2-c">'+c+'</span></button>'; }).join('')+'</div>'+
+      '<div class="card"><h3>MISMO Leadership</h3><div class="rc2-grid one">'+GOVLINKS.map(([nm,u])=>rc2Tile([nm,GOV_DESC[nm]||'',u,'M3 21h18M5 21V10M19 21V10M9 21V10M15 21V10M2 10l10-6 10 6'],'#14486e')).join('')+'</div></div></div>'; }
+  else if(tab==='roles'){ const P=S.people||{}, R=P.roles||{};
+    const who=k=>k==='facilitator'?(P.facilitators||[]):(R[k]||[]);
+    const cards=Object.keys(ROLE_LABEL).filter(k=>!['workgroup','bet','director'].includes(k)).map(k=>{ const L=who(k); const h=HELP_ROLES.find(r=>r[0]===({imawg:'imawg',vps:'approver',architect:'pm'}[k]||k));
+      return '<div class="rc2-role"><b>'+esc(k==='gov'?govName():ROLE_LABEL[k])+'</b><span class="muted">'+esc(h?h[2]:'')+'</span><span class="rc2-ppl">'+(L.length?L.slice(0,4).map(p=>esc(p.name||p.email||'')).join(', ')+(L.length>4?' and '+(L.length-4)+' more':''):'<i>No one set yet</i>')+'</span></div>'; }).join('');
+    body='<div class="rc2-rolesw"><div class="card"><h3>Who’s Who</h3><div class="rc2-roles">'+cards+'</div></div><div class="card roles-card"><h3>Who Can Do What</h3><div class="tblwrap"><table class="tbl roles-tbl"><thead><tr><th>What</th><th>Facilitators</th><th>MISMO Staff</th></tr></thead><tbody>'+
+      ROLE_ROWS.map(([w,f,s])=>'<tr><td>'+esc(w)+'</td><td'+(/^No$/.test(f)?' class="rno"':'')+'>'+esc(f)+'</td><td>'+esc(s)+'</td></tr>').join('')+'</tbody></table></div></div></div>'; }
+  else { if(!(typeof RM!=='undefined'&&RM)&&typeof rmLoad==='function'&&S.mode==='relay') rmLoad().then(R=>{ if(R&&S.view==='resources') renderAll(); }); body=termsCardHtml(); }
+  return hero+seg+'<div class="rc2-body">'+body+'</div>';
+};
+const _wireMainHelp=wireMain;
+wireMain=function(m){ _wireMainHelp(m);
+  $$('[data-hgo]',m).forEach(b=>b.onclick=e=>{ e.preventDefault(); const g=b.dataset.hgo; if(/^rc:/.test(g)){ S.rcTab=g.slice(3); S.rcQ=''; go('resources'); return; } go(g); });
+  $$('[data-hrole]',m).forEach(b=>b.onclick=()=>{ S.helpRole=b.dataset.hrole; S.helpT=''; S.helpQ=''; try{ localStorage.setItem('tools:mms:helpRole',S.helpRole); }catch(e){} renderAll(); });
+  $$('[data-htopic]',m).forEach(b=>b.onclick=()=>{ S.helpT=b.dataset.htopic; renderAll(); const a=$('.hx-main',m); if(a&&a.getBoundingClientRect().top<0) a.scrollIntoView({block:'start'}); });
+  const hs=$('#hxsel',m); if(hs) hs.onchange=()=>{ S.helpT=hs.value; renderAll(); };
+  const hq=$('#helpq',m); if(hq){ hq.oninput=()=>{ clearTimeout(hq._t); hq._t=setTimeout(()=>{ S.helpQ=hq.value; S.helpT=''; renderAll(); const n=$('#helpq'); if(n){ n.focus(); n.setSelectionRange(n.value.length,n.value.length); } },180); }; }
+  $$('[data-rctab]',m).forEach(b=>b.onclick=()=>{ S.rcTab=b.dataset.rctab; renderAll(); });
+  $$('[data-rcs2]',m).forEach(b=>b.onclick=()=>{ S.rcStage=b.dataset.rcs2; S.rcTab='flow'; S.rcQ=''; renderAll(); });
+  $$('[data-hq2]',m).forEach(b=>b.onclick=()=>{ S.helpT=b.dataset.hq2; S.helpQ=''; const r=Object.keys(HELP_ORDER).find(k=>HELP_ORDER[k].includes(S.helpT)&&(k===S.helpRole)); if(!r){ const any=Object.keys(HELP_ORDER).find(k=>HELP_ORDER[k].includes(S.helpT)); if(any) S.helpRole=any; } go('help'); });
+  const rq=$('#rcq',m); if(rq){ rq.oninput=()=>{ clearTimeout(rq._t); rq._t=setTimeout(()=>{ S.rcQ=rq.value; renderAll(); const n=$('#rcq'); if(n){ n.focus(); n.setSelectionRange(n.value.length,n.value.length); } },180); }; }
+  const rc=$('#rcclear',m); if(rc) rc.onclick=()=>{ S.rcQ=''; renderAll(); };
+};
+
+/* Notifications: delete one email or the whole list shown (staff) */
+const _wireMainMail=wireMain;
+wireMain=function(m){ _wireMainMail(m);
+  $$('[data-mdel]',m).forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const id=b.dataset.mdel; delete S.outbox[id]; S.mailSel=''; await remove('outbox',id); toast('Email deleted'); renderAll(); });
+  const da=$('#mdelall',m); if(da) da.onclick=async()=>{ const ids=(S._mailL||[]).slice(); if(!ids.length) return;
+    const ok=await modal({title:'Delete '+ids.length+' Email'+(ids.length===1?'':'s')+'?',body:'<p style="margin:0">They come off the Notifications list for good. Nothing is sent.</p>',ok:'Delete'}); if(!ok) return;
+    for(const id of ids){ delete S.outbox[id]; await remove('outbox',id); } S.mailSel=''; toast(ids.length+' deleted'); renderAll(); };
+};
+window.__mmsMail={queue:m=>queueMail(m),held:()=>mailHeld()};
+
+/* ================= Metrics: how the line is running ================= */
+const MX_K=['var(--k1)','var(--k2)','var(--k3)','var(--k4)','var(--k5)'];
+const MX_PH=[['start','Getting Started','submitted','workStart'],['build','Building','workStart','imSubmitted'],['review','In Review','imSubmitted','@revEnd'],['comment','Comment','@revEnd','postGc'],['publish','Publishing','postGc','published']];
+const MX_STEPS=[
+  ['approve','Waiting for Approval','start','submitted','bet'],
+  ['startup','Approval to Start of Work','start','bet','workStart'],
+  ['build','Building the Work Product','build','workStart','@buildEnd'],
+  ['preim','AI and Pre-IM Review','build','aiSubmitted','imSubmitted'],
+  ['im','IM Review','review','imSubmitted','imDecision'],
+  ['awg','AWG Review','review','awgSubmitted','awgDecision'],
+  ['desig','License Designation','review','awgDecision','designation'],
+  ['tocomment','Approval to Comment Posted','comment','gcComment','@cStart'],
+  ['comment','Comment Period','comment','commentStart','commentEnd'],
+  ['postc','Post-Comment to Approval','comment','commentEnd','postGc'],
+  ['release','Approval to Published','publish','postGc','published'],
+  ['total','Submitted to Published','total','submitted','published']];
+const MX_TYPES=['Initiative','Initiative Deliverable','Maintenance','Non-Initiative','Administrative'];
+function mxDate(t,k){ const d=t.dates||{};
+  if(k==='@revEnd') return d.designation||d.awgDecision||'';
+  if(k==='@buildEnd') return d.aiSubmitted||d.imSubmitted||'';
+  if(k==='@cStart') return d.commentPublished||d.commentStart||'';
+  return d[k]||''; }
+function mxSpan(t,a,b){ const x=mxDate(t,a), y=mxDate(t,b); if(!x||!y) return null; const n=daysBetween(x,y); return n==null||n<0||n>2200?null:n; }
+function mxMed(a){ if(!a.length) return null; const s=a.slice().sort((x,y)=>x-y), m=s.length>>1; return s.length%2?s[m]:Math.round((s[m-1]+s[m])/2); }
+function mxAvg(a){ return a.length?Math.round(a.reduce((x,y)=>x+y,0)/a.length):null; }
+function mxStat(a){ return (S.mx.stat==='avg'?mxAvg:mxMed)(a); }
+function mxStatWord(){ return S.mx.stat==='avg'?'Average':'Typical'; }
+function mxNum(n){ return n==null?'–':Number(n).toLocaleString(); }
+function mxRange(){ const p=S.mx.range, td=today(), y=+td.slice(0,4);
+  if(p==='12m') return [addDays(td,-365),td]; if(p==='ytd') return [y+'-01-01',td]; if(p==='3y') return [(y-2)+'-01-01',td]; if(p==='5y') return [(y-4)+'-01-01',td]; return ['2015-01-01',td]; }
+function mxPrior(){ const [a,b]=mxRange(), n=daysBetween(a,b); return [addDays(a,-n-1),addDays(a,-1)]; }
+function mxIn(d,r){ return !!d&&d>=r[0]&&d<=r[1]; }
+function mxYears(){ const r=mxRange(), y0=Math.max(2017,+r[0].slice(0,4)), y1=+r[1].slice(0,4), L=[]; for(let y=y0;y<=y1;y++) L.push(String(y)); return L; }
+function mxPool(){ const f=S.mx; return allTickets().filter(t=>!t.test&&!/^test/i.test(t.id||'')&&!t.split&&!t.rides&&
+  (f.type==='all'||(t.workType||'')===f.type)&&(f.size==='all'||(t.size||'')===f.size)&&(f.wg==='all'||(t.workgroup||'')===f.wg)&&(f.fac==='all'||(t.facilitator||'')===f.fac)); }
+S.mx=S.mx||{range:'3y',type:'all',size:'all',wg:'all',fac:'all',stat:'med',tab:'line',tbl:{},sort:'live',dir:-1};
+S._mxD={};
+function mxDrill(key,title,rows,unit){ S._mxD[key]={title,rows:rows.slice().sort((a,b)=>(b.v==null?-1:b.v)-(a.v==null?-1:a.v)),unit:unit||''}; return ' data-mxd="'+esc(key)+'"'; }
+function mxRow(t,v,sub){ return {id:t.id,wr:t.wr||'',name:t.name||'',v,sub:sub||''}; }
+function mxTip(lines){ return ' data-tip="'+esc(lines.filter(x=>x!==''&&x!=null).join('\n'))+'" tabindex="0"'; }
+/* ---------- chart pieces (inline SVG, thin marks, one baseline) ---------- */
+function mxCols(id,cats,series,o){ o=o||{}; const W=o.w||560, H=o.h||210, L=34, B=24, T=14, iw=W-L-8, ih=H-B-T;
+  const max=Math.max(1,...series.flatMap(s=>s.v.map(x=>x||0))), nice=mxNice(max), band=iw/cats.length, ns=series.length, bw=Math.min(24,(band*.7-(ns-1)*2)/ns);
+  let g=''; const tn=mxTickN(nice); for(let i=0;i<=tn;i++){ const v=nice*i/tn, y=T+ih-ih*v/nice; g+='<line x1="'+L+'" x2="'+(W-8)+'" y1="'+y+'" y2="'+y+'" class="mx-grid"/><text x="'+(L-6)+'" y="'+(y+3.5)+'" class="mx-ax" text-anchor="end">'+mxNum(Math.round(v))+'</text>'; }
+  let bars='';
+  cats.forEach((c,i)=>{ const x0=L+band*i+(band-(ns*bw+(ns-1)*2))/2;
+    series.forEach((s,j)=>{ const v=s.v[i]; if(v==null) return; const h=Math.max(v>0?2:0,ih*v/nice), x=x0+j*(bw+2), y=T+ih-h;
+      bars+='<path class="mx-m" style="fill:'+s.c+'" d="'+mxBarPath(x,y,bw,h)+'"'+mxTip([mxNum(v)+(o.unit||''),s.n+(cats.length>1?' · '+c:''),s.sub?s.sub[i]:''])+(s.d&&s.d[i]?s.d[i]:'')+'/>';
+      if(o.labels!==false&&ns<=2&&bw>=12) bars+='<text x="'+(x+bw/2)+'" y="'+(y-4)+'" class="mx-vl" text-anchor="middle">'+mxNum(v)+'</text>'; });
+    if(o.xlab!==false&&(cats.length<=14||i%Math.ceil(cats.length/12)===0)) bars+='<text x="'+(L+band*i+band/2)+'" y="'+(H-7)+'" class="mx-ax" text-anchor="middle">'+esc(c)+'</text>'; });
+  const ref=o.ref!=null?(()=>{ const y=T+ih-ih*o.ref/nice; return '<line x1="'+L+'" x2="'+(W-8)+'" y1="'+y+'" y2="'+y+'" class="mx-ref"/><text x="'+(W-10)+'" y="'+(y-4)+'" class="mx-ax" text-anchor="end">'+esc(o.refLab||'')+'</text>'; })():'';
+  return '<svg class="mx-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+esc(o.aria||'')+'">'+g+'<line x1="'+L+'" x2="'+(W-8)+'" y1="'+(T+ih)+'" y2="'+(T+ih)+'" class="mx-base"/>'+ref+bars+'</svg>'; }
+function mxCW(){ const m=document.getElementById('main'); if(!m) return 1100; const cs=getComputedStyle(m); return Math.max(300,m.clientWidth-parseFloat(cs.paddingLeft||0)-parseFloat(cs.paddingRight||0)); }
+function mxWide(){ return Math.round(Math.min(1400,Math.max(300,mxCW()-38))); }
+function mxHalf(f){ const cw=mxCW(); return innerWidth>1100?Math.round(((cw-16)*(f||.5))-38):mxWide(); }
+function mxMini(){ const cw=mxCW(), n=innerWidth>1300?4:innerWidth>1100?3:innerWidth>600?2:1; return Math.round((cw-(n-1)*12)/n-30); }
+function mxTickN(nice){ return [4,5,2,3].find(n=>Math.abs(nice/n-Math.round(nice/n))<1e-9)||4; }
+function mxNice(m){ const p=Math.pow(10,Math.floor(Math.log10(m))), f=m/p; return (f<=1?1:f<=2?2:f<=2.5?2.5:f<=5?5:10)*p; }
+function mxBarPath(x,y,w,h){ const r=Math.min(4,h,w/2); if(h<=0) return ''; return 'M'+x+','+(y+h)+'V'+(y+r)+'Q'+x+','+y+' '+(x+r)+','+y+'H'+(x+w-r)+'Q'+(x+w)+','+y+' '+(x+w)+','+(y+r)+'V'+(y+h)+'Z'; }
+function mxHBarPath(x,y,w,h){ const r=Math.min(4,w,h/2); if(w<=0) return ''; return 'M'+x+','+y+'H'+(x+w-r)+'Q'+(x+w)+','+y+' '+(x+w)+','+(y+r)+'V'+(y+h-r)+'Q'+(x+w)+','+(y+h)+' '+(x+w-r)+','+(y+h)+'H'+x+'Z'; }
+function mxLegend(items){ return '<div class="mx-leg">'+items.map(([n,c])=>'<span><i style="background:'+c+'"></i>'+esc(n)+'</span>').join('')+'</div>'; }
+function mxCard(id,title,sub,chart,table,o){ o=o||{}; const tb=S.mx.tbl[id];
+  return '<section class="card mx-card'+(o.cls?' '+o.cls:'')+'" id="mxc-'+id+'"><header class="mx-ch"><div><h3>'+esc(title)+'</h3>'+(sub?'<p>'+sub+'</p>':'')+'</div>'+(table?'<button type="button" class="mx-tb" data-mxtbl="'+id+'" aria-pressed="'+!!tb+'">'+(tb?'Chart':'Table')+'</button>':'')+'</header><div class="mx-cb">'+(tb&&table?table:chart)+'</div></section>'; }
+function mxTable(head,rows){ return '<div class="tblwrap mx-tbl"><table class="tbl"><thead><tr>'+head.map(h=>'<th>'+esc(h)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map((c,i)=>'<td'+(i?' class="num"':'')+'>'+esc(c==null?'–':typeof c==='number'?mxNum(c):c)+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>'; }
+/* ---------- the view ---------- */
+VIEWS.metrics=function(){
+  S._mxD={}; const f=S.mx, R=mxRange(), P=mxPool(), td=today();
+  const live=P.filter(t=>t.state==='active'||t.state==='hold'), act=live.filter(t=>t.state==='active');
+  const pubIn=P.filter(t=>mxIn(mxDate(t,'published'),R)), subIn=P.filter(t=>mxIn(mxDate(t,'submitted'),R));
+  const pubPr=P.filter(t=>mxIn(mxDate(t,'published'),mxPrior()));
+  const tot=a=>a.map(t=>mxSpan(t,'bet','published')).filter(x=>x!=null);
+  const hero=mxStat(tot(pubIn)), heroPr=mxStat(tot(pubPr)), delta=hero!=null&&heroPr!=null?hero-heroPr:null;
+  const toIM=P.filter(t=>mxIn(mxDate(t,'imSubmitted'),R)&&t.dates.targetIM), onT=toIM.filter(t=>t.dates.imSubmitted<=t.dates.targetIM);
+  const pct=toIM.length?Math.round(100*onT.length/toIM.length):null;
+  const opt=(id,cur,all,list)=>'<select id="'+id+'" class="mx-sel"><option value="all">'+esc(all)+'</option>'+list.map(v=>'<option'+(v===cur?' selected':'')+' value="'+esc(v)+'">'+esc(v)+'</option>').join('')+'</select>';
+  const uniq=k=>[...new Set(allTickets().map(t=>t[k]).filter(Boolean))].sort();
+  const RANGES=[['12m','Last 12 Months'],['ytd','This Year'],['3y','Last 3 Years'],['5y','Last 5 Years'],['all','All Years']];
+  const filtered=f.type!=='all'||f.size!=='all'||f.wg!=='all'||f.fac!=='all';
+  const bar='<div class="mx-filters"><div class="seg sm" id="mxrange">'+RANGES.map(([k,l])=>'<button type="button" data-mxr="'+k+'" aria-pressed="'+(f.range===k)+'">'+l+'</button>').join('')+'</div>'+
+    opt('mxtype',f.type,'All Work Types',MX_TYPES)+opt('mxsize',f.size,'All Sizes',['S','M','L','XL'])+opt('mxwg',f.wg,'All Workgroups',uniq('workgroup'))+opt('mxfac',f.fac,'All Facilitators',uniq('facilitator'))+
+    '<div class="seg sm" id="mxstat"><button type="button" data-mxs="med" aria-pressed="'+(f.stat!=='avg')+'">Median</button><button type="button" data-mxs="avg" aria-pressed="'+(f.stat==='avg')+'">Average</button></div>'+(filtered?'<button type="button" class="btn sm" id="mxreset">Clear Filters</button>':'')+'</div>';
+  const tile=(k,v,l,sub,d,tone)=>'<button type="button" class="mx-tile'+(tone?' '+tone:'')+'"'+(d||'')+'><span class="mx-tv">'+v+'</span><span class="mx-tl">'+esc(l)+'</span>'+(sub?'<span class="mx-ts">'+sub+'</span>':'')+'</button>';
+  const rlab=RANGES.find(x=>x[0]===f.range)[1].toLowerCase();
+  const heroHtml='<div class="hero mx-hero"><div class="mx-hl"><div class="date">Metrics · '+esc(rlab)+(filtered?' · filtered':'')+'</div><div class="mx-big"><b>'+mxNum(hero)+'</b><span>days</span></div><p>'+mxStatWord()+' time from approval to published, across '+pubIn.length+' work products published'+(delta!=null?'. <b class="mx-d '+(delta<=0?'up':'down')+'">'+(delta<=0?'▼ '+Math.abs(delta)+' days faster':'▲ '+delta+' days slower')+'</b> than the '+(f.range==='all'?'period before':'same stretch before'):'')+'.</p></div>'+
+    '<div class="mx-tiles">'+tile('live',live.length,'Live Now',act.filter(t=>['im','awg','designation','aireview'].includes(t.stage)).length+' in review',mxDrill('t-live','Live now',live.map(t=>mxRow(t,daysBetween(t.stageSince,td),stageDef(t.stage).name)),' days at this step'))+
+      tile('pub',pubIn.length,'Published',pubPr.length+' the period before',mxDrill('t-pub','Published, '+rlab,pubIn.map(t=>mxRow(t,mxSpan(t,'bet','published'),fmt(t.dates.published))),' days approval to published'))+
+      tile('sub',subIn.length,'Submitted','new work requests',mxDrill('t-sub','Submitted, '+rlab,subIn.map(t=>mxRow(t,null,fmt(t.dates.submitted)+' · '+stageDef(t.stage).name))))+
+      tile('ot',pct==null?'–':pct+'%','To IM by Target',onT.length+' of '+toIM.length+' on time',mxDrill('t-ot','Sent to IM, '+rlab,toIM.map(t=>mxRow(t,daysBetween(t.dates.targetIM,t.dates.imSubmitted),t.dates.imSubmitted<=t.dates.targetIM?'On time':'Late')),' days past target (negative is early)'),pct!=null&&pct<60?'warn':'')+
+      tile('late',act.filter(pastTarget).length,'Past Target Now','still building',mxDrill('t-late','Past target now',act.filter(pastTarget).map(t=>mxRow(t,daysBetween(t.dates.targetIM,td),'Target '+fmt(t.dates.targetIM))),' days past target'),act.filter(pastTarget).length?'bad':'')+'</div></div>';
+  const TABS=[['line','The Line'],['now','Right Now'],['volume','Volume'],['sizes','Sizes and Targets'],['groups','Workgroups and People']];
+  const tabs='<div class="seg mx-tabs" role="tablist">'+TABS.map(([k,l])=>'<button type="button" role="tab" data-mxtab="'+k+'" aria-pressed="'+(f.tab===k)+'">'+l+'</button>').join('')+'</div>';
+  const body=({line:mxLine,now:mxNow,volume:mxVolume,sizes:mxSizes,groups:mxGroups}[f.tab]||mxLine)(P,R,live,act);
+  const dr=S.mx.drill&&S._mxD[S.mx.drill];
+  const drill=dr?'<aside class="mx-drill" role="dialog" aria-label="'+esc(dr.title)+'"><header><div><b>'+esc(dr.title)+'</b><span>'+dr.rows.length+' work request'+(dr.rows.length===1?'':'s')+(dr.unit?' ·'+esc(dr.unit):'')+'</span></div><button type="button" class="wh-x mx-dx" id="mxdx" aria-label="Close">×</button></header><div class="mx-dl">'+(dr.rows.length?dr.rows.map(r=>'<button type="button" class="mx-dr" data-open="'+esc(r.id)+'"><span class="mx-dn"><b>'+esc(r.wr)+'</b> '+esc(r.name)+(r.sub?'<em>'+esc(r.sub)+'</em>':'')+'</span>'+(r.v!=null?'<span class="mx-dv">'+mxNum(r.v)+'</span>':'')+'</button>').join(''):'<div class="lead-empty">None.</div>')+'</div></aside>':'';
+  return '<div class="pagehead slim"><div><h1>Metrics</h1><div class="sub">How the line is running, worked out from every date the MMS keeps. Click anything to see the work requests behind it.</div></div></div>'+bar+heroHtml+tabs+'<div class="mx-body">'+body+'</div>'+drill+'<div class="mx-tip" id="mxtip" hidden></div>';
+};
+/* ---- The Line: how long each part takes, year over year ---- */
+function mxLine(P,R){
+  const yrs=mxYears(), done=P.filter(t=>mxDate(t,'published'));
+  const rows=yrs.map(y=>{ const L=done.filter(t=>mxDate(t,'published').slice(0,4)===y); return {y,L,ph:MX_PH.map(([k,n,a,b])=>{ const v=L.map(t=>[t,mxSpan(t,a,b)]).filter(x=>x[1]!=null); return {k,n,v:mxStat(v.map(x=>x[1])),c:v.length,rows:v.map(([t,d])=>mxRow(t,d))}; }),tot:mxStat(L.map(t=>mxSpan(t,'submitted','published')).filter(x=>x!=null))}; }).filter(r=>r.L.length);
+  const W=mxWide(), rowH=34, L0=48, H=rows.length*rowH+30, max=Math.max(1,...rows.map(r=>r.ph.reduce((a,p)=>a+(p.v||0),0))), nice=mxNice(max), iw=W-L0-90;
+  let g=''; const tn=mxTickN(nice); for(let i=0;i<=tn;i++){ const x=L0+iw*i/tn; g+='<line x1="'+x+'" x2="'+x+'" y1="4" y2="'+(H-22)+'" class="mx-grid"/><text x="'+x+'" y="'+(H-6)+'" class="mx-ax" text-anchor="middle">'+mxNum(Math.round(nice*i/tn))+'</text>'; }
+  let bars=''; rows.forEach((r,i)=>{ const y=8+i*rowH; let x=L0; bars+='<text x="'+(L0-8)+'" y="'+(y+15)+'" class="mx-ax b" text-anchor="end">'+r.y+'</text>';
+    r.ph.forEach((p,j)=>{ if(!p.v) return; const w=Math.max(2,iw*p.v/nice)-2, lastSeg=!r.ph.slice(j+1).some(q=>q.v); bars+=(lastSeg?'<path class="mx-m" d="'+mxHBarPath(x,y,w,20)+'"':'<rect class="mx-m" x="'+x+'" y="'+y+'" width="'+w+'" height="20"')+' style="fill:'+MX_K[j]+'"'+mxTip([mxNum(p.v)+' days',p.n+' · '+r.y,p.c+' work products'])+mxDrill('ln-'+r.y+'-'+p.k,p.n+', published in '+r.y,p.rows,' days')+'/>'; x+=w+2; });
+    const sum=r.ph.reduce((a,p)=>a+(p.v||0),0); bars+='<text x="'+(x+6)+'" y="'+(y+14.5)+'" class="mx-vl">'+mxNum(sum)+'<tspan class="mx-ax"> · '+r.L.length+'</tspan></text>'; });
+  const chart=rows.length?mxLegend(MX_PH.map((p,i)=>[p[1],MX_K[i]]))+'<svg class="mx-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="'+mxStatWord()+' days in each phase, by year published">'+g+bars+'</svg>':'<div class="lead-empty">Nothing published in this range.</div>';
+  const table=mxTable(['Year Published','Work Products'].concat(MX_PH.map(p=>p[1]),['Sum']),rows.map(r=>[r.y,r.L.length].concat(r.ph.map(p=>p.v),[r.ph.reduce((a,p)=>a+(p.v||0),0)])));
+  const card1=mxCard('journey','The Journey, Year Over Year',mxStatWord()+' days in each phase for work published that year. The number at the end is the total and how many were published.',chart,table,{cls:'wide'});
+  const minis=MX_STEPS.map(([k,n,ph,a,b],si)=>{ const pts=yrs.map(y=>{ const v=P.map(t=>[t,mxSpan(t,a,b),mxDate(t,b)]).filter(x=>x[1]!=null&&x[2].slice(0,4)===y); return {y,v:mxStat(v.map(x=>x[1])),rows:v.map(([t,d])=>mxRow(t,d,fmt(mxDate(t,b))))}; });
+      const last=pts.filter(p=>p.v!=null).slice(-1)[0], first=pts.filter(p=>p.v!=null)[0], c=ph==='total'?'var(--navy-mid)':MX_K[MX_PH.findIndex(p=>p[0]===ph)];
+      const chart=mxCols('st-'+k,pts.map(p=>p.y),[{n:n,c,v:pts.map(p=>p.v),d:pts.map(p=>mxDrill('st-'+k+'-'+p.y,n+', '+p.y,p.rows,' days'))}],{w:mxMini(),h:150,unit:' days',aria:n});
+      const ch=last&&first&&last!==first?last.v-first.v:null;
+      return '<section class="card mx-mini"><header><span class="mx-sw" style="background:'+c+'"></span><b>'+esc(n)+'</b></header><div class="mx-mv">'+(last?mxNum(last.v)+'<em> days in '+last.y+'</em>':'–')+(ch!=null?'<i class="'+(ch<=0?'up':'down')+'">'+(ch<=0?'▼ ':'▲ ')+Math.abs(ch)+' days</i>':'')+'</div>'+chart+'</section>'; }).join('');
+  return card1+'<h2 class="mx-h2">Each Step, Year Over Year<span>'+mxStatWord()+' days, by the year the step finished. ▼ is faster than the first year shown.</span></h2><div class="mx-minis">'+minis+'</div>';
+}
+/* ---- Right Now ---- */
+function mxNow(P,R,live,act){ const td=today();
+  const st=stages(), cnt=st.map(s=>act.filter(t=>t.stage===s.key)), max=Math.max(1,...cnt.map(a=>a.length)), nice=mxNice(max);
+  const W=mxHalf(.535), rh=24, L0=190, H=st.length*rh+10, iw=W-L0-40;
+  let b=''; st.forEach((s,i)=>{ const n=cnt[i].length, y=6+i*rh, w=iw*n/nice; b+='<text x="'+(L0-10)+'" y="'+(y+13)+'" class="mx-ax b" text-anchor="end">'+esc(s.name.length>26?s.name.slice(0,25)+'…':s.name)+'</text>'+
+    '<g'+mxTip([n+' work request'+(n===1?'':'s'),s.name])+mxDrill('now-'+s.key,s.name+' now',cnt[i].map(t=>mxRow(t,daysBetween(t.stageSince,td),'Since '+fmt(t.stageSince))),' days here')+' class="mx-hit"><rect x="'+L0+'" y="'+(y-2)+'" width="'+iw+'" height="'+(rh-2)+'" class="mx-hitbg"/>'+(n?'<path class="mx-m" style="fill:'+s.color+'" d="'+mxHBarPath(L0,y+2,Math.max(3,w),14)+'"/>':'')+'<text x="'+(L0+Math.max(3,w)+6)+'" y="'+(y+13)+'" class="mx-vl">'+n+'</text></g>'; });
+  const c1=mxCard('stages','Where Everything Is','Live work requests at each step, in the step’s own color. Click a row to see them.','<svg class="mx-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Work requests at each step">'+b+'</svg>',mxTable(['Step','Work Requests'],st.map((s,i)=>[s.name,cnt[i].length])));
+  const wait=act.map(t=>[t,daysBetween(t.stageSince,td)]).filter(x=>x[1]!=null).sort((a,b)=>b[1]-a[1]).slice(0,9), wm=Math.max(1,...wait.map(x=>x[1]));
+  const c2=mxCard('wait','Waiting Longest','Days at the current step.','<div class="mx-wait">'+wait.map(([t,d])=>'<button type="button" class="mx-wr" data-open="'+esc(t.id)+'"><span class="mx-wn"><b>'+esc(t.wr||'')+'</b> '+esc(t.name||'')+'<em>'+esc(stageDef(t.stage).name)+'</em></span><span class="mx-wb"><i style="width:'+Math.max(4,100*d/wm)+'%;background:'+stageDef(t.stage).color+'"></i></span><span class="mx-wd">'+mxNum(d)+'</span></button>').join('')+'</div>',null);
+  const types=MX_TYPES.map((k,i)=>[k,live.filter(t=>(t.workType||'')===k),MX_K[i]]).filter(x=>x[1].length), tl=live.length||1;
+  const seg='<div class="mx-segbar">'+types.map(([k,L,c])=>'<span style="flex:'+L.length+';background:'+c+'"'+mxTip([L.length+' · '+Math.round(100*L.length/tl)+'%',k])+mxDrill('type-'+k,k+', live',L.map(t=>mxRow(t,null,stageDef(t.stage).name)))+'>'+(L.length/tl>.09?'<b>'+L.length+'</b>':'')+'</span>').join('')+'</div>'+mxLegend(types.map(([k,,c])=>[k,c]));
+  const bk=[['Past target',t=>t.dates.targetIM<td,'var(--bad)'],['Next 30 days',t=>t.dates.targetIM>=td&&t.dates.targetIM<=addDays(td,30),'var(--warn)'],['31 to 90 days',t=>t.dates.targetIM>addDays(td,30)&&t.dates.targetIM<=addDays(td,90),'var(--k1)'],['Later',t=>t.dates.targetIM>addDays(td,90),'var(--navy-mid)']];
+  const bl=act.filter(t=>['approved','cfp','kickoff','work','aireview'].includes(t.stage)&&t.dates&&t.dates.targetIM), bt=bl.length||1;
+  const out=bk.map(([n,fn,c])=>[n,bl.filter(fn),c]).filter(x=>x[1].length);
+  const seg2='<div class="mx-segbar">'+out.map(([n,L,c])=>'<span style="flex:'+L.length+';background:'+c+'"'+mxTip([L.length+' work requests',n])+mxDrill('due-'+n,'Target to Submit to IM: '+n,L.map(t=>mxRow(t,daysBetween(td,t.dates.targetIM),fmt(t.dates.targetIM))),' days to target')+'>'+(L.length/bt>.09?'<b>'+L.length+'</b>':'')+'</span>').join('')+'</div>'+mxLegend(out.map(([n,,c])=>[n,c]));
+  const c3=mxCard('mix','Live Work by Type',live.length+' live work requests.',seg,mxTable(['Work Type','Live'],types.map(([k,L])=>[k,L.length])));
+  const c4=mxCard('due','Coming Due at IM','Target to Submit to IM for work still being built.',seg2,mxTable(['When','Work Requests'],out.map(([n,L])=>[n,L.length])));
+  return '<div class="mx-grid2">'+c1+'<div class="mx-stack">'+c2+c3+c4+'</div></div>';
+}
+/* ---- Volume ---- */
+function mxVolume(P,R){
+  const yrs=mxYears(), by=(k,y)=>P.filter(t=>mxDate(t,k).slice(0,4)===y), endY=(t,y)=>((t.dates.closed||t.dates.canceled||'').slice(0,4)===y);
+  const sub=yrs.map(y=>by('submitted',y)), pub=yrs.map(y=>by('published',y)), cl=yrs.map(y=>P.filter(t=>endY(t,y)));
+  const ser=[{n:'Submitted',c:MX_K[0],v:sub.map(a=>a.length),d:sub.map((a,i)=>mxDrill('v-s-'+yrs[i],'Submitted in '+yrs[i],a.map(t=>mxRow(t,null,stageDef(t.stage).name))))},
+    {n:'Published',c:MX_K[2],v:pub.map(a=>a.length),d:pub.map((a,i)=>mxDrill('v-p-'+yrs[i],'Published in '+yrs[i],a.map(t=>mxRow(t,mxSpan(t,'bet','published'),fmt(t.dates.published))),' days approval to published'))},
+    {n:'Closed or Canceled',c:MX_K[1],v:cl.map(a=>a.length),d:cl.map((a,i)=>mxDrill('v-c-'+yrs[i],'Closed or canceled in '+yrs[i],a.map(t=>mxRow(t,null,t.state))))}];
+  const c1=mxCard('flow','In and Out, by Year','Work requests submitted, published, and closed or canceled each year.',mxLegend(ser.map(s=>[s.n,s.c]))+mxCols('flow',yrs,ser,{w:mxWide(),h:240,aria:'Submitted, published and closed by year'}),mxTable(['Year','Submitted','Published','Closed or Canceled'],yrs.map((y,i)=>[y,sub[i].length,pub[i].length,cl[i].length])),{cls:'wide'});
+  const ms=[]; { const d=toD(today()); for(let i=23;i>=0;i--){ const x=new Date(d.getFullYear(),d.getMonth()-i,1); ms.push(x.getFullYear()+'-'+pad(x.getMonth()+1)); } }
+  const pm=ms.map(m=>P.filter(t=>mxDate(t,'published').slice(0,7)===m));
+  const c2=mxCard('monthly','Published Each Month','The last 24 months.',mxCols('monthly',ms.map(m=>MON[+m.slice(5)-1]+(m.slice(5)==='01'?' '+m.slice(2,4):'')),[{n:'Published',c:MX_K[2],v:pm.map(a=>a.length),d:pm.map((a,i)=>mxDrill('pm-'+ms[i],'Published in '+MON[+ms[i].slice(5)-1]+' '+ms[i].slice(0,4),a.map(t=>mxRow(t,null,fmt(t.dates.published)))))}],{w:mxHalf(),h:220,labels:false,aria:'Published each month'}),mxTable(['Month','Published'],ms.map((m,i)=>[m,pm[i].length])));
+  // stacked by work type
+  const W=mxHalf(),H=240,L0=34,T=14,B=24,iw=W-L0-8,ih=H-T-B, tot=yrs.map(y=>by('submitted',y)), max=mxNice(Math.max(1,...tot.map(a=>a.length))), band=iw/yrs.length, bw=Math.min(24,band*.6);
+  let g=''; const tn=mxTickN(max); for(let i=0;i<=tn;i++){ const y=T+ih-ih*i/tn; g+='<line x1="'+L0+'" x2="'+(W-8)+'" y1="'+y+'" y2="'+y+'" class="mx-grid"/><text x="'+(L0-6)+'" y="'+(y+3.5)+'" class="mx-ax" text-anchor="end">'+mxNum(Math.round(max*i/tn))+'</text>'; }
+  yrs.forEach((y,i)=>{ let yy=T+ih; const x=L0+band*i+(band-bw)/2; const parts=MX_TYPES.map((k,j)=>[k,tot[i].filter(t=>(t.workType||'')===k),MX_K[j]]).filter(p=>p[1].length);
+    parts.forEach(([k,L,c],j)=>{ const h=ih*L.length/max, top=j===parts.length-1; g+=(top?'<path class="mx-m" style="fill:'+c+'" d="'+mxBarPath(x,yy-h,bw,h-(j?2:0))+'"':'<rect class="mx-m" x="'+x+'" y="'+(yy-h)+'" width="'+bw+'" height="'+Math.max(0,h-(j?2:0))+'" style="fill:'+c+'"')+mxTip([L.length+'',k+' · '+y])+mxDrill('ty-'+y+'-'+k,k+', submitted in '+y,L.map(t=>mxRow(t,null,stageDef(t.stage).name)))+'/>'; yy-=h; });
+    g+='<text x="'+(x+bw/2)+'" y="'+(yy-5)+'" class="mx-vl" text-anchor="middle">'+tot[i].length+'</text><text x="'+(L0+band*i+band/2)+'" y="'+(H-7)+'" class="mx-ax" text-anchor="middle">'+y+'</text>'; });
+  const c3=mxCard('types','What Came In, by Work Type','Work requests submitted each year.',mxLegend(MX_TYPES.map((k,i)=>[k,MX_K[i]]))+'<svg class="mx-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Submitted by work type">'+g+'<line x1="'+L0+'" x2="'+(W-8)+'" y1="'+(T+ih)+'" y2="'+(T+ih)+'" class="mx-base"/></svg>',mxTable(['Year'].concat(MX_TYPES),yrs.map((y,i)=>[y].concat(MX_TYPES.map(k=>tot[i].filter(t=>(t.workType||'')===k).length)))));
+  return c1+'<div class="mx-grid2 even">'+c2+c3+'</div>';
+}
+/* ---- Sizes and Targets ---- */
+function mxSizes(P,R){
+  const SD=(proc().sizeDays)||SIZE_DAYS, built=P.filter(t=>mxIn(mxDate(t,'imSubmitted'),R)&&mxSpan(t,'workStart','imSubmitted')!=null);
+  const panels=['S','M','L','XL'].map(sz=>{ const L=built.filter(t=>t.size===sz).map(t=>[t,mxSpan(t,'workStart','imSubmitted')]), tg=SD[sz]||SIZE_DAYS[sz];
+    const W=mxMini(),H=150, max=mxNice(Math.max(tg*1.4,...L.map(x=>x[1]),10)), sx=v=>14+(W-28)*v/max, ok=L.filter(x=>x[1]<=tg).length, md=mxStat(L.map(x=>x[1]));
+    const bins={}; let dots=''; L.sort((a,b)=>a[1]-b[1]).forEach(([t,d])=>{ const bx=Math.round(sx(d)/9); bins[bx]=(bins[bx]||0)+1; const k=bins[bx]-1; const y=104-((k%10)*9)-(k>=10?4:0);
+      dots+='<circle class="mx-dot" cx="'+sx(d)+'" cy="'+y+'" r="4" style="fill:'+(d<=tg?'var(--k3)':'var(--k2)')+'"'+mxTip([d+' days',(t.wr||'')+' '+(t.name||''),d<=tg?'Within the '+tg+'-day target':(d-tg)+' days over target'])+' data-open="'+esc(t.id)+'"/>'; });
+    let ax=''; for(let i=0;i<=4;i++){ const v=max*i/4; ax+='<text x="'+sx(v)+'" y="'+(H-4)+'" class="mx-ax" text-anchor="middle">'+mxNum(Math.round(v))+'</text>'; }
+    const svg='<svg class="mx-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Size '+sz+' build days"><line x1="14" x2="'+(W-14)+'" y1="112" y2="112" class="mx-base"/><line x1="'+sx(tg)+'" x2="'+sx(tg)+'" y1="4" y2="116" class="mx-ref"/><text x="'+(sx(tg)+4)+'" y="12" class="mx-ax">Target '+tg+'</text>'+(md!=null?'<line x1="'+sx(md)+'" x2="'+sx(md)+'" y1="16" y2="116" class="mx-med"/><text x="'+(sx(md)+4)+'" y="24" class="mx-ax b">'+mxStatWord()+' '+md+'</text>':'')+dots+ax+'</svg>';
+    return '<section class="card mx-mini"><header><span class="mx-size">'+sz+'</span><b>'+({S:'Small',M:'Medium',L:'Large',XL:'Extra Large'}[sz])+'</b></header><div class="mx-mv">'+(L.length?Math.round(100*ok/L.length)+'%<em> within target · '+L.length+' work products</em>':'–')+'</div>'+(L.length?svg:'<div class="lead-empty">None in this range.</div>')+'</section>'; }).join('');
+  const yrs=mxYears(), hit=yrs.map(y=>{ const L=P.filter(t=>mxDate(t,'imSubmitted').slice(0,4)===y&&t.dates.targetIM); const ok=L.filter(t=>t.dates.imSubmitted<=t.dates.targetIM); return {y,L,ok,p:L.length?Math.round(100*ok.length/L.length):null}; });
+  const c2=mxCard('hit','Sent to IM by the Target','Share of work sent to IM on or before its Target to Submit to IM date.',mxCols('hit',yrs,[{n:'On time',c:MX_K[0],v:hit.map(h=>h.p),sub:hit.map(h=>h.ok.length+' of '+h.L.length),d:hit.map(h=>mxDrill('hit-'+h.y,'Sent to IM in '+h.y,h.L.map(t=>mxRow(t,daysBetween(t.dates.targetIM,t.dates.imSubmitted),t.dates.imSubmitted<=t.dates.targetIM?'On time':'Late')),' days past target'))}],{w:mxHalf(),h:220,unit:'%',aria:'Percent on time to IM by year'}),mxTable(['Year','On Time','Sent','Share'],hit.map(h=>[h.y,h.ok.length,h.L.length,h.p==null?'–':h.p+'%'])));
+  const inR=P.filter(t=>mxIn(mxDate(t,'submitted'),R)||t.state==='active'), lab=['None','1','2','3','4','5 or more'], grp=lab.map((l,i)=>inR.filter(t=>{ const n=+t.targetChanges||0; return i===5?n>=5:n===i; }));
+  const c3=mxCard('chg','How Often Targets Move','Times the Target to Submit to IM changed, for work submitted in this range or still live.',mxCols('chg',lab,[{n:'Work requests',c:MX_K[3],v:grp.map(a=>a.length),d:grp.map((a,i)=>mxDrill('chg-'+i,'Target changed: '+lab[i],a.map(t=>mxRow(t,+t.targetChanges||0,stageDef(t.stage).name)),' changes'))}],{w:mxHalf(),h:220,aria:'Target changes'}),mxTable(['Changes','Work Requests'],lab.map((l,i)=>[l,grp[i].length])));
+  return '<h2 class="mx-h2">Build Time Against the Size Target<span>Each dot is one work product: days from start of work to sent to IM. Green is within the target, orange is over. The dark line is the '+mxStatWord().toLowerCase()+'. Click a dot to open it.</span></h2><div class="mx-minis four">'+panels+'</div><div class="mx-grid2 even">'+c2+c3+'</div>';
+}
+/* ---- Workgroups and People ---- */
+function mxGroups(P,R,live,act){ const td=today();
+  const W=[...new Set(P.map(t=>t.workgroup).filter(Boolean))].map(w=>{ const L=P.filter(t=>t.workgroup===w), pub=L.filter(t=>mxIn(mxDate(t,'published'),R));
+    return {w,live:L.filter(t=>t.state==='active'||t.state==='hold').length,pub:pub.length,tot:mxStat(pub.map(t=>mxSpan(t,'bet','published')).filter(x=>x!=null)),build:mxStat(L.filter(t=>mxIn(mxDate(t,'imSubmitted'),R)).map(t=>mxSpan(t,'workStart','imSubmitted')).filter(x=>x!=null)),late:L.filter(pastTarget).length}; })
+    .filter(r=>r.live||r.pub);
+  const k=S.mx.sort||'live', d=S.mx.dir||-1; W.sort((a,b)=>k==='w'?d*a.w.localeCompare(b.w):d*((a[k]==null?-1:a[k])-(b[k]==null?-1:b[k])));
+  const cols=[['w','Workgroup'],['live','Live'],['pub','Published'],['tot',mxStatWord()+' Days to Publish'],['build',mxStatWord()+' Build Days'],['late','Past Target']];
+  const mx={}; cols.slice(1).forEach(([c])=>mx[c]=Math.max(1,...W.map(r=>r[c]||0)));
+  const all=W.length, shown=S.mx.wgAll?W:W.slice(0,12); const tbl='<div class="tblwrap mx-wg"><table class="tbl"><thead><tr>'+cols.map(([c,l])=>'<th><button type="button" data-mxsort="'+c+'">'+esc(l)+(k===c?(d>0?' ▲':' ▼'):'')+'</button></th>').join('')+'</tr></thead><tbody>'+shown.map(r=>'<tr data-mxwg="'+esc(r.w)+'" tabindex="0"><td><b>'+esc(r.w)+'</b></td>'+cols.slice(1).map(([c])=>'<td class="num"><span class="mx-cell"><i style="width:'+(r[c]?Math.max(4,100*r[c]/mx[c]):0)+'%;background:'+(c==='late'?'var(--bad)':'var(--k1)')+'"></i><b>'+mxNum(r[c])+'</b></span></td>').join('')+'</tr>').join('')+'</tbody></table></div>'+(all>12?'<button type="button" class="btn sm mx-more" id="mxwgall">'+(S.mx.wgAll?'Show the Top 12':'Show All '+all+' Workgroups')+'</button>':'');
+  const c1=mxCard('wg','Workgroups','Click a column to sort, or a row to filter the whole page to that workgroup.',tbl,null,{cls:'wide'});
+  const F=[...new Set(live.map(t=>t.facilitator).filter(Boolean))].sort().map(n=>({n,L:live.filter(t=>t.facilitator===n)})).sort((a,b)=>b.L.length-a.L.length);
+  const fm=mxNice(Math.max(1,...F.map(x=>x.L.length))), Wd=mxWide(), L0=150, iw=Wd-L0-40, H=F.length*30+8;
+  let s=''; F.forEach((x,i)=>{ const y=6+i*30; let xx=L0; s+='<text x="'+(L0-10)+'" y="'+(y+14)+'" class="mx-ax b" text-anchor="end">'+esc(x.n)+'</text>';
+    const parts=PHASES.map((ph,j)=>[ph,x.L.filter(t=>phaseOf(t.stage)===ph.key),MX_K[j]]).filter(p=>p[1].length);
+    parts.forEach(([ph,L,c],j)=>{ const w=iw*L.length/fm-2; s+=(j===parts.length-1?'<path class="mx-m" style="fill:'+c+'" d="'+mxHBarPath(xx,y+2,Math.max(2,w),16)+'"':'<rect class="mx-m" x="'+xx+'" y="'+(y+2)+'" width="'+Math.max(1,w)+'" height="16" style="fill:'+c+'"')+mxTip([L.length+'',ph.name+' · '+x.n])+mxDrill('f-'+x.n+'-'+ph.key,x.n+': '+ph.name,L.map(t=>mxRow(t,daysBetween(t.stageSince,td),stageDef(t.stage).name)),' days at this step')+'/>'; xx+=w+2; });
+    s+='<text x="'+(xx+6)+'" y="'+(y+14)+'" class="mx-vl">'+x.L.length+'</text>'; });
+  const c2=mxCard('fac','Live Work by Facilitator','Split by phase. Click a piece to see the work.',mxLegend(PHASES.map((p,i)=>[p.name,MX_K[i]]))+'<svg class="mx-svg" viewBox="0 0 '+Wd+' '+H+'" role="img" aria-label="Live work by facilitator">'+s+'</svg>',mxTable(['Facilitator'].concat(PHASES.map(p=>p.name),['Total']),F.map(x=>[x.n].concat(PHASES.map(p=>x.L.filter(t=>phaseOf(t.stage)===p.key).length),[x.L.length]))));
+  return c1+c2;
+}
+/* ---------- wiring ---------- */
+const _wireMainMx=wireMain;
+wireMain=function(m){ _wireMainMx(m); if(S.view!=='metrics') return;
+  const re=()=>{ S.mx.drill=null; renderAll(); };
+  $$('[data-mxr]',m).forEach(b=>b.onclick=()=>{ S.mx.range=b.dataset.mxr; re(); });
+  $$('[data-mxs]',m).forEach(b=>b.onclick=()=>{ S.mx.stat=b.dataset.mxs; renderAll(); });
+  $$('[data-mxtab]',m).forEach(b=>b.onclick=()=>{ S.mx.tab=b.dataset.mxtab; re(); });
+  [['#mxtype','type'],['#mxsize','size'],['#mxwg','wg'],['#mxfac','fac']].forEach(([id,k])=>{ const s=$(id,m); if(s) s.onchange=()=>{ S.mx[k]=s.value; re(); }; });
+  const wa=$('#mxwgall',m); if(wa) wa.onclick=()=>{ S.mx.wgAll=!S.mx.wgAll; renderAll(); };
+  const rs=$('#mxreset',m); if(rs) rs.onclick=()=>{ Object.assign(S.mx,{type:'all',size:'all',wg:'all',fac:'all'}); re(); };
+  $$('[data-mxtbl]',m).forEach(b=>b.onclick=()=>{ const k=b.dataset.mxtbl; S.mx.tbl[k]=!S.mx.tbl[k]; renderAll(); });
+  $$('[data-mxsort]',m).forEach(b=>b.onclick=()=>{ const k=b.dataset.mxsort; if(S.mx.sort===k) S.mx.dir=-(S.mx.dir||-1); else { S.mx.sort=k; S.mx.dir=k==='w'?1:-1; } renderAll(); });
+  $$('[data-mxwg]',m).forEach(r=>{ const fn=()=>{ S.mx.wg=r.dataset.mxwg; S.mx.tab='line'; re(); window.scrollTo(0,0); }; r.onclick=fn; r.onkeydown=e=>{ if(e.key==='Enter') fn(); }; });
+  $$('[data-mxd]',m).forEach(el=>{ const fn=e=>{ e.stopPropagation(); S.mx.drill=el.dataset.mxd; renderAll(); }; el.addEventListener('click',fn); el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); fn(e); } }); el.style.cursor='pointer'; });
+  const dx=$('#mxdx',m); if(dx) dx.onclick=()=>{ S.mx.drill=null; renderAll(); };
+  const tip=$('#mxtip',m); if(tip){ const show=(el,x,y)=>{ const L=(el.getAttribute('data-tip')||'').split('\n'); tip.textContent=''; L.forEach((l,i)=>{ const d=document.createElement(i?'span':'b'); d.textContent=l; tip.appendChild(d); }); tip.hidden=false; const r=tip.getBoundingClientRect(); tip.style.left=Math.min(innerWidth-r.width-8,x+14)+'px'; tip.style.top=Math.max(8,y-r.height-10)+'px'; };
+    $$('[data-tip]',m).forEach(el=>{ el.addEventListener('pointermove',e=>show(el,e.clientX,e.clientY)); el.addEventListener('pointerleave',()=>tip.hidden=true); el.addEventListener('focus',()=>{ const r=el.getBoundingClientRect(); show(el,r.left+r.width/2,r.top); }); el.addEventListener('blur',()=>tip.hidden=true); }); }
+};
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&S.view==='metrics'&&S.mx.drill&&!S.panel){ S.mx.drill=null; renderAll(); } });
+
+window.addEventListener('resize',()=>{ clearTimeout(window._mxRz); window._mxRz=setTimeout(()=>{ if(S.view==='metrics'){ S._lastHtml=''; renderAll(); } },250); });
+
 /* ---------- settings ---------- */
 let setTab='process';
 VIEWS.settings=function(){
@@ -5725,7 +6526,7 @@ VIEWS.settings=function(){
   }
   if(setTab==='notify'){
     const N=S.notify;
-    body='<div class="card"><h3>Email Flow<span class="sp"><button class="btn sm pri" id="nsave" type="button">Save</button></span></h3><div class="kv"><div class="f wide"><label>Power Automate Flow Link (HTTP Trigger)</label><input id="nflow" value="'+esc(N.flowUrl||'')+'" placeholder="https://prod-00.westus.logic.azure.com/…"></div><div class="f"><label>Sent From</label><input id="nfrom" value="'+esc(N.from||'')+'"></div><div class="f"><label>Target Reminder (Days Before)</label><input id="nr1" value="'+esc(N.reminders.targetDays)+'"></div><div class="f"><label>Comment Ending (Days Before)</label><input id="nr2" value="'+esc(N.reminders.commentEndingDays)+'"></div><div class="f"><label>Stalled After (Days)</label><input id="nr3" value="'+esc(N.reminders.staleDays)+'"></div></div><p class="muted" style="font-size:12.5px;margin:10px 0 0">With no flow link, emails wait in Notifications with an Open Email button. The flow gets to, subject, body and from, same as the Meeting Trackers calendar flow.</p></div>'+
+    body='<div class="card"><h3>Email Flow<span class="sp"><button class="btn sm pri" id="nsave" type="button">Save</button></span></h3><div class="kv"><div class="f wide"><label>Power Automate Flow Link (HTTP Trigger)</label><input id="nflow" value="'+esc(N.flowUrl||'')+'" placeholder="https://prod-00.westus.logic.azure.com/…"></div><div class="f"><label>Sent From</label><input id="nfrom" value="'+esc(N.from||'')+'"></div><div class="f"><label>Hold All Email Until</label><input id="nhold" type="date" value="'+esc(N.holdUntil||'')+'"></div><div class="f"><label>Target Reminder (Days Before)</label><input id="nr1" value="'+esc(N.reminders.targetDays)+'"></div><div class="f"><label>Comment Ending (Days Before)</label><input id="nr2" value="'+esc(N.reminders.commentEndingDays)+'"></div><div class="f"><label>Stalled After (Days)</label><input id="nr3" value="'+esc(N.reminders.staleDays)+'"></div></div><p class="muted" style="font-size:12.5px;margin:10px 0 0">Until the hold date, nothing is sent: every email waits in Notifications as Held so you can see it, and held emails are never sent later. Clear the date to send right away. With no flow link, emails wait in Notifications with an Open Email button. The flow gets to, subject, body and from, same as the Meeting Trackers calendar flow.</p></div>'+
       '<div class="card"><h3>Who Hears When Work Arrives at Each Stage</h3><table class="tbl"><thead><tr><th>Stage</th>'+['staff','facilitator','media','imawg','director','vps','gov','website'].map(r=>'<th style="text-align:center">'+esc(r==='gov'?govName():ROLE_LABEL[r])+'</th>').join('')+'</tr></thead><tbody>'+stages().map(s=>'<tr><td class="nm">'+esc(s.name)+'</td>'+['staff','facilitator','media','imawg','director','vps','gov','website'].map(r=>'<td style="text-align:center"><input type="checkbox" data-nr="'+s.key+'|'+r+'"'+(((N.onEnter||{})[s.key]||[]).includes(r)?' checked':'')+'></td>').join('')+'</tr>').join('')+'</tbody></table></div>';
   }
   if(setTab==='digest') body=digestSettingsHtml();
@@ -5757,7 +6558,7 @@ function wireSettings(m){
   }
   $$('[data-padd]',m).forEach(b=>b.onclick=async()=>{ const v=await modal({title:'Add Person',ok:'Add',body:fld('Name',inp('name',''))+fld('Email',inp('email','','first initial + last name @mismo.org')),validate:x=>x.name?'':'Add a name'}); if(!v) return; const P=clone(S.people); const path=b.dataset.padd.split('.'); let arr=path.length>1?(P.roles[path[1]]=P.roles[path[1]]||[]):P.facilitators; arr.push({name:v.name.trim(),email:v.email.trim()}); S.people=P; await write('config','people',P); renderAll(); });
   $$('[data-pdel]',m).forEach(b=>b.onclick=async()=>{ const [key,name]=b.dataset.pdel.split('|'); const P=clone(S.people); const path=key.split('.'); const arr=path.length>1?P.roles[path[1]]:P.facilitators; const i=arr.findIndex(p=>p.name===name); if(i>=0) arr.splice(i,1); S.people=P; await write('config','people',P); renderAll(); });
-  const ns=$('#nsave',m); if(ns) ns.onclick=async()=>{ const N=clone(S.notify); N.flowUrl=$('#nflow',m).value.trim(); N.from=$('#nfrom',m).value.trim(); N.reminders={targetDays:+$('#nr1',m).value||7,commentEndingDays:+$('#nr2',m).value||3,staleDays:+$('#nr3',m).value||45}; S.notify=N; await write('config','notify',N); toast('Saved'); renderAll(); };
+  const ns=$('#nsave',m); if(ns) ns.onclick=async()=>{ const N=clone(S.notify); N.flowUrl=$('#nflow',m).value.trim(); N.from=$('#nfrom',m).value.trim(); N.holdUntil=($('#nhold',m)||{value:''}).value||''; N.reminders={targetDays:+$('#nr1',m).value||7,commentEndingDays:+$('#nr2',m).value||3,staleDays:+$('#nr3',m).value||45}; S.notify=N; await write('config','notify',N); toast('Saved'); renderAll(); };
   $$('[data-nr]',m).forEach(c=>c.onchange=async()=>{ const [k,r]=c.dataset.nr.split('|'); const N=clone(S.notify); N.onEnter=N.onEnter||{}; const a=new Set(N.onEnter[k]||[]); c.checked?a.add(r):a.delete(r); N.onEnter[k]=[...a]; S.notify=N; await write('config','notify',N); });
   const ig=$('#impgo',m); if(ig){ $('#impf',m).onchange=async e=>{ const f=e.target.files[0]; if(f) $('#impt',m).value=await f.text(); }; ig.onclick=()=>importData($('#impt',m).value,$('#impo',m).checked,$('#impmsg',m)); }
   const eg=$('#expgo',m); if(eg) eg.onclick=async()=>{ const data=JSON.stringify({exportedAt:new Date().toISOString(),tickets:S.tickets,leaders:S.leaderSnap,process:S.process,people:S.people,notify:S.notify,media:S.media},null,1); const name='MMS Backup '+today()+'.json';

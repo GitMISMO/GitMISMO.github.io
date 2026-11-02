@@ -91,12 +91,15 @@ for (const p of ((config.people || {}).facilitators || [])) {
 }
 
 const list = D.build({ now, tickets, process: config.process, people: config.people, arch, media, comments, mt, hours, settings: config.digest });
+const N = config.notify || {}, holdUntil = ('holdUntil' in N) ? N.holdUntil : '2026-11-20';
+const HELD = !!holdUntil && new Date().toISOString().slice(0, 10) < holdUntil;
+if (HELD) console.log(`Email is on hold until ${holdUntil}: building the digests but not sending them. Staff see them in MMS Notifications as Held.`);
 let sent = 0;
 for (const m of list) {
   if (!m.to.length) { console.log(`Skipped ${m.name}: no email on file.`); continue; }
   if (m.empty && settings.skipEmpty) { console.log(`Skipped ${m.name}: nothing to report.`); continue; }
   console.log(`${DRY ? '[dry run] ' : ''}${m.name}: ${m.subject} (${m.sections} sections)`);
-  if (DRY || !FLOW) continue;
+  if (DRY || !FLOW || HELD) continue;
   const r = await fetch(FLOW, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to: m.to.join(';'), cc: m.cc.join(';'), subject: m.subject, body: m.text, html: m.html, from: ((config.notify || {}).from) || 'workrequests@mismo.org', kind: 'digest' }) });
   if (r.ok) sent++; else console.log(`  Not sent: the flow answered ${r.status}`);
 }
