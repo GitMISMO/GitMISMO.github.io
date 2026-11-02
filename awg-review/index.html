@@ -620,7 +620,7 @@ select.inp.sel{min-width:0;width:auto}
 @media(max-width:560px){.cp-row{grid-template-columns:1fr}.ros-r{grid-template-columns:1fr 1fr}.ros-r .inp:first-child{grid-column:1/-1}.cp-m{flex-wrap:wrap}}
 
 .cp-list{grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
-.cp-out .seg{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:6px;border:0;background:none;overflow:visible}
+.cp-out .seg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;border:0;background:none;overflow:visible}
 .cp-out .seg button{border:1px solid var(--border-strong);border-radius:5px;padding:9px 10px;background:var(--surface)}
 .cp-out .seg button[aria-pressed="true"]{border-color:var(--navy)}
 .callp .cp-t textarea{min-height:44px}
@@ -638,6 +638,12 @@ select.inp.sel{min-width:0;width:auto}
 
 .cp-out{grid-template-columns:minmax(0,1fr)}
 .cp-out .seg{max-width:100%;box-sizing:border-box}
+
+.cp-votes{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:5px}
+.cp-vm{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:5px 8px;border:1px solid var(--rule);border-radius:5px;font-size:13px}
+.cp-vm.on{border-color:var(--warn)}
+.cp-vm b{font-weight:600;white-space:nowrap}
+.cp-who{font-size:12.5px;margin:2px 0 0}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -682,9 +688,6 @@ select.inp.sel{min-width:0;width:auto}
     <button type="button" data-hq="draft" title="How the Draft Is Doing">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>
       <span>How the Draft Is Doing</span></button>
-    <button type="button" data-hq="setup" title="Roster and Calls">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0111 0"/><path d="M16 4.5a3 3 0 010 6M17.5 14a5 5 0 013.5 5"/></svg>
-      <span>Roster and Calls</span></button>
     <button type="button" data-hq="help" title="Help">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 015 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17.2v.1"/></svg>
       <span>Help</span></button>
@@ -767,9 +770,9 @@ const ROSTER0={chair:"Mark Kleingers (Actualize Consulting)",vice:"Chris Trujill
   {cop:"Secondary CoP",name:"Mark Friend",org:"Fannie Mae"},{cop:"Title & Closing CoP",name:"Bryan Bedard",org:"Rocket Close"},{cop:"Property & Valuation Services CoP",name:"Chris Williams",org:"AIMS Dashboard"}],
   vacant:["Servicing CoP","eMortgage CoP","HERO CoP","Business Process Model CoP"]};
 const CALLS0=["2026-11-12","2026-11-26","2026-12-10","2026-12-24"];
-const roster=()=>S.cfg.roster||ROSTER0;
+const roster=()=>(S.cfg.roster&&(S.cfg.roster.members||[]).length)?S.cfg.roster:ROSTER0;
 const voters=()=>(roster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name));
-const quorumNeed=()=>Math.floor(voters().length/2)+1;
+const quorumNeed=()=>(+roster().need>0)?+roster().need:Math.floor(voters().length/2)+1;
 /* the next AWG calls: the dates staff keep on the Roster and Calls page, then every other Thursday */
 function nextCalls(n){ const L=(S.cfg.calls||CALLS0).filter(d=>d>=today()).sort(); let last=L[L.length-1]||(S.cfg.calls||CALLS0).slice(-1)[0]||today();
   while(L.length<n){ const d=new Date(last+"T12:00:00"); d.setDate(d.getDate()+14); last=d.toISOString().slice(0,10); if(last>=today()) L.push(last); } return L.slice(0,n); }
@@ -888,11 +891,11 @@ function shell(body){ const r=route(), w=Object.values(S.queue).filter(isOpen).l
 window.__imrSearch=function(){ const out=[]; const go=h=>()=>{ location.hash=h; };
   Object.values(S.queue).forEach(q=>out.push({group:q.status==="decided"?"Decided":"On the Agenda",name:(q.wr||"")+" "+(q.wrName||q.name||""),where:q.status==="decided"?(q.outcome||"Decided")+" "+fmtS(q.decidedAt):(q.rec?"Draft: "+q.rec+" · ":"")+(q.rows||0)+" rows",go:go("#/review/"+encodeURIComponent(q.rep))}));
   const r=route(), d=r.view==="review"&&S.docs[r.rep]; if(d) (d.rows||[]).forEach(x=>out.push({group:"Rows in This Submission",name:"Item "+(x.item||x.i+1)+" · "+(x.name||""),where:[x.body,x.ct,x.tt].filter(Boolean).join(" · "),go:()=>{ S.filter="all"; render(); setTimeout(()=>{ const el=document.querySelector('[data-row="'+x.i+'"]'); if(el){ el.scrollIntoView({block:"center"}); el.style.outline="2px solid var(--sky)"; setTimeout(()=>el.style.outline="",1600); } },60); }}));
-  [["On the Agenda","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Roster and Calls","#/setup"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
+  [["On the Agenda","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
   return out; };
 function render(){ if(!S.loaded) return; const r=route();
   if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d) return shell(desk(d)); shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(route().rep===r.rep) shell(x?desk(x):'<div class="empty">That submission isn’t here. It may have been withdrawn.</div>'); }); return; }
-  const V={decided:decidedView,trends:trendsView,draft:draftView,help:helpView,setup:setupView,add:addView}[r.view]; shell(V?V():home()); }
+  const V={decided:decidedView,trends:trendsView,draft:draftView,help:helpView,add:addView}[r.view]; shell(V?V():home()); }
 
 /* ---------- home ---------- */
 function ring(parts,center,sub){ const tot=parts.reduce((s,p)=>s+p.v,0), R=56, C=2*Math.PI*R; let off=0;
@@ -978,22 +981,24 @@ function draftCard(doc){ const D=doc.draft; if(!D) return '<div class="card"><h3
 
 /* the call record: who was there, quorum, the vote, conditions */
 function attFor(date){ return ((S.att||{})[date])||null; }
-function callPanel(doc){ const c=doc.call||(doc.call={date:nextCalls(1)[0],method:"Standard Meeting",present:[],others:[],votes:{},outcome:"",conditions:"",notes:""}); const can=canReview()&&doc.status!=="decided";
-  if(!(c.present||[]).length){ const a=attFor(c.date); if(a){ c.present=(a.present||[]).slice(); c.others=(a.others||[]).slice(); c.guests=a.guests||""; } }
-  const V=voters(), R=roster(), need=quorumNeed(), here=V.filter(m=>(c.present||[]).includes(m.name)), q=here.length>=need;
-  const obj=here.filter(m=>(c.votes||{})[m.name]==="Objects"), abs=here.filter(m=>(c.votes||{})[m.name]==="Abstains");
-  const calls=[...new Set([c.date].concat(nextCalls(4)).concat((doc.calls||[]).map(x=>x.date)))].filter(Boolean).sort();
-  const dis=can?'':' disabled';
-  return '<div class="card callp"><h3>Record the AWG Call<small>'+(doc.calls&&doc.calls.length?'call '+(doc.calls.length+1)+' for this submission':'what happened on the call')+'</small></h3>'+
+function callPanel(doc){ const c=doc.call||(doc.call={date:nextCalls(1)[0],method:"Standard Meeting",votes:{},outcome:"",conditions:"",notes:""}); const can=canReview()&&doc.status!=="decided";
+  /* who was there comes from Meeting Trackers (Erin logs it there); this only records the vote */
+  const a=attFor(c.date), V=voters(), need=quorumNeed(); const known=!!(a&&a.present&&a.present.length);
+  c.present=known?a.present.slice():[]; c.others=known?(a.others||[]).slice():[];
+  const here=known?V.filter(m=>c.present.includes(m.name)):[], q=known?here.length>=need:null;
+  const who=known?here:V; const obj=who.filter(m=>(c.votes||{})[m.name]==="Objects"), abs=who.filter(m=>(c.votes||{})[m.name]==="Abstains");
+  const calls=[...new Set([c.date].concat(nextCalls(4)).concat((doc.calls||[]).map(x=>x.date)).concat(Object.keys(S.att||{}).filter(d=>d>=String(doc.at||"").slice(0,10)&&d<=today())))].filter(Boolean).sort();
+  const dis=can?'':' disabled', open=S.attOpen===doc.rep;
+  return '<div class="card callp"><h3>Record the AWG Vote<small>'+(doc.calls&&doc.calls.length?'call '+(doc.calls.length+1)+' for this submission':'attendance comes from Meeting Trackers')+'</small></h3>'+
     '<div class="cp-row"><label>Call Date<select data-cf="date"'+dis+'>'+calls.map(d=>'<option value="'+d+'"'+(d===c.date?' selected':'')+'>'+esc(fmtL(d))+(d===today()?' (today)':'')+'</option>').join("")+'</select></label><label>Review Method<select data-cf="method"'+dis+'>'+METHODS.map(m=>'<option'+(m===c.method?' selected':'')+'>'+esc(m)+'</option>').join("")+'</select></label></div>'+
-    '<div class="cp-att"><div class="cp-h"><b>Voting Members</b><span class="q '+(q?'ok':'no')+'">'+here.length+' of '+V.length+' present · '+need+' needed · '+(q?'Quorum ✓':'No quorum yet')+'</span><span class="sp"></span>'+(can?'<button type="button" class="btn sm ghost" data-allhere="1">Everyone Was There</button>':'')+'</div>'+
-    '<div class="cp-list">'+V.map(m=>{ const on=(c.present||[]).includes(m.name), v=(c.votes||{})[m.name]||"For"; return '<div class="cp-m'+(on?' on':'')+'"><label class="cp-c"><input type="checkbox" data-pres="'+esc(m.name)+'"'+(on?' checked':'')+dis+'><span><b>'+esc(m.name)+'</b><em>'+esc(m.cop)+(m.org?' · '+esc(m.org):'')+'</em></span></label>'+(on?'<span class="cp-v seg sm">'+["For","Objects","Abstains"].map(x=>'<button type="button" data-vote="'+esc(m.name)+'|'+x+'" aria-pressed="'+(v===x)+'"'+dis+'>'+x+'</button>').join("")+'</span>':'')+'</div>'; }).join("")+'</div>'+
-    '<div class="cp-h" style="margin-top:10px"><b>Also There</b></div><div class="cp-o">'+[["chair",R.chair+" · Chair"],["vice",R.vice+" · Vice Chair"],["fac",R.fac+" · Facilitator"]].filter(x=>x[1]&&!/^undefined/.test(x[1])).map(([k,l])=>'<label class="cp-c sm"><input type="checkbox" data-oth="'+esc(l.split(" · ")[0])+'"'+((c.others||[]).includes(l.split(" · ")[0])?' checked':'')+dis+'><span>'+esc(l)+'</span></label>').join("")+'<input class="inp" data-cf="guests" placeholder="Other participants (comma separated)" value="'+esc(c.guests||"")+'"'+dis+'></div></div>'+
+    '<div class="cp-h"><b>Attendance</b>'+(known?'<span class="q '+(q?'ok':'no')+'">'+here.length+' of '+V.length+' voting members · '+need+' needed · '+(q?'Quorum ✓':'No quorum')+'</span><button type="button" class="lnk" data-attopen="1">'+(open?'Hide who was there':'Who was there')+'</button>':'<span class="q no">Not in Meeting Trackers yet</span><span class="muted">Erin logs it there after the call; the quorum fills in then.</span>')+'</div>'+
+    (known&&open?'<p class="muted cp-who">'+esc(here.map(m=>m.name).join(", "))+(c.others.length?'; also '+esc(c.others.join(", ")):'')+'</p>':'')+
     '<div class="cp-out"><span class="lbl">Outcome</span><div class="seg wrap">'+OUT.map(o=>'<button type="button" data-out="'+esc(o)+'" aria-pressed="'+(c.outcome===o)+'"'+dis+'>'+esc(o)+'</button>').join("")+'</div></div>'+
     (c.outcome==="Conditional Approval"||/^Returned/.test(c.outcome)?'<label class="cp-t">'+(c.outcome==="Conditional Approval"?'Conditions':'What Needs to Change')+'<textarea data-cf="conditions" rows="3"'+dis+'>'+esc(c.conditions||"")+'</textarea></label>':'')+
+    (c.outcome&&c.outcome!=="Carried to Next Call"&&c.outcome!=="Passed on Review"?'<div class="cp-h" style="margin-top:12px"><b>Objections and Abstentions</b><span class="muted">'+(obj.length||abs.length?'':'none, unless you mark someone')+'</span></div><div class="cp-votes">'+who.map(m=>{ const v=(c.votes||{})[m.name]||"For"; return '<span class="cp-vm'+(v!=="For"?' on':'')+'"><b>'+esc(m.name)+'</b><span class="seg sm">'+["For","Objects","Abstains"].map(x=>'<button type="button" data-vote="'+esc(m.name)+'|'+x+'" aria-pressed="'+(v===x)+'"'+dis+'>'+x+'</button>').join("")+'</span></span>'; }).join("")+'</div>':'')+
     '<label class="cp-t">Notes for the Minutes (optional)<textarea data-cf="notes" rows="2"'+dis+'>'+esc(c.notes||"")+'</textarea></label>'+
     (c.outcome?'<div class="cp-min"><span class="lbl">For the Minutes</span><p id="minline">'+esc(minutesLine(doc,c,obj,abs))+'</p><button type="button" class="btn sm ghost" data-copymin="1">Copy</button></div>':'')+
-    (can?'<div class="cp-acts">'+(c.outcome==="Carried to Next Call"?'<button type="button" class="btn pri" data-finish="1"'+(q?'':' title="Recorded without quorum"')+'>Save and Carry to '+esc(fmtS(nextAfter(c.date)))+'</button>':'<button type="button" class="btn pri" data-finish="1"'+(c.outcome&&(q||c.method==="Expedited Review")?'':' disabled')+'>Record the Decision</button>')+(c.outcome&&!q&&c.method!=="Expedited Review"&&c.outcome!=="Carried to Next Call"?'<span class="muted">A decision needs quorum ('+need+' voting members) unless it is an expedited review.</span>':'')+'</div>':'')+'</div>'; }
+    (can?'<div class="cp-acts">'+(c.outcome==="Carried to Next Call"?'<button type="button" class="btn pri" data-finish="1">Save and Carry to '+esc(fmtS(nextAfter(c.date)))+'</button>':'<button type="button" class="btn pri" data-finish="1"'+(c.outcome&&q!==false?'':' disabled')+'>Record the Decision</button>')+(c.outcome&&q===false&&c.outcome!=="Carried to Next Call"&&c.method!=="Expedited Review"?'<span class="muted">Meeting Trackers shows no quorum for that call ('+need+' voting members needed).</span>':'')+'</div>':'')+'</div>'; }
 function nextAfter(d){ const L=nextCalls(6).filter(x=>x>d); return L[0]||d; }
 function minutesLine(doc,c,obj,abs){ c=Object.assign({},c,{conditions:String(c.conditions||"").trim().replace(/[.;\s]+$/,"")}); const head=(doc.wr?doc.wr+" ":"")+(doc.name||""); const oa=(obj.length||abs.length)?" ("+[obj.length?obj.length+" objection"+(obj.length===1?"":"s")+": "+obj.map(m=>m.name).join(", "):"",abs.length?abs.length+" abstention"+(abs.length===1?"":"s")+": "+abs.map(m=>m.name).join(", "):""].filter(Boolean).join("; ")+")":" with no objections or abstentions";
   const t={"Approved":"Group reviewed and approved"+oa+".","Conditional Approval":"Group reviewed and conditionally approved"+oa+", subject to: "+(c.conditions||"[conditions]")+".","Returned to Workgroup":"Group reviewed and returned the submission to the workgroup"+(c.conditions?": "+c.conditions:"")+".","Returned to IM":"Group reviewed and returned the submission to IM"+(c.conditions?": "+c.conditions:"")+".","Passed on Review":"AWG passed on reviewing this submission.","Carried to Next Call":"Review continues on the next AWG call ("+fmtS(nextAfter(c.date))+")."}[c.outcome]||"";
@@ -1036,17 +1041,15 @@ function desk(doc){ (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flags=rowFlags(r)
 function earlierHtml(doc){ if(!doc.wr) return ''; const L=Object.values(S.queue).filter(x=>x.rep!==doc.rep&&x.wr===doc.wr&&x.status==="decided").sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt))); if(!L.length) return '';
   return '<div class="card earlier"><h3>Earlier AWG Decisions on '+esc(doc.wr)+'<small>'+L.length+' on record</small></h3><div class="subs">'+L.map(x=>subCard(x).replace('href="#/review/'+encodeURIComponent(x.rep)+'"','href="#/review/'+encodeURIComponent(x.rep)+'/'+encodeURIComponent(doc.rep)+'"')).join('')+'</div></div>'; }
 /* ---------- recording ---------- */
-async function finish(doc){ const c=doc.call, by=S.me.name||S.me.email||"", at=new Date().toISOString(); const V=voters(), here=V.filter(m=>(c.present||[]).includes(m.name));
-  const rec=Object.assign({},c,{need:quorumNeed(),seats:V.length,quorum:here.length>=quorumNeed(),line:minutesLine(doc,c,here.filter(m=>(c.votes||{})[m.name]==="Objects"),here.filter(m=>(c.votes||{})[m.name]==="Abstains")),by,at});
-  // attendance is shared by every submission on the same call
-  try{ const a=await update("attendance",cur=>{ const o=cur||{}; o[c.date]={present:c.present||[],others:c.others||[],guests:c.guests||"",by,at}; return o; }); S.att=a; }catch(e){}
+async function finish(doc){ const c=doc.call, by=S.me.name||S.me.email||"", at=new Date().toISOString(); const V=voters(), known=(c.present||[]).length>0, here=V.filter(m=>(c.present||[]).includes(m.name)), who=known?here:V;
+  const rec=Object.assign({},c,{need:quorumNeed(),seats:V.length,quorum:known?here.length>=quorumNeed():null,line:minutesLine(doc,c,who.filter(m=>(c.votes||{})[m.name]==="Objects"),who.filter(m=>(c.votes||{})[m.name]==="Abstains")),by,at});
   doc.calls=(doc.calls||[]).concat([rec]);
-  if(c.outcome==="Carried to Next Call"){ const nx=nextAfter(c.date); doc.call={date:nx,method:c.method,present:[],others:[],votes:{},outcome:"",conditions:"",notes:""}; doc.status="carried"; await saveDoc(doc);
+  if(c.outcome==="Carried to Next Call"){ const nx=nextAfter(c.date); doc.call={date:nx,method:c.method,votes:{},outcome:"",conditions:"",notes:""}; doc.status="carried"; await saveDoc(doc);
     const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"carried",lastCall:c.date,nextCall:nx,calls:doc.calls.length}); return o; }); S.queue=q.items; toast("Saved. It stays on the agenda for "+fmtS(nx)+"."); return false; }
   doc.status="decided"; doc.outcome=c.outcome; doc.decidedAt=c.date; doc.decidedBy=by; await saveDoc(doc);
   const agreed=recMatches(doc.draft&&doc.draft.rec,c.outcome);
   if(!doc.test){ try{ await update("learn-"+String(c.date).slice(0,4),cur=>{ const o=cur||{rows:{}}; o.rows=o.rows||{}; o.rows[doc.rep]={rep:doc.rep,wr:doc.wr,at,rec:(doc.draft&&doc.draft.rec)||"",soft:(doc.draft&&doc.draft.soft)||"",claude:(doc.draft&&doc.draft.claude)||"",outcome:c.outcome,agreed,calls:doc.calls.length,rows:(doc.rows||[]).length,by}; return o; }); }catch(e){} }
-  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",outcome:c.outcome,decidedAt:c.date,decidedBy:by,present:here.length,conds:c.outcome==="Conditional Approval"?String(c.conditions||"").slice(0,200):"",calls:doc.calls.length,agreed}); return o; }); S.queue=q.items;
+  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",outcome:c.outcome,decidedAt:c.date,decidedBy:by,present:known?here.length:null,conds:c.outcome==="Conditional Approval"?String(c.conditions||"").slice(0,200):"",calls:doc.calls.length,agreed}); return o; }); S.queue=q.items;
   const it=S.queue[doc.rep]||{}, flow=it.flow||S.cfg.flow;
   if(!doc.test&&flow&&it.fac&&it.fac.email){ try{ await fetch(flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"AWG decision: "+(doc.wr||"")+" "+(doc.name||""),body:"AWG reviewed "+(doc.wr||"")+" "+(doc.name||"")+" on "+fmtD(c.date)+": "+c.outcome+"."+(c.conditions?"\n\n"+(c.outcome==="Conditional Approval"?"Conditions: ":"What needs to change: ")+c.conditions:"")+"\n\n"+rec.line+"\n\nSee the call record and the rows: https://resources.mismo.org/awg-review/#/review/"+encodeURIComponent(doc.rep),html:"",from:it.from||S.cfg.from||""})}); }catch(e){} }
   toast("AWG decision recorded: "+c.outcome); return true; }
@@ -1124,8 +1127,8 @@ function helpView(){ const step=(t,d)=>'<li><b>'+t+'</b> '+d+'</li>';
   return '<div class="head"><div><h1>Help</h1><div class="sub">How AWG Review works.</div></div></div><div class="help">'+
     '<div class="card"><h3>What This Is</h3><p>AWG reviews each Reference Model submission after IM, for its architecture: the MEGs, container structure, relationships, attributes, XPATHs and anything that would break existing implementations. AWG votes on the submission as a whole on its call, with quorum.</p><p>Here, each submission arrives with a <b>draft</b>: a recommendation (Approve, Approve With Conditions or Send Back) and the architecture points behind it, from software checks and Claude’s read. You stay the decision-makers; the draft just puts the questions in front of the call.</p></div>'+
     '<div class="card"><h3>How a Submission Gets Here</h3>'+flowHtml()+'</div>'+
-    '<div class="g2"><div class="card"><h3>On the Call</h3><ol>'+step('Open the submission','from On the Agenda.')+step('Talk through the draft','and the rows marked AWG or flagged. Add a note to any row for the record.')+step('Record the call:','tick who was there (quorum is counted for you), pick the outcome, add conditions, and mark anyone who objected or abstained.')+step('Record the Decision.','The facilitator gets an email, the decision goes to the work request in the MMS, and the line for the minutes is ready to copy. Carried to Next Call keeps it on the agenda for the next call.')+'</ol></div>'+
-    '<div class="card"><h3>Good to Know</h3><ul><li>Attendance is shared: tick it once and every other submission on the same call starts with it.</li><li>Download for Excel gives the form with AWG’s decision, notes, the AWG face-page fields and the vote tabulation.</li><li>Roster and Calls holds the voting members and the call dates. MISMO staff keep it current.</li><li>Mark and Erin record decisions. Facilitators and staff can follow every submission. Access is granted in People &amp; Access.</li><li>Shortcuts: <b>\\</b> narrows the menu; <b>Ctrl+K</b> (or ⌘K) searches.</li></ul></div></div></div>'; }
+    '<div class="g2"><div class="card"><h3>On the Call</h3><ol>'+step('Open the submission','from On the Agenda.')+step('Talk through the draft','and the rows marked AWG or flagged. Add a note to any row for the record.')+step('Record the vote:','pick the outcome, add any conditions, and mark anyone who objected or abstained. Attendance and quorum come from Meeting Trackers.')+step('Record the Decision.','The facilitator gets an email, the decision goes to the work request in the MMS, and the line for the minutes is ready to copy. Carried to Next Call keeps it on the agenda for the next call.')+'</ol></div>'+
+    '<div class="card"><h3>Good to Know</h3><ul><li>Who was there and quorum come from Meeting Trackers, where Erin logs each call. The voting members, chairs and call dates come from there too.</li><li>Download for Excel gives the form with AWG’s decision, notes, the AWG face-page fields and the vote tabulation.</li><li>Mark and Erin record decisions. Facilitators and staff can follow every submission. Access is granted in People &amp; Access.</li><li>Shortcuts: <b>\\</b> narrows the menu; <b>Ctrl+K</b> (or ⌘K) searches.</li></ul></div></div></div>'; }
 
 /* ---------- roster and calls ---------- */
 function setupView(){ const R=roster(), ed=isAdmin()||S.role==="staff"; const dis=ed?'':' disabled'; const C=(S.cfg.calls||CALLS0).slice().sort();
@@ -1204,7 +1207,8 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-save]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.save], t=($("textarea[name=note]",b.closest(".edit"))||{}).value||""; if(t.trim()) x.note={t:t.trim(),by:S.me.name||S.me.email,at:new Date().toISOString()}; else { delete x.note; x._clr=new Date().toISOString(); } S.edit=null; render(); save(); });
   $$("[data-clr]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.clr]; delete x.note; x._clr=new Date().toISOString(); S.edit=null; render(); save(); });
   const c=doc.call;
-  $$("[data-cf]",m).forEach(el=>el.onchange=el.oninput=()=>{ const k=el.dataset.cf; c[k]=el.value; if(k==="date"){ const a=attFor(c.date); if(a&&!(c.present||[]).length){ c.present=a.present.slice(); c.others=(a.others||[]).slice(); c.guests=a.guests||""; } render(); } else { const ml=$("#minline"); if(ml&&c.outcome){ const V=voters().filter(x=>(c.present||[]).includes(x.name)); ml.textContent=minutesLine(doc,c,V.filter(x=>(c.votes||{})[x.name]==="Objects"),V.filter(x=>(c.votes||{})[x.name]==="Abstains")); } } saveSoon(); });
+  $$("[data-attopen]",m).forEach(b=>b.onclick=keep(async()=>{ S.attOpen=S.attOpen===doc.rep?"":doc.rep; render(); }));
+  $$("[data-cf]",m).forEach(el=>el.onchange=el.oninput=()=>{ const k=el.dataset.cf; c[k]=el.value; if(k==="date"){ render(); } else { const ml=$("#minline"); if(ml&&c.outcome){ const V=(c.present||[]).length?voters().filter(x=>(c.present||[]).includes(x.name)):voters(); ml.textContent=minutesLine(doc,c,V.filter(x=>(c.votes||{})[x.name]==="Objects"),V.filter(x=>(c.votes||{})[x.name]==="Abstains")); } } saveSoon(); });
   $$("[data-pres]",m).forEach(el=>el.onchange=keep(async()=>{ const n=el.dataset.pres; c.present=(c.present||[]).filter(x=>x!==n); if(el.checked) c.present.push(n); render(); saveSoon(); }));
   $$("[data-oth]",m).forEach(el=>el.onchange=()=>{ const n=el.dataset.oth; c.others=(c.others||[]).filter(x=>x!==n); if(el.checked) c.others.push(n); saveSoon(); });
   $$("[data-allhere]",m).forEach(b=>b.onclick=keep(async()=>{ c.present=voters().map(x=>x.name); render(); saveSoon(); }));
