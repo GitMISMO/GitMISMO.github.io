@@ -285,6 +285,14 @@ html,body{overflow-x:clip}
 .pane:not(.on){visibility:hidden;transition:transform .22s cubic-bezier(.4,0,.2,1),visibility 0s .22s}
 @media(max-width:700px){.hqtop{padding:0 12px}.hqtop .mastrule{margin-inline:10px}.logoplate{padding:7px 10px}.logoplate .wordmark{height:19px}.hqtop .hqname{font-size:14px}.pv-who{font-size:0;gap:0;padding:4px}.pv-who em{display:none}.steps{grid-template-columns:1fr 1fr}.steps div:nth-child(2){border-right:0}.steps div{border-bottom:1px solid var(--rule)}main{padding:14px}.row{grid-template-columns:10px minmax(0,1fr) auto;gap:10px}.row .wh,.row .dt{display:none}.vsub{white-space:normal}.fr{grid-template-columns:120px minmax(0,1fr) 28px}.form{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* Payment in Process (Jonna, Nov 2, 2026) */
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
+.fld select{width:100%;box-sizing:border-box;font-family:inherit;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:5px;padding:8px 10px;font-size:14px}
+.fld input.bad,.fld select.bad{border-color:var(--bad)}
+#v-pip .vhead .btn{margin:0}
+#home-tiles{grid-template-columns:repeat(5,minmax(0,1fr))}
+@media(max-width:1100px){.grid2{grid-template-columns:1fr}#home-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}#home-tiles>.tile:nth-child(5){grid-column:1/-1}}
+
 </style>
 </head>
 <body>
@@ -339,6 +347,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <nav aria-label="Membership Desk">
     <button type="button" data-hq="home" aria-current="page" title="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Home</span></button>
     <button type="button" data-hq="todo" title="To Do"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg><span>To Do</span><b class="nb" id="nb-todo"></b></button>
+    <button type="button" data-hq="pip" title="Payment in Process"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Payment in Process</span><b class="nb" id="nb-pip"></b></button>
     <button type="button" data-hq="cases" title="Case Management"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Case Management</span></button>
     <button type="button" data-hq="done" title="Completed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Completed</span></button>
     <button type="button" data-hq="help" title="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2v.1"/></svg><span>Help</span></button>
@@ -375,6 +384,16 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <section class="view" id="v-help" hidden>
     <div class="vhead"><div><h1>Help</h1><div class="vsub">How the Membership Desk works, step by step. Questions: Jonna Critchley.</div></div></div>
     <div class="helpgrid"><nav class="helpnav" id="help-nav" aria-label="Help topics"></nav><div class="panel helpbody" id="help-body"></div></div>
+  </section>
+
+  <section class="view" id="v-pip" hidden>
+    <div class="vhead"><div><h1>Payment in Process</h1><div class="vsub">Invoices that have been sent and not paid yet, Lenders and Non-Lenders apart. Each one comes off when the payment shows up in Aptify, or when someone selects Mark Paid.</div></div><button class="btn" type="button" id="pip-add">Add an Invoice</button></div>
+    <div class="tiles" id="pip-tiles"></div>
+    <div class="grid2">
+      <div class="panel"><div class="ph"><h2>Lenders</h2><span class="hint" id="pip-lh"></span></div><div class="rows" id="pip-lender"></div></div>
+      <div class="panel"><div class="ph"><h2>Non-Lenders</h2><span class="hint" id="pip-nh"></span></div><div class="rows" id="pip-non"></div></div>
+    </div>
+    <div class="panel" style="margin-top:16px"><div class="ph"><h2>Paid in the Last 60 Days</h2><span class="hint">newest first</span></div><div class="rows" id="pip-paid"></div></div>
   </section>
 
   <section class="view" id="v-cases" hidden>
@@ -415,13 +434,15 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   window.__deskSave=async f=>{const me=window.__deskMe();f.entry=f.entry||Date.now().toString(36)+Math.random().toString(36).slice(2,7);
     return change(P=>{P.items.push({entry:f.entry,id:f.x.id,kind:f.x.kind,name:f.x.name,level:f.x.level||"",special:f.x.special||"",price:f.x.price||0,cid:f.cid||"",order:f.order||"",person:f.person||"",note:f.note||"",at:f.at,by:me.email,byName:me.name});});};
   window.__deskUndo=async f=>change(P=>{const it=P.items.find(x=>x.entry===f.entry);if(it){it.undone=true;it.undoneAt=new Date().toISOString();it.undoneBy=window.__deskMe().name;}});
+  /* Payment in Process: the invoices the team adds, kept in desk/invoices (never deleted: Entered by Mistake only marks one) (Jonna, Nov 2, 2026) */
+  window.__deskInv=async fn=>{for(let i=0;i<4;i++){const g=await get("invoices");const P=(g.data&&Array.isArray(g.data.items))?g.data:{items:[]};fn(P);P.writtenAt=new Date().toISOString();const r=await put("invoices",P,g.sha);if(r.ok)return P;if(r.status!==409)throw new Error("save "+r.status);}throw new Error("busy");};
   async function load(){say("Opening the Membership Desk…","Loading what's waiting and what's been set up.");
-    const [T,S,C,Dn]=await Promise.all(["todos","square","cases","done"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
+    const [T,S,C,Dn,I]=await Promise.all(["todos","square","cases","done","invoices"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
     if(!T.data&&!S.data&&T.err&&S.err){say("The Membership Desk couldn't load","Please refresh. If it keeps happening, email Jonna.");return;}
     const t=T.data||{},s=S.data||{},items=((Dn.data&&Dn.data.items)||[]).filter(x=>!x.undone),doneIds=new Set(items.map(x=>x.id));
     const keep=(k,L)=>(L||[]).map(x=>Object.assign({},x,{id:idOf(k,x)})).filter(x=>!doneIds.has(x.id));
     const tt=t.todo||{},td=t.done||{};
-    window.DESK={asOf:today(),
+    window.DESK={asOf:today(),inv:((I&&I.data&&I.data.items)||[]),pip:t.pip||[],invPaid:t.invPaid||{},
       todo:{square:keep("square",s.pending),members:keep("members",tt.members),free:keep("free",tt.free),iif:keep("iif",tt.iif)},
       done:{square:s.done||[],squareWaitingPay:s.waitingPay||[],iif:td.iif||[],members:td.members||[],freeActive:td.freeActive||0},
       cases:C.data||{asOf:today(),total:0,months:{},topicsY:{},channelY:{},byY:{},sameDay:0,closed:0,list:{T:[],C:[],B:[],R:[]}},
@@ -481,6 +502,7 @@ function renderHome(){const hr=new Date().getHours();$("hello").textContent=(hr<
  const oldest=TODO.map(x=>x.sold||x.paid).filter(Boolean).sort()[0],fin=finished().filter(r=>r.grp==="setup"&&r.d.slice(0,7)===TODAY.slice(0,7)).length,C=D.cases;
  tiles($("home-tiles"),[
   {k:"#ff8f7d",lab:"Waiting on You",v:TODO.length,sub:TODO.length?(oldest?"oldest from "+fmtS(oldest):"see the To Do page"):"you're all caught up",go:()=>go("todo")},
+  {k:"#f0b94a",lab:"Payment in Process",v:pipRows().length,sub:(L=>L.length?money(pipSum(L))+" invoiced, not paid yet":"no invoices waiting")(pipRows()),go:()=>go("pip")},
   {k:"#5fd39a",lab:"Set Up Recently",v:finished().filter(r=>r.grp==="setup").length,sub:"Square, new members and IIF since "+fmtS(finished().filter(r=>r.grp==="setup").map(r=>r.d).sort()[0]||TODAY),go:()=>go("done")},
   {k:"#74bfeb",lab:"MISMO Cases in "+TODAY.slice(0,4),v:caseYTD(),sub:(C.months[TODAY.slice(0,7)]||C.months[Object.keys(C.months).sort().pop()])+" last month in Aptify",go:()=>go("cases")},
   {k:"#b79cff",lab:"Closed the Same Day",v:Math.round(100*C.sameDay/C.closed),sub:C.sameDay+" of "+C.closed+" cases this year",go:()=>go("cases"),f:v=>Math.round(v)+"%"}]);
@@ -488,7 +510,7 @@ function renderHome(){const hr=new Date().getHours();$("hello").textContent=(hr<
  L.slice(0,7).forEach(x=>t.appendChild(todoRow2(x)));if(!L.length)t.appendChild(h("div",{class:"empty"},"Nothing waiting. New set-ups from MISMO Money and Member 360 land here."));
  const d=$("home-done");d.textContent="";finished().filter(r=>r.grp==="setup").slice(0,7).forEach(r=>d.appendChild(doneRow2(r)));
  const hc=$("home-cases");hc.textContent="";finished().filter(r=>r.grp==="case").slice(0,7).forEach(r=>hc.appendChild(doneRow2(r)));
- const nb=$("nb-todo");nb.textContent=TODO.length||"";nb.hidden=!TODO.length;}
+ const nb=$("nb-todo");nb.textContent=TODO.length||"";nb.hidden=!TODO.length;pipBadge();}
 
 /* ---------- To Do ---------- */
 let tkind="";
@@ -542,7 +564,7 @@ let last=null,tt=0;
 function markDone(x,cid,order,person,note){const i=TODO.indexOf(x);if(i<0)return;const me=(window.__deskMe&&window.__deskMe())||{};const f={x,cid,order,person,note,at:new Date().toISOString(),by:me.email||"",byName:me.name||""};
  TODO.splice(i,1);last={x,i,f};FIN.unshift(f);closePane();renderAll();
  window.__deskSave(f).then(ok=>{if(!ok)throw new Error("not saved");}).catch(e=>{console.error("desk save",e);const k=FIN.indexOf(f);if(k>=0)FIN.splice(k,1);if(!TODO.includes(x))TODO.splice(Math.min(i,TODO.length),0,x);renderAll();$("toast-t").textContent="That didn't save. Please try again.";$("toast").classList.add("on");clearTimeout(tt);tt=setTimeout(()=>$("toast").classList.remove("on"),6000);});
- $("toast-t").textContent=x.name+" marked set up";$("toast").classList.add("on");clearTimeout(tt);tt=setTimeout(()=>$("toast").classList.remove("on"),6000);}
+ $("toast-u").hidden=false;$("toast-t").textContent=x.name+" marked set up";$("toast").classList.add("on");clearTimeout(tt);tt=setTimeout(()=>$("toast").classList.remove("on"),6000);}
 $("toast-u").addEventListener("click",()=>{if(!last)return;const L=last;TODO.splice(L.i,0,L.x);FIN.splice(FIN.indexOf(L.f),1);last=null;$("toast").classList.remove("on");renderAll();window.__deskUndo(L.f).catch(e=>console.error("desk undo",e));});
 
 /* ---------- Completed: a page at a time ---------- */
@@ -663,14 +685,20 @@ const HELP=[
    ["Set Up in Aptify","Set up the membership with no invoice, using the level and dates shown."],
    ["Record the IDs","Enter the Aptify Company ID (and the order number if Aptify created one), then select Mark Set Up."],
    ["What Happens Next","Member 360 counts them as free members, so they don't get renewal invoices."]],
-  notes:[]},
+  notes:["<b>Subsidiaries.</b> A company Member 360 has marked as a subsidiary of another member (for example First Funding under First American) comes here as a free Corporate membership, with its parent named. Set it up the same way, at Corporate with no invoice. Member 360 then counts it as a Subsidiary member."]},
  {id:"iif",k:"#f0b94a",name:"IIF Lenders",lead:"A lender paid $1,000 or more to the Innovation Investment Fund (IIF), which makes them a MISMO member, but Aptify doesn't show them as a member yet.",
   steps:[["Check the Details","The lender and what they paid are on the left."],
    ["Turn Them On in Aptify","Set the lender up as a MISMO member in Aptify, the same way as other IIF lenders."],
    ["Record the IDs","Enter the Aptify Company ID and select Mark Set Up."],
    ["What Happens Next","Member 360's IIF numbers and member counts pick them up on the next Aptify pull."]],
   notes:[]},
-  {id:"cases",k:"#9fb3c8",name:"Case Management",lead:"Your MISMO cases from Aptify Case Management. Only cases with the Aptify Case Category MISMO are included, so nothing from MBA or anyone else is counted.",
+  {id:"pip",k:"#f0b94a",name:"Payment in Process",lead:"Invoices that have been sent and not paid yet, with Lenders and Non-Lenders apart, so the membership team, Amy and Kelly all see what's still owed.",
+  steps:[["Add an Invoice","On Payment in Process, select Add an Invoice and enter the company, Lender or Non-Lender, what it's for, the amount and the invoice date. The Aptify Company ID is optional, but with it the payment is tied for certain."],
+   ["Renewals Come In on Their Own","Non-Lender renewals that Member 360 has at Invoiced or Payment in Process show on the Non-Lender list by themselves, marked from Member 360. Don't enter those."],
+   ["It Comes Off When Paid","Once Aptify shows payments from the company on or after the invoice date that add up to the invoice, it moves to Paid in the Last 60 Days. You can also open it and select Mark Paid."],
+   ["Entered by Mistake","Open it and select Entered by Mistake. It comes off the list but is kept on the record."]],
+  notes:["<b>The days on the right</b> count from the invoice date. Anything waiting more than 30 days shows in red."]},
+ {id:"cases",k:"#9fb3c8",name:"Case Management",lead:"Your MISMO cases from Aptify Case Management. Only cases with the Aptify Case Category MISMO are included, so nothing from MBA or anyone else is counted.",
   steps:[["Read the Numbers","The figure boxes show cases this year, how many were closed the same day, the most common topic and how many came in by phone."],
    ["Narrow It Down","Select any month, topic, way in (Email, Phone, Web) or person. The other charts and the list below update. Select it again, or the × on its label, to let it go."],
    ["See the Cases","The list below shows the matching cases, twelve at a time. Select a case to see its details: who it's for, what was asked, and that company's other MISMO cases. The full case, with its notes, is in Aptify."],
@@ -694,11 +722,94 @@ function renderHelp(){const nav=$("help-nav"),body=$("help-body");nav.textConten
  (t.notes||[]).forEach(n=>{const d=h("div",{class:"hnote"});d.innerHTML=n;body.appendChild(d);});
  if(t.faq)body.appendChild(h("div",{class:"hfaq"},...t.faq.map(q=>h("div",null,h("b",null,q[0]),h("span",null,q[1])))));
  if(t.id==="start")body.appendChild(h("button",{type:"button",class:"btn",onclick:()=>go("todo")},"Go to To Do"));}
+/* ---------- Payment in Process (Jonna, Nov 2, 2026): invoices that have been sent and not paid yet, Lenders and Non-Lenders apart, so
+   Amy, Kelly and the membership team follow them together. Anyone on the desk adds an invoice (data/invoices.json, kept, never deleted).
+   Member 360 adds the Non-Lender renewals that are Invoiced or Payment in Process, and marks a desk invoice paid once Aptify shows
+   payments from that company on or after the invoice date that add up to it. Anyone can also select Mark Paid. ---------- */
+const INV=(D.inv||[]).slice(),PIP=D.pip||[],INVPAID=D.invPaid||{};
+const PIP_WHAT=["IIF","Membership Dues","Renewal","Other"];
+function invState(v){if(v.paidBy)return {paid:true,d:String(v.paidAt||"").slice(0,10),how:"Marked paid by "+String(v.paidByName||"the desk").split(" ")[0]+(v.paidAt?" on "+fmt(String(v.paidAt).slice(0,10)):"")+(v.paidNote?" · "+v.paidNote:"")};
+ const a=INVPAID[v.id];if(a)return {paid:true,auto:true,d:a.d,how:"Paid in Aptify, "+money(a.n)+" by "+fmt(a.d)};return {paid:false};}
+function pipRows(){const open=INV.filter(v=>!v.archived&&!invState(v).paid).map(v=>({src:"inv",v,name:v.name,lender:!!v.lender,amount:+v.amount||0,d:v.date||"",what:v.what||"",num:v.number||""}));
+ const has=p=>open.some(r=>!r.lender&&((r.v.cid&&String(r.v.cid)===String(p.cid))||slug(r.name)===slug(p.name)));
+ const ren=PIP.filter(p=>!has(p)).map(p=>({src:"m360",p,name:p.name,lender:false,amount:+p.amount||0,d:"",what:(p.level?p.level+" ":"")+"renewal · "+p.stage,num:""}));
+ return open.concat(ren).sort((a,b)=>String(a.d||"9999").localeCompare(String(b.d||"9999"))||a.name.localeCompare(b.name));}
+const pipSum=L=>L.reduce((s,r)=>s+(r.amount||0),0);
+function pipBadge(){const n=pipRows().length,nb=$("nb-pip");if(nb){nb.textContent=n||"";nb.hidden=!n;}}
+function pipRow(r){const age=r.d?Math.max(0,days(r.d,TODAY)):null;
+ return h("button",{type:"button",class:"row r2",style:"--k:"+(r.lender?"#f0b94a":"#5fd39a"),onclick:()=>openInv(r)},h("span",{class:"dot"}),
+  h("span",{class:"nm",title:r.name},r.name,h("small",null,[r.amount?money(r.amount):"",r.what,r.d?"invoiced "+fmt(r.d):"",r.src==="m360"?"from Member 360":""].filter(Boolean).join(" · "))),
+  h("span",{class:"age"+(age!=null&&age>30?" late":"")},age==null?"Renewal":age===0?"Today":age+(age===1?" day":" days")));}
+function renderPip(){const L=pipRows(),len=L.filter(r=>r.lender),non=L.filter(r=>!r.lender);
+ const paid=INV.filter(v=>!v.archived&&invState(v).paid&&days(invState(v).d||TODAY,TODAY)<=60).sort((a,b)=>String(invState(b).d).localeCompare(String(invState(a).d)));
+ const old=L.filter(r=>r.d).sort((a,b)=>a.d.localeCompare(b.d))[0];
+ tiles($("pip-tiles"),[
+  {k:"#f0b94a",lab:"Lender Invoices Out",v:len.length,sub:len.length?money(pipSum(len))+" not paid yet":"nothing waiting"},
+  {k:"#5fd39a",lab:"Non-Lender Invoices Out",v:non.length,sub:non.length?money(pipSum(non))+" not paid yet":"nothing waiting"},
+  {k:"#ff8f7d",lab:"Oldest Unpaid",v:old?Math.max(0,days(old.d,TODAY)):0,f:v=>Math.round(v)+(Math.round(v)===1?" day":" days"),sub:old?old.name+" · invoiced "+fmtS(old.d):"no dated invoices waiting"},
+  {k:"#74bfeb",lab:"Paid in the Last 60 Days",v:paid.length,sub:paid.length?money(paid.reduce((s,v)=>s+(+v.amount||0),0))+" came in":"none yet"}]);
+ const fill=(id,arr,empty)=>{const b=$(id);b.textContent="";arr.forEach(r=>b.appendChild(pipRow(r)));if(!arr.length)b.appendChild(h("div",{class:"empty"},empty));};
+ fill("pip-lender",len,"No Lender invoices waiting on payment.");fill("pip-non",non,"No Non-Lender invoices waiting on payment.");
+ $("pip-lh").textContent=len.length?money(pipSum(len))+" out":"";$("pip-nh").textContent=non.length?money(pipSum(non))+" out":"";
+ const pb=$("pip-paid");pb.textContent="";paid.forEach(v=>{const s=invState(v);pb.appendChild(h("button",{type:"button",class:"row r2",style:"--k:#9fb3c8",onclick:()=>openInv({src:"inv",v,name:v.name,lender:!!v.lender,amount:+v.amount||0,d:v.date||""})},h("span",{class:"dot"}),h("span",{class:"nm",title:v.name},v.name,h("small",null,money(+v.amount||0)+" · "+s.how)),h("span",{class:"age"},v.lender?"Lender":"Non-Lender")));});
+ if(!paid.length)pb.appendChild(h("div",{class:"empty"},"Invoices that have been paid show here for 60 days."));
+ pipBadge();}
+async function invSave(fn,okText){try{const P=await window.__deskInv(fn);INV.length=0;(P.items||[]).forEach(x=>INV.push(x));closePane();renderAll();
+  $("toast-t").textContent=okText;$("toast-u").hidden=true;$("toast").classList.add("on");clearTimeout(tt);tt=setTimeout(()=>{$("toast").classList.remove("on");$("toast-u").hidden=false;},5000);return true;}
+ catch(e){console.error("invoice save",e);return false;}}
+/* the panel: add an invoice, or one invoice with Mark Paid */
+function openInv(r){cur=r||{add:true};const B=$("pane-b");B.textContent="";const me=(window.__deskMe&&window.__deskMe())||{};
+ const kv=rows=>h("div",{class:"kv"},...rows.filter(x=>x&&x[1]!=null&&x[1]!=="").flatMap(x=>[h("div",null,x[0]),h("div",null,String(x[1]))]));
+ if(!r){$("pane-t").textContent="Add an Invoice";$("pane-s").textContent="An invoice that has been sent and not paid yet";
+  const nm=h("input",{id:"i-nm",autocomplete:"off",placeholder:"e.g. Mortgage Center LLC"}),cid=h("input",{id:"i-cid",inputmode:"numeric",autocomplete:"off",placeholder:"e.g. 724700"}),
+   amt=h("input",{id:"i-amt",inputmode:"decimal",autocomplete:"off",placeholder:"e.g. 1,000"}),dt=h("input",{id:"i-dt",type:"date",value:TODAY}),num=h("input",{id:"i-num",autocomplete:"off",placeholder:"Aptify invoice or order number"}),
+   ty=h("select",{id:"i-ty",onchange:e=>{const w=document.getElementById("i-wh");if(!w)return;if(e.target.value==="non"&&w.value==="IIF")w.value="Membership Dues";if(e.target.value==="lender"&&w.value==="Membership Dues")w.value="IIF";}},h("option",{value:"lender"},"Lender"),h("option",{value:"non"},"Non-Lender")),wh=h("select",{id:"i-wh"},...PIP_WHAT.map(x=>h("option",{value:x},x))),note=h("textarea",{id:"i-note",rows:"2",placeholder:"Anything the team should know"});
+  const say=h("span",{class:"saynote"},"Saves with your name. It comes off the list when the payment shows up in Aptify, or when someone selects Mark Paid.");
+  const go=h("button",{type:"button",class:"btn",onclick:async()=>{const n=nm.value.trim(),c=cid.value.trim(),a=parseFloat(amt.value.replace(/[$,\s]/g,""));
+    [nm,cid,amt,dt].forEach(x=>x.classList.remove("bad"));
+    if(!n){nm.classList.add("bad");say.textContent="Enter the company.";nm.focus();return;}
+    if(c&&!/^\d{3,9}$/.test(c)){cid.classList.add("bad");say.textContent="The Aptify Company ID is numbers only.";cid.focus();return;}
+    if(!(a>0)){amt.classList.add("bad");say.textContent="Enter the amount invoiced.";amt.focus();return;}
+    if(!/^\d{4}-\d{2}-\d{2}$/.test(dt.value)){dt.classList.add("bad");say.textContent="Enter the invoice date.";dt.focus();return;}
+    go.disabled=true;say.textContent="Saving…";
+    const v={id:"inv-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),name:n,cid:c,lender:ty.value==="lender",amount:Math.round(a*100)/100,date:dt.value,number:num.value.trim(),what:wh.value,note:note.value.trim(),at:new Date().toISOString(),by:me.email||"",byName:me.name||""};
+    if(!await invSave(P=>{P.items.push(v);},n+" added to Payment in Process")){go.disabled=false;say.textContent="That didn't save. Please try again.";}}},"Add the Invoice");
+  B.appendChild(h("div",{class:"sect",style:"grid-column:1/-1"},h("h3",null,"The Invoice"),h("div",{class:"form"},
+   h("div",{class:"fld"},h("label",{for:"i-nm"},"Company"),nm,h("small",null,"As it is in Aptify")),
+   h("div",{class:"fld"},h("label",{for:"i-cid"},"Aptify Company ID"),cid,h("small",null,"Optional, but it ties the payment for certain")),
+   h("div",{class:"fld"},h("label",{for:"i-ty"},"Lender or Non-Lender"),ty,h("small",null,"Which list it goes on")),
+   h("div",{class:"fld"},h("label",{for:"i-wh"},"What It's For"),wh,h("small",null,"IIF for a lender's IIF invoice")),
+   h("div",{class:"fld"},h("label",{for:"i-amt"},"Amount"),amt,h("small",null,"What the invoice is for, in dollars")),
+   h("div",{class:"fld"},h("label",{for:"i-dt"},"Invoice Date"),dt,h("small",null,"The day it was sent")),
+   h("div",{class:"fld"},h("label",{for:"i-num"},"Invoice or Order Number"),num,h("small",null,"Optional")),
+   h("div",{class:"fld"},h("label",null,"Added By"),h("input",{value:me.name||"",disabled:""}),h("small",null,"From your sign-in")),
+   h("div",{class:"fld wide"},h("label",{for:"i-note"},"Note"),note),
+   h("div",{class:"acts"},go,h("button",{type:"button",class:"btn ghost",onclick:closePane},"Cancel"),say))));
+  $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");setTimeout(()=>nm.focus(),240);return;}
+ const age=r.d?Math.max(0,days(r.d,TODAY)):null;$("pane-t").textContent=r.name;
+ if(r.src==="m360"){const p=r.p;$("pane-s").textContent="Non-Lender renewal · from Member 360";
+  B.appendChild(h("div",{class:"sect"},h("h3",null,"The Renewal"),kv([["Company",p.name],["Aptify Company ID",p.cid||"Not recorded"],["Level",p.level],["Dues",p.amount?money(p.amount):""],["Stage in Member 360",p.stage],["Relationship Owner",p.owner||"Unassigned"]])));
+  B.appendChild(h("div",{class:"sect"},h("h3",null,"How It Comes Off"),h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)"},"This renewal is "+p.stage+" in Member 360, so it shows here on its own. It comes off when Member 360 moves it on, which it does when the payment reaches Aptify. Nothing to enter here.")));
+  $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");return;}
+ const v=r.v,s=invState(v);$("pane-s").textContent=(v.lender?"Lender":"Non-Lender")+" invoice · "+(s.paid?"paid":(age==null?"not paid yet":"waiting "+age+(age===1?" day":" days")));
+ B.appendChild(h("div",{class:"sect"},h("h3",null,"The Invoice"),kv([["Company",v.name],["Aptify Company ID",v.cid||"Not entered"],["Lender or Non-Lender",v.lender?"Lender":"Non-Lender"],["What It's For",v.what],["Amount",money(+v.amount||0)],["Invoice Date",fmt(v.date)],["Invoice or Order Number",v.number],["Added By",(v.byName||"")+(v.at?", "+fmt(String(v.at).slice(0,10)):"")],["Note",v.note]])));
+ if(s.paid){B.appendChild(h("div",{class:"sect"},h("h3",null,"Paid"),h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)"},s.how+".")));}
+ else{const pn=h("textarea",{id:"i-pn",rows:"2",placeholder:"e.g. check received, paid by card"}),say=h("span",{class:"saynote"},"Saves with your name and the date.");
+  const mk=h("button",{type:"button",class:"btn",onclick:async()=>{mk.disabled=true;say.textContent="Saving…";
+    if(!await invSave(P=>{const x=P.items.find(i=>i.id===v.id);if(x){x.paidBy=me.email||"desk";x.paidByName=me.name||"";x.paidAt=new Date().toISOString();x.paidNote=pn.value.trim();}},v.name+" marked paid")){mk.disabled=false;say.textContent="That didn't save. Please try again.";}}},"Mark Paid");
+  const off=h("button",{type:"button",class:"btn ghost",onclick:async()=>{off.disabled=true;say.textContent="Saving…";
+    if(!await invSave(P=>{const x=P.items.find(i=>i.id===v.id);if(x){x.archived=true;x.archivedBy=me.name||"";x.archivedAt=new Date().toISOString();}},v.name+" taken off the list")){off.disabled=false;say.textContent="That didn't save. Please try again.";}}},"Entered by Mistake");
+  B.appendChild(h("div",{class:"sect"},h("h3",null,"When It's Paid"),h("div",{class:"form"},
+   h("div",{class:"fld wide"},h("label",{for:"i-pn"},"Note"),pn,h("small",null,"Optional. Member 360 also marks it paid on its own once the payment shows up in Aptify.")),
+   h("div",{class:"acts"},mk,off,say))));}
+ $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");}
+$("pip-add").addEventListener("click",()=>openInv(null));
+
 /* ---------- pages ---------- */
 function go(tab){const b=document.querySelector('.hq nav button[data-hq="'+tab+'"]');if(b)b.click();}
 function show(tab){document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>{if(b.dataset.hq===tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
  document.querySelectorAll("main .view").forEach(v=>v.hidden=v.id!=="v-"+tab);closePane();
- ({home:renderHome,todo:renderTodo,done:renderDone,cases:renderCases,help:renderHelp})[tab]();window.scrollTo(0,0);}
+ ({home:renderHome,todo:renderTodo,pip:renderPip,done:renderDone,cases:renderCases,help:renderHelp})[tab]();window.scrollTo(0,0);}
 document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.hq)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 function renderAll(){const t=(document.querySelector(".hq nav button[aria-current]")||{dataset:{hq:"home"}}).dataset.hq;renderHome();if(t!=="home")show(t);}
@@ -706,7 +817,7 @@ $("asof").textContent="As of "+fmt(TODAY);
 window.__desk={todo:()=>TODO,finished,open:openPane,go};
 renderHome();
 /* a link from an email opens the set-up straight away: #todo/<id> */
-function fromHash(){const v=/^#(home|todo|cases|done|help)$/.exec(location.hash||"");if(v){go(v[1]);return;}const m=/^#todo\/(.+)$/.exec(location.hash||"");if(m){const x=TODO.find(t=>t.id===decodeURIComponent(m[1]));go("todo");if(x)setTimeout(()=>openPane(x),150);}}
+function fromHash(){const v=/^#(home|todo|pip|cases|done|help)$/.exec(location.hash||"");if(v){go(v[1]);return;}const m=/^#todo\/(.+)$/.exec(location.hash||"");if(m){const x=TODO.find(t=>t.id===decodeURIComponent(m[1]));go("todo");if(x)setTimeout(()=>openPane(x),150);}}
 fromHash();window.addEventListener("hashchange",fromHash);
 if(new Date().getMonth()===11)document.documentElement.setAttribute("data-season","december");
 };
