@@ -1925,6 +1925,21 @@ p,.sub,.lede{text-wrap:pretty}
 .dg-sw span:before{display:none}
 .dg-sw input:checked+span{background:var(--accent);border-color:var(--accent)}
 .dg-sw input:checked+span:before{display:block;width:5px;height:9px;left:5px;top:1px;background:none;border:solid #fff;border-width:0 2px 2px 0;border-radius:0;box-shadow:none;transform:rotate(45deg)}
+/* Comment Period card */
+.cpk-row{display:grid;grid-template-columns:minmax(260px,1fr) 1.2fr;gap:16px;align-items:start}
+@media(max-width:800px){.cpk-row{grid-template-columns:1fr}}
+.cpc{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--c6);border-radius:8px;padding:12px 14px;box-shadow:var(--shadow)}
+.cpc-eb{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--c6)}
+.cpc-t{display:block;font-size:15px;margin:4px 0 6px;line-height:1.3}
+.cpc-x{font-size:13px;margin:0 0 10px;color:var(--ink-2);line-height:1.45}
+.cpc-a{display:flex;flex-wrap:wrap;gap:6px}
+.cpc-b{font-size:11.5px;font-weight:600;border:1px solid var(--border-strong);border-radius:4px;padding:4px 9px;color:var(--ink);white-space:nowrap}
+.cpc-b.pri{background:var(--navy);border-color:var(--navy);color:#fff}
+.cpc-b.off{opacity:.45;border-style:dashed}
+.cp-how{margin:0;padding-left:18px;font-size:12.5px;color:var(--ink-2);display:flex;flex-direction:column;gap:6px}
+.cp-how b{color:var(--ink)}
+.cp-miss{color:var(--warn);font-weight:600}
+.cp-sec h4 .btn{margin-left:10px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -5783,6 +5798,67 @@ async function ssSyncFolder(t){ const url=S.notify&&S.notify.docFlowUrl; if(!url
 document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-ptab="files"]'); if(!b) return; const t=S.tickets[S.panel]; if(t) ssSyncFolder(t); });
 const _renderPanelSS2=renderPanel;
 renderPanel=function(){ _renderPanelSS2(); if(S.ptab==='files'&&S.panel&&!String(S.panel).startsWith('arch:')){ const t=S.tickets[S.panel]; if(t) ssSyncFolder(t); } };
+
+/* =====================================================================
+   The Comment Period card: what the website's Open for Comment card says.
+   The facilitator writes it (title + a few lines); members open the work
+   product in the Resource Library; non-members sign the Proposed (open for
+   comment) license form and then get the download. Nobody outside goes
+   through the MMS. Stored on the work request as t.cpCard {title,text,nonMember}.
+   ===================================================================== */
+const CP_TEXT_MAX=320;
+const CP_STAGES=['designation','gc-comment','comment','post'];
+function cpCardOf(t){ const c=t.cpCard||{}, L=t.links||{};
+  return {title:(c.title||'').trim()||cpName(t), text:(c.text||'').trim(), member:L.resourceLibrary||'', nonMember:(c.nonMember||'').trim(), set:!!(c.text||'').trim()}; }
+function cpCanEdit(t){ return S.canWrite&&!S.viewAs&&(S.isStaff||sameName(t.facilitator,S.me&&S.me.name)); }
+function cpPreview(c,t){ const d=t.dates||{};
+  return '<div class="cpc"><div class="cpc-eb">Open for Comment'+(d.commentEnd?' · closes '+esc(fmtS(d.commentEnd)):'')+'</div><b class="cpc-t">'+esc(c.title)+'</b>'+
+    '<p class="cpc-x'+(c.text?'':' muted')+'">'+esc(c.text||'Not written yet. Say in a sentence or two what the work product is and what reviewers should look at.')+'</p>'+
+    '<div class="cpc-a"><span class="cpc-b'+(c.member?'':' off')+'">Member Access</span><span class="cpc-b'+(c.nonMember?'':' off')+'">Non-Member Access</span><span class="cpc-b pri">Comment</span></div></div>'; }
+function cpSection(t){ const c=cpCardOf(t);
+  const miss=[!c.text&&'what the card says',!c.member&&'the Resource Library link (members)',!c.nonMember&&'the non-member download (behind the license form)'].filter(Boolean);
+  return '<div class="psec full cp-sec" data-anchor="cpcard"><h4>Comment Period Card<span class="sp muted" style="font-size:12px;font-weight:500">What the website shows while it’s open for comment</span>'+(cpCanEdit(t)?'<button type="button" class="btn sm '+(c.set?'':'pri')+'" data-cpedit="'+esc(t.id)+'">'+(c.set?'Edit the Card':'Write the Card')+'</button>':'')+'</h4>'+
+    '<div class="cpk-row">'+cpPreview(c,t)+'<ul class="cp-how"><li><b>Members</b> click Member Access and open it in the Resource Library'+(c.member?'':' (link not added yet)')+'.</li><li><b>Non-members</b> click Non-Member Access, sign the Proposed (open for comment) license form, then get the download'+(c.nonMember?'':' (download not added yet)')+'.</li><li><b>Comments</b> go through the public comment form and land on this work request’s Comments tab.</li>'+(miss.length?'<li class="cp-miss">Still needed: '+esc(miss.join(', '))+'.</li>':'')+'</ul></div></div>'; }
+async function cpEdit(t){ const c=cpCardOf(t), raw=t.cpCard||{};
+  const v=await modal({title:'Comment Period Card',text:esc(t.wr)+' · what the website’s Open for Comment card says',ok:'Save the Card',body:
+    fld('Card Title',inp('title',raw.title||'',cpName(t)),'Leave blank to use '+esc(cpName(t))+'.')+
+    fld('What the Card Says','<textarea name="text" rows="4" maxlength="'+CP_TEXT_MAX+'" placeholder="One or two sentences: what it is, who it’s for, and what reviewers should look at.">'+esc(raw.text||'')+'</textarea>','Up to '+CP_TEXT_MAX+' characters. Plain sentences; no links.')+
+    fld('Member Access: Resource Library Link',inp('member',c.member,'https://collaborate.mismo.org/…'),'Members open the work product here.')+
+    fld('Non-Member Access: Download Link',inp('nonmember',raw.nonMember||'','https://…'),'The file non-members get after they sign the Proposed (open for comment) license form.'),
+    validate:x=>{ for(const k of ['member','nonmember']){ const u=(x[k]||'').trim(); if(u&&!/^https:\/\//i.test(u)) return 'Links start with https://'; } return ''; }});
+  if(!v) return; const x=clone(t), b=clone(t);
+  x.cpCard={title:(v.title||'').trim(),text:(v.text||'').trim().slice(0,CP_TEXT_MAX),nonMember:(v.nonmember||'').trim(),by:S.me.name||'',at:today()};
+  x.links=Object.assign({},x.links,{resourceLibrary:(v.member||'').trim()});
+  hist(x,'Comment Period card '+(raw.text?'updated':'written')); await saveTicket(x,'Card saved',b);
+  if(typeof publishFeed==='function') try{ publishFeed(); }catch(e){}
+}
+document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-cpedit]'); if(!b) return; e.preventDefault(); const t=S.tickets[b.dataset.cpedit]; if(t) cpEdit(t); });
+/* the card sits on the Overview while the work is headed to (or in) comment; on Details otherwise */
+const _renderPanelCP=renderPanel;
+renderPanel=function(){ _renderPanelCP(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return;
+  const pb=$('.pb',P); if(!pb||$('.cp-sec',pb)) return; const near=CP_STAGES.includes(t.stage);
+  const host=$('[data-wtab="'+(near?'over':'det')+'"]',pb); if(!host) return;
+  const w=document.createElement('div'); w.innerHTML=cpSection(t); const sec=w.firstChild;
+  if(near){ const lead=$('.wh-lead-in',host); (lead&&lead.nextSibling)?host.insertBefore(sec,lead.nextSibling):host.appendChild(sec); } else host.appendChild(sec); };
+/* the website feed carries the card */
+const _webFeedCP=webFeed;
+webFeed=function(){ const d=_webFeedCP(); d.commentPeriods=d.commentPeriods.map(p=>{ const t=allTickets().find(x=>x.wr===p.wr); if(!t) return p; const c=cpCardOf(t);
+  return Object.assign({},p,{name:c.title,text:c.text,memberAccess:c.member,nonMemberAccess:c.nonMember,nonMemberLicense:'Proposed (open for comment)'}); }); return d; };
+/* ---------- the Initiative Hub's size and requested completion date ----------
+   The Hub asks the requester for an effort size (Extra-Small 3 months, Small 6,
+   Medium 9, Large 1 year) and a target completion date. Both come across. */
+const HUB_EFFORT={xs:['Extra-Small','3 months',90],s:['Small','6 months',180],m:['Medium','9 months',270],l:['Large','1 year',365]};
+function hubFor(t){ return (S.hub||[]).find(x=>(t.hubId&&x.id===t.hubId)||(x.wr&&x.wr===t.wr))||null; }
+function hubAsk(t){ const h=hubFor(t), q=(h&&h.req)||{}; const e=HUB_EFFORT[String(q.effort||t.hubEffort||'').toLowerCase()];
+  const c=q.completion||(t.dates&&t.dates.requestedCompletion)||''; return (e||c)?{effort:e,completion:c,why:q.effortWhy||''}:null; }
+const _hubSyncCP=hubSync;
+hubSync=async function(){ await _hubSyncCP(); if(!S.canWrite||!S.hub) return;
+  for(const h of S.hub){ const q=h.req||{}; if(!h.wr||!(q.effort||q.completion)) continue; const t=allTickets().find(x=>x.wr===h.wr||(x.hubId&&x.hubId===h.id)); if(!t) continue;
+    const eff=String(q.effort||'').toLowerCase(), comp=q.completion||''; if(t.hubEffort===eff&&((t.dates||{}).requestedCompletion||'')===comp) continue;
+    const x=clone(t); x.hubEffort=eff; x.dates=Object.assign({},x.dates,{requestedCompletion:comp}); S.tickets[x.id]=x; try{ await write('tickets',x.id,x); }catch(e){} } };
+/* Start Work shows what the requester asked for in the Hub */
+const _startWorkCP=startWork;
+startWork=async function(t){ const a=hubAsk(t); if(a){ const msg='In the Initiative Hub the requester sized this '+(a.effort?a.effort[0]+' ('+a.effort[1]+')':'')+(a.effort&&a.completion?' and ':'')+(a.completion?'asked for completion by '+fmt(a.completion):'')+'.'; setTimeout(()=>{ const bd=$('#modal-root .modal .bd'); if(bd&&!$('.hub-ask',bd)) bd.insertAdjacentHTML('afterbegin','<div class="banner info hub-ask" style="margin:0 0 12px">'+esc(msg)+(a.why?' <span class="muted">“'+esc(a.why)+'”</span>':'')+'</div>'); },40); } return _startWorkCP(t); };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
