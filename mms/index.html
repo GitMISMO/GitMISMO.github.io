@@ -1638,6 +1638,9 @@ button.hp-t{cursor:pointer}button.hp-t:hover{background:rgba(255,255,255,.12)}
 .ss-up.ok{color:var(--good)}
 .ss-up.bad{color:var(--bad)}
 .ss-add{cursor:pointer}
+
+/* a redraw of the same page: no entrance animations */
+main.calm .fl-d,main.calm .bd-h,main.calm .okmark,main.calm .rise,main.calm>*{animation:none!important}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2097,10 +2100,21 @@ function qItem(t){
 
 /* ---------- views ---------- */
 const VIEWS={};
+/* Renders come in bursts while the records load (tickets, settings, architecture requests, the hub and
+   elections syncs). A burst is drawn once, a redraw that would change nothing is skipped, and a redraw of
+   the same page doesn't replay the entrance animations, so the page doesn't flash. */
+let renderT=0, renderAt=0;
 function renderAll(){
   if(!S.ready||S.importing) return;
+  const now=Date.now(); if(!S._readyAt) S._readyAt=now; if(!S._enter&&now-S._readyAt<10000&&now-renderAt<250){ clearTimeout(renderT); renderT=setTimeout(renderAll,250-(now-renderAt)); return; }
+  clearTimeout(renderT); renderAt=now;
   const v=VIEWS[S.view]||VIEWS.home; const m=$('#main'); const y=window.scrollY;
-  m.innerHTML=(S.mode==='memory'?'<div class="banner">This copy isn\u2019t connected to the MMS records, so nothing here is saved. Open the published MMS to work for real.</div>':'')+(S.canWrite?'':'<div class="banner info">You can look at everything here; ask MISMO staff if you need to make changes.</div>')+v();
+  const html=(S.mode==='memory'?'<div class="banner">This copy isn\u2019t connected to the MMS records, so nothing here is saved. Open the published MMS to work for real.</div>':'')+(S.canWrite?'':'<div class="banner info">You can look at everything here; ask MISMO staff if you need to make changes.</div>')+v();
+  const same=!S._enter&&S._lastView===S.view;
+  if(same&&html===S._lastHtml){ counts(); if(S.panel) renderPanel(); return; }
+  S._lastHtml=html; S._lastView=S.view;
+  m.classList.toggle('calm',same);
+  m.innerHTML=html;
   wireMain(m); window.scrollTo(0,y); counts(); if(S.panel) renderPanel();
 }
 function counts(){
