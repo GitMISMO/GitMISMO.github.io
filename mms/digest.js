@@ -276,42 +276,43 @@
     return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:' + (big ? '22px 0 6px' : '10px 0 2px') + '"><tr><td bgcolor="#0d314c" style="border-radius:6px;background:#0d314c">' +
       '<a href="' + esc(href) + '" target="_blank" style="display:inline-block;padding:' + (big ? '13px 26px' : '8px 16px') + ';font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '15px' : '13px') + ';font-weight:700;color:#ffffff;text-decoration:none;border-radius:6px;border-bottom:3px solid #74bfeb">' + esc(label) + ' &rarr;</a></td></tr></table>';
   }
+  /* The email: what needs them first, then what is good to know. Short rows, a few per section,
+     and a link to the rest in the MMS, so it reads in under a minute. */
+  var ACT_KEYS = { yourMove: 1, overdue: 1, targetUpdate: 1, attendance: 1, comments: 1, hours: 1, wkOverdue: 1 };
   D.html = function (o) {
     var F = "font-family:'IBM Plex Sans',Arial,Helvetica,sans-serif;";
-    var sec = (o.sections || []).map(function (s) {
-      var c = TONE[s.tone || ''] || TONE[''];
-      return '<tr><td style="padding:0 28px 18px">' +
-        '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-radius:8px;border-collapse:separate;overflow:hidden">' +
-        '<tr><td style="' + F + 'padding:11px 16px;background:' + c[1] + ';border-bottom:1px solid #d5e2ed;border-left:4px solid ' + c[0] + '">' +
-        '<span style="font-size:15px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (s.rows && !s.noCount ? ' <span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;' + s.rows.length + '</span>' : '') +
-        (s.note ? '<div style="font-size:12.5px;color:#456179;margin-top:2px">' + esc(s.note) + '</div>' : '') + '</td></tr>' +
-        (s.rows || []).map(function (r, i) {
+    var all = o.sections || [], act = all.filter(function (s) { return ACT_KEYS[s.key]; }), info = all.filter(function (s) { return !ACT_KEYS[s.key]; });
+    var block = function (s, max) {
+      var c = TONE[s.tone || ''] || TONE[''], rows = s.rows || [], shown = rows.slice(0, max), more = rows.length - shown.length;
+      return '<tr><td style="padding:0 28px 12px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-left:4px solid ' + c[0] + ';border-radius:6px;border-collapse:separate">' +
+        '<tr><td style="' + F + 'padding:8px 14px 4px"><span style="font-size:14px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (rows.length && !s.noCount ? '<span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;&nbsp;' + rows.length + '</span>' : '') + (s.note ? '<span style="font-size:12px;color:#7794aa">&nbsp;&nbsp;' + esc(s.note) + '</span>' : '') + '</td></tr>' +
+        shown.map(function (r) {
           var rc = TONE[r.tone || ''] || TONE[''];
-          return '<tr><td style="' + F + 'padding:10px 16px;border-top:' + (i ? '1px solid #e5eef5' : '0') + '">' +
-            '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr>' +
-            '<td style="' + F + 'vertical-align:top;font-size:13.5px;color:#0d314c">' +
-            (r.lead ? '<div style="font-size:11px;font-weight:700;letter-spacing:.04em;color:#7794aa;text-transform:uppercase">' + esc(r.lead) + '</div>' : '') +
-            '<a href="' + esc(r.href || APP) + '" target="_blank" style="font-weight:700;color:#0d314c;text-decoration:none">' + esc(r.main) + '</a>' +
-            (r.sub ? '<div style="font-size:12.5px;color:#456179;margin-top:2px">' + esc(r.sub) + '</div>' : '') + '</td>' +
-            (r.badge ? '<td style="' + F + 'vertical-align:top;text-align:right;white-space:nowrap;padding-left:12px"><span style="display:inline-block;font-size:11.5px;font-weight:700;color:' + rc[0] + ';background:' + rc[1] + ';border-radius:4px;padding:3px 8px">' + esc(r.badge) + '</span></td>' : '') +
-            '</tr></table></td></tr>';
+          return '<tr><td style="' + F + 'padding:3px 14px;font-size:13px;line-height:1.4;color:#0d314c">' +
+            (r.badge ? '<span style="float:right;font-size:11px;font-weight:700;color:' + rc[0] + ';background:' + rc[1] + ';border-radius:4px;padding:1px 6px;margin-left:8px">' + esc(r.badge) + '</span>' : '') +
+            (r.lead ? '<span style="font-size:11px;font-weight:700;color:#7794aa">' + esc(r.lead) + '</span>&nbsp; ' : '') +
+            '<a href="' + esc(r.href || APP) + '" target="_blank" style="font-weight:600;color:#0d314c;text-decoration:none">' + esc(r.main) + '</a>' +
+            (r.sub ? '<span style="color:#456179"> · ' + esc(r.sub) + '</span>' : '') + '</td></tr>';
         }).join('') +
-        (s.button ? '<tr><td style="padding:0 16px 12px">' + btn(s.button.href, s.button.label) + '</td></tr>' : '') +
-        '</table></td></tr>';
-    }).join('');
+        (more > 0 ? '<tr><td style="' + F + 'padding:3px 14px 2px;font-size:12.5px"><a href="' + esc(s.button && s.button.href || APP + '#mine') + '" target="_blank" style="color:#2477b8;font-weight:600;text-decoration:none">+ ' + more + ' more in the MMS ›</a></td></tr>' : '') +
+        (s.button ? '<tr><td style="padding:6px 14px 4px">' + btn(s.button.href, s.button.label) + '</td></tr>' : '') +
+        '<tr><td style="height:6px;line-height:6px;font-size:0">&nbsp;</td></tr></table></td></tr>';
+    };
+    var head = function (t, sub) { return '<tr><td style="' + F + 'padding:10px 28px 6px"><span style="font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0d314c">' + t + '</span>' + (sub ? '<span style="font-size:12px;color:#7794aa">&nbsp;&nbsp;' + sub + '</span>' : '') + '</td></tr>'; };
+    var sec = (act.length ? head('Needs You', 'do these first') + act.map(function (s) { return block(s, 5); }).join('') : '') +
+              (info.length ? head('Good to Know', 'no action needed') + info.map(function (s) { return block(s, 3); }).join('') : '');
     return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>' + esc(o.title) + '</title></head>' +
       '<body style="margin:0;padding:0;background:#f1f6fa">' +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f1f6fa" style="background:#f1f6fa"><tr><td align="center" style="padding:24px 12px">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f1f6fa" style="background:#f1f6fa"><tr><td align="center" style="padding:20px 10px">' +
       '<table role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:640px;background:#ffffff;border-radius:10px;border-collapse:separate;overflow:hidden;box-shadow:0 2px 10px rgba(13,49,76,.08)">' +
-      '<tr><td bgcolor="#0d314c" style="background:#0d314c;padding:18px 28px;border-bottom:4px solid #74bfeb">' +
-      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img src="' + LOGO + '" alt="MISMO" width="120" style="display:block;border:0;background:#ffffff;border-radius:6px;padding:6px 10px"></td>' +
-      '<td align="right" style="' + F + 'font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#74bfeb">MISMO Manufacturing System</td></tr></table></td></tr>' +
-      '<tr><td style="' + F + 'padding:24px 28px 6px"><div style="font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#7794aa">' + esc(o.dateLine) + '</div>' +
-      '<div style="font-size:24px;font-weight:700;color:#0d314c;margin:4px 0 8px">' + esc(o.title) + '</div>' +
-      '<div style="font-size:15px;color:#0d314c;line-height:1.5">Hi ' + esc(o.first || 'there') + ',</div><div style="font-size:15px;color:#456179;line-height:1.5;margin-top:4px">' + o.intro + '</div>' +
+      '<tr><td bgcolor="#0d314c" style="background:#0d314c;padding:14px 28px;border-bottom:4px solid #74bfeb">' +
+      '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img src="' + LOGO + '" alt="MISMO" width="110" style="display:block;border:0;background:#ffffff;border-radius:6px;padding:5px 9px"></td>' +
+      '<td align="right" style="' + F + 'font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#74bfeb">' + esc(o.dateLine) + '</td></tr></table></td></tr>' +
+      '<tr><td style="' + F + 'padding:18px 28px 4px"><div style="font-size:21px;font-weight:700;color:#0d314c;margin:0 0 6px">' + esc(o.title) + '</div>' +
+      '<div style="font-size:14.5px;color:#456179;line-height:1.5">Hi ' + esc(o.first || 'there') + '. ' + o.intro + '</div>' +
       btn(o.button ? o.button.href : APP + '#mine', o.button ? o.button.label : 'Open My Queue', true) + '</td></tr>' +
-      '<tr><td style="height:14px;line-height:14px;font-size:0">&nbsp;</td></tr>' + sec +
-      '<tr><td style="' + F + 'padding:6px 28px 24px;font-size:12px;color:#7794aa;line-height:1.5;border-top:1px solid #e5eef5">' + (o.footer || 'Sent by the MMS to MISMO facilitators at the end of each workday. Click any work request to open it.') + ' Questions about this email: <a href="mailto:workrequests@mismo.org" style="color:#2477b8">workrequests@mismo.org</a>.</td></tr>' +
+      '<tr><td style="height:8px;line-height:8px;font-size:0">&nbsp;</td></tr>' + sec +
+      '<tr><td style="' + F + 'padding:8px 28px 18px;font-size:11.5px;color:#7794aa;line-height:1.5;border-top:1px solid #e5eef5">' + (o.footer || 'From the MMS. A daily email comes only on days something needs you; the weekly wrap-up comes on Fridays.') + ' Questions: <a href="mailto:workrequests@mismo.org" style="color:#2477b8">workrequests@mismo.org</a>.</td></tr>' +
       '</table></td></tr></table></body></html>';
   };
   D.text = function (first, intro, S) {
