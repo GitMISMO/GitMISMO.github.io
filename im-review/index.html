@@ -715,7 +715,7 @@ async function load(role){
   S.up=(up&&up.data&&up.data.items)||[]; S.upAt=(up&&up.data&&up.data.asOf)||"";
   S.queue=(q.data&&q.data.items)||{}; S.cfg=Object.assign({imauto:{}},cfg.data||{}); S.bt=bt.data||null;
   S.learn=Object.assign({},(l0.data&&l0.data.rows)||{},(l1.data&&l1.data.rows)||{});
-  try{ const a=await get("attendance"); S.att=a.data||{}; }catch(e){ S.att={}; }
+  try{ const a=await get("attendance"); S.att=Object.fromEntries(Object.entries(a.data||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k))); }catch(e){ S.att={}; }
   S.loaded=true; render();
 }
 async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=g.data; return S.docs[rep]||null; }
