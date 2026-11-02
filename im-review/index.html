@@ -580,6 +580,9 @@ body.railmini .hq nav button .nb{display:none}
 
 .nw{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;vertical-align:bottom}
 @media(max-width:560px){.q{white-space:normal}}
+
+.ic-who{font-size:12.5px;margin:6px 0 0}
+.lnk{border:0;background:none;padding:0;color:var(--accent);font:inherit;font-size:12.5px;font-weight:600;cursor:pointer;text-decoration:underline}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -624,9 +627,6 @@ body.railmini .hq nav button .nb{display:none}
     <button type="button" data-hq="draft" title="How the Draft Is Doing">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></svg>
       <span>How the Draft Is Doing</span></button>
-    <button type="button" data-hq="setup" title="Roster and Calls">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19a5.5 5.5 0 0111 0"/><path d="M16 4.5a3 3 0 010 6M17.5 14a5 5 0 013.5 5"/></svg>
-      <span>Roster and Calls</span></button>
     <button type="button" data-hq="help" title="Help">
       <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 015 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17.2v.1"/></svg>
       <span>Help</span></button>
@@ -743,7 +743,7 @@ function shell(body){ const r=route(), w=Object.values(S.queue).filter(q=>q.stat
 window.__imrSearch=function(){ const out=[]; const go=h=>()=>{ location.hash=h; };
   Object.values(S.queue).forEach(q=>out.push({group:q.status==="decided"?"Decided":"Waiting for IM",name:(q.wr||"")+" "+(q.name||""),where:q.status==="decided"?"Decided "+fmtS(q.decidedAt)+(q.decidedBy?" by "+q.decidedBy:""):(q.look||0)+" to look at · "+(q.rows||0)+" rows",go:go("#/review/"+encodeURIComponent(q.rep))}));
   const r=route(), d=r.view==="review"&&S.docs[r.rep]; if(d) (d.rows||[]).forEach(x=>out.push({group:"Rows in This Submission",name:"Item "+x.item+" · "+(x.name||""),where:[x.ct,x.tt,x.final?"decided: "+x.final.dec:"draft: "+x.draft.dec].filter(Boolean).join(" · "),go:()=>{ S.filter="all"; render(); setTimeout(()=>{ const el=document.querySelector('[data-row="'+x.i+'"]'); if(el){ el.scrollIntoView({block:"center"}); el.style.outline="2px solid var(--sky)"; setTimeout(()=>el.style.outline="",1600); } },60); }}));
-  [["Waiting for IM","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Roster and Calls","#/setup"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
+  [["Waiting for IM","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
   return out; };
 function render(){ if(!S.loaded) return; const r=route();
   if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d) return shell(desk(d)); shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(route().rep===r.rep) shell(x?desk(x):'<div class="empty">That submission isn’t here. It may have been withdrawn.</div>'); }); return; }
@@ -751,7 +751,6 @@ function render(){ if(!S.loaded) return; const r=route();
   if(r.view==="trends") return shell(trendsView());
   if(r.view==="draft") return shell(draftView());
   if(r.view==="help") return shell(helpView());
-  if(r.view==="setup") return shell(setupView());
   shell(home()); }
 
 function subCard(q){ const n=q.rows||0, look=q.look||0, done=q.status==="decided";
@@ -917,7 +916,7 @@ function rowHtml(r,can){ const f=r.final, ed=S.edit===r.i&&can, lk=isLook(r);
 
 async function finish(doc){
   const by=S.me.name||S.me.email||"", at=new Date().toISOString(); doc.status="decided"; doc.decidedBy=by; doc.decidedAt=at;
-  if(doc.call){ const V=imVoters(), here=V.filter(m=>(doc.call.present||[]).includes(m.name)); doc.call=Object.assign({},doc.call,{need:imNeed(),seats:V.length,quorum:here.length>=imNeed(),by,at}); try{ S.att=await update("attendance",cur=>{ const o=cur||{}; o[doc.call.date]={present:doc.call.present||[],others:doc.call.others||[],by,at}; return o; }); }catch(e){} }
+  if(doc.call){ const V=imVoters(), here=V.filter(m=>(doc.call.present||[]).includes(m.name)); doc.call=Object.assign({},doc.call,{need:imNeed(),seats:V.length,quorum:(doc.call.present||[]).length?here.length>=imNeed():null,by,at}); }
   const R=doc.rows||[], agreed=R.filter(r=>r.final&&r.final.agreed).length, c=R.length?tally(R):(doc.final?{[doc.final.dec]:1}:{});
   await saveDoc(doc);
   const yr=new Date().getFullYear(), recs={};
@@ -1032,17 +1031,17 @@ const IM_CALLS0=["2026-11-02","2026-11-09","2026-11-16","2026-11-23"];
 const DAYN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const fmtL=s=>{ const d=new Date(String(s).slice(0,10)+"T12:00:00"); return isNaN(d)?"":DAYN[d.getDay()]+", "+MON[d.getMonth()]+" "+d.getDate(); };
 const todayS=()=>new Date().toISOString().slice(0,10);
-const imRoster=()=>S.cfg.roster||IM_ROSTER0, imVoters=()=>(imRoster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name)), imNeed=()=>Math.floor(imVoters().length/2)+1;
+const imRoster=()=>(S.cfg.roster&&(S.cfg.roster.members||[]).length)?S.cfg.roster:IM_ROSTER0, imVoters=()=>(imRoster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name)), imNeed=()=>(+imRoster().need>0)?+imRoster().need:Math.floor(imVoters().length/2)+1;
 /* the next IM calls: the dates kept on Roster and Calls, then every Monday */
 function imCalls(n){ const L=(S.cfg.calls||IM_CALLS0).filter(d=>d>=todayS()).sort(); let last=L[L.length-1]||(S.cfg.calls||IM_CALLS0).slice(-1)[0]||todayS(); while(L.length<n){ const d=new Date(last+"T12:00:00"); d.setDate(d.getDate()+7); last=d.toISOString().slice(0,10); if(last>=todayS()) L.push(last); } return L.slice(0,n); }
-function callCard(doc,can){ if(doc.hist) return ''; const decided=doc.status==="decided"; const c=doc.call||(doc.call={date:imCalls(1)[0],present:[],others:[]});
-  if(!(c.present||[]).length&&!decided){ const a=(S.att||{})[c.date]; if(a){ c.present=(a.present||[]).slice(); c.others=(a.others||[]).slice(); } }
-  const V=imVoters(), here=V.filter(m=>(c.present||[]).includes(m.name)), q=here.length>=imNeed(), open=S.callOpen===doc.rep, ed=can&&!decided;
-  const dates=[...new Set([c.date].concat(imCalls(4)))].filter(Boolean).sort();
-  return '<div class="card imcall"><div class="ic-h"><h3>The IM Call</h3>'+(ed?'<select class="inp sel" data-icdate="1" aria-label="Call date">'+dates.map(d=>'<option value="'+d+'"'+(d===c.date?' selected':'')+'>'+esc(fmtL(d))+'</option>').join('')+'</select>':'<b>'+esc(fmtL(c.date))+'</b>')+
-    '<span class="q '+(q?'ok':'no')+'">'+here.length+' of '+V.length+' voting members · '+imNeed()+' needed · '+(q?'Quorum ✓':'No quorum yet')+'</span><span class="sp"></span>'+(ed?'<button type="button" class="btn sm ghost" data-icall="1">Everyone Was There</button>':'')+'<button type="button" class="btn sm" data-icopen="1">'+(open?'Hide Attendance':'Attendance')+'</button></div>'+
-    (open?'<div class="ic-list">'+V.map(m=>{ const on=(c.present||[]).includes(m.name); return '<label class="ic-m'+(on?' on':'')+'"><input type="checkbox" data-icp="'+esc(m.name)+'"'+(on?' checked':'')+(ed?'':' disabled')+'><span><b>'+esc(m.name)+'</b><em>'+esc(m.cop)+(m.org?' · '+esc(m.org):'')+'</em></span></label>'; }).join('')+
-      [["chair",imRoster().chair+" · Chair"],["vice",imRoster().vice+" · Vice Chair"],["fac",imRoster().fac+" · Facilitator"]].filter(x=>x[1]&&!/^undefined/.test(x[1])).map(([k,l])=>{ const nm=l.split(" · ")[0], on=(c.others||[]).includes(nm); return '<label class="ic-m sm'+(on?' on':'')+'"><input type="checkbox" data-ico="'+esc(nm)+'"'+(on?' checked':'')+(ed?'':' disabled')+'><span><b>'+esc(nm)+'</b><em>'+esc(l.split(" · ")[1])+'</em></span></label>'; }).join('')+'</div><p class="note">Attendance is shared: tick it once and every other submission on the same call starts with it.</p>':'')+'</div>'; }
+function callCard(doc,can){ if(doc.hist) return ''; const decided=doc.status==="decided"; const c=doc.call||(doc.call={date:imCalls(1)[0]});
+  /* who was there comes from Meeting Trackers, where Erin logs each IM call */
+  const a=(S.att||{})[c.date], known=!!(a&&a.present&&a.present.length); c.present=known?a.present.slice():[]; c.others=known?(a.others||[]).slice():[];
+  const V=imVoters(), here=known?V.filter(m=>c.present.includes(m.name)):[], q=here.length>=imNeed(), open=S.callOpen===doc.rep;
+  const dates=[...new Set([c.date].concat(imCalls(4)).concat(Object.keys(S.att||{}).filter(d=>d>=String(doc.at||"").slice(0,10)&&d<=todayS())))].filter(Boolean).sort();
+  return '<div class="card imcall"><div class="ic-h"><h3>The IM Call</h3>'+(can&&!decided?'<select class="inp sel" data-icdate="1" aria-label="Call date">'+dates.map(d=>'<option value="'+d+'"'+(d===c.date?' selected':'')+'>'+esc(fmtL(d))+'</option>').join('')+'</select>':'<b>'+esc(fmtL(c.date))+'</b>')+
+    (known?'<span class="q '+(q?'ok':'no')+'">'+here.length+' of '+V.length+' voting members · '+imNeed()+' needed · '+(q?'Quorum ✓':'No quorum')+'</span><button type="button" class="lnk" data-icopen="1">'+(open?'Hide who was there':'Who was there')+'</button>':'<span class="q no">Not in Meeting Trackers yet</span><span class="muted">Erin logs attendance there after the call.</span>')+'</div>'+
+    (known&&open?'<p class="muted ic-who">'+esc(here.map(m=>m.name).join(', '))+(c.others.length?'; also '+esc(c.others.join(', ')):'')+'</p>':'')+'</div>'; }
 function setupView(){ const R=imRoster(), ed=isAdmin()||S.role==="staff", dis=ed?'':' disabled', C=(S.cfg.calls||IM_CALLS0).slice().sort();
   return '<div class="head"><div><h1>Roster and Calls</h1><div class="sub">IM’s voting members (one per Community of Practice), the chair, vice chair and facilitator, and the IM call dates. Quorum is a majority of the assigned voting members. '+(ed?'Changes save for everyone.':'MISMO staff keep this current.')+'</div></div></div>'+
     '<div class="g2"><div class="card"><h3>Voting Members<small>'+imVoters().length+' assigned · '+imNeed()+' needed for quorum</small></h3><div class="ros">'+(R.members||[]).map((m,i)=>'<div class="ros-r"><input class="inp" data-ros="'+i+'|cop" value="'+esc(m.cop)+'" aria-label="Community of Practice"'+dis+'><input class="inp" data-ros="'+i+'|name" value="'+esc(m.name)+'" aria-label="Name"'+dis+'><input class="inp" data-ros="'+i+'|org" value="'+esc(m.org||"")+'" aria-label="Company"'+dis+'>'+(ed?'<button type="button" class="btn sm ghost" data-rosdel="'+i+'" aria-label="Remove">×</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><button type="button" class="btn sm" data-rosadd="1">Add a Voting Member</button><button type="button" class="btn sm pri" data-rossave="1">Save the Roster</button></div>':'')+
@@ -1100,10 +1099,7 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ if(!confirm("Finish the IM review of "+doc.wr+"? The facilitator gets the decisions.")) return; b.disabled=true; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } celebrate(); render(); });
   $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
   const cc=doc.call; let ccT; const ccSave=()=>{ clearTimeout(ccT); ccT=setTimeout(()=>saveDoc(doc).catch(()=>{}),1000); };
-  $$("[data-icdate]",m).forEach(el=>el.onchange=()=>{ cc.date=el.value; cc.present=[]; cc.others=[]; render(); ccSave(); });
-  $$("[data-icp]",m).forEach(el=>el.onchange=keep(async()=>{ const n=el.dataset.icp; cc.present=(cc.present||[]).filter(x=>x!==n); if(el.checked) cc.present.push(n); render(); ccSave(); }));
-  $$("[data-ico]",m).forEach(el=>el.onchange=keep(async()=>{ const n=el.dataset.ico; cc.others=(cc.others||[]).filter(x=>x!==n); if(el.checked) cc.others.push(n); render(); ccSave(); }));
-  $$("[data-icall]",m).forEach(b=>b.onclick=keep(async()=>{ cc.present=imVoters().map(x=>x.name); S.callOpen=doc.rep; render(); ccSave(); }));
+  $$("[data-icdate]",m).forEach(el=>el.onchange=()=>{ cc.date=el.value; render(); ccSave(); });
   $$("[data-dfinish]",m).forEach(b=>b.onclick=async()=>{ const box=b.closest(".edit"); const dec=$("[name=ddec]",box).value, com=$("[name=dcom]",box).value.trim(); if(!confirm("Finish the IM review of "+doc.wr+": "+dec+"? The facilitator gets the decision.")) return; b.disabled=true; doc.final={dec,com,by:S.me.name||S.me.email,at:new Date().toISOString()}; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } celebrate(); render(); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
