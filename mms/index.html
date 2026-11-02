@@ -5627,6 +5627,34 @@ function withAutoDesignation(x){ const a=autoDesignation(x), days=(proc().commen
   x.designation=Object.assign({},x.designation||{},a.ds,{auto:true,basis:a.basis,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
   return {x,text:'Designation recommended automatically from '+a.basis+': '+[a.ds.type,x.classification,a.ds.license,a.ds.royalty,a.ds.availableTo].filter(Boolean).join(', ')+'. Sent to the VPs for agreement.'}; }
 
+/* ---------- Meeting Trackers → IM Review and AWG Review: the voting roster, the call dates and who was there ----------
+   Erin keeps these in Meeting Trackers; the portals only record what was decided. */
+let mtPortalAt=0;
+async function mtToPortals(){ if(!S.isStaff||!S.canWrite||Date.now()-mtPortalAt<30*60000) return; mtPortalAt=Date.now();
+  try{ const base=await rGet('meeting-trackers','baseline'); const B=base&&base.data&&base.data.doc&&base.data.doc.z?await gunzipB64(base.data.doc.z):null;
+    const doc=async n=>{ const d=await rGet('meeting-trackers',n); return d&&d.data; };
+    const [vo,le,pe,sc]=await Promise.all(['voters','leaders','people','sched'].map(doc));
+    const names={}, cos=(B&&B.companies)||[]; ((B&&B.people)||[]).forEach(p=>{ names[MT_KEY(p[0])]={n:p[0],co:typeof p[1]==='number'&&p[1]>=0?(Array.isArray(cos[p[1]])?cos[p[1]][0]:cos[p[1]])||'':''}; });
+    Object.values((pe&&pe.docs)||{}).forEach(d=>Object.entries(d.items||{}).forEach(([k,v])=>{ if(v&&(v.n||v.name)) names[k]=Object.assign({},names[k]||{},{n:v.n||v.name,co:v.co||v.company||(names[k]||{}).co||''}); }));
+    const V=((vo&&vo.docs&&vo.docs['voters/all'])||{}).items||{}, L=((le&&le.docs&&le.docs['leaders/all'])||{}).items||{}, SC=Object.assign({},(B&&B.sched)||{},((sc&&sc.docs&&sc.docs['sched/all'])||{}).items||{});
+    const nameOf=k=>(names[k]&&names[k].n)||k;
+    const yr=new Date().getFullYear();
+    for(const [proj,gk] of [[IMR,'informationmanagement'],[AWGR,'architectureworkgroup']]){
+      const v=V[gk]||{reps:[]}, l=(L[gk]&&L[gk].list)||[], s=SC[gk]||{};
+      const roster={src:'Meeting Trackers',chair:(l.find(x=>x.r==='chair')||{}).n||'',vice:(l.filter(x=>x.r==='chair')[1]||l.find(x=>x.r==='vice')||{}).n||'',fac:s.fac||'',need:+v.need||0,
+        members:(v.reps||[]).map(r=>({key:r.k,cop:r.cop||'',name:nameOf(r.k),org:(names[r.k]&&names[r.k].co)||''})),at:v.at||''};
+      // the next calls from the meeting rule (weekly, or the nth weekdays of the month)
+      const calls=[]; const rule=s.rule||null; if(rule){ for(let i=0;i<120&&calls.length<8;i++){ const d=addDays(today(),i), dt=new Date(d+'T12:00:00'); if(dt.getDay()!==rule.dow) continue; const nth=Math.ceil(dt.getDate()/7); if(rule.weeks==='*'||(Array.isArray(rule.weeks)&&rule.weeks.includes(nth))) calls.push(d); } }
+      // who was there, from the meetings Erin logged
+      const att={}; for(const y of [yr-1,yr]){ const f=await rGet('meeting-trackers',mtFile('m-'+gk+'-'+y)).catch(()=>null); const items=(f&&f.data&&f.data.doc&&f.data.doc.items)||{}; Object.entries(items).forEach(([d,m])=>{ const p=(m&&m.p)||[]; const vk=new Set((v.reps||[]).map(r=>r.k)); att[d]={src:'mt',present:p.filter(k=>vk.has(k)).map(nameOf),others:p.filter(k=>!vk.has(k)).map(nameOf),by:m.by||'',at:m.at||''}; }); }
+      const up=(name,fn)=>proj===IMR?imrUpdate(name,fn):awgUpdate(name,fn);
+      const cur=await rGet(proj,'config'); const c0=(cur&&cur.data)||{};
+      if(JSON.stringify(c0.roster)!==JSON.stringify(roster)||JSON.stringify(c0.calls)!==JSON.stringify(calls)||c0.when!==(s.day+', '+(s.time||''))) await up('config',c=>Object.assign({},c||{},{roster,calls,when:(s.day||'')+', '+(s.time||'')+' ET'}));
+      const a0=await rGet(proj,'attendance'); const A=Object.assign({},(a0&&a0.data)||{}); let ch=false; Object.entries(att).forEach(([d,x])=>{ if(JSON.stringify(A[d])!==JSON.stringify(x)){ A[d]=x; ch=true; } }); if(ch) await up('attendance',()=>A);
+    }
+  }catch(e){ console.warn('meeting trackers to portals',e); } }
+const _imEnsureQ2=imEnsureQ; imEnsureQ=function(){ _imEnsureQ2(); setTimeout(mtToPortals,4000); };
+
 /* ---------- settings ---------- */
 let setTab='process';
 VIEWS.settings=function(){
