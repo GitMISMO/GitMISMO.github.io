@@ -6,7 +6,8 @@
     "writable": [
       "data/"
     ],
-    "ask": true
+    "ask": true,
+    "askMaxTokens": 8000
   },
  "cms": {
     "repo": "GitMISMO/cms-data",
