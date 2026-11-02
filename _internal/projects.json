@@ -465,5 +465,13 @@
       "data/"
     ],
     "ask": true
+  },
+  "glossary-data": {
+    "repo": "GitMISMO/GitMISMO-glossary-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
   }
 }
