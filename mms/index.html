@@ -1854,6 +1854,11 @@ html.pnl-open,html.pnl-open body{overflow:hidden}
 .hx-sel{display:none}
 @media(max-width:820px){.hx-sel{display:block;width:100%;max-width:none;font-size:14px;padding:9px 10px}.hx-toc{display:none!important}}
 @media(max-width:600px){.hx-roles button{white-space:normal;font-size:12px}}
+.pnlbar{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);z-index:20;display:flex;align-items:center;gap:10px;background:var(--navy-deep);color:#fff;border-radius:9px;padding:9px 10px 9px 16px;box-shadow:0 10px 30px rgba(6,32,47,.35);white-space:nowrap;animation:rise .2s both;max-width:calc(100% - 32px)}
+.pnlbar-t{font-size:13px;overflow:hidden;text-overflow:ellipsis}
+.pnlbar .btn:not(.pri){background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.savestate:empty{display:none}
+.pnlbar .btn.pri{background:var(--sky);color:var(--navy-deep);border-color:var(--sky)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2049,7 +2054,7 @@ const Store={db:null,mem:null,subs:{},
   }
 };
 let pendingSaves=0;
-function saveState(ok,msg){ const el=$('#savestate'); if(!el) return; if(ok===false){ el.textContent='Not saved: '+msg; el.className='savestate err'; return; } el.className='savestate'; el.textContent=pendingSaves?'Saving…':(S.mode==='memory'?'Not connected: changes stay on this screen':'All changes saved'); }
+function saveState(ok,msg){ const el=$('#savestate'); if(!el) return; if(ok===false){ el.textContent='Not saved: '+msg; el.className='savestate err'; return; } el.className='savestate'; el.textContent=pendingSaves?'Saving…':(S.mode==='memory'?'Not connected: changes stay on this screen':''); }
 async function write(coll,id,data){
   pendingSaves++; saveState();
   try{ await Store.set(coll,id,data); pendingSaves--; saveState(); return true; }
@@ -5981,14 +5986,15 @@ const HELP_TOPICS={
     ['Overview: where it is, whose move it is, and the next step button.',
      'Details: workgroup, facilitator, size, classification and the rest of its record.',
      'Key Dates: start, Target to Submit to IM, comment period dates and what actually happened when.',
-     'Documents: every file for this work request in SharePoint. Click one to open it.',
+     'Files: every document for this work request in SharePoint. Click one to open it.',
+     'Change anything in Details, Key Dates or Links, then click Save Changes. Leave without saving and the MMS asks whether to save or discard.',
      'Links: anything else worth keeping with it, such as a draft or a Teams thread.',
      'History: every move, who made it and when.'],
-    ['Every change is logged in History, so nothing is lost.'],
+    ['Every saved change is logged in History, and the Undo on the Saved message puts it back.'],
     []],
   docs:['Documents: Opening and Adding Files','facilitator staff imawg member',
     'Each work request has its own folder in the MISMO Facilitator Team SharePoint (MMS Smartsheet Files). The MMS shows the files, not the folder.',
-    ['Open a work request and click the Documents tab.',
+    ['Open a work request and click the Files tab.',
      'Click a file to open it in a new tab. Word, Excel and PDF all open the file itself.',
      'To add files, click Add Documents and choose them. They are saved into that work request’s SharePoint folder and show up right away.',
      'To change a Word or Excel file, open it and edit it in the browser. SharePoint saves as you go and keeps every version.'],
@@ -6505,6 +6511,48 @@ wireMain=function(m){ _wireMainMx(m); if(S.view!=='metrics') return;
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&S.view==='metrics'&&S.mx.drill&&!S.panel){ S.mx.drill=null; renderAll(); } });
 
 window.addEventListener('resize',()=>{ clearTimeout(window._mxRz); window._mxRz=setTimeout(()=>{ if(S.view==='metrics'){ S._lastHtml=''; renderAll(); } },250); });
+
+/* ================= Unsaved changes in a work request: Save, Discard, and a check before leaving ================= */
+S._dirty=new Set(); S._dirtyFor=null;
+function pnlDirty(){ return S._dirty.size>0&&S._dirtyFor===S.panel; }
+function pnlClear(){ S._dirty.clear(); S._dirtyFor=null; const b=$('#pnlbar'); if(b) b.remove(); }
+const PNL_SEC={details:'Details',dates:'Key Dates',links:'Links'};
+function pnlBar(){ const P=$('#panel'); if(!P) return; let bar=$('#pnlbar',P);
+  if(!pnlDirty()){ if(bar) bar.remove(); return; }
+  const where=[...S._dirty].map(k=>PNL_SEC[k]||k).join(' and ');
+  if(!bar){ bar=document.createElement('div'); bar.id='pnlbar'; bar.className='pnlbar'; bar.setAttribute('role','status'); P.appendChild(bar); }
+  bar.innerHTML='<span class="pnlbar-t"><b>Unsaved changes</b> in '+esc(where)+'</span><button type="button" class="btn sm" data-pb="discard">Discard</button><button type="button" class="btn sm pri" data-pb="save">Save Changes</button>';
+  $('[data-pb=discard]',bar).onclick=()=>pnlDiscard();
+  $('[data-pb=save]',bar).onclick=()=>pnlSave(); }
+async function pnlSave(){ const t0=S.tickets[S._dirtyFor||S.panel]; if(!t0) return true;
+  const P=$('#panel'), t=clone(t0), before=clone(t0); let bad=false; const changed=[];
+  const setK=(k,v,isDate)=>{ const parts=k.split('.'); let o=t; for(let j=0;j<parts.length-1;j++){ o[parts[j]]=o[parts[j]]||{}; o=o[parts[j]]; } const last=parts[parts.length-1];
+    if((o[last]||'')!==v){ if(isDate&&k==='dates.targetIM'&&o[last]) t.targetChanges=(t.targetChanges||0)+1; o[last]=v; changed.push(k); } };
+  [...S._dirty].forEach(id=>{ const sec=$('[data-sec="'+id+'"]',P); if(!sec) return;
+    $$('[data-k]',sec).forEach(i=>setK(i.dataset.k,i.value.trim(),false));
+    $$('[data-date]',sec).forEach(i=>{ const v=parseDate(i.value); if(v===null){ bad=true; return; } setK(i.dataset.date,v,true); }); });
+  if(bad){ toast('A date did not read right. Try a format like 9/30/26.'); return false; }
+  pnlClear();
+  if(!changed.length){ toast('Nothing changed'); renderPanel(); return true; }
+  hist(t,'Updated '+changed.map(k=>k.replace(/^(dates|links)\./,'')).join(', '));
+  await saveTicket(t,'Saved',before); return true; }
+function pnlDiscard(){ pnlClear(); renderPanel(); toast('Changes discarded'); }
+function pnlAsk(){ return new Promise(res=>{ const root=$('#modal-root');
+  root.innerHTML='<div class="modal" role="dialog" aria-modal="true"><div class="box"><header><h3>Save your changes?</h3></header><div class="bd"><p style="margin:0">You changed '+esc([...S._dirty].map(k=>PNL_SEC[k]||k).join(' and '))+' on this work request and have not saved yet.</p></div><footer><button class="btn" data-m="keep" type="button">Keep Editing</button><button class="btn danger" data-m="discard" type="button">Discard</button><button class="btn pri" data-m="save" type="button">Save</button></footer></div></div>';
+  const done=v=>{ root.innerHTML=''; res(v); }; $$('[data-m]',root).forEach(b=>b.onclick=()=>done(b.dataset.m)); setTimeout(()=>{ const s=$('[data-m=save]',root); if(s) s.focus(); },30); }); }
+async function pnlLeave(){ if(!pnlDirty()) return true; const a=await pnlAsk(); if(a==='save') return await pnlSave(); if(a==='discard'){ pnlClear(); return true; } return false; }
+/* hold the panel still while someone is typing: other saves arriving don't wipe their edits */
+const _renderPanelGuard=renderPanel;
+renderPanel=function(){ if(pnlDirty()) { pnlBar(); return; } _renderPanelGuard(); };
+const _openPanelGuard=openPanel, _closePanelGuard=closePanel;
+openPanel=function(id){ if(pnlDirty()&&id!==S.panel){ pnlLeave().then(ok=>{ if(ok) _openPanelGuard(id); }); return; } _openPanelGuard(id); };
+closePanel=function(){ if(pnlDirty()){ pnlLeave().then(ok=>{ if(ok) _closePanelGuard(); }); return; } pnlClear(); _closePanelGuard(); };
+document.addEventListener('input',e=>{ const el=e.target; if(!el.closest||!el.closest('#panel')) return; if(!el.matches('[data-k],[data-date]')) return; const sec=el.closest('[data-sec]'); if(!sec) return;
+  if(S._dirtyFor!==S.panel){ S._dirty.clear(); S._dirtyFor=S.panel; } S._dirty.add(sec.dataset.sec); pnlBar(); },true);
+document.addEventListener('change',e=>{ const el=e.target; if(el.closest&&el.closest('#panel')&&el.matches('select[data-k],input[data-date]')) el.dispatchEvent(new Event('input',{bubbles:true})); },true);
+/* a section's own Save button saves everything changed */
+document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('#panel [data-save]'); if(!b) return; e.stopImmediatePropagation(); e.preventDefault(); if(pnlDirty()) pnlSave(); else toast('Nothing changed'); },true);
+window.addEventListener('beforeunload',e=>{ if(pnlDirty()){ e.preventDefault(); e.returnValue=''; } });
 
 /* ---------- settings ---------- */
 let setTab='process';
