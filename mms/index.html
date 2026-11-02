@@ -4171,7 +4171,7 @@ async function publishFeed(force){
   if(!force&&st.sig===sig) return;
   feedBusy=true;
   try{
-    const r=await fetch(RELAY()+'/mms-feed/commit',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({files:[{path:'mismo-standards/docs/standards.json',content:JSON.stringify(doc,null,2)}],message:'MMS: open comment periods for the website ('+doc.commentPeriods.length+')'})});
+    const r=await fetch(RELAY()+'/mms-feed/commit',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({files:[{path:'docs/standards.json',content:JSON.stringify(doc,null,2)}],message:'MMS: open comment periods for the website ('+doc.commentPeriods.length+')'})});
     const b=await r.json().catch(()=>({}));
     S.feedState=Object.assign({},st,r.ok?{sig,at:new Date().toISOString(),by:S.me.name||'',count:doc.commentPeriods.length,error:''}:{error:(b&&b.error)||('HTTP '+r.status),tried:new Date().toISOString()});
     await write('config','feed',S.feedState);
@@ -6158,6 +6158,14 @@ const HELP_TOPICS={
      'Click any bar, dot or number to see the work requests behind it, then click one to open it.'],
     ['Median is the typical value and ignores outliers; switch to Average to compare.','Every chart has a Table button for the exact numbers.'],
     [['Open Metrics','metrics']]],
+  hub:['Where Work Requests Come From','facilitator staff',
+    'Every work request starts in the Initiative Hub. The MMS brings it in on its own once it is approved.',
+    ['Anyone submits a work request in the Initiative Hub (Resource Center › Submit a Work Request).',
+     'MISMO staff confirm it, and it goes for approval there.',
+     'Once it is approved and has a WR number, the MMS adds it at Approved – Set Up within a few minutes, linked back to its Hub request, and tells the people on it.',
+     'From then on, the MMS tracks it. Open the Hub request from the work request’s Links.'],
+    ['Nothing can be added to the MMS without going through the Initiative Hub.','The Overview shows how many requests are waiting to be confirmed or approved in the Hub.'],
+    [['Submit a Work Request','https://resources.mismo.org/initiative-hub/work-requests.html#new']]],
   words:['Words We Use','*',
     'MISMO writes its own names one way. The Resource Center has the full list, and AI Review checks for them.',
     ['Open the Resource Center and pick MISMO Terms.',
@@ -6166,8 +6174,8 @@ const HELP_TOPICS={
     [['Open MISMO Terms','rc:terms']]]
 };
 const HELP_ORDER={
-  facilitator:['start','queue','panel','docs','aireview','handoff','asks','comments','digest','arch','mediareq','metrics','path','find','words'],
-  staff:['start','queue','board','metrics','approvals','handoff','govrec','settings','mt','notif','digest','panel','docs','path','find'],
+  facilitator:['start','hub','queue','panel','docs','aireview','handoff','asks','comments','digest','arch','mediareq','metrics','path','find','words'],
+  staff:['start','hub','queue','board','metrics','approvals','handoff','govrec','settings','mt','notif','digest','panel','docs','path','find'],
   imawg:['start','imrun','awgrun','mt','handoff','docs','digest','path','find'],
   member:['start','member','docs','path','find'],
   approver:['start','approve','queue','handoff','metrics','digest','path','find'],
