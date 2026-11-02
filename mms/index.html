@@ -2404,7 +2404,7 @@ function subChip(t){
   const m={updates:['Updates Needed','warn'],resubmitted:['Resubmitted','info'],'in-review':['In Review','info'],new:['Waiting','info'],reviewed:['Reviewed','good'],setup:['Being Set Up','warn'],prep:['For Approval','info'],vps:['For Approval','info'],director:['With Director','info'],discuss:['Needs Discussion','warn'],published:['Published','good']};
   const x=m[t.sub]; return x?'<span class="chip '+x[1]+'">'+x[0]+'</span>':'';
 }
-const sizeTag=t=>t.size?'<span class="size" title="Size: '+esc((SIZES.find(s=>s[0]===t.size)||[])[1]||t.size)+'">'+esc(t.size)+'</span>':'';
+const sizeTag=t=>t.size?'<span class="size" title="Size: '+esc(typeof sizeLabel==='function'?sizeLabel(t):t.size)+'">'+esc(t.size)+'</span>':'';
 function miniTrack(t){ const list=stages(); const i=list.findIndex(s=>s.key===t.stage); return '<div class="mini-track">'+list.map((s,j)=>'<i class="'+(t.state==='published'||j<i?'done':(j===i?'cur':''))+'" title="'+esc(s.name)+'"></i>').join('')+'</div>'; }
 function tkCard(t,drag){
   const w=whoseMove(t), age=stageAge(t);
@@ -2682,7 +2682,7 @@ function renderPanel(){
     return '<div class="f'+(wide?' wide':'')+'"><label>'+esc(label)+'</label>'+el+'</div>';
   };
   const sec=(id,title,inner,full,extra)=>'<div class="psec'+(full?' full':'')+'" data-sec="'+id+'"><h4>'+title+(extra||'')+'</h4>'+inner+(edit&&id!=='hist'&&id!=='stage'?'<div class="savebar"><button class="btn sm pri" data-save="'+id+'" type="button">Save</button><span class="dirty" hidden>Unsaved changes</span></div>':'')+'</div>';
-  const details='<div class="kv">'+field('Work Request Name','name',t.name,'text',null,true)+field('Work Product Name','product',t.product)+field('Workgroup','workgroup',t.workgroup)+field('DWG or CoP','groupType',t.groupType,'select',['CoP','DWG'])+field('Facilitator','facilitator',t.facilitator,'select',facs)+field('Size','size',t.size,'select',SIZES)+field('Work Type','workType',t.workType,'select',['Initiative','Initiative Deliverable','Maintenance','Non-Initiative'])+field('Request Type','reqType',t.reqType,'select',['New','Update'])+field('MISMO Segment','segment',t.segment)+field('Part of RM Release','rmRelease',t.rmRelease)+field('Product Page Name','productPageName',t.productPageName)+field('Classification','classification',t.classification,'select',['Standard','Collateral'])+field('Summary','summary',t.summary,'area',null,true)+'</div>';
+  const details='<div class="kv">'+field('Work Request Name','name',t.name,'text',null,true)+field('Work Product Name','product',t.product)+field('Workgroup','workgroup',t.workgroup)+field('DWG or CoP','groupType',t.groupType,'select',['CoP','DWG'])+field('Facilitator','facilitator',t.facilitator,'select',facs)+field('Size','size',t.size,'select',(t.sizeScale==='hub'&&typeof HUB_SIZES!=='undefined')?HUB_SIZES.map(z=>[z[0],z[1]+' · '+z[2]]):SIZES)+field('Work Type','workType',t.workType,'select',['Initiative','Initiative Deliverable','Maintenance','Non-Initiative'])+field('Request Type','reqType',t.reqType,'select',['New','Update'])+field('MISMO Segment','segment',t.segment)+field('Part of RM Release','rmRelease',t.rmRelease)+field('Product Page Name','productPageName',t.productPageName)+field('Classification','classification',t.classification,'select',['Standard','Collateral'])+field('Summary','summary',t.summary,'area',null,true)+'</div>';
   const dates='<div class="kv">'+field('Submitted','dates.submitted',d.submitted,'date')+field('Approved (BET)','dates.bet',d.bet,'date')+field('Work Start','dates.workStart',d.workStart,'date')+field('Target to Submit to IM','dates.targetIM',d.targetIM,'date')+field('AI Review Submitted','dates.aiSubmitted',d.aiSubmitted,'date')+field('IM Submitted','dates.imSubmitted',d.imSubmitted,'date')+field('IM Decision','dates.imDecision',d.imDecision,'date')+field('AWG Decision','dates.awgDecision',d.awgDecision,'date')+field(govName()+' Approval to Comment','dates.gcComment',d.gcComment,'date')+field('Comment Start','dates.commentStart',d.commentStart,'date')+field('Comment End','dates.commentEnd',d.commentEnd,'date')+field(govName()+' Approval to Publish','dates.postGc',d.postGc,'date')+field('Published','dates.published',d.published,'date')+field('Regulation / Mandate','dates.regulation',d.regulation,'date')+'</div>'+(t.targetChanges?'<div class="muted" style="font-size:12px;margin-top:8px">Target to IM has changed '+t.targetChanges+' time'+(t.targetChanges===1?'':'s')+'.</div>':'');
   const L=t.links||{};
   const links='<div class="kv">'+[['MISMO.org Product Page','productPage'],['Resource Library','resourceLibrary'],['Workgroup Page','workgroupPage'],['MISMO Connect Site','connect'],['Work Product File (SharePoint)','workFile'],['Comment Announcement','newsComment'],['CR or Final Announcement','newsFinal']].map(([l,k])=>'<div class="f"><label>'+esc(l)+(L[k]?' <a href="'+esc(L[k])+'" target="_blank" rel="noopener" style="text-transform:none;letter-spacing:0">Open</a>':'')+'</label>'+(edit?'<input data-k="links.'+k+'" value="'+esc(L[k]||'')+'" placeholder="https://">':'<div class="ro">'+esc(L[k]||'—')+'</div>')+'</div>').join('')+'</div>';
@@ -3650,7 +3650,7 @@ const ATT_TIP={late:'Target to Submit to IM has passed',soon:'Comment period end
 function ageLong(n){ if(n==null) return ''; if(n<60) return n+' day'+(n===1?'':'s'); if(n<365) return Math.round(n/30.4)+' months'; return (n/365).toFixed(1).replace(/\.0$/,'')+' years'; }
 function ageTxt(n){ if(n==null) return ''; if(n<60) return n+'d'; if(n<365) return Math.round(n/30.4)+' mo'; return (n/365).toFixed(1).replace(/\.0$/,'')+' yr'; }
 function heatLevel(t){ const a=stageAge(t); if(a==null||t.state!=='active') return -1; if(pastTarget(t)) return 2; if(stalled(t)) return 1;
-  const lim=t.stage==='work'?(SIZE_DAYS[t.size]||120):(t.stage==='comment'?(+t.commentDays||30):21); return a>lim*.6?1:0; }
+  const lim=t.stage==='work'?((typeof sizeImDays==='function'?sizeImDays(t):SIZE_DAYS[t.size]||120)):(t.stage==='comment'?(+t.commentDays||30):21); return a>lim*.6?1:0; }
 function heat(t){ const a=stageAge(t), l=heatLevel(t); if(l<0) return ''; return '<span class="heat h'+l+'" title="'+a+' days in '+esc(stageDef(t.stage).name)+'"><svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2M9 2h6"/></svg>'+ageTxt(a)+'</span>'; }
 function tags(t){ return [t.kind?'<span class="chip">'+esc(t.kind)+'</span>':'', t.rides?'<span class="chip info">Moves With '+esc((S.tickets[t.rides]||{}).wr||'')+'</span>':'', ridersOf(t.id).length?'<span class="chip info">'+ridersOf(t.id).length+' Riding</span>':'', t.request?'<span class="chip warn">Asked to '+esc(t.request.kind)+'</span>':'', subChip(t), stateChip(t), pastTarget(t)?'<span class="chip bad">Past Target</span>':''].join(''); }
 function canAct(t){ return S.canWrite && (S.isStaff || isMine(t)); }
@@ -3665,7 +3665,7 @@ function card2(t,o){
   const acts=o.act?qaBtns(t,1):'';
   const age=(a!=null&&t.state==='active')?'<span class="t2-age'+(hl===2?' bad':'')+'" title="'+a+' days in '+esc(s.name)+'">'+ageTxt(a)+' in stage</span>':'';
   return '<div role="button" tabindex="0" class="tk2'+(t.state==='hold'?' hold':'')+(pastTarget(t)?' late':'')+(o.focus?' isnext':'')+'" data-open="'+esc(t.id)+'"'+(o.drag?' draggable="true" data-drag="'+esc(t.id)+'"':'')+' style="--i:'+(o.i||0)+'">'+
-    '<div class="t2-top"><span class="wr">'+esc(t.wr)+'</span>'+(t.size?'<span class="t2-sz" title="Size: '+esc((SIZES.find(x=>x[0]===t.size)||[])[1]||'')+'">'+esc(t.size)+'</span>':'')+age+'</div>'+
+    '<div class="t2-top"><span class="wr">'+esc(t.wr)+'</span>'+(t.size?'<span class="t2-sz" title="Size: '+esc(typeof sizeLabel==='function'?sizeLabel(t):'')+'">'+esc(t.size)+'</span>':'')+age+'</div>'+
     '<div class="t2-nm">'+esc(t.name)+'</div>'+
     (o.stage?'<div class="t2-st">'+esc(s.name)+'</div>':'')+
     (tg?'<div class="t2-tags">'+tg+'</div>':'')+
@@ -3856,7 +3856,7 @@ VIEWS.all=function(){
   const match=t=>(!f.fac||t.facilitator===f.fac)&&(!f.wg||t.workgroup===f.wg)&&(!f.size||t.size===f.size)&&(!f.type||t.workType===f.type)&&(!q||(t.name+' '+t.wr+' '+t.workgroup+' '+t.facilitator).toLowerCase().includes(q));
   const inState=(t,s)=>s==='all'||(s==='live'?t.state==='active':t.state===s);
   let L=base.filter(t=>inState(t,f.state)&&match(t));
-  const key={wr:t=>t.wr,name:t=>t.name,fac:t=>t.facilitator||'',stage:t=>String(stageIndex(t.stage)+100).padStart(4,'0'),size:t=>{ const i=['S','M','L','XL'].indexOf(t.size); return i<0?9:i; },target:t=>(t.dates&&t.dates.targetIM)||'9',upd:t=>t.updatedAt||t.importedAt||''}[f.sort]||(t=>t.wr);
+  const key={wr:t=>t.wr,name:t=>t.name,fac:t=>t.facilitator||'',stage:t=>String(stageIndex(t.stage)+100).padStart(4,'0'),size:t=>{ const i=['XS','S','M','L','XL'].indexOf(t.size); return i<0?9:i; },target:t=>(t.dates&&t.dates.targetIM)||'9',upd:t=>t.updatedAt||t.importedAt||''}[f.sort]||(t=>t.wr);
   L.sort((a,b)=>{ const x=key(a), y=key(b); return (x>y?1:x<y?-1:0)*f.dir; });
   const sig=JSON.stringify([f.state,f.q,f.fac,f.wg,f.size,f.type,f.sort,f.dir]); if(S._allSig!==sig){ S._allSig=sig; S.page=0; }
   const pages=Math.max(1,Math.ceil(L.length/PER)); S.page=Math.min(S.page||0,pages-1); const P=L.slice(S.page*PER,S.page*PER+PER);
@@ -4817,7 +4817,7 @@ function wrHub(P,t){
   if(!TABS.some(x=>x[0]===S.ptab)) S.ptab='over';
   const hero='<div class="wh"><div class="wh-wave" aria-hidden="true"></div>'+
     '<div class="wh-top"><span class="wh-eb">'+esc(t.wr)+(t.workgroup?' · '+esc(t.workgroup):'')+'</span>'+chips+'</div>'+
-    '<h2>'+esc(t.name)+(t.size?' <span class="wh-acr" title="T-shirt size">'+esc(t.size)+'</span>':'')+'</h2>'+
+    '<h2>'+esc(t.name)+(t.size?' <span class="wh-acr" title="Size: '+esc(typeof sizeLabel==='function'?sizeLabel(t):t.size)+'">'+esc(t.size)+'</span>':'')+'</h2>'+
     '<div class="wh-row"><div class="wh-people"><div class="wh-fac">'+av(t.facilitator)+'<span><em>Facilitator</em><b>'+esc(t.facilitator||'Not assigned yet')+'</b><small>MISMO</small></span></div>'+leaderChips(t)+'</div>'+
     ((kd||meet)?'<div class="wh-dates">'+kd+meet+'</div>':'')+'</div>'+
     (prev?'<div class="wh-prev">'+prev.innerHTML+'</div>':'')+
@@ -5859,6 +5859,35 @@ hubSync=async function(){ await _hubSyncCP(); if(!S.canWrite||!S.hub) return;
 /* Start Work shows what the requester asked for in the Hub */
 const _startWorkCP=startWork;
 startWork=async function(t){ const a=hubAsk(t); if(a){ const msg='In the Initiative Hub the requester sized this '+(a.effort?a.effort[0]+' ('+a.effort[1]+')':'')+(a.effort&&a.completion?' and ':'')+(a.completion?'asked for completion by '+fmt(a.completion):'')+'.'; setTimeout(()=>{ const bd=$('#modal-root .modal .bd'); if(bd&&!$('.hub-ask',bd)) bd.insertAdjacentHTML('afterbegin','<div class="banner info hub-ask" style="margin:0 0 12px">'+esc(msg)+(a.why?' <span class="muted">“'+esc(a.why)+'”</span>':'')+'</div>'); },40); } return _startWorkCP(t); };
+
+/* ---------- Hub sizes going forward (Jonna, Nov 2) ----------
+   Work requests that come from the Initiative Hub use the Hub's sizes from now on:
+   Extra-Small 3 months, Small 6, Medium 9, Large 1 year for the whole job. The
+   Target to Submit to IM defaults to the first half of that. Everything already in
+   the MMS (Smartsheet sizes S/M/L/XL and their 60/90/150/210-day targets) stays as is.
+   A work request on the Hub scale carries sizeScale:'hub'. */
+const HUB_SIZES=[['XS','Extra-Small','3 months',90],['S','Small','6 months',180],['M','Medium','9 months',270],['L','Large','1 year',365]];
+const hubSize=k=>HUB_SIZES.find(s=>s[0]===k)||null;
+function onHubScale(t){ return t&&(t.sizeScale==='hub'); }
+function fromHub(t){ return !!(t&&(t.source==='hub'||t.hubId)); }
+/* days from work start to the Target to Submit to IM, on whichever scale the work request uses */
+function sizeImDays(t){ if(onHubScale(t)){ const h=hubSize(t.size); return h?Math.round(h[3]/2):135; } return SIZE_DAYS[t.size]||90; }
+function sizeLabel(t){ if(onHubScale(t)){ const h=hubSize(t.size); return h?h[1]+' · '+h[2]+' (Initiative Hub size)':t.size; } return (SIZES.find(s=>s[0]===t.size)||[])[1]||t.size||''; }
+const _startWorkHub=startWork;
+startWork=async function(t){
+  if(!fromHub(t)||(t.size&&!onHubScale(t))) return _startWorkHub(t);
+  const a=hubAsk(t), pre=(a&&a.effort)?{xs:'XS',s:'S',m:'M',l:'L'}[String(t.hubEffort||'').toLowerCase()]||'M':(t.size||'M');
+  const v=await modal({title:'Start Work',text:esc(t.name),ok:'Start Work',body:
+    (a?'<div class="banner info hub-ask" style="margin:0 0 12px">In the Initiative Hub the requester sized this '+(a.effort?esc(a.effort[0]+' ('+a.effort[1]+')'):'')+(a.effort&&a.completion?' and ':'')+(a.completion?'asked for completion by '+esc(fmt(a.completion)):'')+'.'+(a.why?' <span class="muted">“'+esc(a.why)+'”</span>':'')+'</div>':'')+
+    fld('Work Start',dateField('start',today()))+fld('Size',radios('size',HUB_SIZES.map(s=>[s[0],s[1]+' · '+s[2]]),pre),'The Initiative Hub’s sizes: the whole job, from work start to done.')+
+    fld('Target to Submit to IM',dateField('target',t.dates&&t.dates.targetIM||''),'Leave blank to set it from the size: the first half of the job (Extra-Small 45 days, Small 90, Medium 135, Large 180).')+
+    fld('Call for Participation Needed?',radios('cfp',[['no','No, work begins'],['yes','Yes, ask MISMO Media']],'no'))+fld('DWG or CoP',radios('gt',[['CoP','Community of Practice'],['DWG','Development Workgroup']],t.groupType||'CoP'))});
+  if(!v) return; const h=hubSize(v.size)||hubSize('M'), st=v.start||today();
+  const target=v.target||addDays(st,Math.round(h[3]/2));
+  const x=clone(t); x.size=h[0]; x.sizeScale='hub'; x.groupType=v.gt; x.cfp={needed:v.cfp==='yes'};
+  x.dates=Object.assign({},x.dates,v.cfp==='yes'?{}:{workStart:st},{targetIM:target,forecastIM:target,targetDone:addDays(st,h[3])});
+  await move(x,v.cfp==='yes'?'cfp':nextStage(x,'kickoff'),{text:'Work approved to start ('+h[1]+', '+h[2]+')'+(v.cfp==='yes'?'; Call for Participation requested from MISMO Media':'')+'. Target to Submit to IM '+fmt(target)});
+};
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
@@ -6322,7 +6351,7 @@ const HELP_TOPICS={
   panel:['Inside a Work Request','*',
     'Click any card to open its panel. The tabs across the top hold everything about it.',
     ['Overview: where it is, whose move it is, and the next step button.',
-     'Details: workgroup, facilitator, size (the S, M, L or XL box on every card: Small, Medium, Large, X-Large), classification and the rest of its record.',
+     'Details: workgroup, facilitator, size (the letter box on every card; hover it for the full name). Work requests from the Initiative Hub use the Hub’s sizes: Extra-Small 3 months, Small 6, Medium 9, Large 1 year for the whole job, with the Target to Submit to IM at the halfway point. Older work keeps its Smartsheet size: Small, Medium, Large or X-Large, classification and the rest of its record.',
      'Key Dates: start, Target to Submit to IM, comment period dates and what actually happened when.',
      'Files: every document for this work request in SharePoint. Click one to open it.',
      'Links: anything else worth keeping with it, such as a draft or a Teams thread.',
@@ -6808,13 +6837,14 @@ function mxVolume(P,R){
 /* ---- Sizes and Targets ---- */
 function mxSizes(P,R){
   const SD=(proc().sizeDays)||SIZE_DAYS, built=P.filter(t=>mxIn(mxDate(t,'imSubmitted'),R)&&mxSpan(t,'workStart','imSubmitted')!=null);
-  const panels=['S','M','L','XL'].map(sz=>{ const L=built.filter(t=>t.size===sz).map(t=>[t,mxSpan(t,'workStart','imSubmitted')]), tg=SD[sz]||SIZE_DAYS[sz];
+  const hubBuilt=built.filter(t=>t.sizeScale==='hub'); const scales=[['S','M','L','XL'].map(sz=>[sz,false])].concat(hubBuilt.length?[['XS','S','M','L'].map(sz=>[sz,true])]:[]);
+  const panels=scales.flat().map(([sz,hub])=>{ const L=built.filter(t=>t.size===sz&&(t.sizeScale==='hub')===hub).map(t=>[t,mxSpan(t,'workStart','imSubmitted')]), tg=hub?Math.round(hubSize(sz)[3]/2):(SD[sz]||SIZE_DAYS[sz]);
     const W=mxMini(),H=150, max=mxNice(Math.max(tg*1.4,...L.map(x=>x[1]),10)), sx=v=>14+(W-28)*v/max, ok=L.filter(x=>x[1]<=tg).length, md=mxStat(L.map(x=>x[1]));
     const bins={}; let dots=''; L.sort((a,b)=>a[1]-b[1]).forEach(([t,d])=>{ const bx=Math.round(sx(d)/9); bins[bx]=(bins[bx]||0)+1; const k=bins[bx]-1; const y=104-((k%10)*9)-(k>=10?4:0);
       dots+='<circle class="mx-dot" cx="'+sx(d)+'" cy="'+y+'" r="4" style="fill:'+(d<=tg?'var(--k3)':'var(--k2)')+'"'+mxTip([d+' days',(t.wr||'')+' '+(t.name||''),d<=tg?'Within the '+tg+'-day target':(d-tg)+' days over target'])+' data-open="'+esc(t.id)+'"/>'; });
     let ax=''; for(let i=0;i<=4;i++){ const v=max*i/4; ax+='<text x="'+sx(v)+'" y="'+(H-4)+'" class="mx-ax" text-anchor="middle">'+mxNum(Math.round(v))+'</text>'; }
     const svg='<svg class="mx-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Size '+sz+' build days"><line x1="14" x2="'+(W-14)+'" y1="112" y2="112" class="mx-base"/><line x1="'+sx(tg)+'" x2="'+sx(tg)+'" y1="4" y2="116" class="mx-ref"/><text x="'+(sx(tg)+4)+'" y="12" class="mx-ax">Target '+tg+'</text>'+(md!=null?'<line x1="'+sx(md)+'" x2="'+sx(md)+'" y1="16" y2="116" class="mx-med"/><text x="'+(sx(md)+4)+'" y="24" class="mx-ax b">'+mxStatWord()+' '+md+'</text>':'')+dots+ax+'</svg>';
-    return '<section class="card mx-mini"><header><span class="mx-size">'+sz+'</span><b>'+({S:'Small',M:'Medium',L:'Large',XL:'X-Large'}[sz])+'</b></header><div class="mx-mv">'+(L.length?Math.round(100*ok/L.length)+'%<em> within target · '+L.length+' work products</em>':'–')+'</div>'+(L.length?svg:'<div class="lead-empty">None in this range.</div>')+'</section>'; }).join('');
+    return '<section class="card mx-mini"><header><span class="mx-size">'+sz+'</span><b>'+({XS:'Extra-Small',S:'Small',M:'Medium',L:'Large',XL:'X-Large'}[sz])+(hub?' <small class="muted">Initiative Hub size</small>':'')+'</b></header><div class="mx-mv">'+(L.length?Math.round(100*ok/L.length)+'%<em> within target · '+L.length+' work products</em>':'–')+'</div>'+(L.length?svg:'<div class="lead-empty">None in this range.</div>')+'</section>'; }).join('');
   const yrs=mxYears(), hit=yrs.map(y=>{ const L=P.filter(t=>mxDate(t,'imSubmitted').slice(0,4)===y&&t.dates.targetIM); const ok=L.filter(t=>t.dates.imSubmitted<=t.dates.targetIM); return {y,L,ok,p:L.length?Math.round(100*ok.length/L.length):null}; });
   const c2=mxCard('hit','Sent to IM by the Target','Share of work sent to IM on or before its Target to Submit to IM date.',mxCols('hit',yrs,[{n:'On time',c:MX_K[0],v:hit.map(h=>h.p),sub:hit.map(h=>h.ok.length+' of '+h.L.length),d:hit.map(h=>mxDrill('hit-'+h.y,'Sent to IM in '+h.y,h.L.map(t=>mxRow(t,daysBetween(t.dates.targetIM,t.dates.imSubmitted),t.dates.imSubmitted<=t.dates.targetIM?'On time':'Late')),' days past target'))}],{w:mxHalf(),h:220,unit:'%',aria:'Percent on time to IM by year'}),mxTable(['Year','On Time','Sent','Share'],hit.map(h=>[h.y,h.ok.length,h.L.length,h.p==null?'–':h.p+'%'])));
   const inR=P.filter(t=>mxIn(mxDate(t,'submitted'),R)||t.state==='active'), lab=['None','1','2','3','4','5 or more'], grp=lab.map((l,i)=>inR.filter(t=>{ const n=+t.targetChanges||0; return i===5?n>=5:n===i; }));
