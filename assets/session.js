@@ -14,7 +14,7 @@
        { token, name, email, access: {hub:'admin', ...}, platformAdmin, expiresAt }
    localStorage rather than sessionStorage because sessionStorage is private to
    one tab, and a sign-in that did not follow you into a new tab would not feel
-   like one sign-in. The token expires after four hours regardless, and signing
+   like one sign-in. The token expires after eight hours regardless (four before relay request 10), and signing
    out removes it everywhere at once.
 
    The token proves who someone is. It is not what decides what they may do: the
