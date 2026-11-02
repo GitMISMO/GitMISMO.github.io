@@ -5763,6 +5763,25 @@ async function ssUpload(t,files){ const url=S.notify&&S.notify.docFlowUrl, box=d
     }catch(e){ say('Couldn’t save '+f.name+': '+e.message+(done?' ('+done+' saved first)':''),'bad'); break; } }
   if(added.length){ const D=clone(ssFor(t)||{wr:t.wr,files:[],links:[]}); D.files=(D.files||[]).filter(x=>!added.some(a=>a.p===x.p)).concat(added); S.ssfiles[t.id]=D; await write('ssfiles',t.id,D); renderPanel(); const b2=document.getElementById('ssup-'+t.id); if(b2){ b2.hidden=false; b2.className='ss-up ok'; b2.textContent=added.length+' document'+(added.length===1?'':'s')+' saved to SharePoint and added here.'; } } }
 document.addEventListener('change',e=>{ const i=e.target; if(!i||!i.dataset||!i.dataset.ssadd) return; const t=S.tickets[i.dataset.ssadd]; if(t&&i.files&&i.files.length) ssUpload(t,i.files); i.value=''; });
+
+/* ---------- Files saved straight into SharePoint: when the Files tab opens, the
+   "MMS Documents - Upload" flow lists the work request's folder (mode "list") and any
+   file not on the list yet is added. Once per work request per visit. ---------- */
+const ssListed={};
+async function ssSyncFolder(t){ const url=S.notify&&S.notify.docFlowUrl; if(!url||!t||ssListed[t.id]||S.viewAs) return; ssListed[t.id]=1;
+  try{ await ssReady(4000); const folder=ssFolderName(t); if(!folder) return;
+    const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({token:(window.ResourcesSession&&ResourcesSession.token())||'',project:'mms',mode:'list',folder:'MMS Smartsheet Files/'+folder})});
+    if(!r.ok) return; const j=await r.json().catch(()=>null); if(!j||!j.listed||!Array.isArray(j.files)) return;
+    const D=clone(ssFor(t)||{wr:t.wr,files:[],links:[]}); D.files=D.files||[]; const have=new Set(D.files.map(f=>String(f.p||'').toLowerCase()));
+    const sz=n=>!n?'':n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+    const add=j.files.filter(f=>f&&!f.IsFolder&&f.Name).map(f=>({n:f.DisplayName||f.Name,p:folder+'/'+f.Name,u:String(f.LastModified||'').slice(0,10)||today(),b:typeof f.LastModifiedBy==='string'?f.LastModifiedBy:'',sz:sz(+f.Size||0),sp:true})).filter(f=>!have.has(f.p.toLowerCase()));
+    if(!add.length) return; D.files=D.files.concat(add); S.ssfiles[t.id]=D;
+    if(S.canWrite) await write('ssfiles',t.id,D);
+    if(S.panel===t.id) renderPanel();
+  }catch(e){ delete ssListed[t.id]; } }
+document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-ptab="files"]'); if(!b) return; const t=S.tickets[S.panel]; if(t) ssSyncFolder(t); });
+const _renderPanelSS2=renderPanel;
+renderPanel=function(){ _renderPanelSS2(); if(S.ptab==='files'&&S.panel&&!String(S.panel).startsWith('arch:')){ const t=S.tickets[S.panel]; if(t) ssSyncFolder(t); } };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
