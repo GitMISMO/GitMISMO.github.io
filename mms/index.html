@@ -2654,7 +2654,7 @@ function renderPanel(){
     t.state==='active'?'<button class="btn sm" data-x="hold" type="button">Put on Hold</button>':'',
     live?'<button class="btn sm" data-x="close" type="button">Close</button><button class="btn sm danger" data-x="cancel" type="button">Cancel</button>':''].join('')
     :(live&&own&&!t.request?['<button class="btn sm" data-x="rhold" type="button">'+(t.state==='hold'?'Ask to Resume':'Ask to Put on Hold')+'</button>','<button class="btn sm" data-x="rclose" type="button">Ask to Close</button>','<button class="btn sm" data-x="rcancel" type="button">Ask to Cancel</button>'].join(''):''))+
-    (live&&S.canWrite?'<button class="btn sm" data-x="arch" type="button">Ask for Architecture Help</button>':'');
+    (live&&archCanAsk(t)?'<button class="btn sm" data-x="arch" type="button">Ask for Architecture Help</button>':'');
   const facs=(S.people.facilitators||[]).map(p=>p.name).sort();
   const field=(label,key,val,type,opts,wide)=>{
     let el; const v=val==null?'':val;
@@ -3180,7 +3180,9 @@ async function decideAsk(t,yes){
    Carries on the Architecture Task Board's numbering (ATB0000015 and up) and its fields. */
 const ARCH_TYPES=['Data Modeling / Reference Model','Schema (XSD) or Extension','MEG or Guideline Question','API Design or Review','Work Product Review','Mapping Support','Website or Documentation','Outside Question','Other'];
 function nextAtb(){ const n=Math.max(14,...Object.keys(S.arch||{}).map(k=>{ const m=k.match(/^ATB(\d+)$/); return m?+m[1]:0; })); return 'ATB'+String(n+1).padStart(7,'0'); }
-async function archRequest(t,follow){
+/* only facilitators ask for Architecture Help (Jonna, Nov 2): on a work request, its own facilitator */
+function archCanAsk(t){ if(!S.canWrite) return false; const v=(typeof viewer==='function'?viewer():S.me)||{}; const isFac=(S.people.facilitators||[]).some(f=>sameName(f.name,v.name)); if(!isFac) return false; return !t||!t.facilitator||sameName(t.facilitator,v.name); }
+async function archRequest(t,follow){ if(!follow&&!archCanAsk(t)){ toast('Facilitators ask for Architecture Help on their own work requests.'); return; }
   const live=liveTickets().slice().sort((a,b)=>a.wr.localeCompare(b.wr));
   const wgs=[...new Set(allTickets().map(x=>x.workgroup).filter(Boolean))].sort();
   const v=await modal({title:follow?'Follow-Up Architecture Work':'Ask for Architecture Help',text:(t?esc(t.wr+' '+t.name)+'. ':'')+'The Program Manager reviews it; once approved it goes to the Architect’s queue.',ok:'Send to the Program Manager',body:
@@ -3880,7 +3882,7 @@ VIEWS.arch=function(){
   const done=A.filter(a=>a.status==='Done'||a.status==='Declined').sort((a,b)=>String(b.done||b.requested).localeCompare(String(a.done||a.requested)));
   const hrs=done.filter(a=>String(a.done||'').slice(0,4)===today().slice(0,4)).reduce((s,a)=>s+(+a.hoursSpent||0),0);
   const L=(key,title,sub,list,actsFor,c,cls,empty)=>({key,title,sub,n:list.length,c,cls,empty,items:list.map(a=>archCard(a,actsFor(a)))});
-  return '<div class="pagehead slim"><div><h1>Architecture Help</h1><div class="sub">Facilitators ask, the Program Manager approves, and the Architect works the queue, all tied to the work it supports.</div></div><div class="acts">'+(S.canWrite?'<button class="btn pri" id="archnew" type="button">+ Ask for Architecture Help</button>':'')+'</div></div>'+
+  return '<div class="pagehead slim"><div><h1>Architecture Help</h1><div class="sub">Facilitators ask, the Program Manager approves, and the Architect works the queue, all tied to the work it supports.</div></div><div class="acts">'+(archCanAsk(null)?'<button class="btn pri" id="archnew" type="button">+ Ask for Architecture Help</button>':'')+'</div></div>'+
     lens('arch',[{k:'Waiting on Approval',v:A.filter(a=>a.status==='Requested').length,s:esc(peopleFor('pm').map(p=>p.name).join(', ')||'Program Manager'),c:'var(--c4)'},{k:'With the Architect',v:A.filter(a=>['Approved','In Progress'].includes(a.status)).length,s:esc(peopleFor('architect').map(p=>p.name).join(', ')||'Architect'),c:'var(--c1)'},{k:'Past Target',v:late,s:late?'Check in with the architect':'All on track',c:late?'var(--bad)':'var(--good)',cls:late?'alert':''},{k:'Done This Year',v:done.filter(a=>a.status==='Done'&&String(a.done||'').slice(0,4)===today().slice(0,4)).length,s:hrs?hrs+' hours of architect time':'Completed requests',c:'var(--good)'}])+
     lanesHtml('arch',[
       L('pm','Waiting on the Program Manager',esc(peopleFor('pm').map(p=>p.name).join(', ')||'Program Manager'),A.filter(a=>a.status==='Requested'),a=>pm?btn(a.id,'Approved','Approve →','pri')+btn(a.id,'Declined','Decline'):'','var(--c4)','','New requests wait here for the Program Manager to approve'),
@@ -4618,11 +4620,11 @@ archMine=function(me){
   if(reqs.length) out+='<div class="qgroup"><h3>Requests to Decide <span class="chip warn">'+reqs.length+'</span></h3><div class="qlist">'+reqs.map(qItem).join('')+'</div></div>';
   if(L.length||recent.length){
     const pg=pageOf('archmine:'+(S.viewAs||''),L,4);
-    out+='<div class="aq"><div class="aq-h"><h3>Architecture Help</h3><span class="muted">'+L.length+' open'+(recent.length?' · '+recent.length+' finished in the last two weeks':'')+'</span>'+(S.canWrite?'<button class="btn sm" type="button" id="archnew2">+ Ask for Architecture Help</button>':'')+'</div>'+
+    out+='<div class="aq"><div class="aq-h"><h3>Architecture Help</h3><span class="muted">'+L.length+' open'+(recent.length?' · '+recent.length+' finished in the last two weeks':'')+'</span>'+(archCanAsk(null)?'<button class="btn sm" type="button" id="archnew2">+ Ask for Architecture Help</button>':'')+'</div>'+
       (L.length?'<div class="aq-grid">'+pg.items.map(([a,r])=>archTile(a,r)).join('')+'</div>'+pg.bar:'')+
       (recent.length?'<div class="aq-done">'+recent.map(a=>'<button type="button" class="aq-d" data-archopen="'+esc(a.id)+'"><span class="okdot">✓</span><b>'+esc(a.id)+'</b> '+esc(a.title)+'<em>done '+esc(fmtS(a.done))+'</em></button>').join('')+'</div>':'')+'</div>';
   } else if(S.canWrite&&!S.viewAs&&(S.people.facilitators||[]).some(p=>sameName(p.name,me.name))) {
-    out+='<div class="aq aq-empty"><div><h3>Architecture Help</h3><span class="muted">Need '+esc(firstName((peopleFor('architect')[0]||{}).name||'')||'the Architect')+' on something? Ask, and '+esc(firstName((peopleFor('pm')[0]||{}).name||'')||'the Program Manager')+' routes it to the Architect’s queue.</span></div><button class="btn sm" type="button" id="archnew2">+ Ask for Architecture Help</button></div>';
+    out+='<div class="aq aq-empty"><div><h3>Architecture Help</h3><span class="muted">Need '+esc(firstName((peopleFor('architect')[0]||{}).name||'')||'the Architect')+' on something? Ask, and '+esc(firstName((peopleFor('pm')[0]||{}).name||'')||'the Program Manager')+' routes it to the Architect’s queue.</span></div>'+(archCanAsk(null)?'<button class="btn sm" type="button" id="archnew2">+ Ask for Architecture Help</button>':'')+'</div>';
   }
   return out;
 };
@@ -5294,7 +5296,8 @@ async function rvAiIm(P,ctx,progress){
 function rvReadiness(findings,ai){
   const fix=findings.filter(f=>f.sev==='fix').length, ai3=(ai&&ai.readiness)||[];
   if(fix>=5||ai3.includes('needs-updates')) return ['needs','Needs Updates'];
-  if(fix>0||ai3.includes('minor')||((ai&&ai.corrections)||[]).length>3) return ['minor','Ready With Minor Edits'];
+  if(fix>0) return ['minor','A Few Fixes Before IM'];
+  if(ai3.includes('minor')||((ai&&ai.corrections)||[]).length>3) return ['minor','Ready With Minor Edits'];
   return ['ready','Ready'];
 }
 function rvImReadiness(findings,ai){ const fix=findings.filter(f=>f.sev==='fix').length; const risky=((ai&&ai.rows)||[]).filter(r=>/returned|denied/.test(r.likely||'')).length;
@@ -5320,7 +5323,7 @@ function rvReportHtml(rep,forWord){
   const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'f'+i},f)), fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
   const title=rep.kind==='im'?'IM Pre-Review Report':'AI Review Report';
   let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(atDay(rep.at)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):(rep.rm?' · Checked against the '+e(rep.rm):''))+'</div>'+
-    '<div class="rvr-score rv-'+e(rep.readiness)+'"><b>'+e(rep.readinessLabel)+'</b><span>'+fx.length+' must fix · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
+    '<div class="rvr-score rv-'+e(rep.readiness)+'"><b>'+e(rep.readinessLabel)+'</b> <span>'+fx.length+' must fix · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
     (rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
     '<p class="rvr-note">This report recommends; it doesn’t change the work product. '+(rep.kind==='editor'?'Editorial suggestions are judgment calls: the facilitator and workgroup decide.':'IM makes the final decision on every row.')+'</p></div>';
   const sec=(t2,body)=>body?'<h3>'+e(t2)+'</h3>'+body:'';
@@ -5333,7 +5336,7 @@ function rvReportHtml(rep,forWord){
   if(rep.kind==='im'&&rep.form) h+=sec('What IM Has Done Before','<p>Across '+RV_IM_LEARNED.decided.toLocaleString()+' decided rows since 2021, '+Math.round(RV_IM_LEARNED.asSubmitted/RV_IM_LEARNED.decided*100)+'% were approved as submitted and '+Math.round(RV_IM_LEARNED.withMod/RV_IM_LEARNED.decided*100)+'% with modification. The most common reasons for changes: '+RV_IM_LEARNED.themes.slice(0,5).map(t=>t[0].toLowerCase()).join(', ')+'.</p>');
   h+='</div>';
   if(!forWord) return h;
-  return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+e(title)+'</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#0d314c}h2{font-size:16pt;margin:4pt 0}h3{font-size:13pt;margin:14pt 0 4pt;color:#0d314c}.rvr-k{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#456179}.rvr-m,.rvr-note{font-size:9.5pt;color:#456179}.rvr-score b{font-size:13pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #adc4d6;padding:4pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#e4f2fb}</style></head><body>'+h+'<p class="rvr-note">©'+RV_YEAR()+' Mortgage Industry Standards Maintenance Organization, Inc. Prepared by the MISMO Manufacturing System.</p></body></html>';
+  return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+e(title)+'</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#0d314c}h2{font-size:16pt;margin:4pt 0}h3{font-size:13pt;margin:14pt 0 4pt;color:#0d314c}.rvr-k{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#456179}.rvr-m,.rvr-note{font-size:9.5pt;color:#456179}.rvr-score b{font-size:13pt;margin-right:8pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #adc4d6;padding:4pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#e4f2fb}</style></head><body>'+h+'<p class="rvr-note">©'+RV_YEAR()+' Mortgage Industry Standards Maintenance Organization, Inc. Prepared by the MISMO Manufacturing System.</p></body></html>';
 }
 function rvDownload(rep){ const html=rvReportHtml(rep,true); const blob=new Blob(['\ufeff',html],{type:'application/msword'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(rep.kind==='im'?'IM Pre-Review':'AI Review')+' - '+rep.wr+' - '+atDay(rep.at)+'.doc'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
 /* ============================================================================
@@ -5760,6 +5763,18 @@ async function ssUpload(t,files){ const url=S.notify&&S.notify.docFlowUrl, box=d
     }catch(e){ say('Couldn’t save '+f.name+': '+e.message+(done?' ('+done+' saved first)':''),'bad'); break; } }
   if(added.length){ const D=clone(ssFor(t)||{wr:t.wr,files:[],links:[]}); D.files=(D.files||[]).filter(x=>!added.some(a=>a.p===x.p)).concat(added); S.ssfiles[t.id]=D; await write('ssfiles',t.id,D); renderPanel(); const b2=document.getElementById('ssup-'+t.id); if(b2){ b2.hidden=false; b2.className='ss-up ok'; b2.textContent=added.length+' document'+(added.length===1?'':'s')+' saved to SharePoint and added here.'; } } }
 document.addEventListener('change',e=>{ const i=e.target; if(!i||!i.dataset||!i.dataset.ssadd) return; const t=S.tickets[i.dataset.ssadd]; if(t&&i.files&&i.files.length) ssUpload(t,i.files); i.value=''; });
+/* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
+   Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
+   A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
+function mismoHoliday(ymd){ const d=new Date(String(ymd).slice(0,10)+"T12:00:00"); if(isNaN(d)) return false; const y=d.getFullYear(), m=d.getMonth(), day=d.getDate(), dow=d.getDay();
+  const nth=(mo,wd,n)=>{ const f=new Date(y,mo,1,12); const off=(wd-f.getDay()+7)%7; return 1+off+(n-1)*7; }, last=(mo,wd)=>{ const l=new Date(y,mo+1,0,12); return l.getDate()-((l.getDay()-wd+7)%7); };
+  const obs=(mo,dd)=>{ const x=new Date(y,mo,dd,12), w=x.getDay(); return w===6?[mo,dd-1]:w===0?[mo,dd+1]:[mo,dd]; };
+  const is=(mo,dd)=>m===mo&&day===dd;
+  if(is(0,nth(0,1,3))||is(1,nth(1,1,3))||is(4,last(4,1))||is(8,nth(8,1,1))) return true;
+  for(const [mo,dd] of [[5,19],[6,4],[10,11]]){ const [a,b]=obs(mo,dd); if(is(a,b)) return true; }
+  const tg=nth(10,4,4); if(is(10,tg)||is(10,tg+1)) return true;
+  if((m===11&&day>=25)||(m===0&&day===1)) return true;
+  return false; }
 /* =====================================================================
    IM Review Desk. The IM Pre-Review drafts IM's decision for every row of the
    IM Submission Form (decision, comment, suggested wording). IM reviewers
@@ -5913,7 +5928,7 @@ wireMain=function(m){ _wireMainIM(m); if(S.view!=='imreview') return;
 /* the IM report gets a "Send to IM" button and shows the draft decisions */
 const _rvShowIM=rvShow;
 rvShow=function(rep){ _rvShowIM(rep); if(rep.kind!=='im'||!rep.imDraft) return; const box=$('#modal-root .rv-rep'); if(!box) return; const t=S.tickets[rep.ticket]; imEnsureQ(); const q=S.imq[rep.id];
-  const foot=$('footer',box); if(foot&&!q&&t&&!S.viewAs){ const b=document.createElement('button'); b.type='button'; b.className='btn pri'; b.textContent='Send to IM Reviewers'; b.title='IM reviewers get the draft decision for every row and agree or correct it'; b.onclick=async()=>{ b.disabled=true; await imSend(t,rep); b.textContent='Sent to IM'; }; foot.appendChild(b); }
+  const foot=$('footer',box); if(foot&&!q&&t&&!S.viewAs){ const b=document.createElement('button'); b.type='button'; b.className='btn pri'; b.textContent='Send to IM'; b.title='IM reviewers get the draft decision for every row and agree or correct it'; b.onclick=async()=>{ b.disabled=true; await imSend(t,rep); b.textContent='Sent to IM'; }; foot.appendChild(b); }
   else if(foot&&q){ const s=document.createElement('span'); s.className='muted'; s.style.marginRight='auto'; s.textContent=q.status==='decided'?'IM decided this '+fmtS(String(q.decidedAt||'').slice(0,10)):'With the IM reviewers since '+fmtS(String(q.sentAt||'').slice(0,10)); foot.insertBefore(s,foot.firstChild); } };
 /* nav: IM Review sits after the Review Desk */
 (function(){ const nav=$('#nav'); if(!nav||$('[data-hq="imreview"]',nav)) return; const after=$('[data-hq="reviews"]',nav); const b=document.createElement('button'); b.type='button'; b.dataset.hq='imreview'; b.title='IM Review'; b.hidden=true; b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9l2.5 2.5L16 7"/></svg><span>IM Review</span><b id="nav-imreview" hidden></b>'; b.onclick=e=>{ if(e) e.stopPropagation(); window.open(IMR_URL_NAV,'imreview'); if(typeof go==='function') go('home'); }; if(after) after.after(b); else nav.appendChild(b); })();
@@ -6127,7 +6142,7 @@ async function mtToPortals(){ if(!S.isStaff||!S.canWrite||Date.now()-mtPortalAt<
       const roster={src:'Meeting Trackers',chair:(l.find(x=>x.r==='chair')||{}).n||'',vice:(l.filter(x=>x.r==='chair')[1]||l.find(x=>x.r==='vice')||{}).n||'',fac:s.fac||'',need:+v.need||0,
         members:(v.reps||[]).map(r=>({key:r.k,cop:r.cop||'',name:nameOf(r.k),org:(names[r.k]&&names[r.k].co)||''})),at:v.at||''};
       // the next calls from the meeting rule (weekly, or the nth weekdays of the month)
-      const calls=[]; const rule=s.rule||null; if(rule){ for(let i=0;i<120&&calls.length<8;i++){ const d=addDays(today(),i), dt=new Date(d+'T12:00:00'); if(dt.getDay()!==rule.dow) continue; const nth=Math.ceil(dt.getDate()/7); if(rule.weeks==='*'||(Array.isArray(rule.weeks)&&rule.weeks.includes(nth))) calls.push(d); } }
+      const calls=[]; const rule=s.rule||null; if(rule){ for(let i=0;i<120&&calls.length<8;i++){ const d=addDays(today(),i), dt=new Date(d+'T12:00:00'); if(dt.getDay()!==rule.dow||mismoHoliday(d)) continue; const nth=Math.ceil(dt.getDate()/7); if(rule.weeks==='*'||(Array.isArray(rule.weeks)&&rule.weeks.includes(nth))) calls.push(d); } }
       // who was there, from the meetings Erin logged
       const att={}; for(const y of [yr-1,yr]){ const f=await rGet('meeting-trackers',mtFile('m-'+gk+'-'+y)).catch(()=>null); const items=(f&&f.data&&f.data.doc&&f.data.doc.items)||{}; Object.entries(items).forEach(([d,m])=>{ const p=(m&&m.p)||[]; const vk=new Set((v.reps||[]).map(r=>r.k)); att[d]={src:'mt',present:p.filter(k=>vk.has(k)).map(nameOf),others:p.filter(k=>!vk.has(k)).map(nameOf),by:m.by||'',at:m.at||''}; }); }
       const up=(name,fn)=>proj===IMR?imrUpdate(name,fn):awgUpdate(name,fn);
@@ -6234,7 +6249,7 @@ const HELP_TOPICS={
     ['When the work product is ready, click Submit for AI Review on the work request.',
      'The review runs in a few minutes. You get a list of what to fix and what is only a suggestion.',
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
-     'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM Reviewers. The IM reviewers get a draft decision for every row.'],
+     'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.'],
     ['Fixes are things IM will send back. Suggestions are up to you.','Run AI Review Again any time you change the documents.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
     [['Open the Review Desk','reviews']]],
   handoff:['IM, AWG and Designation: What Happens on Its Own','*',
@@ -6331,8 +6346,8 @@ const HELP_TOPICS={
     ['Nothing about the roster or calls is typed into the review portals.'],
     [['Open Meeting Trackers','https://resources.mismo.org/meeting-trackers/']]],
   imrun:['Running an IM Review','imawg',
-    'IM Review is its own page, where the IM reviewers and the IM chair and facilitator decide each submission.',
-    ['Facilitators send their own submissions from the work request: Run the IM Pre-Review, then Send to IM Reviewers on the report.',
+    'IM Review is its own page, where Colleen (IM chair) and Erin (IM facilitator) record IM’s decision on each submission.',
+    ['Facilitators send their own submissions from the work request: Run the IM Pre-Review, then Send to IM on the report.',
      'Open IM Review from the left rail. It opens in a new tab.',
      'Each submission comes with a draft decision for every row. Agree, or correct what the draft got wrong.',
      'Click a document to open it. Resubmissions link to the earlier decision.',
@@ -6350,7 +6365,7 @@ const HELP_TOPICS={
     ['Attendance and quorum come from Meeting Trackers.'],
     [['Open AWG Review','https://resources.mismo.org/awg-review/']]],
   member:['Reading a Submission before the Call','member',
-    'You do not need to do anything in the MMS. IM reviewers agree with or correct each row in IM Review. The IM chair and facilitator finish IM’s decision; the AWG chair and facilitator record AWG’s vote.',
+    'You do not need to do anything in the MMS. Colleen and Erin record IM’s decisions in IM Review; Mark and Erin record AWG’s vote in AWG Review.',
     ['Open the IM Review or AWG Review link you were sent.',
      'Pick the submission and click a document to open it.',
      'Bring questions to the call. The vote and attendance are recorded there.'],
@@ -6461,7 +6476,7 @@ const RC2_STAGE_HOW={
   kickoff:['Approve kicking off the Development Workgroup.','Staff record the decision; approved work moves to In Work.'],
   work:['Build the work product and keep the target date current.','Reminders before the target and when it passes.'],
   aireview:['Submit for AI Review, make the fixes, then send it to IM.','Claude reviews it in minutes and lists fixes and suggestions.'],
-  im:['The facilitator runs the IM Pre-Review and sends it to the IM reviewers, who agree with or correct the draft for each row; IM votes on the call.','Approved goes to AWG on its own; returned goes back to the facilitator.'],
+  im:['The facilitator runs the IM Pre-Review and sends it to IM. On the IM call, Colleen and Erin agree with or correct the draft for each row and record IM’s decision.','Approved goes to AWG on its own; returned goes back to the facilitator.'],
   awg:['AWG reviews and votes on the call.','Approved goes to License Designation with a recommendation.'],
   designation:['Jonna approves the recommended designation.','The recommendation is drawn from past designations of the same kind.'],
   'gc-comment':['Governance approves it for public comment.','Staff record the vote; approved work goes to the website.'],
@@ -6538,6 +6553,7 @@ wireMain=function(m){ _wireMainMail(m);
     for(const id of ids){ delete S.outbox[id]; await remove('outbox',id); } S.mailSel=''; toast(ids.length+' deleted'); renderAll(); };
 };
 window.__mmsMail={queue:m=>queueMail(m),held:()=>mailHeld()};
+window.__mmsRv={readFile:f=>rvReadFile(f),editorChecks:(r,c)=>rvEditorChecks(r,c),aiEditor:(r,c)=>rvAiEditor(r,c,()=>{}),build:(k,t,r,f,a,c)=>rvBuildReport(k,t,r,f,a,c),show:r=>rvShow(r),html:(r,w)=>rvReportHtml(r,w),expected:t=>rvExpectedBoiler(t)};
 
 /* ================= Metrics: how the line is running ================= */
 const MX_K=['var(--k1)','var(--k2)','var(--k3)','var(--k4)','var(--k5)'];
