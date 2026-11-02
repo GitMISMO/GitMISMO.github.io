@@ -8,7 +8,7 @@
   --navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
   --ground:#f1f6fa;--surface:#ffffff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;
   --border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
-  --ink:#0d314c;--ink-2:#456179;--ink-3:#7794aa;
+  --ink:#0d314c;--ink-2:#456179;--ink-3:#5a7489;
   --good:#0f7b5c;--bad:#b3372c;--warn:#a2701a;
   --good-bg:#e3f4ed;--bad-bg:#fbe9e7;--warn-bg:#fbf1dc;--info-bg:#e4f2fb;--hold-bg:#efe9f7;--hold:#6b4fa0;
   --accent:#2477b8;--accent-soft:#e4f2fb;
@@ -653,6 +653,41 @@ select.inp.sel{min-width:0;width:auto}
 .hr-steps li{counter-increment:hr;position:relative;padding:8px 10px 8px 40px;border:1px solid var(--rule,#e5eef5);border-radius:7px;background:var(--surface-2,#f6fafd);line-height:1.5}
 .hr-steps li:before{content:counter(hr);position:absolute;left:10px;top:8px;width:20px;height:20px;border-radius:5px;background:var(--accent,#2477b8);color:#fff;font-size:11.5px;font-weight:700;display:grid;place-items:center}
 .help ol.hr-steps{padding-left:0;margin-left:0}
+
+/* stress test C: review-time estimate tile, nothing in italics, quick estimate hint */
+em,i,cite,address,dfn{font-style:normal}
+.wc-nums{grid-template-columns:repeat(4,minmax(0,1fr))}
+.wc-nums .wc-est b{color:var(--ink)}.wc-nums>span[title]{cursor:help}
+.hero p .est{white-space:nowrap}.est[title]{cursor:help;text-decoration:underline dotted rgba(127,127,127,.6);text-underline-offset:3px}
+@media(max-width:560px){.wc-nums{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}}
+.xp{font-family:inherit;font-size:12px;letter-spacing:.01em}
+.g2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+@media(max-width:900px){.g2{grid-template-columns:minmax(0,1fr)}}
+.tw{overflow-x:auto;max-width:100%}
+.cp-votes{grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr))}
+.cp-t .hint,label .hint{font-weight:400;color:var(--ink-3);font-size:12px;margin-left:6px}
+
+.ups{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
+@media(max-width:560px){.ups{grid-template-columns:minmax(0,1fr)}}
+.wc-nums span:first-child b{color:var(--ink)}.wc-nums span:nth-child(2) b{color:var(--c1)}.wc-nums span:nth-child(3) b{color:var(--warn)}
+.cp-out .seg{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}.cp-out .seg button{white-space:nowrap}
+@media(max-width:560px){.cp-out .seg{grid-template-columns:repeat(2,minmax(0,1fr))}.cp-out .seg button{padding:9px 6px;font-size:12.5px}}
+/* the row note button sits on the row header line, not on a line of its own */
+@media(min-width:561px){.rows .row{position:relative}.rows .row>.racts{position:absolute;top:8px;right:12px;margin:0}.rows .row:has(>.racts) .rh{padding-right:110px}}
+@media(max-width:560px){.rows .row>.racts{margin-top:6px}}
+@media(max-width:560px){.cp-out .seg{grid-template-columns:minmax(0,1fr)}.cp-vm{flex-wrap:wrap;row-gap:4px}.cp-vm .seg{margin-left:auto}}
+/* outcome buttons fit their words; the hint under them */
+.cp-out .seg{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+.cp-hint{font-size:12px;margin:6px 0 0;grid-column:1/-1}
+/* XPATH lines in the body font */
+.xp{font-family:inherit;font-size:12px;color:var(--ink-2)}
+/* the draft table scrolls inside its card on a phone, never the page */
+.tw{overflow-x:auto;max-width:100%}
+.g2>.card{min-width:0}
+.wc-fac{margin-left:10px;white-space:nowrap;color:var(--ink-3)}
+/* Coming to AWG: whole names, and the cards fill the row */
+.up .up-m b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.up .up-m em{white-space:normal}
+@media(max-width:560px){.chart.dark{overflow-x:auto}.chart.dark svg{min-width:520px}}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -762,13 +797,16 @@ async function ask(prompt){ const r=await fetch(RELAY+"/"+PROJECT+"/ask",{method
 const OUT=["Approved","Conditional Approval","Returned to Workgroup","Returned to IM","Passed on Review","Carried to Next Call"];
 const OUT_FINAL=OUT.filter(o=>o!=="Carried to Next Call");
 const ORANK={"Approved":0,"Passed on Review":0,"Conditional Approval":1,"Carried to Next Call":2,"Returned to IM":3,"Returned to Workgroup":3};
-const OCOL={"Approved":"var(--good)","Passed on Review":"var(--ink-3)","Conditional Approval":"var(--c1)","Carried to Next Call":"var(--hold)","Returned to IM":"var(--warn)","Returned to Workgroup":"var(--warn)"};
-const OHEX={"Approved":"#4fc79b","Passed on Review":"#7a9db4","Conditional Approval":"#74bfeb","Carried to Next Call":"#b9a3e8","Returned to IM":"#e0a83c","Returned to Workgroup":"#e0a83c"};
+const OCOL={"Approved":"var(--good)","Passed on Review":"var(--ink-3)","Conditional Approval":"var(--c1)","Carried to Next Call":"var(--hold)","Returned to IM":"var(--bad)","Returned to Workgroup":"var(--warn)"};
+const OHEX={"Approved":"#4fc79b","Passed on Review":"#7a9db4","Conditional Approval":"#74bfeb","Carried to Next Call":"#b9a3e8","Returned to IM":"#f08579","Returned to Workgroup":"#e0a83c"};
 const ochip=o=>'<span class="dec d'+(ORANK[o]||0)+(o==="Carried to Next Call"?" dh":"")+'">'+esc(o)+'</span>';
 /* the draft recommends one of three */
 const REC=["Approve","Approve With Conditions","Send Back"];
 const RCOL={"Approve":"var(--good)","Approve With Conditions":"var(--c1)","Send Back":"var(--warn)"};
-const rchip=r=>'<span class="dec d'+(REC.indexOf(r)<0?0:[0,1,3][REC.indexOf(r)])+'">'+esc(r||"—")+'</span>';
+/* how a recommendation reads on screen: the same words as the outcome buttons */
+const RLAB={"Approve":"Approve","Approve With Conditions":"Approve with Conditions","Send Back":"Return"};
+const rlab=r=>RLAB[r]||r;
+const rchip=r=>'<span class="dec d'+(REC.indexOf(r)<0?0:[0,1,3][REC.indexOf(r)])+'">'+esc(rlab(r)||"—")+'</span>';
 const recMatches=(rec,out)=>rec==="Approve"?/^(Approved|Passed)/.test(out):rec==="Approve With Conditions"?out==="Conditional Approval":rec==="Send Back"?/^Returned/.test(out):false;
 const METHODS=["Standard Meeting","Expedited Review","Joint IM-AWG Meeting"];
 
@@ -789,12 +827,29 @@ function nextCalls(n){ const L=(S.cfg.calls||CALLS0).filter(d=>d>=today()).sort(
 /* ---------- state ---------- */
 const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{},bt:null,up:[],filter:"awg",edit:null,loaded:false,rowPg:{},dec:{page:0,size:10,year:"all",q:""}};
 const canEdit=()=>{ try{ if(RS()&&RS().canEdit) return !!RS().canEdit(PROJECT); }catch(e){} return S.role==="admin"||S.role==="staff"; };
-const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const L=(S.cfg.reviewers||[]).map(x=>String(x).toLowerCase()); return !L.length||L.includes(String(S.me.email||"").toLowerCase()); };
+const sameNm=(a,b)=>{ a=String(a||"").replace(/\(.*\)/,"").trim().toLowerCase(); b=String(b||"").trim().toLowerCase(); return !!a&&a===b; };
+/* the AWG chair and facilitator record decisions: whoever is on the Who Records Decisions list, or the chair,
+   vice chair or facilitator in Meeting Trackers' roster (Mark and Erin) */
+const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const L=(S.cfg.reviewers||[]).map(x=>String(x).toLowerCase()); if(!L.length||L.includes(String(S.me.email||"").toLowerCase())) return true; const R=roster(); return [R.chair,R.vice,R.fac].some(n=>sameNm(n,S.me.name)); };
 const isAdmin=()=>S.role==="admin";
 const route=()=>{ const h=location.hash.replace(/^#\/?/,""); const [a,b,c]=h.split("/"); return {view:a||"waiting",rep:b?decodeURIComponent(b):"",from:c?decodeURIComponent(c):""}; };
 function backLink(href,label){ const f=route().from, q=f&&S.queue[f]; if(q) return '<a class="back" href="#/review/'+encodeURIComponent(f)+'">‹ Back to the '+esc((q.wr?q.wr+" ":"")+(q.resub?"Resubmission":"Submission"))+'</a><a class="back" style="margin-left:16px" href="'+href+'">'+label+'</a>'; return '<a class="back" href="'+href+'">‹ '+label+'</a>'; }
 const isOpen=q=>q.status==="awaiting"||q.status==="carried";
 
+/* ---------- how long a submission takes to read before the call (an estimate; the real time is recorded on each decision for tuning) ---------- */
+function estAWG(q){ const n=q.rows||0, a=Math.min(n,q.awgRows||0), f=Math.min(n-a,Math.max(0,(q.flagged||0)-(q.awgBoth!=null?q.awgBoth:a))), rest=Math.max(0,n-a-f);
+  const m=Math.max(10,Math.round(5+a*1.5+f*1+rest*0.05));
+  return {min:m,tip:"An estimate: 5 min for the draft, 1.5 min for each row marked AWG ("+a+"), 1 min for each other flagged row ("+f+") and a few seconds for the rest ("+rest+")."}; }
+const fmtMin=m=>m>=90?"about "+(Math.round(m/30)/2)+" hours":"about "+m+" min";
+const tmPend={}, tmOpen={}; let lastAct=Date.now();
+["click","keydown","scroll","mousemove","touchstart"].forEach(ev=>document.addEventListener(ev,()=>{ lastAct=Date.now(); },{passive:true}));
+setInterval(()=>{ const r=route(); if(r.view!=="review"||document.hidden||Date.now()-lastAct>120000) return; const d=S.docs[r.rep]; if(!d||d.hist||d.status==="decided"||!canReview()) return; tmPend[r.rep]=(tmPend[r.rep]||0)+15; },15000);
+function mergeTiming(t,doc,pend){ t=Object.assign({},t||{}); const me=S.me.name||S.me.email||"someone"; const R=doc.rows||[];
+  if(!t.est) t.est=estAWG({rows:R.length,awgRows:R.filter(isAwgRow).length,flagged:R.filter(r=>(r.flags||[]).length).length,awgBoth:R.filter(r=>isAwgRow(r)&&(r.flags||[]).length).length}).min;
+  const o=tmOpen[doc.rep]; if(o&&(!t.opened||o<t.opened)) t.opened=o;
+  if(pend){ t.activeSec=(t.activeSec||0)+pend; t.by=Object.assign({},t.by||{}); t.by[me]=(t.by[me]||0)+pend; }
+  if(doc.status==="decided"&&doc._finishedAt&&!t.finished){ t.finished=doc._finishedAt; if(t.opened) t.wallMin=Math.round((new Date(t.finished)-new Date(t.opened))/6e4); }
+  t.activeMin=Math.round((t.activeSec||0)/60); return t; }
 async function load(role){
   S.role=role||""; const c=(RS()&&RS().current())||{}; S.me={name:c.name||"",email:c.email||""};
   const yr=new Date().getFullYear();
@@ -809,14 +864,16 @@ async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await g
 async function refreshQueue(){ try{ const q=await get("queue"); S.queue=(q.data&&q.data.items)||{}; }catch(e){} }
 /* save one submission; on a clash keep the newest note on each row and the newest call record */
 async function saveDoc(doc){
-  S.docs[doc.rep]=doc;
+  S.docs[doc.rep]=doc; const pend=doc.hist||doc.status==="decided"&&!doc._finishedAt?0:(tmPend[doc.rep]||0);
   const merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv) return doc; const out=clone(srv);
     (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; if(r.note&&(!o.note||String(r.note.at)>=String(o.note.at))) o.note=r.note; else if(!r.note&&o.note&&r._clr&&String(r._clr)>String(o.note.at)) delete o.note; });
     if(doc.draft&&(!out.draft||String(doc.draft.at)>=String(out.draft.at))) out.draft=doc.draft;
-    if(doc.call&&(!out.call||String(doc.call.at||"")>=String(out.call.at||""))) out.call=doc.call;
+    /* a copy that hasn't seen the latest recorded call (a late autosave) never undoes it */ const stale=(doc.calls||[]).length<(out.calls||[]).length||out.status==="decided"&&doc.status!=="decided";
+    if(!stale&&doc.call&&(!out.call||String(doc.call.at||"")>=String(out.call.at||""))) out.call=doc.call;
     out.calls=doc.calls&&doc.calls.length>=(out.calls||[]).length?doc.calls:out.calls;
-    ["status","decidedBy","decidedAt","outcome"].forEach(k=>{ if(doc[k]!=null) out[k]=doc[k]; });
-    return out; });
+    if(!stale) ["status","decidedBy","decidedAt","outcome"].forEach(k=>{ if(doc[k]!=null) out[k]=doc[k]; });
+    if(!doc.hist) out.timing=mergeTiming(out.timing,doc,pend); return out; });
+  tmPend[doc.rep]=Math.max(0,(tmPend[doc.rep]||0)-pend); delete merged._finishedAt; delete doc._finishedAt;
   (merged.rows||[]).forEach(r=>delete r._clr); S.docs[doc.rep]=merged; return merged;
 }
 /* ---------- reading the AWG Submission Form (the same MISMO Submission Review Form IM uses) ---------- */
@@ -838,54 +895,75 @@ function readForm(wb,fileName){
 }
 
 /* ---------- the architecture checks the software can settle ---------- */
-const AREAS=["Breaking Change","Structure","Relationship","Attribute","XPATH","MEG","Form"];
+const AREAS=["Breaking Change","Structure","Reuse","Relationship","Attribute","XPATH","MEG","Form"];
+const UPPER=v=>/^[A-Z][A-Z0-9_]*$/.test(String(v||"").trim());
 function rowFlags(r){ const F=[], ct=String(r.ct||"").toLowerCase(), tt=String(r.tt||"").toLowerCase(), add=/add/.test(ct), what=sx(r.tt)||"item";
   if(/delet|remov|deprecat/.test(ct)) F.push({a:"Breaking Change",t:"Removes or deprecates an existing "+what.toLowerCase()+". Check the deprecation path and what breaks for implementers."});
   else if(/renam/.test(ct)) F.push({a:"Breaking Change",t:"Renames an existing "+what.toLowerCase()+". Messages that use the old name stop validating."});
   else if(/move|relocat/.test(ct)) F.push({a:"Breaking Change",t:"Moves an existing "+what.toLowerCase()+" to a new location."});
   else if(/modif|chang|updat/.test(ct)&&!/definition/.test(ct)&&r.old) F.push({a:"Breaking Change",t:"Changes an existing "+what.toLowerCase()+" (was: "+String(r.old).slice(0,80)+"). Confirm it stays backward compatible."});
   if(/container/.test(tt)&&add) F.push({a:"Structure",t:"Adds a container"+(r.pc?" under "+r.pc:"")+". Check it fits the MEGs and the parent’s purpose."});
+  if(r.cn&&/container/.test(tt)&&!UPPER(r.cn)) F.push({a:"Structure",t:"The container name "+r.cn+" isn’t in UPPER_CASE with underscores.",hold:1});
+  if(r.pc&&!UPPER(r.pc)) F.push({a:"Structure",t:"The parent container "+r.pc+" isn’t in UPPER_CASE with underscores.",hold:1});
   if(r.alias) F.push({a:"Structure",t:"Uses an alias container ("+r.alias+")."});
   if(r.cg) F.push({a:"Structure",t:"Sits in a choice group ("+String(r.cg).slice(0,60)+")."});
-  if(/relationship/.test(tt)||r.rel||r.rf||r.rt){ if(!(r.rel&&r.rf&&r.rt)) F.push({a:"Relationship",t:"Relationship is missing its "+[!r.rf&&"From",!r.rel&&"verb phrase",!r.rt&&"To"].filter(Boolean).join(", ")+"."}); else F.push({a:"Relationship",t:"Adds a relationship: "+r.rf+" "+r.rel+" "+r.rt+"."}); }
+  if(/relationship/.test(tt)||r.rel||r.rf||r.rt){ if(!(r.rel&&r.rf&&r.rt)) F.push({a:"Relationship",t:"Relationship is missing its "+[!r.rf&&"From",!r.rel&&"verb phrase",!r.rt&&"To"].filter(Boolean).join(", ")+"."}); else if(!UPPER(r.rf)||!UPPER(r.rt)) F.push({a:"Relationship",t:"A relationship’s From and To should be container names in UPPER_CASE ("+r.rf+", "+r.rt+").",hold:1}); else F.push({a:"Relationship",t:"Adds a relationship: "+r.rf+" "+r.rel+" "+r.rt+"."}); }
   if(/attribute/.test(tt)||r.at) F.push({a:"Attribute",t:"Adds or changes an attribute"+(r.at?" ("+r.at+")":"")+(r.aat?", association "+r.aat:"")+"."});
-  if(!r.xp&&add&&!/acronym|definition/.test(tt+" "+ct)) F.push({a:"XPATH",t:"No Reference Model location (XPATH) given."});
+  if(!r.xp&&add&&!/acronym|definition|enumeration|relationship/.test(tt+" "+ct)) F.push({a:"XPATH",t:"No Reference Model location (XPATH) given."});
   if(r.xp){ const x=String(r.xp).trim(); const steps=x.replace(/^\/+/,"").split("/").filter(Boolean); const leaf=/data point|enumeration|attribute/.test(tt);
     if(/\s/.test(x)) F.push({a:"XPATH",t:"The XPATH has spaces in it."});
-    else if(steps.slice(0,leaf?-1:undefined).some(s=>/[a-z]/.test(s.replace(/\[.*?\]/g,"")))) F.push({a:"XPATH",t:"A container step in the XPATH isn’t in UPPER_CASE."});
+    else if(steps.filter((s,i)=>!(leaf&&i===steps.length-1&&/^@?[A-Z][A-Za-z0-9]*[a-z][A-Za-z0-9]*$/.test(s.replace(/\[.*?\]/g,"")))).some(s=>!UPPER(s.replace(/\[.*?\]/g,"").replace(/^[a-z]+:/,"")))) F.push({a:"XPATH",t:"A container step in the XPATH isn’t in UPPER_CASE."});
+    if(/[^:]\/\//.test(x)||/\/$/.test(x)) F.push({a:"XPATH",t:"The XPATH has an empty step (// or a trailing slash)."});
     if(r.pc&&!new RegExp("(^|/)"+String(r.pc).replace(/[^A-Z0-9_]/gi,"")+"(/|\\[|$)").test(x)) F.push({a:"XPATH",t:"The XPATH doesn’t pass through the parent container "+r.pc+"."}); }
   if(/\bMEG\b/i.test((r.sc||"")+" "+(r.def||""))) F.push({a:"MEG",t:"Mentions a MEG. Check the MEG’s guidance is followed."});
   if(!r.ct||!r.tt) F.push({a:"Form",t:"Change Type or Change Target Type is blank."});
   return F; }
 const isAwgRow=r=>/awg/i.test(r.body||"");
-function softDraft(form){ const rows=form.rows; rows.forEach(r=>{ r.flags=rowFlags(r); });
+/* every row's checks, plus what only shows across rows: the same thing added (and defined) more than once */
+function formFlags(rows){ rows.forEach(r=>{ r.flags=rowFlags(r); }); const seen={};
+  rows.forEach(r=>{ const ct=String(r.ct||"").toLowerCase(), tt=String(r.tt||"").toLowerCase(), nm=String(r.name||r.en||r.dp||r.cn||r.at||"").trim().toLowerCase(); if(!nm||!/add/.test(ct)||/relationship/.test(tt)) return;
+    const key=tt+"|"+(/enumeration/.test(tt)?String(r.dp||"").toLowerCase()+"|":"")+nm, it=String(r.item||r.i+1), prev=seen[key];
+    if(!prev){ seen[key]={it,pc:String(r.pc||""),def:/defin/.test(ct)}; return; }
+    if(prev.pc===String(r.pc||"")) r.flags.push({a:"Reuse",t:"Listed twice in this submission (items "+prev.it+" and "+it+").",hold:1});
+    else if(/defin/.test(ct)&&prev.def) r.flags.push({a:"Reuse",t:"Added and defined again (also item "+prev.it+", under "+(prev.pc||"another parent")+"). Define it once and reuse it.",hold:1}); });
+  return rows; }
+function softDraft(form){ const rows=formFlags(form.rows);
   const by={}; rows.forEach(r=>r.flags.forEach(f=>{ const k=f.a+"|"+f.t.replace(/\(.*?\)|: .*$/g,"").slice(0,60); (by[k]=by[k]||{area:f.a,t:f.t,items:[]}).items.push(r.item||String(r.i+1)); }));
   const notes=Object.values(by).sort((a,b)=>AREAS.indexOf(a.area)-AREAS.indexOf(b.area)||b.items.length-a.items.length).map(n=>({area:n.area,t:n.items.length>1?n.t.replace(/^Adds a container under [^.]+\./,"Adds containers.").replace(/\(was: .*?\)/,""):n.t,items:n.items.slice(0,40),src:"software"}));
-  const n=k=>rows.filter(r=>r.flags.some(f=>f.a===k)).length, form0=n("Form"), brk=n("Breaking Change"), xp=n("XPATH"), rel=rows.filter(r=>r.flags.some(f=>f.a==="Relationship"&&/missing/.test(f.t))).length;
-  const rec=rows.length&&form0/rows.length>0.25?"Send Back":(brk||xp||rel)?"Approve With Conditions":"Approve";
-  const why=rec==="Send Back"?form0+" of "+rows.length+" rows are missing their Change Type or Change Target Type.":rec==="Approve With Conditions"?[brk&&brk+" possible breaking change"+(brk===1?"":"s"),xp&&xp+" XPATH issue"+(xp===1?"":"s"),rel&&rel+" incomplete relationship"+(rel===1?"":"s")].filter(Boolean).join(", ")+" to settle first.":"The software checks found nothing architectural to hold it up.";
+  const n=k=>rows.filter(r=>r.flags.some(f=>f.a===k)).length, form0=n("Form"), brk=n("Breaking Change"), xp=n("XPATH"), rel=rows.filter(r=>r.flags.some(f=>f.a==="Relationship"&&/missing/.test(f.t))).length, hold=rows.filter(r=>r.flags.some(f=>f.hold)).length;
+  const rec=rows.length&&form0/rows.length>0.25?"Send Back":(brk||xp||rel||hold)?"Approve With Conditions":"Approve";
+  const why=rec==="Send Back"?form0+" of "+rows.length+" rows are missing their Change Type or Change Target Type.":rec==="Approve With Conditions"?[brk&&brk+" possible breaking change"+(brk===1?"":"s"),xp&&xp+" XPATH issue"+(xp===1?"":"s"),rel&&rel+" incomplete relationship"+(rel===1?"":"s"),hold&&hold+" naming or reuse point"+(hold===1?"":"s")].filter(Boolean).join(", ")+" to settle first.":"The software checks found nothing architectural to hold it up.";
   return {rec,why,notes}; }
 
 /* ---------- Claude's architecture read ---------- */
-const AWG_PERSONA="Quick first read for MISMO’s Architecture Workgroup (AWG), which checks Reference Model submissions after IM for structure and containers, reuse, relationships, attributes, XPATHs, choice groups, MEG guidance and breaking changes (deletes, renames, moves, deprecations). Not definition wording; IM did that. Give your first impression; do not deliberate at length.";
+/* Claude answers through the relay, which caps an answer at 1,000 tokens including thinking: every ask stays
+   under ASK_CAP characters, asks for a first impression and a compact JSON answer */
+const ASK_CAP=2600;
+const AWG_PERSONA="First read for MISMO’s Architecture Workgroup (AWG). AWG checks Reference Model submissions after IM: structure and containers, reuse, relationships, attributes, XPATHs, choice groups, MEGs and breaking changes. Not definition wording (IM did that). Give your first impression; do not deliberate.";
+const AWG_ASK_TAIL="Reply with JSON only: {\"rec\":\"Approve|Approve With Conditions|Send Back\",\"sum\":\"under 30 words\",\"notes\":[{\"area\":\"Structure|Reuse|Relationship|Attribute|XPATH|Breaking Change|MEG\",\"t\":\"under 25 words\",\"items\":[\"2\"]}]}. At most 3 notes, only real architecture concerns; an empty list is fine.";
 function rowLine(r){ return [r.item||r.i+1,r.body,r.ct,r.tt,r.pc&&("parent "+r.pc),r.cn&&("container "+r.cn),r.dp&&("dp "+r.dp),r.at&&("attr "+r.at),r.en&&("enum "+r.en),r.rel&&("rel "+[r.rf,r.rel,r.rt].join(" ")),r.old&&("old "+String(r.old).slice(0,80)),r.xp&&("xpath "+r.xp),r.cg&&("choice "+r.cg),r.sc&&("note "+String(r.sc).slice(0,140))].filter(Boolean).join(" | "); }
 function repairJson(t){ const a=t.indexOf("{"); if(a<0) return null; let s=t.slice(a); const b=s.lastIndexOf("}"); try{ return JSON.parse(s.slice(0,b+1)); }catch(e){}
   /* cut off mid-answer: close what is open */ let st=[],q=false,e=false,ok=0; for(let i=0;i<s.length;i++){ const c=s[i]; if(q){ if(e) e=false; else if(c==="\\") e=true; else if(c==='"') q=false; continue; } if(c==='"') q=true; else if(c==="{"||c==="[") st.push(c==="{"?"}":"]"); else if(c==="}"||c==="]"){ st.pop(); ok=i; } }
   try{ return JSON.parse(s.slice(0,ok+1)+st.slice(0,st.length).reverse().join("")); }catch(e2){ return null; } }
 async function claudeRead(form,soft,progress){
   const rows=form.rows; const pick=rows.filter(r=>isAwgRow(r)||(r.flags||[]).length||/container|relationship|attribute/i.test(r.tt||""));
+  const by=Object.entries(rows.reduce((c,r)=>{ const k=(r.ct||"?")+" "+(r.tt||"?"); c[k]=(c[k]||0)+1; return c; },{})).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([k,n])=>n+" "+k).join(", ");
+  const found=soft.notes.slice(0,6).map(n=>(n.area+": "+n.t).slice(0,90)+" (items "+n.items.slice(0,5).join(", ")+(n.items.length>5?"…":"")+")").join("; ");
+  const head=("Submission: "+[form.wr,form.name].filter(Boolean).join(" ")).slice(0,120)+"\n"+[form.category&&"Category: "+form.category,form.wg&&"Workgroup: "+form.wg].filter(Boolean).join(" · ").slice(0,140)+(form.summary?"\nSummary: "+String(form.summary).slice(0,240):"")+
+    "\nRows: "+rows.length+"; "+rows.filter(isAwgRow).length+" marked AWG; "+by+".\nShown: "+(pick.length&&pick.length<rows.length?"the rows marked AWG, flagged or touching structure; the software checked every row":"every row")+".\nSoftware found: "+(found.slice(0,520)||"nothing")+".";
+  const headC=head.slice(0,1100);
+  const intro="Rows, one per line: item | body | change | target | details";
+  const room=Math.max(700,ASK_CAP-AWG_PERSONA.length-headC.length-AWG_ASK_TAIL.length-intro.length-30);
   const use=(pick.length?pick:rows).slice(0,400); const chunks=[]; let cur=[]; let len=0;
-  use.forEach(r=>{ const l=rowLine(r); if(len+l.length>2600&&cur.length){ chunks.push(cur); cur=[]; len=0; } cur.push(l); len+=l.length+1; }); if(cur.length) chunks.push(cur);
-  const head="Submission: "+(form.wr||"")+" "+(form.name||"")+"\nCategory: "+(form.category||"")+" · Artifacts: "+(form.artifacts||"")+" · Workgroup: "+(form.wg||"")+"\nSummary: "+String(form.summary||"").slice(0,700)+"\nRows: "+rows.length+" in all; "+rows.filter(isAwgRow).length+" marked Approval Body AWG. By change: "+Object.entries(rows.reduce((c,r)=>{ const k=(r.ct||"?")+" "+(r.tt||"?"); c[k]=(c[k]||0)+1; return c; },{})).map(([k,n])=>n+" "+k).join(", ")+".\nYou are shown "+(pick.length?"only the "+Math.min(pick.length,400)+" rows the software flagged or that touch structure; the software checked every row, so do not ask for the rest":"every row")+".\nThe software checks found: "+(soft.notes.map(n=>n.area+": "+n.t+" (items "+n.items.slice(0,8).join(", ")+")").join("; ")||"nothing")+".";
+  use.forEach(r=>{ const l=rowLine(r).slice(0,Math.min(260,room)); if(len+l.length+1>room&&cur.length){ chunks.push(cur); cur=[]; len=0; } cur.push(l); len+=l.length+1; }); if(cur.length) chunks.push(cur);
   const out=[]; let k=0;
   for(const c of chunks.slice(0,8)){ k++; if(progress) progress(k,Math.min(8,chunks.length));
-    const p=AWG_PERSONA+"\n\n"+head+"\n\nRows "+(chunks.length>1?"(part "+k+" of "+Math.min(8,chunks.length)+")":"")+", one per line: item | approval body | change type | target type | details\n"+c.join("\n")+
-      "\n\nAnswer with this JSON and nothing else: {\"rec\":\"Approve|Approve With Conditions|Send Back\",\"sum\":\"under 30 words\",\"notes\":[{\"area\":\"Structure|Relationship|Attribute|XPATH|Breaking Change|MEG|Reuse\",\"t\":\"under 25 words\",\"items\":[\"item numbers\"]}]} (at most 3 notes; only real architecture concerns; an empty list is fine).";
-    try{ let j=repairJson(await ask(p)); if(!j) j=repairJson(await ask(p.replace("Give your first impression; do not deliberate at length.","Answer at once with your first impression."))); if(j) out.push(j); }catch(e){ if(!out.length&&k===1) throw e; } }
+    const p=(AWG_PERSONA+"\n\n"+headC+"\n\n"+intro+(chunks.length>1?" (part "+k+" of "+Math.min(8,chunks.length)+")":"")+"\n"+c.join("\n")+"\n\n"+AWG_ASK_TAIL).slice(0,ASK_CAP);
+    try{ let j=repairJson(await ask(p)); if(!j) j=repairJson(await ask(p.replace("Give your first impression; do not deliberate.","Answer at once with your first impression."))); if(j) out.push(j); }catch(e){ if(!out.length&&k===1) throw e; } }
   if(!out.length) return null;
   const rank=r=>Math.max(0,REC.indexOf(r)); const rec=out.map(o=>o.rec).filter(r=>REC.includes(r)).sort((a,b)=>rank(b)-rank(a))[0]||"Approve";
   const notes=[]; out.forEach(o=>(o.notes||[]).forEach(n=>{ if(n&&n.t&&!notes.some(x=>x.t===n.t)) notes.push({area:n.area||"Structure",t:String(n.t).slice(0,240),items:(n.items||[]).map(String).slice(0,30),src:"claude"}); }));
-  return {rec,sum:out.map(o=>o.sum).filter(Boolean).join(" ").slice(0,600),notes:notes.slice(0,10)}; }
+  return {rec,sum:[...new Set(out.map(o=>String(o.sum||"").trim()).filter(Boolean))].slice(0,3).join(" ").slice(0,600),notes:notes.slice(0,10)}; }
 
 /* the draft = the software checks + Claude's read; Claude can only make it stricter by one step at most from clean */
 async function buildDraft(form,progress){ const soft=softDraft(form); let cl=null, err="";
@@ -910,10 +988,10 @@ function render(){ if(!S.loaded) return; const r=route();
 function ring(parts,center,sub){ const tot=parts.reduce((s,p)=>s+p.v,0), R=56, C=2*Math.PI*R; let off=0;
   const live=parts.filter(p=>p.v); const segs=tot?live.map(p=>{ const len=p.v/tot*C, gap=live.length>1?2.5:0; const el='<circle r="'+R+'" cx="64" cy="64" fill="none" stroke="'+p.c+'" stroke-width="9" stroke-dasharray="'+Math.max(0,len-gap)+' '+C+'" stroke-dashoffset="'+(-off)+'" class="dn-seg"><title>'+esc(p.v+' '+p.k)+'</title></circle>'; off+=len; return el; }).join(""):'';
   return '<svg class="donut" viewBox="0 0 128 128" role="img" aria-label="'+esc(center+' '+sub)+'"><circle r="'+R+'" cx="64" cy="64" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/>'+segs+'</svg><div class="dn-c"><b data-count="'+(+String(center).replace(/\D/g,'')||0)+'">'+esc(center)+'</b><span>'+esc(sub)+'</span></div>'; }
-function agendaCard(q,i){ const n=q.rows||0, aw=q.awgRows||0, fl=q.flagged||0, age=Math.floor((Date.now()-new Date(q.sentAt||Date.now()))/864e5);
+function agendaCard(q,i){ const n=q.rows||0, aw=q.awgRows||0, fl=q.flagged||0, E=estAWG(q), age=Math.floor((Date.now()-new Date(q.sentAt||Date.now()))/864e5);
   return '<a class="wc rise'+(q.status==="carried"?" warm":"")+'" style="--i:'+i+'" href="#/review/'+encodeURIComponent(q.rep)+'"><span class="wc-top"><span class="wr">'+esc(q.wr||"")+(q.wg?" · "+esc(q.wg):"")+'</span><span class="wc-age">'+(q.status==="carried"?"Carried from "+esc(fmtS(q.lastCall)):age<=0?"Added today":"Added "+ago(q.sentAt)+" ago")+'</span></span><b class="wc-n">'+esc(q.wrName||q.name||"")+'</b>'+
-    '<span class="wc-nums"><span><b data-count="'+n+'">'+n+'</b><em>rows</em></span><span><b data-count="'+aw+'">'+aw+'</b><em>marked AWG</em></span><span><b data-count="'+fl+'">'+fl+'</b><em>flagged</em></span></span>'+
-    '<span class="wc-f">'+(q.rec?'The draft: '+rchip(q.rec):'No draft yet')+(q.fac&&q.fac.name?' · '+esc(q.fac.name):'')+(q.test?' · <span class="tst">Test</span>':'')+'<span class="wc-go">Open ›</span></span></a>'; }
+    '<span class="wc-nums"><span><b data-count="'+n+'">'+n+'</b><em>rows</em></span><span><b data-count="'+aw+'">'+aw+'</b><em>marked AWG</em></span><span><b data-count="'+fl+'">'+fl+'</b><em>flagged</em></span><span class="wc-est" title="'+esc(E.tip)+'"><b>'+esc(fmtMin(E.min).replace(/^about/,"About"))+'</b> <em>to review</em></span></span>'+
+    '<span class="wc-f">'+(q.rec?'The draft: '+rchip(q.rec):'No draft yet')+(q.fac&&q.fac.name?'<span class="wc-fac">'+esc(q.fac.name)+'</span>':'')+(q.test?' · <span class="tst">Test</span>':'')+'<span class="wc-go">Open ›</span></span></a>'; }
 function upCard(u,i){ const d=u.since?Math.max(0,-daysTo(u.since)):null; const sub=u.sub||String(u.stage||'').replace(/^At IM ·\s*/,'');
   return '<div class="up rise" style="--i:'+i+'" title="'+esc((u.wr||'')+' '+(u.name||''))+'"><span class="up-d"><b>'+(d!=null?d:esc(u.stageShort||'IM'))+'</b><em>'+(d!=null?(d===1?'day at IM':'days at IM'):'at IM')+'</em></span><span class="up-m"><span class="wr">'+esc(u.wr)+(u.wg?' · '+esc(u.wg):'')+'</span><b>'+esc(u.name)+'</b><em>'+esc([sub?sub.charAt(0).toUpperCase()+sub.slice(1):'',u.fac].filter(Boolean).join(' · '))+'</em></span></div>'; }
 /* AWG decisions by quarter, a showcase panel */
@@ -923,7 +1001,7 @@ function activityChart(years){ const L=Object.values(S.queue).filter(q=>q.status
   const W=900,H=220,pl=30,pb=26,pt=14, mx=Math.max(4,...per.map(p=>p.n)), cw=(W-pl)/per.length, bw=Math.max(6,Math.min(30,cw*0.6)), Y=v=>(H-pb-pt)*v/mx;
   const K=["Approved","Conditional Approval","Returned to Workgroup","Returned to IM"];
   let g='<defs><linearGradient id="g-ap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fd6a6"/><stop offset="1" stop-color="#1baf7a"/></linearGradient><linearGradient id="g-co" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8fd0f3"/><stop offset="1" stop-color="#3987e5"/></linearGradient></defs>';
-  const AC={"Approved":"url(#g-ap)","Conditional Approval":"url(#g-co)","Returned to Workgroup":"#e0a83c","Returned to IM":"#f0c46c"};
+  const AC={"Approved":"url(#g-ap)","Conditional Approval":"url(#g-co)","Returned to Workgroup":"#e0a83c","Returned to IM":"#f08579"};
   [0.5,1].forEach(f=>{ const v=Math.round(mx*f), y=H-pb-Y(v); g+='<line x1="'+pl+'" x2="'+W+'" y1="'+y+'" y2="'+y+'" stroke="rgba(255,255,255,.1)"/><text x="'+(pl-6)+'" y="'+(y+4)+'" text-anchor="end" class="ax-d">'+v+'</text>'; });
   per.forEach((p,i)=>{ const x=pl+i*cw+(cw-bw)/2; let y=H-pb; const segs=K.filter(d=>p.c[d]); let col='<g class="col"><rect class="col-bg" x="'+(pl+i*cw+1)+'" y="'+pt+'" width="'+(cw-2)+'" height="'+(H-pb-pt)+'" rx="4"/>';
     segs.forEach((d,j)=>{ const h=Y(p.c[d]); y-=h; const top=j===segs.length-1; col+='<rect class="bar-in" style="--d:'+(i*30)+'ms" x="'+x+'" y="'+y+'" width="'+bw+'" height="'+Math.max(0,h-(top?0:1.5))+'" rx="'+(top?Math.min(4,bw/2):0)+'" fill="'+AC[d]+'"/>'; });
@@ -938,11 +1016,11 @@ function home(){
   const nc=nextCalls(3), call=nc[0], dd=daysTo(call); const h=new Date().getHours(), g=h<12?"Good morning":h<17?"Good afternoon":"Good evening";
   const carried=aw.filter(q=>q.status==="carried").length; const dnY=dn.filter(q=>String(q.decidedAt).slice(0,4)===YR); const oY={}; dnY.forEach(q=>oY[q.outcome]=(oY[q.outcome]||0)+1);
   const when=dd===0?"today":dd===1?"tomorrow":"in "+dd+" days";
-  const line=aw.length?'The next AWG call is <b>'+esc(fmtL(call))+'</b>, '+when+', 2:00–3:00 pm ET. <b>'+aw.length+'</b> submission'+(aw.length===1?' is':'s are')+' on the agenda'+(carried?', '+carried+' carried over from the last call':'')+'. Each arrives with the draft’s architecture read and a recommendation.':'<b>Nothing is waiting for AWG.</b> The next call is '+esc(fmtL(call))+', '+when+'. When IM approves a submission in IM Review, it lands here on its own.';
+  const line=aw.length?'The next AWG call is <b>'+esc(fmtL(call))+'</b>, '+when+', 2:00–3:00 pm ET. <b>'+aw.length+'</b> submission'+(aw.length===1?' is':'s are')+' on the agenda'+(carried?', '+carried+' carried over from the last call':'')+'. Each arrives with the draft’s architecture read and a recommendation. <span class="est" title="An estimate, added up from each submission below. Hover a submission’s time to see how it is figured.">Estimated review time: <b>'+esc(fmtMin(aw.reduce((s,q)=>s+estAWG(q).min,0)).replace(/^about /,""))+'</b> in all.</span>':'<b>Nothing is waiting for AWG.</b> The next call is '+esc(fmtL(call))+', '+when+'. When IM approves a submission in IM Review, it lands here on its own.';
   const st=(k,v,s,cls)=>'<div class="hs'+(cls?' '+cls:'')+'"><span>'+k+'</span><b'+(typeof v==="number"?' data-count="'+v+'"':'')+'>'+v+'</b><em>'+s+'</em></div>';
   const tiles=st("On the Agenda",aw.length,"submissions",aw.length?"amb":"grn")+st("Carried Over",carried,"from earlier calls",carried?"amb":"")+st("Next Call",fmtS(call),DAY[new Date(call+"T12:00:00").getDay()]+", 2–3 pm ET")+st("Decided in "+YR,dnY.length,(oY.Approved||0)+" approved");
   const recs={}; aw.forEach(q=>{ if(q.rec) recs[q.rec]=(recs[q.rec]||0)+1; });
-  const ringP=aw.length?REC.map(r=>({k:r.toLowerCase(),v:recs[r]||0,c:{"Approve":"#4fc79b","Approve With Conditions":"#74bfeb","Send Back":"#e0a83c"}[r]})):OUT_FINAL.map(o=>({k:o.toLowerCase(),v:oY[o]||0,c:OHEX[o]}));
+  const ringP=aw.length?REC.map(r=>({k:rlab(r).toLowerCase(),v:recs[r]||0,c:{"Approve":"#4fc79b","Approve With Conditions":"#74bfeb","Send Back":"#e0a83c"}[r]})):OUT_FINAL.map(o=>({k:o.toLowerCase(),v:oY[o]||0,c:OHEX[o]}));
   const ringBox='<div class="hero-r">'+ring(ringP,String(aw.length?aw.length:dnY.length),aw.length?'on the agenda':'decided in '+YR)+'<div class="dn-key">'+ringP.filter(p=>p.v).slice(0,4).map(p=>'<span><i style="background:'+p.c+'"></i>'+esc(p.k)+' '+p.v+'</span>').join('')+'</div></div>';
   const Y=S.homeYears||4; const U=(S.up||[]); const upN=S.upAll?U.length:6;
   return '<div class="hero rise"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}))+'</div><h2>'+g+(S.me.name?", "+esc(first(S.me.name)):"")+'</h2><p>'+line+'</p>'+
@@ -986,7 +1064,7 @@ const areaChip=a=>'<span class="ar" style="--ac:'+(ACOL[a]||"var(--ink-3)")+'">'
 function draftCard(doc){ const D=doc.draft; if(!D) return '<div class="card"><h3>The Draft</h3><div class="empty">No draft yet.</div></div>';
   const byA={}; (D.notes||[]).forEach(n=>(byA[n.area]=byA[n.area]||[]).push(n));
   return '<div class="card draft"><div class="dr-h"><span class="lbl">The Draft Recommends</span>'+rchip(D.rec)+'<span class="sp"></span>'+(canReview()&&doc.status!=="decided"&&!doc.hist?'<button type="button" class="btn sm ghost" data-redraft="1">Ask Claude Again</button>':'')+'</div>'+
-    (D.pending?'<p class="dr-sum muted">Claude is reading the rows…</p>':D.sum?'<p class="dr-sum">'+esc(D.sum)+'</p>':'')+'<p class="muted dr-why">'+esc(D.why||"")+(D.claude?' Claude’s read: '+esc(D.claude)+'; the software checks: '+esc(D.soft)+'.':D.err?' Claude couldn’t be reached ('+esc(D.err)+'), so this is the software checks alone.':'')+'</p>'+
+    (D.pending?'<p class="dr-sum muted">Claude is reading the rows…</p>':D.sum?'<p class="dr-sum">'+esc(D.sum)+'</p>':'')+'<p class="muted dr-why">'+esc(D.why||"")+(D.claude?' Claude’s read: '+esc(D.claude)+'; the software checks: '+esc(D.soft)+'.':D.err?' Claude couldn’t be reached ('+esc(D.err)+'), so this is the software checks alone.':!D.at&&!D.pending?' This is the software checks for now; Claude’s read comes when the AWG chair or facilitator opens it.':'')+'</p>'+
     (Object.keys(byA).length?'<div class="dr-notes">'+Object.entries(byA).sort((a,b)=>AREAS.indexOf(a[0])-AREAS.indexOf(b[0])).map(([a,L])=>'<div class="dr-a">'+areaChip(a)+'<ul>'+L.map(n=>'<li>'+esc(n.t)+(n.items&&n.items.length?' <button type="button" class="lnk" data-items="'+esc(n.items.join(","))+'">'+(n.items.length===1?'Item '+esc(n.items[0]):n.items.length+' items')+'</button>':'')+(n.src==="claude"?' <span class="by-c">Claude</span>':'')+'</li>').join("")+'</ul></div>').join("")+'</div>':'<p class="muted">Nothing architectural to raise.</p>')+'</div>'; }
 
 /* the call record: who was there, quorum, the vote, conditions */
@@ -1001,14 +1079,14 @@ function callPanel(doc){ const c=doc.call||(doc.call={date:nextCalls(1)[0],metho
   const dis=can?'':' disabled', open=S.attOpen===doc.rep;
   return '<div class="card callp"><h3>Record the AWG Vote<small>'+(doc.calls&&doc.calls.length?'call '+(doc.calls.length+1)+' for this submission':'attendance comes from Meeting Trackers')+'</small></h3>'+
     '<div class="cp-row"><label>Call Date<select data-cf="date"'+dis+'>'+calls.map(d=>'<option value="'+d+'"'+(d===c.date?' selected':'')+'>'+esc(fmtL(d))+(d===today()?' (today)':'')+'</option>').join("")+'</select></label><label>Review Method<select data-cf="method"'+dis+'>'+METHODS.map(m=>'<option'+(m===c.method?' selected':'')+'>'+esc(m)+'</option>').join("")+'</select></label></div>'+
-    '<div class="cp-h"><b>Attendance</b>'+(known?'<span class="q '+(q?'ok':'no')+'">'+here.length+' of '+V.length+' voting members · '+need+' needed · '+(q?'Quorum ✓':'No quorum')+'</span><button type="button" class="lnk" data-attopen="1">'+(open?'Hide who was there':'Who was there')+'</button>':'<span class="q no">Not in Meeting Trackers yet</span><span class="muted">Erin logs it there after the call; the quorum fills in then.</span>')+'</div>'+
+    '<div class="cp-h"><b>Attendance</b>'+(known?'<span class="q '+(q?'ok':'no')+'">'+here.length+' of '+V.length+' voting members · '+need+' needed · '+(q?'Quorum ✓':'No quorum')+'</span><button type="button" class="lnk" data-attopen="1">'+(open?'Hide Who Was There':'Who Was There')+'</button>':'<span class="q no">Not in Meeting Trackers yet</span><span class="muted">Erin logs it there after the call; the quorum fills in then.</span>')+'</div>'+
     (known&&open?'<p class="muted cp-who">'+esc(here.map(m=>m.name).join(", "))+(c.others.length?'; also '+esc(c.others.join(", ")):'')+'</p>':'')+
-    '<div class="cp-out"><span class="lbl">Outcome</span><div class="seg wrap">'+OUT.map(o=>'<button type="button" data-out="'+esc(o)+'" aria-pressed="'+(c.outcome===o)+'"'+dis+'>'+esc(o)+'</button>').join("")+'</div></div>'+
+    '<div class="cp-out"><span class="lbl">Outcome</span><div class="seg wrap">'+OUT.map(o=>'<button type="button" data-out="'+esc(o)+'" aria-pressed="'+(c.outcome===o)+'"'+dis+'>'+esc(o)+'</button>').join("")+'</div><p class="muted cp-hint">The draft’s Approve is Approved, Approve with Conditions is Conditional Approval, and Return is Returned to Workgroup or Returned to IM. Passed on Review means AWG had nothing to review; it moves on without a vote.</p></div>'+
     (c.outcome==="Conditional Approval"||/^Returned/.test(c.outcome)?'<label class="cp-t">'+(c.outcome==="Conditional Approval"?'Conditions':'What Needs to Change')+'<textarea data-cf="conditions" rows="3"'+dis+'>'+esc(c.conditions||"")+'</textarea></label>':'')+
     (c.outcome&&c.outcome!=="Carried to Next Call"&&c.outcome!=="Passed on Review"?'<div class="cp-h" style="margin-top:12px"><b>Objections and Abstentions</b><span class="muted">'+(obj.length||abs.length?'':'none, unless you mark someone')+'</span></div><div class="cp-votes">'+who.map(m=>{ const v=(c.votes||{})[m.name]||"For"; return '<span class="cp-vm'+(v!=="For"?' on':'')+'"><b>'+esc(m.name)+'</b><span class="seg sm">'+["For","Objects","Abstains"].map(x=>'<button type="button" data-vote="'+esc(m.name)+'|'+x+'" aria-pressed="'+(v===x)+'"'+dis+'>'+x+'</button>').join("")+'</span></span>'; }).join("")+'</div>':'')+
-    '<label class="cp-t">Notes for the Minutes (optional)<textarea data-cf="notes" rows="2"'+dis+'>'+esc(c.notes||"")+'</textarea></label>'+
+    '<label class="cp-t">Notes for the Minutes<textarea data-cf="notes" rows="2" placeholder="Optional"'+dis+'>'+esc(c.notes||"")+'</textarea></label>'+
     (c.outcome?'<div class="cp-min"><span class="lbl">For the Minutes</span><p id="minline">'+esc(minutesLine(doc,c,obj,abs))+'</p><button type="button" class="btn sm ghost" data-copymin="1">Copy</button></div>':'')+
-    (can?'<div class="cp-acts">'+(c.outcome==="Carried to Next Call"?'<button type="button" class="btn pri" data-finish="1">Save and Carry to '+esc(fmtS(nextAfter(c.date)))+'</button>':'<button type="button" class="btn pri" data-finish="1"'+(c.outcome&&q!==false?'':' disabled')+'>Record the Decision</button>')+(c.outcome&&q===false&&c.outcome!=="Carried to Next Call"&&c.method!=="Expedited Review"?'<span class="muted">Meeting Trackers shows no quorum for that call ('+need+' voting members needed).</span>':'')+'</div>':'')+'</div>'; }
+    (can?'<div class="cp-acts">'+(c.outcome==="Carried to Next Call"?'<button type="button" class="btn pri" data-finish="1">Save and Carry to '+esc(fmtS(nextAfter(c.date)))+'</button>':'<button type="button" class="btn pri" data-finish="1"'+(c.outcome&&(q!==false||c.method==="Expedited Review")?'':' disabled')+'>Record the Decision</button>')+(c.outcome&&q===false&&c.outcome!=="Carried to Next Call"&&c.method!=="Expedited Review"?'<span class="muted">Meeting Trackers shows no quorum for that call ('+need+' voting members needed).</span>':'')+'</div>':'')+'</div>'; }
 function nextAfter(d){ const L=nextCalls(6).filter(x=>x>d); return L[0]||d; }
 function minutesLine(doc,c,obj,abs){ c=Object.assign({},c,{conditions:String(c.conditions||"").trim().replace(/[.;\s]+$/,"")}); const head=(doc.wr?doc.wr+" ":"")+(doc.name||""); const oa=(obj.length||abs.length)?" ("+[obj.length?obj.length+" objection"+(obj.length===1?"":"s")+": "+obj.map(m=>m.name).join(", "):"",abs.length?abs.length+" abstention"+(abs.length===1?"":"s")+": "+abs.map(m=>m.name).join(", "):""].filter(Boolean).join("; ")+")":" with no objections or abstentions";
   const t={"Approved":"Group reviewed and approved"+oa+".","Conditional Approval":"Group reviewed and conditionally approved"+oa+", subject to: "+(c.conditions||"[conditions]")+".","Returned to Workgroup":"Group reviewed and returned the submission to the workgroup"+(c.conditions?": "+c.conditions:"")+".","Returned to IM":"Group reviewed and returned the submission to IM"+(c.conditions?": "+c.conditions:"")+".","Passed on Review":"AWG passed on reviewing this submission.","Carried to Next Call":"Review continues on the next AWG call ("+fmtS(nextAfter(c.date))+")."}[c.outcome]||"";
@@ -1025,18 +1103,19 @@ function rowHtml(r,doc,can){ const ed=S.edit===r.i&&can, cl=((doc.draft&&doc.dra
     ((r.flags||[]).length||cl.length?'<div class="flags">'+(r.flags||[]).map(f=>'<span class="fl">'+areaChip(f.a)+esc(f.t)+'</span>').join("")+cl.map(n=>'<span class="fl">'+areaChip(n.area)+esc(n.t)+' <span class="by-c">Claude</span></span>').join("")+'</div>':'')+
     (r.sc?'<div class="def muted"><span class="lbl">Submitter Comments</span>'+esc(r.sc)+'</div>':'')+(r.dec||r.com?'<div class="def muted"><span class="lbl">'+(doc.hist?'Review Decision on the Form':'IM’s Decision')+'</span>'+esc([r.dec,r.com].filter(Boolean).join(" · "))+'</div>':'')+
     (r.note&&!ed?'<div class="box note"><span class="lbl">AWG Note'+(r.note.by?' · '+esc(first(r.note.by)):'')+'</span>'+esc(r.note.t)+'</div>':'')+
-    (ed?'<div class="edit"><label>AWG Note for the Record (goes in Review Comments on the form)<textarea name="note">'+esc((r.note&&r.note.t)||"")+'</textarea></label><div class="racts"><button class="btn sm" data-cancel="1">Cancel</button>'+(r.note?'<button class="btn sm ghost" data-clr="'+r.i+'">Remove</button>':'')+'<button class="btn sm pri" data-save="'+r.i+'">Save</button></div></div>':can?'<div class="racts"><button class="btn sm ghost" data-chg="'+r.i+'">'+(r.note?'Edit Note':'Add a Note')+'</button></div>':'')+'</div>'; }
+    (ed?'<div class="edit"><label>AWG Note for the Record <span class="hint">Goes in Review Comments on the form.</span><textarea name="note">'+esc((r.note&&r.note.t)||"")+'</textarea></label><div class="racts"><button class="btn sm" data-cancel="1">Cancel</button>'+(r.note?'<button class="btn sm ghost" data-clr="'+r.i+'">Remove</button>':'')+'<button class="btn sm pri" data-save="'+r.i+'">Save</button></div></div>':can?'<div class="racts"><button class="btn sm ghost" data-chg="'+r.i+'">'+(r.note?'Edit Note':'Add a Note')+'</button></div>':'')+'</div>'; }
 
-function desk(doc){ (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flags=rowFlags(r); });
+function desk(doc){ if(doc.hist) (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flags=rowFlags(r); }); else formFlags(doc.rows||[]);
+  if(!doc.hist&&doc.status!=="decided"&&canReview()&&!tmOpen[doc.rep]) tmOpen[doc.rep]=new Date().toISOString();
   /* arrived from IM Review without a draft: the software checks now, Claude's read once a reviewer opens it */
-  if(!doc.draft&&!doc.hist&&doc.status!=="decided"){ const sd=softDraft({rows:doc.rows||[]}); doc.draft={rec:sd.rec,why:sd.why,sum:"",notes:sd.notes,soft:sd.rec,claude:null,at:"",pending:true};
+  if(!doc.draft&&!doc.hist&&doc.status!=="decided"){ const sd=softDraft({rows:doc.rows||[]}); doc.draft={rec:sd.rec,why:sd.why,sum:"",notes:sd.notes,soft:sd.rec,claude:null,at:"",pending:canReview()};
     if(canReview()&&!doc._asking){ doc._asking=true; buildDraft({rows:doc.rows||[],wr:doc.wr,name:doc.name,summary:doc.summary,category:doc.category,artifacts:doc.artifacts,wg:doc.wg}).then(async d=>{ doc.draft=d; delete doc._asking; try{ await saveDoc(doc); await update("queue",cur=>{ const o=cur||{items:{}}; if(o.items&&o.items[doc.rep]) Object.assign(o.items[doc.rep],{rec:d.rec,flagged:(doc.rows||[]).filter(x=>(x.flags||[]).length).length}); return o; }); if(S.queue[doc.rep]) S.queue[doc.rep].rec=d.rec; }catch(e){} if(route().rep===doc.rep) render(); }).catch(()=>{ delete doc._asking; }); } } const R=doc.rows||[], decided=doc.status==="decided", q=S.queue[doc.rep]||{}, can=canReview()&&!decided&&!doc.hist;
   const awgR=R.filter(isAwgRow), flagged=R.filter(r=>(r.flags||[]).length), F0=S.filter; const F=F0==="awg"&&!awgR.length?(flagged.length?"flag":"all"):F0;
   const vis=r=>F==="all"||(F==="awg"?isAwgRow(r):F==="flag"?(r.flags||[]).length>0:F==="items"?(S.items||[]).includes(String(r.item||r.i+1)):true);
   const shownAll=R.filter(vis); const RP=S.rowPg[doc.rep+F]||(S.rowPg[doc.rep+F]={page:0,size:10}); const pages=Math.max(1,Math.ceil(shownAll.length/RP.size)); if(RP.page>=pages) RP.page=pages-1; const shown=shownAll.slice(RP.page*RP.size,RP.page*RP.size+RP.size);
   const tabs=[["awg","Marked AWG",awgR.length],["flag","Flagged",flagged.length],["all","All Rows",R.length]].filter(x=>x[0]==="all"||x[2]).concat(F==="items"?[["items","From the Draft",shownAll.length]]:[]);
-  const calls=doc.calls||[];
-  return '<div class="dhead"><div class="t">'+backLink(decided?'#/decided':'#/',decided?'All Decisions':'The Agenda')+'<h1 style="margin-top:6px">'+esc((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||""))+'</h1><div class="sub">'+nwj([doc.wg,doc.at&&!doc.hist?(doc.fromIm?"From IM Review "+fmtD(doc.at):"Brought in "+fmtD(doc.at)+(doc.by?" by "+doc.by:"")):"",doc.category])+'</div>'+(doc.resub?'<div class="resub"><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span><span>'+nwj([doc.resub.first?'first submitted '+fmtD(doc.resub.first):'',doc.resub.date?'resubmitted '+fmtD(doc.resub.date):''])+'</span></div>':'')+'</div>'+
+  const calls=doc.calls||[]; const E=estAWG({rows:R.length,awgRows:awgR.length,flagged:flagged.length,awgBoth:R.filter(r=>isAwgRow(r)&&(r.flags||[]).length).length});
+  return '<div class="dhead"><div class="t">'+backLink(decided?'#/decided':'#/',decided?'All Decisions':'The Agenda')+'<h1 style="margin-top:6px">'+esc((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||""))+'</h1><div class="sub">'+[nwj([doc.wg,doc.at&&!doc.hist?(doc.fromIm?"From IM Review "+fmtD(doc.at):"Brought in "+fmtD(doc.at)+(doc.by?" by "+doc.by:"")):"",doc.category]),decided||doc.hist?'':'<span class="nw est" title="'+esc(E.tip)+'">'+esc(fmtMin(E.min))+' to review</span>'].filter(Boolean).join(' · ')+'</div>'+(doc.resub?'<div class="resub"><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span><span>'+nwj([doc.resub.first?'first submitted '+fmtD(doc.resub.first):'',doc.resub.date?'resubmitted '+fmtD(doc.resub.date):''])+'</span></div>':'')+'</div>'+
     '<div class="prog">'+(decided?ochip(doc.outcome)+'<span>'+esc(fmtD(doc.decidedAt))+'</span>':(q.status==="carried"?'<b>Carried</b><span>from '+esc(fmtS(q.lastCall))+'</span>':'<b>'+R.length+'</b><span>rows · '+awgR.length+' marked AWG</span>'))+'</div></div>'+
     (doc.fromIm?'<div class="card fromim"><b>From IM Review.</b> <span class="muted">IM approved it '+esc(fmtD(doc.fromIm.decidedAt))+(doc.fromIm.decidedBy?' ('+esc(doc.fromIm.decidedBy)+')':'')+'. '+((doc.rows||[]).length)+' rows IM approved come here, with IM’s final wording'+(Object.entries(doc.fromIm.counts||{}).filter(x=>/Denied|Returned|Withdrawn/.test(x[0])&&x[1]).length?'; rows IM denied or returned stay behind':'')+'.</span></div>':'')+
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: record a call, carry it, decide it. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
@@ -1044,7 +1123,7 @@ function desk(doc){ (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flags=rowFlags(r)
     docsHtml(q,doc,doc.rep)+earlierHtml(doc)+
     (decided||calls.length?'<div class="card"><h3>'+(decided?'The Decision':'Earlier Calls')+'</h3>'+(decided&&doc.call&&!calls.includes(doc.call)?[doc.call]:[]).concat(calls).slice().reverse().map((c,i,a)=>callRecordHtml(c,a.length-1-i,a.length)).join("")+'</div>':'')+
     (doc.hist?'':draftCard(doc)+(decided?'':callPanel(doc)))+
-    (!canReview()&&!decided&&!doc.hist?'<div class="card">You can follow this submission here. Mark and Erin record the AWG call.</div>':'')+
+    (!canReview()&&!decided&&!doc.hist?'<div class="card">You can follow this submission here. The AWG chair and facilitator record the AWG call.</div>':'')+
     (R.length?'<div class="dtools"><div class="seg" role="tablist">'+tabs.map(([k,l,n])=>'<button type="button" data-f="'+k+'" aria-pressed="'+(F===k)+'">'+l+'<b>'+n+'</b></button>').join("")+'</div><span class="sp"></span><button class="btn sm" data-xl="1">Download for Excel</button></div>'+
     '<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,doc,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):''):(doc.hist?'':'<div class="empty">No Reference Model rows on this form.</div>')); }
 
@@ -1056,10 +1135,10 @@ async function finish(doc){ const c=doc.call, by=S.me.name||S.me.email||"", at=n
   doc.calls=(doc.calls||[]).concat([rec]);
   if(c.outcome==="Carried to Next Call"){ const nx=nextAfter(c.date); doc.call={date:nx,method:c.method,votes:{},outcome:"",conditions:"",notes:""}; doc.status="carried"; await saveDoc(doc);
     const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"carried",lastCall:c.date,nextCall:nx,calls:doc.calls.length}); return o; }); S.queue=q.items; toast("Saved. It stays on the agenda for "+fmtS(nx)+"."); return false; }
-  doc.status="decided"; doc.outcome=c.outcome; doc.decidedAt=c.date; doc.decidedBy=by; await saveDoc(doc);
+  doc.status="decided"; doc.outcome=c.outcome; doc.decidedAt=c.date; doc.decidedBy=by; doc._finishedAt=at; const sd=await saveDoc(doc); const tm=sd.timing||{};
   const agreed=recMatches(doc.draft&&doc.draft.rec,c.outcome);
-  if(!doc.test){ try{ await update("learn-"+String(c.date).slice(0,4),cur=>{ const o=cur||{rows:{}}; o.rows=o.rows||{}; o.rows[doc.rep]={rep:doc.rep,wr:doc.wr,at,rec:(doc.draft&&doc.draft.rec)||"",soft:(doc.draft&&doc.draft.soft)||"",claude:(doc.draft&&doc.draft.claude)||"",outcome:c.outcome,agreed,calls:doc.calls.length,rows:(doc.rows||[]).length,by}; return o; }); }catch(e){} }
-  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",outcome:c.outcome,decidedAt:c.date,decidedBy:by,present:known?here.length:null,conds:c.outcome==="Conditional Approval"?String(c.conditions||"").slice(0,200):"",calls:doc.calls.length,agreed}); return o; }); S.queue=q.items;
+  if(!doc.test){ const lr={rep:doc.rep,wr:doc.wr,at,rec:(doc.draft&&doc.draft.rec)||"",soft:(doc.draft&&doc.draft.soft)||"",claude:(doc.draft&&doc.draft.claude)||"",outcome:c.outcome,agreed,calls:doc.calls.length,rows:(doc.rows||[]).length,by}; S.learn[doc.rep]=lr; try{ await update("learn-"+String(c.date).slice(0,4),cur=>{ const o=cur||{rows:{}}; o.rows=o.rows||{}; o.rows[doc.rep]=lr; return o; }); }catch(e){} }
+  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",outcome:c.outcome,decidedAt:c.date,decidedBy:by,present:known?here.length:null,conds:c.outcome==="Conditional Approval"?String(c.conditions||"").slice(0,200):"",calls:doc.calls.length,agreed,estMin:tm.est||null,activeMin:tm.activeMin!=null?tm.activeMin:null}); return o; }); S.queue=q.items;
   const it=S.queue[doc.rep]||{}, flow=it.flow||S.cfg.flow;
   if(!doc.test&&flow&&it.fac&&it.fac.email){ try{ await fetch(flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"AWG decision: "+(doc.wr||"")+" "+(doc.name||""),body:"AWG reviewed "+(doc.wr||"")+" "+(doc.name||"")+" on "+fmtD(c.date)+": "+c.outcome+"."+(c.conditions?"\n\n"+(c.outcome==="Conditional Approval"?"Conditions: ":"What needs to change: ")+c.conditions:"")+"\n\n"+rec.line+"\n\nSee the call record and the rows: https://resources.mismo.org/awg-review/#/review/"+encodeURIComponent(doc.rep),html:"",from:it.from||S.cfg.from||""})}); }catch(e){} }
   toast("AWG decision recorded: "+c.outcome); return true; }
@@ -1113,17 +1192,17 @@ function trendsView(){ const B=S.bt;
     '<div class="kp dark">'+kpi("Approved Outright, "+last.y,pct(last.out.Approved||0,last.subs)+"%","of "+last.subs+" decisions"+(prev.subs?" ("+pct(prev.out.Approved||0,prev.subs)+"% in "+prev.y+")":""),"var(--good)")+
       kpi("Decisions, "+last.y,last.subs,last.calls+" calls","var(--c1)")+kpi("Voting Members Present",last.avgPresent!=null?last.avgPresent:"—","average per call in "+last.y,"var(--c4)")+kpi("Calls With Quorum",last.calls?pct(last.quorum,last.qKnown||last.calls)+"%":"—",(last.qKnown||0)+" calls with a record in "+last.y,"var(--c2)")+'</div>'+
     '<div class="g2"><div class="card"><h3>What AWG Decides<small>share of decisions, by year</small></h3>'+stackChart(per,["Approved","Conditional Approval","Returned"],{"Approved":"var(--good)","Conditional Approval":"var(--c1)","Returned":"var(--warn)"},(p,k)=>k==="Returned"?(p.y.out["Returned to Workgroup"]||0)+(p.y.out["Returned to IM"]||0):(p.y.out[k]||0))+
-      '<details class="nums"><summary>Show the numbers</summary><div class="tw"><table class="tbl"><thead><tr><th>Year</th><th>Calls</th><th>Decisions</th><th>Approved</th><th>Conditional</th><th>Returned</th><th>Carried First</th></tr></thead><tbody>'+Y.map(y=>'<tr><td>'+y.y+'</td><td class="n">'+y.calls+'</td><td class="n">'+y.subs+'</td><td class="n">'+(y.out.Approved||0)+'</td><td class="n">'+(y.out["Conditional Approval"]||0)+'</td><td class="n">'+((y.out["Returned to Workgroup"]||0)+(y.out["Returned to IM"]||0))+'</td><td class="n">'+(y.carried||0)+'</td></tr>').join('')+'</tbody></table></div></details></div>'+
+      '<details class="nums"><summary>Show the Numbers</summary><div class="tw"><table class="tbl"><thead><tr><th>Year</th><th>Calls</th><th>Decisions</th><th>Approved</th><th>Conditional</th><th>Returned</th><th>Carried First</th></tr></thead><tbody>'+Y.map(y=>'<tr><td>'+y.y+'</td><td class="n">'+y.calls+'</td><td class="n">'+y.subs+'</td><td class="n">'+(y.out.Approved||0)+'</td><td class="n">'+(y.out["Conditional Approval"]||0)+'</td><td class="n">'+((y.out["Returned to Workgroup"]||0)+(y.out["Returned to IM"]||0))+'</td><td class="n">'+(y.carried||0)+'</td></tr>').join('')+'</tbody></table></div></details></div>'+
       '<div class="card"><h3>Decisions and Calls<small>by year</small></h3>'+lineChart(per,[{name:"Decisions",c:"var(--c1)",v:p=>p.y.subs},{name:"Calls held",c:"var(--c4)",v:p=>p.y.calls}])+'<p class="note">A submission that was carried to a later call counts once, in the year it was decided.</p></div></div>'+
     '<div class="g2" style="margin-top:18px"><div class="card"><h3>Attendance<small>voting members present per call, average</small></h3>'+lineChart(per,[{name:"Voting members present",c:"var(--c4)",v:p=>p.y.avgPresent,extra:p=>p.y.calls?' over '+p.y.nPresent+' calls':''}])+'<p class="note">Quorum is a majority of the assigned voting members (today '+quorumNeed()+' of '+voters().length+').</p></div>'+
-      '<div class="card"><h3>Calls Before a Decision<small>share decided on their first call</small></h3>'+lineChart(per,[{name:"Decided on the first call",c:"var(--good)",v:p=>p.y.subs?pct(p.y.subs-(p.y.carried||0),p.y.subs):null}],{unit:"%",max:112})+'</div></div>'+
+      '<div class="card"><h3>Calls before a Decision<small>share decided on their first call</small></h3>'+lineChart(per,[{name:"Decided on the first call",c:"var(--good)",v:p=>p.y.subs?pct(p.y.subs-(p.y.carried||0),p.y.subs):null}],{unit:"%",max:112})+'</div></div>'+
     (B.areas&&B.areas.length?'<div class="g2" style="margin-top:18px"><div class="card"><h3>What the Rows Touch<small>architecture checks on AWG submission forms, all years</small></h3>'+hbars(B.areas.map(a=>({k:a.k,v:a.n,c:ACOL[a.k],tip:a.n+' rows in '+a.subs+' submissions'})))+'</div>'+
       '<div class="card"><h3>By Community of Practice<small>AWG submissions, all years</small></h3><div class="tw"><table class="tbl"><thead><tr><th>Community</th><th>Submissions</th><th>Rows</th></tr></thead><tbody>'+(B.cop||[]).slice(0,12).map(c=>'<tr><td>'+esc(c.cop)+'</td><td class="n">'+c.subs+'</td><td class="n">'+c.rows.toLocaleString()+'</td></tr>').join("")+'</tbody></table></div></div></div>':'')+
     (B.notes&&B.notes.length?'<div class="card" style="margin-top:18px"><h3>How These Were Counted</h3>'+B.notes.map(n=>'<p class="note">'+esc(n)+'</p>').join("")+'</div>':''); }
 
 /* ---------- the draft's report card ---------- */
 function draftView(){ const B=S.bt, D=B&&B.draft; const lv=Object.values(S.learn), la=lv.filter(x=>x.agreed).length;
-  return '<div class="head"><div><h1>How the Draft Is Doing</h1><div class="sub">The <b>draft</b> is what the portal recommends before the AWG call: Approve, Approve With Conditions or Send Back, with the architecture points behind it. It comes from software checks (breaking changes, structure, relationships, attributes, XPATHs, MEG mentions) and Claude’s read. This page is its report card: how often AWG’s vote matched it.</div></div></div>'+
+  return '<div class="head"><div><h1>How the Draft Is Doing</h1><div class="sub">The <b>draft</b> is what the portal recommends before the AWG call: Approve, Approve with Conditions or Return, with the architecture points behind it. It comes from software checks (breaking changes, structure, relationships, attributes, XPATHs, MEG mentions) and Claude’s read. This page is its report card: how often AWG’s vote matched it.</div></div></div>'+
     '<div class="kp dark">'+kpi("Matched AWG Here",lv.length?pct(la,lv.length)+"%":"—",lv.length?la+" of "+lv.length+" submissions recorded here":"fills in as AWG decides","var(--c1)")+
       (D?kpi("Software Checks vs History",pct(D.agree,D.n)+"%",D.agree+" of "+D.n+" past decisions","var(--c3)")+kpi("Flagged and Approved Anyway",pct(D.flagApproved,D.flagged)+"%","of "+D.flagged+" flagged submissions","var(--c2)")+kpi("Clean and Approved",pct(D.cleanApproved,D.clean)+"%","of "+D.clean+" with nothing flagged","var(--good)"):"")+'</div>'+
     (B&&B.findings?'<div class="card"><h3>What the Analysis Found<small>'+esc(fmtD(B.asOf))+'</small></h3><ul class="finds">'+B.findings.map(f=>'<li>'+esc(f)+'</li>').join("")+'</ul></div>':'')+
@@ -1132,10 +1211,10 @@ function draftView(){ const B=S.bt, D=B&&B.draft; const lv=Object.values(S.learn
 
 /* ---------- help ---------- */
 function flowHtml(){ const st=(n,t,d)=>'<div class="fl-s"><span class="fl-n">'+n+'</span><b>'+t+'</b><span>'+d+'</span></div>';
-  return '<div class="flow">'+st(1,'IM approves','In IM Review. The rows IM approved, with IM’s wording and the work request’s documents, come straight here.')+'<span class="fl-a">›</span>'+st(2,'The draft is built','Software checks and Claude’s architecture read, the first time Mark or Erin opens it.')+'<span class="fl-a">›</span>'+st(3,'On the agenda','It waits for the next AWG call with its recommendation and the architecture points to discuss.')+'<span class="fl-a">›</span>'+st(4,'AWG votes','On the call, record who was there, quorum and the outcome. The facilitator gets an email; the minutes line is ready to paste.')+'</div>'; }
+  return '<div class="flow">'+st(1,'IM Approves','In IM Review. The rows IM approved, with IM’s wording and the work request’s documents, come straight here.')+'<span class="fl-a">›</span>'+st(2,'The Draft Is Built','Software checks and Claude’s architecture read, the first time the chair or facilitator opens it.')+'<span class="fl-a">›</span>'+st(3,'On the Agenda','It waits for the next AWG call with its recommendation and the architecture points to discuss.')+'<span class="fl-a">›</span>'+st(4,'AWG Votes','After the call, the AWG chair and facilitator record the outcome, any conditions and any objections. Attendance and quorum come from Meeting Trackers; the minutes line is ready to paste.')+'</div>'; }
 /* ---------- help, by role ---------- */
-const HELP_R=[["rec", "AWG Facilitator and Architect", "You run the AWG call and record what AWG voted. Mark and Erin record decisions.", ["Open each submission from On the Agenda. Each one has the draft: a recommendation and the architecture points behind it.", "Read Claude’s read and the flagged rows. If the documents changed, click Ask Claude Again for a fresh read.", "On the call, talk through the draft and the rows marked AWG or flagged. Add a note to any row for the record.", "Record the AWG Vote: pick the outcome, add any conditions, and mark anyone who objected or abstained.", "Record the Decision. The line for the minutes is ready to copy.", "The MMS takes it from there: approved goes to License Designation with a recommendation for Jonna; returned goes back to the facilitator, or to IM if AWG asks for that. Carried to Next Call keeps it on the agenda."], ["Who was there and quorum come from Meeting Trackers, where Erin logs each call. The voting members, chairs and call dates come from there too.", "Download for Excel gives the form with AWG’s decision, notes, the face-page fields and the vote tabulation.", "Until the MMS goes live on Nov 20, emails to facilitators wait in MMS Notifications instead of sending."]], ["mem", "AWG Members", "You read submissions before the call and vote on it.", ["Coming to AWG shows what is still at IM and how long it has been there, so you can see what is next.", "On the Agenda lists what the next call will vote on.", "Open a submission to read the draft, the rows marked AWG, IM’s decision and the documents. Click a document to open the file itself.", "Bring questions to the call. The vote is recorded there; you do not need to do anything in this page."], ["Attendance is taken in Meeting Trackers.", "Decided shows every past AWG decision, with the minutes it came from."]], ["fac", "Submitting Facilitators", "You follow your submission through AWG. You do not decide here.", ["Once IM approves your submission, it comes to AWG on its own and shows on Coming to AWG, then On the Agenda.", "Open it to see the draft and, after the call, AWG’s decision and any conditions.", "If AWG approves, the MMS recommends the license designation and sends it to Jonna. Nothing for you to move.", "If AWG returns it, the work request comes back to you in the MMS with AWG’s notes."], ["You hear about each decision in your MMS daily digest.", "Add or update files from the work request’s Files tab in the MMS; they show here."]], ["staff", "MISMO Staff", "You watch how AWG and the draft are doing.", ["Trends shows what AWG decided each year, how many calls, attendance and how often work was carried over.", "How the Draft Is Doing shows how often the draft’s recommendation matched AWG’s vote.", "Decided lists every past decision, read from the AWG minutes and approval forms.", "Access to this page is set in People & Access."], ["The roster and call dates come from Meeting Trackers. Change them there.", "Shortcuts: \\\\ narrows the menu; Ctrl+K (or ⌘K) searches."]]];
-function helpView(){ const roles=HELP_R, k=S.helpRole&&roles.some(r=>r[0]===S.helpRole)?S.helpRole:(typeof canReview==="function"&&canReview()&&S.role!=="staff"&&S.role!=="admin"?"rec":(S.role==="staff"||S.role==="admin")?"staff":"mem"), R=roles.find(r=>r[0]===k)||roles[0];
+const HELP_R=[["rec", "AWG Chair and Facilitator", "You run the AWG call and record what AWG voted. The AWG chair and facilitator record decisions.", ["Open each submission from On the Agenda. Each one has the draft: a recommendation and the architecture points behind it.", "Read The Draft Recommends card and the flagged rows. Click an item number to see just those rows. If the submission changed, click Ask Claude Again for a fresh read.", "On the call, talk through the draft and the rows marked AWG or flagged. Add a note to any row for the record.", "Under Record the AWG Vote, pick the call date and the outcome, add any conditions, then mark anyone who Objects or Abstains (those buttons show once an outcome is picked).", "Click Record the Decision. The For the Minutes line is ready to copy.", "The MMS takes it from there: approved goes to License Designation with a recommendation for Jonna; returned goes back to the facilitator, or to IM if AWG asks for that. To keep a submission for the next call, pick Carried to Next Call and click Save and Carry."], ["Who was there and quorum come from Meeting Trackers, where Erin logs each call. The voting members, chairs and call dates come from there too.", "Download for Excel gives the form with AWG’s decision, notes, the face-page fields and the vote tabulation.", "Each card on the agenda shows about how long it takes to read: an estimate from the rows marked AWG, the flagged rows and the rest.", "Record the Decision stays off when Meeting Trackers shows no quorum for that call, unless the review method is Expedited Review.", "Until the MMS goes live on Nov 20, emails to facilitators wait in MMS Notifications instead of sending."]], ["mem", "AWG Members", "You read submissions before the call and vote on them.", ["Coming to AWG shows what is still at IM and how long it has been there, so you can see what is next.", "On the Agenda lists what the next call will vote on.", "Open a submission to read the draft, the rows marked AWG, IM’s decision and the documents. Click a document to open the file itself.", "Bring questions to the call. The vote is recorded there; you do not need to do anything in this page."], ["Attendance is taken in Meeting Trackers.", "Each agenda card shows about how long it takes to read before the call.", "Decided shows every past AWG decision, with the minutes it came from."]], ["fac", "Submitting Facilitators", "You follow your submission through AWG. You do not decide here.", ["Once IM approves your submission, it comes to AWG on its own and shows on Coming to AWG, then On the Agenda.", "Open it to see the draft and, after the call, AWG’s decision and any conditions.", "If AWG approves, the MMS recommends the license designation and sends it to Jonna. Nothing for you to move.", "If AWG returns it, the work request comes back to you in the MMS with AWG’s notes."], ["You hear about each decision in your MMS daily digest.", "Add or update files from the work request’s Files tab in the MMS; they show here."]], ["staff", "MISMO Staff", "You watch how AWG and the draft are doing.", ["Trends shows what AWG decided each year, how many calls, attendance and how often work was carried over.", "How the Draft Is Doing shows how often the draft’s recommendation matched AWG’s vote.", "Decided lists every past decision, read from the AWG minutes and approval forms.", "Access to this page is set in People & Access."], ["The roster and call dates come from Meeting Trackers. Change them there.", "Press \\ to filter the left menu; Ctrl+K (or ⌘K) to search."]]];
+function helpView(){ const roles=HELP_R, k=S.helpRole&&roles.some(r=>r[0]===S.helpRole)?S.helpRole:roles[0][0], R=roles.find(r=>r[0]===k)||roles[0];
   return '<div class="head"><div><h1>Help</h1><div class="sub">How AWG Review works, for each person who uses it. Pick who you are.</div></div></div><div class="help">'+
     '<div class="seg hr-seg" role="tablist" aria-label="Pick who you are">'+roles.map(r=>'<button type="button" role="tab" data-hrole="'+r[0]+'" aria-pressed="'+(r[0]===k)+'">'+esc(r[1])+'</button>').join('')+'</div>'+
     '<div class="g2"><div class="card"><h3>'+esc(R[1])+': What You Do Here</h3><p class="hr-who">'+esc(R[2])+'</p><ol class="hr-steps">'+R[3].map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol></div>'+
@@ -1149,11 +1228,11 @@ function setupView(){ const R=roster(), ed=isAdmin()||S.role==="staff"; const di
     '<div class="g2"><div class="card"><h3>Voting Members<small>'+voters().length+' assigned · '+quorumNeed()+' needed for quorum</small></h3><div class="ros">'+(R.members||[]).map((m,i)=>'<div class="ros-r"><input class="inp" data-ros="'+i+'|cop" value="'+esc(m.cop)+'" aria-label="Community of Practice"'+dis+'><input class="inp" data-ros="'+i+'|name" value="'+esc(m.name)+'" aria-label="Name"'+dis+'><input class="inp" data-ros="'+i+'|org" value="'+esc(m.org||"")+'" aria-label="Company"'+dis+'>'+(ed?'<button type="button" class="btn sm ghost" data-rosdel="'+i+'" aria-label="Remove">×</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><button type="button" class="btn sm" data-rosadd="1">Add a Voting Member</button><button type="button" class="btn sm pri" data-rossave="1">Save the Roster</button></div>':'')+
       '<h3 style="margin-top:16px">Chairs and Facilitator</h3><div class="ros">'+[["chair","Chair"],["vice","Vice Chair"],["fac","Facilitator"]].map(([k,l])=>'<label class="ros-l">'+l+'<input class="inp" data-rk="'+k+'" value="'+esc(R[k]||"")+'"'+dis+'></label>').join("")+'</div>'+(R.vacant&&R.vacant.length?'<p class="note">Vacant seats: '+esc(R.vacant.join(", "))+'.</p>':'')+'</div>'+
     '<div class="card"><h3>AWG Calls<small>Thursdays, 2:00–3:00 pm ET</small></h3><div class="calls">'+C.map(d=>'<div class="call-r'+(d<today()?' past':'')+'"><b>'+esc(fmtL(d))+'</b><span class="muted">'+(d<today()?'held':daysTo(d)===0?'today':'in '+daysTo(d)+' days')+'</span><span class="sp"></span>'+(ed?'<button type="button" class="btn sm ghost" data-calldel="'+d+'">Remove</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><input type="date" class="inp" id="calladd"><button type="button" class="btn sm pri" data-calladd="1">Add a Call</button></div>':'')+'<p class="note">After the last date here, the portal assumes every other Thursday.</p>'+
-      '<h3 style="margin-top:16px">Who Records Decisions</h3><p class="muted">'+((S.cfg.reviewers||[]).length?esc(S.cfg.reviewers.join(", ")):'Anyone with edit access to AWG Review (set in People &amp; Access). Add emails here to limit it to Mark and Erin.')+'</p>'+(isAdmin()?'<div class="racts"><input class="inp" id="revs" placeholder="emails, comma separated" value="'+esc((S.cfg.reviewers||[]).join(", "))+'"><button type="button" class="btn sm" data-revsave="1">Save</button></div>':'')+'</div></div>'; }
+      '<h3 style="margin-top:16px">Who Records Decisions</h3><p class="muted">'+((S.cfg.reviewers||[]).length?esc(S.cfg.reviewers.join(", ")):'Anyone with edit access to AWG Review (set in People &amp; Access). Add emails here to limit it to the AWG chair and facilitator.')+'</p>'+(isAdmin()?'<div class="racts"><input class="inp" id="revs" placeholder="emails, comma separated" value="'+esc((S.cfg.reviewers||[]).join(", "))+'"><button type="button" class="btn sm" data-revsave="1">Save</button></div>':'')+'</div></div>'; }
 
 /* ---------- bring in a submission from MISMO Connect ---------- */
 S.add=null;
-function addView(){ if(!canEdit()) return '<div class="head"><div><h1>Bring In a Submission</h1></div></div><div class="card">You can follow submissions here; Mark, Erin and MISMO staff bring them in.</div>';
+function addView(){ if(!canEdit()) return '<div class="head"><div><h1>Bring In a Submission</h1></div></div><div class="card">You can follow submissions here; the AWG chair, facilitator and MISMO staff bring them in.</div>';
   const A=S.add; const nc=nextCalls(4);
   return '<div class="head"><div><h1>Bring In a Submission</h1><div class="sub">The facilitator still posts the AWG submission in MISMO Connect. Download the submission form from the AWG library and drop it here: the portal reads it, checks the architecture, asks Claude for a read, and puts it on the agenda.</div></div></div>'+
     (!A||!A.form?'<label class="drop" id="drop"><input type="file" id="fi" accept=".xlsx,.xlsm,.xls" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M4 20h16"/></svg><b>Drop the AWG Submission Form here</b><span class="muted">or click to choose it (.xlsx)</span>'+(A&&A.err?'<span class="bad">'+esc(A.err)+'</span>':'')+'</label>':
@@ -1212,7 +1291,8 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   /* the desk */
   const r=route(); if(r.view!=="review") return; const doc=S.docs[r.rep]; if(!doc) return;
   const save=keep(async()=>{ try{ await saveDoc(doc); }catch(e){ toast("Couldn’t save. Check your connection and try again."); } render(); });
-  let saveT; const saveSoon=()=>{ clearTimeout(saveT); saveT=setTimeout(()=>saveDoc(doc).catch(()=>toast("Couldn’t save. Check your connection.")),1200); };
+  /* one autosave timer for the page (not one per render), so finishing can cancel it */
+  const saveSoon=()=>{ clearTimeout(S.saveT); S.saveT=setTimeout(()=>{ if(doc.status!=="decided") saveDoc(doc).catch(()=>toast("Couldn’t save. Check your connection.")); },1200); };
   $$("[data-f]",m).forEach(b=>b.onclick=()=>{ S.filter=b.dataset.f; S.edit=null; render(); });
   $$("[data-items]",m).forEach(b=>b.onclick=()=>{ S.items=b.dataset.items.split(","); S.filter="items"; render(); const t=$(".dtools",$("#main")); if(t) t.scrollIntoView({block:"start",behavior:"smooth"}); });
   $$("[data-chg]",m).forEach(b=>b.onclick=keep(async()=>{ S.edit=+b.dataset.chg; render(); }));
@@ -1229,7 +1309,7 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-out]",m).forEach(b=>b.onclick=keep(async()=>{ c.outcome=b.dataset.out; render(); saveSoon(); }));
   $$("[data-copymin]",m).forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText($("#minline").textContent); toast("Copied for the minutes"); }catch(e){ toast("Select the text and copy it"); } });
   $$("[data-redraft]",m).forEach(b=>b.onclick=async()=>{ b.disabled=true; b.textContent="Asking Claude…"; try{ const d=await buildDraft({rows:doc.rows,wr:doc.wr,name:doc.name,summary:doc.summary,category:doc.category,artifacts:doc.artifacts,wg:doc.wg},(k,n)=>{ b.textContent="Claude: part "+k+" of "+n+"…"; }); if(d.err&&doc.draft&&doc.draft.claude){ toast("Claude couldn’t be reached ("+d.err+"). The earlier draft stays."); render(); return; } doc.draft=d; await saveDoc(doc); try{ await update("queue",cur=>{ const o=cur||{items:{}}; if(o.items&&o.items[doc.rep]) o.items[doc.rep].rec=d.rec; return o; }); S.queue[doc.rep]&&(S.queue[doc.rep].rec=d.rec); }catch(e){} toast(d.err?"Claude couldn’t be reached; the software checks are current":"The draft is updated"); }catch(e){ toast("Couldn’t update the draft: "+e.message); } render(); });
-  $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ const carry=c.outcome==="Carried to Next Call"; if(!confirm(carry?"Save this call and carry "+(doc.wr||"the submission")+" to the next call?":"Record AWG’s decision on "+(doc.wr||"this submission")+": "+c.outcome+"?"+(doc.test?"":" The facilitator gets an email."))) return; b.disabled=true; clearTimeout(saveT);
+  $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ const carry=c.outcome==="Carried to Next Call"; if(!confirm(carry?"Save this call and carry "+(doc.wr||"the submission")+" to the next call?":"Record AWG’s decision on "+(doc.wr||"this submission")+": "+c.outcome+"?"+(doc.test?"":" The facilitator gets an email."))) return; b.disabled=true; clearTimeout(S.saveT);
     try{ const done=await finish(doc); if(done) celebrate(); }catch(e){ toast("Couldn’t record it: "+e.message); b.disabled=false; return; } render(); });
   $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
 }
@@ -1243,6 +1323,9 @@ function start(){ const rs=RS(); if(!rs){ setTimeout(start,100); return; }
 window.__awgr={S,load,render,readForm,softDraft,rowFlags,buildDraft};
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else start();
 })();
+/* attendance and the roster come from Meeting Trackers: re-read them while the page stays open */
+setInterval(async()=>{ if(document.hidden||!S.loaded) return; try{ const [att,cfg]=await Promise.all(["attendance","config"].map(n=>get(n).catch(()=>({data:null})))); const A=Object.fromEntries(Object.entries((att&&att.data)||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k)));
+  const ch=JSON.stringify(A)!==JSON.stringify(S.att||{})||(cfg&&cfg.data&&JSON.stringify(cfg.data.roster)!==JSON.stringify((S.cfg||{}).roster)); if(!ch) return; S.att=A; if(cfg&&cfg.data) S.cfg=Object.assign({},S.cfg,{roster:cfg.data.roster,calls:cfg.data.calls||S.cfg.calls,when:cfg.data.when||S.cfg.when}); if(route().view!=="review"||!S.edit) render(); }catch(e){} },120000);
 
 </script>
 <script>
