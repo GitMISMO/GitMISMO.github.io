@@ -644,6 +644,8 @@ select.inp.sel{min-width:0;width:auto}
 .cp-vm.on{border-color:var(--warn)}
 .cp-vm b{font-weight:600;white-space:nowrap}
 .cp-who{font-size:12.5px;margin:2px 0 0}
+
+.up-m .wr,.up-m em{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -905,7 +907,8 @@ function agendaCard(q,i){ const n=q.rows||0, aw=q.awgRows||0, fl=q.flagged||0, a
   return '<a class="wc rise'+(q.status==="carried"?" warm":"")+'" style="--i:'+i+'" href="#/review/'+encodeURIComponent(q.rep)+'"><span class="wc-top"><span class="wr">'+esc(q.wr||"")+(q.wg?" · "+esc(q.wg):"")+'</span><span class="wc-age">'+(q.status==="carried"?"Carried from "+esc(fmtS(q.lastCall)):age<=0?"Added today":"Added "+ago(q.sentAt)+" ago")+'</span></span><b class="wc-n">'+esc(q.wrName||q.name||"")+'</b>'+
     '<span class="wc-nums"><span><b data-count="'+n+'">'+n+'</b><em>rows</em></span><span><b data-count="'+aw+'">'+aw+'</b><em>marked AWG</em></span><span><b data-count="'+fl+'">'+fl+'</b><em>flagged</em></span></span>'+
     '<span class="wc-f">'+(q.rec?'The draft: '+rchip(q.rec):'No draft yet')+(q.fac&&q.fac.name?' · '+esc(q.fac.name):'')+(q.test?' · <span class="tst">Test</span>':'')+'<span class="wc-go">Open ›</span></span></a>'; }
-function upCard(u,i){ return '<div class="up rise" style="--i:'+i+'"><span class="up-d"><b>'+esc(u.stageShort||"IM")+'</b><em>'+esc(u.when||"")+'</em></span><span class="up-m"><span class="wr">'+esc(u.wr)+(u.wg?' · '+esc(u.wg):'')+'</span><b title="'+esc(u.name)+'">'+esc(u.name)+'</b><em>'+esc([u.stage,u.fac].filter(Boolean).join(' · '))+'</em></span></div>'; }
+function upCard(u,i){ const d=u.since?Math.max(0,-daysTo(u.since)):null; const sub=u.sub||String(u.stage||'').replace(/^At IM ·\s*/,'');
+  return '<div class="up rise" style="--i:'+i+'" title="'+esc((u.wr||'')+' '+(u.name||''))+'"><span class="up-d"><b>'+(d!=null?d:esc(u.stageShort||'IM'))+'</b><em>'+(d!=null?(d===1?'day at IM':'days at IM'):'at IM')+'</em></span><span class="up-m"><span class="wr">'+esc(u.wr)+(u.wg?' · '+esc(u.wg):'')+'</span><b>'+esc(u.name)+'</b><em>'+esc([sub?sub.charAt(0).toUpperCase()+sub.slice(1):'',u.fac].filter(Boolean).join(' · '))+'</em></span></div>'; }
 /* AWG decisions by quarter, a showcase panel */
 function activityChart(years){ const L=Object.values(S.queue).filter(q=>q.status==="decided"&&q.decidedAt&&q.outcome); const now=new Date(); const per=[];
   const q0=Math.floor(now.getMonth()/3); for(let i=years*4-1;i>=0;i--){ let y=now.getFullYear(), qq=q0-i; while(qq<0){ qq+=4; y--; } per.push({k:y+"Q"+(qq+1),y,q:qq,c:{},n:0}); }
@@ -1026,7 +1029,7 @@ function desk(doc){ (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flags=rowFlags(r)
   const shownAll=R.filter(vis); const RP=S.rowPg[doc.rep+F]||(S.rowPg[doc.rep+F]={page:0,size:10}); const pages=Math.max(1,Math.ceil(shownAll.length/RP.size)); if(RP.page>=pages) RP.page=pages-1; const shown=shownAll.slice(RP.page*RP.size,RP.page*RP.size+RP.size);
   const tabs=[["awg","Marked AWG",awgR.length],["flag","Flagged",flagged.length],["all","All Rows",R.length]].filter(x=>x[0]==="all"||x[2]).concat(F==="items"?[["items","From the Draft",shownAll.length]]:[]);
   const calls=doc.calls||[];
-  return '<div class="dhead"><div class="t">'+backLink(decided?'#/decided':'#/',decided?'All Decisions':'The Agenda')+'<h1 style="margin-top:6px">'+esc((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||""))+'</h1><div class="sub">'+nwj([doc.wg,doc.file,doc.at&&!doc.hist?"brought in "+fmtD(doc.at)+(doc.by?" by "+doc.by:""):"",doc.category])+'</div>'+(doc.resub?'<div class="resub"><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span><span>'+nwj([doc.resub.first?'first submitted '+fmtD(doc.resub.first):'',doc.resub.date?'resubmitted '+fmtD(doc.resub.date):''])+'</span></div>':'')+'</div>'+
+  return '<div class="dhead"><div class="t">'+backLink(decided?'#/decided':'#/',decided?'All Decisions':'The Agenda')+'<h1 style="margin-top:6px">'+esc((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||""))+'</h1><div class="sub">'+nwj([doc.wg,doc.at&&!doc.hist?(doc.fromIm?"From IM Review "+fmtD(doc.at):"Brought in "+fmtD(doc.at)+(doc.by?" by "+doc.by:"")):"",doc.category])+'</div>'+(doc.resub?'<div class="resub"><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span><span>'+nwj([doc.resub.first?'first submitted '+fmtD(doc.resub.first):'',doc.resub.date?'resubmitted '+fmtD(doc.resub.date):''])+'</span></div>':'')+'</div>'+
     '<div class="prog">'+(decided?ochip(doc.outcome)+'<span>'+esc(fmtD(doc.decidedAt))+'</span>':(q.status==="carried"?'<b>Carried</b><span>from '+esc(fmtS(q.lastCall))+'</span>':'<b>'+R.length+'</b><span>rows · '+awgR.length+' marked AWG</span>'))+'</div></div>'+
     (doc.fromIm?'<div class="card fromim"><b>From IM Review.</b> <span class="muted">IM approved it '+esc(fmtD(doc.fromIm.decidedAt))+(doc.fromIm.decidedBy?' ('+esc(doc.fromIm.decidedBy)+')':'')+'. '+((doc.rows||[]).length)+' rows IM approved come here, with IM’s final wording'+(Object.entries(doc.fromIm.counts||{}).filter(x=>/Denied|Returned|Withdrawn/.test(x[0])&&x[1]).length?'; rows IM denied or returned stay behind':'')+'.</span></div>':'')+
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: record a call, carry it, decide it. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
