@@ -748,6 +748,18 @@ em,i,cite,address,dfn{font-style:normal}
 <main class="wrap" id="main"><div class="empty">Loading…</div></main>
 
 <script>
+/* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
+   Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
+   A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
+function mismoHoliday(ymd){ const d=new Date(String(ymd).slice(0,10)+"T12:00:00"); if(isNaN(d)) return false; const y=d.getFullYear(), m=d.getMonth(), day=d.getDate(), dow=d.getDay();
+  const nth=(mo,wd,n)=>{ const f=new Date(y,mo,1,12); const off=(wd-f.getDay()+7)%7; return 1+off+(n-1)*7; }, last=(mo,wd)=>{ const l=new Date(y,mo+1,0,12); return l.getDate()-((l.getDay()-wd+7)%7); };
+  const obs=(mo,dd)=>{ const x=new Date(y,mo,dd,12), w=x.getDay(); return w===6?[mo,dd-1]:w===0?[mo,dd+1]:[mo,dd]; };
+  const is=(mo,dd)=>m===mo&&day===dd;
+  if(is(0,nth(0,1,3))||is(1,nth(1,1,3))||is(4,last(4,1))||is(8,nth(8,1,1))) return true;
+  for(const [mo,dd] of [[5,19],[6,4],[10,11]]){ const [a,b]=obs(mo,dd); if(is(a,b)) return true; }
+  const tg=nth(10,4,4); if(is(10,tg)||is(10,tg+1)) return true;
+  if((m===11&&day>=25)||(m===0&&day===1)) return true;
+  return false; }
 /* =====================================================================
    AWG Review: the portal for MISMO's Architecture Workgroup.
    A facilitator posts the AWG submission in MISMO Connect, as today. Mark or
@@ -821,8 +833,8 @@ const roster=()=>(S.cfg.roster&&(S.cfg.roster.members||[]).length)?S.cfg.roster:
 const voters=()=>(roster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name));
 const quorumNeed=()=>(+roster().need>0)?+roster().need:Math.floor(voters().length/2)+1;
 /* the next AWG calls: the dates staff keep on the Roster and Calls page, then every other Thursday */
-function nextCalls(n){ const L=(S.cfg.calls||CALLS0).filter(d=>d>=today()).sort(); let last=L[L.length-1]||(S.cfg.calls||CALLS0).slice(-1)[0]||today();
-  while(L.length<n){ const d=new Date(last+"T12:00:00"); d.setDate(d.getDate()+14); last=d.toISOString().slice(0,10); if(last>=today()) L.push(last); } return L.slice(0,n); }
+function nextCalls(n){ const L=(S.cfg.calls||CALLS0).filter(d=>d>=today()&&!mismoHoliday(d)).sort(); let last=L[L.length-1]||(S.cfg.calls||CALLS0).slice(-1)[0]||today();
+  while(L.length<n){ const d=new Date(last+"T12:00:00"); d.setDate(d.getDate()+14); last=d.toISOString().slice(0,10); if(last>=today()&&!mismoHoliday(last)) L.push(last); } return L.slice(0,n); }
 
 /* ---------- state ---------- */
 const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{},bt:null,up:[],filter:"awg",edit:null,loaded:false,rowPg:{},dec:{page:0,size:10,year:"all",q:""}};
@@ -830,7 +842,9 @@ const canEdit=()=>{ try{ if(RS()&&RS().canEdit) return !!RS().canEdit(PROJECT); 
 const sameNm=(a,b)=>{ a=String(a||"").replace(/\(.*\)/,"").trim().toLowerCase(); b=String(b||"").trim().toLowerCase(); return !!a&&a===b; };
 /* the AWG chair and facilitator record decisions: whoever is on the Who Records Decisions list, or the chair,
    vice chair or facilitator in Meeting Trackers' roster (Mark and Erin) */
-const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const L=(S.cfg.reviewers||[]).map(x=>String(x).toLowerCase()); if(!L.length||L.includes(String(S.me.email||"").toLowerCase())) return true; const R=roster(); return [R.chair,R.vice,R.fac].some(n=>sameNm(n,S.me.name)); };
+/* who records decisions here (Jonna, Nov 2): Erin Bittenbender (AWG facilitator) and Mark Kleingers (AWG chair). MISMO staff admins can step in. */
+const RECORDERS=[{n:"Erin Bittenbender",e:"ebittenbender@mismo.org"},{n:"Mark Kleingers",e:"mkleingers@mismo.org"}];
+const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const em=String(S.me.email||"").toLowerCase(); return RECORDERS.some(r=>sameNm(r.n,S.me.name)||(r.e&&r.e===em)); };
 const isAdmin=()=>S.role==="admin";
 const route=()=>{ const h=location.hash.replace(/^#\/?/,""); const [a,b,c]=h.split("/"); return {view:a||"waiting",rep:b?decodeURIComponent(b):"",from:c?decodeURIComponent(c):""}; };
 function backLink(href,label){ const f=route().from, q=f&&S.queue[f]; if(q) return '<a class="back" href="#/review/'+encodeURIComponent(f)+'">‹ Back to the '+esc((q.wr?q.wr+" ":"")+(q.resub?"Resubmission":"Submission"))+'</a><a class="back" style="margin-left:16px" href="'+href+'">'+label+'</a>'; return '<a class="back" href="'+href+'">‹ '+label+'</a>'; }
