@@ -5650,7 +5650,7 @@ async function mtToPortals(){ if(!S.isStaff||!S.canWrite||Date.now()-mtPortalAt<
       const up=(name,fn)=>proj===IMR?imrUpdate(name,fn):awgUpdate(name,fn);
       const cur=await rGet(proj,'config'); const c0=(cur&&cur.data)||{};
       if(JSON.stringify(c0.roster)!==JSON.stringify(roster)||JSON.stringify(c0.calls)!==JSON.stringify(calls)||c0.when!==(s.day+', '+(s.time||''))) await up('config',c=>Object.assign({},c||{},{roster,calls,when:(s.day||'')+', '+(s.time||'')+' ET'}));
-      const a0=await rGet(proj,'attendance'); const A=Object.assign({},(a0&&a0.data)||{}); let ch=false; Object.entries(att).forEach(([d,x])=>{ if(JSON.stringify(A[d])!==JSON.stringify(x)){ A[d]=x; ch=true; } }); if(ch) await up('attendance',()=>A);
+      const a0=await rGet(proj,'attendance'); const A=Object.assign({},(a0&&a0.data)||{}); delete A.savedBy; delete A.savedAt; let ch=false; Object.entries(att).forEach(([d,x])=>{ if(JSON.stringify(A[d])!==JSON.stringify(x)){ A[d]=x; ch=true; } }); if(ch) await up('attendance',()=>A);
     }
   }catch(e){ console.warn('meeting trackers to portals',e); } }
 const _imEnsureQ2=imEnsureQ; imEnsureQ=function(){ _imEnsureQ2(); setTimeout(mtToPortals,4000); };
