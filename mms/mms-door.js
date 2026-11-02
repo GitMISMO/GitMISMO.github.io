@@ -118,9 +118,36 @@
     return f.loading;
   }
   function ensure(f) { return f.loaded ? Promise.resolve(f) : load(f); }
+  /* A save carries the whole document. If someone else saved it after this tab read it, keep their
+     changes: take only the fields this tab actually changed, and keep every history line from both. */
+  function same(a, b) { return JSON.stringify(a) === JSON.stringify(b); }
+  function isObj(v) { return v && typeof v === 'object' && !Array.isArray(v); }
+  function mergeSet(cur, op) {
+    var mine = clone(op.data), base = op.base;
+    if (!base || !cur || !isObj(cur) || !isObj(mine) || same(cur, base)) return mine;
+    var out = clone(cur), keys = {};
+    Object.keys(mine).concat(Object.keys(base)).forEach(function (k) { keys[k] = 1; });
+    Object.keys(keys).forEach(function (k) {
+      if (same(mine[k], base[k])) return;
+      if (k === 'history' && Array.isArray(mine[k]) && Array.isArray(cur[k])) {
+        var seen = {}, all = [];
+        cur[k].concat(mine[k]).forEach(function (h) { var key = JSON.stringify(h); if (!seen[key]) { seen[key] = 1; all.push(h); } });
+        all.sort(function (x, y) { return String((x && x.at) || '').localeCompare(String((y && y.at) || '')); });
+        out[k] = all; return;
+      }
+      if (isObj(mine[k]) && isObj(base[k]) && isObj(cur[k])) {
+        var o = clone(cur[k]), sub = {};
+        Object.keys(mine[k]).concat(Object.keys(base[k])).forEach(function (j) { sub[j] = 1; });
+        Object.keys(sub).forEach(function (j) { if (!same(mine[k][j], base[k][j])) { if (mine[k][j] === undefined) delete o[j]; else o[j] = clone(mine[k][j]); } });
+        out[k] = o; return;
+      }
+      if (mine[k] === undefined) delete out[k]; else out[k] = clone(mine[k]);
+    });
+    return out;
+  }
   function applyOps(content, ops) {
     ops.forEach(function (op) {
-      if (op.kind === 'set') content.docs[op.path] = clone(op.data);
+      if (op.kind === 'set') content.docs[op.path] = mergeSet(content.docs[op.path], op);
       else if (op.kind === 'update') content.docs[op.path] = Object.assign({}, content.docs[op.path] || {}, clone(op.data));
       else if (op.kind === 'delete') delete content.docs[op.path];
     });
@@ -140,7 +167,8 @@
     return new Promise(function (res, rej) {
       var go = function () {
         if (kind === 'update' && f.loaded && docIn(f, path) === null) { rej(err('not-found', 'No document to update: ' + path)); return; }
-        f.pending.push({ kind: kind, path: path, data: data, res: res, rej: rej }); f.view = null;
+        var base = f.loaded ? docIn(f, path) : undefined;
+        f.pending.push({ kind: kind, path: path, data: data, base: base ? clone(base) : null, res: res, rej: rej }); f.view = null;
         notify(f, true);
         schedule(f, FLUSH_MS);
       };

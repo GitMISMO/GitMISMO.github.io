@@ -79,7 +79,7 @@
   function diff(a, b) { var x = U(a), y = U(b); return (x && y) ? Math.round((y - x) / 864e5) : null; }
   function f(s) { var d = U(s); return d ? MON[d.getUTCMonth()] + ' ' + d.getUTCDate() : ''; }
   function fl(s) { var d = U(s); return d ? DOW[d.getUTCDay()] + ', ' + MON[d.getUTCMonth()] + ' ' + d.getUTCDate() : ''; }
-  function ageTxt(n) { if (n == null) return ''; if (n < 60) return n + ' day' + (n === 1 ? '' : 's'); if (n < 730) return Math.round(n / 30.4) + ' months'; return (n / 365).toFixed(1).replace(/\.0$/, '') + ' years'; }
+  function ageTxt(n) { if (n == null) return ''; if (n < 60) return n + ' day' + (n === 1 ? '' : 's'); if (n < 365) return Math.round(n / 30.4) + ' months'; return (n / 365).toFixed(1).replace(/\.0$/, '') + ' years'; }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
   function same(a, b) { a = String(a || '').trim().toLowerCase(); b = String(b || '').trim().toLowerCase(); if (!a || !b) return false; if (a === b) return true; var fa = a.split(/\s+/), fb = b.split(/\s+/); return fa.length === 1 ? fa[0] === fb[0] : (fb.length === 1 ? fb[0] === fa[0] : false); }
 
@@ -87,17 +87,21 @@
   var BUILT = ['approved', 'cfp', 'kickoff', 'work', 'aireview', 'im', 'awg', 'designation', 'gc-comment', 'comment', 'post', 'gc-publish', 'release'];
   function proc(process) { var p = process || {}; return (p.presets && p.presets[p.active]) || { stages: [], gov: 'GC' }; }
   function stageName(P, k) { var s = (P.stages || []).find(function (x) { return x.key === k; }); return s ? s.name : (k === 'published' ? 'Published' : k); }
-  function stageAge(t, today) { return diff(t.stageSince || (t.dates && t.dates.workStart) || (t.importedAt || '').slice(0, 10), today); }
+  var ENTRY = { approved: ['bet', 'submitted'], cfp: ['bet'], kickoff: ['cfpPublished', 'bet'], work: ['workStart', 'kickoffGc', 'bet'], aireview: ['aiSubmitted'], im: ['imSubmitted', 'aiDecision'], awg: ['awgSubmitted', 'imDecision'], designation: ['awgDecision'], 'gc-comment': ['designation', 'awgDecision'], comment: ['commentStart', 'commentPublished', 'gcComment'], post: ['commentEnd'], 'gc-publish': ['commentEnd', 'postGc'], release: ['postGc'] };
+  // work brought over from Smartsheet was stamped with its IM or work start date: use the date it entered its current stage
+  function stageAge(t, today) { var d = t.dates || {}, imp = t.importedAt && t.source === 'smartsheet' && t.stageSince === (d.imSubmitted || d.workStart || t.importedAt), since = t.stageSince;
+    if (!since || imp) { var c = (ENTRY[t.stage] || []).map(function (k) { return d[k]; }).filter(function (x) { return x && x <= today; }).sort(); since = c.length ? c[c.length - 1] : (t.importedAt || t.stageSince || d.workStart || ''); }
+    return diff(String(since).slice(0, 10), today); }
   function pastTarget(t, today) { var d = t.dates || {}; return t.state === 'active' && !t.split && !t.rides && d.targetIM && d.targetIM < today && ['approved', 'cfp', 'kickoff', 'work', 'aireview'].indexOf(t.stage) >= 0; }
   /* The facilitator's next step, or null when the move is someone else's. Mirrors whoseMove() in the MMS. */
-  function facMove(t, P) {
+  function facMove(t, P, today) {
     if (t.state !== 'active' || t.split || t.rides || t.request) return null;
     var sub = t.sub || '';
     switch (t.stage) {
-      case 'work': return 'Build the work product; submit for AI Review when ready';
+      /* building work is only "your move" once its Target to Submit to IM is a week away or past, same as My Queue */
+      case 'work': { var tg = (t.dates || {}).targetIM; return (tg && (!today || diff(today, tg) <= 7)) ? 'Build the work product; submit for AI Review when ready' : null; }
       case 'aireview': return sub === 'updates' ? 'Make the updates AI Review found, then resubmit' : (sub === 'reviewed' ? 'Read the AI Review and send it to IM, or make updates' : 'Run the AI Review on the submission');
       case 'im': case 'awg': { var nm = t.stage === 'im' ? 'IM' : 'AWG'; if (sub === 'updates') return 'Make the ' + nm + ' updates, then resubmit'; if (sub === 'prep') return 'Submit to ' + nm; return null; }
-      case 'designation': return (sub === 'prep' || !sub) ? 'Send it to designation with the comment length and page name' : null;
       case 'post': return 'Report what came back from comment';
     }
     var sd = (P.stages || []).find(function (s) { return s.key === t.stage; });
@@ -169,7 +173,9 @@
     var row = function (t, sub, badge, tone) { return { lead: t.wr, main: t.name, sub: sub, badge: badge, tone: tone, href: link(t) }; };
 
     if (on.yourMove) {
-      var ym = act.map(function (t) { return [t, facMove(t, P)]; }).filter(function (x) { return x[1]; })
+      /* the MMS passes moveFor (its own My Queue rule), so the email and the queue always agree */
+      var ymPool = input.moveFor ? T.filter(function (t) { return (t.state === 'active' || t.state === 'hold') && !t.split; }) : act;
+      var ym = ymPool.map(function (t) { return [t, input.moveFor ? input.moveFor(t, person) : facMove(t, P, today)]; }).filter(function (x) { return x[1]; })
         .sort(function (a, b) { return (pastTarget(b[0], today) - pastTarget(a[0], today)) || ((stageAge(b[0], today) || 0) - (stageAge(a[0], today) || 0)); });
       count.todo = ym.length;
       if (ym.length) S.push({ key: 'yourMove', title: 'Your Move', note: ym.length + ' waiting on you', tone: 'warn',
@@ -177,10 +183,11 @@
     }
     var late = act.filter(function (t) { return pastTarget(t, today); });
     count.late = late.length;
-    if (on.overdue && late.length) S.push({ key: 'overdue', title: 'Past Target', tone: 'bad', note: 'Past the Target to Submit to IM date',
+    if (on.overdue && late.length) S.push({ key: 'overdue', title: 'Past Target', tone: 'bad', note: 'Past the Target to Submit to IM date. Submit it, or open it and choose Change Target Date.',
       rows: late.map(function (t) { return row(t, stageName(P, t.stage), 'Was due ' + f(t.dates.targetIM), 'bad'); }) });
     if (on.targetUpdate) {
-      var tu = act.filter(function (t) { var d = (t.dates || {}).targetIM; return ['approved', 'work', 'aireview'].indexOf(t.stage) >= 0 && !t.split && !t.rides && (!d || diff(today, d) <= cfg.targetSoonDays); })
+      /* work already listed under Past Target is not listed again here */
+      var tu = act.filter(function (t) { var d = (t.dates || {}).targetIM; return ['approved', 'work', 'aireview'].indexOf(t.stage) >= 0 && !t.split && !t.rides && !(on.overdue && late.indexOf(t) >= 0) && (!d || diff(today, d) <= cfg.targetSoonDays); })
         .sort(function (a, b) { return String((a.dates || {}).targetIM || '0').localeCompare(String((b.dates || {}).targetIM || '0')); });
       if (tu.length) S.push({ key: 'targetUpdate', title: 'Check Your Target to Submit to IM', tone: 'warn',
         note: 'If a date below is no longer right, open the work request and choose Change Target Date.',
