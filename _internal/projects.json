@@ -352,7 +352,8 @@
     ],
     "readable": [
       "orders-public/"
-    ]
+    ],
+    "ask": true
   },
   "so-actualize-hours": {
     "repo": "GitMISMO/so-actualize-data",
@@ -364,7 +365,8 @@
     ],
     "readable": [
       "orders-public/"
-    ]
+    ],
+    "ask": true
   },
   "so-trex-hours": {
     "repo": "GitMISMO/so-trex-data",
@@ -376,7 +378,8 @@
     ],
     "readable": [
       "orders-public/"
-    ]
+    ],
+    "ask": true
   },
   "so-falcon-hours": {
     "repo": "GitMISMO/so-falcon-data",
@@ -388,7 +391,8 @@
     ],
     "readable": [
       "orders-public/"
-    ]
+    ],
+    "ask": true
   },
   "so-trudigital-hours": {
     "repo": "GitMISMO/so-trudigital-data",
@@ -400,7 +404,8 @@
     ],
     "readable": [
       "orders-public/"
-    ]
+    ],
+    "ask": true
   },
   "so-vianteye-hours": {
     "repo": "GitMISMO/so-vianteye-data",
@@ -412,7 +417,8 @@
     ],
     "readable": [
       "orders-public/"
-    ]
+    ],
+    "ask": true
   },
   "as-falcon": {
     "repo": "GitMISMO/as-falcon-data",
