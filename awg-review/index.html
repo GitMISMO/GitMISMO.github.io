@@ -790,7 +790,7 @@ async function load(role){
   S.role=role||""; const c=(RS()&&RS().current())||{}; S.me={name:c.name||"",email:c.email||""};
   const yr=new Date().getFullYear();
   const [q,cfg,bt,l1,l0,up,att,wrs]=await Promise.all(["queue","config","backtest","learn-"+yr,"learn-"+(yr-1),"upcoming","attendance","wrs"].map(n=>get(n).catch(()=>({data:null}))));
-  S.att=att.data||{}; S.wrs=(wrs.data&&wrs.data.items)||{};
+  S.att=Object.fromEntries(Object.entries(att.data||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k))); S.wrs=(wrs.data&&wrs.data.items)||{};
   S.queue=(q.data&&q.data.items)||{}; S.cfg=cfg.data||{}; S.bt=bt.data||null;
   S.up=(up.data&&up.data.items)||[]; S.upAt=(up.data&&up.data.asOf)||"";
   S.learn=Object.assign({},(l0.data&&l0.data.rows)||{},(l1.data&&l1.data.rows)||{});
