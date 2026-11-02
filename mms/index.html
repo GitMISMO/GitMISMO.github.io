@@ -5676,6 +5676,16 @@ async function mtToPortals(){ if(!S.isStaff||!S.canWrite||Date.now()-mtPortalAt<
   }catch(e){ console.warn('meeting trackers to portals',e); } }
 const _imEnsureQ2=imEnsureQ; imEnsureQ=function(){ _imEnsureQ2(); setTimeout(mtToPortals,4000); };
 
+/* nav: AWG Review sits right after IM Review and opens in its own tab, like IM Review */
+(function(){ const nav=$('#nav'); if(!nav||$('[data-hq="awgreview"]',nav)) return; const after=$('[data-hq="imreview"]',nav)||$('[data-hq="reviews"]',nav); const b=document.createElement('button'); b.type='button'; b.dataset.hq='awgreview'; b.title='AWG Review'; b.hidden=true;
+  b.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9z"/><path d="M12 12l8-4.5M12 12v9M12 12L4 7.5"/></svg><span>AWG Review</span><b id="nav-awgreview" hidden></b>';
+  b.onclick=e=>{ if(e) e.stopPropagation(); window.open(AWGR_URL,'awgreview'); if(typeof go==='function') go('home'); };
+  if(after) after.after(b); else nav.appendChild(b); })();
+function awgCount(){ const n=Object.values(S.awgPortalQ||{}).filter(q=>!q.hist&&(q.status==='awaiting'||q.status==='carried')).length; const c=$('#nav-awgreview'); if(c){ c.textContent=n||''; c.hidden=!n; }
+  const btn=$('#nav button[data-hq="awgreview"]'); const im=$('#nav button[data-hq="imreview"]'); if(btn) btn.hidden=im?im.hidden:!S.isStaff; }
+const _imCount_awg=imCount; imCount=function(){ _imCount_awg(); awgCount(); };
+const _awgSync0=awgSync; awgSync=async function(){ await _awgSync0(); awgCount(); };
+
 /* ---------- settings ---------- */
 let setTab='process';
 VIEWS.settings=function(){
