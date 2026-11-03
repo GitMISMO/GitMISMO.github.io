@@ -1940,6 +1940,12 @@ p,.sub,.lede{text-wrap:pretty}
 .cp-how b{color:var(--ink)}
 .cp-miss{color:var(--warn);font-weight:600}
 .cp-sec h4 .btn{margin-left:10px}
+.desig-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.dg-f{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:8px 10px}
+.dg-f label{display:block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin-bottom:2px}
+.dg-f b{font-size:13.5px}
+.dg-f.miss{border-style:dashed}.dg-f.miss b{color:var(--warn)}
+.dg-votes{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2643,7 +2649,7 @@ function stageActions(t){
       break; }
     case 'designation':
       if(sub==='director'||sub==='discuss'||sub==='prep'||!sub){ add('Approve Recommended Designation →',()=>approveRec(t),'pri'); add('Change the Designation',()=>directorRec(t)); }
-      if(sub==='vps') add('Approve the Designation',()=>vpAgree(t),'pri');
+      if(sub==='vps'){ add('Approve the Designation',()=>vpAgree(t),'pri'); if(S.isStaff||isRole('director',S.me)) add('Change the Designation',()=>directorRec(t)); }
       break;
     case 'gc-comment': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
     case 'comment':
@@ -5888,6 +5894,37 @@ startWork=async function(t){
   x.dates=Object.assign({},x.dates,v.cfp==='yes'?{}:{workStart:st},{targetIM:target,forecastIM:target,targetDone:addDays(st,h[3])});
   await move(x,v.cfp==='yes'?'cfp':nextStage(x,'kickoff'),{text:'Work approved to start ('+h[1]+', '+h[2]+')'+(v.cfp==='yes'?'; Call for Participation requested from MISMO Media':'')+'. Target to Submit to IM '+fmt(target)});
 };
+
+/* ---------- License Designation, shown plainly (Nov 2) ----------
+   While a work request is in License Designation (and after), the Overview shows the
+   designation it carries now, who set it and when, and where approval stands, so a
+   change is visible the moment it is saved. */
+function desigRows(t){ const d=t.designation||{};
+  return [['Comment Type',d.type],['Classification',t.classification],['License Usage',d.license],['Royalty Status',d.royalty],['Available To',d.availableTo]]; }
+function desigSetBy(t){ const H=(t.history||[]).filter(h=>/Director recommended|recommended designation|Designation approved|designation (was )?changed/i.test(h.text||'')); const h=H[H.length-1];
+  const d=t.designation||{}; if(h) return (/Director recommended/.test(h.text)?'Set by '+byName(h.by):'Updated by '+byName(h.by))+' · '+fmt(atDay(h.at));
+  return d.auto?'Recommended automatically'+(d.basis?' from '+d.basis:''):''; }
+function desigSection(t){ const d=t.designation||{}, rows=desigRows(t), sub=t.sub||'';
+  const vps=peopleFor('vps'), votes=d.vps||{}, approved=/Approved/.test(d.status||'');
+  const state=approved?['good','Approved']:sub==='vps'?['info','Waiting for approval']:sub==='discuss'?['warn','Needs discussion']:d.auto?['info','Recommended automatically']:['', 'Not set yet'];
+  const canChange=S.canWrite&&!S.viewAs&&(S.isStaff||isRole('director',S.me))&&t.stage==='designation';
+  return '<div class="psec full desig-sec"><h4>License Designation<span class="chip '+state[0]+'" style="margin-left:6px">'+esc(state[1])+'</span><span class="sp muted" style="font-size:12px;font-weight:500">'+esc(desigSetBy(t))+'</span>'+'</h4>'+
+    '<div class="desig-grid">'+rows.map(([k,v])=>'<div class="dg-f'+(v?'':' miss')+'"><label>'+esc(k)+'</label><b>'+esc(v||'Not set')+'</b></div>').join('')+'</div>'+
+    (d.notes?'<p class="muted" style="font-size:12.5px;margin:8px 0 0">Note: '+esc(d.notes)+'</p>':'')+
+    (vps.length&&(sub==='vps'||Object.keys(votes).length)?'<div class="dg-votes">'+vps.map(p=>{ const v=votes[p.name]; return '<span class="chip '+(v&&/Agree|Approve/.test(v.vote)?'good':v&&v.vote==='Needs Discussion'?'warn':'')+'">'+esc(p.name)+': '+esc(v?(v.vote==='Agree'?'Approve':v.vote):'Not yet')+'</span>'; }).join(' ')+'</div>':'')+'</div>'; }
+document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-desigchg]'); if(!b) return; e.preventDefault(); const t=S.tickets[b.dataset.desigchg]; if(t) directorRec(t); });
+const _renderPanelDG=renderPanel;
+renderPanel=function(){ _renderPanelDG(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return;
+  const pb=$('.pb',P); if(!pb||$('.desig-sec',pb)) return; const d=t.designation||{}; const near=['designation','gc-comment'].includes(t.stage);
+  if(!near&&!d.license&&!d.type) return;
+  const host=$('[data-wtab="'+(near?'over':'det')+'"]',pb); if(!host) return;
+  const w=document.createElement('div'); w.innerHTML=desigSection(t); const sec=w.firstChild;
+  if(near){ const lead=$('.wh-lead-in',host); (lead&&lead.nextSibling)?host.insertBefore(sec,lead.nextSibling):host.appendChild(sec); } else host.appendChild(sec); };
+/* say plainly that a changed designation saved */
+const _directorRecDG=directorRec;
+directorRec=async function(t){ const before=JSON.stringify([t.designation&&t.designation.type,t.classification,t.designation&&t.designation.license,t.designation&&t.designation.royalty,t.designation&&t.designation.availableTo]);
+  await _directorRecDG(t); const x=S.tickets[t.id]; if(!x) return; const d=x.designation||{}; const after=JSON.stringify([d.type,x.classification,d.license,d.royalty,d.availableTo]);
+  if(after!==before){ toast('Designation saved: '+[d.type,x.classification,d.license,d.royalty,d.availableTo].filter(Boolean).join(' · ')); if(S.panel===t.id) renderPanel(); } };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
