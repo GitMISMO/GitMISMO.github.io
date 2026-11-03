@@ -293,6 +293,72 @@ html,body{overflow-x:clip}
 #home-tiles{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media(max-width:1100px){.grid2{grid-template-columns:1fr}#home-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}#home-tiles>.tile:nth-child(5){grid-column:1/-1}}
 
+/* Home: the work and how it's going, in one place (Jonna, Nov 2, 2026) */
+.hero{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center;padding:24px 30px;border-radius:14px;margin:0 0 16px;color:#fff;background:radial-gradient(70% 140% at 100% 0%,rgba(116,191,235,.30),transparent 62%),radial-gradient(55% 120% at 0% 110%,rgba(95,211,154,.16),transparent 60%),linear-gradient(135deg,#0d314c 0%,#14486e 58%,#1d6a96 100%);border:1px solid rgba(116,191,235,.25);box-shadow:0 20px 44px -26px rgba(6,32,47,.85)}
+.hero::after{content:"";position:absolute;right:-70px;top:-90px;width:300px;height:300px;border-radius:50%;border:1px solid rgba(255,255,255,.08);box-shadow:0 0 0 44px rgba(255,255,255,.025),0 0 0 88px rgba(255,255,255,.02);pointer-events:none}
+.hero-l{position:relative;z-index:1;min-width:0}
+.hero-eb{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--sky);flex-wrap:wrap}
+.hero-eb #asof{color:rgba(255,255,255,.62);font-size:11px;white-space:nowrap}
+.hero-dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.4)}
+.hero h1{margin:6px 0 8px;font-size:28px;font-weight:700;letter-spacing:-.015em;line-height:1.15}
+.hero-s{margin:0;max-width:760px;font-size:14.5px;line-height:1.6;color:rgba(255,255,255,.8)}
+.hero-s b{color:#fff;font-weight:700}
+.hero-acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.hbtn{border:1px solid var(--sky);background:var(--sky);color:#06202f;border-radius:6px;padding:8px 15px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;transition:filter .12s,background .12s}
+.hbtn:hover{filter:brightness(1.07)}
+.hbtn.ghost{background:rgba(255,255,255,.06);color:#fff;border-color:rgba(255,255,255,.32)}
+.hbtn.ghost:hover{background:rgba(255,255,255,.14)}
+.hbtn:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.hero-r{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center}
+.hring{position:relative;width:132px;height:132px}
+.hring svg{display:block;width:100%;height:100%}
+.hring .arc{transition:stroke-dashoffset 1.2s cubic-bezier(.2,.8,.2,1)}
+.hring-m{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.hring-m b{font-size:30px;font-weight:700;line-height:1;letter-spacing:-.02em}
+.hring-m span{font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:6px}
+.hring-c{margin-top:8px;font-size:12px;color:rgba(255,255,255,.72);white-space:nowrap}
+.hring-c b{color:#fff}
+#home-tiles.htiles{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.ktile{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px 14px 19px;display:flex;flex-direction:column;min-width:0;box-shadow:0 1px 2px rgba(6,32,47,.05);transition:transform .15s,box-shadow .15s,border-color .15s}
+.ktile::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--k)}
+.ktile:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--k) 55%,var(--border));box-shadow:0 16px 28px -20px rgba(6,32,47,.5)}
+.ktile:focus-visible{outline:2px solid var(--sky);outline-offset:3px}
+.kt{display:flex;align-items:center;gap:9px;font-size:12.5px;font-weight:700;color:var(--ink-2);white-space:nowrap;min-width:0}
+.kt i{width:28px;height:28px;border-radius:8px;flex:none;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--k) 24%,var(--surface));color:var(--ink)}
+.kt svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.kt .go{margin-left:auto;color:var(--ink-3);font-weight:600;opacity:0;transition:opacity .15s}
+.ktile:hover .kt .go,.ktile:focus-visible .kt .go{opacity:1}
+.ktile .kn{font-size:34px;font-weight:700;line-height:1.05;margin-top:10px;color:var(--ink);letter-spacing:-.02em}
+.ktile .sub{font-size:12.5px;color:var(--ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini{margin-top:12px;height:30px;display:flex;flex-direction:column;justify-content:flex-end;gap:5px}
+.mcap{font-size:11px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kbar{display:flex;gap:2px;height:8px;border-radius:4px;overflow:hidden;background:var(--surface-3)}
+.kbar i,.pbar-b i{display:block;height:100%;min-width:3px;transition:flex-grow .9s cubic-bezier(.2,.8,.2,1)}
+.mini.cols{flex-direction:row;align-items:flex-end;gap:4px}
+.mini.cols i{flex:1;border-radius:3px 3px 0 0;background:color-mix(in srgb,var(--k) 38%,var(--surface-3));transition:height .9s cubic-bezier(.2,.8,.2,1)}
+.mini.cols i.now{background:var(--k)}
+.hgrid{display:grid;grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);gap:16px;align-items:start}
+.hside{display:flex;flex-direction:column;gap:16px;min-width:0}
+#work{scroll-margin-top:calc(var(--hq-h) + 16px)}
+.wtip{margin:0;padding:10px 16px 0;font-size:12.5px;color:var(--ink-3);line-height:1.5}
+.hchips{margin:10px 16px 6px}
+.hchips:empty{display:none}
+#home-todo .row.r2{padding:11px 16px}
+.allclear{display:flex;align-items:center;gap:14px;padding:22px 18px}
+.ac-i{width:44px;height:44px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,#5fd39a 26%,var(--surface));color:var(--good)}
+.ac-i svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.allclear b{display:block;font-size:15px}
+.allclear span{font-size:13px;color:var(--ink-2);line-height:1.5}
+.pbar{padding:12px 16px 12px;border-bottom:1px solid var(--rule)}
+.pbar-k{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:12.5px;color:var(--ink-2);margin-bottom:8px}
+.pbar-k span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pbar-k i{width:9px;height:9px;border-radius:2px}
+.pbar-k b{color:var(--ink)}
+.pbar-k em{font-style:normal;color:var(--ink-3)}
+.pbar-b{display:flex;gap:2px;height:10px;border-radius:5px;overflow:hidden;background:var(--surface-3)}
+@media(max-width:1100px){#home-tiles.htiles{grid-template-columns:repeat(2,minmax(0,1fr))}.hgrid{grid-template-columns:1fr}}
+@media(max-width:700px){.hero{grid-template-columns:1fr;padding:20px;gap:16px}.hero-r{flex-direction:row;gap:14px;align-items:center}.hring{width:96px;height:96px}.hring-m b{font-size:22px}.hring-m span{font-size:8.5px}.hero h1{font-size:23px}.ktile .kn{font-size:28px}}
+@media(max-width:480px){#home-tiles.htiles{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -345,8 +411,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <div class="railhits" id="rail-hits" hidden></div>
   </div>
   <nav aria-label="Membership Desk">
-    <button type="button" data-hq="home" aria-current="page" title="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Home</span></button>
-    <button type="button" data-hq="todo" title="To Do"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 12l3 3 5-6"/></svg><span>To Do</span><b class="nb" id="nb-todo"></b></button>
+    <button type="button" data-hq="home" aria-current="page" title="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Home</span><b class="nb" id="nb-todo" hidden></b></button>
+    
     <button type="button" data-hq="pip" title="Payment in Process"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Payment in Process</span><b class="nb" id="nb-pip"></b></button>
     <button type="button" data-hq="cases" title="Case Management"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Case Management</span></button>
     <button type="button" data-hq="done" title="Completed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Completed</span></button>
@@ -360,12 +426,30 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
 <main>
   <section class="view" id="v-home">
-    <div class="vhead"><div><h1 id="hello">Membership Desk</h1><div class="vsub">What's waiting on you for MISMO, what you've finished, and your MISMO cases from Aptify.</div></div><div class="asof" id="asof"></div></div>
-    <div class="tiles" id="home-tiles"></div>
-    <div class="grid3">
-      <div class="panel"><div class="ph"><h2>Waiting on You</h2><button class="link" type="button" data-go="todo">See All&nbsp;→</button></div><div class="rows" id="home-todo"></div></div>
-      <div class="panel"><div class="ph"><h2>Recently Set Up</h2><button class="link" type="button" data-go="done">See All&nbsp;→</button></div><div class="rows" id="home-done"></div></div>
-      <div class="panel"><div class="ph"><h2>Latest MISMO Cases</h2><button class="link" type="button" data-go="cases">See All&nbsp;→</button></div><div class="rows" id="home-cases"></div></div>
+    <div class="hero">
+      <div class="hero-l">
+        <div class="hero-eb"><span>Membership Desk</span><span class="hero-dot"></span><span id="asof"></span></div>
+        <h1 id="hello">Membership Desk</h1>
+        <p class="hero-s" id="hero-s"></p>
+        <div class="hero-acts"><button class="hbtn" type="button" data-go="todo">Start on Your To Do</button><button class="hbtn ghost" type="button" id="hero-inv">Add an Invoice</button></div>
+      </div>
+      <div class="hero-r" id="hero-ring"></div>
+    </div>
+    <div class="tiles htiles" id="home-tiles"></div>
+    <div class="hgrid">
+      <div class="hside">
+        <div class="panel" id="work">
+          <div class="ph"><h2>Your To Do</h2><span class="hint" id="work-h"></span></div>
+          <p class="wtip">Open one to see what to set up. Set it up in Aptify, then enter the Aptify Company ID and order number and select Mark Set Up.</p>
+          <div class="chips hchips" id="work-chips"></div>
+          <div class="rows" id="home-todo"></div>
+        </div>
+        <div class="panel"><div class="ph"><h2>Recently Completed</h2><button class="link" type="button" data-go="done">See All&nbsp;→</button></div><div class="rows" id="home-done"></div></div>
+      </div>
+      <div class="hside">
+        <div class="panel"><div class="ph"><h2>Payments to Track</h2><button class="link" type="button" data-go="pip" id="home-piplink">See All&nbsp;→</button></div><div id="home-pipbar"></div><div class="rows" id="home-pip"></div></div>
+        <div class="panel"><div class="ph"><h2>Latest MISMO Cases</h2><button class="link" type="button" data-go="cases">See All&nbsp;→</button></div><div class="rows" id="home-cases"></div></div>
+      </div>
     </div>
   </section>
 
@@ -498,19 +582,66 @@ function doneRow(r){return h(r.cs?"button":"div",{type:r.cs?"button":null,class:
 /* ---------- Home ---------- */
 function tiles(box,list){box.textContent="";list.forEach(t=>{const b=h("button",{type:"button",class:"tile",style:"--k:"+t.k,onclick:t.go},h("b",null,"0"),h("span",{class:"lab"},t.lab),h("span",{class:"sub"},t.sub));count(b.querySelector("b"),t.v,t.f||(v=>Math.round(v).toLocaleString("en-US")));box.appendChild(b);});}
 function caseYTD(){const yr=TODAY.slice(0,4);return Object.entries(D.cases.months).filter(([m])=>m.startsWith(yr)).reduce((a,[,v])=>a+v,0);}
-function renderHome(){const hr=new Date().getHours();$("hello").textContent=(hr<12?"Good Morning":hr<17?"Good Afternoon":"Good Evening")+", "+(((window.__deskMe&&window.__deskMe().name)||"").split(" ")[0]||"Membership Team");
- const oldest=TODO.map(x=>x.sold||x.paid).filter(Boolean).sort()[0],fin=finished().filter(r=>r.grp==="setup"&&r.d.slice(0,7)===TODAY.slice(0,7)).length,C=D.cases;
- tiles($("home-tiles"),[
-  {k:"#ff8f7d",lab:"Waiting on You",v:TODO.length,sub:TODO.length?(oldest?"oldest from "+fmtS(oldest):"see the To Do page"):"you're all caught up",go:()=>go("todo")},
-  {k:"#f0b94a",lab:"Payment in Process",v:pipRows().length,sub:(L=>L.length?money(pipSum(L))+" invoiced, not paid yet":"no invoices waiting")(pipRows()),go:()=>go("pip")},
-  {k:"#5fd39a",lab:"Set Up Recently",v:finished().filter(r=>r.grp==="setup").length,sub:"Square, new members and IIF since "+fmtS(finished().filter(r=>r.grp==="setup").map(r=>r.d).sort()[0]||TODAY),go:()=>go("done")},
-  {k:"#74bfeb",lab:"MISMO Cases in "+TODAY.slice(0,4),v:caseYTD(),sub:(C.months[TODAY.slice(0,7)]||C.months[Object.keys(C.months).sort().pop()])+" last month in Aptify",go:()=>go("cases")},
-  {k:"#b79cff",lab:"Closed the Same Day",v:Math.round(100*C.sameDay/C.closed),sub:C.sameDay+" of "+C.closed+" cases this year",go:()=>go("cases"),f:v=>Math.round(v)+"%"}]);
- const t=$("home-todo");t.textContent="";const L=TODO.slice().sort((a,b)=>String(a.sold||a.paid).localeCompare(String(b.sold||b.paid)));
- L.slice(0,7).forEach(x=>t.appendChild(todoRow2(x)));if(!L.length)t.appendChild(h("div",{class:"empty"},"Nothing waiting. New set-ups from MISMO Money and Member 360 land here."));
- const d=$("home-done");d.textContent="";finished().filter(r=>r.grp==="setup").slice(0,7).forEach(r=>d.appendChild(doneRow2(r)));
- const hc=$("home-cases");hc.textContent="";finished().filter(r=>r.grp==="case").slice(0,7).forEach(r=>hc.appendChild(doneRow2(r)));
- const nb=$("nb-todo");nb.textContent=TODO.length||"";nb.hidden=!TODO.length;pipBadge();}
+/* ---------- Home: the work and how it's going, in one place (Jonna, Nov 2, 2026). Your To Do is the whole list of set-ups, so there's
+   no separate To Do page. Payments to track, what's been completed and the latest cases sit around it, and each box at the top goes to its page. ---------- */
+const RED=()=>!!(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches);
+function countUp(el,to,f){f=f||(v=>Math.round(v).toLocaleString("en-US"));if(RED()||!to){el.textContent=f(to||0);return;}const t0=performance.now(),dur=750,st=t=>{const p=Math.min(1,(t-t0)/dur);el.textContent=f(to*(1-Math.pow(1-p,3)));if(p<1)requestAnimationFrame(st);};el.textContent=f(0);requestAnimationFrame(st);}
+const HICON={todo:'<path d="M9 11.5l2.6 2.6L17 8.7"/><rect x="3.5" y="3.5" width="17" height="17" rx="3"/>',pay:'<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3 9.5h18M7 14.5h4"/>',done:'<path d="M12 3.2l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.6l-5.2 2.7 1-5.8-4.3-4.1 5.9-.9z"/>',cases:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>'};
+function ktile(o){const ic=h("i"),mini=h("div",{class:"mini"}),n=h("b",{class:"kn"},"0");ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+o.ic+'</svg>';
+  const b=h("button",{type:"button",class:"ktile",style:"--k:"+o.k,onclick:o.go,"aria-label":o.lab+": "+(o.f?o.f(o.v):o.v)+", "+o.sub},h("span",{class:"kt"},ic,o.lab,h("span",{class:"go"},"→")),n,h("span",{class:"sub",title:o.sub},o.sub),mini);
+  countUp(n,o.v,o.f);if(o.viz)o.viz(mini);return b;}
+function kbar(mini,cap,parts){mini.appendChild(h("div",{class:"mcap",title:cap},cap));const bar=h("div",{class:"kbar"});
+  parts.filter(p=>p.v>0).forEach(p=>{const i=h("i",{style:"flex:"+(RED()?p.v:0)+" 1 0;background:"+p.k,title:p.t||null});bar.appendChild(i);if(!RED())setTimeout(()=>{i.style.flexGrow=String(p.v);},60);});mini.appendChild(bar);}
+let hkind="";
+function renderWork(){const kc=k=>TODO.filter(x=>x.kind===k).length;if(hkind&&!kc(hkind))hkind="";
+  const chips=$("work-chips");chips.textContent="";
+  if(TODO.length)[["","Everything","#74bfeb",TODO.length]].concat(Object.keys(KINDS).filter(k=>kc(k)).map(k=>[k,KINDS[k].plural,KINDS[k].k,kc(k)])).forEach(([v,l,k,n])=>chips.appendChild(h("button",{type:"button",class:"chipb"+(hkind===v?" on":""),style:"--k:"+k,"aria-pressed":hkind===v?"true":"false",onclick:()=>{hkind=v;renderWork();}},h("i",null),l,h("em",null,String(n)))));
+  const t=$("home-todo");t.textContent="";const L=TODO.filter(x=>!hkind||x.kind===hkind).sort((a,b)=>String(a.sold||a.paid||"9999").localeCompare(String(b.sold||b.paid||"9999"))||a.name.localeCompare(b.name));
+  L.forEach(x=>t.appendChild(todoRow2(x)));
+  $("work-h").textContent=TODO.length?L.length+" to set up · oldest first":"";
+  if(!TODO.length){const lf=finished().find(r=>r.grp==="setup"),ic=h("span",{class:"ac-i"});ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.2 4.2L19 7"/></svg>';
+    t.appendChild(h("div",{class:"allclear"},ic,h("div",null,h("b",null,"You're all caught up"),h("span",null,"Nothing is waiting to be set up. New set-ups from MISMO Money and Member 360 land here."+(lf?" The last one finished was "+lf.nm+", "+fmtS(lf.d)+".":"")))));}
+  const wt=document.querySelector("#work .wtip");if(wt)wt.hidden=!TODO.length;
+  const nb=$("nb-todo");if(nb){nb.textContent=TODO.length||"";nb.hidden=!TODO.length;}}
+function renderHome(){const hr=new Date().getHours(),first=(((window.__deskMe&&window.__deskMe().name)||"").split(" ")[0]);
+  $("hello").textContent=(hr<12?"Good Morning":hr<17?"Good Afternoon":"Good Evening")+", "+(first||"Membership Team");
+  const SU=finished().filter(r=>r.grp==="setup"&&r.d),mo=TODAY.slice(0,7),monName=new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{month:"long"}),
+    finM=SU.filter(r=>r.d.slice(0,7)===mo).length,since=SU.map(r=>r.d).sort()[0]||TODAY,
+    oldest=TODO.map(x=>x.sold||x.paid).filter(Boolean).sort()[0],oldD=oldest?Math.max(0,days(oldest,TODAY)):0,
+    P=pipRows(),pL=P.filter(r=>r.lender),pN=P.filter(r=>!r.lender),late=P.filter(r=>r.d&&days(r.d,TODAY)>30).length,C=D.cases,yr=TODAY.slice(0,4),
+    same=C.closed?Math.round(100*C.sameDay/C.closed):0,pl=(n,a,b)=>n===1?a:b,B=x=>h("b",null,x);
+  /* the sentence at the top */
+  const hs=$("hero-s");hs.textContent="";
+  if(SU.length)hs.append("You've completed ",B(SU.length+" "+pl(SU.length,"set-up","set-ups")),(since<TODAY?" since "+fmtS(since):"")+(finM?", "+finM+" of them in "+monName:"")+". ");
+  hs.append(TODO.length?B(TODO.length+" "+pl(TODO.length,"is","are")+" waiting on you"):B("Nothing is waiting on you"),TODO.length?(oldest?", the oldest from "+fmtS(oldest)+".":"."):" right now.");
+  if(P.length)hs.append(" "+P.length+" "+pl(P.length,"payment","payments")+" to track, ",B(money(pipSum(P))+" out"),".");
+  /* the ring: of all the set-ups that have come in, how many are done */
+  const pct=(SU.length+TODO.length)?Math.floor(100*SU.length/(SU.length+TODO.length)):100,LEN=2*Math.PI*54,ring=$("hero-ring"),off=v=>(LEN*(1-v/100)).toFixed(1);
+  ring.innerHTML='<div class="hring"><svg viewBox="0 0 132 132" aria-hidden="true"><defs><linearGradient id="hring-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74bfeb"/><stop offset="1" stop-color="#5fd39a"/></linearGradient></defs><circle cx="66" cy="66" r="54" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="12"/><circle class="arc" cx="66" cy="66" r="54" fill="none" stroke="url(#hring-g)" stroke-width="12" stroke-linecap="'+(pct?"round":"butt")+'" stroke-dasharray="'+LEN.toFixed(1)+'" stroke-dashoffset="'+(RED()?off(pct):off(0))+'" transform="rotate(-90 66 66)"/></svg><div class="hring-m"><b>'+pct+'%</b><span>Set Up</span></div></div><div class="hring-c"><b>'+SU.length+'</b> done · <b>'+TODO.length+'</b> to go</div>';
+  ring.title=pct+"% of the set-ups that have come in are done: "+SU.length+" completed, "+TODO.length+" still waiting";
+  if(!RED())setTimeout(()=>{const a=ring.querySelector(".arc");if(a)a.setAttribute("stroke-dashoffset",off(pct));},80);
+  /* the four boxes */
+  const months=[];{let y=+yr,m=+TODAY.slice(5,7);for(let i=0;i<6;i++){months.unshift(y+"-"+String(m).padStart(2,"0"));m--;if(!m){m=12;y--;}}}
+  const mc=months.map(m=>SU.filter(r=>r.d.slice(0,7)===m).length),mx=Math.max(1,...mc),kn=k=>TODO.filter(x=>x.kind===k).length;
+  const T=$("home-tiles");T.textContent="";
+  T.append(
+    ktile({k:"#ff8f7d",ic:HICON.todo,lab:"To Set Up",v:TODO.length,sub:TODO.length?(oldest?"oldest waiting "+oldD+" "+pl(oldD,"day","days"):"ready for you"):"you're all caught up",go:()=>go("todo"),
+      viz:m=>{const ks=Object.keys(KINDS).filter(kn);if(!TODO.length)kbar(m,"Nothing waiting",[{v:1,k:"#5fd39a"}]);else kbar(m,ks.map(k=>kn(k)+" "+(kn(k)===1?KINDS[k].name:KINDS[k].plural)).join(" · "),ks.map(k=>({v:kn(k),k:KINDS[k].k,t:KINDS[k].plural})));}}),
+    ktile({k:"#f0b94a",ic:HICON.pay,lab:"Payments Pending",v:P.length,sub:P.length?money(pipSum(P))+" out"+(late?" · "+late+" over 30 days":""):"nothing waiting on payment",go:()=>go("pip"),
+      viz:m=>kbar(m,P.length?"Lenders "+pL.length+" · Non-Lenders "+pN.length:"No invoices out",[{v:pipSum(pL),k:"#f0b94a",t:"Lenders "+money(pipSum(pL))},{v:pipSum(pN),k:"#5fd39a",t:"Non-Lenders "+money(pipSum(pN))}])}),
+    ktile({k:"#5fd39a",ic:HICON.done,lab:"Completed",v:SU.length,sub:finM+" in "+monName+" · since "+fmtS(since),go:()=>go("done"),
+      viz:m=>{m.classList.add("cols");months.forEach((mm,i)=>{const hh=Math.max(10,Math.round(100*mc[i]/mx)),b=h("i",{class:i===5?"now":"",style:"height:"+(RED()?hh:0)+"%",title:MON[+mm.slice(5)-1]+" "+mm.slice(0,4)+": "+mc[i]+" set up"});m.appendChild(b);if(!RED())setTimeout(()=>{b.style.height=hh+"%";},60+i*60);});}}),
+    ktile({k:"#74bfeb",ic:HICON.cases,lab:"Cases Closed Same Day",v:same,f:v=>Math.round(v)+"%",sub:C.sameDay+" of "+C.closed+" MISMO cases in "+yr,go:()=>go("cases"),
+      viz:m=>kbar(m,C.closed?(C.closed-C.sameDay)+" took longer than a day":caseYTD()+" MISMO cases so far in "+yr,[{v:same,k:"#74bfeb",t:same+"% closed the same day"},{v:100-same,k:"transparent"}])}));
+  /* payments to track: Lenders and Non-Lenders, the oldest five */
+  const pb=$("home-pipbar");pb.textContent="";const aL=pipSum(pL),aN=pipSum(pN);
+  if(P.length){const bb=h("div",{class:"pbar-b"});pb.appendChild(h("div",{class:"pbar"},h("div",{class:"pbar-k"},h("span",null,h("i",{style:"background:#f0b94a"}),"Lenders ",h("b",null,money(aL)),h("em",null,"· "+pL.length)),h("span",null,h("i",{style:"background:#5fd39a"}),"Non-Lenders ",h("b",null,money(aN)),h("em",null,"· "+pN.length))),bb));
+    [[aL,"#f0b94a"],[aN,"#5fd39a"]].forEach(([v,k])=>{if(v>0){const i=h("i",{style:"flex:"+(RED()?v:0)+" 1 0;background:"+k});bb.appendChild(i);if(!RED())setTimeout(()=>{i.style.flexGrow=String(v);},60);}});}
+  const hp=$("home-pip");hp.textContent="";P.slice(0,5).forEach(r=>hp.appendChild(pipRow(r)));if(!P.length)hp.appendChild(h("div",{class:"empty"},"No invoices waiting on payment. Use Add an Invoice at the top to add one."));
+  const pk=$("home-piplink");if(pk)pk.textContent=P.length>5?"See All "+P.length+" →":"See All →";
+  const dn=$("home-done");dn.textContent="";SU.slice(0,6).forEach(r=>dn.appendChild(doneRow2(r)));if(!SU.length)dn.appendChild(h("div",{class:"empty"},"Set-ups you finish show here."));
+  const hc=$("home-cases");hc.textContent="";finished().filter(r=>r.grp==="case").slice(0,4).forEach(r=>hc.appendChild(doneRow2(r)));if(!hc.children.length)hc.appendChild(h("div",{class:"empty"},"No MISMO cases yet this year."));
+  renderWork();pipBadge();}
 
 /* ---------- To Do ---------- */
 let tkind="";
@@ -542,7 +673,7 @@ function openPane(x){cur=x;const K=KINDS[x.kind];$("pane-t").textContent=x.name;
    h("div",{class:"fld wide"},h("label",{for:"f-note"},"Note"),note),
    h("div",{class:"acts"},save,h("button",{type:"button",class:"btn ghost",onclick:closePane},"Cancel"),say))));
  left.appendChild(h("div",{class:"sect"},h("h3",null,"Why It's Here"),h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)"},K.what+(x.paid?" Paid "+fmt(x.paid)+".":""))));
- const st=[x.kind==="square"?["Email","MISMO Money emailed the membership team with a link to this set-up."]:["On To Do",K.from+" added it here when it needed setting up in Aptify."],["Set Up in Aptify","Add the company, the membership order and the dates shown."],["Enter the IDs Here","The Aptify Company ID and order number, then Mark Set Up."],["Everyone Sees It",x.kind==="square"?"MISMO Money ties the Square payment to the order the next time it's opened.":"It moves to Completed with your name and the date, and Jonna, Amy and Kelly can see it."]];
+ const st=[x.kind==="square"?["Email","MISMO Money emailed the membership team with a link to this set-up."]:["On Your To Do",K.from+" added it here when it needed setting up in Aptify."],["Set Up in Aptify","Add the company, the membership order and the dates shown."],["Enter the IDs Here","The Aptify Company ID and order number, then Mark Set Up."],["Everyone Sees It",x.kind==="square"?"MISMO Money ties the Square payment to the order the next time it's opened.":"It moves to Completed with your name and the date, and Jonna, Amy and Kelly can see it."]];
  B.appendChild(h("div",{class:"sect",style:"grid-column:1/-1"},h("h3",null,"How This Works"),h("div",{class:"steps"},...st.map((s,i)=>h("div",{class:i===2?"now":""},h("b",null,h("i",null,String(i+1)),s[0]),s[1])))));
  $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");setTimeout(()=>cid.focus(),240);}
 
@@ -663,11 +794,11 @@ function renderCases(keep){const C=D.cases,yr=TODAY.slice(0,4),ytd=caseYTD(),cm=
 /* ---------- Help: the whole process, one topic at a time ---------- */
 const HELP=[
  {id:"start",k:"#74bfeb",name:"How It Works",lead:"Everything that needs setting up in Aptify for MISMO comes to this page, oldest first. You set it up in Aptify as usual, then come back here and record the Aptify IDs, so MISMO Money, Member 360 and the MISMO team all see it's done. No emails back and forth.",
-  steps:[["Find What's Waiting","Square set-ups also arrive as an email from MISMO Money to membership@mismo.org, with an Open in the Membership Desk button. New members, free memberships and IIF lenders appear on To Do on their own."],
-   ["Open It","The email button, or selecting it on To Do, opens that exact item, with everything you need on the left: company, level, price, special rate and membership dates. Sign in with your own MISMO sign-in if asked."],
+  steps:[["Find What's Waiting","Square set-ups also arrive as an email from MISMO Money to membership@mismo.org, with an Open in the Membership Desk button. New members, free memberships and IIF lenders appear on Home, under Your To Do, on their own."],
+   ["Open It","The email button, or selecting it under Your To Do on Home, opens that exact item, with everything you need on the left: company, level, price, special rate and membership dates. Sign in with your own MISMO sign-in if asked."],
    ["Set It Up in Aptify","Add or find the company in Aptify and create the membership order with the level, price and dates shown. Put any special rate (TMC, Broker, ACUMA) in the order line's description."],
    ["Record the IDs and Mark Set Up","Back here, enter the Aptify Company ID (required), the Aptify order number and, if you added a person, the Aptify Person ID. Select Mark Set Up. It moves to Completed."]],
-  notes:["<b>Marked one by mistake?</b> Select Undo in the message at the bottom of the screen right after. Later than that, email Jonna and she'll reopen it.","<b>Nothing arrives by email?</b> Everything waiting is always on the To Do page, oldest first, so you can work straight from there. Home shows the five oldest."]},
+  notes:["<b>Marked one by mistake?</b> Select Undo in the message at the bottom of the screen right after. Later than that, email Jonna and she'll reopen it.","<b>Nothing arrives by email?</b> Everything waiting is always on Home, under Your To Do, oldest first, so you can work straight from there.","<b>The boxes at the top of Home</b> show how things stand: what's left to set up, payments waiting, what's been completed and how many cases closed the same day. Select any box to go to it. The ring shows how much of all the set-up work that has come in is done."]},
  {id:"square",k:"#74bfeb",name:"Square Set-Ups",lead:"A company paid MISMO through Square for a special rate (TMC, Broker or ACUMA). MISMO Money sees the payment and sends the set-up here.",
   steps:[["Check the Details","The left side shows the company, the level, the special rate, what they paid and the membership dates."],
    ["Set Up in Aptify","Add or find the company, then create the membership order at the level and price shown. Put the special rate in the order line's description so it's clear why the price differs."],
@@ -693,7 +824,7 @@ const HELP=[
    ["What Happens Next","Member 360's IIF numbers and member counts pick them up on the next Aptify pull."]],
   notes:[]},
   {id:"pip",k:"#f0b94a",name:"Payment in Process",lead:"Invoices that have been sent and not paid yet, with Lenders and Non-Lenders apart, so the membership team, Amy and Kelly all see what's still owed.",
-  steps:[["Add an Invoice","On Payment in Process, select Add an Invoice and enter the company, Lender or Non-Lender, what it's for, the amount and the invoice date. The Aptify Company ID is optional, but with it the payment is tied for certain."],
+  steps:[["Add an Invoice","On Payment in Process, or at the top of Home, select Add an Invoice and enter the company, Lender or Non-Lender, what it's for, the amount and the invoice date. The Aptify Company ID is optional, but with it the payment is tied for certain."],
    ["Renewals Come In on Their Own","Non-Lender renewals that Member 360 has at Invoiced or Payment in Process show on the Non-Lender list by themselves, marked from Member 360. Don't enter those."],
    ["It Comes Off When Paid","Once Aptify shows payments from the company on or after the invoice date that add up to the invoice, it moves to Paid in the Last 60 Days. You can also open it and select Mark Paid."],
    ["Entered by Mistake","Open it and select Entered by Mistake. It comes off the list but is kept on the record."]],
@@ -706,12 +837,12 @@ const HELP=[
   notes:[]},
 {id:"finished",k:"#9fb3c8",name:"Completed",lead:"Completed keeps everything that's been set up: what you marked here, the Square set-ups MISMO Money confirmed, IIF lenders and new members Aptify shows, and your MISMO cases.",
   steps:[["Filter It","Use Everything, Set-Ups or Aptify Cases at the top."],["Page Through It","Twelve at a time, newest first. Use Newer and Older at the bottom."]],
-  notes:["<b>Who else sees it?</b> Jonna, Amy and Kelly can open the desk from Member 360, where they also see how many set-ups are waiting.","<b>Set Up Recently</b> on Home counts what has been set up since the date it shows."]},
+  notes:["<b>Who else sees it?</b> Jonna, Amy and Kelly can open the desk from Member 360, where they also see how many set-ups are waiting.","<b>Completed</b> on Home counts everything set up since the date it shows, and how many of those were this month."]},
  {id:"faq",k:"#ff8f7d",name:"Questions",faq:[
   ["Where do I find the Aptify Company ID?","It's the ID on the company's record in Aptify. For a new company, add it in Aptify first and use the ID it's given."],
   ["Where do I find the order number?","It's the ID of the membership order you created in Aptify for this set-up."],
   ["Do I need the Person ID?","Only if you added a new person record in Aptify for this set-up. Otherwise leave it blank."],
-  ["Something's on To Do that shouldn't be.","Email Jonna with the company name. Nothing here is deleted; she'll close it out."],
+  ["Something's on Your To Do that shouldn't be.","Email Jonna with the company name. Nothing here is deleted; she'll close it out."],
   ["I can't sign in.","Use your own MISMO sign-in, the one Jonna set up for you. If it still won't let you in, email Jonna."],
   ["Who can see what I enter?","The MISMO team in Member 360 and MISMO Money, with your name and the time on each set-up. Aptify stays the record."]]}];
 let hcur="start";
@@ -721,7 +852,7 @@ function renderHelp(){const nav=$("help-nav"),body=$("help-body");nav.textConten
  if(t.steps)body.appendChild(h("div",{class:"hsteps"},...t.steps.map((s,i)=>h("div",{class:"hstep"},h("b",{class:"n"},String(i+1)),h("strong",null,s[0]),h("span",null,s[1])))));
  (t.notes||[]).forEach(n=>{const d=h("div",{class:"hnote"});d.innerHTML=n;body.appendChild(d);});
  if(t.faq)body.appendChild(h("div",{class:"hfaq"},...t.faq.map(q=>h("div",null,h("b",null,q[0]),h("span",null,q[1])))));
- if(t.id==="start")body.appendChild(h("button",{type:"button",class:"btn",onclick:()=>go("todo")},"Go to To Do"));}
+ if(t.id==="start")body.appendChild(h("button",{type:"button",class:"btn",onclick:()=>go("todo")},"Go to Your To Do"));}
 /* ---------- Payment in Process (Jonna, Nov 2, 2026): invoices that have been sent and not paid yet, Lenders and Non-Lenders apart, so
    Amy, Kelly and the membership team follow them together. Anyone on the desk adds an invoice (data/invoices.json, kept, never deleted).
    Member 360 adds the Non-Lender renewals that are Invoiced or Payment in Process, and marks a desk invoice paid once Aptify shows
@@ -804,12 +935,13 @@ function openInv(r){cur=r||{add:true};const B=$("pane-b");B.textContent="";const
    h("div",{class:"acts"},mk,off,say))));}
  $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");}
 $("pip-add").addEventListener("click",()=>openInv(null));
+{const hi=$("hero-inv");if(hi)hi.addEventListener("click",()=>openInv(null));}
 
 /* ---------- pages ---------- */
-function go(tab){const b=document.querySelector('.hq nav button[data-hq="'+tab+'"]');if(b)b.click();}
+function go(tab){if(tab==="todo"){if($("v-home").hidden)show("home");setTimeout(()=>{const w=$("work");if(w)w.scrollIntoView({behavior:RED()?"auto":"smooth",block:"start"});},80);return;}const b=document.querySelector('.hq nav button[data-hq="'+tab+'"]');if(b)b.click();}
 function show(tab){document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>{if(b.dataset.hq===tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
  document.querySelectorAll("main .view").forEach(v=>v.hidden=v.id!=="v-"+tab);closePane();
- ({home:renderHome,todo:renderTodo,pip:renderPip,done:renderDone,cases:renderCases,help:renderHelp})[tab]();window.scrollTo(0,0);}
+ ({home:renderHome,todo:renderHome,pip:renderPip,done:renderDone,cases:renderCases,help:renderHelp})[tab]();window.scrollTo(0,0);}
 document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.hq)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 function renderAll(){const t=(document.querySelector(".hq nav button[aria-current]")||{dataset:{hq:"home"}}).dataset.hq;renderHome();if(t!=="home")show(t);}
