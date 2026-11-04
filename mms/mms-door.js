@@ -218,7 +218,7 @@
     }).then(function () { f.flushing = false; if (f.pending.length && !f.waitingSignIn) schedule(f, FLUSH_MS); });
   }
   function anyPending() { return Object.keys(F).some(function (k) { return F[k].pending.length; }); }
-  window.addEventListener('beforeunload', function (e) { if (anyPending()) { e.preventDefault(); e.returnValue = 'The MMS is still saving.'; return e.returnValue; } });
+  /* no browser "Leave site?" prompt (Jonna, Nov 3); saves take a second and finish in the background */
 
   /* ---------- snapshots and listeners ---------- */
   function docSnap(path, data, pending) {

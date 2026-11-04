@@ -6970,7 +6970,7 @@ document.addEventListener('input',e=>{ const el=e.target; if(!el.closest||!el.cl
 document.addEventListener('change',e=>{ const el=e.target; if(el.closest&&el.closest('#panel')&&el.matches('select[data-k],input[data-date]')) el.dispatchEvent(new Event('input',{bubbles:true})); },true);
 /* a section's own Save button saves everything changed */
 document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('#panel [data-save]'); if(!b) return; e.stopImmediatePropagation(); e.preventDefault(); if(pnlDirty()) pnlSave(); else toast('Nothing changed'); },true);
-window.addEventListener('beforeunload',e=>{ if(pnlDirty()){ e.preventDefault(); e.returnValue=''; } });
+/* no browser "Leave site?" prompt (Jonna, Nov 3): unsaved edits are caught by the MMS's own Save Changes / Discard / Keep Editing prompt when you close or switch */
 
 /* ---------- settings ---------- */
 let setTab='process';
