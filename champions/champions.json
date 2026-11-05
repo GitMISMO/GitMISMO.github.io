@@ -1,0 +1,251 @@
+{
+ "updated": "2026-11-05",
+ "source": "Member 360",
+ "lender": {
+  "Chair": [
+   {
+    "name": "Guild Mortgage Company"
+   },
+   {
+    "name": "Newrez LLC"
+   },
+   {
+    "name": "Pennymac"
+   },
+   {
+    "name": "Rocket Mortgage, LLC"
+   }
+  ],
+  "Executive": [
+   {
+    "name": "Chase Home Lending"
+   },
+   {
+    "name": "Citizens Bank (978986)"
+   },
+   {
+    "name": "Freedom Mortgage Corporation"
+   },
+   {
+    "name": "Lennar Mortgage"
+   },
+   {
+    "name": "Rate"
+   },
+   {
+    "name": "U.S. Bank Home Mortgage"
+   },
+   {
+    "name": "Veterans United Home Loans"
+   },
+   {
+    "name": "Wells Fargo Home Mortgage"
+   }
+  ],
+  "Associate": [
+   {
+    "name": "American Pacific Mortgage Corporation"
+   },
+   {
+    "name": "Averra Financial, Inc."
+   },
+   {
+    "name": "Bank of America"
+   },
+   {
+    "name": "Better Mortgage"
+   },
+   {
+    "name": "Carrington Mortgage Services, LLC"
+   },
+   {
+    "name": "DHI Mortgage Company"
+   },
+   {
+    "name": "Everett Financial Inc dba Supreme Lending"
+   },
+   {
+    "name": "Fifth Third Bank"
+   },
+   {
+    "name": "NVR Mortgage Finance, Inc."
+   },
+   {
+    "name": "Paramount Residential Mortgage Group"
+   },
+   {
+    "name": "PrimeLending"
+   },
+   {
+    "name": "Pulte Mortgage LLC"
+   },
+   {
+    "name": "The Huntington National Bank"
+   },
+   {
+    "name": "Truist"
+   },
+   {
+    "name": "United Wholesale Mortgage"
+   },
+   {
+    "name": "USAA Federal Savings Bank"
+   },
+   {
+    "name": "Zillow Home Loans"
+   }
+  ]
+ },
+ "industry": {
+  "Chair": [
+   {
+    "name": "Cotality"
+   },
+   {
+    "name": "Equifax"
+   },
+   {
+    "name": "Experian Information Solutions, Inc."
+   },
+   {
+    "name": "Fannie Mae Single-Family"
+   },
+   {
+    "name": "FICO"
+   },
+   {
+    "name": "First American"
+   },
+   {
+    "name": "Freddie Mac Single-Family"
+   },
+   {
+    "name": "ICE Mortgage Technology"
+   },
+   {
+    "name": "VantageScore Solutions, LLC"
+   }
+  ],
+  "Executive": [
+   {
+    "name": "Arch Mortgage Insurance Company"
+   },
+   {
+    "name": "Consolidated Analytics, Inc."
+   },
+   {
+    "name": "Enact"
+   },
+   {
+    "name": "Essent Guaranty, Inc."
+   },
+   {
+    "name": "Evolve Mortgage Services"
+   },
+   {
+    "name": "Factual Data"
+   },
+   {
+    "name": "KPMG LLP"
+   },
+   {
+    "name": "Mortgage Guaranty Insurance Corporation (MGIC)"
+   },
+   {
+    "name": "Radian Guaranty Inc."
+   },
+   {
+    "name": "Viant Eye"
+   }
+  ],
+  "Associate": [
+   {
+    "name": "ActiveComply, LLC"
+   },
+   {
+    "name": "Actualize Consulting"
+   },
+   {
+    "name": "Alpha7X"
+   },
+   {
+    "name": "Assurant"
+   },
+   {
+    "name": "BNY"
+   },
+   {
+    "name": "Brody Gapp LLP"
+   },
+   {
+    "name": "Copperlane"
+   },
+   {
+    "name": "DocMagic"
+   },
+   {
+    "name": "Ernst & Young LLP"
+   },
+   {
+    "name": "FICS"
+   },
+   {
+    "name": "Fiserv"
+   },
+   {
+    "name": "Gateless, Inc."
+   },
+   {
+    "name": "Guidehouse"
+   },
+   {
+    "name": "Lender Toolkit, LLC"
+   },
+   {
+    "name": "Lenders One"
+   },
+   {
+    "name": "Mortgage Cadence LLC"
+   },
+   {
+    "name": "Optimal Blue, LLC"
+   },
+   {
+    "name": "Pace"
+   },
+   {
+    "name": "Pensato.ai"
+   },
+   {
+    "name": "Redwood Trust, Inc."
+   },
+   {
+    "name": "Sagent"
+   },
+   {
+    "name": "Stewart"
+   },
+   {
+    "name": "Supreme Lending"
+   },
+   {
+    "name": "Tavant"
+   },
+   {
+    "name": "TELUS Digital"
+   },
+   {
+    "name": "Trisotech"
+   },
+   {
+    "name": "Wolters Kluwer"
+   },
+   {
+    "name": "Xactus"
+   },
+   {
+    "name": "Xpanse"
+   }
+  ]
+ }
+}
