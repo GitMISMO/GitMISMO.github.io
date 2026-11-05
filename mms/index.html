@@ -1995,6 +1995,9 @@ p,.sub,.lede{text-wrap:pretty}
 .pt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px 10px;margin-top:8px}
 .pt-grid .fld{margin-bottom:4px}
 .pt-grid select{width:100%;font:inherit;font-size:12.5px;border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:5px;padding:5px 6px}
+/* the fact icons sit centered in their tile (the generic ".wh-fact span" rule was turning the tile into a block) */
+.wh-fact .wh-fi{display:grid;place-items:center;width:32px;height:32px;line-height:0}
+.wh-fact .wh-fi svg{display:block}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
