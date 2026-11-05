@@ -1946,6 +1946,38 @@ p,.sub,.lede{text-wrap:pretty}
 .dg-f b{font-size:13.5px}
 .dg-f.miss{border-style:dashed}.dg-f.miss b{color:var(--warn)}
 .dg-votes{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+/* Architecture Help on the work request */
+.awr-sec.open{border-left:4px solid var(--c4)}
+.awr-row{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;width:100%;text-align:left;background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:9px 12px;margin-bottom:6px;cursor:pointer;color:var(--ink);font:inherit}
+.awr-row:hover{border-color:var(--border-strong);background:var(--accent-soft)}
+.awr-m{display:flex;flex-direction:column;gap:2px;min-width:0}
+.awr-m b{font-size:13.5px}
+.awr-m em{font-style:normal;font-size:12px;color:var(--ink-3)}
+.awr-m .awr-last{color:var(--ink-2)}
+.awr-go{font-size:12px;font-weight:600;color:var(--accent);white-space:nowrap}
+.awr-card h4{flex-wrap:wrap}
+.awr-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:4px}
+.awr-steps span{font-size:11.5px;font-weight:600;color:var(--ink-3);display:flex;flex-direction:column;gap:3px}
+.awr-steps span i{display:block;height:5px;border-radius:2px;background:var(--surface-3)}
+.awr-steps span.done{color:var(--ink-2)}.awr-steps span.done i{background:var(--sky)}
+.awr-steps span.cur{color:var(--ink)}.awr-steps span.cur i{background:var(--navy)}
+:root[data-theme="dark"] .awr-steps span.cur i{background:#fff}
+.awr-steps small{font-weight:500;color:var(--ink-3)}
+.awr-b{margin-top:12px}
+.awr-b label{display:block;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;color:var(--ink-3);margin-bottom:4px}
+.awr-b p{margin:0;font-size:13px;white-space:pre-line}
+.awr-b.good{background:var(--good-bg);border-radius:6px;padding:8px 10px}
+.awr-b.warn{background:var(--warn-bg);border-radius:6px;padding:8px 10px}
+/* Reviews and Decisions, step by step */
+.rd-list{display:flex;flex-direction:column}
+.rd-row{display:grid;grid-template-columns:170px auto 1fr;gap:6px 14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--rule)}
+.rd-row:last-child{border-bottom:0}
+.rd-n{font-weight:700;font-size:13.5px}
+.rd-d{font-size:12.5px;color:var(--ink-2)}
+.rd-x{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px}
+.rd-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;width:100%}
+.chip.rd-before{background:transparent;border:1px dashed var(--border-strong);color:var(--ink-3)}
+@media(max-width:600px){.rd-row{grid-template-columns:1fr auto}.rd-d{grid-column:1/-1}}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -4820,7 +4852,7 @@ function wrHub(P,t){
   const filledLinks=Object.values(t.links||{}).filter(Boolean).length;
   const TABS=[['over','Overview','over',''],['det','Details','det',''],['dates','Key Dates','cal',''],['links','Links','link',filledLinks||''],['hist','History','hist',(t.history||[]).length||'']];
   if(secs.cmts) TABS.splice(1,0,['cmts','Comments','cmt',nCm||'0']);
-  if(!TABS.some(x=>x[0]===S.ptab)) S.ptab='over';
+  if(!TABS.some(x=>x[0]===S.ptab)&&!['files','reviews','arch'].includes(S.ptab)) S.ptab='over';
   const hero='<div class="wh"><div class="wh-wave" aria-hidden="true"></div>'+
     '<div class="wh-top"><span class="wh-eb">'+esc(t.wr)+(t.workgroup?' · '+esc(t.workgroup):'')+'</span>'+chips+'</div>'+
     '<h2>'+esc(t.name)+(t.size?' <span class="wh-acr" title="Size: '+esc(typeof sizeLabel==='function'?sizeLabel(t):t.size)+'">'+esc(t.size)+'</span>':'')+'</h2>'+
@@ -5918,7 +5950,7 @@ renderPanel=function(){ _renderPanelDG(); const P=$('#panel'); if(!S.panel||Stri
   const pb=$('.pb',P); if(!pb||$('.desig-sec',pb)) return; const d=t.designation||{}; const near=['designation','gc-comment'].includes(t.stage);
   if(!near&&!d.license&&!d.type) return;
   const host=$('[data-wtab="'+(near?'over':'det')+'"]',pb); if(!host) return;
-  const w=document.createElement('div'); w.innerHTML=desigSection(t); const sec=w.firstChild;
+  const w=document.createElement('div'); w.innerHTML=desigSection(t); const sec=w.firstChild; if(!sec) return;
   if(near){ const lead=$('.wh-lead-in',host); (lead&&lead.nextSibling)?host.insertBefore(sec,lead.nextSibling):host.appendChild(sec); } else host.appendChild(sec); };
 /* say plainly that a changed designation saved */
 const _directorRecDG=directorRec;
@@ -5949,6 +5981,102 @@ renderPanel=function(){ const P=$('#panel'), id=S.panel, same=!!(P&&id&&P.datase
   if(id&&S.panel===id&&py>0){ const P2=$('#panel'); if(P2) P2.scrollTop=py; }
   if(id&&S.panel===id&&y>0){ const pb=$('.pb',$('#panel')); if(pb){ pb.scrollTop=y; requestAnimationFrame(()=>{ if(S.panel===id&&pb.isConnected&&pb.scrollTop<y) pb.scrollTop=y; }); } }
   if(window.scrollY!==wy) window.scrollTo(0,wy); };
+
+/* =====================================================================
+   Architecture Help on the work request (Nov 4, Jonna)
+   - A work request's architecture tasks show on the work request itself:
+     a short list on the Overview and a full Architecture tab (what was asked,
+     where it stands, the architect's notes, what was done).
+   - Work can't go to AI Review while any of its architecture tasks is still open.
+   Also: the Reviews and Decisions card, laid out step by step, and honest about
+   history: a step the work request passed before the MMS says so instead of
+   "Not run yet".
+   ===================================================================== */
+const ARCH_OPEN=a=>!['Done','Declined'].includes(a.status);
+function archFor(t){ return Object.values(S.arch||{}).filter(a=>a.ticket===t.id).sort((a,b)=>b.id.localeCompare(a.id)); }
+function archOpenFor(t){ return archFor(t).filter(ARCH_OPEN); }
+function archLine(a){ return esc(a.id)+' '+esc(a.title||''); }
+function archStepper(a){ const steps=['Requested','Approved','In Progress','Done'], at=a.status==='On Hold'?2:a.status==='Declined'?0:steps.indexOf(a.status);
+  return '<div class="awr-steps">'+steps.map((s,i)=>'<span class="'+(i<at||a.status==='Done'?'done':i===at?'cur':'')+'"><i></i>'+esc(s)+'<small>'+esc(fmtS({Requested:a.requested,Approved:a.approved,'In Progress':a.started,Done:a.done}[s]||''))+'</small></span>').join('')+'</div>'; }
+function archNotes(a){ return (a.log||[]).filter(l=>l.note).slice().reverse().slice(0,6); }
+
+/* the Overview: a short list, open ones first */
+function archOverview(t){ const L=archFor(t); if(!L.length) return ''; const open=L.filter(ARCH_OPEN);
+  const row=a=>{ const n=archNotes(a)[0]; return '<button type="button" class="awr-row" data-awrtab="1"><span class="chip '+archTone(a.status)+'">'+esc(a.status)+'</span><span class="awr-m"><b>'+archLine(a)+'</b><em>'+esc([a.type,a.assignedTo,a.needBy&&ARCH_OPEN(a)?'target '+fmtS(a.needBy):'',a.done?'done '+fmtS(a.done):''].filter(Boolean).join(' · '))+'</em>'+(n?'<em class="awr-last">Latest: '+esc(n.note.slice(0,140))+(n.note.length>140?'…':'')+'</em>':'')+'</span><span class="awr-go">See Details ›</span></button>'; };
+  return '<div class="psec full awr-sec'+(open.length?' open':'')+'"><h4>Architecture Help<span class="sp muted" style="font-size:12px;font-weight:500">'+(open.length?open.length+' open · AI Review waits until '+(open.length===1?'it’s':'they’re')+' done':'All done')+'</span></h4>'+L.map(row).join('')+'</div>'; }
+
+/* the Architecture tab: everything about each task */
+function archTab(t){ const L=archFor(t);
+  return L.map(a=>{ const late=a.needBy&&a.needBy<today()&&ARCH_OPEN(a), notes=(a.log||[]).slice().reverse();
+    const kv=(k,v)=>v?'<div class="f"><label>'+esc(k)+'</label><div>'+v+'</div></div>':'';
+    return '<div class="psec full awr-card"><h4><span class="chip '+archTone(a.status)+'">'+esc(a.status)+'</span> '+archLine(a)+(late?' <span class="chip bad">Past Target</span>':'')+'<span class="sp"><button type="button" class="btn sm" data-archopen="'+esc(a.id)+'">Open in Architecture Help ›</button></span></h4>'+archStepper(a)+
+      '<div class="kv" style="margin-top:10px">'+kv('Type of Help',esc(a.type||''))+kv('Priority',esc(a.priority||''))+kv('Architect',esc(a.assignedTo||''))+kv('Target Date',a.needBy?esc(fmt(a.needBy)):'')+kv('Requested By',esc((a.requestedBy||'')+(a.requested?' · '+fmtS(a.requested):'')))+kv('Hours Spent',a.hoursSpent?esc(a.hoursSpent)+' hours':'')+'</div>'+
+      (a.details?'<div class="awr-b"><label>What the Architect Was Asked to Do</label><p>'+esc(a.details)+'</p></div>':'')+
+      (a.status==='Done'&&a.result?'<div class="awr-b good"><label>What Was Done</label><p>'+esc(a.result)+'</p></div>':'')+
+      (a.status==='On Hold'?'<div class="awr-b warn"><label>On Hold</label><p>'+esc(a.holdWhy||'Waiting')+'</p></div>':'')+
+      (a.further?'<div class="awr-b"><label>Further Work Needed</label><p>'+esc(a.further)+'</p></div>':'')+
+      '<div class="awr-b"><label>Notes and Activity</label>'+(notes.length?'<ul class="hist">'+notes.map(l=>'<li><div class="when">'+esc(l.at?fmtS(ymd(new Date(l.at))):'')+' · '+esc(l.by||'')+'</div><b>'+esc(l.text||'')+'</b>'+(l.note?'<div class="anote">'+esc(l.note)+'</div>':'')+'</li>').join('')+'</ul>':'<p class="muted">Nothing yet.</p>')+'</div></div>'; }).join('')||'<div class="psec full"><div class="lead-empty">No Architecture Help on this work request.</div></div>'; }
+
+/* the old one-line banner gives way to the Overview section */
+archBanner=function(){ return ''; };
+const _renderPanelAW=renderPanel;
+renderPanel=function(){ _renderPanelAW(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return;
+  const pb=$('.pb',P); if(!pb||!$('.wh-tabs',pb)||$('[data-ptab="arch"]',pb)) return; const L=archFor(t); if(!L.length) return;
+  const ov=$('[data-wtab="over"]',pb); if(ov){ const lead=$('.wh-lead-in',ov); const w=document.createElement('div'); w.innerHTML=archOverview(t); (lead&&lead.nextSibling)?ov.insertBefore(w.firstChild,lead.nextSibling):ov.appendChild(w.firstChild); }
+  const tabs=$('.wh-tabs',pb), before=$('[data-ptab="hist"]',tabs), open=L.filter(ARCH_OPEN).length;
+  const b=document.createElement('button'); b.type='button'; b.setAttribute('role','tab'); b.dataset.ptab='arch'; b.setAttribute('aria-selected',S.ptab==='arch'); b.innerHTML=whIc('box')+'<span>Architecture</span><b'+(open?' class="warn"':'')+'>'+(open||L.length)+'</b>'; tabs.insertBefore(b,before||null);
+  const pane=document.createElement('div'); pane.className='wtab pgrid'; pane.dataset.wtab='arch'; pane.hidden=S.ptab!=='arch'; pane.innerHTML=archTab(t); $$('.wtab',pb).pop().after(pane);
+  if(S.ptab==='arch') $$('.wtab',pb).forEach(w=>w.hidden=w.dataset.wtab!=='arch');
+  const show=()=>{ S.ptab='arch'; $$('.wh-tabs [data-ptab]',pb).forEach(x=>x.setAttribute('aria-selected',x.dataset.ptab==='arch')); $$('.wtab',pb).forEach(w=>w.hidden=w.dataset.wtab!=='arch'); const tb=$('.wh-tabs',pb); if(pb.scrollTop>tb.offsetTop) pb.scrollTop=tb.offsetTop; };
+  b.onclick=e=>{ e.preventDefault(); show(); }; $$('[data-awrtab]',pb).forEach(x=>x.onclick=e=>{ e.preventDefault(); show(); }); };
+
+/* AI Review waits for Architecture Help */
+async function archBlock(t){ const L=archOpenFor(t); if(!L.length) return false;
+  await modal({title:'Architecture Help Comes First',text:esc(t.wr+' '+t.name),ok:'See the Architecture Help',cancel:'Close',body:'<p style="margin:0 0 8px">This work request can go to AI Review once its Architecture Help is done:</p><ul style="margin:0;padding-left:18px">'+L.map(a=>'<li><b>'+archLine(a)+'</b> · '+esc(a.status)+(a.assignedTo?' with '+esc(a.assignedTo):'')+(a.needBy?' · target '+esc(fmtS(a.needBy)):'')+'</li>').join('')+'</ul>'}).then(v=>{ if(v){ S.ptab='arch'; if(S.panel===t.id) renderPanel(); else openPanel(t.id); } });
+  return true; }
+const _submitAIAW=submitAI;
+submitAI=async function(t){ if(await archBlock(t)) return; return _submitAIAW(t); };
+const _moveAW=move;
+move=async function(t,to,o){ if(to==='aireview'&&t&&t.stage!=='aireview'&&archOpenFor(t).length){ await archBlock(t); return; } return _moveAW(t,to,o); };
+const _stageActionsAW=stageActions;
+stageActions=function(t){ const A=_stageActionsAW(t); if(t.stage==='work'&&t.state==='active'&&archOpenFor(t).length){ const i=A.findIndex(a=>/^Submit for AI Review/.test(a.label)); if(i>=0){ A[i]=Object.assign({},A[i],{label:'Submit for AI Review (after Architecture Help)',cls:''}); } } return A; };
+const _whoseMoveAW=whoseMove;
+whoseMove=function(t){ const w=_whoseMoveAW(t); if(t.stage==='work'&&t.state==='active'&&w&&w.role==='facilitator'){ const L=archOpenFor(t); if(L.length) return Object.assign({},w,{text:'Waiting on Architecture Help ('+L.map(a=>a.id).join(', ')+'), then submit for AI Review'}); } return w; };
+
+/* ---------- Reviews and Decisions, step by step ---------- */
+function rdPast(t,key){ const a=stageIndex(key), b=stageIndex(t.stage); return a>=0&&b>a; }
+function rdRow(name,chip,detail,extra){ return '<div class="rd-row"><div class="rd-n">'+esc(name)+'</div><div class="rd-s">'+chip+'</div><div class="rd-d">'+(detail||'')+'</div>'+(extra?'<div class="rd-x">'+extra+'</div>':'')+'</div>'; }
+const RD_BEFORE='<span class="chip rd-before" title="This step happened before the MMS, so the MMS has no record of it">Before the MMS</span>';
+stagePanel=function(t){ const rows=[], sub=t.sub||'', d=t.dates||{};
+  if(t.cfp&&t.cfp.needed) rows.push(rdRow('Call for Participation',d.cfpPublished?'<span class="chip good">Published</span>':'<span class="chip warn">Needed</span>',d.cfpPublished?esc(fmtS(d.cfpPublished)):''));
+  const ai=t.ai||{}, rounds=ai.rounds||[];
+  if(rounds.length){ const r=rounds.at(-1); rows.push(rdRow('AI Review','<span class="chip '+(r.verdict==='ready'?'good':'warn')+'">'+(r.verdict==='ready'?'Ready':'Updates Suggested')+'</span>',esc(r.summary||''),rounds.map((x,i)=>'<button class="btn sm" data-aiview="'+i+'" type="button">Round '+(i+1)+' · '+esc(fmtS(atDay(x.at)))+'</button>').join(''))); }
+  else if(t.stage==='aireview') rows.push(rdRow('AI Review',subChip(t)||'<span class="chip warn">Not run yet</span>',''));
+  else if(rdPast(t,'aireview')) rows.push(rdRow('AI Review',RD_BEFORE,''));
+  const rv=(k,nm)=>{ const o=t[k]||{}, st=plainCode(o.status), dd=d[k+'Decision'];
+    if(t.stage===k) rows.push(rdRow(nm,subChip(t)||'<span class="chip info">In Review</span>',[d[k+'Submitted']?'Submitted '+fmtS(d[k+'Submitted']):'',o.resubs?o.resubs+' resubmission'+(o.resubs===1?'':'s'):''].filter(Boolean).map(esc).join(' · ')));
+    else if(st||dd) rows.push(rdRow(nm,'<span class="chip '+(/approv|pass/i.test(st||'Decided')?'good':/return|denied|resub/i.test(st)?'warn':'')+'">'+esc(st||'Decided')+'</span>',[dd?'Decided '+fmtS(dd):'',o.resubs?o.resubs+' resubmission'+(o.resubs===1?'':'s'):''].filter(Boolean).map(esc).join(' · ')));
+    else if(rdPast(t,k)) rows.push(rdRow(nm,RD_BEFORE,'')); };
+  rv('im','IM Review'); rv('awg','AWG Review');
+  const ds=t.designation||{}, approved=/Approved/i.test(ds.status||'');
+  if(t.stage==='designation'||ds.type||ds.license){
+    const chip=approved?'<span class="chip good">Designated</span>':t.stage==='designation'?(subChip(t)||'<span class="chip info">For Approval</span>'):'<span class="chip">Set</span>';
+    const tiles='<div class="rd-tiles">'+[['Comment Type',ds.type],['Classification',t.classification],['License Usage',ds.license],['Royalty Status',ds.royalty],['Available To',ds.availableTo],['Comment Length',t.commentDays?t.commentDays+' days':'']].map(([l,v])=>'<div class="dg-f'+(v?'':' miss')+'"><label>'+esc(l)+'</label><b>'+esc(v||'Not set')+'</b></div>').join('')+'</div>';
+    const deciding=t.stage==='designation'&&!approved; rows.push(rdRow('License Designation',chip,deciding?'Being decided: see License Designation above':d.designation&&approved?'Designated '+esc(fmtS(d.designation)):'',deciding?'':tiles)); }
+  else if(rdPast(t,'designation')) rows.push(rdRow('License Designation',RD_BEFORE,''));
+  (t.votes||[]).forEach(v=>rows.push(rdRow(stageDef(v.stage).name,'<span class="chip '+(v.outcome==='Approved'?'good':v.outcome==='Deferred'?'warn':'bad')+'">'+esc(v.outcome)+'</span>',esc([fmtS(v.date),v.method,v.tally].filter(Boolean).join(' · ')),Object.keys(v.members||{}).length?'<div class="muted" style="font-size:12px">'+esc(Object.entries(v.members).map(([n,x])=>n+': '+x).join(' · '))+'</div>':'')));
+  if(t.commentReport) rows.push(rdRow('Comment Report','<span class="chip">'+esc(t.commentReport)+'</span>',''));
+  if(!rows.length) return '';
+  return '<div class="psec full rd-card" data-sec="stage"><h4>Reviews and Decisions<span class="sp muted" style="font-size:12px;font-weight:500">Each step, in order. “Before the MMS” means it happened in the old process.</span></h4><div class="rd-list">'+rows.join('')+'</div></div>'; };
+
+/* the separate License Designation section is for deciding; once designated it steps aside
+   (the designation stays on Reviews and Decisions) */
+const _desigSectionAW=desigSection;
+desigSection=function(t){ const ds=t.designation||{}; if(/Approved/i.test(ds.status||'')||t.stage!=='designation') return ''; return _desigSectionAW(t); };
+/* keep the reader's place (outermost, after every section above has been added) */
+const _renderPanelKeep2=renderPanel;
+renderPanel=function(){ const P=$('#panel'), id=S.panel, same=!!(P&&id&&P.dataset.for2===String(id)&&P.classList.contains('on')), pb0=P&&$('.pb',P), y=same&&pb0?pb0.scrollTop:0;
+  _renderPanelKeep2(); if(P) P.dataset.for2=S.panel?String(S.panel):''; if(same&&y>0){ const pb=$('.pb',$('#panel')); if(pb&&pb.scrollTop!==y) pb.scrollTop=y; } };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
