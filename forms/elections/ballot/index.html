@@ -494,14 +494,15 @@ var EF = (function(){
 
   function ballot(el, cfg){
     var sl=cfg.slate; var started=Date.now(); var GL=sl&&sl.type==="domain"?"Business Domain":"Area of Focus";
-    var hero='<div class="ef-hero"><small>MISMO Elections · '+e(sl?sl.year:"")+'</small><h2>'+e(sl?sl.name:"Ballot")+'</h2><p>One ballot per company'+(sl&&sl.type==="aof"?' in each Area of Focus':sl&&sl.type==="domain"?' in each Business Domain':'')+'. '+(sl&&sl.closes?'Voting closes '+e(fmt(sl.closes))+'.':'')+'</p></div>';
+    var hero='<div class="ef-hero"><small>MISMO Elections · '+e(sl?sl.year:"")+'</small><h2>'+e(sl?sl.name:"Ballot")+'</h2><p>'+(sl&&sl.type==="domain"?'One ballot per company, covering all eight Business Domains, cast by your MISMO Voting Representative (MVR)':'One ballot per company'+(sl&&sl.type==="aof"?' in each Area of Focus':''))+'. '+(sl&&sl.closes?'Voting closes '+e(fmt(sl.closes))+'.':'')+'</p></div>';
     if(!sl || cfg.closed){ el.innerHTML='<div class="ef">'+hero+'<div class="closed"><b>This ballot isn\'t open right now.</b><br>Questions? Write to elections@mismo.org.</div></div>'; return; }
-    var multi=sl.groups.length>1;
+    var allIn=sl.type==="domain"; var multi=!allIn && sl.groups.length>1;
+    var ALL=allIn? {name:"All Business Domains", seats:[].concat.apply([],sl.groups.map(function(g){ return g.seats.map(function(s){ var o={}; for(var k in s) o[k]=s[k]; o.position=g.name+": "+s.position; return o; }); }))} : null;
     el.innerHTML='<form class="ef" novalidate>'+hero+
       '<fieldset><legend>About you</legend><div class="fgrid">'+fld("first","First Name","text",true,"given-name")+fld("last","Last Name","text",true,"family-name")+fld("email","Work Email","email",true,"email")+fld("company","Company","text",true,"organization")+fld("title","Job Title","text",false,"organization-title")+'</div></fieldset>'+
       (multi?'<fieldset><legend>Which '+GL+' are you voting in?</legend><div class="field"><select name="group" id="ef-g" required><option value="">Choose one</option>'+sl.groups.map(function(g){ return '<option>'+e(g.name)+'</option>'; }).join("")+'</select></div><div class="efn" style="margin-top:6px">Taking part in more than one? Send one ballot for each.</div></fieldset>':'')+
       '<fieldset><legend>Your votes</legend><div id="ef-seats">'+(multi?'<div class="efn">Choose the '+GL+' first.</div>':'')+'</div></fieldset>'+
-      '<fieldset><legend>Before you send it</legend><label class="ack"><input type="checkbox" name="ack"> <span>I\'m casting this ballot for my company, and my company is sending only one'+(sl.type==="aof"||sl.type==="domain"?' for this '+GL:'')+'.</span></label></fieldset>'+
+      '<fieldset><legend>Before you send it</legend><label class="ack"><input type="checkbox" name="ack"> <span>I\'m casting this ballot for my company, and my company is sending only one'+(sl.type==="aof"?' for this '+GL:'')+'.</span></label></fieldset>'+
       '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>'+
       '<button class="btn pri" type="submit" id="ef-go">Cast My Ballot</button><div class="err" id="ef-err" role="alert"></div></form>';
     var f=el.querySelector("form");
@@ -511,7 +512,7 @@ var EF = (function(){
         return '<div class="seatq" data-seat="'+e(s.id)+'" data-count="'+s.count+'"><h4>'+e(s.position)+'<small>'+(many?'vote for up to '+s.count:'vote for one')+'</small></h4><div class="opts">'+
           s.nominees.map(function(n){ return '<label class="opt"><input type="'+(many?"checkbox":"radio")+'" name="s_'+e(s.id)+'" value="'+e(n.id)+'"><span><b>'+e(n.name)+'</b><small>'+e([n.title,n.company].filter(Boolean).join(", "))+'</small>'+(n.statement?'<small style="margin-top:6px">'+e(n.statement)+'</small>':'')+'</span></label>'; }).join("")+
           '<label class="opt"><input type="'+(many?"checkbox":"radio")+'" name="s_'+e(s.id)+'" value="abstain"><span><b>Abstain</b></span></label></div></div>'; }).join(""); }
-    if(!multi) draw(sl.groups[0]);
+    if(allIn) draw(ALL); else if(!multi) draw(sl.groups[0]);
     else { var gs=f.querySelector("#ef-g"); gs.onchange=function(){ draw(sl.groups.filter(function(g){ return g.name===gs.value; })[0]); };
       if(cfg.group && sl.groups.some(function(g){ return g.name===cfg.group; })){ gs.value=cfg.group; gs.onchange(); } }
     f.addEventListener("change",function(ev){ var t=ev.target; if(t.type==="checkbox" && t.name.indexOf("s_")===0){ var q=t.closest(".seatq"), max=+q.dataset.count; if(t.value==="abstain" && t.checked) [].forEach.call(q.querySelectorAll("input"),function(i){ if(i!==t) i.checked=false; }); else { var ab=q.querySelector('input[value="abstain"]'); if(ab && t.checked) ab.checked=false; var on=q.querySelectorAll("input:checked"); if(on.length>max){ t.checked=false; f.querySelector("#ef-err").textContent="You can choose up to "+max+" for "+q.querySelector("h4").firstChild.textContent+"."; } } }
@@ -521,7 +522,7 @@ var EF = (function(){
       var miss=["first","last","email","company"].filter(function(n){ return !val(f,n); });
       if(miss.length) return void(er.textContent="Please fill in your name, email and company.");
       if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val(f,"email"))) return void(er.textContent="Check the email address.");
-      var g=multi? val(f,"group") : sl.groups[0].name; if(!g) return void(er.textContent="Choose the "+GL+".");
+      var g=allIn? ALL.name : multi? val(f,"group") : sl.groups[0].name; if(!g) return void(er.textContent="Choose the "+GL+".");
       var choices={}, any=false;
       [].forEach.call(f.querySelectorAll(".seatq[data-seat]"),function(q){ var picks=[].map.call(q.querySelectorAll("input:checked"),function(i){ return i.value; }).filter(function(v){ return v!=="abstain"; }); choices[q.dataset.seat]=picks; if(q.querySelector("input:checked")) any=true; });
       if(!any) return void(er.textContent="Make at least one choice, or choose Abstain.");
