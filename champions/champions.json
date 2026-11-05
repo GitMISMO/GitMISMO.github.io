@@ -22,7 +22,8 @@
   ],
   "Executive": [
    {
-    "name": "Chase Home Lending"
+    "name": "Chase Home Lending",
+    "logo": "https://resources.mismo.org/champions/logos/chase-home-lending-14ca2c06.png"
    },
    {
     "name": "Citizens Bank (978986)"
@@ -32,16 +33,20 @@
     "logo": "https://resources.mismo.org/champions/logos/freedom-mortgage-corporation-67db92cb.png"
    },
    {
-    "name": "Lennar Mortgage"
+    "name": "Lennar Mortgage",
+    "logo": "https://resources.mismo.org/champions/logos/lennar-mortgage-c9edc18c.png"
    },
    {
-    "name": "Rate"
+    "name": "Rate",
+    "logo": "https://resources.mismo.org/champions/logos/rate-25a7ae2f.png"
    },
    {
-    "name": "U.S. Bank Home Mortgage"
+    "name": "U.S. Bank Home Mortgage",
+    "logo": "https://resources.mismo.org/champions/logos/u-s-bank-home-mortgage-19d45c1a.jpg"
    },
    {
-    "name": "Veterans United Home Loans"
+    "name": "Veterans United Home Loans",
+    "logo": "https://resources.mismo.org/champions/logos/veterans-united-home-loans-744933d3.png"
    },
    {
     "name": "Wells Fargo Home Mortgage",
@@ -50,22 +55,27 @@
   ],
   "Associate": [
    {
-    "name": "American Pacific Mortgage Corporation"
+    "name": "American Pacific Mortgage Corporation",
+    "logo": "https://resources.mismo.org/champions/logos/american-pacific-mortgage-corporation-61eb25f5.png"
    },
    {
-    "name": "Averra Financial, Inc."
+    "name": "Averra Financial, Inc.",
+    "logo": "https://resources.mismo.org/champions/logos/averra-financial-inc-c3d6b586.svg"
    },
    {
     "name": "Bank of America"
    },
    {
-    "name": "Better Mortgage"
+    "name": "Better Mortgage",
+    "logo": "https://resources.mismo.org/champions/logos/better-mortgage-5102f4bb.png"
    },
    {
-    "name": "Carrington Mortgage Services, LLC"
+    "name": "Carrington Mortgage Services, LLC",
+    "logo": "https://resources.mismo.org/champions/logos/carrington-mortgage-services-llc-fab19ea0.png"
    },
    {
-    "name": "DHI Mortgage Company"
+    "name": "DHI Mortgage Company",
+    "logo": "https://resources.mismo.org/champions/logos/dhi-mortgage-company-c016d25a.png"
    },
    {
     "name": "Everett Financial Inc dba Supreme Lending"
@@ -74,94 +84,122 @@
     "name": "Fifth Third Bank"
    },
    {
-    "name": "NVR Mortgage Finance, Inc."
+    "name": "NVR Mortgage Finance, Inc.",
+    "logo": "https://resources.mismo.org/champions/logos/nvr-mortgage-finance-inc-373d9ab8.png"
    },
    {
-    "name": "Paramount Residential Mortgage Group"
+    "name": "Paramount Residential Mortgage Group",
+    "logo": "https://resources.mismo.org/champions/logos/paramount-residential-mortgage-group-c2358c3c.png"
    },
    {
-    "name": "PrimeLending"
+    "name": "PrimeLending",
+    "logo": "https://resources.mismo.org/champions/logos/primelending-a18d705d.jpg"
    },
    {
-    "name": "Pulte Mortgage LLC"
+    "name": "Pulte Mortgage LLC",
+    "logo": "https://resources.mismo.org/champions/logos/pulte-mortgage-llc-64da221b.png"
    },
    {
-    "name": "The Huntington National Bank"
+    "name": "The Huntington National Bank",
+    "logo": "https://resources.mismo.org/champions/logos/the-huntington-national-bank-06177f16.png"
    },
    {
-    "name": "Truist"
+    "name": "Truist",
+    "logo": "https://resources.mismo.org/champions/logos/truist-ba55ccb9.jpg"
    },
    {
-    "name": "United Wholesale Mortgage"
+    "name": "United Wholesale Mortgage",
+    "logo": "https://resources.mismo.org/champions/logos/united-wholesale-mortgage-301119f3.png"
    },
    {
-    "name": "USAA Federal Savings Bank"
+    "name": "USAA Federal Savings Bank",
+    "logo": "https://resources.mismo.org/champions/logos/usaa-federal-savings-bank-befea280.png"
    },
    {
-    "name": "Zillow Home Loans"
+    "name": "Zillow Home Loans",
+    "logo": "https://resources.mismo.org/champions/logos/zillow-home-loans-0f4f2938.jpg"
    }
   ]
  },
  "industry": {
   "Chair": [
    {
-    "name": "Cotality"
+    "name": "Cotality",
+    "logo": "https://resources.mismo.org/champions/logos/cotality-18e7f389.png"
    },
    {
-    "name": "Equifax"
+    "name": "Equifax",
+    "logo": "https://resources.mismo.org/champions/logos/equifax-ee96e357.png"
    },
    {
-    "name": "Experian Information Solutions, Inc."
+    "name": "Experian Information Solutions, Inc.",
+    "logo": "https://resources.mismo.org/champions/logos/experian-information-solutions-inc-61ab5bcc.png"
    },
    {
-    "name": "Fannie Mae Single-Family"
+    "name": "Fannie Mae Single-Family",
+    "logo": "https://resources.mismo.org/champions/logos/fannie-mae-single-family-71001532.png"
    },
    {
-    "name": "FICO"
+    "name": "FICO",
+    "logo": "https://resources.mismo.org/champions/logos/fico-8f436870.png"
    },
    {
-    "name": "First American"
+    "name": "First American",
+    "logo": "https://resources.mismo.org/champions/logos/first-american-32af0a8e.png"
    },
    {
-    "name": "Freddie Mac Single-Family"
+    "name": "Freddie Mac Single-Family",
+    "logo": "https://resources.mismo.org/champions/logos/freddie-mac-single-family-e8fd3080.png"
    },
    {
-    "name": "ICE Mortgage Technology"
+    "name": "ICE Mortgage Technology",
+    "logo": "https://resources.mismo.org/champions/logos/ice-mortgage-technology-033ca761.png"
    },
    {
-    "name": "VantageScore Solutions, LLC"
+    "name": "VantageScore Solutions, LLC",
+    "logo": "https://resources.mismo.org/champions/logos/vantagescore-solutions-llc-add6ee00.png"
    }
   ],
   "Executive": [
    {
-    "name": "Arch Mortgage Insurance Company"
+    "name": "Arch Mortgage Insurance Company",
+    "logo": "https://resources.mismo.org/champions/logos/arch-mortgage-insurance-company-a56aadc3.jpg"
    },
    {
-    "name": "Consolidated Analytics, Inc."
+    "name": "Consolidated Analytics, Inc.",
+    "logo": "https://resources.mismo.org/champions/logos/consolidated-analytics-inc-4e708e77.png"
    },
    {
-    "name": "Enact"
+    "name": "Enact",
+    "logo": "https://resources.mismo.org/champions/logos/enact-11f51d57.png"
    },
    {
-    "name": "Essent Guaranty, Inc."
+    "name": "Essent Guaranty, Inc.",
+    "logo": "https://resources.mismo.org/champions/logos/essent-guaranty-inc-26e02aec.png"
    },
    {
-    "name": "Evolve Mortgage Services"
+    "name": "Evolve Mortgage Services",
+    "logo": "https://resources.mismo.org/champions/logos/evolve-mortgage-services-26faae28.png"
    },
    {
-    "name": "Factual Data"
+    "name": "Factual Data",
+    "logo": "https://resources.mismo.org/champions/logos/factual-data-def4fd98.png"
    },
    {
-    "name": "KPMG LLP"
+    "name": "KPMG LLP",
+    "logo": "https://resources.mismo.org/champions/logos/kpmg-llp-b9db5d7e.jpg"
    },
    {
-    "name": "Mortgage Guaranty Insurance Corporation (MGIC)"
+    "name": "Mortgage Guaranty Insurance Corporation (MGIC)",
+    "logo": "https://resources.mismo.org/champions/logos/mortgage-guaranty-insurance-corporation-mgic-f772cfa6.jpg"
    },
    {
-    "name": "Radian Guaranty Inc."
+    "name": "Radian Guaranty Inc.",
+    "logo": "https://resources.mismo.org/champions/logos/radian-guaranty-inc-d64c3b13.png"
    },
    {
-    "name": "Viant Eye"
+    "name": "Viant Eye",
+    "logo": "https://resources.mismo.org/champions/logos/viant-eye-7c32e55c.png"
    }
   ],
   "Associate": [
@@ -169,88 +207,114 @@
     "name": "ActiveComply, LLC"
    },
    {
-    "name": "Actualize Consulting"
+    "name": "Actualize Consulting",
+    "logo": "https://resources.mismo.org/champions/logos/actualize-consulting-dc3e27c5.jpg"
    },
    {
-    "name": "Alpha7X"
+    "name": "Alpha7X",
+    "logo": "https://resources.mismo.org/champions/logos/alpha7x-794a84d4.png"
    },
    {
-    "name": "Assurant"
+    "name": "Assurant",
+    "logo": "https://resources.mismo.org/champions/logos/assurant-411dbcf0.png"
    },
    {
-    "name": "BNY"
+    "name": "BNY",
+    "logo": "https://resources.mismo.org/champions/logos/bny-c28383b7.png"
    },
    {
-    "name": "Brody Gapp LLP"
+    "name": "Brody Gapp LLP",
+    "logo": "https://resources.mismo.org/champions/logos/brody-gapp-llp-b4b6afc8.png"
    },
    {
-    "name": "Copperlane"
+    "name": "Copperlane",
+    "logo": "https://resources.mismo.org/champions/logos/copperlane-2d513b6e.png"
    },
    {
-    "name": "DocMagic"
+    "name": "DocMagic",
+    "logo": "https://resources.mismo.org/champions/logos/docmagic-6a7bf728.png"
    },
    {
-    "name": "Ernst & Young LLP"
+    "name": "Ernst & Young LLP",
+    "logo": "https://resources.mismo.org/champions/logos/ernst-young-llp-e3c521ae.png"
    },
    {
-    "name": "FICS"
+    "name": "FICS",
+    "logo": "https://resources.mismo.org/champions/logos/fics-4e686496.png"
    },
    {
-    "name": "Fiserv"
+    "name": "Fiserv",
+    "logo": "https://resources.mismo.org/champions/logos/fiserv-d30817e8.jpg"
    },
    {
-    "name": "Gateless, Inc."
+    "name": "Gateless, Inc.",
+    "logo": "https://resources.mismo.org/champions/logos/gateless-inc-bd48959c.svg"
    },
    {
-    "name": "Guidehouse"
+    "name": "Guidehouse",
+    "logo": "https://resources.mismo.org/champions/logos/guidehouse-59e82aaa.png"
    },
    {
-    "name": "Lender Toolkit, LLC"
+    "name": "Lender Toolkit, LLC",
+    "logo": "https://resources.mismo.org/champions/logos/lender-toolkit-llc-b78d39e0.png"
    },
    {
     "name": "Lenders One"
    },
    {
-    "name": "Mortgage Cadence LLC"
+    "name": "Mortgage Cadence LLC",
+    "logo": "https://resources.mismo.org/champions/logos/mortgage-cadence-llc-666c2577.png"
    },
    {
-    "name": "Optimal Blue, LLC"
+    "name": "Optimal Blue, LLC",
+    "logo": "https://resources.mismo.org/champions/logos/optimal-blue-llc-7e1413b2.png"
    },
    {
-    "name": "Pace"
+    "name": "Pace",
+    "logo": "https://resources.mismo.org/champions/logos/pace-708b5b41.png"
    },
    {
-    "name": "Pensato.ai"
+    "name": "Pensato.ai",
+    "logo": "https://resources.mismo.org/champions/logos/pensato-ai-67609193.png"
    },
    {
     "name": "Redwood Trust, Inc."
    },
    {
-    "name": "Sagent"
+    "name": "Sagent",
+    "logo": "https://resources.mismo.org/champions/logos/sagent-c73f525b.png"
    },
    {
-    "name": "Stewart"
+    "name": "Stewart",
+    "logo": "https://resources.mismo.org/champions/logos/stewart-941650bc.png"
    },
    {
-    "name": "Supreme Lending"
+    "name": "Supreme Lending",
+    "logo": "https://resources.mismo.org/champions/logos/supreme-lending-76f93ad9.png"
    },
    {
-    "name": "Tavant"
+    "name": "Tavant",
+    "logo": "https://resources.mismo.org/champions/logos/tavant-11b2efee.jpg"
    },
    {
-    "name": "TELUS Digital"
+    "name": "TELUS Digital",
+    "logo": "https://resources.mismo.org/champions/logos/telus-digital-df1e9c97.jpeg"
    },
    {
-    "name": "Trisotech"
+    "name": "Trisotech",
+    "logo": "https://resources.mismo.org/champions/logos/trisotech-ad4262ee.png"
    },
    {
-    "name": "Wolters Kluwer"
+    "name": "Wolters Kluwer",
+    "logo": "https://resources.mismo.org/champions/logos/wolters-kluwer-aea8f32e.png"
    },
    {
-    "name": "Xactus"
+    "name": "Xactus",
+    "logo": "https://resources.mismo.org/champions/logos/xactus-010e394f.png"
    },
    {
-    "name": "Xpanse"
+    "name": "Xpanse",
+    "logo": "https://resources.mismo.org/champions/logos/xpanse-c0f4bba8.png"
    }
   ]
  }
