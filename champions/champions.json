@@ -4,16 +4,20 @@
  "lender": {
   "Chair": [
    {
-    "name": "Guild Mortgage Company"
+    "name": "Guild Mortgage Company",
+    "logo": "https://resources.mismo.org/champions/logos/guild-mortgage-company-6570cab1.png"
    },
    {
-    "name": "Newrez LLC"
+    "name": "Newrez LLC",
+    "logo": "https://resources.mismo.org/champions/logos/newrez-llc-a504cfd5.png"
    },
    {
-    "name": "Pennymac"
+    "name": "Pennymac",
+    "logo": "https://resources.mismo.org/champions/logos/pennymac-078d29f4.jpg"
    },
    {
-    "name": "Rocket Mortgage, LLC"
+    "name": "Rocket Mortgage, LLC",
+    "logo": "https://resources.mismo.org/champions/logos/rocket-mortgage-llc-bdc10196.jpg"
    }
   ],
   "Executive": [
@@ -24,7 +28,8 @@
     "name": "Citizens Bank (978986)"
    },
    {
-    "name": "Freedom Mortgage Corporation"
+    "name": "Freedom Mortgage Corporation",
+    "logo": "https://resources.mismo.org/champions/logos/freedom-mortgage-corporation-67db92cb.png"
    },
    {
     "name": "Lennar Mortgage"
@@ -39,7 +44,8 @@
     "name": "Veterans United Home Loans"
    },
    {
-    "name": "Wells Fargo Home Mortgage"
+    "name": "Wells Fargo Home Mortgage",
+    "logo": "https://resources.mismo.org/champions/logos/wells-fargo-home-mortgage-74249765.png"
    }
   ],
   "Associate": [
