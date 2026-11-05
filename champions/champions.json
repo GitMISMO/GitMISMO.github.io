@@ -150,10 +150,6 @@
     "logo": "https://resources.mismo.org/champions/logos/champions-funding-llc-09859630.png"
    },
    {
-    "name": "Citizens Bank",
-    "logo": "https://resources.mismo.org/champions/logos/citizens-bank-be5039e3.png"
-   },
-   {
     "name": "Click n’ Close, Inc",
     "logo": "https://resources.mismo.org/champions/logos/click-n-close-inc-f62fe557.png"
    },
@@ -370,7 +366,8 @@
     "logo": "https://resources.mismo.org/champions/logos/lender-toolkit-llc-b78d39e0.png"
    },
    {
-    "name": "Lenders One"
+    "name": "Lenders One",
+    "website": "https://lendersone.com"
    },
    {
     "name": "Mortgage Cadence LLC",
