@@ -1982,6 +1982,19 @@ p,.sub,.lede{text-wrap:pretty}
 .awr-guess{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
 .awr-pick{display:flex;gap:8px;align-items:center}
 .awr-pick select{flex:1;min-width:0;font:inherit;font-size:13px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:5px;padding:6px 8px}
+/* parts with their own license designation */
+.pt-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:6px}
+.pt-tbl th{position:static!important;top:auto}
+.pt-tbl td{font-size:12.5px}
+.pt-tbl td.pt-miss{color:var(--warn)}
+.pt-ed{display:flex;flex-direction:column;gap:6px;margin-bottom:10px}
+.pt-row{display:grid;grid-template-columns:1fr 210px auto;gap:6px;align-items:center}
+.pt-row input,.pt-row select{font:inherit;font-size:13px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:5px;padding:6px 8px;min-width:0}
+@media(max-width:600px){.pt-row{grid-template-columns:1fr auto}.pt-row select{grid-column:1/2}}
+.pt-blk{border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:10px;background:var(--surface-2)}
+.pt-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px 10px;margin-top:8px}
+.pt-grid .fld{margin-bottom:4px}
+.pt-grid select{width:100%;font:inherit;font-size:12.5px;border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:5px;padding:5px 6px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -6065,8 +6078,8 @@ stagePanel=function(t){ const rows=[], sub=t.sub||'', d=t.dates||{};
   const ds=t.designation||{}, approved=/Approved/i.test(ds.status||'');
   if(t.stage==='designation'||ds.type||ds.license){
     const chip=approved?'<span class="chip good">Designated</span>':t.stage==='designation'?(subChip(t)||'<span class="chip info">For Approval</span>'):'<span class="chip">Set</span>';
-    const tiles='<div class="rd-tiles">'+[['Comment Type',ds.type],['Classification',t.classification],['License Usage',ds.license],['Royalty Status',ds.royalty],['Available To',ds.availableTo],['Comment Length',t.commentDays?t.commentDays+' days':'']].map(([l,v])=>'<div class="dg-f'+(v?'':' miss')+'"><label>'+esc(l)+'</label><b>'+esc(v||'Not set')+'</b></div>').join('')+'</div>';
-    const deciding=t.stage==='designation'&&!approved; rows.push(rdRow('License Designation',chip,deciding?'Being decided: see License Designation above':d.designation&&approved?'Designated '+esc(fmtS(d.designation)):'',deciding?'':tiles)); }
+    let tiles='<div class="rd-tiles">'+[['Comment Type',ds.type],['Classification',t.classification],['License Usage',ds.license],['Royalty Status',ds.royalty],['Available To',ds.availableTo],['Comment Length',t.commentDays?t.commentDays+' days':'']].map(([l,v])=>'<div class="dg-f'+(v?'':' miss')+'"><label>'+esc(l)+'</label><b>'+esc(v||'Not set')+'</b></div>').join('')+'</div>';
+    const deciding=t.stage==='designation'&&!approved; if(typeof hasParts==='function'&&hasParts(t)&&!deciding) tiles=partsTable(t); rows.push(rdRow('License Designation',chip,deciding?'Being decided: see License Designation above':d.designation&&approved?'Designated '+esc(fmtS(d.designation)):'',deciding?'':tiles)); }
   else if(rdPast(t,'designation')) rows.push(rdRow('License Designation',RD_BEFORE,''));
   (t.votes||[]).forEach(v=>rows.push(rdRow(stageDef(v.stage).name,'<span class="chip '+(v.outcome==='Approved'?'good':v.outcome==='Deferred'?'warn':'bad')+'">'+esc(v.outcome)+'</span>',esc([fmtS(v.date),v.method,v.tally].filter(Boolean).join(' · ')),Object.keys(v.members||{}).length?'<div class="muted" style="font-size:12px">'+esc(Object.entries(v.members).map(([n,x])=>n+': '+x).join(' · '))+'</div>':'')));
   if(t.commentReport) rows.push(rdRow('Comment Report','<span class="chip">'+esc(t.commentReport)+'</span>',''));
@@ -6104,6 +6117,103 @@ renderPanel=function(){ _renderPanelLink(); const id=String(S.panel||''); if(id.
   const grid=$('.pgrid',pb); if(grid) grid.insertAdjacentHTML('afterbegin',box); else pb.insertAdjacentHTML('afterbegin',box);
   $$('[data-awlink]',pb).forEach(b=>b.onclick=()=>archLink(a,b.dataset.awlink));
   const go=$('#awpickgo',pb); if(go) go.onclick=()=>{ const v=$('#awpick',pb).value; if((t?t.id:'')===v) return; archLink(a,v); }; };
+
+/* =====================================================================
+   Parts with their own License Designation (Nov 4, Jonna)
+   A work request (or one deliverable of a split) can carry parts that move
+   together through the whole process but are each designated on their own,
+   e.g. a Reference Model release with its schema, LDD, iGuide and release notes.
+   t.parts = [{id, name, kind, ds:{classification,type,license,royalty,availableTo}}]
+   The work request's own designation mirrors the first part, so lists and
+   counts keep working; the parts carry the detail.
+   ===================================================================== */
+const DS_TYPES=['Public','Member'], DS_CLS=['Standard','Collateral'], DS_LIC=['Commercial Distributor','Non Commercial Distributor','Internal Use Only','Copyright'],
+  DS_ROY=['Public for Free','Available to PUBLIC for FREE with COMMERCIAL USAGE LICENSE','Members Only for Free','Public for a Fee','Royalty Temp Waived'], DS_AV=['Public','Members Only'];
+const hasParts=t=>!!(t&&Array.isArray(t.parts)&&t.parts.length);
+function partRec(t,p){ const r=recommend(Object.assign({},t,{id:t.id+'~'+p.id,name:p.name,product:p.name,kind:p.kind||''})); return {classification:r.classification,type:r.type,license:r.license,royalty:r.royalty,availableTo:r.availableTo}; }
+function partDs(t,p){ return (p.ds&&p.ds.license)?p.ds:partRec(t,p); }
+const dsLine=d=>[d.classification,d.type,d.license,d.royalty,d.availableTo].filter(Boolean).join(' · ');
+function partsCanEdit(t){ return S.canWrite&&!S.viewAs&&(S.isStaff||sameName(t.facilitator,S.me&&S.me.name)||isRole('director',S.me)); }
+
+/* the parts table, used on the Overview, Details and Reviews and Decisions */
+function partsTable(t,o){ o=o||{}; const P=t.parts||[];
+  return '<div class="pt-wrap"><table class="tbl pt-tbl"><thead><tr><th>Part</th><th>Classification</th><th>Comment Type</th><th>License Usage</th><th>Royalty Status</th><th>Available To</th></tr></thead><tbody>'+
+    P.map(p=>{ const d=o.recommend?partDs(t,p):(p.ds||{}); const c=v=>'<td'+(v?'':' class="pt-miss"')+'>'+esc(v||'Not set')+'</td>';
+      return '<tr><td><b>'+esc(p.name)+'</b>'+(p.kind?'<div class="muted" style="font-size:11.5px">'+esc(p.kind)+'</div>':'')+'</td>'+c(d.classification)+c(d.type)+c(d.license)+c(d.royalty)+c(d.availableTo)+'</tr>'; }).join('')+'</tbody></table></div>'; }
+
+/* set up the parts */
+async function editParts(t){ const base=S.tickets[t.id]||t; let rows=(base.parts||[]).map(p=>Object.assign({},p)); if(!rows.length) rows=[{id:'p1',name:'',kind:''}];
+  const root=$('#modal-root');
+  const draw=()=>{ const body='<p class="muted" style="margin:0 0 10px;font-size:12.5px">Each part moves through the process with this work request and gets its own License Designation. Leave this empty when the whole work request takes one designation.</p>'+
+      '<div class="pt-ed">'+rows.map((r,i)=>'<div class="pt-row"><input data-pn="'+i+'" value="'+esc(r.name)+'" placeholder="Part name, e.g. v3.6.4 XML Schema"><select data-pk="'+i+'"><option value="">Kind…</option>'+KINDS.map(k=>'<option'+(k===r.kind?' selected':'')+'>'+esc(k)+'</option>').join('')+'</select><button type="button" class="btn sm ghost" data-px="'+i+'" title="Remove this part">×</button></div>').join('')+'</div>'+
+      '<button type="button" class="dv-add" id="ptadd">+ Add a Part</button>';
+    return body; };
+  const p=modal({title:'Parts With Their Own License Designation',text:esc(base.wr+' '+base.name),ok:'Save Parts',body:draw()});
+  const box=$('.modal',root); const bd=$('.bd',box);
+  const sync=()=>{ $$('[data-pn]',bd).forEach(i=>rows[+i.dataset.pn].name=i.value); $$('[data-pk]',bd).forEach(s=>rows[+s.dataset.pk].kind=s.value); };
+  const wire=()=>{ $('#ptadd',bd).onclick=()=>{ sync(); rows.push({id:'p'+(Date.now()%100000),name:'',kind:''}); bd.innerHTML=draw(); wire(); const l=$$('[data-pn]',bd).pop(); l&&l.focus(); };
+    $$('[data-px]',bd).forEach(b=>b.onclick=()=>{ sync(); rows.splice(+b.dataset.px,1); bd.innerHTML=draw(); wire(); }); };
+  wire();
+  const okb=$('[data-m=ok]',box); okb.addEventListener('click',sync,true);
+  const v=await p; if(!v) return;
+  const clean=rows.map((r,i)=>({id:r.id||('p'+(i+1)),name:String(r.name||'').trim(),kind:r.kind||'',ds:r.ds})).filter(r=>r.name);
+  const ids=new Set(); clean.forEach((r,i)=>{ if(ids.has(r.id)) r.id='p'+(i+1)+'x'; ids.add(r.id); });
+  const x=clone(base), b=clone(base); x.parts=clean; hist(x,clean.length?'Parts for License Designation: '+clean.map(r=>r.name).join('; '):'Parts removed: one License Designation for the whole work request');
+  await saveTicket(x,'Parts saved',b); }
+document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-partsedit]'); if(!b) return; e.preventDefault(); const t=S.tickets[b.dataset.partsedit]; if(t) editParts(t); });
+
+/* Details tab: the parts, with a button to set them up */
+function partsSection(t){ const can=partsCanEdit(t)&&t.state==='active'&&!['gc-comment','comment','post','gc-publish','release'].includes(t.stage);
+  return '<div class="psec full pt-sec"><h4>Parts With Their Own License Designation<span class="sp muted" style="font-size:12px;font-weight:500">'+(hasParts(t)?t.parts.length+' part'+(t.parts.length===1?'':'s')+' · they move together':'One designation for the whole work request')+'</span>'+(can?'<button type="button" class="btn sm" data-partsedit="'+esc(t.id)+'" style="margin-left:10px">'+(hasParts(t)?'Edit the Parts':'+ Add Parts')+'</button>':'')+'</h4>'+
+    (hasParts(t)?partsTable(t):'<p class="muted" style="margin:0;font-size:12.5px">If this work request has pieces that move together but each need their own license (for example a Reference Model release’s schema, LDD and iGuide), add them as parts.</p>')+'</div>'; }
+const _renderPanelPT=renderPanel;
+renderPanel=function(){ _renderPanelPT(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t||t.split) return;
+  const pb=$('.pb',P); if(!pb||$('.pt-sec',pb)) return; const det=$('[data-wtab="det"]',pb); if(!det) return;
+  const w=document.createElement('div'); w.innerHTML=partsSection(t); det.insertBefore(w.firstChild,det.children[1]||null); };
+
+/* the recommendation: per part, and only until a designation is chosen */
+const _recPanelPT=recPanel;
+recPanel=function(t){ if(t.stage!=='designation'||t.state!=='active') return ''; if(['vps'].includes(t.sub||'')) return '';
+  if(!hasParts(t)) return _recPanelPT(t);
+  return '<div class="psec full rec"><h4>Recommended Designation, Part by Part<span class="sp muted" style="font-size:12px;font-weight:500">From the kind of each part and past designations</span></h4>'+partsTable(t,{recommend:true})+'</div>'; };
+
+/* the License Designation section while deciding */
+const _desigSectionPT=desigSection;
+desigSection=function(t){ const h=_desigSectionPT(t); if(!h||!hasParts(t)) return h;
+  const set=t.parts.some(p=>p.ds&&p.ds.license); return h.replace(/<div class="desig-grid">[\s\S]*?<\/div><\/div>/,'').replace('</h4>','</h4>'+(set?partsTable(t):'<p class="muted" style="margin:0;font-size:12.5px">Not chosen yet for its '+t.parts.length+' parts. Approve the recommendation part by part below, or change it.</p>')); };
+
+/* approving the recommendation sets every part */
+const _approveRecPT=approveRec;
+approveRec=async function(t){ if(!hasParts(t)||t.rides) return _approveRecPT(t);
+  const x=clone(t); x.parts=x.parts.map(p=>Object.assign({},p,{ds:partDs(t,p)})); const f=x.parts[0].ds;
+  x.classification=f.classification; x.commentDays=x.commentDays||recommend(t).commentDays;
+  x.designation=Object.assign({},x.designation,{type:f.type,license:f.license,royalty:f.royalty,availableTo:f.availableTo,recommended:true,parts:true,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
+  const sum=x.parts.map(p=>p.name+': '+dsLine(p.ds)).join('\n');
+  const ap=peopleFor('vps'); if(ap.length&&ap.every(p=>sameName(p.name,S.me.name))){ x.designation.vps={[ap[0].name]:{vote:'Approve',note:'',at:today()}}; x.designation.status='3. Approved';
+    await move(x,nextStage(x),{text:'Designation approved by '+ap[0].name+' for '+x.parts.length+' parts; added to the '+govName()+' agenda',note:sum}); return; }
+  await setSub(x,'vps','Director approved the recommended designation for '+x.parts.length+' parts');
+  queueMail({to:ap.map(p=>p.email),subject:t.wr+' '+t.name+': designation ready for your approval ('+x.parts.length+' parts)',body:'Recommended designation, part by part:\n\n'+sum+'\n\nApprove it or ask to discuss it in the MMS.',ticket:t.id,kind:'stage',key:t.id+'-vps-'+today()}); };
+
+/* changing the designation: one block per part */
+const _directorRecPT=directorRec;
+directorRec=async function(t){ if(!hasParts(t)) return _directorRecPT(t);
+  const sl=(n,opts,v)=>'<select name="'+n+'">'+['',...opts].map(o=>'<option value="'+esc(o)+'"'+(o===(v||'')?' selected':'')+'>'+esc(o||'—')+'</option>').join('')+'</select>';
+  const body=t.parts.map((p,i)=>{ const d=partDs(t,p); return '<div class="pt-blk"><b>'+esc(p.name)+'</b>'+(p.kind?' <span class="muted">'+esc(p.kind)+'</span>':'')+'<div class="pt-grid">'+
+    fld('Classification',sl('c'+i,DS_CLS,d.classification))+fld('Comment Type',sl('t'+i,DS_TYPES,d.type))+fld('License Usage',sl('l'+i,DS_LIC,d.license))+fld('Royalty Status',sl('r'+i,DS_ROY,d.royalty))+fld('Available To',sl('a'+i,DS_AV,d.availableTo))+'</div></div>'; }).join('')+fld('Notes',ta('note',(t.designation&&t.designation.notes)||''));
+  const v=await modal({title:'Designation, Part by Part',text:esc(t.wr+' '+t.name),ok:'Send for Approval',body}); if(!v) return;
+  const x=clone(t); x.parts=x.parts.map((p,i)=>Object.assign({},p,{ds:{classification:v['c'+i],type:v['t'+i],license:v['l'+i],royalty:v['r'+i],availableTo:v['a'+i]}})); const f=x.parts[0].ds;
+  x.classification=f.classification; x.designation=Object.assign({},t.designation,{type:f.type,license:f.license,royalty:f.royalty,availableTo:f.availableTo,notes:v.note,parts:true,auto:false,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
+  const sum=x.parts.map(p=>p.name+': '+dsLine(p.ds)).join('\n');
+  await setSub(x,'vps','Director recommended a designation for each of '+x.parts.length+' parts');
+  queueMail({to:peopleFor('vps').map(p=>p.email),subject:t.wr+' '+t.name+': designation ready for your approval ('+x.parts.length+' parts)',body:'Part by part:\n\n'+sum+'\n\nApprove it or ask to discuss it in the MMS.',ticket:t.id,kind:'stage',key:t.id+'-vps-'+today()});
+  toast('Designation saved for '+x.parts.length+' parts'); };
+
+/* the approver sees every part in the approval window */
+const _vpAgreePT=vpAgree;
+vpAgree=function(t){ if(hasParts(t)) setTimeout(()=>{ const bd=$('#modal-root .modal .bd'); if(bd&&!$('.pt-wrap',bd)) bd.insertAdjacentHTML('afterbegin','<div style="margin-bottom:12px">'+partsTable(t)+'</div>'); },40); return _vpAgreePT(t); };
+/* when AWG's approval sets the designation automatically, every part gets its own recommendation too */
+const _withAutoDesignationPT=withAutoDesignation;
+withAutoDesignation=function(x){ const r=_withAutoDesignationPT(x); try{ if(hasParts(x)) x.parts=x.parts.map(p=>p.ds&&p.ds.license?p:Object.assign({},p,{ds:partRec(x,p)})); }catch(e){} return r; };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
