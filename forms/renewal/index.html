@@ -551,14 +551,16 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <div class="tick" aria-hidden="true">&check;</div>
     <h1 style="font-size:22px">Thank you &mdash; we have it</h1>
     <p class="lede" id="done-line"></p>
+    <div id="done-invoice" style="text-align:left;max-width:560px;margin:22px auto 0"></div>
     <div class="next" style="text-align:left;max-width:460px;margin:22px auto 0">
       <h3>What Happens Next</h3>
       <ol>
         <li>Your attestation is recorded against your certification.</li>
-        <li>Your renewal invoice is raised and sent to you.</li>
+        <li id="done-inv-step">Your renewal invoice is raised and sent to you.</li>
         <li>Once the fee is paid, we write to arrange your assessment.</li>
       </ol>
     </div>
+    <p style="margin:18px 0 0"><button class="btn ghost" type="button" id="done-fix">Send a Correction</button></p>
   </section>
 </main>
 
@@ -1183,11 +1185,35 @@ function send(){
     toast("That did not go through — your answers have been saved to your computer instead.");
   });
 }
+/* Sent already - on this browser, or on any other (R.received, from MISMO's records): the thank-you
+   screen, with the invoice moved onto it so it can still be downloaded, and a way to send a
+   correction (5 Nov 2026: Proof came back for the invoice and found the form empty). */
+var invHome = null, invNext = null;
+function fmtSent(iso){
+  var d = iso ? new Date(iso) : null;
+  return d && !isNaN(d) ? d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
+}
 function showDone(){
   el("form-wrap").hidden = true;
   el("done-wrap").hidden = false;
+  var rc = R.received || null, when = rc && rc.at ? fmtSent(rc.at) : "";
   el("done-line").textContent = "We have your renewal for " + R.org
-    + (R.product ? " · " + R.product : "") + ". Nothing else is needed from you today.";
+    + (R.product ? " · " + R.product : "") + "."
+    + (when ? " It was sent on " + when + (rc.by ? " by " + rc.by : "") + "." : "")
+    + " Nothing else is needed from you today.";
+  var inv = el("invoice"), box = el("done-invoice");
+  if (inv && box && inv.parentNode !== box){ invHome = inv.parentNode; invNext = inv.nextSibling; box.appendChild(inv); }
+  var i = R.invoice || {};
+  el("done-inv-step").textContent = i.paid ? "Your renewal fee is paid. Thank you."
+    : i.available ? "Your renewal invoice is above. Download it here at any time."
+    : "Your renewal invoice is raised and sent to you. It will also appear on this page.";
+  window.scrollTo(0, 0);
+}
+function showForm(){
+  var inv = el("invoice");
+  if (inv && invHome && inv.parentNode !== invHome) invHome.insertBefore(inv, invNext);
+  el("done-wrap").hidden = true;
+  el("form-wrap").hidden = false;
   window.scrollTo(0, 0);
 }
 
@@ -1234,7 +1260,9 @@ function start(renewal){
   numberSteps();
   renderHeader(); renderFacts(); renderInvoice(); renderDocs(); renderScript(); renderSigner(); renderAttest(); renderWebsite();
   wireAll(); paintReady();
-  if (submitted) showDone();
+  var fix = el("done-fix");
+  if (fix) fix.onclick = function(){ submitted = false; persist(); R.received = null; showForm(); };
+  if (submitted || R.received) showDone();
 }
 
 boot();
