@@ -2383,7 +2383,7 @@ function modal(o){
   });
 }
 const CAL='<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>';
-function dateField(name,val){ return '<div class="dateb"><input type="text" data-date="'+name+'" value="'+esc(val?fmt(val):'')+'" placeholder="e.g. 9/30/26"><span class="cal" title="Pick a date">'+CAL+'<input type="date" tabindex="-1" value="'+esc(val||'')+'" aria-label="Calendar"></span></div>'; }
+function dateField(name,val,ph){ return '<div class="dateb"><input type="text" data-date="'+name+'" value="'+esc(val?fmt(val):'')+'" placeholder="'+esc(ph==null?'e.g. 9/30/26':ph)+'"><span class="cal" title="Pick a date">'+CAL+'<input type="date" tabindex="-1" value="'+esc(val||'')+'" aria-label="Calendar"></span></div>'; }
 function wireDates(root){
   $$('.dateb',root).forEach(w=>{ const t=$('input[type=text]',w), c=$('input[type=date]',w);
     c.addEventListener('change',()=>{ t.value=c.value?fmt(c.value):''; t.dispatchEvent(new Event('input',{bubbles:true})); });
@@ -2680,7 +2680,7 @@ function renderPanel(){
   const facs=(S.people.facilitators||[]).map(p=>p.name).sort();
   const field=(label,key,val,type,opts,wide)=>{
     let el; const v=val==null?'':val;
-    if(type==='date') el=dateField(key,v);
+    if(type==='date') el=dateField(key,v,'');
     else if(type==='select') el='<select data-k="'+key+'">'+['',...opts].map(o=>{ const ov=Array.isArray(o)?o[0]:o, ol=Array.isArray(o)?o[1]:o; return '<option value="'+esc(ov)+'"'+(String(ov)===String(v)?' selected':'')+'>'+esc(ol||'—')+'</option>'; }).join('')+(v&&!opts.some(o=>(Array.isArray(o)?o[0]:o)===v)?'<option selected>'+esc(v)+'</option>':'')+'</select>';
     else if(type==='area') el='<textarea data-k="'+key+'" rows="4">'+esc(v)+'</textarea>';
     else el='<input data-k="'+key+'" value="'+esc(v)+'">';
@@ -4734,7 +4734,7 @@ function keyDate(t){
     return dateTile(d.targetIM,'Target to Submit to IM',late?'<i class="bad">'+Math.abs(n)+' days past target</i>':esc(relDays(d.targetIM))+(t.targetChanges?' · changed '+t.targetChanges+'×':''),late?'bad':n<=14?'warn':''); }
   if(t.stage==='comment'&&d.commentStart) return dateTile(d.commentStart,'Comment Period Opened',esc(relDays(d.commentStart)));
   const since=stageEntered(t);
-  if(t.state==='active'&&since){ const n=daysBetween(since,today()), nm=stageDef(t.stage).name, g=stageDef(t.stage).owner==='gov'; return dateTile(since,g?'With Governance since':(nm==='In Work'?'In Work since':'In '+nm+' since'),n===0?'Today':n+' day'+(n===1?'':'s'),n>90?'warn':''); }
+  if(t.state==='active'&&since){ const n=daysBetween(since,today()), nm=stageDef(t.stage).name, g=stageDef(t.stage).owner==='gov'; const rs=(typeof resubSince==='function')&&resubSince(t)===since; return dateTile(since,rs?'Resubmitted to '+nm:g?'With Governance since':(nm==='In Work'?'In Work since':'In '+nm+' since'),n===0?'Today':n+' day'+(n===1?'':'s'),n>90?'warn':''); }
   return '';
 }
 function leaderChips(t){
@@ -5722,7 +5722,7 @@ renderPanel=function(){ _renderPanel7(); const P=$('#panel'); if(!S.panel||Strin
    ===================================================================== */
 const SP_HOST='https://mortgagebankersassociation.sharepoint.com';
 S.ssfiles=S.ssfiles||{}; let ssSub=false;
-function ssEnsure(){ if(ssSub) return; ssSub=true; try{ Store.sub('ssfiles',o=>{ S.ssfiles=o||{}; S.ssLoaded=true; if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel(); }); }catch(e){} }
+function ssEnsure(){ if(ssSub) return; ssSub=true; try{ Store.sub('ssfiles',o=>{ const first=!S.ssLoaded; S.ssfiles=o||{}; S.ssLoaded=true; if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel(); else if(first&&S.ready&&typeof renderAll==='function') renderAll(); }); }catch(e){} }
 function ssFor(t){ return S.ssfiles[t.id]||null; }
 /* the documents list loads a moment after the page opens: wait for it before sending documents to a portal */
 async function ssReady(ms){ ssEnsure(); for(let k=0;k<(ms||4000)/200&&!S.ssLoaded;k++) await new Promise(z=>setTimeout(z,200)); return !!S.ssLoaded; }
@@ -5858,7 +5858,7 @@ function hubFor(t){ return (S.hub||[]).find(x=>(t.hubId&&x.id===t.hubId)||(x.wr&
 function hubAsk(t){ const h=hubFor(t), q=(h&&h.req)||{}; const e=HUB_EFFORT[String(q.effort||t.hubEffort||'').toLowerCase()];
   const c=q.completion||(t.dates&&t.dates.requestedCompletion)||''; return (e||c)?{effort:e,completion:c,why:q.effortWhy||''}:null; }
 const _hubSyncCP=hubSync;
-hubSync=async function(){ await _hubSyncCP(); if(!S.canWrite||!S.hub) return;
+hubSync=async function(){ try{ ssEnsure(); }catch(e){} /* the files list also dates resubmissions */ await _hubSyncCP(); if(!S.canWrite||!S.hub) return;
   for(const h of S.hub){ const q=h.req||{}; if(!h.wr||!(q.effort||q.completion)) continue; const t=allTickets().find(x=>x.wr===h.wr||(x.hubId&&x.hubId===h.id)); if(!t) continue;
     const eff=String(q.effort||'').toLowerCase(), comp=q.completion||''; if(t.hubEffort===eff&&((t.dates||{}).requestedCompletion||'')===comp) continue;
     const x=clone(t); x.hubEffort=eff; x.dates=Object.assign({},x.dates,{requestedCompletion:comp}); S.tickets[x.id]=x; try{ await write('tickets',x.id,x); }catch(e){} } };
@@ -5925,6 +5925,30 @@ const _directorRecDG=directorRec;
 directorRec=async function(t){ const before=JSON.stringify([t.designation&&t.designation.type,t.classification,t.designation&&t.designation.license,t.designation&&t.designation.royalty,t.designation&&t.designation.availableTo]);
   await _directorRecDG(t); const x=S.tickets[t.id]; if(!x) return; const d=x.designation||{}; const after=JSON.stringify([d.type,x.classification,d.license,d.royalty,d.availableTo]);
   if(after!==before){ toast('Designation saved: '+[d.type,x.classification,d.license,d.royalty,d.availableTo].filter(Boolean).join(' · ')); if(S.panel===t.id) renderPanel(); } };
+
+/* ---------- Nov 4 fixes ---------- */
+/* 1. Queues: the IM and AWG facilitator sees IM/AWG work in the Review Desk and IM/AWG Review,
+   not in her own queue, unless she facilitates that work request. Her rights to act are unchanged. */
+const _isMineRaw=isMine;
+isMine=function(t,who){ if(!_isMineRaw(t,who)) return false; who=who||viewer();
+  try{ if(whoseMove(t).role==='imawg'&&!sameName(t.facilitator,who&&who.name)) return false; }catch(e){} return true; };
+canAct=function(t){ return S.canWrite && (S.isStaff || _isMineRaw(t)); };
+/* 2. Time in stage after a resubmission counts from the resubmission: the date the MMS records
+   when someone resubmits, or, for work brought over from Smartsheet, the newest submission form
+   in the work request's files (its date in the name, else when it was added). */
+function lastSubFile(t,stg){ const D=S.ssfiles&&S.ssfiles[t.id]; if(!D) return ''; const re=stg==='awg'?/AWG ?_?SUB/i:/(^|[^A])IM ?_?Sub/i, td=today(); let best='';
+  (D.files||[]).forEach(f=>{ if(!re.test(f.n||'')) return; const m=String(f.n).match(/(20\d\d)(0[1-9]|1[0-2])([0-2]\d|3[01])/); const d=m?m[1]+'-'+m[2]+'-'+m[3]:String(f.u||'').slice(0,10); if(d&&d<=td&&d>best) best=d; }); return best; }
+function resubSince(t){ if(!['im','awg'].includes(t.stage)||t.sub!=='resubmitted') return ''; const d=t.dates||{}; return [d[t.stage+'Resubmitted'],lastSubFile(t,t.stage)].filter(Boolean).sort().pop()||''; }
+const _stageEnteredRS=stageEntered;
+stageEntered=function(t){ const e=_stageEnteredRS(t), r=resubSince(t); return r&&r>e?r:e; };
+/* 3. The panel keeps its place: when the MMS refreshes the open work request (new data comes in,
+   a background sync finishes), the panel stays where you were reading instead of jumping to the top. */
+const _renderPanelKeep=renderPanel;
+renderPanel=function(){ const P=$('#panel'), id=S.panel, same=!!(P&&id&&P.dataset.for===String(id)&&P.classList.contains('on')), pb0=P&&$('.pb',P), y=same&&pb0?pb0.scrollTop:0, py=same?P.scrollTop:0, wy=window.scrollY;
+  _renderPanelKeep(); if(P) P.dataset.for=S.panel?String(S.panel):'';
+  if(id&&S.panel===id&&py>0){ const P2=$('#panel'); if(P2) P2.scrollTop=py; }
+  if(id&&S.panel===id&&y>0){ const pb=$('.pb',$('#panel')); if(pb){ pb.scrollTop=y; requestAnimationFrame(()=>{ if(S.panel===id&&pb.isConnected&&pb.scrollTop<y) pb.scrollTop=y; }); } }
+  if(window.scrollY!==wy) window.scrollTo(0,wy); };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
