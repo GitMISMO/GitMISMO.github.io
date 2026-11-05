@@ -126,60 +126,735 @@
   ],
   "Corporate": [
    {
+    "name": "1st Security Bank of Washington",
+    "website": "https://fsbwa.com",
+    "logo": "https://resources.mismo.org/champions/logos/1st-security-bank-of-washington-75157323.svg"
+   },
+   {
+    "name": "5th Street Capital, Inc.",
+    "website": "https://5thstcap.com",
+    "logo": "https://resources.mismo.org/champions/logos/5th-street-capital-inc-2052b33c.png"
+   },
+   {
+    "name": "Aberdeen Proving Ground Federal Credit Union",
+    "website": "https://apgfcu.com",
+    "logo": "https://resources.mismo.org/champions/logos/aberdeen-proving-ground-federal-credit-union-9ee86975.png"
+   },
+   {
+    "name": "ABNB Federal Credit Union",
+    "website": "https://abnb.org",
+    "logo": "https://resources.mismo.org/champions/logos/abnb-federal-credit-union-85b0f284.png"
+   },
+   {
+    "name": "Absolute Home Mortgage Corp.",
+    "website": "https://ahmcloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/absolute-home-mortgage-corp-d0c67376.svg"
+   },
+   {
+    "name": "ACC Mortgage, Inc.",
+    "website": "https://accmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/acc-mortgage-inc-3d21b58e.png"
+   },
+   {
     "name": "Achieve",
     "logo": "https://resources.mismo.org/champions/logos/achieve-c29c2db9.png"
+   },
+   {
+    "name": "Acrisure Mortgage",
+    "website": "https://fbchomeloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/acrisure-mortgage-26f755c5.png"
+   },
+   {
+    "name": "Adams Bank and Trust",
+    "website": "https://abtbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/adams-bank-and-trust-635943d6.svg"
+   },
+   {
+    "name": "AdvantageFirst Lending Inc.",
+    "website": "https://advantage1st.com",
+    "logo": "https://resources.mismo.org/champions/logos/advantagefirst-lending-inc-753aec7e.svg"
    },
    {
     "name": "ALCOVA Mortgage",
     "logo": "https://resources.mismo.org/champions/logos/alcova-mortgage-31abb359.png"
    },
    {
+    "name": "Alliance Bank, a Texas Banking Association",
+    "website": "https://alliancebank.com",
+    "logo": "https://resources.mismo.org/champions/logos/alliance-bank-a-texas-banking-association-2ac6b7ce.png"
+   },
+   {
+    "name": "Alpha Mortgage Company",
+    "website": "https://alphamortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/alpha-mortgage-company-3913a133.png"
+   },
+   {
+    "name": "Altura Credit Union",
+    "website": "https://alturacu.com",
+    "logo": "https://resources.mismo.org/champions/logos/altura-credit-union-56e9a42b.svg"
+   },
+   {
+    "name": "Amerant Mortgage",
+    "website": "https://amerantmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/amerant-mortgage-b313914e.svg"
+   },
+   {
+    "name": "American Bank & Trust Company, Inc",
+    "website": "https://ambanking.com",
+    "logo": "https://resources.mismo.org/champions/logos/american-bank-trust-company-inc-e129797b.webp"
+   },
+   {
     "name": "American Financial Network",
     "logo": "https://resources.mismo.org/champions/logos/american-financial-network-38d4428c.png"
+   },
+   {
+    "name": "American Liberty Mortgage, Inc.",
+    "website": "https://almortgageinc.com",
+    "logo": "https://resources.mismo.org/champions/logos/american-liberty-mortgage-inc-f03a0eb0.png"
+   },
+   {
+    "name": "American National Bank & Trust",
+    "website": "https://amnat.com",
+    "logo": "https://resources.mismo.org/champions/logos/american-national-bank-trust-ae41f257.png"
+   },
+   {
+    "name": "American Pride Bank",
+    "website": "https://americanpride.bank",
+    "logo": "https://resources.mismo.org/champions/logos/american-pride-bank-c5349a77.svg"
+   },
+   {
+    "name": "AmeriCU Credit Union",
+    "website": "https://americu.org",
+    "logo": "https://resources.mismo.org/champions/logos/americu-credit-union-eb5b3578.png"
+   },
+   {
+    "name": "AmeriHome Mortgage, a Western Alliance Bank Company",
+    "website": "https://amerihome.com",
+    "logo": "https://resources.mismo.org/champions/logos/amerihome-mortgage-a-western-alliance-bank-company-6f7698a0.png"
    },
    {
     "name": "Ameris Bank",
     "logo": "https://resources.mismo.org/champions/logos/ameris-bank-5fc77513.png"
    },
    {
+    "name": "Amplify Federal Credit Union",
+    "website": "https://goamplify.com",
+    "logo": "https://resources.mismo.org/champions/logos/amplify-federal-credit-union-36d7cec3.svg"
+   },
+   {
+    "name": "Andrews Federal Credit Union",
+    "website": "https://andrewsfcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/andrews-federal-credit-union-c5091bc5.svg"
+   },
+   {
+    "name": "Androscoggin Bank",
+    "website": "https://androscogginbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/androscoggin-bank-ed87d8be.png"
+   },
+   {
+    "name": "AnnieMac Home Mortgage",
+    "website": "https://annie-mac.com",
+    "logo": "https://resources.mismo.org/champions/logos/anniemac-home-mortgage-7bd1c87d.webp"
+   },
+   {
+    "name": "Archwest Capital. LLC",
+    "website": "https://archwestcapital.com",
+    "logo": "https://resources.mismo.org/champions/logos/archwest-capital-llc-504e22c1.svg"
+   },
+   {
+    "name": "Arizona Federal Credit Union",
+    "website": "https://azfcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/arizona-federal-credit-union-009f8fb1.png"
+   },
+   {
+    "name": "Ark Mortgage, Inc.",
+    "website": "https://arkmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/ark-mortgage-inc-e6dd77bb.png"
+   },
+   {
+    "name": "Arkansas Federal Credit Union",
+    "website": "https://afcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/arkansas-federal-credit-union-e0e55929.png"
+   },
+   {
+    "name": "Avadian Credit Union",
+    "website": "https://avadiancu.com",
+    "logo": "https://resources.mismo.org/champions/logos/avadian-credit-union-a282dba6.png"
+   },
+   {
+    "name": "Bank CMG",
+    "website": "https://greenwoods.bank",
+    "logo": "https://resources.mismo.org/champions/logos/bank-cmg-c5e6ecab.svg"
+   },
+   {
+    "name": "Bank Five Nine",
+    "website": "https://bankfivenine.com",
+    "logo": "https://resources.mismo.org/champions/logos/bank-five-nine-e7857842.png"
+   },
+   {
+    "name": "Bank of the Flint Hills",
+    "website": "https://bankflinthills.com",
+    "logo": "https://resources.mismo.org/champions/logos/bank-of-the-flint-hills-905bdfc3.svg"
+   },
+   {
+    "name": "BankSouth Mortgage",
+    "website": "https://banksouth.com",
+    "logo": "https://resources.mismo.org/champions/logos/banksouth-mortgage-c2d33164.png"
+   },
+   {
     "name": "Barrett Financial Group, L.L.C.",
     "logo": "https://resources.mismo.org/champions/logos/barrett-financial-group-l-l-c-f5460306.png"
+   },
+   {
+    "name": "BECU - Boeing Employees' Credit Union",
+    "website": "https://becu.org",
+    "logo": "https://resources.mismo.org/champions/logos/becu-boeing-employees-credit-union-d397fc5a.svg"
+   },
+   {
+    "name": "Boss Mortgage, LLC",
+    "website": "https://bossmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/boss-mortgage-llc-bb805c81.png"
+   },
+   {
+    "name": "BSI Financial Services",
+    "website": "https://bsifinancial.com",
+    "logo": "https://resources.mismo.org/champions/logos/bsi-financial-services-50e997a2.png"
+   },
+   {
+    "name": "C2 Financial Corporation",
+    "website": "https://c2financial.com",
+    "logo": "https://resources.mismo.org/champions/logos/c2-financial-corporation-925f2a2d.png"
+   },
+   {
+    "name": "Cal Coast Financial Corp.",
+    "website": "https://calcoastmtg.com",
+    "logo": "https://resources.mismo.org/champions/logos/cal-coast-financial-corp-a2780db4.png"
+   },
+   {
+    "name": "Canyon View Federal Credit Union",
+    "website": "https://ucreditu.com",
+    "logo": "https://resources.mismo.org/champions/logos/canyon-view-federal-credit-union-795196f5.png"
+   },
+   {
+    "name": "Capital City Home Loans",
+    "website": "https://cchl.com",
+    "logo": "https://resources.mismo.org/champions/logos/capital-city-home-loans-08c16998.svg"
+   },
+   {
+    "name": "Capital Mortgage Services of Texas",
+    "website": "https://capitalmort.com",
+    "logo": "https://resources.mismo.org/champions/logos/capital-mortgage-services-of-texas-a1f6f233.png"
+   },
+   {
+    "name": "Castle & Cooke Mortgage, LLC",
+    "website": "https://castlecookemortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/castle-cooke-mortgage-llc-d85dc94a.webp"
+   },
+   {
+    "name": "Centennial Bank",
+    "website": "https://my100bank.com",
+    "logo": "https://resources.mismo.org/champions/logos/centennial-bank-8a230beb.svg"
+   },
+   {
+    "name": "Central Trust Bank",
+    "website": "https://centralbank.net",
+    "logo": "https://resources.mismo.org/champions/logos/central-trust-bank-e8d4f66d.svg"
+   },
+   {
+    "name": "CFBANK",
+    "website": "https://cfbankmail.com",
+    "logo": "https://resources.mismo.org/champions/logos/cfbank-69bb4990.png"
    },
    {
     "name": "Champions Funding, LLC",
     "logo": "https://resources.mismo.org/champions/logos/champions-funding-llc-09859630.png"
    },
    {
+    "name": "Churchill Mortgage Corporation",
+    "website": "https://churchillmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/churchill-mortgage-corporation-b5b4fb40.svg"
+   },
+   {
+    "name": "Citizens Bank of Ada",
+    "website": "https://citizensada.bank",
+    "logo": "https://resources.mismo.org/champions/logos/citizens-bank-of-ada-14c0a5c0.png"
+   },
+   {
+    "name": "City & County Credit Union",
+    "website": "https://cccu.com",
+    "logo": "https://resources.mismo.org/champions/logos/city-county-credit-union-5a190f7c.svg"
+   },
+   {
+    "name": "Clear Mountain Bank",
+    "website": "https://clearmountain.bank",
+    "logo": "https://resources.mismo.org/champions/logos/clear-mountain-bank-476ca656.svg"
+   },
+   {
+    "name": "ClearEdge Lending",
+    "website": "https://clearedgelending.com",
+    "logo": "https://resources.mismo.org/champions/logos/clearedge-lending-2d089b64.png"
+   },
+   {
     "name": "Click n’ Close, Inc",
     "logo": "https://resources.mismo.org/champions/logos/click-n-close-inc-f62fe557.png"
+   },
+   {
+    "name": "Cliffco Mortgage Bankers",
+    "website": "https://cliffcomortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/cliffco-mortgage-bankers-e6b75e9a.png"
+   },
+   {
+    "name": "Commerce Bank",
+    "website": "https://commercebank.com",
+    "logo": "https://resources.mismo.org/champions/logos/commerce-bank-4fe196a6.png"
+   },
+   {
+    "name": "Community Choice Credit Union",
+    "website": "https://comchoicecu.org",
+    "logo": "https://resources.mismo.org/champions/logos/community-choice-credit-union-4a22fba0.png"
+   },
+   {
+    "name": "Congressional Federal Credit Union",
+    "website": "https://congressionalfcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/congressional-federal-credit-union-ecece210.svg"
+   },
+   {
+    "name": "Connexus Credit Union",
+    "website": "https://connexuscu.org",
+    "logo": "https://resources.mismo.org/champions/logos/connexus-credit-union-10fc5127.svg"
+   },
+   {
+    "name": "Consumers National Bank",
+    "website": "https://consumers.bank",
+    "logo": "https://resources.mismo.org/champions/logos/consumers-national-bank-621a2e50.svg"
    },
    {
     "name": "Cornerstone Mortgage Group",
     "logo": "https://resources.mismo.org/champions/logos/cornerstone-mortgage-group-088b1e92.png"
    },
    {
+    "name": "CorTrust Mortgage a Subsidiary of CorTrust Bank",
+    "website": "https://cortrustbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/cortrust-mortgage-a-subsidiary-of-cortrust-bank-d5c7f48d.svg"
+   },
+   {
+    "name": "Credit Union of Texas",
+    "website": "https://cutx.org",
+    "logo": "https://resources.mismo.org/champions/logos/credit-union-of-texas-5f43f5a7.svg"
+   },
+   {
+    "name": "Customers Bank",
+    "website": "https://customersbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/customers-bank-d11d917c.svg"
+   },
+   {
+    "name": "Delmar Financial Company",
+    "website": "https://delmarmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/delmar-financial-company-ebf8b79a.png"
+   },
+   {
+    "name": "Diamond Residential Mortgage Corporation",
+    "website": "https://thedrmc.com",
+    "logo": "https://resources.mismo.org/champions/logos/diamond-residential-mortgage-corporation-cfb32c16.webp"
+   },
+   {
+    "name": "Digital Federal Credit Union",
+    "website": "https://dcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/digital-federal-credit-union-6756e02d.svg"
+   },
+   {
+    "name": "Dynagen Lending, LLC",
+    "website": "https://dynagenlending.com",
+    "logo": "https://resources.mismo.org/champions/logos/dynagen-lending-llc-bdfdffbd.png"
+   },
+   {
+    "name": "Educational Federal Credit Union",
+    "website": "https://edfed.org",
+    "logo": "https://resources.mismo.org/champions/logos/educational-federal-credit-union-03531951.png"
+   },
+   {
+    "name": "EFCU Financial Federal Credit Union",
+    "website": "https://efcufinancial.org",
+    "logo": "https://resources.mismo.org/champions/logos/efcu-financial-federal-credit-union-74d8f897.png"
+   },
+   {
+    "name": "Efinity Financial, LLC.",
+    "website": "https://efinitymortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/efinity-financial-llc-6ea8354b.png"
+   },
+   {
     "name": "eLend",
     "logo": "https://resources.mismo.org/champions/logos/elend-6b42523d.png"
+   },
+   {
+    "name": "Embers Credit Union",
+    "website": "https://embers.org",
+    "logo": "https://resources.mismo.org/champions/logos/embers-credit-union-80ceb9d4.svg"
+   },
+   {
+    "name": "Embrace Home Loans",
+    "website": "https://embracehomeloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/embrace-home-loans-8153b619.svg"
+   },
+   {
+    "name": "Eustis Mortgage Corporation",
+    "website": "https://eustismortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/eustis-mortgage-corporation-ef30b710.webp"
+   },
+   {
+    "name": "Evergreen Home Loans",
+    "website": "https://evergreenhomeloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/evergreen-home-loans-742dd218.svg"
+   },
+   {
+    "name": "Evolution Mortgage LLC",
+    "website": "https://evolutionmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/evolution-mortgage-llc-b78b5c2c.png"
+   },
+   {
+    "name": "Evolve Bank & Trust",
+    "website": "https://getevolved.com",
+    "logo": "https://resources.mismo.org/champions/logos/evolve-bank-trust-29792623.svg"
+   },
+   {
+    "name": "EZ Fundings Inc.",
+    "website": "https://ezfundings.com",
+    "logo": "https://resources.mismo.org/champions/logos/ez-fundings-inc-3ef4429e.png"
+   },
+   {
+    "name": "Fairway Asset Corporation",
+    "website": "https://facloan.com",
+    "logo": "https://resources.mismo.org/champions/logos/fairway-asset-corporation-60797105.png"
+   },
+   {
+    "name": "Family Advantage Federal Credit Union",
+    "website": "https://myfafcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/family-advantage-federal-credit-union-85744fb9.png"
+   },
+   {
+    "name": "Filo Mortgage, L.L.C.",
+    "website": "https://filomortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/filo-mortgage-l-l-c-92f52739.png"
+   },
+   {
+    "name": "First Bank Carolinas",
+    "website": "https://localfirstbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-bank-carolinas-95a17ede.jpg"
+   },
+   {
+    "name": "First Federal Bank",
+    "website": "https://ffbf.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-federal-bank-46571bfa.svg"
+   },
+   {
+    "name": "First Federal Bank of Kansas City",
+    "website": "https://ffbkc.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-federal-bank-of-kansas-city-08ad8c39.svg"
+   },
+   {
+    "name": "First Federal Community Bank of Bucyrus",
+    "website": "https://ffcb.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-federal-community-bank-of-bucyrus-6b4f0d5f.webp"
+   },
+   {
+    "name": "First Federal Savings & Loan Association",
+    "website": "https://ourfirstfed.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-federal-savings-loan-association-0213125f.svg"
    },
    {
     "name": "First Heritage Mortgage, LLC",
     "logo": "https://resources.mismo.org/champions/logos/first-heritage-mortgage-llc-4f04c058.png"
    },
    {
+    "name": "First National Bank of Huntsville",
+    "website": "https://fnbhuntsvilletx.bank",
+    "logo": "https://resources.mismo.org/champions/logos/first-national-bank-of-huntsville-aebc8551.svg"
+   },
+   {
+    "name": "First National Bank Texas",
+    "website": "https://1stnb.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-national-bank-texas-961d32dd.png"
+   },
+   {
+    "name": "First Northern Bank of Wyoming",
+    "website": "https://firstnorthern.bank",
+    "logo": "https://resources.mismo.org/champions/logos/first-northern-bank-of-wyoming-0ed19f4c.svg"
+   },
+   {
+    "name": "First Piedmont Federal Savings and Loan Association of Gaffney, South Carolina",
+    "website": "https://firstpiedmont.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-piedmont-federal-savings-and-loan-association-of-gaffn-02c9e793.png"
+   },
+   {
+    "name": "First Premier Bank",
+    "website": "https://firstpremier.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-premier-bank-57a63383.png"
+   },
+   {
+    "name": "First Reliance Bank",
+    "website": "https://firstreliance.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-reliance-bank-3b0126c2.png"
+   },
+   {
+    "name": "First Security Bank",
+    "website": "https://fsbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-security-bank-b22c075e.png"
+   },
+   {
+    "name": "First State Bank Mortgage",
+    "website": "https://fsbfinancial.com",
+    "logo": "https://resources.mismo.org/champions/logos/first-state-bank-mortgage-2b567e9a.svg"
+   },
+   {
+    "name": "FirstTrust Home Loans, Inc.",
+    "website": "https://myfthl.com",
+    "logo": "https://resources.mismo.org/champions/logos/firsttrust-home-loans-inc-77048fc7.svg"
+   },
+   {
+    "name": "FLCBank (Florida Capital Bank)",
+    "website": "https://flcb.com",
+    "logo": "https://resources.mismo.org/champions/logos/flcbank-florida-capital-bank-27f8cc2c.png"
+   },
+   {
+    "name": "Foundation Mortgage Corporation",
+    "website": "https://foundationmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/foundation-mortgage-corporation-b6b3be61.webp"
+   },
+   {
+    "name": "Freedom First Federal Credit Union",
+    "website": "https://freedomfirst.com",
+    "logo": "https://resources.mismo.org/champions/logos/freedom-first-federal-credit-union-c8e45905.svg"
+   },
+   {
+    "name": "Fulton Mortgage Company, a Division of Fulton Bank",
+    "website": "https://fultonmortgagecompany.com",
+    "logo": "https://resources.mismo.org/champions/logos/fulton-mortgage-company-a-division-of-fulton-bank-16552cd6.svg"
+   },
+   {
+    "name": "Galaxy Lending Corp",
+    "website": "https://galaxylendingcorp.com",
+    "logo": "https://resources.mismo.org/champions/logos/galaxy-lending-corp-89a2c1cd.png"
+   },
+   {
+    "name": "Gate City Bank",
+    "website": "https://gatecity.bank",
+    "logo": "https://resources.mismo.org/champions/logos/gate-city-bank-734c1949.png"
+   },
+   {
     "name": "Gateway First Bank",
     "logo": "https://resources.mismo.org/champions/logos/gateway-first-bank-7da91339.png"
+   },
+   {
+    "name": "Generations Bank",
+    "website": "https://mygenerations.bank",
+    "logo": "https://resources.mismo.org/champions/logos/generations-bank-28c2f3ca.png"
+   },
+   {
+    "name": "Generations Federal Credit Union",
+    "website": "https://mygenfcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/generations-federal-credit-union-e63a46bb.png"
+   },
+   {
+    "name": "Georgia Banking Company (GBC Mortgage)",
+    "website": "https://georgiabanking.com",
+    "logo": "https://resources.mismo.org/champions/logos/georgia-banking-company-gbc-mortgage-c0ac89d0.svg"
+   },
+   {
+    "name": "Georgia United Credit Union",
+    "website": "https://gucu.org",
+    "logo": "https://resources.mismo.org/champions/logos/georgia-united-credit-union-44b28ea7.svg"
+   },
+   {
+    "name": "German American Bank",
+    "website": "https://germanamerican.com",
+    "logo": "https://resources.mismo.org/champions/logos/german-american-bank-d48aa63c.svg"
+   },
+   {
+    "name": "Gold Star Mortgage Financial Group, Corp.",
+    "website": "https://goldstarfinancial.com",
+    "logo": "https://resources.mismo.org/champions/logos/gold-star-mortgage-financial-group-corp-f34c376a.svg"
+   },
+   {
+    "name": "Goodleap, LLC",
+    "website": "https://goodleap.com",
+    "logo": "https://resources.mismo.org/champions/logos/goodleap-llc-740182ec.svg"
+   },
+   {
+    "name": "Greater Iowa Credit Union",
+    "website": "https://gicu.org",
+    "logo": "https://resources.mismo.org/champions/logos/greater-iowa-credit-union-f6847857.png"
+   },
+   {
+    "name": "Green Haven Capital Inc.",
+    "website": "https://greenhavencap.com",
+    "logo": "https://resources.mismo.org/champions/logos/green-haven-capital-inc-a28c7ce2.png"
    },
    {
     "name": "GreenState Credit Union",
     "logo": "https://resources.mismo.org/champions/logos/greenstate-credit-union-b5e2fabb.png"
    },
    {
+    "name": "Greylock Federal Credit Union",
+    "website": "https://greylock.org",
+    "logo": "https://resources.mismo.org/champions/logos/greylock-federal-credit-union-cce35bf3.png"
+   },
+   {
+    "name": "GTE Federal Credit Union",
+    "website": "https://gtefinancial.org",
+    "logo": "https://resources.mismo.org/champions/logos/gte-federal-credit-union-39f5e3c2.svg"
+   },
+   {
+    "name": "Guadalupe Bank",
+    "website": "https://guadalupebank.com",
+    "logo": "https://resources.mismo.org/champions/logos/guadalupe-bank-5e7b9cec.png"
+   },
+   {
+    "name": "Guaranty Bank and Trust Company",
+    "website": "https://gbtonline.com",
+    "logo": "https://resources.mismo.org/champions/logos/guaranty-bank-and-trust-company-5daa7076.svg"
+   },
+   {
+    "name": "Guardhill Financial Corp",
+    "website": "https://guardhill.com",
+    "logo": "https://resources.mismo.org/champions/logos/guardhill-financial-corp-d1d1064b.jpg"
+   },
+   {
+    "name": "Gulf Winds Credit Union",
+    "website": "https://gogulfwinds.com",
+    "logo": "https://resources.mismo.org/champions/logos/gulf-winds-credit-union-4214b587.svg"
+   },
+   {
+    "name": "Gum Tree Mortgage, LLC",
+    "website": "https://gumtreemortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/gum-tree-mortgage-llc-3d7c1cf5.png"
+   },
+   {
+    "name": "Hancock Whitney Bank",
+    "website": "https://hancockwhitney.com",
+    "logo": "https://resources.mismo.org/champions/logos/hancock-whitney-bank-a2683d5c.png"
+   },
+   {
+    "name": "Harmony Home Loans, LLC",
+    "website": "https://harmonyhomeloans.net",
+    "logo": "https://resources.mismo.org/champions/logos/harmony-home-loans-llc-76cd336f.png"
+   },
+   {
+    "name": "Harvard Federal Credit Union",
+    "website": "https://harvardfcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/harvard-federal-credit-union-3e3e4e8d.svg"
+   },
+   {
+    "name": "Heritage Bank of the Ozarks",
+    "website": "https://heritagebankozarks.com",
+    "logo": "https://resources.mismo.org/champions/logos/heritage-bank-of-the-ozarks-fe17d8eb.png"
+   },
+   {
+    "name": "Herring Bank",
+    "website": "https://herringbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/herring-bank-70f3b2ee.svg"
+   },
+   {
     "name": "Highlands Residential Mortgage",
     "logo": "https://resources.mismo.org/champions/logos/highlands-residential-mortgage-e0685565.png"
    },
    {
+    "name": "Highmark Federal Credit Union",
+    "website": "https://highmarkfcu.com",
+    "logo": "https://resources.mismo.org/champions/logos/highmark-federal-credit-union-4ff935a6.svg"
+   },
+   {
+    "name": "Holland Mortgage Advisors (HMA)",
+    "website": "https://hmamortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/holland-mortgage-advisors-hma-0bc31663.png"
+   },
+   {
+    "name": "Hometrust Mortgage Company / Home Mortgage of America, Inc.",
+    "website": "https://hometrust.com",
+    "logo": "https://resources.mismo.org/champions/logos/hometrust-mortgage-company-home-mortgage-of-america-inc-f786d008.png"
+   },
+   {
+    "name": "Homium",
+    "website": "https://homium.io",
+    "logo": "https://resources.mismo.org/champions/logos/homium-c3ddd949.svg"
+   },
+   {
+    "name": "Hope Federal Credit Union",
+    "website": "https://hopecu.org",
+    "logo": "https://resources.mismo.org/champions/logos/hope-federal-credit-union-f1d2a86d.png"
+   },
+   {
+    "name": "Inspire Home Loans Inc. a Subsidiary of Century Communities",
+    "website": "https://inspirehomeloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/inspire-home-loans-inc-a-subsidiary-of-century-communities-0310cd9b.png"
+   },
+   {
+    "name": "InterLinc Mortgage Services, LLC",
+    "website": "https://lincloan.com",
+    "logo": "https://resources.mismo.org/champions/logos/interlinc-mortgage-services-llc-c7988c68.png"
+   },
+   {
+    "name": "Iowa Bankers Mortgage Corporation",
+    "website": "https://iowabankers.com",
+    "logo": "https://resources.mismo.org/champions/logos/iowa-bankers-mortgage-corporation-ee32b626.svg"
+   },
+   {
+    "name": "iQ Credit Union",
+    "website": "https://iqcu.com",
+    "logo": "https://resources.mismo.org/champions/logos/iq-credit-union-22b08cce.png"
+   },
+   {
+    "name": "IServe Lending, Inc.",
+    "website": "https://iservelending.com",
+    "logo": "https://resources.mismo.org/champions/logos/iserve-lending-inc-ee4ffeb9.webp"
+   },
+   {
+    "name": "Jet Direct Mortgage",
+    "website": "https://jetdirectmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/jet-direct-mortgage-0cc70ac1.png"
+   },
+   {
+    "name": "Kentucky Housing Corporation",
+    "website": "https://kyhousing.org",
+    "logo": "https://resources.mismo.org/champions/logos/kentucky-housing-corporation-d2106ac8.svg"
+   },
+   {
+    "name": "KeyPoint Credit Union",
+    "website": "https://kpcu.com",
+    "logo": "https://resources.mismo.org/champions/logos/keypoint-credit-union-b7194ba8.svg"
+   },
+   {
+    "name": "Kind Lending",
+    "website": "https://kindlending.com",
+    "logo": "https://resources.mismo.org/champions/logos/kind-lending-37ec09b3.png"
+   },
+   {
+    "name": "Lafayette Federal Credit Union",
+    "website": "https://lfcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/lafayette-federal-credit-union-fb488119.svg"
+   },
+   {
     "name": "Lake Michigan Credit Union",
     "logo": "https://resources.mismo.org/champions/logos/lake-michigan-credit-union-c26d5b62.png"
+   },
+   {
+    "name": "Lake Region Bank",
+    "website": "https://lakeregion.com",
+    "logo": "https://resources.mismo.org/champions/logos/lake-region-bank-ef059426.svg"
+   },
+   {
+    "name": "Leaders Credit Union",
+    "website": "https://leaderscu.com",
+    "logo": "https://resources.mismo.org/champions/logos/leaders-credit-union-8204b701.png"
+   },
+   {
+    "name": "Legend Bank, N. A.",
+    "website": "https://legend.bank",
+    "logo": "https://resources.mismo.org/champions/logos/legend-bank-n-a-34d32a26.svg"
+   },
+   {
+    "name": "Lone Star National Bank",
+    "website": "https://lonestarnationalbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/lone-star-national-bank-c9bc71e0.svg"
    },
    {
     "name": "Luminate Bank",
@@ -190,8 +865,168 @@
     "logo": "https://resources.mismo.org/champions/logos/m-i-financial-llc-152a01a4.png"
    },
    {
+    "name": "MassHousing",
+    "website": "https://masshousing.com",
+    "logo": "https://resources.mismo.org/champions/logos/masshousing-22176356.svg"
+   },
+   {
+    "name": "Maverick Lending Solutions LLC",
+    "website": "https://mavericklends.com",
+    "logo": "https://resources.mismo.org/champions/logos/maverick-lending-solutions-llc-6f8f740a.webp"
+   },
+   {
+    "name": "MegaStar Financial Corp",
+    "website": "https://megastarfinancial.com",
+    "logo": "https://resources.mismo.org/champions/logos/megastar-financial-corp-160f7443.png"
+   },
+   {
+    "name": "Members 1st Federal Credit Union",
+    "website": "https://members1st.org",
+    "logo": "https://resources.mismo.org/champions/logos/members-1st-federal-credit-union-50c3fadc.svg"
+   },
+   {
+    "name": "Members Cooperative Credit Union",
+    "website": "https://membersccu.com",
+    "logo": "https://resources.mismo.org/champions/logos/members-cooperative-credit-union-5a5ca04a.svg"
+   },
+   {
+    "name": "Members Mortgage Services LLC",
+    "website": "https://mms.coop",
+    "logo": "https://resources.mismo.org/champions/logos/members-mortgage-services-llc-873e52f4.svg"
+   },
+   {
+    "name": "Merchants Bank",
+    "website": "https://merchantsbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/merchants-bank-e508d159.svg"
+   },
+   {
+    "name": "Mid-Atlantic Federal Credit Union",
+    "website": "https://mafcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/mid-atlantic-federal-credit-union-caac04a4.png"
+   },
+   {
+    "name": "Midland States Bank",
+    "website": "https://midlandsb.com",
+    "logo": "https://resources.mismo.org/champions/logos/midland-states-bank-8ddb1233.svg"
+   },
+   {
+    "name": "Milend, Inc.",
+    "website": "https://milend.com",
+    "logo": "https://resources.mismo.org/champions/logos/milend-inc-7b14dade.png"
+   },
+   {
+    "name": "Modern Home Lending",
+    "website": "https://modernhomelending.com",
+    "logo": "https://resources.mismo.org/champions/logos/modern-home-lending-f7e03224.png"
+   },
+   {
+    "name": "MOR Lending, LLC",
+    "website": "https://morlending.com",
+    "logo": "https://resources.mismo.org/champions/logos/mor-lending-llc-42044d9e.png"
+   },
+   {
+    "name": "Mountain America Credit Union",
+    "website": "https://macu.com",
+    "logo": "https://resources.mismo.org/champions/logos/mountain-america-credit-union-b79b9485.svg"
+   },
+   {
+    "name": "MountainOne Bank",
+    "website": "https://mountainone.com",
+    "logo": "https://resources.mismo.org/champions/logos/mountainone-bank-8ec6b863.svg"
+   },
+   {
+    "name": "MSA Mortgage, LLC",
+    "website": "https://msamortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/msa-mortgage-llc-94cd65b0.png"
+   },
+   {
+    "name": "MyLendingPal, Inc",
+    "website": "https://mylendingpal.com",
+    "logo": "https://resources.mismo.org/champions/logos/mylendingpal-inc-ee4581e7.png"
+   },
+   {
+    "name": "NexBank",
+    "website": "https://nexbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/nexbank-4cf5fc90.svg"
+   },
+   {
     "name": "NFM Lending",
     "logo": "https://resources.mismo.org/champions/logos/nfm-lending-045700d3.jpg"
+   },
+   {
+    "name": "Nicolet National Bank",
+    "website": "https://nicoletbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/nicolet-national-bank-ece81694.svg"
+   },
+   {
+    "name": "NMSI, Inc.",
+    "website": "https://nmsigroup.com",
+    "logo": "https://resources.mismo.org/champions/logos/nmsi-inc-c69d1616.png"
+   },
+   {
+    "name": "Nola Lending Group a Division of Fidelity Bank",
+    "website": "https://nolalending.com",
+    "logo": "https://resources.mismo.org/champions/logos/nola-lending-group-a-division-of-fidelity-bank-ae6727e9.svg"
+   },
+   {
+    "name": "North American Banking Company",
+    "website": "https://nabankco.com",
+    "logo": "https://resources.mismo.org/champions/logos/north-american-banking-company-b109830c.svg"
+   },
+   {
+    "name": "North American Savings Bank, F.S. B.",
+    "website": "https://nasb.com",
+    "logo": "https://resources.mismo.org/champions/logos/north-american-savings-bank-f-s-b-a7ee60f9.png"
+   },
+   {
+    "name": "North Easton Savings Bank",
+    "website": "https://northeastonsavingsbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/north-easton-savings-bank-b00620dd.svg"
+   },
+   {
+    "name": "Northwest Bank",
+    "website": "https://northwest.com",
+    "logo": "https://resources.mismo.org/champions/logos/northwest-bank-670d86fb.png"
+   },
+   {
+    "name": "NOVA Home Loans",
+    "website": "https://novahomeloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/nova-home-loans-466176f2.png"
+   },
+   {
+    "name": "Nusenda Credit Union",
+    "website": "https://nusenda.org",
+    "logo": "https://resources.mismo.org/champions/logos/nusenda-credit-union-a8b6f079.svg"
+   },
+   {
+    "name": "NuVision Federal Credit Union",
+    "website": "https://nuvisioncu.org",
+    "logo": "https://resources.mismo.org/champions/logos/nuvision-federal-credit-union-20663528.png"
+   },
+   {
+    "name": "Oregon Community Credit Union (OCCU)",
+    "website": "https://myoccu.org",
+    "logo": "https://resources.mismo.org/champions/logos/oregon-community-credit-union-occu-6f618e1f.svg"
+   },
+   {
+    "name": "Pacific Home Loans, Inc.",
+    "website": "https://pacifichomeloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/pacific-home-loans-inc-bd3bfa08.png"
+   },
+   {
+    "name": "Panhandle First Bank",
+    "website": "https://mypfb.bank",
+    "logo": "https://resources.mismo.org/champions/logos/panhandle-first-bank-fa1cfa82.svg"
+   },
+   {
+    "name": "Paramount Bank",
+    "website": "https://paramountbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/paramount-bank-153805ec.png"
+   },
+   {
+    "name": "Perry Johnson Mortgage Company, Inc.",
+    "website": "https://perryjohnsonmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/perry-johnson-mortgage-company-inc-43091071.webp"
    },
    {
     "name": "Planet Home Lending",
@@ -202,28 +1037,343 @@
     "logo": "https://resources.mismo.org/champions/logos/primary-residential-mortgage-inc-500c853b.png"
    },
    {
+    "name": "Priority 1 Lending, LLC",
+    "website": "https://priority1lending.com",
+    "logo": "https://resources.mismo.org/champions/logos/priority-1-lending-llc-69345af4.png"
+   },
+   {
+    "name": "Qualstar Credit Union",
+    "website": "https://qualstarcu.com",
+    "logo": "https://resources.mismo.org/champions/logos/qualstar-credit-union-19813cba.svg"
+   },
+   {
+    "name": "Reach Home Loans LLC",
+    "website": "https://reachhomeloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/reach-home-loans-llc-807312a2.png"
+   },
+   {
+    "name": "RiverHills Bank",
+    "website": "https://rhb24.com",
+    "logo": "https://resources.mismo.org/champions/logos/riverhills-bank-6cbc5a3b.jpg"
+   },
+   {
+    "name": "Riverstone Bank",
+    "website": "https://bankriverstone.com",
+    "logo": "https://resources.mismo.org/champions/logos/riverstone-bank-4f26e6a2.png"
+   },
+   {
+    "name": "Ross Mortgage Corporation",
+    "website": "https://rossmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/ross-mortgage-corporation-29bb2b2b.webp"
+   },
+   {
     "name": "Ruoff Mortgage",
     "logo": "https://resources.mismo.org/champions/logos/ruoff-mortgage-81d81855.png"
+   },
+   {
+    "name": "RWM Home Loans",
+    "website": "https://rwmloans.com",
+    "logo": "https://resources.mismo.org/champions/logos/rwm-home-loans-20326f32.svg"
+   },
+   {
+    "name": "Sabine State Bank & Trust Co. Inc.",
+    "website": "https://sabine.bank",
+    "logo": "https://resources.mismo.org/champions/logos/sabine-state-bank-trust-co-inc-c8e17c95.png"
+   },
+   {
+    "name": "San Francisco Federal Credit Union",
+    "website": "https://sanfranciscofcu.com",
+    "logo": "https://resources.mismo.org/champions/logos/san-francisco-federal-credit-union-8968acd9.png"
+   },
+   {
+    "name": "Seacoast Bank",
+    "website": "https://seacoastbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/seacoast-bank-345ea68b.png"
+   },
+   {
+    "name": "Servbank, sb",
+    "website": "https://servbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/servbank-sb-81979271.png"
+   },
+   {
+    "name": "ServisFirst Bank",
+    "website": "https://servisfirstbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/servisfirst-bank-93bd80ff.svg"
+   },
+   {
+    "name": "SI Mortgage (DBA Sistar Mortgage)",
+    "website": "https://sistarmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/si-mortgage-dba-sistar-mortgage-42761e4c.svg"
+   },
+   {
+    "name": "SIRVA Mortgage, Inc.",
+    "website": "https://sirva.com",
+    "logo": "https://resources.mismo.org/champions/logos/sirva-mortgage-inc-defc2e52.svg"
+   },
+   {
+    "name": "Sound Credit Union",
+    "website": "https://soundcu.com",
+    "logo": "https://resources.mismo.org/champions/logos/sound-credit-union-e3793e3d.svg"
+   },
+   {
+    "name": "South Central Bank",
+    "website": "https://southcentralbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/south-central-bank-e53fbb9f.jpg"
+   },
+   {
+    "name": "South Point Bank",
+    "website": "https://southpoint.bank",
+    "logo": "https://resources.mismo.org/champions/logos/south-point-bank-70ef1344.png"
+   },
+   {
+    "name": "Standard Mortgage Corporation",
+    "website": "https://stanmor.com",
+    "logo": "https://resources.mismo.org/champions/logos/standard-mortgage-corporation-034c9885.png"
+   },
+   {
+    "name": "State Bank Financial",
+    "website": "https://statebankfinancial.com",
+    "logo": "https://resources.mismo.org/champions/logos/state-bank-financial-8ceff45f.png"
+   },
+   {
+    "name": "Staunton Financial, Inc. DBA John Adams Mortgage & Total Home Lending",
+    "website": "https://johnadamsmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/staunton-financial-inc-dba-john-adams-mortgage-total-home-le-2337003d.png"
    },
    {
     "name": "Stockton Mortgage Corporation",
     "logo": "https://resources.mismo.org/champions/logos/stockton-mortgage-corporation-46235e05.png"
    },
    {
+    "name": "Success Lending, LLC",
+    "website": "https://successlending.com",
+    "logo": "https://resources.mismo.org/champions/logos/success-lending-llc-6d7f6efa.svg"
+   },
+   {
+    "name": "Success Mortgage, LLC",
+    "website": "https://successmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/success-mortgage-llc-d1d1a007.png"
+   },
+   {
+    "name": "Sun American Mortgage Company",
+    "website": "https://sunamerican.com",
+    "logo": "https://resources.mismo.org/champions/logos/sun-american-mortgage-company-48db584d.png"
+   },
+   {
+    "name": "Sunflower Bank",
+    "website": "https://sunflowerbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/sunflower-bank-1dc614d9.png"
+   },
+   {
+    "name": "Sutherland Mortgage Services, Inc",
+    "website": "https://sutherlandglobal.com",
+    "logo": "https://resources.mismo.org/champions/logos/sutherland-mortgage-services-inc-133830c2.svg"
+   },
+   {
     "name": "Synergy One Lending, Inc.",
     "logo": "https://resources.mismo.org/champions/logos/synergy-one-lending-inc-b7c45c5b.png"
+   },
+   {
+    "name": "T2 Financial LLC",
+    "website": "https://revolutionmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/t2-financial-llc-16628422.svg"
+   },
+   {
+    "name": "Telhio Credit Union",
+    "website": "https://telhio.org",
+    "logo": "https://resources.mismo.org/champions/logos/telhio-credit-union-0b7e0bd5.webp"
+   },
+   {
+    "name": "Texas Bank, a Texas Banking Company",
+    "website": "https://texasbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/texas-bank-a-texas-banking-company-7fda97e9.svg"
+   },
+   {
+    "name": "Texas Trust Credit Union",
+    "website": "https://texastrustcu.org",
+    "logo": "https://resources.mismo.org/champions/logos/texas-trust-credit-union-9b762de9.png"
+   },
+   {
+    "name": "The Bank of Commerce",
+    "website": "https://bofc.bank",
+    "logo": "https://resources.mismo.org/champions/logos/the-bank-of-commerce-14e35f7f.png"
+   },
+   {
+    "name": "The Bank of New Glarus",
+    "website": "https://thebankofnewglarus.bank",
+    "logo": "https://resources.mismo.org/champions/logos/the-bank-of-new-glarus-7bb5a944.webp"
+   },
+   {
+    "name": "The First National Bank of Dennison",
+    "website": "https://fnbdennison.com",
+    "logo": "https://resources.mismo.org/champions/logos/the-first-national-bank-of-dennison-15968cf8.svg"
+   },
+   {
+    "name": "The Horn Funding Corp",
+    "website": "https://hornfunding.com",
+    "logo": "https://resources.mismo.org/champions/logos/the-horn-funding-corp-f2782e19.png"
+   },
+   {
+    "name": "The Money Source Inc.",
+    "website": "https://themoneysource.com",
+    "logo": "https://resources.mismo.org/champions/logos/the-money-source-inc-19ef9351.svg"
+   },
+   {
+    "name": "The State Bank & Trust Company; State Bank",
+    "website": "https://yourstatebank.com",
+    "logo": "https://resources.mismo.org/champions/logos/the-state-bank-trust-company-state-bank-fe614f86.png"
+   },
+   {
+    "name": "Third Coast Bank SSB",
+    "website": "https://tcbssb.com",
+    "logo": "https://resources.mismo.org/champions/logos/third-coast-bank-ssb-300ff8da.png"
+   },
+   {
+    "name": "Thomaston Savings Bank",
+    "website": "https://thomastonsb.com",
+    "logo": "https://resources.mismo.org/champions/logos/thomaston-savings-bank-ba486b6e.svg"
+   },
+   {
+    "name": "Total Mortgage Services",
+    "website": "https://totalmortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/total-mortgage-services-09768fb2.png"
+   },
+   {
+    "name": "Towne Mortgage Company",
+    "website": "https://townemortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/towne-mortgage-company-ca5dce80.png"
+   },
+   {
+    "name": "Traditional Bank, Inc.",
+    "website": "https://traditionalbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/traditional-bank-inc-7e272463.png"
+   },
+   {
+    "name": "Traditional Mortgage Acceptance Corporation",
+    "website": "https://traditionalmac.com",
+    "logo": "https://resources.mismo.org/champions/logos/traditional-mortgage-acceptance-corporation-3b4ae079.png"
+   },
+   {
+    "name": "TRI Pointe Connect, LLC",
+    "website": "https://tripointeconnect.com",
+    "logo": "https://resources.mismo.org/champions/logos/tri-pointe-connect-llc-e936493f.svg"
+   },
+   {
+    "name": "UMB Bank, N.A.",
+    "website": "https://umb.com",
+    "logo": "https://resources.mismo.org/champions/logos/umb-bank-n-a-a449cf33.svg"
+   },
+   {
+    "name": "Union Bank and Trust Company",
+    "website": "https://ubt.com",
+    "logo": "https://resources.mismo.org/champions/logos/union-bank-and-trust-company-878aa906.svg"
+   },
+   {
+    "name": "Union Savings Bank",
+    "website": "https://usavingsbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/union-savings-bank-0fb2b4c6.png"
+   },
+   {
+    "name": "Union Square Credit Union",
+    "website": "https://unionsquare.org",
+    "logo": "https://resources.mismo.org/champions/logos/union-square-credit-union-766d961f.svg"
+   },
+   {
+    "name": "United Bank",
+    "website": "https://bankwithunited.com",
+    "logo": "https://resources.mismo.org/champions/logos/united-bank-83a8dc06.png"
+   },
+   {
+    "name": "United Security Financial",
+    "website": "https://usfwholesale.net",
+    "logo": "https://resources.mismo.org/champions/logos/united-security-financial-ec3117eb.png"
+   },
+   {
+    "name": "Universal Financial Mortgage Group LLC",
+    "website": "https://ufmgusa.com",
+    "logo": "https://resources.mismo.org/champions/logos/universal-financial-mortgage-group-llc-2b5a61b5.png"
+   },
+   {
+    "name": "Uplift Bank",
+    "website": "https://banksouthern.com",
+    "logo": "https://resources.mismo.org/champions/logos/uplift-bank-2526c237.svg"
+   },
+   {
+    "name": "Uwharrie Bank",
+    "website": "https://uwharrie.com",
+    "logo": "https://resources.mismo.org/champions/logos/uwharrie-bank-77619335.png"
+   },
+   {
+    "name": "Valley Financial Credit Union",
+    "website": "https://valleyfcu.com",
+    "logo": "https://resources.mismo.org/champions/logos/valley-financial-credit-union-09f4b605.webp"
+   },
+   {
+    "name": "Valley Mortgage, Inc.",
+    "website": "https://valleymortgageinc.com",
+    "logo": "https://resources.mismo.org/champions/logos/valley-mortgage-inc-5643d449.png"
+   },
+   {
+    "name": "Victory Mortgage, L.L.C.",
+    "website": "https://victorymortgage.com",
+    "logo": "https://resources.mismo.org/champions/logos/victory-mortgage-l-l-c-a1a7fced.png"
    },
    {
     "name": "Village Capital & Investment, LLC",
     "logo": "https://resources.mismo.org/champions/logos/village-capital-investment-llc-1ae492e8.png"
    },
    {
+    "name": "Washington Trust Bank",
+    "website": "https://watrust.com",
+    "logo": "https://resources.mismo.org/champions/logos/washington-trust-bank-767dce39.svg"
+   },
+   {
+    "name": "Washington Trust Mortgage Company",
+    "website": "https://washtrust.com",
+    "logo": "https://resources.mismo.org/champions/logos/washington-trust-mortgage-company-2f709ddd.svg"
+   },
+   {
+    "name": "Waterman State Bank",
+    "website": "https://watermanbank.com",
+    "logo": "https://resources.mismo.org/champions/logos/waterman-state-bank-db5b0916.png"
+   },
+   {
     "name": "Waterstone Mortgage Corporation",
     "logo": "https://resources.mismo.org/champions/logos/waterstone-mortgage-corporation-3442c0ad.png"
    },
    {
+    "name": "West Gate Bank",
+    "website": "https://westgate.bank",
+    "logo": "https://resources.mismo.org/champions/logos/west-gate-bank-55486975.svg"
+   },
+   {
+    "name": "West Michigan Community Bank",
+    "website": "https://wmcb.com",
+    "logo": "https://resources.mismo.org/champions/logos/west-michigan-community-bank-2ab27630.svg"
+   },
+   {
+    "name": "West Penn Financial Service Center Inc",
+    "website": "https://westpennfinancial.net",
+    "logo": "https://resources.mismo.org/champions/logos/west-penn-financial-service-center-inc-e8d8f138.png"
+   },
+   {
+    "name": "Westerra Credit Union",
+    "website": "https://westerracu.com",
+    "logo": "https://resources.mismo.org/champions/logos/westerra-credit-union-9eb5a866.svg"
+   },
+   {
+    "name": "Willow Bend Mortgage",
+    "website": "https://wbm.com",
+    "logo": "https://resources.mismo.org/champions/logos/willow-bend-mortgage-29a1507e.svg"
+   },
+   {
     "name": "Wintrust Mortgage, a Division of Barrington Bank & Trust Company, N.A.",
     "logo": "https://resources.mismo.org/champions/logos/wintrust-mortgage-a-division-of-barrington-bank-trust-compan-a80f0bdb.png"
+   },
+   {
+    "name": "Zenith Home Loans, LLC",
+    "website": "https://zenithhl.com",
+    "logo": "https://resources.mismo.org/champions/logos/zenith-home-loans-llc-0557c386.png"
    }
   ]
  },
