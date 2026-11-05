@@ -1978,6 +1978,10 @@ p,.sub,.lede{text-wrap:pretty}
 .rd-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;width:100%}
 .chip.rd-before{background:transparent;border:1px dashed var(--border-strong);color:var(--ink-3)}
 @media(max-width:600px){.rd-row{grid-template-columns:1fr auto}.rd-d{grid-column:1/-1}}
+.awr-link.need{border-left:4px solid var(--c4)}
+.awr-guess{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.awr-pick{display:flex;gap:8px;align-items:center}
+.awr-pick select{flex:1;min-width:0;font:inherit;font-size:13px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:5px;padding:6px 8px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -6077,6 +6081,29 @@ desigSection=function(t){ const ds=t.designation||{}; if(/Approved/i.test(ds.sta
 const _renderPanelKeep2=renderPanel;
 renderPanel=function(){ const P=$('#panel'), id=S.panel, same=!!(P&&id&&P.dataset.for2===String(id)&&P.classList.contains('on')), pb0=P&&$('.pb',P), y=same&&pb0?pb0.scrollTop:0;
   _renderPanelKeep2(); if(P) P.dataset.for2=S.panel?String(S.panel):''; if(same&&y>0){ const pb=$('.pb',$('#panel')); if(pb&&pb.scrollTop!==y) pb.scrollTop=y; } };
+
+/* ---------- link an Architecture Help task to its work request ----------
+   Tasks asked from a work request carry the link already. Older tasks (and ones
+   asked from the Architecture Help page) can be linked from the task itself. */
+function archCanLink(a){ return S.canWrite&&!S.viewAs&&(S.isStaff||isRole('pm')||isRole('architect')||sameName(a.requestedBy,S.me&&S.me.name)); }
+function archGuess(a){ const words=s=>new Set(String(s||'').toLowerCase().replace(/[^a-z0-9 ]/g,' ').split(/\s+/).filter(w=>w.length>3&&!/^(with|from|that|this|data|mismo|support|update|updates|review)$/.test(w)));
+  const aw=words(a.title+' '+(a.details||'')), wg=String(a.workgroup||'').toLowerCase().replace(/\bcop\b|\bdwg\b/g,'').trim();
+  return liveTickets().map(t=>{ const tw=words(t.name); let n=0; tw.forEach(w=>{ if(aw.has(w)) n++; }); if(wg&&String(t.workgroup||'').toLowerCase().includes(wg)) n+=2; return [t,n]; }).filter(x=>x[1]>=2).sort((x,y)=>y[1]-x[1]).slice(0,3).map(x=>x[0]); }
+async function archLink(a,tid){ const x=clone(S.arch[a.id]); const t=tid?S.tickets[tid]:null;
+  x.ticket=t?t.id:''; x.wr=t?t.wr:''; x.name=t?t.name:''; if(t){ x.workgroup=x.workgroup||t.workgroup||''; x.facilitator=t.facilitator||x.facilitator||''; }
+  x.log=[...(x.log||[]),{at:new Date().toISOString(),by:S.me.name||'',text:t?'Linked to '+t.wr+' '+t.name:'Unlinked from its work request'}];
+  S.arch[x.id]=x; await write('arch',x.id,x); toast(t?'Linked to '+t.wr:'Unlinked'); renderAll(); }
+const _renderPanelLink=renderPanel;
+renderPanel=function(){ _renderPanelLink(); const id=String(S.panel||''); if(id.indexOf('arch:')!==0) return; const a=S.arch[id.slice(5)], P=$('#panel'); if(!a||!archCanLink(a)) return;
+  const pb=$('.pb',P); if(!pb||$('.awr-link',pb)) return; const t=a.ticket&&S.tickets[a.ticket];
+  const opts=liveTickets().slice().sort((x,y)=>String(x.wr).localeCompare(String(y.wr))).map(x=>'<option value="'+esc(x.id)+'"'+(t&&t.id===x.id?' selected':'')+'>'+esc(x.wr+' '+x.name)+'</option>').join('');
+  const g=t?[]:archGuess(a);
+  const box='<div class="psec full awr-link'+(t?'':' need')+'"><h4>'+(t?'Work Request':'Which Work Request Is This For?')+'</h4>'+(t?'':'<p class="muted" style="margin:-4px 0 8px;font-size:12.5px">Linking it shows this task on the work request’s Overview and Architecture tab, and holds the work request back from AI Review until the task is done.</p>')+
+    (g.length?'<div class="awr-guess">'+g.map(x=>'<button type="button" class="btn sm" data-awlink="'+esc(x.id)+'">'+esc(x.wr+' '+x.name)+'</button>').join('')+'</div>':'')+
+    '<div class="awr-pick"><select id="awpick"><option value="">'+(t?'Not linked':'Pick a work request…')+'</option>'+opts+'</select><button type="button" class="btn sm pri" id="awpickgo">'+(t?'Change':'Link')+'</button></div></div>';
+  const grid=$('.pgrid',pb); if(grid) grid.insertAdjacentHTML('afterbegin',box); else pb.insertAdjacentHTML('afterbegin',box);
+  $$('[data-awlink]',pb).forEach(b=>b.onclick=()=>archLink(a,b.dataset.awlink));
+  const go=$('#awpickgo',pb); if(go) go.onclick=()=>{ const v=$('#awpick',pb).value; if((t?t.id:'')===v) return; archLink(a,v); }; };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
