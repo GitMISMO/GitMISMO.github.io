@@ -1998,6 +1998,9 @@ p,.sub,.lede{text-wrap:pretty}
 /* the fact icons sit centered in their tile (the generic ".wh-fact span" rule was turning the tile into a block) */
 .wh-fact .wh-fi{display:grid;place-items:center;width:32px;height:32px;line-height:0}
 .wh-fact .wh-fi svg{display:block}
+/* digest Send On: room between each box and its day (Nov 4) */
+.kv .f .dg-days label,.dg-kv .dg-days label{display:inline-flex!important;align-items:center;gap:8px!important;text-transform:none;margin:0}
+.kv .f .dg-days input{margin:0!important}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -6675,32 +6678,36 @@ const HELP_TOPICS={
      'Click the button on the card to do it, or click the card to see everything about that work request first.',
      'Drag a card up or down to put your work in the order you want, or pick an order: Most Urgent, My Order, A–Z, WR Number or Workgroup.',
      'Drag a card onto another column, or onto the strip that shows under the columns, to do its next step.'],
-    ['When the queue is empty, nothing is waiting on you.','MISMO staff can look at anyone’s queue the way that person sees it, from Everyone’s Queue.'],
+    ['If you are the IM or AWG facilitator, work that is waiting on IM or AWG stays out of My Queue. You will find it in the Review Desk, IM Review and AWG Review. Your own work requests still show.','When the queue is empty, nothing is waiting on you.','MISMO staff can look at anyone’s queue the way that person sees it, from Everyone’s Queue.'],
     [['Open My Queue','mine']]],
   panel:['Inside a Work Request','*',
-    'Click any card to open its panel. The tabs across the top hold everything about it.',
-    ['Overview: where it is, whose move it is, and the next step button.',
-     'Details: workgroup, facilitator, size (the letter box on every card; hover it for the full name). Work requests from the Initiative Hub use the Hub’s sizes: Extra-Small 3 months, Small 6, Medium 9, Large 1 year for the whole job, with the Target to Submit to IM at the halfway point. Older work keeps its Smartsheet size: Small, Medium, Large or X-Large, classification and the rest of its record.',
-     'Key Dates: start, Target to Submit to IM, comment period dates and what actually happened when.',
-     'Files: every document for this work request in SharePoint. Click one to open it.',
+    'Click any card to open its panel. The tabs across the top hold everything about it. The panel stays where you scrolled to while you work in it.',
+    ['Overview: where it is, whose move it is, and the next step button. Depending on the step, it also shows Architecture Help, License Designation, the Comment Period Card, and Reviews and Decisions.',
+     'Reviews and Decisions (on the Overview): each review step in order, with its decision and date. A step marked Before the MMS happened in the old process, so there is nothing to do for it now.',
+     'Details: workgroup, facilitator, size (the letter box on every card; hover it for the full name), classification and the rest of its record. Parts With Their Own License Designation is here too; see Parts in this Help.',
+     'Key Dates: start, Target to Submit to IM, comment period dates and what actually happened when. A box with no date stays blank. Once a resubmission is in, the date box shows Resubmitted to IM Review (or the step it went back to) and counts the days from then, not from the first time.',
+     'Files: every document for this work request in SharePoint, including files added straight into its SharePoint folder. Click one to open it.',
+     'Architecture: shows only when the work request has Architecture Help. It covers what was asked, who is working on it, the status, the hours and the notes.',
      'Links: anything else worth keeping with it, such as a draft or a Teams thread.',
      'Comments: what came in through the public comment form, during and after its comment period.',
      'Reviews: the AI Review and IM Pre-Review reports, and IM’s past decisions.',
      'History: every move, who made it and when. Type in Add a note to the history and press Enter or click Add Note.',
-     'On your own work, change anything in Details, Key Dates or Links, then click Save Changes. Leave without saving and the MMS asks whether to save or discard.'],
-    ['Every saved change is logged in History, and the Undo on the Saved message puts it back.'],
+     'On your own work, change anything in Details, Key Dates or Links, then click Save Changes. Leave without saving and the MMS asks whether to save, discard or keep editing.'],
+    ['Every saved change is logged in History, and the Undo on the Saved message puts it back.','Your browser no longer asks “Leave site?” when you close or leave the MMS. The only question you get is the MMS’s own Save, Discard or Keep Editing, and only when you have unsaved changes.'],
     []],
   docs:['Files: Opening and Adding Them','facilitator staff imawg member',
     'Each work request has its own folder in the MISMO Facilitator Team SharePoint (MMS Smartsheet Files). The MMS shows the files, not the folder.',
     ['Open a work request and click the Files tab.',
      'Click a file to open it in a new tab. Word, Excel and PDF all open the file itself.',
      'To add files, click Add Files and choose them. They are saved into that work request’s SharePoint folder and show up right away.',
+     'Files someone puts straight into the SharePoint folder show up too. The MMS checks the folder each time you open the Files tab.',
      'To change a Word or Excel file, open it and edit it in the browser. SharePoint saves as you go and keeps every version.'],
     ['To see an older version, open the file in SharePoint and use Version History.','Upload a new file only when it is a new document, such as an IM resubmission.'],
     []],
   aireview:['AI Review: Getting Ready for IM','facilitator staff',
     'AI Review is the editor and readiness review in one. Claude reads the submission the way MISMO’s editor would and lists what to fix before IM sees it.',
-    ['When the work product is ready, click Submit for AI Review on the work request.',
+    ['If the work request has open Architecture Help, finish that first. The button reads Submit for AI Review (after Architecture Help) and shows what is still open.',
+     'When the work product is ready, click Submit for AI Review on the work request.',
      'The review runs in a few minutes. You get a list of what to fix and what is only a suggestion.',
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
      'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.'],
@@ -6710,9 +6717,9 @@ const HELP_TOPICS={
     'Once a submission is sent to IM, nobody has to move it by hand.',
     ['IM approves: it goes straight to AWG and shows up on the AWG agenda.',
      'IM returns it: it goes back to the facilitator as Updates Needed, with IM’s notes.',
-     'AWG approves: the MMS recommends a comment type, classification and license from past designations of the same kind, and sends it to Jonna.',
+     'AWG approves: the MMS recommends a comment type, classification and license from past designations of the same kind, and sends it to Jonna. If the work request has parts, each part gets its own recommendation.',
      'AWG returns it: it goes back to the facilitator, or back to IM if AWG asks for that.',
-     'Jonna approves the designation: it moves on to Governance for approval to comment.'],
+     'Jonna approves the designation: it moves on to Governance for approval to comment. The recommendation goes away, and the License Designation section shows what was chosen.'],
     ['The facilitator hears about each of these in the daily digest.','The Review Desk shows all four review steps side by side.'],
     [['Open the Review Desk','reviews']]],
   asks:['Dates, Holds and Closing','facilitator staff',
@@ -6725,18 +6732,25 @@ const HELP_TOPICS={
     []],
   comments:['Comment Periods and Comments','facilitator staff website gov',
     'Comment Periods shows what is open for public comment, what just closed and what is approved but not posted yet.',
-    ['Comments sent through the website’s comment form land on the work request, under Comments Received.',
+    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card.',
+     'Members click Member Access on the card and open the work product in the Resource Library. They do not use the MMS.',
+     'Non-members click Non-Member Access, sign the Proposed (open for comment) license form, and then get the download.',
+     'Still needed on the card lists anything missing: the card text, the Resource Library link or the non-member download.',
+     'Comments sent through the website’s comment form land on the work request, under Comments Received.',
      'Read each one and mark it addressed when it is handled.',
      'When the period ends, the work request moves to Post-Comment on its own.',
      'In Post-Comment, the facilitator reports what came back, then it goes to Governance for approval to publish.'],
     ['The digest tells facilitators about new comments and periods ending soon.'],
     [['Open Comment Periods','comment']]],
   arch:['Asking for Architecture Help','facilitator pm staff',
-    'Architecture Help is how a workgroup asks MISMO’s Architect for help, tied to the work request it supports.',
-    ['Click + Ask for Architecture Help on the Architecture Help page, or Ask for Architecture Help on the work request.',
+    'Architecture Help is how a workgroup asks MISMO’s Architect for help, tied to the work request it supports. The facilitator can follow it from the work request, and AI Review waits until it is done.',
+    ['Click Ask for Architecture Help on the work request, or + Ask for Architecture Help on the Architecture Help page.',
      'The Program Manager clicks Approve or Decline.',
-     'The Architect clicks Start on an approved request, then Mark Done when it is finished.'],
-    ['The number on Architecture Help is what is waiting on you, if you are the Program Manager or the Architect.'],
+     'The Architect clicks Start on an approved request, then Mark Done when it is finished.',
+     'On the work request, the Overview lists each Architecture Help task with its status and latest note. The Architecture tab has the full details. Click See Details to go there.',
+     'While any task is open, the work request cannot go to AI Review. Submit for AI Review shows what it is waiting on, and the button works again once every task is done or declined.',
+     'An older task that is not tied to a work request shows Which Work Request Is This For? when you open it. Pick from the suggestions or the list and click Link. The Program Manager, the Architect, MISMO staff and the person who asked can link one.'],
+    ['The number on Architecture Help is what is waiting on you, if you are the Program Manager or the Architect.','Linking a task to the wrong work request? Open it and pick the right one, or unlink it.'],
     [['Open Architecture Help','arch']]],
   mediareq:['MISMO Media Requests','media staff facilitator',
     'The MMS asks MISMO Media for a Call for Participation, a LinkedIn post or a release announcement at the right step, on its own.',
@@ -6785,12 +6799,14 @@ const HELP_TOPICS={
   settings:['Settings','staff',
     'Settings changes how the MMS works without changing the page. Only MISMO staff see it.',
     ['Process: the steps, their owners and descriptions, and comment period lengths.',
-     'People and Roles: facilitators and who fills each role, which decides whose queue a work request lands in and who is emailed.',
+     'People and Roles: facilitators and who fills each role, which decides whose queue a work request lands in and who is emailed. Click + Add on a list to add someone with their name and email. Click Edit next to a person to fix their name or email, or Remove to take them off.',
+     'Workgroups and Their Facilitators (under People and Roles): to give a workgroup a new facilitator, pick the person under Hand Over To and click Hand Over. Every work request in that workgroup, live and closed, moves to them and keeps who facilitated it before.',
+     'To move a single work request, change Facilitator on its Details tab and click Save Changes.',
      'Notifications: the email flow link, the sender, Hold All Email Until, reminder timing, and who hears when work arrives at each step.',
      'Daily Digest: who gets it, which days, who is copied, and which sections are on.',
      'Website: the feed of open comment periods to mismo.org.',
      'Import and Backup: bring in or save a copy of the records.'],
-    ['Who can sign in is set in People and Access on resources.mismo.org, not here.'],
+    ['Who can sign in is set in People and Access on resources.mismo.org, not here. A new facilitator needs both: added here, and given access there.','Editing a facilitator’s name also updates the work requests that show it, and logs the change in their History.','If Meeting Trackers lists a different facilitator for a workgroup, the row says Meeting Trackers says, with that name, and the Hand Over button is highlighted.'],
     [['Open Settings','settings']]],
   mt:['Rosters and Attendance Come from Meeting Trackers','staff imawg',
     'Meeting Trackers is the source of truth for the IM and AWG rosters, call dates and attendance.',
@@ -6826,12 +6842,14 @@ const HELP_TOPICS={
     ['Attendance is taken in Meeting Trackers.'],
     [['IM Review','https://resources.mismo.org/im-review/'],['AWG Review','https://resources.mismo.org/awg-review/']]],
   approve:['Approving the Designation','approver staff',
-    'When AWG approves, the MMS recommends the comment type, classification and license from past designations of the same kind, and sends it to you.',
+    'When AWG approves, the MMS recommends the comment type, classification, license usage, royalty status and who it is available to from past designations of the same kind, and sends it to you.',
     ['Open My Queue. Look for Approve the recommended designation.',
-     'Open the work request to see the recommendation and why.',
+     'Open the work request. The License Designation section on the Overview shows the recommendation, who set it and where it stands.',
+     'If the recommendation is not right, change it first. A message confirms it: Designation saved.',
      'Click Approve the Designation and choose Approve, Needs Discussion or Not Yet.',
-     'Approved designations move on to Governance for approval to comment.'],
-    ['Change any part of the recommendation before approving if it is not right.'],
+     'Waiting on approval and need to fix it? Click Change the Designation.',
+     'Approved designations move on to Governance for approval to comment. The recommendation goes away, and Reviews and Decisions shows the designation that was chosen.'],
+    ['A work request with parts gets one designation per part, all approved together. See Parts in this Help.'],
     [['Open My Queue','mine']]],
   govmem:['What Governance Sees','gov',
     'You can look at any work request in the MMS, but you do not have to do anything in it.',
@@ -6843,11 +6861,21 @@ const HELP_TOPICS={
   web:['Comment Periods on the Website','website staff',
     'The Comment Period step belongs to the website. Approved work is posted to the standards page and announced.',
     ['Comment Periods lists what is approved but not posted yet.',
+     'Post it on mismo.org using its Comment Period Card: the title, what the card says, Member Access (Resource Library) and Non-Member Access (license form, then the download).',
      'Post it on mismo.org, then the period runs on its own.',
      'When the period ends, the MMS moves it to Post-Comment.',
      'The website feed in Settings › Website can post and remove open comment periods on the new mismo.org on its own once it is switched on.'],
     [],
     [['Open Comment Periods','comment']]],
+  parts:['Parts: More Than One License Designation','facilitator staff approver',
+    'Some work requests have pieces that need their own license, such as a reference model with three or four parts. Parts move through every step together, and each one gets its own License Designation.',
+    ['Open the work request and go to Details. Find Parts With Their Own License Designation.',
+     'Click + Add Parts. Enter each part’s name and kind, then click Save Parts. Use Edit the Parts to change them later.',
+     'Nothing else changes: the work request still goes through AI Review, IM and AWG as one.',
+     'After AWG, the MMS recommends a designation for each part. The License Designation section shows a row per part.',
+     'Jonna approves them all at once. Afterwards, Reviews and Decisions shows the designation for each part.'],
+    ['Parts and deliverables are different. A split into deliverables (Split into Deliverables) is for pieces that move through the steps on their own schedule. Parts are for pieces that move together but are licensed separately.','A deliverable from a split can have its own parts too.','With no parts, the work request gets one designation for the whole thing, as before.','Parts can be added or changed until it goes to Governance for approval to comment.'],
+    []],
   metrics:['Metrics','*',
     'Metrics shows how the line is running, worked out from the date stamps the MMS keeps every time work moves.',
     ['Pick a time range and any filters at the top. Everything on the page follows them.',
@@ -6862,22 +6890,24 @@ const HELP_TOPICS={
     ['Anyone submits a work request in the Initiative Hub (Resource Center › Submit a Work Request).',
      'MISMO staff confirm it, and it goes for approval there.',
      'Once it is approved and has a WR number, the MMS adds it at Approved – Set Up within a few minutes, linked back to its Hub request, and tells the people on it.',
-     'From then on, the MMS tracks it. Open the Hub request from the work request’s Links.'],
-    ['Nothing can be added to the MMS without going through the Initiative Hub.','The Overview shows how many requests are waiting to be confirmed or approved in the Hub.'],
+     'From then on, the MMS tracks it. Open the Hub request from the work request’s Links.',
+     'Work from the Hub uses the Hub’s sizes for the whole job: Extra-Small 3 months, Small 6 months, Medium 9 months, Large 1 year. The MMS brings in the size and target date the requester gave in the Hub.',
+     'At Start Work, the Target to Submit to IM is set at the halfway point of the job. Change it on Key Dates if it is not right.'],
+    ['Older work keeps its Smartsheet size: Small, Medium, Large or X-Large. Nothing from before is changed.','Nothing can be added to the MMS without going through the Initiative Hub.','The Overview shows how many requests are waiting to be confirmed or approved in the Hub.'],
     [['Submit a Work Request','https://resources.mismo.org/initiative-hub/work-requests.html#new']]],
   words:['Words We Use','*',
     'MISMO writes its own names one way. The Resource Center has the full list, and AI Review checks for them.',
     ['Open the Resource Center and pick MISMO Terms.',
      'Type a word to find it, for example eNote or CoP.'],
-    [],
+    ['Parts: pieces of one work request that move together but each get their own license designation.','Deliverables: pieces split from one work request that move through the steps separately.','Before the MMS: a step that happened in the old process. There is nothing to do for it now.','Comment Period Card: the card shown on mismo.org while the work is open for comment.'],
     [['Open MISMO Terms','rc:terms']]]
 };
 const HELP_ORDER={
-  facilitator:['start','hub','queue','panel','docs','aireview','handoff','asks','comments','digest','arch','mediareq','metrics','path','find','words'],
-  staff:['start','hub','queue','board','metrics','approvals','handoff','govrec','settings','mt','notif','digest','panel','docs','path','find'],
+  facilitator:['start','hub','queue','panel','docs','arch','aireview','handoff','parts','asks','comments','digest','mediareq','metrics','path','find','words'],
+  staff:['start','hub','queue','board','metrics','approvals','handoff','parts','govrec','settings','mt','notif','digest','panel','docs','arch','comments','path','find'],
   imawg:['start','imrun','awgrun','mt','handoff','docs','digest','path','find'],
   member:['start','member','docs','path','find'],
-  approver:['start','approve','queue','handoff','metrics','digest','path','find'],
+  approver:['start','approve','parts','queue','handoff','metrics','digest','path','find'],
   gov:['start','govmem','comments','metrics','path','digest','find'],
   media:['start','mediareq','queue','digest','path','find'],
   pm:['start','arch','queue','digest','path','find'],
@@ -6929,12 +6959,12 @@ const RC2_STAGE_HOW={
   cfp:['Write and publish the Call for Participation.','MISMO Media gets the request on its own.'],
   kickoff:['Approve kicking off the Development Workgroup.','Staff record the decision; approved work moves to In Work.'],
   work:['Build the work product and keep the target date current.','Reminders before the target and when it passes.'],
-  aireview:['Submit for AI Review, make the fixes, then send it to IM.','Claude reviews it in minutes and lists fixes and suggestions.'],
+  aireview:['Finish any Architecture Help, submit for AI Review, make the fixes, then send it to IM.','Claude reviews it in minutes and lists fixes and suggestions.'],
   im:['The facilitator runs the IM Pre-Review and sends it to IM. On the IM call, Colleen and Erin agree with or correct the draft for each row and record IM’s decision.','Approved goes to AWG on its own; returned goes back to the facilitator.'],
   awg:['AWG reviews and votes on the call.','Approved goes to License Designation with a recommendation.'],
-  designation:['Jonna approves the recommended designation.','The recommendation is drawn from past designations of the same kind.'],
+  designation:['Jonna approves the recommended designation (one per part, if it has parts).','The recommendation is drawn from past designations of the same kind.'],
   'gc-comment':['Governance approves it for public comment.','Staff record the vote; approved work goes to the website.'],
-  comment:['Post it on mismo.org and announce it.','Moves to Post-Comment by itself when the period ends.'],
+  comment:['Post its Comment Period Card on mismo.org and announce it.','Moves to Post-Comment by itself when the period ends.'],
   post:['Report what came back from the comment period.','Comments from the website form land on the work request.'],
   'gc-publish':['Governance approves it to publish.','Staff record the vote; approved work goes to Release.'],
   release:['Announce it and put the pages live.','MISMO Media gets the release request on its own.']
@@ -7279,7 +7309,7 @@ VIEWS.settings=function(){
       '<div class="muted" style="font-size:12px;margin-bottom:8px">Drag to reorder. Untick a stage to switch it off. Rename it, change who owns it, or add your own stage; a stage you add gets a Done button that moves the work on.</div><div class="stagelist" id="slist">'+pr.stages.map((s,i)=>'<div class="srow'+(s.on===false?' off':'')+'" draggable="true" data-i="'+i+'"><span class="grip" title="Drag">⋮⋮</span><input type="checkbox" data-f="on"'+(s.on!==false?' checked':'')+' style="width:16px;height:16px"><input data-f="name" value="'+esc(s.name)+'"><select data-f="owner">'+Object.entries(ROLE_LABEL).map(([k,l])=>'<option value="'+k+'"'+(s.owner===k?' selected':'')+'>'+esc(l)+'</option>').join('')+'</select><input class="hide-sm" data-f="desc" value="'+esc(s.desc||'')+'"><input class="hide-sm" type="color" data-f="color" value="'+esc(s.color)+'" style="padding:0;height:28px">'+(STAGE_KEYS.includes(s.key)?'':'<button class="btn sm ghost" data-sdel="'+i+'" type="button" title="Remove this stage">Remove</button>')+'</div>').join('')+'</div><div style="margin-top:10px"><button class="btn sm" id="sadd" type="button">+ Add a Stage</button></div></div>';
   }
   if(setTab==='people'){
-    const P=S.people; const block=(title,key,list,desc)=>'<div class="card" data-plist="'+key+'"><h3>'+esc(title)+'<span class="sp"><button class="btn sm" data-padd="'+key+'" type="button">+ Add</button></span></h3>'+(desc?'<div class="muted" style="font-size:12px;margin:-4px 0 8px">'+desc+'</div>':'')+(list||[]).slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>'<div class="vote"><span class="nm"><b>'+esc(p.name)+'</b> <span class="muted">'+esc(p.email||'')+'</span></span><button class="btn sm ghost" data-pdel="'+key+'|'+esc(p.name)+'" type="button">Remove</button></div>').join('')+'</div>';
+    const P=S.people; const block=(title,key,list,desc)=>'<div class="card" data-plist="'+key+'"><h3>'+esc(title)+'<span class="sp"><button class="btn sm" data-padd="'+key+'" type="button">+ Add</button></span></h3>'+(desc?'<div class="muted" style="font-size:12px;margin:-4px 0 8px">'+desc+'</div>':'')+(list||[]).slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>'<div class="vote"><span class="nm"><b>'+esc(p.name)+'</b> <span class="muted">'+esc(p.email||'')+'</span></span><button class="btn sm ghost" data-pedit="'+key+'|'+esc(p.name)+'" type="button">Edit</button> <button class="btn sm ghost" data-pdel="'+key+'|'+esc(p.name)+'" type="button">Remove</button></div>').join('')+'</div>';
     body='<div class="banner info">Who can open and save the MMS on resources.mismo.org is set in People and Access, same as Meeting Trackers. These lists decide whose queue a work request lands in and who gets emailed.</div><div class="peoplegrid">'+block('Facilitators','facilitators',P.facilitators)+Object.keys(ROLE_LABEL).filter(k=>!['facilitator','workgroup','bet'].includes(k)).map(k=>block(k==='gov'?govName()+' Members':ROLE_LABEL[k],'roles.'+k,P.roles[k],{staff:'MISMO staff who set up approved work and see Settings.',gov:'Listed here, each member’s vote is logged with every decision.',vps:'The Designation Approver approves each license designation before it goes to Governance.',imreview:'Leave empty to let anyone with IM Review access decide rows.',imawg:'The IM chair and AWG chair and facilitator, who finish IM’s and AWG’s decisions.'}[k]||'')).join('')+'</div>';
   }
   if(setTab==='notify'){
@@ -7315,6 +7345,14 @@ function wireSettings(m){
       S.process=p; await write('config','process',p); toast('Stages saved'); renderAll(); };
   }
   $$('[data-padd]',m).forEach(b=>b.onclick=async()=>{ const v=await modal({title:'Add Person',ok:'Add',body:fld('Name',inp('name',''))+fld('Email',inp('email','','first initial + last name @mismo.org')),validate:x=>!x.name?'Add a name':(()=>{ const path=b.dataset.padd.split('.'); const L=path.length>1?(S.people.roles[path[1]]||[]):(S.people.facilitators||[]); return L.some(p=>p.name.trim().toLowerCase()===x.name.trim().toLowerCase())?x.name.trim()+' is already on this list':''; })()}); if(!v) return; const P=clone(S.people); const path=b.dataset.padd.split('.'); let arr=path.length>1?(P.roles[path[1]]=P.roles[path[1]]||[]):P.facilitators; arr.push({name:v.name.trim(),email:v.email.trim()}); S.people=P; await write('config','people',P); renderAll(); });
+  $$('[data-pedit]',m).forEach(b=>b.onclick=async()=>{ const [key,name]=b.dataset.pedit.split('|'); const path=key.split('.'); const src=path.length>1?(S.people.roles[path[1]]||[]):(S.people.facilitators||[]); const cur=src.find(p=>p.name===name); if(!cur) return;
+    const isFac=path.length===1, nWR=isFac?allTickets().filter(t=>t.facilitator===name).length:0;
+    const v=await modal({title:'Edit '+name,ok:'Save',body:fld('Name',inp('name',cur.name))+fld('Email',inp('email',cur.email||'','first initial + last name @mismo.org'))+(isFac&&nWR?'<p class="muted" style="margin:6px 0 0;font-size:12.5px">If you change the name, the '+nWR+' work request'+(nWR===1?'':'s')+' showing '+esc(name)+' update to the new name too.</p>':''),
+      validate:x=>!x.name.trim()?'Add a name':(x.name.trim().toLowerCase()!==name.toLowerCase()&&src.some(p=>p.name.trim().toLowerCase()===x.name.trim().toLowerCase()))?x.name.trim()+' is already on this list':''}); if(!v) return;
+    const nn=v.name.trim(), P=clone(S.people), arr=path.length>1?P.roles[path[1]]:P.facilitators, i=arr.findIndex(p=>p.name===name); if(i<0) return; arr[i]=Object.assign({},arr[i],{name:nn,email:v.email.trim()});
+    S.people=P; await write('config','people',P);
+    if(isFac&&nn!==name){ for(const t0 of allTickets().filter(t=>t.facilitator===name)){ const t=clone(t0); t.facilitator=nn; hist(t,'Facilitator name updated from '+name+' to '+nn); t.updatedAt=new Date().toISOString(); t.updatedBy=S.me.name||''; S.tickets[t.id]=t; await write('tickets',t.id,t); } }
+    toast(nn+' saved'+(isFac&&nn!==name&&nWR?' · '+nWR+' work request'+(nWR===1?'':'s')+' updated':'')); renderAll(); });
   $$('[data-pdel]',m).forEach(b=>b.onclick=async()=>{ const [key,name]=b.dataset.pdel.split('|'); const card=b.closest('[data-plist]'), list=card?(card.querySelector('h3').firstChild||{}).textContent||'this list':'this list';
     if(!await modal({title:'Remove '+name+'?',text:esc(name)+' comes off '+esc(list)+'. Work requests stay as they are; the queue and emails for this role stop going to them.',ok:'Remove'})) return; const P=clone(S.people); const path=key.split('.'); const arr=path.length>1?P.roles[path[1]]:P.facilitators; const i=arr.findIndex(p=>p.name===name); if(i>=0) arr.splice(i,1); S.people=P; await write('config','people',P); renderAll(); });
   const ns=$('#nsave',m); if(ns) ns.onclick=async()=>{ const N=clone(S.notify); N.flowUrl=$('#nflow',m).value.trim(); N.from=$('#nfrom',m).value.trim(); N.holdUntil=($('#nhold',m)||{value:''}).value||''; N.reminders={targetDays:+$('#nr1',m).value||7,commentEndingDays:+$('#nr2',m).value||3,staleDays:+$('#nr3',m).value||45}; S.notify=N; await write('config','notify',N); toast('Saved'); renderAll(); };
