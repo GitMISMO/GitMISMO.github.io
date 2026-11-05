@@ -1,0 +1,39 @@
+name: MISMO Webinar Feed (Education page)
+
+# Checks MBA's public education listing once a day for upcoming MISMO
+# webinars and updates webinars/webinars.json. The website Education page
+# reads that file, so new dates appear and past ones drop off on their own.
+
+on:
+  schedule:
+    - cron: '23 10 * * *'   # daily, about 6:23 AM ET
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: webinar-feed
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Read MBA listing and build webinars.json
+        run: node webinars/build-webinars.mjs
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain webinars/webinars.json)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+            git add webinars/webinars.json
+            git commit -m "Webinar feed: update from MBA listing"
+            git push
+          else
+            echo "No changes"
+          fi
