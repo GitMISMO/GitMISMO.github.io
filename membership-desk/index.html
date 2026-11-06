@@ -655,13 +655,60 @@ function renderTodo(){const by=k=>TODO.filter(x=>x.kind===k);
 
 /* ---------- Everything to set up in Aptify (Jonna, Nov 5, 2026): Member 360 sends the company's details, contacts,
    payment and dates with each set-up; anything it doesn't have is listed under Still Needed. ---------- */
+/* ---------- Still Needed, filled in on the desk (Jonna, Nov 5, 2026): the membership team adds what Member 360 doesn't have
+   (address, phone, website, contacts, member type, sector) right here. It's kept with the set-up in setupinfo, shows at once,
+   and Member 360 picks it up and adds it to the company, so nobody needs Member 360 to do it. ---------- */
+const DSI_R="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/membership-desk/data/setupinfo";
+let DSI=null,DSI_SHA="";
+function dsiTok(){try{return window.ResourcesSession&&ResourcesSession.token&&ResourcesSession.token();}catch(e){return "";}}
+async function dsiLoad(){const t=dsiTok();if(!t)return;try{const r=await fetch(DSI_R,{headers:{Authorization:"Bearer "+t},cache:"no-store"});
+  if(r.status===404){DSI={items:{}};DSI_SHA="";return;}if(!r.ok)return;const j=await r.json();DSI=(j&&(j.data||j.content))||{};if(!DSI.items)DSI.items={};DSI_SHA=(j&&j.sha)||"";}catch(e){}}
+async function dsiSave(id,info){for(let i=0;i<3;i++){await dsiLoad();const doc=DSI||{items:{}};doc.items=doc.items||{};doc.items[id]=Object.assign({},doc.items[id]||{},info);
+  const r=await fetch(DSI_R,{method:"PUT",headers:{"Content-Type":"application/json",Authorization:"Bearer "+dsiTok()},body:JSON.stringify({content:doc,sha:DSI_SHA||undefined})});
+  if(r.ok){DSI=doc;return true;}if(r.status!==409)throw new Error("save "+r.status);}throw new Error("busy");}
+function dsiId(x){const s=x.setup||{};return s.key||String(x.name||"").toLowerCase().replace(/[^a-z0-9]+/g,"-");}
+function dsiMerge(x){const s=JSON.parse(JSON.stringify(x.setup||{}));const d=((DSI&&DSI.items)||{})[dsiId(x)];if(!d)return s;
+  if(d.address&&(d.address.street||d.address.city))s.address=Object.assign({},s.address||{},d.address);
+  if(d.phone)s.phone=d.phone;if(d.website)s.website=d.website;if(d.memberType)s.memberType=d.memberType;if(d.sector)s.sector=d.sector;
+  s.contacts=(s.contacts||[]).slice();[["primary","Primary"],["billing","Billing"]].forEach(([k,l])=>{const c=d[k];if(c&&(c.email||c.name)&&!s.contacts.some(z=>z.email&&c.email&&z.email.toLowerCase()===c.email.toLowerCase()))s.contacts.unshift({role:l,name:c.name||"",title:c.title||"",email:c.email||"",phone:c.phone||""});});
+  s.missing=(s.missing||[]).filter(m=>{if(/street/.test(m))return !(s.address&&s.address.street);if(/phone/.test(m))return !s.phone;if(/website/.test(m))return !s.website;
+    if(/primary/.test(m))return !s.contacts.some(c=>/primary/i.test(c.role)&&c.email);if(/billing/.test(m))return !s.contacts.some(c=>/billing/i.test(c.role)&&c.email);
+    if(/Lender or/.test(m))return !s.memberType;if(/sector/.test(m))return !s.sector;return true;});
+  s.deskAdded=d;return s;}
+function dsiForm(x,s){const miss=s.missing||[],has=re=>miss.some(m=>re.test(m));
+  const box=h("div",{class:"sect need"},h("h3",null,"Still Needed"),h("p",null,"Member 360 doesn't have these yet. Get them from the member and add them here. They're saved with this set-up and go to Member 360 on their own."));
+  const f=h("div",{class:"need-f"}),I={};
+  const inp=(k,label,ph,type,wide)=>{const i=h("input",{type:type||"text",placeholder:ph||"",autocomplete:"off"});I[k]=i;f.appendChild(h("label",{class:"need-l"+(wide?" wide":"")},h("span",null,label),i));};
+  const sel=(k,label,opts)=>{const s=h("select",null,h("option",{value:""},"Choose…"),...opts.map(o=>h("option",{value:o},o)));I[k]=s;f.appendChild(h("label",{class:"need-l"},h("span",null,label),s));};
+  if(has(/street/)){inp("street","Street Address","Street and suite","text",true);inp("city","City");inp("state","State","e.g. TX");inp("zip","ZIP");}
+  if(has(/phone/))inp("phone","Main Phone","","tel");
+  if(has(/website/))inp("website","Website","company.com");
+  if(has(/primary/)){inp("pn","Primary Contact Name");inp("pt","Title");inp("pe","Primary Contact Email","","email");inp("pp","Primary Contact Phone","","tel");}
+  if(has(/billing/)){inp("bn","Billing Contact Name");inp("be","Billing Contact Email","","email");inp("bp","Billing Contact Phone","","tel");}
+  if(has(/Lender or/))sel("mt","Lender or Non-Lender",["Lender","Non-Lender"]);
+  if(has(/sector/))sel("sec","Industry Sector",["Lender/Servicer","Service Provider","Tech Provider","Warehouse Lender","GSE (incl. FHLBs)","Government Agency"]);
+  box.appendChild(f);
+  const say=h("span",{class:"need-say"}),sv=h("button",{type:"button",class:"btn"},"Save These Details");
+  sv.addEventListener("click",async()=>{const v=k=>I[k]?String(I[k].value||"").trim():"";
+    const info={key:s.key||"",name:x.name,cid:x.cid||s.aptifyId||""};
+    if(v("street")||v("city"))info.address={street:v("street"),city:v("city"),state:v("state").toUpperCase(),zip:v("zip"),country:""};
+    if(v("phone"))info.phone=v("phone");if(v("website"))info.website=v("website").replace(/^https?:\/\//i,"").replace(/\/$/,"");
+    if(v("pn")||v("pe"))info.primary={name:v("pn"),title:v("pt"),email:v("pe"),phone:v("pp")};
+    if(v("bn")||v("be"))info.billing={name:v("bn"),email:v("be"),phone:v("bp")};
+    if(v("mt"))info.memberType=v("mt");if(v("sec"))info.sector=v("sec");
+    if(Object.keys(info).length<=3){say.textContent="Fill in at least one of these first.";return;}
+    const bad=[info.primary&&info.primary.email,info.billing&&info.billing.email].filter(e=>e&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e));if(bad.length){say.textContent="Check the email address: "+bad[0];return;}
+    const me=(window.__deskMe&&window.__deskMe())||{};info.by=me.name||me.email||"";info.at=new Date().toISOString();
+    sv.disabled=true;say.textContent="Saving…";
+    try{await dsiSave(dsiId(x),info);say.textContent="Saved.";setTimeout(()=>{if(typeof openPane==="function")openPane(x);},400);}
+    catch(e){sv.disabled=false;say.textContent="That didn't save. Try again in a moment.";}});
+  box.appendChild(h("div",{class:"need-b"},sv,say));return box;}
 function deskSetup(x,left,kv){
- const s=x.setup||{},M360="https://resources.mismo.org/member-360/#co/"+encodeURIComponent(s.key||"");
+ if(DSI===null){dsiLoad().then(()=>{if(DSI&&cur===x&&typeof openPane==="function")openPane(x);});}
+ const s=dsiMerge(x);
  const link=(u,t)=>h("a",{href:u,target:"_blank",rel:"noopener"},t);
  const ad=a=>{if(!a)return "";const l2=[a.city,[a.state,a.zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");return [a.street,l2,a.country&&!/^(us|usa|united states)$/i.test(a.country)?a.country:""].filter(Boolean).join("\n");};
- if((s.missing||[]).length){const nb=h("div",{class:"sect need"},h("h3",null,"Still Needed"),
-   h("p",null,"Member 360 doesn't have "+s.missing.join(", ").replace(/, ([^,]*)$/," or $1")+". Ask the member, or the MISMO team, before setting this up."),
-   s.key?h("p",null,link(M360,"Open the company in Member 360"),h("span",null," to add what's missing.")):null);left.appendChild(nb);}
+ if((s.missing||[]).length)left.appendChild(dsiForm(x,s));
  const site=s.website||x.website||"";
  const addr=ad(s.address),bill=ad(s.billing);
  left.appendChild(h("div",{class:"sect"},h("h3",null,"Company"),kv([
@@ -672,7 +719,8 @@ function deskSetup(x,left,kv){
   s.market?["Commercial or Residential",s.market]:null,s.creditUnion?["Credit Union","Yes"]:null,
   ["Address",addr?h("span",{class:"pre"},addr):"Not on file"],bill&&bill!==addr?["Billing Address",h("span",{class:"pre"},(s.billing.attn?"Attn: "+s.billing.attn+"\n":"")+bill)]:null,
   ["Main Phone",s.phone||"Not on file"],
-  ["Website",site?link(/^https?:\/\//i.test(site)?site:"https://"+site,site):"Not on file"]].filter(Boolean))));
+  ["Website",site?link(/^https?:\/\//i.test(site)?site:"https://"+site,site):"Not on file"],
+  s.deskAdded&&s.deskAdded.at?["Added on the Desk",(s.deskAdded.by||"Membership Desk")+", "+fmt(String(s.deskAdded.at).slice(0,10))]:null].filter(Boolean))));
  const cs=s.contacts||[],pcs=s.parentContacts||[];
  const cbox=h("div",{class:"sect"},h("h3",null,"Contacts"));
  const card=c=>h("div",{class:"ct"},h("div",{class:"ct-r"},c.role||"Contact"),h("div",{class:"ct-n"},c.name||"(no name on file)",c.title?h("span",null," · "+c.title):null),
@@ -703,7 +751,8 @@ function deskSetup(x,left,kv){
   ".sect.need{border-color:#e7b65a;background:rgba(240,185,74,.10)}.sect.need h3{color:#a2701a}.sect.need p{margin:8px 14px 0;font-size:13px;line-height:1.5}.sect.need p:last-child{margin-bottom:12px}"
   +".pre{white-space:pre-line}.ct{padding:8px 14px;border-top:1px solid rgba(127,150,170,.25)}.ct:first-of-type{border-top:0}"
   +".ct-r{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;opacity:.7}.ct-n{font-weight:600;font-size:13.5px;margin-top:2px}.ct-n span{font-weight:400;opacity:.8}"
-  +".ct-d{font-size:13px;margin-top:2px;overflow-wrap:anywhere}.muted{opacity:.75;font-size:13px;margin:8px 14px 4px}.copyrow{display:flex;justify-content:flex-end;margin:6px 0 14px}";
+  +".ct-d{font-size:13px;margin-top:2px;overflow-wrap:anywhere}.muted{opacity:.75;font-size:13px;margin:8px 14px 4px}.copyrow{display:flex;justify-content:flex-end;margin:6px 0 14px}"
+  +".need-f{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;padding:10px 14px 0}.need-l{display:flex;flex-direction:column;gap:3px;font-size:12px;font-weight:600}.need-l.wide{grid-column:1/-1}.need-l input,.need-l select{font:inherit;font-size:13px;font-weight:400;padding:7px 9px;border:1px solid rgba(127,150,170,.55);border-radius:6px;background:transparent;color:inherit;min-width:0}.need-b{display:flex;align-items:center;gap:10px;padding:10px 14px 12px}.need-say{font-size:12.5px;opacity:.8}@media(max-width:600px){.need-f{grid-template-columns:1fr}}";
   document.head.appendChild(st);}
 }
 /* ---------- the right-hand panel: what to set up, and the boxes to fill in ---------- */
