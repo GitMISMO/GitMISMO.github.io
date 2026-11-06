@@ -2308,11 +2308,64 @@ function stalled(t){ const a=stageAge(t); return t.state==='active' && t.stage!=
 let lastUndo=null;
 function byName(b){ return b==='Smartsheet'?'From the old MMS':(b||''); }
 function hist(t,text,extra){ t.history=t.history||[]; t.history.push(Object.assign({at:new Date().toISOString(),by:S.me.name||'Someone',text},extra||{})); }
+
+/* ---------- saving without overwriting anyone (November 5, 2026) ----------
+   A change often starts from a copy of the work request taken a while before it is saved: a
+   dialog (Record Decision, Start Work, Change Target Date...) can sit open for minutes or hours
+   while the MMS picks up other people's saves. Saving used to send that whole older copy, and the
+   save relay took every field that differed from the newest one as a change, so anything someone
+   else saved in the meantime was quietly put back. Now the MMS remembers the versions of each work
+   request it has shown. A save works out what this person changed from the version they started
+   from and lays only that over the newest copy (lists such as the history keep everyone's lines);
+   the relay then merges that into the latest record as it writes, and again if someone saved
+   first. If two people changed the same field, the person saving is asked which to keep. */
+const SEEN={};   // work request id -> the versions this page has shown [{at: its updatedAt, t: a copy}], newest last
+function noteSeen(t){ if(!t||!t.id) return; const k=t.updatedAt||'', L=SEEN[t.id]||(SEEN[t.id]=[]); if(L.some(v=>v.at===k)) return; L.push({at:k,t:clone(t)}); if(L.length>6) L.shift(); }
+function seenAt(id,at){ const L=SEEN[id]||[]; for(let i=L.length-1;i>=0;i--) if(L[i].at===(at||'')) return L[i].t; return null; }
+function normVal(v){ if(v===undefined||v===null||v==='') return ''; if(typeof v==='number'||typeof v==='boolean') return String(v); if(typeof v==='string') return v; return JSON.stringify(v); }
+const sameVal=(x,y)=>normVal(x)===normVal(y);
+const isObj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
+/* lists two people can both add to (history, decisions): keep their additions, add mine, apply my removals */
+function mergeList(cur,mine,base){ cur=Array.isArray(cur)?cur:[]; mine=Array.isArray(mine)?mine:[]; base=Array.isArray(base)?base:[];
+  const key=x=>JSON.stringify(x), had=new Set(base.map(key)), keep=new Set(mine.map(key));
+  const out=cur.filter(x=>!(had.has(key(x))&&!keep.has(key(x)))), have=new Set(out.map(key));
+  mine.forEach(x=>{ if(!had.has(key(x))&&!have.has(key(x))){ out.push(clone(x)); have.add(key(x)); } }); return out; }
+/* mine laid over the newest copy (cur): only what differs from the version it started from (base)
+   is taken. A field both changed is noted in cl; paths in theirs keep the newest copy's value. */
+function merge3(cur,mine,base,path,cl,theirs){ const out=isObj(cur)?clone(cur):{};
+  Object.keys(Object.assign({},mine,base)).forEach(k=>{ const p=path?path+'.'+k:k, m=mine[k], b=base[k], c=isObj(cur)?cur[k]:undefined;
+    if(sameVal(m,b)) return;                                   // not changed here: the newest value stands
+    if(!sameVal(c,b)&&Array.isArray(m)&&Array.isArray(b)){ out[k]=mergeList(c,m,b); return; }
+    if(!sameVal(c,b)&&isObj(m)&&isObj(b)&&isObj(c)){ out[k]=merge3(c,m,b,p,cl,theirs); return; }
+    if(!sameVal(c,b)&&!sameVal(c,m)){ if(cl) cl.push({p,theirs:c,yours:m}); if(theirs&&theirs.has(p)) return; }
+    if(m===undefined) delete out[k]; else out[k]=clone(m); });
+  return out; }
+let lastUserAct=0; ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{ lastUserAct=Date.now(); },{capture:true,passive:true}));
+/* the save laid over the newest copy; null when the person chose to keep someone else's move */
+function onNewest(t,origin){
+  const latest=S.tickets[t.id]; origin=origin||seenAt(t.id,t.updatedAt);
+  if(!latest||!origin||latest===t||sameVal(latest,origin)) return t;   // new, or nobody saved since it was read
+  const cl=[]; merge3(latest,t,origin,'',cl);
+  const show=cl.filter(c=>!/^(updatedAt|updatedBy|stageSince)$/.test(c.p)); let theirs=null;
+  /* asked only when the person just did something: a background move never stops to ask */
+  if(show.length&&Date.now()-lastUserAct<30000){
+    const lab=p=>p.split('.').pop().replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^./,x=>x.toUpperCase());
+    const sh=v=>{ const x=normVal(v); return x===''?'(blank)':x.slice(0,70); };
+    const moved=show.some(c=>c.p==='stage'||c.p==='state'||c.p==='sub');
+    if(!window.confirm('While you had '+(t.wr||'this work request')+' open, someone else saved a different value in the same '+(show.length===1?'field':'fields')+':\n\n'+
+      show.slice(0,8).map(c=>'• '+lab(c.p)+' — theirs: '+sh(c.theirs)+'   ·   yours: '+sh(c.yours)).join('\n')+(show.length>8?'\n• and '+(show.length-8)+' more':'')+
+      '\n\nOK keeps yours. '+(moved?'Cancel keeps theirs, and this change is not saved.':'Cancel keeps theirs for '+(show.length===1?'this field':'these fields')+'; your other changes still save.'))){
+      if(moved){ toast('Not saved: '+(t.wr||'the work request')+' keeps the change someone else made.'); return null; }
+      theirs=new Set(cl.map(c=>c.p)); }
+  }
+  return merge3(latest,t,origin,'',null,theirs);
+}
 async function saveTicket(t,msg,before){
+  t=onNewest(t); if(!t) return null;
   t.updatedAt=new Date().toISOString(); t.updatedBy=S.me.name||'';
-  S.tickets[t.id]=t; renderAll();
+  S.tickets[t.id]=t; noteSeen(t); renderAll();
   const ok=await write('tickets',t.id,t);
-  if(ok && msg){ lastUndo=before?{id:t.id,before}:null; toast(msg,!!before); }
+  if(ok && msg){ lastUndo=before?{id:t.id,before,after:clone(t)}:null; toast(msg,!!before); }
   return ok;
 }
 async function move(t0,to,opts){
@@ -2323,7 +2376,7 @@ async function move(t0,to,opts){
   hist(t,opts.text||('Moved from '+stageDef(from).name+' to '+stageDef(to).name),{from,to,note:opts.note||''});
   stampDates(t,from,to);
   onEnter(t,to,from);
-  await saveTicket(t,opts.toast||(t.wr+' moved to '+stageDef(to).name),before);
+  if(await saveTicket(t,opts.toast||(t.wr+' moved to '+stageDef(to).name),before)===null) return null;   /* kept someone else's move */
   if(!opts.rider){ for(const r of ridersOf(t.id)){ if(r.stage!==to) await move(r,to,{rider:true,sub:to==='published'?'':t.sub,text:'Moved with '+t.wr+' (Reference Model release) to '+stageDef(to).name,toast:t.wr+' and the work riding with it moved to '+stageDef(to).name}); } }
   if(from!==to) notifyEnter(t,to);
   return t;
@@ -2415,7 +2468,10 @@ function toast(msg,undo){
 }
 async function doUndo(){
   if(!lastUndo) return; const u=lastUndo; lastUndo=null; $('#toast').classList.remove('on');
-  const b=clone(u.before); S.tickets[b.id]=b; renderAll(); await write('tickets',b.id,b); toast('Undone');
+  /* undoes only this person's change: anything someone else saved since stays (November 5, 2026) */
+  const b=u.after?onNewest(clone(u.before),u.after):clone(u.before); if(!b) return;
+  if(u.after){ b.updatedAt=new Date().toISOString(); b.updatedBy=S.me.name||''; }
+  S.tickets[b.id]=b; noteSeen(b); renderAll(); await write('tickets',b.id,b); toast('Undone');
 }
 function modal(o){
   return new Promise(res=>{
@@ -7484,7 +7540,7 @@ async function boot(){
   try{ S.sample=window.claude&&await window.claude.use('sample'); }catch(e){ S.sample=null; }
   const done=()=>{ if(S.loaded.tickets&&S.loaded.config&&!S.ready){ S.ready=true; computeRole(); setupViewAs(); if(!location.hash&&!S.isStaff&&(S.people.facilitators||[]).some(f=>sameName(f.name,S.me.name))) S.view='mine'; go(S.view); runAutomations(); setInterval(runAutomations,5*60000); hubSync(); setInterval(hubSync,5*60000); electionsSync(); } else if(S.ready){ computeRole(); renderAll(); } };
   const timer=setTimeout(()=>{ if(!S.ready){ S.loaded.tickets=S.loaded.config=true; done(); toast('The MMS records are taking a while to load; what shows may be out of date.'); } },12000);
-  Store.sub('tickets',o=>{ S.tickets=tidyImported(o); S.loaded.tickets=true; clearTimeout(timer); done(); });
+  Store.sub('tickets',o=>{ S.tickets=tidyImported(o); Object.values(S.tickets).forEach(noteSeen); S.loaded.tickets=true; clearTimeout(timer); done(); });
   Store.sub('config',o=>{ if(o.process&&o.process.presets){ S.process=o.process; Object.values(o.process.presets).forEach(pr=>(pr.stages||[]).forEach(s=>{ if(/^(gc-comment|gc-publish)$/.test(s.key)&&/^\S+ Approval to (Comment|Publish)$/.test(s.name||'')) s.name=s.name.replace(/^\S+ /,'Governance '); })); } if(o.people&&o.people.roles) S.people=o.people; if(o.notify) S.notify=Object.assign(clone(DEFAULT_NOTIFY),o.notify); if(o.leaders&&o.leaders.list&&(!S.leaderSnap||(o.leaders.at||'')>=(S.leaderSnap.at||''))) S.leaderSnap=o.leaders; if(o.digest) S.digestCfg=o.digest; if(o.digestLog) S.digestLog=o.digestLog; if(o.feed) S.feedState=o.feed; S.cfgDocs=o; S.loaded.config=true; done(); });
   Store.sub('cstatus',o=>{ S.cstat=o||{}; if(S.ready&&(S.view==='comment'||S.panel)) renderAll(); });
   Store.sub('outbox',o=>{ S.outbox=o; if(S.ready) counts(); if(S.ready&&S.view==='outbox') renderAll(); });
