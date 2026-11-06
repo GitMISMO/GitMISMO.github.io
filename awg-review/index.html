@@ -802,6 +802,60 @@ const YR=String(new Date().getFullYear());
 async function get(n){ const r=await fetch(U(n),{headers:{Authorization:"Bearer "+tok()},cache:"no-store"}); if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw new Error(n+" "+r.status); const j=await r.json(); return {data:(j&&j.data)||null,sha:(j&&j.sha)||null}; }
 async function put(n,content,sha){ return fetch(U(n),{method:"PUT",headers:{"Content-Type":"application/json",Authorization:"Bearer "+tok()},body:JSON.stringify({content,sha:sha||undefined})}); }
 async function update(n,fn){ for(let i=0;i<5;i++){ const g=await get(n); const next=fn(g.data?clone(g.data):null); const r=await put(n,next,g.sha); if(r.ok) return next; if(r.status!==409&&r.status!==422) throw new Error("save "+r.status); await new Promise(s=>setTimeout(s,300+i*400)); } throw new Error("busy"); }
+
+/* ---------- saving without undoing anyone's work (November 5, 2026) ----------
+   A submission can sit open for hours, and this page only re-reads it after its own saves.
+   Saving used to put back this screen's whole call record (and any row note it still had)
+   unless it was missing a recorded call, so votes, an outcome or a call date someone else
+   saved were undone, and a note someone else removed came back. Now a save carries only what
+   was changed on this screen since the submission was loaded (or last saved here). Everything
+   else keeps its newest value; the change is merged into the latest copy at the moment it is
+   written, and again on a retry. If two people changed the same note, vote or field, the
+   person saving is asked which to keep, and the review page says so when someone else saves
+   the same submission. The roster and the reviewers list work the same way. */
+const OPENED=new WeakMap();   // a submission as loaded or saved -> {base: that copy, sig: how it read}
+const sigOf=d=>JSON.stringify(Object.assign({},d,{timing:null}));
+const noteOpened=d=>{ if(d&&typeof d==="object") OPENED.set(d,{base:clone(d),sig:sigOf(d)}); return d; };
+const baseOf=d=>{ const o=d&&OPENED.get(d); return o?o.base:null; };
+const normVal=v=>v===undefined||v===null||v===""?"":typeof v==="number"||typeof v==="boolean"?String(v):typeof v==="string"?v:JSON.stringify(v);
+const sameVal=(x,y)=>normVal(x)===normVal(y);
+const showVal=v=>{ const t=normVal(v); return t===""?"(blank)":t.slice(0,80); };
+function askClash(what,lines){ return window.confirm("While you had "+what+" open, someone else saved something different in the same "+(lines.length===1?"place":"places")+":\n\n"+lines.map(l=>"• "+l).join("\n")+"\n\nOK keeps yours. Cancel keeps theirs for "+(lines.length===1?"this one":"these")+" — your other changes still save."); }
+/* lists two people can both add to (the reviewers): keep their additions, add mine, apply my removals */
+function mergeList(cur,mine,base){ cur=Array.isArray(cur)?cur:[]; mine=Array.isArray(mine)?mine:[]; base=Array.isArray(base)?base:[];
+  const key=x=>JSON.stringify(x), had=new Set(base.map(key)), keep=new Set(mine.map(key));
+  const out=cur.filter(x=>!(had.has(key(x))&&!keep.has(key(x)))), have=new Set(out.map(key));
+  mine.forEach(x=>{ if(!had.has(key(x))&&!have.has(key(x))){ out.push(x); have.add(key(x)); } }); return out; }
+/* the call record's fields (and each member's vote) changed here, and which of them someone else
+   changed to something different. Who was there follows the call date (it comes from Meeting
+   Trackers), so it only counts as changed here when the date was. */
+function callChanges(cur,mine,base){ base=base||{}; cur=cur||{}; const out=[], date=!sameVal(mine.date,base.date);
+  Object.keys(Object.assign({},mine,base)).forEach(k=>{ if(k==="votes") return; if((k==="present"||k==="others")&&!date) return; if(sameVal(mine[k],base[k])) return;
+    out.push({k,clash:!sameVal(cur[k],base[k])&&!sameVal(cur[k],mine[k]),theirs:cur[k],yours:mine[k]}); });
+  const V=mine.votes||{}, BV=base.votes||{}, CV=cur.votes||{};
+  Object.keys(Object.assign({},V,BV)).forEach(n=>{ if(sameVal(V[n],BV[n])) return; out.push({k:"votes",n,clash:!sameVal(CV[n],BV[n])&&!sameVal(CV[n],V[n]),theirs:CV[n]||"For",yours:V[n]||"For"}); });
+  return out; }
+function callOnto(cur,mine,changes,skip){ const out=clone(cur||{});
+  changes.forEach(c=>{ if(skip(c)) return; if(c.k==="votes"){ out.votes=Object.assign({},out.votes||{}); if(mine.votes&&mine.votes[c.n]!==undefined) out.votes[c.n]=mine.votes[c.n]; else delete out.votes[c.n]; return; }
+    if(mine[c.k]===undefined) delete out[c.k]; else out[c.k]=clone(mine[c.k]); });
+  return out; }
+/* the roster as typed, laid over the newest roster. Rows line up with the roster as this page
+   loaded it (a removed row is null); rows past its end were added here. memo holds the answer to
+   "keep yours?" so a retry doesn't ask again. */
+function rosterOnto(cur,mine,base,memo){ cur=clone(cur); base=base||{}; const out=cur, plan=[], lines=[];
+  const key=m=>JSON.stringify(["cop","name","org"].map(k=>normVal(m&&m[k]).trim())), real=m=>!!(m&&(m.cop||m.name)), who=m=>[m.name,m.cop].filter(Boolean).join(", ");
+  Object.keys(Object.assign({},mine,base)).forEach(k=>{ if(k==="members"||sameVal(mine[k],base[k])) return; const c=!sameVal(cur[k],base[k])&&!sameVal(cur[k],mine[k]);
+    if(c) lines.push(k+" — theirs: "+showVal(cur[k])+"   ·   yours: "+showVal(mine[k])); plan.push({c,go:()=>{ if(mine[k]===undefined) delete out[k]; else out[k]=clone(mine[k]); }}); });
+  const M=(cur.members||[]).slice(), B=base.members||[], Y=mine.members||[];
+  B.forEach((b,i)=>{ const y=Y[i]; if(real(y)&&key(y)===key(b)) return; const j=M.findIndex(x=>x&&key(x)===key(b));
+    if(j>=0){ plan.push({go:()=>{ M[j]=real(y)?clone(y):null; }}); return; }
+    if(!real(y)) return;   /* removed here, and already changed or removed by someone else: theirs stands */
+    lines.push(who(b)+" — someone else changed or removed this row; yours: "+who(y));
+    plan.push({c:true,go:()=>{ const s=i<M.length&&M[i]&&!B.some(x=>key(x)===key(M[i]))?i:-1; if(s>=0) M[s]=clone(y); else M.push(clone(y)); }}); });
+  Y.slice(B.length).forEach(y=>{ if(real(y)) plan.push({go:()=>{ if(!M.some(x=>x&&key(x)===key(y))) M.push(clone(y)); }}); });
+  if(lines.length&&memo.keep===undefined) memo.keep=askClash("the roster",lines);
+  plan.forEach(p=>{ if(!p.c||memo.keep!==false) p.go(); });
+  out.members=M.filter(real); return out; }
 /* Claude, through the relay's Ask route on this project (the key stays in the relay) */
 async function ask(prompt){ const r=await fetch(RELAY+"/"+PROJECT+"/ask",{method:"POST",cache:"no-store",headers:{Authorization:"Bearer "+tok(),"Content-Type":"application/json"},body:JSON.stringify({prompt})}); const b=await r.json().catch(()=>({})); if(!r.ok) throw new Error((b&&b.message)||("Claude "+r.status)); return String((b&&b.text)||""); }
 
@@ -829,7 +883,8 @@ const ROSTER0={chair:"Mark Kleingers (Actualize Consulting)",vice:"Chris Trujill
   {cop:"Secondary CoP",name:"Mark Friend",org:"Fannie Mae"},{cop:"Title & Closing CoP",name:"Bryan Bedard",org:"Rocket Close"},{cop:"Property & Valuation Services CoP",name:"Chris Williams",org:"AIMS Dashboard"}],
   vacant:["Servicing CoP","eMortgage CoP","HERO CoP","Business Process Model CoP"]};
 const CALLS0=["2026-11-12","2026-11-26","2026-12-10","2026-12-24"];
-const roster=()=>(S.cfg.roster&&(S.cfg.roster.members||[]).length)?S.cfg.roster:ROSTER0;
+const rosterIn=cfg=>(cfg&&cfg.roster&&(cfg.roster.members||[]).length)?cfg.roster:ROSTER0;
+const roster=()=>rosterIn(S.cfg);
 const voters=()=>(roster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name));
 const quorumNeed=()=>(+roster().need>0)?+roster().need:Math.floor(voters().length/2)+1;
 /* the next AWG calls: the dates staff keep on the Roster and Calls page, then every other Thursday */
@@ -837,7 +892,7 @@ function nextCalls(n){ const L=(S.cfg.calls||CALLS0).filter(d=>d>=today()&&!mism
   while(L.length<n){ const d=new Date(last+"T12:00:00"); d.setDate(d.getDate()+14); last=d.toISOString().slice(0,10); if(last>=today()&&!mismoHoliday(last)) L.push(last); } return L.slice(0,n); }
 
 /* ---------- state ---------- */
-const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{},bt:null,up:[],filter:"awg",edit:null,loaded:false,rowPg:{},dec:{page:0,size:10,year:"all",q:""}};
+const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{},bt:null,up:[],filter:"awg",edit:null,loaded:false,rowPg:{},dec:{page:0,size:10,year:"all",q:""},saving:{},stale:{},cfgBase:{}};
 const canEdit=()=>{ try{ if(RS()&&RS().canEdit) return !!RS().canEdit(PROJECT); }catch(e){} return S.role==="admin"||S.role==="staff"; };
 const sameNm=(a,b)=>{ a=String(a||"").replace(/\(.*\)/,"").trim().toLowerCase(); b=String(b||"").trim().toLowerCase(); return !!a&&a===b; };
 /* the AWG chair and facilitator record decisions: whoever is on the Who Records Decisions list, or the chair,
@@ -869,26 +924,56 @@ async function load(role){
   const yr=new Date().getFullYear();
   const [q,cfg,bt,l1,l0,up,att,wrs]=await Promise.all(["queue","config","backtest","learn-"+yr,"learn-"+(yr-1),"upcoming","attendance","wrs"].map(n=>get(n).catch(()=>({data:null}))));
   S.att=Object.fromEntries(Object.entries(att.data||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k))); S.wrs=(wrs.data&&wrs.data.items)||{};
-  S.queue=(q.data&&q.data.items)||{}; S.cfg=cfg.data||{}; S.bt=bt.data||null;
+  S.queue=(q.data&&q.data.items)||{}; S.cfg=cfg.data||{}; S.cfgBase=clone(S.cfg); S.bt=bt.data||null;
   S.up=(up.data&&up.data.items)||[]; S.upAt=(up.data&&up.data.asOf)||"";
   S.learn=Object.assign({},(l0.data&&l0.data.rows)||{},(l1.data&&l1.data.rows)||{});
   S.loaded=true; render();
 }
-async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=g.data; return S.docs[rep]||null; }
+async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=noteOpened(g.data); return S.docs[rep]||null; }
 async function refreshQueue(){ try{ const q=await get("queue"); S.queue=(q.data&&q.data.items)||{}; }catch(e){} }
-/* save one submission; on a clash keep the newest note on each row and the newest call record */
+/* save one submission: only the notes, draft, call record and decision changed here go onto the
+   newest copy (November 5, 2026; see "saving without undoing") */
+const STATUS_KEYS=["status","decidedBy","decidedAt","outcome"];
 async function saveDoc(doc){
   S.docs[doc.rep]=doc; const pend=doc.hist||doc.status==="decided"&&!doc._finishedAt?0:(tmPend[doc.rep]||0);
-  const merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv) return doc; const out=clone(srv);
-    (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; if(r.note&&(!o.note||String(r.note.at)>=String(o.note.at))) o.note=r.note; else if(!r.note&&o.note&&r._clr&&String(r._clr)>String(o.note.at)) delete o.note; });
-    if(doc.draft&&(!out.draft||String(doc.draft.at)>=String(out.draft.at))) out.draft=doc.draft;
-    /* a copy that hasn't seen the latest recorded call (a late autosave) never undoes it */ const stale=(doc.calls||[]).length<(out.calls||[]).length||out.status==="decided"&&doc.status!=="decided";
-    if(!stale&&doc.call&&(!out.call||String(doc.call.at||"")>=String(out.call.at||""))) out.call=doc.call;
-    out.calls=doc.calls&&doc.calls.length>=(out.calls||[]).length?doc.calls:out.calls;
-    if(!stale) ["status","decidedBy","decidedAt","outcome"].forEach(k=>{ if(doc[k]!=null) out[k]=doc[k]; });
-    if(!doc.hist) out.timing=mergeTiming(out.timing,doc,pend); return out; });
+  const base=baseOf(doc); let keep=null;   // keep: what to leave as someone else saved it, asked once
+  S.saving[doc.rep]=(S.saving[doc.rep]||0)+1;
+  let merged;
+  try{ merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv) return doc; const out=clone(srv);
+    if(!base){ /* a copy this page didn't load (shouldn't happen): the old rules */
+      (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; if(r.note&&(!o.note||String(r.note.at)>=String(o.note.at))) o.note=r.note; else if(!r.note&&o.note&&r._clr&&String(r._clr)>String(o.note.at)) delete o.note; });
+      if(doc.draft&&(!out.draft||String(doc.draft.at)>=String(out.draft.at))) out.draft=doc.draft;
+      const stale=(doc.calls||[]).length<(out.calls||[]).length||out.status==="decided"&&doc.status!=="decided";
+      if(!stale&&doc.call&&(!out.call||String(doc.call.at||"")>=String(out.call.at||""))) out.call=doc.call;
+      out.calls=doc.calls&&doc.calls.length>=(out.calls||[]).length?doc.calls:out.calls;
+      if(!stale) STATUS_KEYS.forEach(k=>{ if(doc[k]!=null) out[k]=doc[k]; });
+      if(!doc.hist) out.timing=mergeTiming(out.timing,doc,pend); return out; }
+    const R=doc.rows||[], B=base.rows||[], O=out.rows||[];
+    const notes=R.map((r,i)=>i).filter(i=>O[i]&&B[i]&&!sameVal(R[i].note,B[i].note));
+    /* recording a call (carry or decide) adds to calls; someone else may have recorded one meanwhile */
+    const myCalls=!sameVal(doc.calls,base.calls), theirCalls=!sameVal(out.calls,base.calls);
+    const ch=doc.call&&!myCalls&&!theirCalls?callChanges(out.call,doc.call,base.call):[];
+    const st=!myCalls&&!theirCalls?STATUS_KEYS.filter(k=>doc[k]!=null&&!sameVal(doc[k],base[k])):[];
+    if(!keep){ const nt=n=>n&&n.t?n.t.slice(0,60)+(n.by?" ("+first(n.by)+")":""):"no note";
+      const noteCl=notes.filter(i=>!sameVal(O[i].note,B[i].note)&&!sameVal(O[i].note,R[i].note));
+      const lines=noteCl.map(i=>"The note on item "+(R[i].item||i+1)+" — theirs: "+nt(O[i].note)+"   ·   yours: "+nt(R[i].note))
+        .concat(ch.filter(c=>c.clash).map(c=>(c.k==="votes"?c.n+"’s vote":"The call’s "+c.k)+" — theirs: "+showVal(c.theirs)+"   ·   yours: "+showVal(c.yours)))
+        .concat(st.filter(k=>!sameVal(out[k],base[k])&&!sameVal(out[k],doc[k])).map(k=>"The "+k+" — theirs: "+showVal(out[k])+"   ·   yours: "+showVal(doc[k])))
+        .concat(myCalls&&theirCalls?["The call record — someone else recorded "+(doc.wr||"this submission")+"’s AWG call too"]:[]);
+      keep=lines.length&&!askClash((doc.wr?doc.wr+" ":"")+"this submission",lines)?{notes:noteCl,call:true}:{notes:[],call:false}; }
+    /* kept theirs for a call both recorded: nothing is saved, so finishing stops instead of emailing a decision that isn't on record */
+    if(myCalls&&theirCalls&&keep.call) throw new Error("someone else already recorded this call. Reload the page to see it");
+    notes.forEach(i=>{ if(keep.notes.includes(i)) return; if(R[i].note) O[i].note=clone(R[i].note); else delete O[i].note; });
+    if(doc.draft&&!sameVal(doc.draft,base.draft)&&(!out.draft||String(doc.draft.at)>=String(out.draft.at))) out.draft=clone(doc.draft);
+    if(myCalls&&(!theirCalls||!keep.call)){ /* this screen recorded the call: its record stands */
+      out.calls=clone(doc.calls); if(doc.call) out.call=clone(doc.call); STATUS_KEYS.forEach(k=>{ if(doc[k]!=null) out[k]=doc[k]; }); }
+    else if(!myCalls&&!theirCalls){ /* a call record someone else has since recorded is never touched (theirCalls) */
+      const skip=c=>keep.call&&c.clash; if(ch.length) out.call=callOnto(out.call,doc.call,ch,skip);
+      st.forEach(k=>{ if(!(keep.call&&!sameVal(out[k],base[k])&&!sameVal(out[k],doc[k]))) out[k]=doc[k]; }); }
+    if(!doc.hist) out.timing=mergeTiming(out.timing,doc,pend); return out; }); }
+  finally{ S.saving[doc.rep]--; }
   tmPend[doc.rep]=Math.max(0,(tmPend[doc.rep]||0)-pend); delete merged._finishedAt; delete doc._finishedAt;
-  (merged.rows||[]).forEach(r=>delete r._clr); S.docs[doc.rep]=merged; return merged;
+  (merged.rows||[]).forEach(r=>delete r._clr); S.docs[doc.rep]=noteOpened(merged); S.stale[doc.rep]=false; return merged;
 }
 /* ---------- reading the AWG Submission Form (the same MISMO Submission Review Form IM uses) ---------- */
 const sx=v=>v==null?"":String(v).replace(/\r/g,"").trim();
@@ -1083,7 +1168,10 @@ function draftCard(doc){ const D=doc.draft; if(!D) return '<div class="card"><h3
 
 /* the call record: who was there, quorum, the vote, conditions */
 function attFor(date){ return ((S.att||{})[date])||null; }
-function callPanel(doc){ const c=doc.call||(doc.call={date:nextCalls(1)[0],method:"Standard Meeting",votes:{},outcome:"",conditions:"",notes:""}); const can=canReview()&&doc.status!=="decided";
+function callPanel(doc){
+  /* a call record filled in for the screen is not a change someone made: the copy saves compare
+     against carries it too, so it never replaces one someone else saved (November 5, 2026) */
+  const c=doc.call||(doc.call={date:nextCalls(1)[0],method:"Standard Meeting",votes:{},outcome:"",conditions:"",notes:""}, baseOf(doc)&&!baseOf(doc).call&&(baseOf(doc).call=clone(doc.call)), doc.call); const can=canReview()&&doc.status!=="decided";
   /* who was there comes from Meeting Trackers (Erin logs it there); this only records the vote */
   const a=attFor(c.date), V=voters(), need=quorumNeed(); const known=!!(a&&a.present&&a.present.length);
   c.present=known?a.present.slice():[]; c.others=known?(a.others||[]).slice():[];
@@ -1131,7 +1219,7 @@ function desk(doc){ if(doc.hist) (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flag
   const calls=doc.calls||[]; const E=estAWG({rows:R.length,awgRows:awgR.length,flagged:flagged.length,awgBoth:R.filter(r=>isAwgRow(r)&&(r.flags||[]).length).length});
   return '<div class="dhead"><div class="t">'+backLink(decided?'#/decided':'#/',decided?'All Decisions':'The Agenda')+'<h1 style="margin-top:6px">'+esc((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||""))+'</h1><div class="sub">'+[nwj([doc.wg,doc.at&&!doc.hist?(doc.fromIm?"From IM Review "+fmtD(doc.at):"Brought in "+fmtD(doc.at)+(doc.by?" by "+doc.by:"")):"",doc.category]),decided||doc.hist?'':'<span class="nw est" title="'+esc(E.tip)+'">'+esc(fmtMin(E.min))+' to review</span>'].filter(Boolean).join(' · ')+'</div>'+(doc.resub?'<div class="resub"><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span><span>'+nwj([doc.resub.first?'first submitted '+fmtD(doc.resub.first):'',doc.resub.date?'resubmitted '+fmtD(doc.resub.date):''])+'</span></div>':'')+'</div>'+
     '<div class="prog">'+(decided?ochip(doc.outcome)+'<span>'+esc(fmtD(doc.decidedAt))+'</span>':(q.status==="carried"?'<b>Carried</b><span>from '+esc(fmtS(q.lastCall))+'</span>':'<b>'+R.length+'</b><span>rows · '+awgR.length+' marked AWG</span>'))+'</div></div>'+
-    (doc.fromIm?'<div class="card fromim"><b>From IM Review.</b> <span class="muted">IM approved it '+esc(fmtD(doc.fromIm.decidedAt))+(doc.fromIm.decidedBy?' ('+esc(doc.fromIm.decidedBy)+')':'')+'. '+((doc.rows||[]).length)+' rows IM approved come here, with IM’s final wording'+(Object.entries(doc.fromIm.counts||{}).filter(x=>/Denied|Returned|Withdrawn/.test(x[0])&&x[1]).length?'; rows IM denied or returned stay behind':'')+'.</span></div>':'')+
+    staleHtml(doc)+(doc.fromIm?'<div class="card fromim"><b>From IM Review.</b> <span class="muted">IM approved it '+esc(fmtD(doc.fromIm.decidedAt))+(doc.fromIm.decidedBy?' ('+esc(doc.fromIm.decidedBy)+')':'')+'. '+((doc.rows||[]).length)+' rows IM approved come here, with IM’s final wording'+(Object.entries(doc.fromIm.counts||{}).filter(x=>/Denied|Returned|Withdrawn/.test(x[0])&&x[1]).length?'; rows IM denied or returned stay behind':'')+'.</span></div>':'')+
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: record a call, carry it, decide it. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
     (doc.summary?'<div class="card summ"><span class="lbl">Submission Summary</span><p>'+esc(doc.summary)+'</p>'+(doc.artifacts||doc.structure?'<p class="muted">'+esc([doc.artifacts&&"Artifacts: "+doc.artifacts,doc.structure&&doc.structure+" rows on the Proposed Structure tab",doc.imOutcome&&"IM: "+doc.imOutcome+(doc.imDate?" "+fmtD(doc.imDate):"")].filter(Boolean).join(" · "))+'</p>':'')+'</div>':'')+
     docsHtml(q,doc,doc.rep)+earlierHtml(doc)+
@@ -1269,7 +1357,7 @@ async function addGo(){ const A=S.add, f=A.form; const v=id=>($("#"+id)||{}).val
     const doc={rep,wr:f.wr,name:f.name,wg:f.wg,cop:f.cop,file:A.file,at:new Date().toISOString(),by:S.me.name||"",summary:f.summary,category:f.category,artifacts:f.artifacts,structure:f.structure,imOutcome:f.imOutcome,imDate:f.imDate,resub:+f.resub>0?{n:String(f.resub),first:f.firstDate,date:f.resubDate,why:f.resubWhy}:null,url:/^https:\/\//.test(A.url)?A.url:"",rows:f.rows,draft,call:{date:call,method:"Standard Meeting",present:[],others:[],votes:{},outcome:"",conditions:"",notes:""},calls:[],status:"awaiting",test};
     const r=await put("rev-"+rep,doc); if(!r.ok) throw new Error("Couldn’t save ("+r.status+")");
     const item={rep,wr:f.wr,name:f.name,wrName:W.name||"",wg:f.wg,ticket:W.ticket||"",status:"awaiting",sentAt:doc.at,sentBy:doc.by,rows:f.rows.length,awgRows:f.rows.filter(isAwgRow).length,flagged:f.rows.filter(x=>(x.flags||[]).length).length,rec:draft.rec,nextCall:call,test,resub:+f.resub>0,fac:{name:fac,email:A.facEmail},docs:W.docs||[],flow:S.cfg.flow||"",from:S.cfg.from||""};
-    const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[rep]=item; return o; }); S.queue=q.items; S.docs[rep]=doc; S.add=null; toast("On the agenda for "+fmtS(call)); location.hash="#/review/"+encodeURIComponent(rep); }
+    const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[rep]=item; return o; }); S.queue=q.items; S.docs[rep]=noteOpened(doc); S.add=null; toast("On the agenda for "+fmtS(call)); location.hash="#/review/"+encodeURIComponent(rep); }
   catch(e){ A.busy=""; A.err=e.message; render(); toast("Couldn’t bring it in: "+e.message); } }
 /* ---------- wiring ---------- */
 let tt; function toast(m){ let t=$(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; document.body.appendChild(t); } t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,3600); }
@@ -1278,7 +1366,7 @@ const RM_=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)
 function countUp(m){ const v=route().view; if(RM_||seenView[v]) return; seenView[v]=1; $$("[data-count]",m).forEach(el=>{ const to=+el.dataset.count; if(!(to>0)) return; const t0=performance.now(), dur=700; const step=t=>{ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); el.textContent=Math.round(to*e).toLocaleString(); if(k<1) requestAnimationFrame(step); }; el.textContent="0"; requestAnimationFrame(step); }); }
 function celebrate(){ if(RM_) return; const c=document.createElement("canvas"); c.className="confetti"; c.width=innerWidth; c.height=innerHeight; document.body.appendChild(c); const x=c.getContext("2d"); const cols=["#74bfeb","#0f7b5c","#2477b8","#eda100","#e87ba4"]; const P=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight*0.35,vx:(Math.random()-.5)*14,vy:Math.random()*-12-3,r:Math.random()*5+3,c:cols[Math.random()*cols.length|0],a:Math.random()*6})); const t0=performance.now();
   (function f(t){ const k=(t-t0)/1600; x.clearRect(0,0,c.width,c.height); P.forEach(p=>{ p.vy+=0.38; p.x+=p.vx; p.y+=p.vy; p.a+=0.2; x.save(); x.globalAlpha=Math.max(0,1-k); x.translate(p.x,p.y); x.rotate(p.a); x.fillStyle=p.c; x.fillRect(-p.r,-p.r/2,p.r*2,p.r); x.restore(); }); if(k<1) requestAnimationFrame(f); else c.remove(); })(t0); }
-async function saveCfg(fn,msg){ try{ const o=await update("config",cur=>fn(cur||{})); S.cfg=o; toast(msg||"Saved"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); }
+async function saveCfg(fn,msg){ try{ const o=await update("config",cur=>fn(cur||{})); S.cfg=o; S.cfgBase=clone(o); toast(msg||"Saved"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); }
 function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-years]",m).forEach(b=>b.onclick=()=>{ S.homeYears=+b.dataset.years; seenView.waiting=1; render(); });
   $$("[data-upall]",m).forEach(b=>b.onclick=()=>{ S.upAll=!S.upAll; seenView.waiting=1; render(); });
@@ -1296,12 +1384,14 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-addgo]",m).forEach(b=>b.onclick=()=>addGo());
   /* roster and calls */
   const R=()=>clone(roster());
-  $$("[data-rossave]",m).forEach(b=>b.onclick=()=>{ const r=R(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); $$("[data-rk]",m).forEach(inp=>r[inp.dataset.rk]=inp.value.trim()); r.members=r.members.filter(x=>x.cop||x.name); saveCfg(c=>Object.assign(c,{roster:r}),"Roster saved"); });
+  $$("[data-rossave]",m).forEach(b=>b.onclick=()=>{ const r=R(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); $$("[data-rk]",m).forEach(inp=>r[inp.dataset.rk]=inp.value.trim());
+    /* only the rows and names changed here go onto the newest roster (November 5, 2026) */
+    const was=clone(rosterIn(S.cfgBase)), memo={}; saveCfg(c=>Object.assign(c,{roster:rosterOnto(rosterIn(c),r,was,memo)}),"Roster saved"); });
   $$("[data-rosadd]",m).forEach(b=>b.onclick=()=>{ const r=R(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); r.members.push({cop:"",name:"",org:""}); S.cfg.roster=r; render(); });
-  $$("[data-rosdel]",m).forEach(b=>b.onclick=()=>{ const r=R(); r.members.splice(+b.dataset.rosdel,1); saveCfg(c=>Object.assign(c,{roster:r}),"Removed"); });
+  $$("[data-rosdel]",m).forEach(b=>b.onclick=()=>{ const r=R(); r.members[+b.dataset.rosdel]=null; const was=clone(rosterIn(S.cfgBase)), memo={}; saveCfg(c=>Object.assign(c,{roster:rosterOnto(rosterIn(c),r,was,memo)}),"Removed"); });
   $$("[data-calldel]",m).forEach(b=>b.onclick=()=>saveCfg(c=>Object.assign(c,{calls:(c.calls||CALLS0).filter(d=>d!==b.dataset.calldel)}),"Call removed"));
   $$("[data-calladd]",m).forEach(b=>b.onclick=()=>{ const d=($("#calladd",m)||{}).value; if(!d) return toast("Pick a date first"); saveCfg(c=>Object.assign(c,{calls:[...new Set((c.calls||CALLS0).concat([d]))].sort()}),"Call added"); });
-  $$("[data-revsave]",m).forEach(b=>b.onclick=()=>{ const L=(($("#revs",m)||{}).value||"").split(/[,;\s]+/).map(x=>x.trim().toLowerCase()).filter(x=>/@/.test(x)); saveCfg(c=>Object.assign(c,{reviewers:L}),"Saved"); });
+  $$("[data-revsave]",m).forEach(b=>b.onclick=()=>{ const L=(($("#revs",m)||{}).value||"").split(/[,;\s]+/).map(x=>x.trim().toLowerCase()).filter(x=>/@/.test(x)); const was=(S.cfgBase.reviewers||[]).slice(); saveCfg(c=>Object.assign(c,{reviewers:mergeList(c.reviewers,L,was)}),"Saved"); });
   /* the desk */
   const r=route(); if(r.view!=="review") return; const doc=S.docs[r.rep]; if(!doc) return;
   const save=keep(async()=>{ try{ await saveDoc(doc); }catch(e){ toast("Couldn’t save. Check your connection and try again."); } render(); });
@@ -1330,6 +1420,12 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
 document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
 window.addEventListener("hashchange",()=>{ S.edit=null; const r=route(); if(r.view==="review") S.filter="awg"; window.scrollTo(0,0); render(); });
 setInterval(async()=>{ if(document.hidden||route().view==="review"||route().view==="add"||route().view==="setup") return; await refreshQueue(); render(); },60000);
+/* the review page says so when someone else saves the same submission (November 5, 2026) */
+const STALE='<div class="card stalenote" style="border-left:4px solid var(--warn)"><b>Someone else just saved this submission.</b> <span class="muted">Saving keeps their changes and adds yours.</span></div>';
+function staleHtml(doc){ return S.stale[doc.rep]?STALE:''; }
+setInterval(async()=>{ const r=route(); if(r.view!=="review"||document.hidden||S.stale[r.rep]) return; const doc=S.docs[r.rep], o=doc&&OPENED.get(doc); if(!o||doc.hist||S.saving[r.rep]) return;
+  try{ const g=await get("rev-"+safe(r.rep)); if(!g.data||S.docs[r.rep]!==doc||S.saving[r.rep]||sigOf(g.data)===o.sig) return;
+    S.stale[r.rep]=true; const h=$("#main .dhead"); if(h&&route().rep===r.rep&&!$("#main .stalenote")) h.insertAdjacentHTML("afterend",STALE); }catch(e){} },60000);
 
 /* ---------- start: sign in, then the gate decides who gets in ---------- */
 function start(){ const rs=RS(); if(!rs){ setTimeout(start,100); return; }
