@@ -494,7 +494,7 @@ var EF = (function(){
 
   function ballot(el, cfg){
     var sl=cfg.slate; var started=Date.now(); var GL=sl&&sl.type==="domain"?"Business Domain":"Area of Focus";
-    var hero='<div class="ef-hero"><small>MISMO Elections · '+e(sl?sl.year:"")+'</small><h2>'+e(sl?sl.name:"Ballot")+'</h2><p>'+(sl&&sl.type==="domain"?'One ballot per company, covering all eight Business Domains, cast by your MISMO Voting Representative (MVR)':'One ballot per company'+(sl&&sl.type==="aof"?' in each Area of Focus':''))+'. '+(sl&&sl.closes?'Voting closes '+e(fmt(sl.closes))+'.':'')+'</p></div>';
+    var hero='<div class="ef-hero"><small>MISMO Elections · '+e(sl?sl.year:"")+'</small><h2>'+e(sl?sl.name:"Ballot")+'</h2><p>'+(sl&&sl.type==="domain"?'One ballot per company, covering all eight Business Domains, cast by your MISMO Voting Representative (MVR)':'One ballot per company'+(sl&&sl.type==="aof"?' in each Area of Focus':''))+'. '+(sl&&sl.closesLabel?'Voting closes '+e(sl.closesLabel)+'.':sl&&sl.closes?'Voting closes '+e(fmt(sl.closes))+'.':'')+'</p></div>';
     if(!sl || cfg.closed){ el.innerHTML='<div class="ef">'+hero+'<div class="closed"><b>This ballot isn\'t open right now.</b><br>Questions? Write to elections@mismo.org.</div></div>'; return; }
     var allIn=sl.type==="domain"; var multi=!allIn && sl.groups.length>1;
     var ALL=allIn? {name:"All Business Domains", seats:[].concat.apply([],sl.groups.map(function(g){ return g.seats.map(function(s){ var o={}; for(var k in s) o[k]=s[k]; o.position=g.name+": "+s.position; return o; }); }))} : null;
@@ -566,7 +566,7 @@ var EF = (function(){
   var e=(q.get("e")||"").replace(/[^a-z0-9-]/gi,"");
   if(!e){ EF.ballot(host,{slate:null}); return; }
   fetch("/elections-hq/slates/"+e+".json",{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }).then(function(sl){
-    var closed=!sl || !isOpen(sl.mode,sl.opens,sl.closes);
+    var closed=!sl || !isOpen(sl.mode,sl.opens,sl.closes) || !!(sl.closesAt && Date.now()>Date.parse(sl.closesAt));
     EF.ballot(host,{slate:sl, closed:closed, code:(q.get("c")||"").replace(/[^A-Z0-9]/gi,"").toUpperCase(), group:q.get("g")||"", submit:function(rec){ return send("elections-ballot",rec); }});
   });
 })();
