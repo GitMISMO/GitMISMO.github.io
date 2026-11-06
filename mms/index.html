@@ -7566,6 +7566,40 @@ function renderWho(){
   w.innerHTML='<span class="whochip" title="'+esc(full)+'"><span class="av">'+esc(ini)+'</span><span class="fn">'+esc(full.split(' ')[0])+'</span><span class="cv">\u25be</span></span>';
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
+
+/* ================= Typing survives a refresh (November 6, 2026) =================
+   When someone else saves, the open work request redraws to show their change. Details, Key Dates
+   and Links already hold still while you edit them; this does the same for every other box in the
+   panel (a history note, a note for the architect, a part name, a card's wording): anything typed and
+   not yet sent is put back after the redraw, with the cursor where it was. Boxes you haven't touched
+   show the newest values. Text you have just sent (Add, Save, Enter) is not put back. */
+(function(){
+  const BOX='textarea,input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]):not([type=button]):not([type=submit]):not([type=search])';
+  const typed=el=>el.matches(BOX)&&!el.matches('[data-k],[data-date]');
+  const keyOf=el=>{ if(el.id) return '#'+el.id; const a=[...el.attributes].filter(x=>/^(name|data-[\w-]+)$/.test(x.name)).map(x=>x.name+'='+x.value).join('&'); return el.tagName+'|'+a+'|'+(el.placeholder||''); };
+  const boxes=P=>{ const seen={}, out=[]; $$('input,textarea',P).forEach(el=>{ if(!typed(el)) return; const k=keyOf(el); const n=seen[k]=(seen[k]||0)+1; out.push({el,id:k+'#'+n}); }); return out; };
+  let sent={}, sentAt=0;   // what the boxes held when the person last pressed something that sends
+  const markSent=()=>{ const P=$('#panel'); if(!P) return; sent={}; boxes(P).forEach(b=>{ if(b.el.value) sent[b.id]=b.el.value; }); sentAt=Date.now(); };
+  document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('#panel button,#panel [data-x],#panel [data-act],#panel [role=button]'); if(b&&!b.matches('[data-ptab]')) markSent(); },true);
+  document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing&&e.target.closest&&e.target.closest('#panel')&&e.target.matches('input')) markSent(); },true);
+  const _renderPanelTyped=renderPanel;
+  renderPanel=function(){
+    const P=$('#panel'), id=S.panel, keep=[]; let focus=null;
+    const fresh=Date.now()-sentAt<60000;
+    if(P&&id&&P.classList.contains('on')&&P.dataset.for3===String(id)){
+      boxes(P).forEach(b=>{ const el=b.el;
+        if(el.value!==el.defaultValue&&!(fresh&&sent[b.id]===el.value)) keep.push({id:b.id,v:el.value});
+        if(el===document.activeElement) focus={id:b.id,s:el.selectionStart,e:el.selectionEnd}; });
+    }
+    _renderPanelTyped();
+    const P2=$('#panel'); if(P2) P2.dataset.for3=S.panel?String(S.panel):'';
+    if(!P2||S.panel!==id||(!keep.length&&!focus)) return;
+    const at={}; boxes(P2).forEach(b=>{ at[b.id]=b.el; });
+    keep.forEach(x=>{ const el=at[x.id]; if(el&&el.value===el.defaultValue) el.value=x.v; });
+    if(focus){ const el=at[focus.id]; if(el&&el.isConnected&&document.activeElement!==el&&!($('#modal-root')&&$('#modal-root').children.length)){
+      try{ el.focus({preventScroll:true}); if(focus.s!=null&&el.setSelectionRange) el.setSelectionRange(focus.s,focus.e); }catch(e){} } }
+  };
+})();
 })();
 
 </script>
