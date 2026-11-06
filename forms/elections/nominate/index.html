@@ -512,7 +512,7 @@ var EF = (function(){
       box.innerHTML=seats.map(function(s){ var many=s.count>1;
         return '<div class="seatq" data-seat="'+e(s.id)+'" data-count="'+s.count+'"><h4>'+e(s.position)+'<small>'+(many?'vote for up to '+s.count:'vote for one')+'</small></h4><div class="opts">'+
           s.nominees.map(function(n){ return '<label class="opt"><input type="'+(many?"checkbox":"radio")+'" name="s_'+e(s.id)+'" value="'+e(n.id)+'"><span><b>'+e(n.name)+'</b><small>'+e([n.title,n.company].filter(Boolean).join(", "))+'</small>'+(n.statement?'<small style="margin-top:6px">'+e(n.statement)+'</small>':'')+'</span></label>'; }).join("")+
-          '<label class="opt"><input type="'+(many?"checkbox":"radio")+'" name="s_'+e(s.id)+'" value="abstain"><span><b>Abstain</b></span></label></div></div>'; }).join(""); }
+          '</div></div>'; }).join(""); }
     if(allIn) draw(ALL); else if(!multi) draw(sl.groups[0]);
     else { var gs=f.querySelector("#ef-g"); gs.onchange=function(){ draw(sl.groups.filter(function(g){ return g.name===gs.value; })[0]); };
       if(cfg.group && sl.groups.some(function(g){ return g.name===cfg.group; })){ gs.value=cfg.group; gs.onchange(); } }
@@ -526,7 +526,7 @@ var EF = (function(){
       var g=allIn? ALL.name : multi? val(f,"group") : sl.groups[0].name; if(!g) return void(er.textContent="Choose the "+GL+".");
       var choices={}, any=false;
       [].forEach.call(f.querySelectorAll(".seatq[data-seat]"),function(q){ var picks=[].map.call(q.querySelectorAll("input:checked"),function(i){ return i.value; }).filter(function(v){ return v!=="abstain"; }); choices[q.dataset.seat]=picks; if(q.querySelector("input:checked")) any=true; });
-      if(!any) return void(er.textContent="Make at least one choice, or choose Abstain.");
+      if(!any) return void(er.textContent="Choose at least one person. Leave a position blank if you don't want to vote for it.");
       if(!val(f,"ack")) return void(er.textContent="Please tick the box before sending.");
       var rec={id:id("v"), kind:"ballot", cycle:sl.cycle, group:g, voter:{first:val(f,"first"), last:val(f,"last"), email:val(f,"email"), company:val(f,"company"), title:val(f,"title")}, code:cfg.code||"", choices:choices, submittedAt:new Date().toISOString(), hp: !!val(f,"website") || (Date.now()-started)<4000};
       var b=f.querySelector("#ef-go"); b.disabled=true; b.textContent="Sending…";
