@@ -1,0 +1,48 @@
+name: Summit Sponsor Feed (Summit pages)
+
+# Reads the Sponsorship Portal records and updates sponsors/winter-2027.json.
+# The Summit home, Sponsors and Agenda pages read that file, so a sponsor approved
+# in the Portal shows up on the website within the hour (weekdays) or the next morning.
+# Needs a token that can read GitMISMO/sponsorship-data: SPONSOR_DATA_TOKEN if set,
+# otherwise MMS_DATA_TOKEN.
+
+on:
+  schedule:
+    - cron: '17 11-23 * * 1-5'   # weekdays, hourly about 7 AM to 7 PM ET
+    - cron: '17 11 * * 0,6'      # weekends, once in the morning
+  workflow_dispatch:
+  push:
+    paths:
+      - 'sponsors/logos/**'
+      - 'sponsors/build-sponsors.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sponsor-feed
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Read the Portal and build winter-2027.json
+        run: node sponsors/build-sponsors.mjs
+        env:
+          SPONSOR_DATA_TOKEN: ${{ secrets.SPONSOR_DATA_TOKEN || secrets.MMS_DATA_TOKEN }}
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain sponsors/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+            git add sponsors/winter-2027.json
+            git commit -m "Summit sponsors: update from the Sponsorship Portal"
+            git push
+          else
+            echo "No change."
+          fi
