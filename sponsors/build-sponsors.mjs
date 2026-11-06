@@ -68,7 +68,10 @@ function urlFor(name, email) {
 }
 
 async function main() {
-  if (!TOKEN) throw new Error('No token: add the SPONSOR_DATA_TOKEN repository secret (read access to GitMISMO/sponsorship-data).');
+  if (!TOKEN) { // not set up yet: leave the current file alone, don't fail the run
+    console.log('::warning::No token yet. Add the SPONSOR_DATA_TOKEN repository secret (read access to GitMISMO/sponsorship-data). The current sponsors file is unchanged.');
+    return;
+  }
   const r = await fetch(SRC, { headers: { authorization: `Bearer ${TOKEN}`, accept: 'application/vnd.github.raw', 'user-agent': 'mismo-sponsor-feed' } });
   if (!r.ok) throw new Error(`Could not read the Portal records (${r.status}). The token needs read access to GitMISMO/sponsorship-data.`);
   const docs = (await r.json()).docs || {};
