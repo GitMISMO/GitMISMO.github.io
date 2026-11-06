@@ -324,7 +324,7 @@ function drawSecs(){
     const ts = mine().filter(t => t.sec === sec); if (!ts.length) continue;
     html += `<div class="sec tsec"><div class="sh2"><span class="dots" aria-hidden="true">${ts.map(t => `<i style="background:${t.c}"></i>`).join('')}</span><span class="nm">${esc(sec)}</span><span class="ct">${ts.length} ${ts.length === 1 ? 'tool' : 'tools'}</span></div>
       <div class="tgrid">${ts.map(t => { const it = toolItem(t), any = pins.some(id => id === it.id || id.startsWith('page:' + t.key + ':') || id.startsWith(t.key + ':')), open = pinMenu && pinMenu.key === t.key;
-        return `<div class="ttile${open ? ' menu-open' : ''}" data-tile="${esc(t.key)}"><a class="tlink" href="${it.href}">${ticon(t, t.icon, 36, true)}<b>${esc(t.name)}</b><small>${t.key === 'so' ? esc(me().so) : esc(it.title === 'Open ' + t.name ? 'Open \u203a' : it.title)}</small></a>
+        return `<div class="ttile${open ? ' menu-open' : ''}" data-tile="${esc(t.key)}"><a class="tlink" href="${it.href}">${ticon(t, t.icon, 36, true)}<b>${esc(t.name)}</b><small>${t.key === 'so' ? 'Open \u203a' : esc(it.title === 'Open ' + t.name ? 'Open \u203a' : it.title)}</small></a>
           <button type="button" class="pinbtn tpin" data-pinmenu="${esc(t.key)}" aria-haspopup="dialog" aria-expanded="${!!open}" aria-pressed="${any}" title="Pin ${esc(t.name)}, or a page in it">${I(P.pin)}</button>${open ? menuHTML(t) : ''}</div>`; }).join('')}</div></div>`;
   }
   $('#secs').innerHTML = html;
