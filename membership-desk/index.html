@@ -700,10 +700,10 @@ function deskSetup(x,left,kv){
  cp.addEventListener("click",()=>{const t=txt();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{cp.textContent="Copied";setTimeout(()=>cp.textContent="Copy All for Aptify",1800);},()=>{const ta=h("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");cp.textContent="Copied";}catch(e){}ta.remove();});});
  left.appendChild(h("div",{class:"copyrow"},cp));
  if(!document.getElementById("desk-setup-css")){const st=document.createElement("style");st.id="desk-setup-css";st.textContent=
-  ".sect.need{border-color:#e7b65a;background:rgba(240,185,74,.10)}.sect.need h3{color:#a2701a}.sect.need p{margin:6px 0 0;font-size:13px;line-height:1.5}"
-  +".pre{white-space:pre-line}.ct{padding:8px 0;border-top:1px solid rgba(127,150,170,.25)}.ct:first-of-type{border-top:0}"
+  ".sect.need{border-color:#e7b65a;background:rgba(240,185,74,.10)}.sect.need h3{color:#a2701a}.sect.need p{margin:8px 14px 0;font-size:13px;line-height:1.5}.sect.need p:last-child{margin-bottom:12px}"
+  +".pre{white-space:pre-line}.ct{padding:8px 14px;border-top:1px solid rgba(127,150,170,.25)}.ct:first-of-type{border-top:0}"
   +".ct-r{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;opacity:.7}.ct-n{font-weight:600;font-size:13.5px;margin-top:2px}.ct-n span{font-weight:400;opacity:.8}"
-  +".ct-d{font-size:13px;margin-top:2px;overflow-wrap:anywhere}.muted{opacity:.75;font-size:13px;margin:4px 0}.copyrow{display:flex;justify-content:flex-end;margin:6px 0 14px}";
+  +".ct-d{font-size:13px;margin-top:2px;overflow-wrap:anywhere}.muted{opacity:.75;font-size:13px;margin:8px 14px 4px}.copyrow{display:flex;justify-content:flex-end;margin:6px 0 14px}";
   document.head.appendChild(st);}
 }
 /* ---------- the right-hand panel: what to set up, and the boxes to fill in ---------- */
