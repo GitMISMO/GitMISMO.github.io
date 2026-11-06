@@ -41,7 +41,9 @@
   .rule{ width:2px; height:34px; margin:0 20px; border-radius:1px; background:#50a4db }
   .brand{ font-size:15.5px; font-weight:700; color:#50a4db }
   .top-r{ margin-left:auto; display:flex; align-items:center; gap:10px; position:relative }
-  .iconbtn{ width:40px; height:40px; border-radius:4px; border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px }
+  .helpbtn{ width:auto !important; padding:0 13px; gap:7px; font-size:14px; font-weight:700; text-decoration:none } .helpbtn[aria-current="page"]{ background:rgba(116,191,235,.2) }
+@media (max-width:600px){ .helpbtn{ width:40px !important; padding:0 } .helpbtn span{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap } }   /* a phone: the icon alone, its name still read out */
+.iconbtn{ width:40px; height:40px; border-radius:4px; border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px }
   .acct{ display:inline-flex; align-items:center; gap:8px; height:40px; padding:0 12px 0 7px; border-radius:4px; border:0; background:#fff; color:#2C74A6; font-weight:600; font-size:13px; cursor:pointer }
   .acct .av{ width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; color:#fff; background:linear-gradient(160deg,#a8d4ef,#6fb2dc) }
   .menu{ position:absolute; right:0; top:52px; width:290px; background:var(--surface); color:var(--ink); border:1px solid var(--line-2); border-radius:12px; box-shadow:0 18px 40px -18px rgba(6,32,47,.55); padding:8px }
@@ -197,6 +199,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <span class="plate"><svg role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
   <span class="rule" aria-hidden="true"></span><span class="brand">Resources</span>
   <span class="top-r">
+    <!-- Help (Perry, 6 Nov 2026): this page has no sidebar, so Help sits here, beside dark mode -->
+    <a class="iconbtn helpbtn" id="helpBtn" href="/help.html" title="Help"><svg class="i" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.3a2.6 2.6 0 015 .9c0 1.7-2.5 2.2-2.5 3.8"/><path d="M12 17.2v.1"/></svg><span>Help</span></a>
     <button type="button" class="iconbtn" id="theme" aria-label="Switch to dark mode"></button>
     <!-- The shared account button every tool shows in this spot (session.js fills it). -->
     <div id="rs-account"></div>
