@@ -653,6 +653,59 @@ function renderTodo(){const by=k=>TODO.filter(x=>x.kind===k);
  L.forEach(x=>box.appendChild(todoRow(x)));
  if(!L.length){const last=finished().filter(r=>r.grp==="setup"&&(!tkind||r.kind===tkind)).slice(0,5);box.appendChild(h("div",{class:"empty"},"Nothing waiting"+(tkind?" in "+KINDS[tkind].plural:"")+". The last ones finished:"));last.forEach(r=>box.appendChild(doneRow(r)));}}
 
+/* ---------- Everything to set up in Aptify (Jonna, Nov 5, 2026): Member 360 sends the company's details, contacts,
+   payment and dates with each set-up; anything it doesn't have is listed under Still Needed. ---------- */
+function deskSetup(x,left,kv){
+ const s=x.setup||{},M360="https://resources.mismo.org/member-360/#co/"+encodeURIComponent(s.key||"");
+ const link=(u,t)=>h("a",{href:u,target:"_blank",rel:"noopener"},t);
+ const ad=a=>{if(!a)return "";const l2=[a.city,[a.state,a.zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");return [a.street,l2,a.country&&!/^(us|usa|united states)$/i.test(a.country)?a.country:""].filter(Boolean).join("\n");};
+ if((s.missing||[]).length){const nb=h("div",{class:"sect need"},h("h3",null,"Still Needed"),
+   h("p",null,"Member 360 doesn't have "+s.missing.join(", ").replace(/, ([^,]*)$/," or $1")+". Ask the member, or the MISMO team, before setting this up."),
+   s.key?h("p",null,link(M360,"Open the company in Member 360"),h("span",null," to add what's missing.")):null);left.appendChild(nb);}
+ const site=s.website||x.website||"";
+ const addr=ad(s.address),bill=ad(s.billing);
+ left.appendChild(h("div",{class:"sect"},h("h3",null,"Company"),kv([
+  ["Legal Name",s.legal||x.name],s.dba?["Doing Business As",s.dba]:null,
+  ["Aptify Company ID",s.aptifyId||x.cid||"New to Aptify, or not known"],
+  s.parent?["Parent Company",s.parent.name+(s.parent.cid?" (Aptify ID "+s.parent.cid+")":"")]:null,
+  ["Member Type",s.memberType||"Not known"],["Industry Sector",s.sector||"Not known"],
+  s.market?["Commercial or Residential",s.market]:null,s.creditUnion?["Credit Union","Yes"]:null,
+  ["Address",addr?h("span",{class:"pre"},addr):"Not on file"],bill&&bill!==addr?["Billing Address",h("span",{class:"pre"},(s.billing.attn?"Attn: "+s.billing.attn+"\n":"")+bill)]:null,
+  ["Main Phone",s.phone||"Not on file"],
+  ["Website",site?link(/^https?:\/\//i.test(site)?site:"https://"+site,site):"Not on file"]].filter(Boolean))));
+ const cs=s.contacts||[],pcs=s.parentContacts||[];
+ const cbox=h("div",{class:"sect"},h("h3",null,"Contacts"));
+ const card=c=>h("div",{class:"ct"},h("div",{class:"ct-r"},c.role||"Contact"),h("div",{class:"ct-n"},c.name||"(no name on file)",c.title?h("span",null," · "+c.title):null),
+   h("div",{class:"ct-d"},c.email?h("a",{href:"mailto:"+c.email},c.email):null,c.email&&c.phone?h("span",null," · "):null,c.phone?h("span",null,c.phone):null));
+ if(cs.length)cs.forEach(c=>cbox.appendChild(card(c)));
+ else{cbox.appendChild(h("p",{class:"muted"},"No contacts on file for this company yet."));if(pcs.length){cbox.appendChild(h("p",{class:"muted"},"For reference, the parent company's contacts:"));pcs.forEach(c=>cbox.appendChild(card(c)));}}
+ left.appendChild(cbox);
+ const p=s.payment||{};
+ left.appendChild(h("div",{class:"sect"},h("h3",null,"Membership"),kv([
+  ["Level",x.level||"Not set"],["Price",money(x.price)],x.special?["Special",x.special+" (put it in the order line's description)"]:null,
+  p.how?["How It Was Paid",p.how]:null,p.paidBy?["Paid By",p.paidBy]:null,
+  p.amount?["Amount Paid",money(p.amount)]:null,p.date?["Paid On",fmt(p.date)]:null,p.order?["Order Number",p.order]:null,
+  ["Membership Starts",fmt(x.start||s.start)],["Membership Through",fmt(x.end||s.end)],
+  p.notes?["Deal Note",p.notes]:null,
+  s.application?["Application",(s.application.submitted?"Submitted "+fmt(s.application.submitted):"Submitted")+(s.application.po?" · PO "+s.application.po:"")]:null,
+  s.application&&s.application.subsidiaries&&s.application.subsidiaries.length?["Subsidiaries",s.application.subsidiaries.join(", ")]:null,
+  s.application&&s.application.notes?["Application Notes",s.application.notes]:null].filter(Boolean))));
+ /* one button copies it all, to paste or keep beside Aptify */
+ const txt=()=>{const L=[];const kvs=(t,rows)=>{L.push(t.toUpperCase());rows.filter(Boolean).forEach(r=>{if(r[1])L.push(r[0]+": "+r[1]);});L.push("");};
+  kvs("Company",[["Legal Name",s.legal||x.name],["Doing Business As",s.dba],["Aptify Company ID",s.aptifyId||x.cid],["Parent Company",s.parent?s.parent.name+(s.parent.cid?" ("+s.parent.cid+")":""):""],["Member Type",s.memberType],["Industry Sector",s.sector],["Address",addr.replace(/\n/g,", ")],["Billing Address",bill.replace(/\n/g,", ")],["Main Phone",s.phone],["Website",site]]);
+  L.push("CONTACTS");(cs.length?cs:pcs).forEach(c=>L.push((c.role||"Contact")+": "+[c.name,c.title,c.email,c.phone].filter(Boolean).join(", ")));L.push("");
+  kvs("Membership",[["Level",x.level],["Price",money(x.price)],["Special",x.special],["How It Was Paid",p.how],["Paid By",p.paidBy],["Amount Paid",p.amount?money(p.amount):""],["Paid On",p.date?fmt(p.date):""],["Order Number",p.order],["Membership Starts",fmt(x.start||s.start)],["Membership Through",fmt(x.end||s.end)]]);
+  return L.join("\n").trim();};
+ const cp=h("button",{type:"button",class:"btn ghost copyall"},"Copy All for Aptify");
+ cp.addEventListener("click",()=>{const t=txt();(navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(()=>{cp.textContent="Copied";setTimeout(()=>cp.textContent="Copy All for Aptify",1800);},()=>{const ta=h("textarea");ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand("copy");cp.textContent="Copied";}catch(e){}ta.remove();});});
+ left.appendChild(h("div",{class:"copyrow"},cp));
+ if(!document.getElementById("desk-setup-css")){const st=document.createElement("style");st.id="desk-setup-css";st.textContent=
+  ".sect.need{border-color:#e7b65a;background:rgba(240,185,74,.10)}.sect.need h3{color:#a2701a}.sect.need p{margin:6px 0 0;font-size:13px;line-height:1.5}"
+  +".pre{white-space:pre-line}.ct{padding:8px 0;border-top:1px solid rgba(127,150,170,.25)}.ct:first-of-type{border-top:0}"
+  +".ct-r{font-size:11px;letter-spacing:.06em;text-transform:uppercase;font-weight:700;opacity:.7}.ct-n{font-weight:600;font-size:13.5px;margin-top:2px}.ct-n span{font-weight:400;opacity:.8}"
+  +".ct-d{font-size:13px;margin-top:2px;overflow-wrap:anywhere}.muted{opacity:.75;font-size:13px;margin:4px 0}.copyrow{display:flex;justify-content:flex-end;margin:6px 0 14px}";
+  document.head.appendChild(st);}
+}
 /* ---------- the right-hand panel: what to set up, and the boxes to fill in ---------- */
 let cur=null;
 function openPane(x){cur=x;const K=KINDS[x.kind];$("pane-t").textContent=x.name;$("pane-s").textContent=K.name+" · from "+K.from+((x.sold||x.paid)?" · waiting "+Math.max(0,days(x.sold||x.paid,TODAY))+" days":"");
@@ -661,6 +714,7 @@ function openPane(x){cur=x;const K=KINDS[x.kind];$("pane-t").textContent=x.name;
  const left=h("div",{class:"pcol"});B.appendChild(left);
  /* a Square set-up shows every section of MISMO Money's set-up email, as MISMO Money sends them (Jonna, Nov 5, 2026) */
  if(x.kind==="square"&&Array.isArray(x.details)&&x.details.length)x.details.forEach(sec=>{if(Array.isArray(sec)&&Array.isArray(sec[1]))left.appendChild(h("div",{class:"sect"},h("h3",null,String(sec[0])),kv(sec[1].filter(r=>Array.isArray(r)).map(r=>[String(r[0]),String(r[1]==null?"":r[1])]))));});
+ else if(x.setup&&typeof deskSetup==="function")deskSetup(x,left,kv);
  else left.appendChild(h("div",{class:"sect"},h("h3",null,"Set Up in Aptify"),kv([["Company",x.name],x.website?["Website",h("a",{href:/^https?:\/\//i.test(x.website)?x.website:"https://"+x.website,target:"_blank",rel:"noopener"},x.website)]:(x.kind==="members"?["Website","Not given yet. Ask the member, or check their email domain."]:null),["Aptify Company ID",x.cid||"New to Aptify, or not known"],["Level",x.level],["Price",money(x.price)],x.special?["Special",x.special+" (put it in the order line's description)"]:null,["Membership Starts",fmt(x.start)],["Membership Through",fmt(x.end)]].filter(Boolean))));
  const cid=h("input",{id:"f-cid",inputmode:"numeric",autocomplete:"off",value:x.cid||"",placeholder:"e.g. 9741822"}),ord=h("input",{id:"f-ord",inputmode:"numeric",autocomplete:"off",placeholder:"e.g. 6284606"}),per=h("input",{id:"f-per",inputmode:"numeric",autocomplete:"off",placeholder:"if a person record was added"}),note=h("textarea",{id:"f-note",rows:"2",placeholder:"Anything MISMO should know"});
 const fst=h("input",{id:"f-start",type:"date",value:x.start||""}),fen=h("input",{id:"f-end",type:"date",value:x.end||""});
@@ -813,13 +867,13 @@ const HELP=[
    ["What Happens Next","MISMO Money marks the set-up done and ties the order the next time it's opened, then watches for the payment in Aptify. Once Aptify shows it paid, it moves from Waiting for the Aptify Payment to Paid and in Aptify."]],
   notes:["<b>Don't know the Company ID?</b> If the company isn't in Aptify yet, add it first; the ID it gets is the one to enter here."]},
  {id:"members",k:"#5fd39a",name:"New Members",lead:"The MISMO team signed a new member in Member 360. Member 360 sends it here once it's ready to set up.",
-  steps:[["Check the Details","Member 360 adds them here once a deal is logged and still needs setting up in Aptify. The company, level, price and dates are on the left. If Member 360 already knows the Aptify Company ID, it's filled in for you."],
+  steps:[["Check the Details","Member 360 adds them here once a deal is logged and still needs setting up in Aptify. Everything Aptify needs is on the left: the company's legal name, address, phone, website, member type and sector, its contacts, how it paid, and the membership dates. Anything Member 360 doesn't have is listed at the top under Still Needed, and Copy All for Aptify copies it all at once."],
    ["Set Up in Aptify","Create the membership order with the level, price and dates shown."],
    ["Record the IDs","Check the Company ID, add the order number and select Mark Set Up."],
    ["What Happens Next","Member 360 shows the deal as Updated in Aptify, so Amy and Kelly know it's done without asking."]],
   notes:[]},
  {id:"free",k:"#b79cff",name:"Free Memberships",lead:"A complimentary membership the MISMO team has approved. There's no invoice.",
-  steps:[["Check the Details","The company, level and dates are on the left."],
+  steps:[["Check the Details","The company, its parent, contacts and dates are on the left. Anything Member 360 doesn't have is listed at the top under Still Needed."],
    ["Set Up in Aptify","Set up the membership with no invoice, using the level and dates shown."],
    ["Record the IDs","Enter the Aptify Company ID (and the order number if Aptify created one), then select Mark Set Up."],
    ["What Happens Next","Member 360 counts them as free members, so they don't get renewal invoices."]],
@@ -845,6 +899,12 @@ const HELP=[
 {id:"finished",k:"#9fb3c8",name:"Completed",lead:"Completed keeps everything that's been set up: what you marked here, the Square set-ups MISMO Money confirmed, IIF lenders and new members Aptify shows, and your MISMO cases.",
   steps:[["Filter It","Use Everything, Set-Ups or Aptify Cases at the top."],["Page Through It","Twelve at a time, newest first. Use Newer and Older at the bottom."]],
   notes:["<b>Who else sees it?</b> Jonna, Amy and Kelly can open the desk from Member 360, where they also see how many set-ups are waiting.","<b>Completed</b> on Home counts everything set up since the date it shows, and how many of those were this month."]},
+ {id:"dates",k:"#5fd39a",name:"When a Membership Starts",lead:"The membership dates on each set-up follow the same rule as MISMO Money, so Aptify, MISMO Money and Member 360 always agree. They're filled in for you.",
+  steps:[["IIF Lenders","A lender's membership through the Innovation Investment Fund (IIF) starts the month the payment arrives, whatever the day. Paid October 27 starts October 1."],
+   ["Non-Lenders: the 15th Rule","Paid on the 1st through the 15th, the membership starts that month. Paid on the 16th or later, it starts the next month. Paid October 10 starts October 1; paid October 20 starts November 1; paid December 16 starts January 1."],
+   ["Renewals","A renewal covers the renewal year, January 1 to December 31. The 15th rule never applies to a renewal."],
+   ["Through Date","A new membership runs to December 31 of its first year; a dues deal adds the following year. A free membership for a subsidiary runs to its parent company's end date."]],
+  notes:[]},
  {id:"faq",k:"#ff8f7d",name:"Questions",faq:[
   ["Where do I find the Aptify Company ID?","It's the ID on the company's record in Aptify. For a new company, add it in Aptify first and use the ID it's given."],
   ["Where do I find the order number?","It's the ID of the membership order you created in Aptify for this set-up."],
