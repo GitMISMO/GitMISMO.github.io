@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-05",
+ "updated": "2026-11-06",
  "source": "Member 360",
  "lender": {
   "Chair": [
@@ -192,6 +192,11 @@
    {
     "name": "NFM Lending",
     "logo": "https://resources.mismo.org/champions/logos/nfm-lending-045700d3.jpg"
+   },
+   {
+    "name": "Pivot Financial Partners, Inc.",
+    "website": "https://pivotlending.com",
+    "logo": "https://resources.mismo.org/champions/logos/pivot-financial-partners-inc-295c454a.jpg"
    },
    {
     "name": "Planet Home Lending",
