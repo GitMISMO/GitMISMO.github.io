@@ -344,7 +344,7 @@ function menuHTML(t){
     <div class="pfoot">${pages.length ? 'Select a pin to add it to the top of your page; select it again to unpin.' : 'This tool is one page. Pin it to keep it at the top of your page.'}</div></div>`;
 }
 function drawTheme(){
-  const dark = document.documentElement.getAttribute('data-theme') === 'dark' || (!document.documentElement.getAttribute('data-theme') && matchMedia('(prefers-color-scheme: dark)').matches);
+  const dark = document.documentElement.getAttribute('data-theme') === 'dark';   /* light unless chosen (Perry, 6 Nov 2026) */
   $('#theme').innerHTML = I(dark ? P.sun : P.moon); $('#theme').setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
 }
 function drawAll(){ drawTop(); drawPins(); drawSecs(); drawTheme(); }
@@ -455,7 +455,6 @@ document.addEventListener('drop', e => { const c = e.target.closest && e.target.
   const pins = getPins(), from = pins.indexOf(dragId), to = pins.indexOf(c.dataset.card); if (from < 0 || to < 0 || from === to) return;
   pins.splice(to, 0, pins.splice(from, 1)[0]); setPins(pins); dragId = null; drawPins(); });
 document.addEventListener('dragend', () => { dragId = null; document.querySelectorAll('.pcard').forEach(x => x.classList.remove('dragging', 'over')); });
-matchMedia('(prefers-color-scheme: dark)').addEventListener('change', drawTheme);
 fetch('/assets/tools.json', { cache:'no-cache' }).then(r => r.ok ? r.json() : null).then(j => { (j && j.tools || []).forEach(t => { if (t.key.indexOf('so-') === 0) COMPANIES[t.key] = t.label; }); }).catch(() => {});
 function start(){ drawAll(); if ($('#q').value.trim()) drawResults(); loadAccountPins(); }
 if (!RS){ document.documentElement.classList.remove('rs-wait'); }

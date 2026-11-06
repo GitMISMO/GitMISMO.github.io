@@ -18,11 +18,7 @@
     --display:'Archivo','Libre Franklin',sans-serif; --font:'Libre Franklin',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
     color-scheme:light;
   }
-  @media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-    --paper:#0B1826; --surface:#112336; --sunk:#172D44; --ink:#EEF3F8; --ink-2:#B9C8D6; --ink-3:#8C9FB1;
-    --line:#1A3048; --line-2:#243E5A; --line-3:#3A5A7C; --accent:#8CC6EC; --accent-soft:#173A57;
-    --btn:#50A4DB; --btn-ink:#0F314C; --pin:#8CC6EC; --pin-soft:#173A57; --admin-bg:#23305E; --admin-ink:#B8C4FF;
-    --shadow:0 1px 2px rgba(0,0,0,.45), 0 10px 26px -18px rgba(0,0,0,.9); color-scheme:dark; } }
+  /* Light unless someone picks Dark Mode (Perry, 6 Nov 2026): no longer follows the computer's own dark setting. */
   :root[data-theme="dark"]{
     --paper:#0B1826; --surface:#112336; --sunk:#172D44; --ink:#EEF3F8; --ink-2:#B9C8D6; --ink-3:#8C9FB1;
     --line:#1A3048; --line-2:#243E5A; --line-3:#3A5A7C; --accent:#8CC6EC; --accent-soft:#173A57;
