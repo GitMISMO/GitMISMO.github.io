@@ -96,6 +96,12 @@ for (const p of ((config.people || {}).facilitators || [])) {
 const imq = docsOf(await gh('mms-data', 'data/imqueue.json'), 'imqueue');
 const list = D.build({ now, tickets, process: config.process, people: config.people, arch, media, comments, mt, hours, imq, settings: config.digest });
 
+/* each person's own email choices (My Email Choices in the MMS) */
+const prefs = docsOf(await gh('mms-data', 'data/prefs.json'), 'prefs');
+const pk = e => String(e || '').toLowerCase().replace(/[^a-z0-9_.-]/g, '_').slice(0, 80);
+const wants = (e, k) => { const p = prefs[pk(e)]; return !(p && p.off && p.off[k]); };
+for (const m of list) { m.to = m.to.filter(e => wants(e, 'digest')); m.cc = m.cc.filter(e => wants(e, 'digestCc')); }
+
 /* anyone whose digest the MMS already sent today (Send Now, or the MMS sender) is skipped */
 const mk = s => String(s).replace(/[^A-Za-z0-9_-]/g, '-').slice(0, 120);
 const sentToday = new Set();
@@ -120,7 +126,7 @@ async function post(m) {
   return false;
 }
 for (const m of list) {
-  if (!m.to.length) { console.log(`Skipped ${m.name}: no email on file.`); continue; }
+  if (!m.to.length) { console.log(`Skipped ${m.name}: no email on file, or they turned the digest off.`); continue; }
   if (m.empty && settings.skipEmpty) { console.log(`Skipped ${m.name}: nothing to report.`); continue; }
   if (sentToday.has(mk('digest-' + m.name + '-' + et.ymd))) { console.log(`Skipped ${m.name}: the MMS already sent today's digest.`); continue; }
   console.log(`${DRY ? '[dry run] ' : ''}${m.name}: ${m.subject} (${m.sections} sections)`);

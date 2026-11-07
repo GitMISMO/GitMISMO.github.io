@@ -2011,6 +2011,10 @@ p,.sub,.lede{text-wrap:pretty}
 @media(max-width:600px){.seg button,.btn.sm{min-height:36px;padding-top:7px;padding-bottom:7px}}
 .feed-prev{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}.feed-prev>[data-open]{cursor:pointer}
 .ss-f.ss-gone b{text-decoration:line-through;opacity:.7}
+.cmt-disp{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:8px 0 2px;font-size:13px}.cmt-why{color:var(--ink)}.cmt-by{font-size:12px}
+.cres-sum{margin-left:8px;font-size:11.5px}
+.pref-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--rule);cursor:pointer}.pref-row input{margin-top:3px;width:16px;height:16px;flex:0 0 auto}.pref-row span{display:flex;flex-direction:column}.pref-row em{font-style:normal;color:var(--ink-3);font-size:12.5px}
+.cd-box{max-height:60vh;overflow:auto;border:1px solid var(--border);border-radius:6px;font-size:13px}.cd-l{display:grid;grid-template-columns:22px 1fr;gap:4px;padding:4px 8px;border-bottom:1px solid var(--rule)}.cd-l b{color:var(--ink-3)}.cd-add{background:var(--good-bg)}.cd-add b{color:var(--good)}.cd-del{background:var(--bad-bg)}.cd-del span{text-decoration:line-through}.cd-del b{color:var(--bad)}.cd-same{color:var(--ink-2)}.cd-gap{text-align:center;color:var(--ink-3);padding:2px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3890,7 +3894,7 @@ VIEWS.governance=function(){
   const figs=lens('gov',[{k:'Waiting on '+esc(g),v:list.length,s:'Decisions to record',c:'var(--c5)'},{k:'Longest Wait',v:oldest?ageTxt(oldest):'0',s:oldest?'Oldest item on the docket':'Nothing waiting',c:oldest>30?'var(--bad)':'var(--c4)'},{k:'Decided in '+yr,v:thisYr.length,s:'Recorded decisions',c:'var(--c1)'},{k:'Approved',v:thisYr.length?Math.round(appr/thisYr.length*100)+'%':'—',s:appr+' of '+thisYr.length+' this year',c:'var(--good)'}]);
   const dkp=pageOf('gov-dk',list,fitN(430,84,3)); let lastK='';
   const grp=dkp.items.map(t=>{ const k=t.stage, s=stageDef(k); const hd=k!==lastK?'<div class="dk-gh" style="--sc:'+s.color+'"><i></i>'+esc(s.name)+'<b>'+list.filter(x=>x.stage===k).length+'</b></div>':''; lastK=k;
-    return hd+[t].map(t=>'<div class="dk" role="button" tabindex="0" data-open="'+esc(t.id)+'" style="--sc:'+s.color+'"><div class="dk-l">'+av(t.facilitator)+'</div><div class="dk-m"><div class="dk-wr">'+esc(t.wr)+(t.classification?' · '+esc(t.classification):'')+(t.designation&&t.designation.type?' · '+esc(t.designation.type)+(t.designation.license?' / '+esc(t.designation.license):''):'')+'</div><div class="dk-nm">'+esc(t.name)+'</div><div class="dk-s">'+esc(t.workgroup||'')+' · '+esc(t.facilitator||'')+'</div></div><div class="dk-r">'+heat(t)+(S.canWrite&&S.isStaff?'<button class="btn sm pri" data-decide="'+esc(t.id)+'" type="button">Record Decision</button>':'')+'</div></div>').join(''); }).join('');
+    return hd+[t].map(t=>'<div class="dk" role="button" tabindex="0" data-open="'+esc(t.id)+'" style="--sc:'+s.color+'"><div class="dk-l">'+av(t.facilitator)+'</div><div class="dk-m">'+(t.stage==='gc-publish'&&typeof cmOpenFor==='function'&&cmOpenFor(t).length?'<span class="chip warn" style="float:right;margin-left:6px" title="Comments still without a disposition">'+cmOpenFor(t).length+' comment'+(cmOpenFor(t).length===1?'':'s')+' unresolved</span>':'')+'<div class="dk-wr">'+esc(t.wr)+(t.classification?' · '+esc(t.classification):'')+(t.designation&&t.designation.type?' · '+esc(t.designation.type)+(t.designation.license?' / '+esc(t.designation.license):''):'')+'</div><div class="dk-nm">'+esc(t.name)+'</div><div class="dk-s">'+esc(t.workgroup||'')+' · '+esc(t.facilitator||'')+'</div></div><div class="dk-r">'+heat(t)+(S.canWrite&&S.isStaff?'<button class="btn sm pri" data-decide="'+esc(t.id)+'" type="button">Record Decision</button>':'')+'</div></div>').join(''); }).join('');
   const lf=S.govLog||'all';
   const log=decided.filter(([v])=>lf==='all'||(lf==='yes'?v.outcome==='Approved':v.outcome!=='Approved'));
   const logH='<div class="seg sm" id="govlog">'+[['all','All'],['yes','Approved'],['no','Not Approved']].map(([k,l])=>'<button type="button" data-gl="'+k+'" aria-pressed="'+(lf===k)+'">'+l+'</button>').join('')+'</div>';
@@ -6774,10 +6778,12 @@ const HELP_TOPICS={
      'Non-members click Non-Member Access, sign the Proposed (open for comment) license form, and then get the download.',
      'Still needed on the card lists anything missing: the card text, the Resource Library link or the non-member download.',
      'Comments sent through the website’s comment form land on the work request, under Comments Received.',
-     'Read each one and mark it addressed when it is handled.',
+     'For each comment, click Record Disposition and choose Accepted, Accepted with Changes, Not Accepted, or Duplicate or Out of Scope, with the reason (a reason is required for Not Accepted). Comments Received shows how many still need one.',
+     'Click Email the Commenter to open an email in Outlook with the decision and the reason already written. Send it from your mailbox; the MMS notes the day the commenter was told.',
+     'Many comments? Click Download for Dispositions to work in Excel, fill in the Disposition and Reason columns, then Upload Dispositions to bring them back.',
      'When the period ends, the work request moves to Post-Comment on its own.',
      'In Post-Comment, the facilitator reports what came back, then it goes to Governance for approval to publish.'],
-    ['The digest tells facilitators about new comments and periods ending soon.'],
+    ['The digest tells facilitators about new comments and periods ending soon.','Reporting Post-Comment with comments still without a disposition asks first and notes it in History, and the Governance publish card shows how many are unresolved.','A comment that came in when the work request wasn’t open for comment is marked Outside Its Comment Period.','A comment period with a start date still ahead is listed under Scheduled to Open, and doesn’t go to the website until it opens.'],
     [['Open Comment Periods','comment']]],
   arch:['Asking for Architecture Help','facilitator pm staff',
     'Architecture Help is how a workgroup asks MISMO’s Architect for help, tied to the work request it supports. The facilitator can follow it from the work request, and AI Review waits until it is done.',
@@ -6810,6 +6816,7 @@ const HELP_TOPICS={
      'Delete one with Delete, or clear the list with Delete These. Set or clear the hold date in Settings › Notifications.',
      'After the hold, until the email flow is connected, emails wait under To Send. Open one and click Open in Outlook to send it from your mailbox.',
      'Click Mark Sent when it has gone, or Mark All Sent for the whole list.',
+     'An email that didn’t go (the flow was down, or nobody had an address on file) shows under Didn’t Send with the reason. The MMS tries again on its own, up to five times.',
      'Once the Power Automate email flow link is saved in Settings › Notifications, emails send on their own and this page becomes the record of what went out.'],
     ['Search finds an email by recipient, subject or text.'],
     [['Open Notifications','outbox']]],
@@ -6932,6 +6939,34 @@ const HELP_TOPICS={
      'At Start Work, the Target to Submit to IM is set at the halfway point of the job. Change it on Key Dates if it is not right.'],
     ['Older work keeps its Smartsheet size: Small, Medium, Large or X-Large. Nothing from before is changed.','Nothing can be added to the MMS without going through the Initiative Hub.','The Overview shows how many requests are waiting to be confirmed or approved in the Hub.'],
     [['Submit a Work Request','https://resources.mismo.org/initiative-hub/work-requests.html#new']]],
+  mymail:['My Email Choices','*',
+    'Each person chooses which MMS emails they get. Your choices hold everywhere the MMS sends from, including the daily digest.',
+    ['Click My Email Choices in the left rail, above Settings.',
+     'Untick anything you don’t want: work arriving at a step, reminders, answers to your asks, IM and AWG decisions, IM reviews ready, Architecture Help, your daily digest, or copies of other people’s digests.',
+     'Click Save. Tick it again any time to start getting it again.'],
+    ['Email the MMS sends is only ever to @mismo.org and @mba.org addresses, and only for someone signed in to the MMS.'],
+    []],
+  dprec:['Due-Process Record','facilitator staff approver gov',
+    'One printable page per work request shows how it was decided: every review, vote and designation, the public comment period with each comment’s disposition, the key dates and the full history.',
+    ['Open the work request. On the Overview, find Reviews and Decisions.',
+     'Click Due-Process Record. It opens in a new tab.',
+     'Click Print or Save as PDF to keep a copy or send it to someone.'],
+    ['Steps from before the MMS show what the old records hold, marked “before the MMS”.'],
+    []],
+  drafts:['Comparing Two Drafts','facilitator staff imawg',
+    'See what changed between two versions of a submission, paragraph by paragraph.',
+    ['Open the work request and go to the Reviews tab.',
+     'Click Compare Two Drafts, choose the earlier draft, then the newer one. Word, Excel, PDF and text files work.',
+     'Added paragraphs show in green and removed ones struck through in red, with the paragraph before and after for context.'],
+    ['Both files are read in your browser; nothing is uploaded.'],
+    []],
+  invites:['IM and AWG Call Invites','facilitator staff imawg member',
+    'Add the next IM or AWG call to your calendar, with every submission on the agenda linked.',
+    ['Open the Review Desk.',
+     'Click IM Call Invite or AWG Call Invite. A calendar file downloads.',
+     'Open it to add the call to Outlook or any calendar.'],
+    ['The date and time come from Meeting Trackers. If no time is set there, the invite is for 1 pm Eastern.'],
+    [['Open the Review Desk','reviews']]],
   words:['Words We Use','*',
     'MISMO writes its own names one way. The Resource Center has the full list, and AI Review checks for them.',
     ['Open the Resource Center and pick MISMO Terms.',
@@ -6940,15 +6975,15 @@ const HELP_TOPICS={
     [['Open MISMO Terms','rc:terms']]]
 };
 const HELP_ORDER={
-  facilitator:['start','hub','queue','panel','docs','arch','aireview','handoff','parts','asks','comments','digest','mediareq','metrics','path','find','words'],
-  staff:['start','hub','queue','board','metrics','approvals','handoff','parts','govrec','settings','mt','notif','digest','panel','docs','arch','comments','path','find'],
-  imawg:['start','imrun','awgrun','mt','handoff','docs','digest','path','find'],
-  member:['start','member','docs','path','find'],
-  approver:['start','approve','parts','queue','handoff','metrics','digest','path','find'],
-  gov:['start','govmem','comments','metrics','path','digest','find'],
-  media:['start','mediareq','queue','digest','path','find'],
-  pm:['start','arch','queue','digest','path','find'],
-  website:['start','web','comments','queue','digest','path','find']
+  facilitator:['start','hub','queue','panel','docs','arch','aireview','drafts','handoff','parts','asks','comments','dprec','invites','digest','mymail','mediareq','metrics','path','find','words'],
+  staff:['start','hub','queue','board','metrics','approvals','handoff','parts','govrec','dprec','settings','mt','notif','digest','mymail','panel','docs','drafts','arch','comments','invites','path','find'],
+  imawg:['start','imrun','awgrun','invites','mt','handoff','docs','drafts','digest','mymail','path','find'],
+  member:['start','member','invites','docs','path','find'],
+  approver:['start','approve','parts','queue','handoff','dprec','metrics','digest','mymail','path','find'],
+  gov:['start','govmem','comments','dprec','metrics','path','digest','mymail','find'],
+  media:['start','mediareq','queue','digest','mymail','path','find'],
+  pm:['start','arch','queue','digest','mymail','path','find'],
+  website:['start','web','comments','queue','digest','mymail','path','find']
 };
 function helpRoleDefault(){ try{ const r=localStorage.getItem('tools:mms:helpRole'); if(r&&HELP_ORDER[r]) return r; }catch(e){}
   if(typeof isRole==='function'){ if(isRole('imawg')) return 'imawg'; if(isRole('website')) return 'website'; if(S.isStaff&&isRole('staff')) return 'staff'; if(isRole('media')) return 'media'; if(isRole('pm')||isRole('architect')) return 'pm'; }
@@ -7349,6 +7384,178 @@ function needLibs(){ if(window.JSZip&&window.XLSX) return Promise.resolve(); if(
   return libsP; }
 const _readFileLib=readFile; readFile=async function(f){ if(/\.(docx|xlsx|xls|pptx)$/i.test(f&&f.name||'')) try{ await needLibs(); }catch(e){} return _readFileLib(f); };
 const _imExportLib=imExport; imExport=async function(doc){ try{ await needLibs(); }catch(e){ toast('Couldn’t load the Excel tools; try again'); return; } return _imExportLib(doc); };
+
+/* ================= Comment resolution (Build Next, Nov 2026) =================
+   Every public comment gets a disposition (Accepted, Accepted with Changes, Not Accepted, or Duplicate or Out
+   of Scope) with the reason, who decided and when, and whether the commenter was told. Post-Comment can't be
+   reported with comments still open without saying so, and the Governance publish card shows any left.
+   The comments can go out to Excel for working offline and come back in with their dispositions.
+   Stored on the comment's status record (cstatus/<comment id>). */
+const DISPS=['Accepted','Accepted with Changes','Not Accepted','Duplicate or Out of Scope'];
+const DISP_TONE={'Accepted':'good','Accepted with Changes':'good','Not Accepted':'bad','Duplicate or Out of Scope':''};
+function cmStat(c){ return (S.cstat||{})[c.id]||{}; }
+function cmResolved(c){ const st=cmStat(c); return !!st.disposition||st.status==='Addressed'; }
+function cmOpenFor(t){ return commentsFor(t).filter(c=>!cmResolved(c)); }
+function cmTellLink(c,t,st){ const nm=t?cpName(t):(c.workProduct||c.wr||'the work product');
+  const body='Dear '+(c.name||'commenter')+',\n\nThank you for your comment on '+nm+(c.section?' (section: '+c.section+')':'')+'.\n\nOur decision: '+st.disposition+'.'+(st.reason?'\n\n'+st.reason:'')+'\n\nYour comment:\n"'+String(c.comment||'').slice(0,800)+'"\n\nIf you disagree with this outcome, reply to this email within 15 days and MISMO will review it.\n\nMISMO';
+  return 'mailto:'+encodeURIComponent(c.email||'')+'?subject='+encodeURIComponent('Your comment on '+nm+': '+st.disposition)+'&body='+encodeURIComponent(body); }
+commentRow=function(c,withWr){ const st=cmStat(c); const t=S.tickets[c.ticket]||allTickets().find(x=>x.wr===c.wr);
+  return '<div class="cmt'+(cmResolved(c)?' done':'')+'"><div class="cmt-h">'+av(c.name||'?','sm')+'<span class="cmt-who"><b>'+esc(c.name||'Someone')+'</b>'+(c.offPeriod?' <span class="chip warn" title="This work request wasn’t open for comment when this came in">Outside Its Comment Period</span>':'')+'<em>'+esc([c.title,c.company].filter(Boolean).join(', '))+(c.email?' · <a href="mailto:'+esc(c.email)+'">'+esc(c.email)+'</a>':'')+'</em></span><span class="cmt-d">'+esc(fmtS(atDay(c.submittedAt)))+'</span></div>'+
+    (withWr&&t?'<div class="cmt-wr" data-open="'+esc(t.id)+'">'+esc(t.wr)+' '+esc(cpName(t))+'</div>':'')+
+    '<div class="cmt-meta">'+[c.type,c.section&&('Section: '+c.section)].filter(Boolean).map(x=>'<span class="chip">'+esc(x)+'</span>').join('')+(c.ipr==='yes'?'<span class="chip warn">Discloses a patent or IP right</span>':'')+'</div>'+
+    '<div class="cmt-t">'+esc(c.comment||'')+'</div>'+(c.suggestion?'<div class="cmt-s"><b>Suggested change:</b> '+esc(c.suggestion)+'</div>':'')+
+    (st.disposition?'<div class="cmt-disp"><span class="chip '+(DISP_TONE[st.disposition]||'')+'">'+esc(st.disposition)+'</span>'+(st.reason?'<span class="cmt-why">'+esc(st.reason)+'</span>':'')+'<span class="muted cmt-by">'+esc([st.by,st.at&&fmtS(atDay(st.at))].filter(Boolean).join(' · '))+(st.toldAt?' · commenter told '+esc(fmtS(atDay(st.toldAt))):'')+'</span></div>':'')+
+    '<div class="cmt-f">'+(!st.disposition&&st.status==='Addressed'?'<span class="chip good">Addressed'+(st.by?' by '+esc(st.by.split(' ')[0]):'')+'</span>':'')+
+      (S.canWrite?'<button type="button" class="btn sm'+(st.disposition?' ghost':' pri')+'" data-cdisp="'+esc(c.id)+'">'+(st.disposition?'Change Disposition':'Record Disposition')+'</button>':'')+
+      (st.disposition&&c.email&&S.canWrite?'<a class="btn sm ghost" data-ctell="'+esc(c.id)+'" href="'+esc(cmTellLink(c,t,st))+'">'+(st.toldAt?'Email the Commenter Again':'Email the Commenter')+'</a>':'')+'</div></div>'; };
+async function cmDispose(id){ const c=(S.commentsAll||S.comments||[]).find(x=>x.id===id); if(!c) return; const st=cmStat(c);
+  const v=await modal({title:'Comment Disposition',text:esc((c.name||'Someone')+': '+String(c.comment||'').slice(0,160)),ok:'Save',
+    body:fld('Disposition',radios('d',DISPS,st.disposition||'Accepted'))+fld('Reason',ta('r',st.reason||''),'What changed, or why not. The commenter sees this.'),
+    validate:x=>x.d==='Not Accepted'&&!String(x.r||'').trim()?'Say why it wasn’t accepted':''});
+  if(!v) return; const next=Object.assign({},st,{status:'Addressed',disposition:v.d,reason:String(v.r||'').trim(),by:S.me.name||'',at:new Date().toISOString()});
+  S.cstat[id]=next; await write('cstatus',id,next,st); if(S.panel) renderPanel(); else renderAll(); }
+const _wireCstR=wireCst;
+wireCst=function(root){ _wireCstR(root);
+  $$('[data-cdisp]',root).forEach(b=>b.onclick=e=>{ e.stopPropagation(); cmDispose(b.dataset.cdisp); });
+  $$('[data-ctell]',root).forEach(a=>a.addEventListener('click',async e=>{ e.stopPropagation(); const id=a.dataset.ctell; const st=Object.assign({},(S.cstat||{})[id]||{}); st.toldAt=new Date().toISOString(); st.toldBy=S.me.name||''; S.cstat[id]=st; await write('cstatus',id,st); setTimeout(()=>{ if(S.panel) renderPanel(); },300); }));
+  $$('[data-cxl]',root).forEach(b=>b.onclick=e=>{ e.stopPropagation(); const t=S.tickets[b.dataset.cxl]; if(t) cmExport(t); });
+  $$('[data-cxu]',root).forEach(b=>b.onclick=e=>{ e.stopPropagation(); const t=S.tickets[b.dataset.cxu]; if(t) cmImport(t); }); };
+/* the Comments Received heading says how many are resolved and offers Excel out and in */
+const _renderPanelCR=renderPanel;
+renderPanel=function(){ _renderPanelCR(); const t=S.tickets[S.panel]; if(!t) return; const L=commentsFor(t); if(!L.length) return;
+  const h=$$('#panel .psec h4').find(x=>/^Comments Received/.test(x.textContent)); if(!h||$('.cres-sum',h)) return; const open=L.filter(c=>!cmResolved(c)).length;
+  const sp=$('.sp',h); const chip='<span class="cres-sum chip '+(open?'warn':'good')+'">'+(open?open+' without a disposition':'All resolved')+'</span>';
+  if(sp) sp.insertAdjacentHTML('beforebegin',chip); else h.insertAdjacentHTML('beforeend',chip); if(sp&&S.canWrite) sp.insertAdjacentHTML('afterbegin','<button type="button" class="btn sm ghost" data-cxl="'+esc(t.id)+'">Download for Dispositions</button><button type="button" class="btn sm ghost" data-cxu="'+esc(t.id)+'">Upload Dispositions</button>');
+  wireCst($('#panel')); };
+/* Excel out: one row per comment, with Disposition and Reason columns to fill in */
+async function cmExport(t){ try{ await needLibs(); }catch(e){ toast('Couldn’t load the Excel tools; try again'); return; }
+  const head=['Comment ID','Received','Name','Company','Email','Type','Section','Comment','Suggested Change','Disposition','Reason'];
+  const rows=commentsFor(t).map(c=>{ const st=cmStat(c); return [c.id,atDay(c.submittedAt),c.name||'',c.company||'',c.email||'',c.type||'',c.section||'',c.comment||'',c.suggestion||'',st.disposition||'',st.reason||'']; });
+  const ws=XLSX.utils.aoa_to_sheet([head,...rows]); ws['!cols']=[14,11,20,20,24,14,16,60,40,22,50].map(w=>({wch:w}));
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Comments');
+  const ref=XLSX.utils.aoa_to_sheet([['Disposition'],...DISPS.map(d=>[d])]); XLSX.utils.book_append_sheet(wb,ref,'Dispositions');
+  XLSX.writeFile(wb,'Comments - '+t.wr+' - '+today()+'.xlsx'); }
+/* Excel in: rows whose Disposition is one of the four are saved (by Comment ID); anything else is left alone */
+async function cmImport(t){ try{ await needLibs(); }catch(e){ toast('Couldn’t load the Excel tools; try again'); return; }
+  const inp=document.createElement('input'); inp.type='file'; inp.accept='.xlsx'; inp.onchange=async()=>{ const f=inp.files[0]; if(!f) return;
+    try{ const wb=XLSX.read(await f.arrayBuffer()); const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{defval:''});
+      const mine=new Set(commentsFor(t).map(c=>c.id)); let n=0, bad=0;
+      for(const r of rows){ const id=String(r['Comment ID']||'').trim(); if(!mine.has(id)) continue; const d=DISPS.find(x=>x.toLowerCase()===String(r['Disposition']||'').trim().toLowerCase()); if(!d){ if(String(r['Disposition']||'').trim()) bad++; continue; }
+        const st=(S.cstat||{})[id]||{}; const reason=String(r['Reason']||'').trim(); if(st.disposition===d&&(st.reason||'')===reason) continue;
+        const next=Object.assign({},st,{status:'Addressed',disposition:d,reason,by:S.me.name||'',at:new Date().toISOString(),via:'Excel'}); S.cstat[id]=next; await write('cstatus',id,next,st); n++; }
+      toast(n+' disposition'+(n===1?'':'s')+' saved'+(bad?'; '+bad+' row'+(bad===1?'':'s')+' had a disposition the MMS doesn’t know and were skipped':'')); if(S.panel) renderPanel(); }
+    catch(e){ toast('That file couldn’t be read: '+((e&&e.message)||'')); } };
+  inp.click(); }
+/* Post-Comment: reporting with comments still open asks first, and says so in the history */
+const _postReportCR=postReport;
+postReport=async function(t){ const open=cmOpenFor(t); if(open.length){ const ok=await modal({title:open.length+' Comment'+(open.length===1?'':'s')+' Without a Disposition',ok:'Report Anyway',cancel:'Go Back',text:esc(t.wr+' '+t.name),body:'<p style="margin:0">Every comment should have a disposition, with the reason, before it goes to Governance for approval to publish. Open the Comments section to record them.</p>'}); if(!ok) return;
+    const x=clone(S.tickets[t.id]||t); hist(x,'Reported with '+open.length+' comment'+(open.length===1?'':'s')+' still without a disposition'); await saveTicket(x); }
+  return _postReportCR(S.tickets[t.id]||t); };
+
+/* ================= Due-process record (Build Next, Nov 2026) =================
+   One printable page per work request that shows how it was decided: every review and vote, the public comment
+   period with each comment's disposition, the key dates, and the full history. Opens in a new tab; Print or
+   Save as PDF from there. */
+function dpRecord(t){ const e=s=>esc(s==null?'':String(s)); const d=t.dates||{}; const fmtD=x=>x?fmt(atDay(x)):'';
+  const row=(a,b)=>'<tr><th>'+e(a)+'</th><td>'+b+'</td></tr>';
+  const imQ=Object.values(S.imPortalQ||{}).filter(q=>q&&(q.ticket===t.id||(!q.ticket&&q.wr===t.wr))&&q.status==='decided'&&!q.test).sort((a,b)=>String(a.decidedAt).localeCompare(String(b.decidedAt)));
+  const awQ=Object.values(S.awgPortalQ||{}).filter(q=>q&&(q.ticket===t.id||(!q.ticket&&q.wr===t.wr))&&q.status==='decided'&&!q.test).sort((a,b)=>String(a.decidedAt).localeCompare(String(b.decidedAt)));
+  const cnt=c=>Object.entries(c||{}).filter(x=>x[1]).map(([k,n])=>n+' '+k.toLowerCase()).join(', ');
+  const rev=[];
+  if(t.ai&&t.ai.status) rev.push(['AI Review',e(t.ai.status)+(d.aiDecision?' · '+e(fmtD(d.aiDecision)):'')]);
+  imQ.forEach(q=>rev.push(['IM Review',e(fmtD(q.decidedAt))+' · '+e(cnt(q.counts)||'decided')+(q.decidedBy?' · recorded by '+e(q.decidedBy):'')]));
+  if(!imQ.length&&(t.im&&t.im.status||d.imDecision)) rev.push(['IM Review',e((t.im&&t.im.status)||'Decided')+(d.imDecision?' · '+e(fmtD(d.imDecision)):'')+' (before the MMS)']);
+  awQ.forEach(q=>rev.push(['AWG Review',e(fmtD(q.decidedAt))+' · '+e(q.outcome||'decided')+(q.conds?' · conditions: '+e(q.conds):'')+(q.decidedBy?' · recorded by '+e(q.decidedBy):'')]));
+  if(!awQ.length&&(t.awg&&t.awg.status||d.awgDecision)) rev.push(['AWG Review',e((t.awg&&t.awg.status)||'Decided')+(d.awgDecision?' · '+e(fmtD(d.awgDecision)):'')+' (before the MMS)']);
+  const ds=t.designation||{}; if(ds.license) rev.push(['License Designation',e([ds.type,t.classification,ds.license,ds.royalty,ds.availableTo].filter(Boolean).join(' · '))+(ds.status?' · '+e(ds.status):'')+(d.designation?' · '+e(fmtD(d.designation)):'')+(ds.vps&&Object.keys(ds.vps).length?'<br><span class="m">'+Object.entries(ds.vps).map(([n,v])=>e(n)+': '+e(v.vote||'')+(v.note?' ('+e(v.note)+')':'')).join('; ')+'</span>':'')]);
+  (t.parts||[]).forEach(p=>{ const x=p.ds||{}; rev.push(['  Part: '+p.name,e([x.type,x.classification,x.license,x.royalty,x.availableTo].filter(Boolean).join(' · '))]); });
+  const govN={kickoff:'Kickoff','gc-comment':'Approval to Comment','gc-publish':'Approval to Publish'};
+  (t.votes||[]).forEach(v=>rev.push([govName()+' '+(govN[v.stage]||v.stage),e(fmtD(v.date))+' · '+e(v.outcome)+' · '+e(v.method||'')+(v.tally?' · '+e(v.tally):'')+(v.members&&Object.keys(v.members).length?'<br><span class="m">'+Object.entries(v.members).map(([n,x])=>e(n)+': '+e(x)).join('; ')+'</span>':'')+(v.note?'<br><span class="m">'+e(v.note)+'</span>':'')]));
+  const C=(typeof commentsFor==='function'?commentsFor(t):[]).filter(c=>!cmIsTest(c));
+  const cRows=C.map(c=>{ const st=(S.cstat||{})[c.id]||{}; return '<tr><td>'+e(fmtD(c.submittedAt))+'</td><td>'+e(c.name)+(c.company?'<br><span class="m">'+e(c.company)+'</span>':'')+'</td><td>'+e(c.comment)+(c.suggestion?'<br><span class="m">Suggested: '+e(c.suggestion)+'</span>':'')+'</td><td><b>'+e(st.disposition||(st.status==='Addressed'?'Addressed':'Open'))+'</b>'+(st.reason?'<br>'+e(st.reason):'')+(st.by?'<br><span class="m">'+e(st.by)+(st.at?', '+e(fmtD(st.at)):'')+'</span>':'')+'</td><td>'+(st.toldAt?e(fmtD(st.toldAt)):'—')+'</td></tr>'; }).join('');
+  const dates=[['Approved',d.bet],['Work Start',d.workStart],['Submitted to AI Review',d.aiSubmitted],['Submitted to IM',d.imSubmitted],['IM Decision',d.imDecision],['Submitted to AWG',d.awgSubmitted],['AWG Decision',d.awgDecision],['Designation',d.designation],['Approval to Comment',d.gcComment],['Comment Period',d.commentStart?fmtD(d.commentStart)+' to '+fmtD(d.commentEnd):''],['Approval to Publish',d.postGc],['Published',d.published]].filter(x=>x[1]);
+  const H=(t.history||[]).slice().sort((a,b)=>String(a.at).localeCompare(String(b.at))).map(h=>'<tr><td>'+e(fmtD(h.at))+'</td><td>'+e(h.by||'')+'</td><td>'+e(h.text||'')+(h.note?'<br><span class="m">'+e(h.note)+'</span>':'')+'</td></tr>').join('');
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Due-Process Record · '+e(t.wr)+'</title><style>body{font:13px/1.45 "IBM Plex Sans",system-ui,sans-serif;color:#0d314c;margin:32px auto;max-width:960px;padding:0 20px}h1{font-size:22px;margin:0 0 4px}h2{font-size:15px;margin:26px 0 8px;border-bottom:2px solid #0d314c;padding-bottom:4px}.sub{color:#456179;margin-bottom:12px}table{border-collapse:collapse;width:100%}th,td{text-align:left;vertical-align:top;padding:6px 8px;border-bottom:1px solid #d5e2ed}th{width:210px;color:#456179;font-weight:600}.m{color:#5a7489;font-size:12px}.bar{display:flex;gap:8px;justify-content:flex-end}.bar button{font:inherit;padding:8px 14px;border-radius:6px;border:1px solid #0d314c;background:#0d314c;color:#fff;cursor:pointer}@media print{.bar{display:none}body{margin:0}}</style></head><body>'+
+    '<div class="bar"><button onclick="print()">Print or Save as PDF</button></div><h1>Due-Process Record</h1><div class="sub">'+e(t.wr)+' · '+e(t.name)+'<br>'+e([t.workgroup,t.facilitator&&('Facilitator: '+t.facilitator),t.classification].filter(Boolean).join(' · '))+'<br>Prepared '+e(fmt(today()))+' from the MISMO Manufacturing System by '+e(S.me.name||'')+'</div>'+
+    '<h2>Reviews, Votes and Decisions</h2><table>'+(rev.length?rev.map(r=>row(r[0],r[1])).join(''):row('','None recorded yet'))+'</table>'+
+    '<h2>Public Comment</h2><p>'+(d.commentStart?'Open '+e(fmtD(d.commentStart))+' to '+e(fmtD(d.commentEnd))+'. ':'')+C.length+' comment'+(C.length===1?'':'s')+' received'+(C.length?'; '+C.filter(c=>((S.cstat||{})[c.id]||{}).disposition).length+' with a disposition.':'.')+'</p>'+(C.length?'<table><tr><th style="width:90px">Received</th><th style="width:150px">From</th><th>Comment</th><th style="width:200px">Disposition</th><th style="width:90px">Commenter Told</th></tr>'+cRows+'</table>':'')+
+    '<h2>Key Dates</h2><table>'+dates.map(x=>row(x[0],e(/to/.test(x[1])?x[1]:fmtD(x[1])))).join('')+'</table>'+
+    '<h2>Full History</h2><table><tr><th style="width:90px">Date</th><th style="width:150px">Who</th><th>What</th></tr>'+H+'</table></body></html>'; }
+function dpOpen(t){ const w=window.open('','_blank'); if(!w){ toast('Allow pop-ups for resources.mismo.org to open the record'); return; } w.document.open(); w.document.write(dpRecord(t)); w.document.close(); }
+const _renderPanelDP=renderPanel;
+renderPanel=function(){ _renderPanelDP(); const t=S.tickets[S.panel]; if(!t) return; const h=$('#panel .rd-card h4'); if(!h||$('[data-dprec]',h)) return;
+  h.insertAdjacentHTML('beforeend','<button type="button" class="btn sm ghost" data-dprec="1" style="margin-left:auto" title="Every review, vote, comment disposition and date on one printable page">Due-Process Record ↗</button>');
+  $('[data-dprec]',h).onclick=e=>{ e.stopPropagation(); dpOpen(t); }; };
+
+/* ================= Choose your own emails (Build Next, Nov 2026) =================
+   Each person picks which MMS emails they get. Saved as prefs/<email> and checked in queueMail (the MMS) and by
+   the GitHub digest sender, so a choice holds everywhere. Nothing is switched off unless the person does it. */
+const PREF_KINDS=[['stage','Work arriving at a step','When a work request you’re on reaches a new step'],['reminder','Reminders','A Target to Submit to IM coming up, a comment period about to end'],['request','Answers to your asks','Hold, resume, close or cancel requests and their answers'],['decision','IM and AWG decisions','When IM or AWG decides a work request you facilitate'],['imreview','IM reviews ready','For IM reviewers: a submission is ready to review'],['arch','Architecture Help','Requests, approvals and updates'],['digest','Your daily digest','The end-of-day email with what needs you'],['digestCc','Copies of other people’s digests','Only if Settings › Daily Digest copies you']];
+const PREF_OF={stage:'stage',reminder:'reminder',request:'request',imdecision:'decision',awgdecision:'decision',imreview:'imreview',arch:'arch',digest:'digest'};
+S.prefs=S.prefs||{}; let prefSub=false;
+function prefKey(em){ return String(em||'').toLowerCase().replace(/[^a-z0-9_.-]/g,'_').slice(0,80); }
+function prefEnsure(){ if(prefSub||!(Store.db||Store.mem)) return; prefSub=true; try{ Store.sub('prefs',o=>{ S.prefs=o||{}; }); }catch(e){} }
+function wantsMail(email,kind){ const p=S.prefs[prefKey(email)]; return !(p&&p.off&&p.off[kind]); }
+/* every email is checked: each recipient who switched that kind off is left out; with nobody left it isn't filed */
+const _queueMailPref=queueMail;
+queueMail=async function(m){ prefEnsure(); const k=PREF_OF[m.kind]; if(!k) return _queueMailPref(m);
+  const to=(m.to||[]).filter(e=>!e||wantsMail(e,k)), cc=(m.cc||[]).filter(e=>!e||wantsMail(e,k==='digest'?'digestCc':k));
+  if((m.to||[]).filter(Boolean).length&&!to.filter(Boolean).length) return false;
+  return _queueMailPref(Object.assign({},m,{to,cc})); };
+async function prefEdit(){ prefEnsure(); const em=S.me.email; if(!em){ toast('Your email isn’t on file'); return; } const cur=(S.prefs[prefKey(em)]||{}).off||{};
+  const v=await modal({title:'My Email Choices',text:'Untick anything you don’t want. Your choices hold everywhere the MMS sends from, and you can change them any time.',ok:'Save',
+    body:PREF_KINDS.map(([k,l,d])=>'<label class="pref-row"><input type="checkbox" name="p_'+k+'"'+(cur[k]?'':' checked')+'><span><b>'+esc(l)+'</b><em>'+esc(d)+'</em></span></label>').join('')});
+  if(!v) return; const off={}; PREF_KINDS.forEach(([k])=>{ if(!v['p_'+k]) off[k]=true; });
+  const doc={email:em.toLowerCase(),name:S.me.name||'',off,at:new Date().toISOString()}; S.prefs[prefKey(em)]=doc; await write('prefs',prefKey(em),doc);
+  toast(Object.keys(off).length?'Saved. You won’t get: '+PREF_KINDS.filter(([k])=>off[k]).map(x=>x[1].toLowerCase()).join(', '):'Saved. You get every MMS email.'); }
+(function(){ const s=$('#nav-settings'); if(!s||$('#nav-prefs')) return; const b=document.createElement('button'); b.type='button'; b.id='nav-prefs'; b.title='My Email Choices';
+  b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="M4 7l8 6 8-6"/></svg><span>My Email Choices</span>'; b.onclick=e=>{ e.stopPropagation(); prefEdit(); }; s.parentNode.insertBefore(b,s); const pi=setInterval(()=>{ if(S.ready){ clearInterval(pi); prefEnsure(); } },500); })();
+
+/* ================= What changed between drafts (Build Next, Nov 2026) =================
+   On the Reviews tab: pick two versions of a submission (Word, Excel, PDF or text) and see, paragraph by
+   paragraph, what was added and what was taken out. Nothing is uploaded; both files are read in the browser. */
+function cdText(r){ if(!r) return []; if(r.kind==='word'||(r.paras&&!r.text)) return (r.paras||[]).map(p=>String(p.t||'').trim()).filter(Boolean); return String(r.text||'').split(/\n+/).map(x=>x.trim()).filter(Boolean); }
+function cdDiff(a,b){ const n=a.length, m=b.length; if(n*m>6e6){ const B=new Set(b), A=new Set(a); return a.filter(x=>!B.has(x)).map(t=>['-',t]).concat(b.filter(x=>!A.has(x)).map(t=>['+',t])); }
+  const L=Array.from({length:n+1},()=>new Uint32Array(m+1)); for(let i=n-1;i>=0;i--) for(let j=m-1;j>=0;j--) L[i][j]=a[i]===b[j]?L[i+1][j+1]+1:Math.max(L[i+1][j],L[i][j+1]);
+  const out=[]; let i=0,j=0; while(i<n&&j<m){ if(a[i]===b[j]){ out.push(['=',a[i]]); i++; j++; } else if(L[i+1][j]>=L[i][j+1]) out.push(['-',a[i++]]); else out.push(['+',b[j++]]); }
+  while(i<n) out.push(['-',a[i++]]); while(j<m) out.push(['+',b[j++]]); return out; }
+/* the modal clears itself on Compare, so the files are taken as they're chosen */
+async function cdRun(t){ const pick=()=>new Promise(res=>{ const i=document.createElement('input'); i.type='file'; i.accept='.docx,.xlsx,.xlsm,.pdf,.txt,.md'; i.onchange=()=>res(i.files[0]||null); i.click(); });
+  const ok=await modal({title:'What Changed Between Drafts',text:esc(t.wr+' '+t.name),ok:'Choose the Earlier Draft',body:'<p style="margin:0">Pick the earlier draft, then the newer one. Word, Excel, PDF and text files work. Both are read here in your browser; nothing is uploaded.</p>'}); if(!ok) return;
+  const fa=await pick(); if(!fa) return; toast('Now choose the newer draft'); const fb=await pick(); if(!fb) return;
+  let A,B; try{ A=cdText(await rvReadFile(fa)); B=cdText(await rvReadFile(fb)); }catch(e){ toast((e&&e.message)||'That file couldn’t be read'); return; }
+  const D=cdDiff(A,B), add=D.filter(x=>x[0]==='+').length, del=D.filter(x=>x[0]==='-').length;
+  /* show changes with one unchanged paragraph either side for context */
+  const keep=D.map((x,i)=>x[0]!=='='||(D[i-1]&&D[i-1][0]!=='=')||(D[i+1]&&D[i+1][0]!=='='));
+  let html='', gap=false; D.forEach((x,i)=>{ if(!keep[i]){ if(!gap){ html+='<div class="cd-gap">…</div>'; gap=true; } return; } gap=false; html+='<div class="cd-l cd-'+(x[0]==='+'?'add':x[0]==='-'?'del':'same')+'"><b>'+(x[0]==='='?'':x[0])+'</b><span>'+esc(x[1])+'</span></div>'; });
+  await modal({title:'What Changed: '+add+' Added, '+del+' Removed',text:esc(fa.name+' → '+fb.name),ok:'Done',cancel:'Close',body:(add||del?'<div class="cd-box">'+html+'</div>':'<p style="margin:0">The two drafts have the same text.</p>')}); }
+const _renderPanelCD=renderPanel;
+renderPanel=function(){ _renderPanelCD(); const t=S.tickets[S.panel]; if(!t) return; const h=$('#panel .rv-tab h4'); if(!h||$('[data-cdcmp]',h)) return;
+  let sp=$('.sp',h); if(!sp){ sp=document.createElement('span'); sp.className='sp'; h.appendChild(sp); }
+  sp.insertAdjacentHTML('afterbegin','<button type="button" class="btn sm ghost" data-cdcmp="1">Compare Two Drafts</button>'); $('[data-cdcmp]',h).onclick=e=>{ e.stopPropagation(); cdRun(t); }; };
+
+/* ================= Calendar invites for IM and AWG calls (Build Next, Nov 2026) =================
+   On the Review Desk: download the next IM or AWG call as a calendar invite (.ics), with each submission on the
+   agenda linked. Dates and the time come from Meeting Trackers (through the portals' settings). */
+function icsEsc(s){ return String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n'); }
+function icsTime(when){ const m=String(when||'').match(/(\d{1,2})(?::(\d{2}))?\s*(am|pm)/i); if(!m) return null; let h=+m[1]%12; if(/pm/i.test(m[3])) h+=12; return [h,+(m[2]||0)]; }
+function icsFile(o){ const p=n=>String(n).padStart(2,'0'), [y,mo,d]=o.date.split('-'); const tm=o.time||[13,0], end=[tm[0]+Math.floor((tm[1]+60)/60),(tm[1]+60)%60];
+  const dt=(t)=>y+mo+d+'T'+p(t[0])+p(t[1])+'00';
+  return ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//MISMO//MMS//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT','UID:'+o.uid+'@mms.mismo.org','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z',
+    'DTSTART;TZID=America/New_York:'+dt(tm),'DTEND;TZID=America/New_York:'+dt(end),'SUMMARY:'+icsEsc(o.title),'DESCRIPTION:'+icsEsc(o.desc),'URL:'+o.url,'END:VEVENT','END:VCALENDAR'].join('\r\n'); }
+async function icsCall(k){ const name=k==='im'?'IM':'AWG'; let cfg=k==='im'?null:S.awgCfg;
+  try{ const c=await rGet(k==='im'?IMR:AWGR,'config'); cfg=(c&&c.data)||cfg||{}; }catch(e){ cfg=cfg||{}; }
+  const date=(cfg.calls||[]).filter(x=>x>=today()).sort()[0]; if(!date){ toast('No upcoming '+name+' call is set in Meeting Trackers'); return; }
+  const Q=Object.values((k==='im'?S.imPortalQ:S.awgPortalQ)||{}).filter(q=>q&&!q.hist&&!q.test&&(q.status==='awaiting'||q.status==='carried'));
+  const url=k==='im'?IMR_URL:AWGR_URL;
+  const desc=(Q.length?'On the agenda:\n'+Q.map(q=>'- '+q.wr+' '+q.name+': '+url+'#/review/'+encodeURIComponent(q.rep)).join('\n'):'Nothing is on the agenda yet.')+'\n\nOpen '+name+' Review: '+url+(cfg.when?'\n\nUsual time: '+cfg.when:'');
+  const ics=icsFile({uid:'mms-'+k+'-'+date,date,time:icsTime(cfg.when),title:name+' Review Call'+(Q.length?' ('+Q.length+' submission'+(Q.length===1?'':'s')+')':''),desc,url});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([ics],{type:'text/calendar'})); a.download=name+' Call '+date+'.ics'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+  toast(name+' call on '+fmt(date)+' downloaded; open it to add it to your calendar'+(icsTime(cfg.when)?'':' (the time wasn’t in Meeting Trackers, so it’s set for 1 pm)')); }
+const _wireMainICS=wireMain;
+wireMain=function(m){ _wireMainICS(m); if(S.view!=='reviews') return; const acts=$('.pagehead .acts',m); if(!acts||$('[data-ics]',acts)) return;
+  acts.insertAdjacentHTML('afterbegin','<button type="button" class="btn sm ghost" data-ics="im" title="The next IM call as a calendar invite, with the submissions linked">IM Call Invite</button><button type="button" class="btn sm ghost" data-ics="awg" title="The next AWG call as a calendar invite, with the submissions linked">AWG Call Invite</button>');
+  $$('[data-ics]',acts).forEach(b=>b.onclick=e=>{ e.stopPropagation(); icsCall(b.dataset.ics); }); };
 
 /* ================= Unsaved changes in a work request: Save, Discard, and a check before leaving ================= */
 S._dirty=new Set(); S._dirtyFor=null; S._touched=new Set();
