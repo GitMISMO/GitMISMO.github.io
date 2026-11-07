@@ -7796,6 +7796,40 @@ wireMain=function(m){ _wireH(m); if(S.view!=='health') return;
     try{ await navigator.clipboard.writeText(txt); toast('Report copied'); }catch(e){ toast('Couldn’t copy'); } }; };
 (function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); hLogEnsure(); hGhRun().then(hCheck); hCheck(); setInterval(()=>{ hGhRun().then(hCheck); },5*60000); setTimeout(hLogTidy,60000); },500); })();
 
+/* ---------- moving the old one-file SharePoint list into year files (Nov 7, 2026) ----------
+   The door now files each work request's file list by year (ssfiles-2026 ...). Entries still in the old "ssfiles"
+   file are moved by a staff tab, once a session: copied into their year file (never over a newer copy there),
+   then taken out of the old file. The old file itself stays, empty, because the email flow's sign-in check reads it. */
+let ssMoveDone=false;
+async function ssMove(){
+  if(ssMoveDone||S.mode!=='relay'||!S.isStaff||!S.canWrite||S.partial||!S.autoOn||S.viewAs) return 'skip';
+  const rs=window.ResourcesSession, tok=rs&&rs.token(), hr=window.__hqRelay; if(!tok||!hr) return 'skip';
+  ssMoveDone=true;
+  const U=n=>hr.config.RELAY_URL+'/mms/data/'+encodeURIComponent(n), H={Authorization:'Bearer '+tok};
+  const get=async n=>{ const r=await fetch(U(n),{headers:H,cache:'no-store'}); if(r.status===404) return {docs:{},sha:null}; if(!r.ok) throw new Error('read '+n+' '+r.status); const b=await r.json(); return {docs:(b.data&&b.data.docs)||{},sha:b.sha||null}; };
+  const put=async(n,docs,sha)=>{ const r=await fetch(U(n),{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},H),cache:'no-store',body:JSON.stringify({content:{docs},sha})}); return r.status; };
+  try{
+    const old=await get('ssfiles'); const keys=Object.keys(old.docs).filter(p=>/^ssfiles\//.test(p)); if(!keys.length) return 'none';
+    const by={}; keys.forEach(p=>{ const f=hr.place(p).file; if(f!=='ssfiles') (by[f]=by[f]||[]).push(p); });
+    const moved=[];
+    for(const [f,ps] of Object.entries(by)){
+      let ok=false;
+      for(let i=0;i<5&&!ok;i++){ const cur=await get(f); let n=0; ps.forEach(p=>{ if(cur.docs[p]===undefined){ cur.docs[p]=old.docs[p]; n++; } });
+        if(!n){ ok=true; break; }
+        const st=await put(f,cur.docs,cur.sha); if(st>=200&&st<300) ok=true; else if(st!==409) break; else await new Promise(r=>setTimeout(r,500+Math.random()*700)); }
+      if(ok) ps.forEach(p=>moved.push([p,JSON.stringify(old.docs[p])]));
+    }
+    if(!moved.length) return 'fail';
+    for(let i=0;i<5;i++){ const cur=await get('ssfiles'); let n=0;
+      moved.forEach(([p,was])=>{ if(cur.docs[p]!==undefined&&JSON.stringify(cur.docs[p])===was){ delete cur.docs[p]; n++; } }); /* changed since? leave it for the next pass */
+      if(!n) break; const st=await put('ssfiles',cur.docs,cur.sha); if(st>=200&&st<300) break; if(st!==409) return 'fail'; await new Promise(r=>setTimeout(r,500+Math.random()*700)); }
+    S.ssMovedAt=new Date().toISOString(); S.ssMovedN=moved.length;
+    try{ hr.poll(); }catch(e){}
+    return 'ok';
+  }catch(e){ return 'fail'; }
+}
+(function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); setTimeout(()=>{ if(S.autoOn) ssMove(); },20000); },1000); })();
+
 /* ---------- settings ---------- */
 let setTab='process';
 VIEWS.settings=function(){

@@ -62,6 +62,9 @@
     var seg = String(path).split('/');
     if (seg.length !== 2) throw err('invalid_argument', 'Not a document path: ' + path);
     if (seg[0] === 'tickets') return { file: shard(seg[1]), coll: seg[0], id: seg[1] };
+    /* each work request's SharePoint file list, filed by year like the work requests (Nov 7: the one "ssfiles" file
+       reached 72% of its limit). Older entries still in "ssfiles" are read, and moved into the year files by staff. */
+    if (seg[0] === 'ssfiles') return { file: shard(seg[1]).replace('tickets-', 'ssfiles-'), coll: seg[0], id: seg[1] };
     /* emails are filed by month (outbox-2026-11 ...) so no file fills up; older ones stay in "outbox" */
     if (seg[0] === 'outbox') { var mo = String(seg[1]).match(/^(\d{4}-\d{2})_/); return { file: mo ? 'outbox-' + mo[1] : 'outbox', coll: seg[0], id: seg[1] }; }
     return { file: safe(seg[0]).slice(0, 40), coll: seg[0], id: seg[1] };
@@ -69,6 +72,7 @@
   function monthsBack(n) { var out = [], d = new Date(); d.setDate(1); for (var i = 0; i < n; i++) { var k = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2); if (k >= '2026-11') out.push('outbox-' + k); d.setMonth(d.getMonth() - 1); } return out; }
   function filesOfColl(coll) {
     if (coll === 'outbox') return ['outbox'].concat(monthsBack(3));
+    if (coll === 'ssfiles') return ['ssfiles'].concat(filesOfColl('tickets').map(function (n) { return n.replace('tickets-', 'ssfiles-'); }));
     if (coll !== 'tickets') return [safe(coll).slice(0, 40)];
     var out = ['tickets-other'], y = new Date().getFullYear() + 1;
     for (var i = FIRST_YEAR; i <= y; i++) out.push('tickets-' + i);
@@ -354,8 +358,8 @@
     Object.keys(F).forEach(function (k) {
       var f = F[k];
       if (!f.loaded || f.flushing || f.pending.length || f.loading || !hasListener(f)) return;
-      /* last year's tickets and older barely change: look at them every half hour */
-      var old = /^tickets-(\d{4})$/.test(k) && +k.slice(8) < new Date().getFullYear() - 1;
+      /* last year's tickets and file lists and older barely change (nor the old one-file list): every half hour */
+      var old = (/^(tickets|ssfiles)-(\d{4})$/.test(k) && +k.slice(-4) < new Date().getFullYear() - 1) || k === 'ssfiles';
       var gap = old ? 1800000 : (idle ? IDLE_POLL_MS : POLL_MS);
       if (!force && now() - (f.polledAt || f.loadedAt) < gap) return;
       f.polledAt = now();
