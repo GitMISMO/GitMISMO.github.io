@@ -38,7 +38,9 @@ await page.route('**/*', async r => { const u = new URL(r.request().url());
     return r.fulfill({ status: 404, body: '' }); }
   return r.fulfill({ status: 200, contentType: 'text/plain', body: '' }); });
 await page.goto('https://resources.mismo.org/mms/');
-try { await page.waitForFunction(() => window.__mms && window.__mms.ready, null, { timeout: 30000 }); pass('the MMS opens'); } catch (e) { fail('the MMS did not finish opening'); }
+/* poll with evaluate (waitForFunction can trip the page safety list's no-eval rule in some browser versions) */
+let opened = false; for (let i = 0; i < 60 && !opened; i++) { opened = await page.evaluate(() => !!(window.__mms && window.__mms.ready)).catch(() => false); if (!opened) await page.waitForTimeout(500); }
+opened ? pass('the MMS opens') : fail('the MMS did not finish opening');
 const views = await page.evaluate(() => [...document.querySelectorAll('#nav button[data-hq]')].map(b => b.dataset.hq)).catch(() => []);
 for (const v of views) { await page.evaluate(v => document.querySelector('#nav button[data-hq="' + v + '"]').click(), v); await page.waitForTimeout(300); }
 views.length ? pass(`every screen opened (${views.length})`) : fail('no screens found');
