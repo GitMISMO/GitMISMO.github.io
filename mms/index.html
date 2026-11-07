@@ -1959,6 +1959,26 @@ p,.sub,.lede{text-wrap:pretty}
 .gn{padding:8px 12px;border:1px dashed var(--border);border-radius:7px;margin-bottom:6px;cursor:pointer;font-size:13px;line-height:1.35}
 .gn:hover{border-color:var(--accent);background:var(--surface-2,rgba(0,0,0,.02))}
 .gn .muted{font-size:12px;margin-top:2px}
+/* System Health */
+.hh-sum{display:flex;flex-direction:column;gap:4px;border-left:5px solid var(--good);margin-bottom:14px}
+.hh-sum.warn{border-left-color:var(--warn,#eda100)}.hh-sum.bad{border-left-color:var(--bad)}
+.hh-big{font-size:22px;font-weight:700;color:var(--ink)}
+.hh-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.hh-row{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
+.hh-row.bad{border-color:var(--bad)}.hh-row.warn{border-color:var(--warn,#eda100)}
+.hh-d{width:10px;height:10px;border-radius:50%;flex:none;margin-top:5px;background:var(--good)}
+.hh-d.info{background:var(--ink-3)}.hh-d.warn{background:var(--warn,#eda100)}.hh-d.bad{background:var(--bad)}
+.hh-t{font-weight:700;font-size:13.5px}.hh-l{font-size:13px;color:var(--ink-2);margin-top:2px;line-height:1.4}
+.hh-who{font-size:12px;font-weight:600;margin-top:4px;color:var(--ink)}
+.hh-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:14px}
+.hh-two .card{margin:0}
+.hh-bar{display:grid;grid-template-columns:120px 1fr 44px;gap:10px;align-items:center;font-size:12.5px;margin-bottom:7px}
+.hh-bar span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hh-bar em{font-style:normal;text-align:right;color:var(--ink-2)}
+.hh-bar i{display:block;height:8px;border-radius:4px;background:var(--border)}.hh-bar b{display:block;height:100%;border-radius:4px;background:var(--good)}
+.hh-bar b.warn{background:var(--warn,#eda100)}.hh-bar b.bad{background:var(--bad)}
+.hh-note{font-size:12.5px;color:var(--ink-2);line-height:1.45}
+.hh-log{margin:0;padding-left:18px;font-size:12.5px;line-height:1.45}.hh-log li{margin-bottom:5px}
+@media(max-width:900px){.hh-grid,.hh-two{grid-template-columns:1fr}}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2032,6 +2052,39 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
+/* ================= System Health, part 1 (Nov 7, 2026) =================
+   From the very first line: note every error the page hits, and how each outside service last answered
+   (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
+   saving). The System Health page reads these. Nothing here changes what any call does. */
+window.__mmsErrs=window.__mmsErrs||[]; window.__mmsNet=window.__mmsNet||{};
+(function(){
+  const L=window.__mmsErrs;
+  function add(kind,msg,src){ msg=String(msg||'').replace(/\s+/g,' ').slice(0,300);
+    if(!msg||/ResizeObserver loop|^Script error\.?$|AbortError|The user aborted/i.test(msg)) return;
+    const at=new Date().toISOString(), last=L[L.length-1];
+    if(last&&last.msg===msg){ last.n++; last.at=at; } else { L.push({at,kind,msg,src:String(src||'').slice(0,120),n:1,view:String(location.hash||'').slice(0,30)}); if(L.length>60) L.shift(); }
+    try{ window.dispatchEvent(new Event('mms-err')); }catch(e){} }
+  window.addEventListener('error',e=>add('error',e.message||(e.error&&e.error.message),(e.filename||'')+(e.lineno?':'+e.lineno:'')));
+  window.addEventListener('unhandledrejection',e=>{ const r=e.reason; add('promise',(r&&(r.message||r.code))||String(r||'')); });
+  window.__mmsErrAdd=add;
+  const NET=window.__mmsNet, real=window.fetch.bind(window);
+  function kindOf(u){ u=String(u||''); const N=(window.__mms&&window.__mms.notify)||{};
+    if(N.flowUrl&&u===N.flowUrl) return 'mail';
+    if(N.docFlowUrl&&u===N.docFlowUrl) return 'files';
+    if(/\/mms\/ask$/.test(u)) return 'ai';
+    if(/\/hub-requests\/data\/requests$/.test(u)) return 'hub';
+    if(/\/mms-feed\//.test(u)) return 'feed';
+    if(/\/im-review\/(data|file)\//.test(u)) return 'im';
+    if(/\/awg-review\/(data|file)\//.test(u)) return 'awg';
+    if(/\/mms\/data\//.test(u)) return 'data';
+    return ''; }
+  window.fetch=function(input,init){ const u=typeof input==='string'?input:(input&&input.url)||''; const k=kindOf(u);
+    const p=real(input,init); if(!k) return p;
+    const m=String((init&&init.method)||'GET').toUpperCase();
+    return p.then(r=>{ const e=NET[k]=NET[k]||{}; const at=new Date().toISOString();
+      if(r.ok||r.status===404||r.status===409){ e.okAt=at; if(m!=='GET') e.wroteAt=at; } else { e.failAt=at; e.status=r.status; if(r.status===429) e.limitAt=at; }
+      return r; },err=>{ const e=NET[k]=NET[k]||{}; e.failAt=new Date().toISOString(); e.status=0; throw err; }); };
+})();
 /* ============================================================================
    MISMO Manufacturing System (MMS)
    One ticket per Work Request, carried from Approved to Published.
@@ -7605,6 +7658,133 @@ async function hubWriteBack(){
 }
 const _hubSyncBack=hubSync;
 hubSync=async function(){ await _hubSyncBack(); try{ await hubWriteBack(); }catch(e){} };
+
+/* ================= System Health, part 2 (Nov 7, 2026) =================
+   A staff page modelled on Summit HQ's System Health: one line per part the MMS depends on, green, yellow
+   or red, in plain words, with who fixes it. Checks again every 5 minutes while the MMS is open. A staff tab
+   files the result as health/latest so the GitHub digest sender can email Jonna when something is wrong,
+   even on days nobody opens the MMS. Errors anyone hits are kept for 14 days in the Team Error Log. */
+const H_MAX=940000;
+function hWhen(iso){ if(!iso) return ''; const d=new Date(iso); if(isNaN(d)) return ''; const t=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  return atDay(iso)===today()?t:fmtS(atDay(iso))+' at '+t; }
+function hAgoMin(iso){ return iso?(Date.now()-Date.parse(iso))/60000:Infinity; }
+const H_RANK={ok:0,info:0,warn:1,bad:2};
+S.ghRun=S.ghRun||null; let ghRunAt=0;
+async function hGhRun(){ if(Date.now()-ghRunAt<30*60000) return; ghRunAt=Date.now();
+  try{ const r=await fetch('https://api.github.com/repos/GitMISMO/GitMISMO.github.io/actions/workflows/mms-digest.yml/runs?per_page=5',{cache:'no-store'});
+    if(!r.ok) return; const b=await r.json(); const runs=(b.workflow_runs||[]).filter(x=>x.status==='completed');
+    S.ghRun=runs[0]?{at:runs[0].updated_at,ok:runs[0].conclusion==='success',url:runs[0].html_url,lastFail:(runs.find(x=>x.conclusion!=='success')||{}).updated_at||''}:null; }catch(e){} }
+function hFiles(){ const hr=window.__hqRelay; if(!hr) return []; return Object.values(hr.files||{}).filter(f=>f.loaded&&f.server).map(f=>({n:f.name,p:Math.round(JSON.stringify(f.server,null,2).length/H_MAX*100)})).sort((a,b)=>b.p-a.p); }
+function hRows(){
+  const R=[], N=S.notify||{}, NET=window.__mmsNet||{}, row=(k,label,level,text,who)=>R.push({k,label,level,text,who:who||''});
+  const relay=S.mode==='relay', hr=window.__hqRelay;
+  /* saving and loading */
+  if(hr&&relay){ const ops=Object.values(hr.files||{}).flatMap(f=>f.pending||[]), pend=ops.filter(o=>Date.now()-(o.at||Date.now())>60000).length; /* a save takes a second; only one stuck a minute counts */
+    if(hr.status&&hr.status.offline) row('save','Saving','bad','Can’t reach the save service. Changes wait in this tab and save when it’s back.','Perry');
+    else if(pend) row('save','Saving','warn',pend+' change'+(pend===1?' is':'s are')+' still saving'+(hr.status&&hr.status.lastError?' ('+hr.why()+')':'')+'.');
+    else row('save','Saving','ok','Every change is saved.'); }
+  else row('save','Saving','ok','Every change is saved.');
+  row('load','Loading',S.partial?'bad':'ok',S.partial?'Part of the MMS didn’t load, so automatic steps are paused in this tab. Reload; if it keeps happening, the save service may be down.':'Everything loaded.',S.partial?'Perry':'');
+  const fs=hFiles(), top=fs[0];
+  row('store','Storage',top&&top.p>=90?'bad':top&&top.p>=70?'warn':'ok',top?(top.p>=70?'The '+top.n+' file is '+top.p+'% full. It needs splitting before it fills.':'Every file has room. The fullest is '+top.n+', '+top.p+'% full.'):'Every file has room.',top&&top.p>=70?'Jonna (ask Claude)':'');
+  /* email */
+  const ob=Object.values(S.outbox||{}), wk=Date.now()-7*864e5;
+  const failed=ob.filter(m=>m&&mailGroup(m)==='Failed'&&Date.parse(m.triedAt||m.at||0)>wk);
+  const last=ob.filter(m=>m&&m.status==='Sent'&&m.sentAt).sort((a,b)=>String(b.sentAt).localeCompare(String(a.sentAt)))[0];
+  if(!N.flowUrl) row('mail','Email','bad','No email flow link in Settings › Notifications, so nothing can send.','Jonna');
+  else if(failed.length) row('mail','Email','bad',failed.length+' email'+(failed.length===1?'':'s')+' didn’t send in the last 7 days'+(failed[0].error?' (“'+failed[0].error+'”)':'')+'. They’re tried again on their own; see Notifications › Didn’t Send.','Jonna, or MBA IT if the flow can’t send');
+  else if(mailHeld()) row('mail','Email','info','On hold until '+fmt(N.holdUntil)+' by design. Emails wait in Notifications as previews.');
+  else row('mail','Email','ok',last?'Last sent '+hWhen(last.sentAt)+'.':'Nothing has needed sending yet.');
+  /* the daily digest */
+  const dc=(typeof MMSDigest!=='undefined'&&MMSDigest.settings)?MMSDigest.settings(S.digestCfg):{on:false};
+  if(!dc.on) row('digest','Daily Digest','info','Switched off in Settings › Daily Digest.');
+  else if(dc.sender==='action'){ const g=S.ghRun;
+    if(!g) row('digest','Daily Digest','info','Sent by GitHub. Its last run hasn’t been read yet.');
+    else if(!g.ok) row('digest','Daily Digest','bad','GitHub’s last run failed ('+hWhen(g.at)+'). GitHub emails the repository owner the reason.','Jonna (ask Claude)');
+    else if(hAgoMin(g.at)>3*1440) row('digest','Daily Digest','warn','GitHub hasn’t run it since '+hWhen(g.at)+'.','Jonna (ask Claude)');
+    else row('digest','Daily Digest','ok','Sent by GitHub; last ran '+hWhen(g.at)+(mailHeld()?' (building only, while email is on hold)':'')+'.'); }
+  else row('digest','Daily Digest',S.digestLog&&S.digestLog.date?'ok':'info',S.digestLog&&S.digestLog.date?'Sent by the MMS; last on '+fmtS(S.digestLog.date)+' to '+(S.digestLog.count||0)+' people.':'Sent by the MMS when a staff member has it open; not sent yet.');
+  /* the Initiative Hub */
+  const hb=NET.hub||{};
+  if(!relay) row('hub','Initiative Hub','info','Only checked on resources.mismo.org.');
+  else if(hb.failAt&&(!hb.okAt||hb.failAt>hb.okAt)) row('hub','Initiative Hub','bad','Couldn’t read the Initiative Hub'+(hb.status?' (answered '+hb.status+')':'')+'. New approved requests won’t come in until it answers.','Perry');
+  else if(!hb.okAt) row('hub','Initiative Hub','info',S.autoOn?'Not checked yet.':'Checked from staff tabs every 5 minutes.');
+  else if(S.autoOn&&hAgoMin(hb.okAt)>16) row('hub','Initiative Hub','warn','Last checked '+hWhen(hb.okAt)+'; it should check every 5 minutes.');
+  else row('hub','Initiative Hub','ok','Checked '+hWhen(hb.okAt)+'. '+(S.hubBackAt?'Last wrote status back '+hWhen(S.hubBackAt)+'.':'Nothing to write back yet: no Hub request is in the MMS.'));
+  /* comments, the website, files */
+  const lc=(S.commentsAll||[])[0];
+  row('cmt','Public Comments','info',lc?'Last comment arrived '+hWhen(lc.submittedAt)+'.':'No comments have come in yet.');
+  const fsst=S.feedState||{};
+  if(fsst.error&&(!fsst.at||String(fsst.tried||'')>String(fsst.at))) row('feed','Website Feed','bad','The website’s Open for Comment list didn’t update ('+fsst.error+').','Perry');
+  else row('feed','Website Feed',fsst.at?'ok':'info',fsst.at?'Last published '+hWhen(fsst.at)+' ('+(fsst.count||0)+' open for comment).':'Publishes on its own when the list changes.');
+  const fl=NET.files||{};
+  if(!N.docFlowUrl) row('files','SharePoint Files','warn','No Files flow link in Settings › Notifications, so files can’t be listed or uploaded.','Jonna');
+  else if(fl.failAt&&(!fl.okAt||fl.failAt>fl.okAt)) row('files','SharePoint Files','bad','The Files flow didn’t answer'+(fl.status?' ('+fl.status+')':'')+'. Lists and uploads on the Files tab won’t work.','Jonna (the flow’s owner)');
+  else row('files','SharePoint Files',fl.okAt?'ok':'info',fl.okAt?'The Files flow answered '+hWhen(fl.okAt)+'.':'Not used since this page opened.');
+  /* the portals and AI review */
+  [['im','IM Review Portal',S.imPortalQ],['awg','AWG Review Portal',S.awgPortalQ]].forEach(([k,label,q])=>{ const e=NET[k]||{}, waiting=Object.values(q||{}).filter(x=>x&&x.status!=='decided'&&!x.test).length;
+    if(e.failAt&&(!e.okAt||e.failAt>e.okAt)) row(k,label,'bad','Couldn’t reach the portal'+(e.status?' (answered '+e.status+')':'')+'. Hand-offs and decisions wait until it answers.','Perry');
+    else row(k,label,e.okAt?'ok':'info',e.okAt?'Reachable. '+waiting+' waiting there.':'Not checked from this page yet.'); });
+  const ai=NET.ai||{};
+  if(ai.limitAt&&hAgoMin(ai.limitAt)<60) row('ai','AI Review','warn','Hit its hourly limit at '+hWhen(ai.limitAt)+'. Reviews can be run again shortly.','Perry (raise the limit)');
+  else if(ai.failAt&&(!ai.okAt||ai.failAt>ai.okAt)) row('ai','AI Review','bad','Didn’t answer'+(ai.status?' ('+ai.status+')':'')+'.','Perry');
+  else row('ai','AI Review',ai.okAt?'ok':'info',ai.okAt?'Last answered '+hWhen(ai.okAt)+'.':'Not used since this page opened.');
+  /* this page */
+  const E=window.__mmsErrs||[];
+  row('errs','Errors on This Page',E.length?'warn':'ok',E.length?E.length+' since this page was opened (listed below).':'None since this page was opened.');
+  return R;
+}
+function hLevel(R){ return R.reduce((m,r)=>H_RANK[r.level]>H_RANK[m]?r.level:m,'ok'); }
+S.health=S.health||null;
+function hCheck(){ try{ const R=hRows(); S.health={at:new Date().toISOString(),rows:R,level:hLevel(R)}; hFile(); hDot(); if(S.view==='health') renderAll(); }catch(e){} }
+function hDot(){ const b=$('#nav-health'); if(!b||!S.health) return; const n=S.health.rows.filter(r=>r.level==='bad').length, w=S.health.rows.filter(r=>r.level==='warn').length; b.hidden=!(n||w); b.textContent=n||w; b.classList.toggle('warn',!!n); }
+/* a staff tab files the result for the GitHub sender: when it changes, or hourly */
+let hFiledSig='', hFiledAt=0;
+async function hFile(){ if(S.mode!=='relay'||!S.isStaff||!S.canWrite||S.partial||!S.autoOn||S.viewAs) return;
+  const H=S.health, sig=JSON.stringify(H.rows.map(r=>[r.k,r.level])); if(sig===hFiledSig&&Date.now()-hFiledAt<60*60000) return;
+  hFiledSig=sig; hFiledAt=Date.now(); try{ await Store.set('health','latest',{at:H.at,by:S.me.name||'',level:H.level,rows:H.rows.map(r=>({label:r.label,level:r.level,text:r.text,who:r.who}))}); }catch(e){} }
+/* the Team Error Log: each person's errors for the day, kept 14 days */
+S.errlog=S.errlog||{}; let hLogSub=false, hLogT=null, hLogSent=0;
+function hLogEnsure(){ if(hLogSub||!(Store.db||Store.mem)) return; hLogSub=true; try{ Store.sub('errlog',o=>{ S.errlog=o||{}; if(S.view==='health') renderAll(); }); }catch(e){} }
+function hLogQueue(){ clearTimeout(hLogT); hLogT=setTimeout(hLogSave,10000); }
+async function hLogSave(){ if(S.mode!=='relay'||!S.ready||!S.canWrite||!S.me||!S.me.email) return; const E=window.__mmsErrs||[]; if(E.length<=hLogSent) return;
+  const id=today()+'_'+String(S.me.email).toLowerCase().replace(/[^a-z0-9]/g,'_').slice(0,50); const cur=(S.errlog||{})[id]||{who:S.me.name||'',email:S.me.email,date:today(),items:[]};
+  const items=(cur.items||[]).concat(E.slice(hLogSent).map(e=>({at:e.at,msg:e.msg,src:e.src,n:e.n,view:e.view}))).slice(-30); hLogSent=E.length;
+  try{ await Store.set('errlog',id,Object.assign({},cur,{items})); }catch(e){} }
+async function hLogTidy(){ if(!S.isStaff||!S.canWrite||S.partial) return; const cut=addDays(today(),-14);
+  for(const [id,d] of Object.entries(S.errlog||{})) if(d&&d.date&&d.date<cut) try{ await Store.del('errlog',id); }catch(e){} }
+let hErrT=null; window.addEventListener('mms-err',()=>{ hLogQueue(); clearTimeout(hErrT); hErrT=setTimeout(hCheck,800); });
+
+VIEWS.health=function(){
+  hLogEnsure(); if(!S.health) hCheck(); const H=S.health||{rows:[],level:'ok'}; const R=H.rows;
+  const bad=R.filter(r=>r.level==='bad').length, warn=R.filter(r=>r.level==='warn').length;
+  const head=bad?bad+' Thing'+(bad===1?'':'s')+' Need'+(bad===1?'s':'')+' Fixing':warn?warn+' Thing'+(warn===1?'':'s')+' to Watch':'Everything Is Working';
+  const dot={ok:'good',info:'info',warn:'warn',bad:'bad'};
+  const rowH=r=>'<div class="hh-row '+r.level+'"><span class="hh-d '+dot[r.level]+'"></span><div><div class="hh-t">'+esc(r.label)+'</div><div class="hh-l">'+esc(r.text)+'</div>'+(r.who&&(r.level==='bad'||r.level==='warn')?'<div class="hh-who">Who fixes it: '+esc(r.who)+'</div>':'')+'</div></div>';
+  const fs=hFiles().slice(0,6);
+  const bars=fs.length?fs.map(f=>'<div class="hh-bar"><span>'+esc(f.n)+'</span><i><b style="width:'+Math.max(2,Math.min(100,f.p))+'%" class="'+(f.p>=90?'bad':f.p>=70?'warn':'')+'"></b></i><em>'+f.p+'%</em></div>').join(''):'<p class="muted" style="margin:0">No files loaded yet.</p>';
+  const E=(window.__mmsErrs||[]).slice().reverse();
+  const errs=E.length?'<ol class="hh-log">'+E.slice(0,10).map(e=>'<li><b>'+esc(hWhen(e.at))+'</b> '+esc(e.msg)+(e.n>1?' <span class="muted">×'+e.n+'</span>':'')+'</li>').join('')+'</ol>':'<p class="muted" style="margin:0">None since this page was opened.</p>';
+  const wk=addDays(today(),-7), team=Object.values(S.errlog||{}).filter(d=>d&&d.date>=wk).flatMap(d=>(d.items||[]).map(i=>Object.assign({who:d.who},i))).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  const teamH=team.length?'<ol class="hh-log">'+team.slice(0,12).map(e=>'<li><b>'+esc(hWhen(e.at))+'</b> '+esc((e.who||'').split(' ')[0])+': '+esc(e.msg)+(e.n>1?' <span class="muted">×'+e.n+'</span>':'')+'</li>').join('')+'</ol>':'<p class="muted" style="margin:0">No errors logged by anyone in the last 7 days.</p>';
+  return '<div class="pagehead slim"><div><h1>System Health</h1><div class="sub">Checked '+esc(hWhen(H.at))+'; it checks again every 5 minutes while the MMS is open.</div></div><div class="acts"><button class="btn" id="hh-copy" type="button">Copy Report</button><button class="btn pri" id="hh-again" type="button">Check Again</button></div></div>'+
+    '<div class="card hh-sum '+(bad?'bad':warn?'warn':'ok')+'"><span class="hh-big">'+esc(head)+'</span><span class="muted">'+(bad||warn?'Each line below says what’s wrong and who fixes it.':'Every part the MMS depends on answered normally.')+'</span></div>'+
+    '<div class="hh-grid">'+R.filter(r=>r.k!=='errs').map(rowH).join('')+'</div>'+
+    '<div class="hh-two"><div class="card"><h3>Storage</h3>'+bars+'<p class="muted hh-note">Each file can hold about 1 MB. Emails are filed by month, so none fills up.</p></div>'+
+    '<div class="card"><h3>Errors on This Page'+(E.length?'<span class="sp chip warn">'+E.length+'</span>':'')+'</h3>'+errs+'</div></div>'+
+    '<div class="hh-two"><div class="card"><h3>Team Error Log (Last 7 Days)</h3>'+teamH+'</div>'+
+    '<div class="card"><h3>What Isn’t Watched from Here</h3><p class="hh-note" style="margin-top:0">These only show up once their work lands, so a stop can’t be seen from the MMS: the public comment form flow, the MMS Comments flow into GitHub, and the website pages themselves. Power Automate emails a flow’s owner when it keeps failing.</p><p class="hh-note" style="margin:0">On weekdays, GitHub’s digest run reads the last check and emails '+esc(((S.notify||{}).healthTo||['jcritchley@mba.org']).join(', '))+' if something is red or yellow, even when nobody has the MMS open.</p></div></div>';
+};
+(function(){ const s=$('#nav-settings'); if(!s||$('[data-hq="health"]')) return; const b=document.createElement('button'); b.type='button'; b.dataset.hq='health'; b.title='System Health'; b.hidden=true; b.id='nav-healthbtn';
+  b.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>System Health</span><b id="nav-health" hidden></b>'; s.parentNode.insertBefore(b,s.nextSibling); })();
+const _countsH=counts;
+counts=function(){ _countsH(); const b=$('#nav-healthbtn'); if(b) b.hidden=!S.isStaff; hDot(); };
+const _wireH=wireMain;
+wireMain=function(m){ _wireH(m); if(S.view!=='health') return;
+  const a=$('#hh-again',m); if(a) a.onclick=async()=>{ ghRunAt=0; await hGhRun(); hCheck(); toast('Checked just now'); };
+  const c=$('#hh-copy',m); if(c) c.onclick=async()=>{ const H=S.health; const txt='MMS System Health, '+hWhen(H.at)+'\n\n'+H.rows.map(r=>(r.level==='bad'?'RED':r.level==='warn'?'YELLOW':'OK')+'  '+r.label+': '+r.text+(r.who&&r.level!=='ok'&&r.level!=='info'?' (Who fixes it: '+r.who+')':'')).join('\n')+((window.__mmsErrs||[]).length?'\n\nErrors on this page:\n'+window.__mmsErrs.map(e=>e.at+' '+e.msg).join('\n'):'');
+    try{ await navigator.clipboard.writeText(txt); toast('Report copied'); }catch(e){ toast('Couldn’t copy'); } }; };
+(function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); hLogEnsure(); hGhRun().then(hCheck); hCheck(); setInterval(()=>{ hGhRun().then(hCheck); },5*60000); setTimeout(hLogTidy,60000); },500); })();
 
 /* ---------- settings ---------- */
 let setTab='process';

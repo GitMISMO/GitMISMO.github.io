@@ -19,11 +19,13 @@ const D = require('./digest.js');
 const TOKEN = process.env.MMS_DATA_TOKEN, FLOW = process.env.MMS_MAIL_FLOW_URL, MAILKEY = process.env.MMS_MAIL_KEY || '', DRY = process.env.DRY_RUN === '1', FORCE = process.env.FORCE === '1';
 if (!TOKEN) { console.log('Not switched on yet: add the MMS_DATA_TOKEN secret.'); process.exit(0); }
 
+const SIZES = {};   /* how big each MMS data file is, for the System Health storage check */
 async function gh(repo, path) {
   const r = await fetch(`https://api.github.com/repos/GitMISMO/${repo}/contents/${path}`, { headers: { Authorization: `Bearer ${TOKEN}`, Accept: 'application/vnd.github.raw', 'User-Agent': 'mms-digest' } });
   if (r.status === 404) return null;
   if (!r.ok) throw new Error(`${repo}/${path}: ${r.status}`);
-  return JSON.parse(await r.text());
+  const t = await r.text(); if (repo === 'mms-data') SIZES[path] = t.length;
+  return JSON.parse(t);
 }
 const docsOf = (f, coll) => { const out = {}; Object.entries((f && f.docs) || {}).forEach(([p, v]) => { const [c, id] = p.split('/'); if (c === coll) out[id] = v; }); return out; };
 
@@ -104,16 +106,16 @@ for (const m of list) { m.to = m.to.filter(e => wants(e, 'digest')); m.cc = m.cc
 
 /* anyone whose digest the MMS already sent today (Send Now, or the MMS sender) is skipped */
 const mk = s => String(s).replace(/[^A-Za-z0-9_-]/g, '-').slice(0, 120);
-const sentToday = new Set();
+const sentToday = new Set(), failedMail = [];
 for (const n of ['outbox', 'outbox-' + et.ymd.slice(0, 7)]) {
-  try { Object.values(docsOf(await gh('mms-data', `data/${n}.json`), 'outbox')).forEach(d => { if (d && d.status === 'Sent') sentToday.add(d.k || d.id); }); } catch (e) { console.log(`Could not read ${n}: ${e.message}`); }
+  try { Object.values(docsOf(await gh('mms-data', `data/${n}.json`), 'outbox')).forEach(d => { if (d && d.status === 'Sent') sentToday.add(d.k || d.id); if (d && (d.status === 'Didn’t Send' || d.status === 'No Recipient') && now - Date.parse(d.triedAt || d.at || 0) < 7 * 864e5) failedMail.push(d); }); } catch (e) { console.log(`Could not read ${n}: ${e.message}`); }
 }
 const N = config.notify || {}, holdUntil = ('holdUntil' in N) ? N.holdUntil : '2026-11-20';
 const HELD = !!holdUntil && et.ymd < holdUntil;   /* the Eastern date: the evening of Nov 19 is still Nov 19 */
 if (HELD) console.log(`Email is on hold until ${holdUntil}: building the digests but not sending them. Staff see them in MMS Notifications as Held.`);
 let sent = 0, failed = 0, want = 0;
 async function post(m) {
-  const body = JSON.stringify({ to: m.to.join(';'), cc: m.cc.join(';'), subject: m.subject, body: m.text, html: m.html, kind: 'digest', key: MAILKEY });
+  const body = JSON.stringify({ to: m.to.join(';'), cc: m.cc.join(';'), subject: m.subject, body: m.text, html: m.html, kind: m.kind || 'digest', key: MAILKEY });
   for (let i = 0; i < 3; i++) {
     try {
       const r = await fetch(FLOW, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-mms-key': MAILKEY }, body });
@@ -134,6 +136,31 @@ for (const m of list) {
   want++;
   if (await post(m)) sent++; else { failed++; console.log(`  NOT SENT to ${m.name}`); }
 }
+/* System Health: when something is red or yellow, email the health contacts (Settings, default Jonna).
+   The MMS files its last check as health/latest; this run adds what it can see itself (file sizes, emails
+   that didn't send), so a problem is caught even on days nobody has the MMS open. */
+try {
+  const hl = [], hd = docsOf(await gh('mms-data', 'data/health.json'), 'health').latest;
+  const rows = (hd && hd.rows) || [];
+  if (!hd) hl.push(['YELLOW', 'System Health', 'The MMS hasn’t filed a health check yet: no staff member has had it open since System Health was added.']);
+  else if ((now - Date.parse(hd.at)) / 36e5 > 72) hl.push(['YELLOW', 'System Health', `The MMS last checked itself ${String(hd.at).slice(0, 10)}; nobody on staff has had it open since, so its live checks are old.`]);
+  rows.filter(r => r.level === 'bad' || r.level === 'warn').forEach(r => hl.push([r.level === 'bad' ? 'RED' : 'YELLOW', r.label, r.text + (r.who ? ` Who fixes it: ${r.who}.` : '')]));
+  if (failedMail.length && !rows.some(r => r.label === 'Email' && r.level === 'bad')) hl.push(['RED', 'Email', `${failedMail.length} email${failedMail.length === 1 ? '' : 's'} didn’t send in the last 7 days${failedMail[0].error ? ` (“${failedMail[0].error}”)` : ''}. See Notifications › Didn’t Send in the MMS.`]);
+  Object.entries(SIZES).forEach(([p, n]) => { const pct = Math.round(n / 940000 * 100); if (pct >= 70 && !rows.some(r => r.label === 'Storage' && r.level !== 'ok')) hl.push([pct >= 90 ? 'RED' : 'YELLOW', 'Storage', `${p.replace(/^data\/|\.json$/g, '')} is ${pct}% full and needs splitting before it fills.`]); });
+  const to = (Array.isArray(N.healthTo) && N.healthTo.length ? N.healthTo : ['jcritchley@mba.org']);
+  if (!hl.length) console.log('System Health: everything is working.');
+  else {
+    const red = hl.filter(x => x[0] === 'RED').length;
+    const subject = `MMS System Health: ${hl.length} thing${hl.length === 1 ? '' : 's'} need${hl.length === 1 ? 's' : ''} a look${red ? ` (${red} red)` : ''}`;
+    const text = hl.map(x => `${x[0]}  ${x[1]}: ${x[2]}`).join('\n') + '\n\nOpen System Health in the MMS: https://resources.mismo.org/mms/#health';
+    const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const html = '<div style="font-family:Segoe UI,Arial,sans-serif;font-size:14px;color:#0d314c"><p style="margin:0 0 10px"><b>' + esc(subject) + '</b></p><table cellpadding="6" style="border-collapse:collapse">' + hl.map(x => `<tr><td style="font-weight:700;color:${x[0] === 'RED' ? '#b3372c' : '#a66f00'}">${x[0]}</td><td><b>${esc(x[1])}</b><br>${esc(x[2])}</td></tr>`).join('') + '</table><p><a href="https://resources.mismo.org/mms/#health">Open System Health in the MMS</a></p></div>';
+    console.log(subject + '\n' + text);
+    if (DRY || !FLOW || HELD) console.log('System Health email not sent (dry run, no flow link, or email on hold).');
+    else if (!(await post({ to, cc: [], subject, text, html, kind: 'health' }))) console.log('System Health email NOT SENT.');
+  }
+} catch (e) { console.log('System Health check skipped:', e.message); }
+
 if (!FLOW && !DRY) console.log('Built the digests but did not send them: add the MMS_MAIL_FLOW_URL secret.');
 console.log(`${sent} digest${sent === 1 ? '' : 's'} sent${failed ? `, ${failed} not sent` : ''}.`);
 /* the day counts as done only when every digest went (or when email is on hold); a failure fails the run,
