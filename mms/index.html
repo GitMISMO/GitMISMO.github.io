@@ -2058,7 +2058,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-07T20:52:58Z',fp:'f46aabaf'};
+window.__mmsBuild={at:'2026-11-07T21:20:52Z',fp:'642faed0'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7739,9 +7739,9 @@ function hRows(){
   /* comments, the website, files */
   const lc=(S.commentsAll||[])[0];
   const openCp=liveTickets().filter(t=>t.state==='active'&&t.stage==='comment'&&(!(t.dates||{}).commentStart||t.dates.commentStart<=today())).length;
-  const quiet=!lc||hAgoMin(lc.submittedAt)>30*1440;
+  const quiet=!!lc&&hAgoMin(lc.submittedAt)>30*1440;   /* before the first comment ever arrives there's nothing to compare with */
   if(openCp&&quiet&&relay) row('cmt','Public Comments','warn','No comments in 30 days while '+openCp+' work product'+(openCp===1?' is':'s are')+' open for comment. If people have commented, the comment form flow may have stopped.','Jonna (the flow’s owner)');
-  else row('cmt','Public Comments','info',lc?'Last comment arrived '+hWhen(lc.submittedAt)+'.':'No comments have come in yet.');
+  else row('cmt','Public Comments','info',lc?'Last comment arrived '+hWhen(lc.submittedAt)+'.':'No comments have come in yet'+(openCp?' ('+openCp+' work product'+(openCp===1?' is':'s are')+' open for comment).':'.'));
   const fsst=S.feedState||{};
   if(fsst.error==='UNKNOWN_PROJECT') row('feed','Website Feed','info','Not switched on yet: the website feed (mms-feed) still needs setting up on the save service. That’s on Perry’s list.');
   else if(fsst.error&&(!fsst.at||String(fsst.tried||'')>String(fsst.at))) row('feed','Website Feed','bad','The website’s Open for Comment list didn’t update ('+fsst.error+').','Perry');
