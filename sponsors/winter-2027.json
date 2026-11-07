@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-06T23:49:32.625Z",
+ "updated": "2026-11-07T19:09:11.950Z",
  "summit": "2027 Winter Summit",
  "source": "Sponsorship Portal",
  "sponsors": [
@@ -15,13 +15,6 @@
    "tier": "Platinum",
    "url": "https://www.icemortgagetechnology.com",
    "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/ice_mt_primary_logo.jpg",
-   "placements": []
-  },
-  {
-   "name": "Optimal Blue",
-   "tier": "Platinum",
-   "url": "https://www.optimalblue.com",
-   "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/ob-logo-2025-_horizontal-color_-_2_.png",
    "placements": []
   },
   {
@@ -44,6 +37,13 @@
    "tier": "Gold",
    "url": "https://dmatter.com",
    "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/dark-matter-technologies-logo-stacked6fa6033e932640bfb486c1edc3c7c9f2.png",
+   "placements": []
+  },
+  {
+   "name": "Optimal Blue",
+   "tier": "Gold",
+   "url": "https://www.optimalblue.com",
+   "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/ob-logo-2025-_horizontal-color_-_2_.png",
    "placements": []
   },
   {
