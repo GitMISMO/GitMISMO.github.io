@@ -15,6 +15,7 @@ const OUT = 'sponsors/winter-2027.json';
 const SUMMIT = '2027 Winter Summit';
 const EVENTS = ['2027 Series', 'Winter 2027'];
 const SHOW = ['Paid', 'Approved', 'Pending Payment', 'In Kind'];
+const SEASON = 'Winter'; // which summit of the series this feed is for
 const TIERS = { PLATINUM: 'Platinum', GOLD: 'Gold', SILVER: 'Silver', BRONZE: 'Bronze' };
 const HL = 'https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/';
 
@@ -78,19 +79,29 @@ async function main() {
   const seen = new Map();
   for (const a of Object.values(docs)) {
     if (!EVENTS.includes(a.event) || !SHOW.includes(a.status)) continue;
-    const tier = TIERS[String(a.level2027 || '').toUpperCase()];
+    // A 2027 Series record with a custom package covers only the summits listed in it, each at its
+    // own tier, opportunity and day (Connections Map: "Reading Sponsorship Portal records").
+    // A Spring & Fall package has no Winter line, so it is not a Winter sponsor.
+    let level = a.level2027, opp = a.opportunity, day = a.day;
+    const lines = (Array.isArray(a.custom) ? a.custom : (a.custom && typeof a.custom === 'object' ? Object.values(a.custom) : [])).filter((c) => c && c.s);
+    if (a.event === '2027 Series' && lines.length) {
+      const line = lines.find((c) => String(c.s).trim().toLowerCase() === SEASON.toLowerCase());
+      if (!line) continue;
+      level = line.tier || level; opp = line.opp || ''; day = line.day || '';
+    }
+    const tier = TIERS[String(level || '').toUpperCase()];
     if (!tier) continue;
     const raw = String(a.company || '').trim();
     const name = NAMES[raw] || raw;
     if (!name) continue;
-    const p = placement(a.opportunity, a.day);
+    const p = placement(opp, day);
     const cur = seen.get(name);
     if (cur) { // one sponsor, several sponsorships: keep the highest tier, add each placement
       if (Object.values(TIERS).indexOf(tier) < Object.values(TIERS).indexOf(cur.tier)) cur.tier = tier;
-      if (p) cur.placements.push({ ...p, day: a.day });
+      if (p) cur.placements.push({ ...p, day });
       continue;
     }
-    seen.set(name, { name, tier, url: urlFor(name, a.contactEmail), logo: logoFor(name), placements: p ? [{ ...p, day: a.day }] : [] });
+    seen.set(name, { name, tier, url: urlFor(name, a.contactEmail), logo: logoFor(name), placements: p ? [{ ...p, day }] : [] });
   }
   const sponsors = [...seen.values()].sort((x, y) => Object.values(TIERS).indexOf(x.tier) - Object.values(TIERS).indexOf(y.tier) || x.name.localeCompare(y.name));
   const body = { summit: SUMMIT, source: 'Sponsorship Portal', sponsors };
