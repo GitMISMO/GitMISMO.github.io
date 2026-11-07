@@ -1,0 +1,26 @@
+# MMS automatic checks: run on every change to the MMS (mms/, im-review/, awg-review/) and by hand.
+# 1) every script parses, 2) no keys, tokens or passwords in the published files, 3) the page safety list is there,
+# 4) the MMS opens in a real browser on made-up records (a stand-in sign-in and save relay) with no errors.
+name: MMS Checks
+on:
+  push:
+    paths: ['mms/**', 'im-review/**', 'awg-review/**', '.github/workflows/mms-checks.yml', '.github/mms-checks/**']
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install the test browser
+        run: |
+          npm init -y >/dev/null
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+      - name: Run the checks
+        run: node .github/mms-checks/check.mjs
