@@ -281,7 +281,7 @@ h1{font-size:25px;font-weight:700;margin:0 0 4px}
 .step.cur{border-color:var(--sky);box-shadow:0 0 0 2px var(--sky-wash)}
 .seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:6px;overflow:hidden;background:var(--surface)}
 .seg button{border:0;background:none;padding:7px 12px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;font-family:inherit;white-space:nowrap}
-.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.seg button:is([aria-pressed="true"],[aria-selected="true"]){background:var(--navy);color:#fff}
 .seg button b{font-weight:700;opacity:.8;margin-left:4px}
 .dtools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 .dtools .sp{flex:1}
@@ -469,7 +469,7 @@ kbd{display:inline-block;min-width:18px;text-align:center;font:600 11px var(--di
 .sc-k>div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:10px 13px}
 .sc-k b{display:block;font-size:24px;line-height:1.15}.sc-k span{font-size:12px;color:rgba(255,255,255,.7)}
 .sc-k em{font-style:normal;font-weight:700}.sc-k em.up{color:#7ee0b8}.sc-k em.dn{color:#ff9b8f}
-.seg.dark{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}.seg.dark button{color:rgba(255,255,255,.8)}.seg.dark button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}
+.seg.dark{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}.seg.dark button{color:rgba(255,255,255,.8)}.seg.dark button:is([aria-pressed="true"],[aria-selected="true"]){background:var(--sky);color:var(--navy-deep)}
 .chart.dark{position:relative;z-index:1}.chart.dark .ax-d,.ax-d{font-size:11px;fill:rgba(255,255,255,.6)}
 .chart.dark .pk{font-size:11px;font-weight:700;fill:#fff}
 .chart.dark .col-bg{fill:transparent}.chart.dark .col:hover .col-bg{fill:rgba(255,255,255,.07)}
@@ -608,14 +608,17 @@ em,i,cite,address,dfn{font-style:normal}
 .ups{grid-template-columns:repeat(auto-fit,minmax(330px,1fr))}
 @media(max-width:560px){.ups{grid-template-columns:minmax(0,1fr)}}
 /* dark mode: the green button and the selected segment read clearly */
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.good{color:var(--navy-deep)}:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn.good{color:var(--navy-deep)}:root:not([data-theme="light"]) .seg button:is([aria-pressed="true"],[aria-selected="true"]){background:var(--sky);color:var(--navy-deep)}}
 :root[data-theme="dark"] .btn.good{color:var(--navy-deep)}
-:root[data-theme="dark"] .seg button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}
+:root[data-theme="dark"] .seg button:is([aria-pressed="true"],[aria-selected="true"]){background:var(--sky);color:var(--navy-deep)}
 .g1{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
 .wc-mixl{font-size:11.5px;color:var(--ink-3);margin-top:-2px}
 /* Coming to IM: the whole name and the target date */
 .up-m b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.up-m em{white-space:normal}
 .dl-n b{white-space:normal;overflow-wrap:break-word;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+
+/* phones: buttons big enough to tap on a call */
+@media(max-width:560px){.btn.sm,.racts .btn,.seg button,.dtools .btn{min-height:40px}.btn{min-height:40px}}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -713,48 +716,6 @@ async function put(n,content,sha){ return fetch(U(n),{method:"PUT",headers:{"Con
 /* read, change, write; on a clash (someone saved first) read again and redo the change */
 async function update(n,fn){ for(let i=0;i<5;i++){ const g=await get(n); const next=fn(g.data?clone(g.data):null); const r=await put(n,next,g.sha); if(r.ok) return next; if(r.status!==409&&r.status!==422) throw new Error("save "+r.status); await new Promise(s=>setTimeout(s,300+i*400)); } throw new Error("busy"); }
 
-/* ---------- saving without undoing anyone's work (November 5, 2026) ----------
-   A submission can sit open for hours, and this page only re-reads it after its own saves.
-   Saving used to put back this screen's whole call record and any row decision it still had,
-   so a decision someone else had undone came back and a call date someone else picked was
-   reset. Now a save carries only what was changed on this screen since the submission was
-   loaded (or last saved here). Everything else keeps its newest value; the change is merged
-   into the latest copy at the moment it is written, and again on a retry. If two people
-   changed the same row or field, the person saving is asked which to keep, and the review
-   page says so when someone else saves the same submission. The roster works the same way. */
-const OPENED=new WeakMap();   // a submission as loaded or saved -> {base: that copy, sig: how it read}
-const sigOf=d=>JSON.stringify(Object.assign({},d,{timing:null}));
-const noteOpened=d=>{ if(d&&typeof d==="object") OPENED.set(d,{base:clone(d),sig:sigOf(d)}); return d; };
-const baseOf=d=>{ const o=d&&OPENED.get(d); return o?o.base:null; };
-const normVal=v=>v===undefined||v===null||v===""?"":typeof v==="number"||typeof v==="boolean"?String(v):typeof v==="string"?v:JSON.stringify(v);
-const sameVal=(x,y)=>normVal(x)===normVal(y);
-const showVal=v=>{ const t=normVal(v); return t===""?"(blank)":t.slice(0,80); };
-function askClash(what,lines){ return window.confirm("While you had "+what+" open, someone else saved something different in the same "+(lines.length===1?"place":"places")+":\n\n"+lines.map(l=>"• "+l).join("\n")+"\n\nOK keeps yours. Cancel keeps theirs for "+(lines.length===1?"this one":"these")+" — your other changes still save."); }
-/* the call record: what was changed here goes onto the newest one. Who was there follows the
-   call date (it comes from Meeting Trackers), so it is only written when the date was changed here. */
-function callOnto(cur,mine,base,keepTheirs){ if(!mine) return cur; if(!cur) return clone(mine); base=base||{}; const out=clone(cur), date=!sameVal(mine.date,base.date);
-  Object.keys(Object.assign({},mine,base)).forEach(k=>{ if(k==="present"||k==="others"||sameVal(mine[k],base[k])) return; if(k==="date"&&keepTheirs) return; if(mine[k]===undefined) delete out[k]; else out[k]=clone(mine[k]); });
-  if(date&&!keepTheirs){ ["present","others"].forEach(k=>{ if(mine[k]===undefined) delete out[k]; else out[k]=clone(mine[k]); }); }
-  return out; }
-const callClash=(cur,mine,base)=>!!(cur&&mine&&!sameVal(mine.date,(base||{}).date)&&!sameVal(cur.date,(base||{}).date)&&!sameVal(cur.date,mine.date));
-/* the roster as typed, laid over the newest roster. Rows line up with the roster as this page
-   loaded it (a removed row is null); rows past its end were added here. memo holds the answer to
-   "keep yours?" so a retry doesn't ask again. */
-function rosterOnto(cur,mine,base,memo){ cur=clone(cur); base=base||{}; const out=cur, plan=[], lines=[];
-  const key=m=>JSON.stringify(["cop","name","org"].map(k=>normVal(m&&m[k]).trim())), real=m=>!!(m&&(m.cop||m.name)), who=m=>[m.name,m.cop].filter(Boolean).join(", ");
-  Object.keys(Object.assign({},mine,base)).forEach(k=>{ if(k==="members"||sameVal(mine[k],base[k])) return; const c=!sameVal(cur[k],base[k])&&!sameVal(cur[k],mine[k]);
-    if(c) lines.push(k+" — theirs: "+showVal(cur[k])+"   ·   yours: "+showVal(mine[k])); plan.push({c,go:()=>{ if(mine[k]===undefined) delete out[k]; else out[k]=clone(mine[k]); }}); });
-  const M=(cur.members||[]).slice(), B=base.members||[], Y=mine.members||[];
-  B.forEach((b,i)=>{ const y=Y[i]; if(real(y)&&key(y)===key(b)) return; const j=M.findIndex(x=>x&&key(x)===key(b));
-    if(j>=0){ plan.push({go:()=>{ M[j]=real(y)?clone(y):null; }}); return; }
-    if(!real(y)) return;   /* removed here, and already changed or removed by someone else: theirs stands */
-    lines.push(who(b)+" — someone else changed or removed this row; yours: "+who(y));
-    plan.push({c:true,go:()=>{ const s=i<M.length&&M[i]&&!B.some(x=>key(x)===key(M[i]))?i:-1; if(s>=0) M[s]=clone(y); else M.push(clone(y)); }}); });
-  Y.slice(B.length).forEach(y=>{ if(real(y)) plan.push({go:()=>{ if(!M.some(x=>x&&key(x)===key(y))) M.push(clone(y)); }}); });
-  if(lines.length&&memo.keep===undefined) memo.keep=askClash("the roster",lines);
-  plan.forEach(p=>{ if(!p.c||memo.keep!==false) p.go(); });
-  out.members=M.filter(real); return out; }
-
 /* ---------- decisions ---------- */
 const DEC=["Approved as Submitted","Approved with Modification","Returned","Denied","Withdrawn","Deferred"];
 const RANK={"Approved as Submitted":0,"Approved with Modification":1,"Deferred":2,"Returned":3,"Withdrawn":3,"Denied":4};
@@ -766,13 +727,19 @@ const RULE_NAME={clean:"no issues found",ai:"Claude’s read",template:"definiti
 const QUICK=["Already in the model; reuse the existing data point.","Improve the definition.","Enumerations need definitions.","Correct the XPATH.","Spell out the acronym, then give it in parentheses.","Use the class word definition template.","Remove implementation language from the definition.","Coordinate with the other workgroup first."];
 
 /* ---------- state ---------- */
-const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{imauto:{}},bt:null,filter:"look",edit:null,loaded:false,saving:{},stale:{},cfgBase:{}};
+const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{imauto:{}},bt:null,filter:"look",edit:null,loaded:false};
 /* everyone with access can read; Colleen and Erin (and staff admins) record the decisions */
 const canEdit=()=>{ try{ if(RS()&&RS().canEdit) return !!RS().canEdit(PROJECT); }catch(e){} return S.role==="admin"||S.role==="staff"; };
 const sameNm=(a,b)=>{ a=String(a||"").replace(/\(.*\)/,"").trim().toLowerCase(); b=String(b||"").trim().toLowerCase(); return !!a&&a===b; };
 /* who records decisions here (Jonna, Nov 2): Erin Bittenbender (IM facilitator) and Colleen Flaxington (IM chair). MISMO staff admins can step in. */
 const RECORDERS=[{n:"Erin Bittenbender",e:"ebittenbender@mismo.org"},{n:"Colleen Flaxington",e:""}];
-const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const em=String(S.me.email||"").toLowerCase(); return RECORDERS.some(r=>sameNm(r.n,S.me.name)||(r.e&&r.e===em)); };
+/* who records: the IM Reviewer list the MMS keeps in config.reviewers (People and Roles › IM Reviewer, plus the IM/AWG
+   facilitator), and the chair and facilitator on Meeting Trackers' roster (not the vice chair, Jonna Nov 6). With no list yet: Colleen and Erin. */
+const recorderEmails=()=>((S.cfg&&S.cfg.reviewers)||[]).map(x=>String(x||"").trim().toLowerCase()).filter(Boolean);
+const rosterLeads=()=>{ const R=(S.cfg&&S.cfg.roster)||{}; return [R.chair,R.fac].filter(Boolean); };
+const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const em=String(S.me.email||"").toLowerCase(), L=recorderEmails();
+  if(em&&L.includes(em)) return true; if(rosterLeads().some(n=>sameNm(n,S.me.name))) return true;
+  return !L.length&&RECORDERS.some(r=>sameNm(r.n,S.me.name)||(r.e&&r.e===em)); };
 const isAdmin=()=>S.role==="admin";
 const route=()=>{ const h=location.hash.replace(/^#\/?/,""); const [a,b,c]=h.split("/"); return {view:a||"waiting",rep:b?decodeURIComponent(b):"",from:c?decodeURIComponent(c):""}; };
 /* the way back: to the submission you came from (the resubmission you were reviewing), or to the list */
@@ -799,46 +766,40 @@ async function load(role){
   const yr=new Date().getFullYear();
   const [q,cfg,bt,l1,l0,up]=await Promise.all(["queue","config","backtest","learn-"+yr,"learn-"+(yr-1),"upcoming"].map(n=>get(n).catch(()=>({data:null}))));
   S.up=(up&&up.data&&up.data.items)||[]; S.upAt=(up&&up.data&&up.data.asOf)||"";
-  S.queue=(q.data&&q.data.items)||{}; S.cfg=Object.assign({imauto:{}},cfg.data||{}); S.cfgBase=clone(S.cfg); S.bt=bt.data||null;
+  S.queue=(q.data&&q.data.items)||{}; S.cfg=Object.assign({imauto:{}},cfg.data||{}); S.bt=bt.data||null;
   S.learn=Object.assign({},(l0.data&&l0.data.rows)||{},(l1.data&&l1.data.rows)||{});
   try{ const a=await get("attendance"); S.att=Object.fromEntries(Object.entries(a.data||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k))); }catch(e){ S.att={}; }
   S.loaded=true; render();
 }
-async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=noteOpened(g.data); return S.docs[rep]||null; }
+async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=g.data; return S.docs[rep]||null; }
 async function refreshQueue(){ try{ const q=await get("queue"); S.queue=(q.data&&q.data.items)||{}; }catch(e){} }
 
-/* save one submission: only the rows decided or undone here, and the parts of the call record and
-   decision changed here, go onto the newest copy (November 5, 2026; see "saving without undoing") */
+/* someone else finished this review while this page had an older copy */
+function staleErr(srv){ const e=new Error((srv.decidedBy||"Someone")+" finished this review"+(srv.decidedAt?" on "+fmtDE(srv.decidedAt)+" at "+fmtT(srv.decidedAt):"")+". Your change wasn’t saved; the page now shows the finished review."); e.stale=true; e.srv=srv; return e; }
+/* one row, two copies: the newest wins, except that an "agree" never replaces a change someone else made,
+   and an undo only removes the decision that was undone (not one someone else made since) */
+function mergeRows(out,doc){ (doc.rows||[]).forEach((r,i)=>{ const o=(out.rows||[])[i]; if(!o) return; const a=r.final, b=o.final;
+    if(a&&(!b||(String(a.at)>=String(b.at)&&!(a.agreed&&String(a.by||"")!==String(b.by||""))))) o.final=a;
+    else if(!a&&b&&r._undoAt&&(r._undoOf?String(b.at)<=String(r._undoOf):String(r._undoAt)>String(b.at))) delete o.final; });
+  if(doc.final) out.final=doc.final; if(doc.call&&(doc.call.picked||!(out.call&&out.call.picked))) out.call=doc.call; return out; }
+/* save one submission: on a clash keep everyone's newest decision for each row */
 async function saveDoc(doc){
-  S.docs[doc.rep]=doc; const pend=doc.hist||doc.status==="decided"&&!doc._finishing?0:(tmPend[doc.rep]||0);
-  const base=baseOf(doc); let keep=null;   // keep: what to leave as someone else saved it, asked once
-  S.saving[doc.rep]=(S.saving[doc.rep]||0)+1;
-  let merged;
-  try{ merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv) return doc; const out=clone(srv);
-    if(!base){ /* a copy this page didn't load (shouldn't happen): the old rule, newest decision per row */
-      (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; const a=r.final, b=o.final; if(a&&(!b||String(a.at)>=String(b.at))) o.final=a; else if(!a&&b&&r._undoAt&&String(r._undoAt)>String(b.at)) delete o.final; });
-      if(doc.final) out.final=doc.final; if(doc.call) out.call=doc.call;
-      if(doc.status==="decided"){ out.status="decided"; out.decidedBy=doc.decidedBy; out.decidedAt=doc.decidedAt; }
-      out.timing=mergeTiming(out.timing,doc,pend); return out; }
-    const R=doc.rows||[], B=base.rows||[], O=out.rows||[];
-    const mine=R.map((r,i)=>i).filter(i=>O[i]&&B[i]&&!sameVal(R[i].final,B[i].final));
-    if(!keep){ const rowCl=mine.filter(i=>!sameVal(O[i].final,B[i].final)&&!sameVal(O[i].final,R[i].final));
-      const finCl=!!(doc.final&&!sameVal(doc.final,base.final)&&!sameVal(out.final,base.final)&&!sameVal(out.final,doc.final));
-      const dateCl=callClash(out.call,doc.call,base.call);
-      const dec=f=>f?f.dec+(f.by?" ("+first(f.by)+")":""):"no decision";
-      const lines=rowCl.map(i=>"Item "+(R[i].item||i+1)+(R[i].name?" "+R[i].name:"")+" — theirs: "+dec(O[i].final)+"   ·   yours: "+dec(R[i].final))
-        .concat(finCl?["IM’s decision — theirs: "+dec(out.final)+"   ·   yours: "+dec(doc.final)]:[])
-        .concat(dateCl?["The IM call date — theirs: "+showVal(out.call.date)+"   ·   yours: "+showVal(doc.call.date)]:[]);
-      keep=lines.length&&!askClash((doc.wr?doc.wr+" ":"")+"this submission",lines)?{rows:rowCl,final:finCl,date:dateCl}:{rows:[],final:false,date:false}; }
-    mine.forEach(i=>{ if(keep.rows.includes(i)) return; if(R[i].final) O[i].final=clone(R[i].final); else delete O[i].final; });
-    if(doc.final&&!sameVal(doc.final,base.final)&&!keep.final) out.final=clone(doc.final);
-    if(doc.call) out.call=callOnto(out.call,doc.call,base.call,keep.date);
-    if(doc.status==="decided"&&base.status!=="decided"){ out.status="decided"; out.decidedBy=doc.decidedBy; out.decidedAt=doc.decidedAt; }
+  if(!doc._finishing) S.docs[doc.rep]=doc; const pend=doc.hist||doc.status==="decided"&&!doc._finishing?0:(tmPend[doc.rep]||0);
+  let merged; S.saving=(S.saving||0)+1;
+  try{ merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv){ const x=clone(doc); delete x._finishing; return x; }
+    if(srv.status==="decided"&&!srv.hist&&(doc.status!=="decided"||doc._finishing)) throw staleErr(srv);
+    const out=mergeRows(clone(srv),doc);
+    if(doc.status==="decided"){ out.status="decided"; out.decidedBy=doc.decidedBy; out.decidedAt=doc.decidedAt; }
     out.timing=mergeTiming(out.timing,doc,pend); return out; }); }
-  finally{ S.saving[doc.rep]--; }
+  catch(e){ if(e.stale){ S.docs[doc.rep]=e.srv; refreshQueue(); } throw e; }
+  finally{ S.saving--; }
   tmPend[doc.rep]=Math.max(0,(tmPend[doc.rep]||0)-pend);
-  merged.rows.forEach(r=>{ delete r._undoAt; }); S.docs[doc.rep]=noteOpened(merged); S.stale[doc.rep]=false; queueProgress(merged); return merged;
+  (merged.rows||[]).forEach(r=>{ delete r._undoAt; delete r._undoOf; }); delete merged._finishing; S.docs[doc.rep]=merged; queueProgress(merged); return merged;
 }
+/* read the newest copy, keeping this page's own decisions that haven't saved yet */
+async function pullDoc(rep){ const g=await get("rev-"+safe(rep)); if(!g.data) return S.docs[rep]||null; const loc=S.docs[rep];
+  const out=loc&&!loc.hist&&g.data.status!=="decided"?mergeRows(clone(g.data),loc):g.data; S.docs[rep]=out; return out; }
+const rowSig=d=>JSON.stringify([d.status,(d.rows||[]).map(r=>r.final?[r.final.dec,r.final.at,r.final.by]:0),d.final||0]);
 /* the real time a review takes, so the estimate can be tuned: when it was first opened, and
    the minutes someone was active on it (counted in 15-second steps while the page is in front
    and someone touched it in the last two minutes) */
@@ -865,8 +826,11 @@ window.__imrSearch=function(){ const out=[]; const go=h=>()=>{ location.hash=h; 
   const r=route(), d=r.view==="review"&&S.docs[r.rep]; if(d) (d.rows||[]).forEach(x=>out.push({group:"Rows in This Submission",name:"Item "+x.item+" · "+(x.name||""),where:[x.ct,x.tt,x.final?"decided: "+x.final.dec:"draft: "+x.draft.dec].filter(Boolean).join(" · "),go:()=>{ S.filter="all"; render(); setTimeout(()=>{ const el=document.querySelector('[data-row="'+x.i+'"]'); if(el){ el.scrollIntoView({block:"center"}); el.style.outline="2px solid var(--sky)"; setTimeout(()=>el.style.outline="",1600); } },60); }}));
   [["Waiting for IM","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
   return out; };
+S.repair={};
+function repairHome(d){ if(!notHome(d)||!canEdit()||S.repair[d.rep]) return; S.repair[d.rep]=1;
+  sendHome(d).then(h=>{ if(!h.already) toast("IM’s decision is now on its way to the work request."); if(route().rep===d.rep) render(); }).catch(()=>{ if(route().rep===d.rep) render(); }); }
 function render(){ if(!S.loaded) return; const r=route();
-  if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d) return shell(desk(d)); shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(route().rep===r.rep) shell(x?desk(x):backLink('#/','All Submissions')+'<div class="card empty" style="margin-top:12px">That submission isn’t here. It may have been withdrawn, or its decision form is only in the IM library.</div>'); }); return; }
+  if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d){ repairHome(d); return shell(desk(d)); } shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(x) repairHome(x); if(route().rep===r.rep) shell(x?desk(x):backLink('#/','All Submissions')+'<div class="card empty" style="margin-top:12px">That submission isn’t here. It may have been withdrawn, or its decision form is only in the IM library.</div>'); }); return; }
   if(r.view==="decided") return shell(decidedView());
   if(r.view==="trends") return shell(trendsView());
   if(r.view==="draft") return shell(draftView());
@@ -890,7 +854,7 @@ function waitCard(q,i){ const n=q.rows||0, look=q.look||0, done=q.done||0, age=M
     (n?'<span class="wc-nums"><span><b data-count="'+look+'">'+look+'</b><em>need a look</em></span><span><b data-count="'+(n-look)+'">'+(n-look)+'</b><em>clean</em></span>'+est+'</span>':'<span class="wc-nums"><span title="'+esc(docsToRead(q).map(d=>d.n).join("\n"))+'"><b>'+E.docs+'</b><em>document'+(E.docs===1?'':'s')+' to read</em></span><span><b class="wc-cat">'+esc(String(q.category||'Documentation').replace(/^Documentation\s*\((.*)\)$/,'$1'))+'</b><em>no Reference Model rows</em></span>'+est+'</span>')+(q.resub?'<span class="wc-rs">Resubmission'+(q.prior?' · IM decided it before on '+esc(fmtS(q.prior)):'')+'</span>':'')+
     (Object.keys(dc).length?'<span class="wc-mix" title="What the draft suggests">'+DEC.filter(d=>dc[d]).map(d=>'<i style="flex:'+dc[d]+';background:'+DCOL[d]+'" title="'+esc(dc[d]+" "+d)+'"></i>').join("")+'</span><span class="wc-mixl">Draft: '+DEC.filter(d=>dc[d]).map(d=>dc[d]+' '+({'Approved as Submitted':'approve','Approved with Modification':'modify','Returned':'return','Denied':'deny'}[d]||String(d).toLowerCase())).join(' · ')+'</span>':'')+
     '<span class="wc-prog"><i style="--w:'+pct(done,n)+'%"></i></span><span class="wc-f">'+(done?done+' of '+n+' decided'+(q.lastBy?' · '+esc(first(q.lastBy))+' '+esc(ago(q.lastAt))+' ago':''):'Not started')+(q.fac&&q.fac.name?' · Facilitator '+esc(q.fac.name):'')+'<span class="wc-go">'+(done?'Resume':'Start')+' ›</span></span></a>'; }
-const daysTo=d=>Math.round((new Date(d+"T12:00:00")-new Date(new Date().toISOString().slice(0,10)+"T12:00:00"))/864e5);
+const daysTo=d=>Math.round((new Date(d+"T12:00:00")-new Date(todayS()+"T12:00:00"))/864e5);
 function upCard(u,i){ const dd=daysTo(u.targetIM); return '<div class="up rise" style="--i:'+i+'"><span class="up-d'+(dd<0?' late':dd<=14?' soon':'')+'"><b>'+Math.abs(dd)+'</b><em>'+(dd<0?'days late':dd===0?'today':dd===1?'day':'days')+'</em></span><span class="up-m"><span class="wr">'+esc(u.wr)+(u.wg?' · '+esc(u.wg):'')+'</span><b title="'+esc(u.name)+'">'+esc(u.name)+'</b><em>'+esc((u.stage||'')+(u.fac?' · '+u.fac:''))+' · target '+esc(fmtS(u.targetIM))+'</em></span></div>'; }
 /* the road to IM: what IM decided lately, what is waiting, and what is due, on one line (Summit HQ's road) */
 function roadHtml(){ const td=new Date(); const lo=new Date(td.getTime()-150*864e5), hi=new Date(td.getTime()+62*864e5); const span=hi-lo, X=d=>Math.max(0,Math.min(100,(new Date(d+(String(d).length===10?"T12:00:00":""))-lo)/span*100));
@@ -977,7 +941,10 @@ function histDesk(doc){ const R=doc.rows||[], F=S.filter==="all"?"all":"changed"
     '<div class="rows">'+(shown.length?shown.map(row).join(""):'<div class="empty">IM approved every row as submitted.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):''); }
 S.rowPg={};
 /* ---------- the desk ---------- */
+/* the MMS says when Claude's read or the Reference Model check didn't run for this draft */
+function docWarn(doc){ if(!doc||doc.hist) return []; return [String(doc.aiNote||"").trim(),doc.rmLoaded===false&&!/reference model/i.test(String(doc.aiNote||""))?"The Reference Model check didn’t run, so rows already in the model or with a wrong XPATH can look clean.":""].filter(Boolean); }
 function desk(doc){ if(doc.hist) return histDesk(doc); if(doc.status!=="decided"&&canReview()&&!tmOpen[doc.rep]) tmOpen[doc.rep]=new Date().toISOString();
+  const W=docWarn(doc); if(W.length) (doc.rows||[]).forEach(r=>{ if(r.auto){ r.auto=false; r._autoOff=true; } });
   const R=doc.rows||[], decided=doc.status==="decided", q=S.queue[doc.rep]||{}, F=S.filter;
   const looks=R.filter(isLook), clean=R.filter(r=>!isLook(r)), done=R.filter(r=>r.final).length;
   const lookLeft=looks.filter(r=>!r.final).length, cleanLeft=clean.filter(r=>!r.final).length;
@@ -987,17 +954,19 @@ function desk(doc){ if(doc.hist) return histDesk(doc); if(doc.status!=="decided"
   const step=(k,n,t,btn,cur)=>'<div class="step'+(cur?" cur":"")+'"><span class="sk">'+k+'</span><b>'+n+'</b><p>'+t+'</p>'+(btn||"")+'</div>';
   const plan=decided?'':'<div class="plan">'+
     step("1 · Your Judgment",lookLeft?lookLeft+" left":"Done",looks.length?looks.length+" row"+(looks.length===1?"":"s")+" where the draft suggests a change or isn’t sure. Agree or correct each one.":"The draft found nothing that needs your judgment.",lookLeft&&F!=="look"?'<button class="btn sm" data-f="look">Show Them</button>':"",lookLeft>0)+
-    step("2 · Clean Rows",cleanLeft?cleanLeft+" left":"Done",clean.length+" row"+(clean.length===1?"":"s")+" with no issues found. Skim them if you like, then agree with all of them at once.",cleanLeft&&can?'<button class="btn sm good" data-all="clean">Agree with All '+cleanLeft+' Clean Rows</button>':"",!lookLeft&&cleanLeft>0)+
+    step("2 · Clean Rows",cleanLeft?cleanLeft+" left":"Done",clean.length+" row"+(clean.length===1?"":"s")+" with no issues found. "+(W.length?"A check didn’t run on this draft, so agree with each one yourself.":"Skim them if you like, then agree with all of them at once."),cleanLeft&&can&&!W.length?'<button class="btn sm good" data-all="clean">Agree with All '+cleanLeft+' Clean Rows</button>':"",!lookLeft&&cleanLeft>0)+
     step("3 · Finish",done+" of "+R.length,"When every row is decided, finish. The facilitator gets the decisions and the draft learns from your changes.",can?'<button class="btn sm pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':"",done===R.length&&!decided)+'</div>';
   const nChg=R.filter(r=>r.final&&!r.final.agreed).length;
   const tools='<div class="dtools"><div class="seg" role="tablist">'+[["look","Needs a Look",looks.length],["clean","Clean",clean.length],["all","All Rows",R.length]].concat(nChg?[["changed","Changed by IM",nChg]]:[]).map(([k,l,n])=>'<button type="button" data-f="'+k+'" aria-pressed="'+(F===k)+'">'+l+'<b>'+n+'</b></button>').join("")+'</div><span class="sp"></span>'+
-    (can&&shownAll.some(r=>!r.final)&&F!=="changed"?'<button class="btn sm" data-all="'+F+'">Agree with All '+shownAll.filter(r=>!r.final).length+(F==="all"?' Remaining':' Shown')+'</button>':"")+'</div>';
+    (can&&shownAll.some(r=>!r.final)&&F!=="changed"&&!(W.length&&F!=="look")?'<button class="btn sm" data-all="'+F+'">Agree with All '+shownAll.filter(r=>!r.final).length+(F==="all"?' Remaining':' Shown')+'</button>':"")+'</div>';
   return '<div class="dhead"><div class="t">'+backLink('#/','All Submissions')+'<h1 style="margin-top:6px">'+esc((doc.wr||"")+" "+(doc.name||""))+'</h1><div class="sub">'+nwj([doc.at?"Drafted "+fmtD(doc.at):"",q.sentBy?"sent by "+q.sentBy:"",doc.rm?doc.rm.replace(/^MISMO /,""):""])+(decided?(doc.timing&&doc.timing.activeMin?' · <span class="nw">reviewed in '+doc.timing.activeMin+' min</span>':''):' · <span class="nw est" title="'+esc(deskEst(doc,q).tip)+'">'+esc(fmtMin(deskEst(doc,q).min))+' to review</span>')+'</div>'+(doc.resub?'<div class="resub"'+(doc.resub.why?' title="'+esc(doc.resub.why)+'"':'')+'><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span><span>'+nwj([doc.resub.first?'first submitted '+fmtS(doc.resub.first)+(String(doc.resub.first).slice(0,4)!==YR?', '+String(doc.resub.first).slice(0,4):''):'',doc.resub.date?'resubmitted '+fmtS(doc.resub.date)+(String(doc.resub.date).slice(0,4)!==YR?', '+String(doc.resub.date).slice(0,4):''):''])+'</span></div>':'')+'</div>'+
     (R.length?'<div class="prog"><b>'+done+' of '+R.length+'</b><span>rows decided</span><div class="pb"><i style="width:'+pct(done,R.length)+'%"></i></div></div>':'<div class="prog"><b>'+(doc.final?'Decided':'1 decision')+'</b><span>documentation submission</span></div>')+'</div>'+
-    staleHtml(doc)+docsHtml(q,doc.rep)+
+    (W.length&&!decided?'<div class="card warnb" style="border-left:4px solid var(--warn)"><b>Check every row yourself.</b> '+W.map(esc).join(' ')+' <span class="muted">Rows don’t arrive already approved and Agree with All Clean Rows is off for this submission; agree with rows one at a time.</span></div>':'')+
+    (notHome(doc)?'<div class="card homeb" style="border-left:4px solid var(--warn)"><b>IM’s decision is saved, but it hasn’t reached the work request in the MMS yet.</b> '+(canEdit()?'<button type="button" class="btn sm pri" data-resend="1">Send to the MMS Again</button>':'<span class="muted">MISMO staff or the IM chair and facilitator can send it on by opening this page.</span>')+'</div>':'')+
+    docsHtml(q,doc.rep)+
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: agree, change rows, finish. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
     (decided?'<div class="card" style="border-left:4px solid var(--good)"><b>Decided '+esc(fmtD(doc.decidedAt))+' by '+esc(doc.decidedBy||"")+'.</b> <span class="muted">'+Object.entries(tally(R)).map(([d,n])=>n+" "+d.toLowerCase()).join(", ")+'.</span></div>':'')+
-    (!canReview()&&!decided?'<div class="card">You can follow this review here. Colleen and Erin record IM’s decisions.</div>':'')+
+    (!canReview()&&!decided?'<div class="card">You can follow this review here. The IM chair and facilitator record IM’s decisions.</div>':'')+
     earlierHtml(doc)+callCard(doc,can)+(!R.length?docOnlyHtml(doc,can):plan+tools+(can?'<div class="keys" '+(S.keysOff?'hidden':'')+'><kbd>J</kbd><kbd>K</kbd> move between rows <kbd>A</kbd> agree <kbd>C</kbd> change <kbd>U</kbd> undo <kbd>?</kbd> hide this</div>':'')+'<div class="rows">'+(shown.length?shown.map(r=>rowHtml(r,can)).join(""):'<div class="empty">Nothing here.</div>')+'</div>'+(shownAll.length>RP.size?pagerHtml(RP.page,pages,shownAll.length,RP.size,"rows|"+doc.rep+F):'')+
     '<div class="foot"><span>'+(decided?"Decided "+esc(fmtD(doc.decidedAt)):(R.length-done)?(R.length-done)+" row"+(R.length-done===1?"":"s")+" still to decide":"Every row is decided")+'</span><span class="sp"></span><button class="btn" data-xl="1">Download for Excel</button>'+(can?'<button class="btn pri" data-finish="1"'+(done<R.length?" disabled":"")+'>Finish IM Review</button>':'')+'</div>');
 }
@@ -1035,22 +1004,31 @@ function rowHtml(r,can){ const f=r.final, ed=S.edit===r.i&&can, lk=isLook(r);
     (r.old?'<div class="def"><span class="lbl">Original or Old Value</span>'+esc(r.old)+'</div>':'')+(r.def?'<div class="def"><span class="lbl">Submitted Definition</span>'+esc(r.def)+'</div>':'')+(r.xp?'<div class="def muted" style="font-size:12px;word-break:break-all">'+esc(r.xp)+'</div>':'')+
     ((fin||editor)?'<div class="cols">'+draft+(fin||editor)+'</div>':'<div class="cols one">'+draft+'</div>')+(fin&&ed?editor:'')+acts+'</div>'; }
 
-async function finish(doc){
-  const by=S.me.name||S.me.email||"", at=new Date().toISOString(); doc.status="decided"; doc.decidedBy=by; doc.decidedAt=at; doc._finishing=true;
-  if(doc.call){ const V=imVoters(), here=V.filter(m=>(doc.call.present||[]).includes(m.name)); doc.call=Object.assign({},doc.call,{need:imNeed(),seats:V.length,quorum:(doc.call.present||[]).length?here.length>=imNeed():null,by,at}); }
-  const sd=await saveDoc(doc); delete doc._finishing; delete sd._finishing; const tm=sd.timing||{};
-  /* counted from the copy just saved, which holds any row someone else decided (November 5, 2026) */
-  const R=(doc.rows||[]).map((r,i)=>sd.rows&&sd.rows[i]&&sd.rows[i].final?sd.rows[i]:r), agreed=R.filter(r=>r.final&&r.final.agreed).length, c=R.length?tally(R):(sd.final?{[sd.final.dec]:1}:{});
-  const yr=new Date().getFullYear(), recs={};
-  R.forEach(r=>{ recs[safe(doc.rep)+"_"+r.i]={rep:doc.rep,wr:doc.wr,at,tt:r.tt||"",ct:r.ct||"",name:String(r.name||"").slice(0,80),kind:kindOf(r),rule:r.draft.rule||"",draft:r.draft.dec,draftCom:String(r.draft.com||"").slice(0,240),final:r.final.dec,finalCom:String(r.final.com||"").slice(0,240),missed:String(r.final.missed||"").slice(0,240),agreed:!!r.final.agreed,auto:!!r.auto,by:r.final.by||by}; });
+/* Finish: the page shows the review as decided only once the decision is saved. Then the queue (what the MMS reads)
+   is told; if that step fails the decision stays saved and the page offers Send to the MMS Again. */
+async function finish(doc,final){
+  const by=S.me.name||S.me.email||"", at=new Date().toISOString(); const fin=clone(doc); Object.assign(fin,{status:"decided",decidedBy:by,decidedAt:at,_finishing:true}); if(final) fin.final=final;
+  if(fin.call){ const V=imVoters(), here=V.filter(m=>(fin.call.present||[]).includes(m.name)); fin.call=Object.assign({},fin.call,{need:imNeed(),seats:V.length,quorum:(fin.call.present||[]).length?here.length>=imNeed():null,by,at}); }
+  const sd=await saveDoc(fin);
+  try{ const h=await sendHome(sd); toast("IM review finished: "+h.sum); }catch(e){ e.home=true; throw e; }
+}
+/* a decided review whose queue item still says waiting: the MMS only sees decisions on the queue */
+const notHome=d=>!!d&&d.status==="decided"&&!d.hist&&!!S.queue[d.rep]&&S.queue[d.rep].status!=="decided";
+async function sendHome(doc){
+  const by=doc.decidedBy||S.me.name||"", at=doc.decidedAt||new Date().toISOString(), R=doc.rows||[], agreed=R.filter(r=>r.final&&r.final.agreed).length, c=R.length?tally(R):(doc.final?{[doc.final.dec]:1}:{}), tm=doc.timing||{};
+  const yr=new Date(at).getFullYear()||new Date().getFullYear(), recs={};
+  R.forEach(r=>{ const f=r.final||{}; recs[safe(doc.rep)+"_"+r.i]={rep:doc.rep,wr:doc.wr,at,tt:r.tt||"",ct:r.ct||"",name:String(r.name||"").slice(0,80),kind:kindOf(r),rule:r.draft.rule||"",draft:r.draft.dec,draftCom:String(r.draft.com||"").slice(0,240),final:f.dec||r.draft.dec,finalCom:String(f.com||"").slice(0,240),missed:String(f.missed||"").slice(0,240),agreed:!!f.agreed,auto:!!r.auto,by:f.by||by}; });
   if(!doc.test) await update("learn-"+yr,cur=>{ const o=cur||{rows:{}}; o.rows=Object.assign(o.rows||{},recs); return o; });
   Object.assign(S.learn,recs);
-  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",decidedBy:by,decidedAt:at,agree:pct(agreed,R.length),counts:c,estMin:tm.est||null,activeMin:tm.activeMin!=null?tm.activeMin:null,wallMin:tm.wallMin!=null?tm.wallMin:null}); return o; });
+  let already=false;
+  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; already=!!(o.items[doc.rep]&&o.items[doc.rep].status==="decided"); if(already) return o; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",decidedBy:by,decidedAt:at,agree:pct(agreed,R.length),counts:c,estMin:tm.est||null,activeMin:tm.activeMin!=null?tm.activeMin:null,wallMin:tm.wallMin!=null?tm.wallMin:null}); return o; });
   S.queue=q.items;
   const it=S.queue[doc.rep]||{}, sum=Object.entries(c).map(([d,n])=>n+" "+d.toLowerCase()).join(", ");
-  if(!doc.test&&it.flow&&it.fac&&it.fac.email){ try{ await fetch(it.flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"IM decision: "+doc.wr+" "+doc.name,body:"IM has decided "+doc.wr+" "+doc.name+": "+sum+". Reviewed by "+by+".\n\nSee every row: https://resources.mismo.org/im-review/#/review/"+encodeURIComponent(doc.rep)+"\nThe decisions are also on the work request in the MMS.",html:"",from:it.from||""})}); }catch(e){} }
-  toast("IM review finished: "+sum);
+  if(!already&&!doc.test&&it.flow&&it.fac&&it.fac.email){ try{ await fetch(it.flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"IM decision: "+doc.wr+" "+doc.name,body:"IM has decided "+doc.wr+" "+doc.name+": "+sum+". Reviewed by "+by+".\n\nSee every row: https://resources.mismo.org/im-review/#/review/"+encodeURIComponent(doc.rep)+"\nThe decisions are also on the work request in the MMS.",html:"",from:it.from||""})}); }catch(e){} }
+  return {sum,already};
 }
+const HOME_FAIL="IM’s decision is saved, but it hasn’t reached the work request in the MMS yet. Click Send to the MMS Again.";
+const FIN_FAIL="Couldn’t save the decision. Nothing was lost. Check your connection, then click Finish IM Review again.";
 function exportXl(doc){ const head=["Item #","Change Type","Change Target Type","Parent CONTAINER Name","CONTAINER Name","Data Point Name","Enumeration Name","Definition","Review Decision","Review Comments","Suggested Definition or Name","Draft Decision","IM Agreed With Draft"];
   if(doc.hist){ const H=["Item #","Change Type","Change Target Type","Parent CONTAINER Name","Name","Submitted Definition","IM's Final Wording","Review Decision","Review Comments"]; const rows=(doc.rows||[]).map(r=>[r.item,r.ct,r.tt,r.pc,r.name,r.def,r.fin||"",r.dec,r.com||""]); const name="IM Decision - "+(doc.wr||doc.name).slice(0,60)+" - "+String(doc.decidedAt).slice(0,10); const go=()=>{ const ws=XLSX.utils.aoa_to_sheet([H,...rows]); ws["!cols"]=H.map((h,i)=>({wch:[8,16,16,24,32,60,60,24,60][i]})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,"Reference Model Changes"); XLSX.writeFile(wb,name.replace(/[\\/:*?"<>|]/g,"-")+".xlsx"); }; if(window.XLSX) return go(); const sc=document.createElement("script"); sc.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"; sc.onload=go; document.head.appendChild(sc); return; }
   const rows=(doc.rows||[]).map(r=>{ const f=r.final||{}; return [r.item,r.ct,r.tt,r.pc,r.cn,r.dp,r.en,r.def,f.dec||r.draft.dec,(f.agreed?r.draft.com:f.com)||r.draft.com||"",(f.agreed?r.draft.sug:f.sug)||"",r.draft.dec,f.dec?(f.agreed?"Yes":"No"):""]; });
@@ -1156,9 +1134,12 @@ const IM_ROSTER0={chair:"Colleen Flaxington (Freddie Mac)",vice:"Becky Griswold 
 const IM_CALLS0=["2026-11-02","2026-11-09","2026-11-16","2026-11-23"];
 const DAYN=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
 const fmtL=s=>{ const d=new Date(String(s).slice(0,10)+"T12:00:00"); return isNaN(d)?"":DAYN[d.getDay()]+", "+MON[d.getMonth()]+" "+d.getDate(); };
-const todayS=()=>new Date().toISOString().slice(0,10);
-const rosterIn=cfg=>(cfg&&cfg.roster&&(cfg.roster.members||[]).length)?cfg.roster:IM_ROSTER0;
-const imRoster=()=>rosterIn(S.cfg), imVoters=()=>(imRoster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name)), imNeed=()=>(+imRoster().need>0)?+imRoster().need:Math.floor(imVoters().length/2)+1;
+/* today in Eastern time (MISMO's calls are set in ET), not UTC, so the date doesn't flip at 7 or 8 pm */
+function todayS(){ try{ const t=new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"}); if(/^\d{4}-\d{2}-\d{2}$/.test(t)) return t; }catch(e){} return new Date().toISOString().slice(0,10); }
+const fmtDE=iso=>{ try{ return new Date(iso).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"America/New_York"}); }catch(e){ return fmtD(iso); } };
+const fmtT=iso=>{ try{ return new Date(iso).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",timeZone:"America/New_York"}).toLowerCase()+" ET"; }catch(e){ return ""; } };
+const addD=(d,n)=>{ const x=new Date(d+"T12:00:00"); x.setDate(x.getDate()+n); return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0"); };
+const imRoster=()=>(S.cfg.roster&&(S.cfg.roster.members||[]).length)?S.cfg.roster:IM_ROSTER0, imVoters=()=>(imRoster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name)), imNeed=()=>(+imRoster().need>0)?+imRoster().need:Math.floor(imVoters().length/2)+1;
 /* the next IM calls: the dates kept on Roster and Calls, then every Monday */
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
@@ -1173,10 +1154,16 @@ function mismoHoliday(ymd){ const d=new Date(String(ymd).slice(0,10)+"T12:00:00"
   if((m===11&&day>=25)||(m===0&&day===1)) return true;
   return false; }
 function imCalls(n){ const L=(S.cfg.calls||IM_CALLS0).filter(d=>d>=todayS()&&!mismoHoliday(d)).sort(); let last=L[L.length-1]||(S.cfg.calls||IM_CALLS0).slice(-1)[0]||todayS(); while(L.length<n){ const d=new Date(last+"T12:00:00"); d.setDate(d.getDate()+7); last=d.toISOString().slice(0,10); if(last>=todayS()&&!mismoHoliday(last)) L.push(last); } return L.slice(0,n); }
-function callCard(doc,can){ if(doc.hist) return ''; const decided=doc.status==="decided";
-  /* a call date filled in for the screen is not a change someone made: the copy saves compare against
-     carries it too, so it never replaces a date someone else picked (November 5, 2026) */
-  const c=doc.call||(doc.call={date:imCalls(1)[0]}, baseOf(doc)&&!baseOf(doc).call&&(baseOf(doc).call=clone(doc.call)), doc.call);
+/* the call a decision belongs to: the latest IM call on or before today since the submission arrived (one with
+   attendance logged in Meeting Trackers first), else the next call. It follows the calendar until someone picks a date. */
+function defaultCall(doc){ const td=todayS(), from=String((S.queue[doc.rep]||{}).sentAt||doc.at||"").slice(0,10)||"0000-00-00";
+  const inWin=d=>/^\d{4}-\d{2}-\d{2}$/.test(d)&&d>=from&&d<=td;
+  const logged=Object.keys(S.att||{}).filter(d=>inWin(d)&&S.att[d]&&(S.att[d].present||[]).length).sort(); if(logged.length) return logged[logged.length-1];
+  const known=(S.cfg.calls||IM_CALLS0).slice().sort(), cand=known.filter(d=>inWin(d)&&!mismoHoliday(d));
+  /* past calls drop off the calendar Meeting Trackers sends, so count back a week at a time from the first one */
+  for(let d=known[0]?addD(known[0],-7):"",k=0;d&&d>=from&&k<60;d=addD(d,-7),k++) if(d<=td&&!mismoHoliday(d)) cand.push(d);
+  cand.sort(); return cand.length?cand[cand.length-1]:imCalls(1)[0]; }
+function callCard(doc,can){ if(doc.hist) return ''; const decided=doc.status==="decided"; if(!doc.call) doc.call={date:""}; const c=doc.call; if(!decided&&(!c.picked||!c.date)) c.date=defaultCall(doc);
   /* who was there comes from Meeting Trackers, where Erin logs each IM call */
   const a=(S.att||{})[c.date], known=!!(a&&a.present&&a.present.length); c.present=known?a.present.slice():[]; c.others=known?(a.others||[]).slice():[];
   const V=imVoters(), here=known?V.filter(m=>c.present.includes(m.name)):[], q=here.length>=imNeed(), open=S.callOpen===doc.rep;
@@ -1189,10 +1176,16 @@ function setupView(){ const R=imRoster(), ed=isAdmin()||S.role==="staff", dis=ed
     '<div class="g2"><div class="card"><h3>Voting Members<small>'+imVoters().length+' assigned · '+imNeed()+' needed for quorum</small></h3><div class="ros">'+(R.members||[]).map((m,i)=>'<div class="ros-r"><input class="inp" data-ros="'+i+'|cop" value="'+esc(m.cop)+'" aria-label="Community of Practice"'+dis+'><input class="inp" data-ros="'+i+'|name" value="'+esc(m.name)+'" aria-label="Name"'+dis+'><input class="inp" data-ros="'+i+'|org" value="'+esc(m.org||"")+'" aria-label="Company"'+dis+'>'+(ed?'<button type="button" class="btn sm ghost" data-rosdel="'+i+'" aria-label="Remove">×</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><button type="button" class="btn sm" data-rosadd="1">Add a Voting Member</button><button type="button" class="btn sm pri" data-rossave="1">Save the Roster</button></div>':'')+
       '<h3 style="margin-top:16px">Chair, Vice Chair and Facilitator</h3><div class="ros">'+[["chair","Chair"],["vice","Vice Chair"],["fac","Facilitator"]].map(([k,l])=>'<label class="ros-l">'+l+'<input class="inp" data-rk="'+k+'" value="'+esc(R[k]||"")+'"'+dis+'></label>').join("")+'</div>'+(R.vacant&&R.vacant.length?'<p class="note">Vacant seats: '+esc(R.vacant.join(", "))+'.</p>':'')+'</div>'+
     '<div class="card"><h3>IM Calls<small>Mondays, 2:00–3:00 pm ET</small></h3><div class="calls">'+C.map(d=>'<div class="call-r'+(d<todayS()?' past':'')+'"><b>'+esc(fmtL(d))+'</b><span class="muted">'+(d<todayS()?'held':d===todayS()?'today':'')+'</span><span class="sp"></span>'+(ed?'<button type="button" class="btn sm ghost" data-calldel="'+d+'">Remove</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><input type="date" class="inp" id="calladd"><button type="button" class="btn sm pri" data-calladd="1">Add a Call</button></div>':'')+'<p class="note">After the last date here, IM Review assumes every Monday.</p></div></div>'; }
-async function saveCfg(fn,msg){ try{ const o=await update("config",cur=>fn(cur||{})); S.cfg=o; S.cfgBase=clone(o); toast(msg||"Saved"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); }
+async function saveCfg(fn,msg){ try{ const o=await update("config",cur=>fn(cur||{})); S.cfg=o; toast(msg||"Saved"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); }
 
 /* ---------- wiring ---------- */
-let tt; function toast(m){ let t=$(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; document.body.appendChild(t); } t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,3200); }
+/* toasts are a polite live region, so screen readers hear saves and errors */
+let tt; function toastEl(){ let t=$(".toast"); if(!t&&document.body){ t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.setAttribute("aria-live","polite"); t.hidden=true; document.body.appendChild(t); } return t; }
+function toast(m){ const t=toastEl(); if(!t) return; t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,m.length>90?7000:3600); }
+/* filter rows of buttons marked as tab lists are tabs to assistive tech */
+function tabRoles(m){ $$('[role="tablist"]',m).forEach(tl=>$$("button",tl).forEach(b=>{ const on=b.getAttribute("aria-pressed")==="true"||b.getAttribute("aria-selected")==="true"; b.setAttribute("role","tab"); b.setAttribute("aria-selected",String(on)); b.removeAttribute("aria-pressed"); })); }
+/* after a row is agreed, changed or undone, keep keyboard focus on that row */
+function refocus(i){ const el=document.querySelector('.rows [data-row="'+i+'"]'); if(!el) return; const bt=el.querySelector(".racts button"); if(bt) bt.focus({preventScroll:true}); else { el.tabIndex=-1; el.focus({preventScroll:true}); } }
 function keep(fn){ const y=window.scrollY; return async(...a)=>{ await fn(...a); window.scrollTo(0,y); }; }
 const RM_=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches; const seenView={};
 function countUp(m){ const v=route().view; if(RM_||seenView[v]) return; seenView[v]=1; $$("[data-count]",m).forEach(el=>{ const to=+el.dataset.count; if(!(to>0)) return; const t0=performance.now(), dur=700; const step=t=>{ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); el.textContent=Math.round(to*e).toLocaleString(); if(k<1) requestAnimationFrame(step); }; el.textContent="0"; requestAnimationFrame(step); }); }
@@ -1205,16 +1198,14 @@ document.addEventListener("keydown",e=>{ const t=e.target; if(t&&(t.tagName==="I
   else if(k==="k"||e.key==="ArrowUp"&&e.shiftKey){ e.preventDefault(); focusRow(m,S.focus-1); }
   else if(k==="a"||k==="c"||k==="u"){ const el=$$(".rows .row",m)[S.focus]; if(!el) return; const b=$(k==="a"?"[data-ok]":k==="c"?"[data-chg]":"[data-undo]",el); if(b){ e.preventDefault(); b.click(); } }
   else if(k==="?"){ const h=$(".keys",m); if(h) h.hidden=!h.hidden; } });
-function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
+function wire(){ const m=$("#main"); tabRoles(m); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-months]",m).forEach(b=>b.onclick=()=>{ S.homeMonths=+b.dataset.months; seenView.waiting=1; render(); });
   $$("[data-upall]",m).forEach(b=>b.onclick=()=>{ S.upAll=!S.upAll; seenView.waiting=1; render(); });
   $$("[data-docsall]",m).forEach(b=>b.onclick=()=>{ S.docsAll=S.docsAll===b.dataset.docsall?"":b.dataset.docsall; render(); });
   const R0=()=>clone(imRoster());
-  $$("[data-rossave]",m).forEach(b=>b.onclick=()=>{ const r=R0(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); $$("[data-rk]",m).forEach(inp=>r[inp.dataset.rk]=inp.value.trim());
-    /* only the rows and names changed here go onto the newest roster (November 5, 2026) */
-    const was=clone(rosterIn(S.cfgBase)), memo={}; saveCfg(c=>Object.assign(c,{roster:rosterOnto(rosterIn(c),r,was,memo)}),"Roster saved"); });
+  $$("[data-rossave]",m).forEach(b=>b.onclick=()=>{ const r=R0(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); $$("[data-rk]",m).forEach(inp=>r[inp.dataset.rk]=inp.value.trim()); r.members=r.members.filter(x=>x.cop||x.name); saveCfg(c=>Object.assign(c,{roster:r}),"Roster saved"); });
   $$("[data-rosadd]",m).forEach(b=>b.onclick=()=>{ const r=R0(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); r.members.push({cop:"",name:"",org:""}); S.cfg.roster=r; render(); });
-  $$("[data-rosdel]",m).forEach(b=>b.onclick=()=>{ const r=R0(); r.members[+b.dataset.rosdel]=null; const was=clone(rosterIn(S.cfgBase)), memo={}; saveCfg(c=>Object.assign(c,{roster:rosterOnto(rosterIn(c),r,was,memo)}),"Removed"); });
+  $$("[data-rosdel]",m).forEach(b=>b.onclick=()=>{ const r=R0(); r.members.splice(+b.dataset.rosdel,1); saveCfg(c=>Object.assign(c,{roster:r}),"Removed"); });
   $$("[data-calldel]",m).forEach(b=>b.onclick=()=>saveCfg(c=>Object.assign(c,{calls:(c.calls||IM_CALLS0).filter(d=>d!==b.dataset.calldel)}),"Call removed"));
   $$("[data-calladd]",m).forEach(b=>b.onclick=()=>{ const d=($("#calladd",m)||{}).value; if(!d) return toast("Pick a date first"); saveCfg(c=>Object.assign(c,{calls:[...new Set((c.calls||IM_CALLS0).concat([d]))].sort()}),"Call added"); });
   $$("[data-icopen]",m).forEach(b=>b.onclick=keep(async()=>{ const rp=route().rep; S.callOpen=S.callOpen===rp?"":rp; render(); }));
@@ -1224,42 +1215,50 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-dyear]",m).forEach(b=>b.onclick=()=>{ S.dec.year=b.dataset.dyear; S.dec.page=0; render(); });
   const dq=$("#decq",m); if(dq){ dq.oninput=()=>{ clearTimeout(dq._t); dq._t=setTimeout(()=>{ S.dec.q=dq.value; S.dec.page=0; const pos=dq.selectionStart; render(); const n=$("#decq"); if(n){ n.focus(); n.setSelectionRange(pos,pos); } },200); }; }
   if(route().view==="review"&&S.focus>=0) focusRow(m,S.focus);
-  $$("[data-auto]",m).forEach(c=>c.onchange=async()=>{ const kd=c.dataset.auto; try{ const o=await update("config",cur=>{ const x=cur||{}; x.imauto=Object.assign({},x.imauto||{},{[kd]:c.checked}); return x; }); S.cfg=o; S.cfgBase=clone(o); toast(c.checked?"Those rows will arrive already approved":"Those rows will need a reviewer again"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); });
+  $$("[data-auto]",m).forEach(c=>c.onchange=async()=>{ const kd=c.dataset.auto; try{ const o=await update("config",cur=>{ const x=cur||{}; x.imauto=Object.assign({},x.imauto||{},{[kd]:c.checked}); return x; }); S.cfg=o; toast(c.checked?"Those rows will arrive already approved":"Those rows will need a reviewer again"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); });
   const r=route(); if(r.view!=="review") return; const doc=S.docs[r.rep]; if(!doc) return;
-  const save=keep(async()=>{ try{ await saveDoc(doc); }catch(e){ toast("Couldn’t save. Check your connection and try again."); } render(); });
+  const save=keep(async(fi)=>{ const d=S.docs[r.rep]||doc; try{ await saveDoc(d); }catch(e){ toast(e.stale?e.message:"Couldn’t save. Check your connection and try again."); } render(); if(fi!=null&&typeof fi!=="object") refocus(fi); });
   $$("[data-f]",m).forEach(b=>b.onclick=()=>{ S.filter=b.dataset.f; S.edit=null; render(); });
-  $$("[data-ok]",m).forEach(b=>b.onclick=()=>{ const rws=$$(".rows .row",m), at=rws.indexOf(b.closest(".row")); if(at>=0&&S.focus>=0) S.focus=at; const x=doc.rows[+b.dataset.ok]; x.final={dec:x.draft.dec,com:x.draft.com,sug:x.draft.sug,agreed:true,by:S.me.name||S.me.email,at:new Date().toISOString()}; render(); save(); });
-  $$("[data-undo]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.undo]; delete x.final; x._undoAt=new Date().toISOString(); render(); save(); });
+  $$("[data-ok]",m).forEach(b=>b.onclick=()=>{ const rws=$$(".rows .row",m), at=rws.indexOf(b.closest(".row")); if(at>=0&&S.focus>=0) S.focus=at; const x=doc.rows[+b.dataset.ok]; x.final={dec:x.draft.dec,com:x.draft.com,sug:x.draft.sug,agreed:true,by:S.me.name||S.me.email,at:new Date().toISOString()}; render(); refocus(x.i); save(x.i); });
+  $$("[data-undo]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.undo]; x._undoOf=x.final&&x.final.at; delete x.final; x._undoAt=new Date().toISOString(); render(); refocus(x.i); save(x.i); });
   $$("[data-chg]",m).forEach(b=>b.onclick=keep(async()=>{ S.edit=+b.dataset.chg; render(); }));
   $$("[data-cancel]",m).forEach(b=>b.onclick=keep(async()=>{ S.edit=null; render(); }));
   $$("[data-q]",m).forEach(b=>b.onclick=()=>{ const ta=$("textarea[name=com]",b.closest(".edit")); ta.value=(ta.value.trim()?ta.value.trim()+" ":"")+b.dataset.q; ta.focus(); });
   $$("[data-save]",m).forEach(b=>b.onclick=()=>{ const box=b.closest(".edit"), x=doc.rows[+b.dataset.save], v=n=>($("[name="+n+"]",box)||{}).value||"";
     const dec=v("dec"), com=v("com").trim(), sug=v("sug").trim(), missed=v("miss").trim();
     const agreed=dec===x.draft.dec&&com===String(x.draft.com||"").trim()&&sug===String(x.draft.sug||"").trim()&&!missed;
-    x.final={dec,com,sug,missed,agreed,by:S.me.name||S.me.email,at:new Date().toISOString()}; S.edit=null; render(); save(); });
-  $$("[data-all]",m).forEach(b=>b.onclick=()=>{ const F=b.dataset.all; let n=0; const now=new Date().toISOString();
-    doc.rows.forEach(x=>{ if(x.final) return; const lk=isLook(x); if(F==="look"&&!lk) return; if(F==="clean"&&lk) return; x.final={dec:x.draft.dec,com:x.draft.com,sug:x.draft.sug,agreed:true,by:S.me.name||S.me.email,at:now}; n++; });
-    toast("Agreed with "+n+" row"+(n===1?"":"s")); render(); save(); });
-  $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ if(!confirm("Finish the IM review of "+doc.wr+"? The facilitator gets the decisions.")) return; b.disabled=true; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } celebrate(); render(); });
+    x.final={dec,com,sug,missed,agreed,by:S.me.name||S.me.email,at:new Date().toISOString()}; S.edit=null; render(); refocus(x.i); save(x.i); });
+  /* agree with many rows at once: read the newest copy first, so rows someone else decided meanwhile keep their decision */
+  $$("[data-all]",m).forEach(b=>b.onclick=async()=>{ const F=b.dataset.all; b.disabled=true; let d=doc;
+    try{ d=await pullDoc(doc.rep)||doc; }catch(e){ toast("Couldn’t check for changes. Check your connection and try again."); b.disabled=false; return; }
+    if(d.status==="decided"){ render(); return toast((d.decidedBy||"Someone")+" finished this review"+(d.decidedAt?" on "+fmtDE(d.decidedAt)+" at "+fmtT(d.decidedAt):"")+"."); }
+    if(docWarn(d).length&&F!=="look"){ render(); return; }
+    let n=0, kept=0; const now=new Date().toISOString(), me=S.me.name||S.me.email;
+    d.rows.forEach(x=>{ if(x.final){ if(x.final.by&&x.final.by!==me&&(F==="all"||(F==="look")===isLook(x))) kept++; return; } const lk=isLook(x); if(F==="look"&&!lk) return; if(F==="clean"&&lk) return; x.final={dec:x.draft.dec,com:x.draft.com,sug:x.draft.sug,agreed:true,by:me,at:now}; n++; });
+    toast("Agreed with "+n+" row"+(n===1?"":"s")+(kept?"; "+kept+" decided by someone else stay as they are":"")); render(); save(); });
+  $$("[data-resend]",m).forEach(b=>b.onclick=async()=>{ b.disabled=true; try{ await sendHome(S.docs[r.rep]||doc); toast("IM’s decision is now on its way to the work request."); }catch(e){ toast("Still couldn’t reach it. Check your connection and try again in a minute."); } render(); });
+  const finErr=(e,b)=>{ if(e.stale||e.home){ toast(e.stale?e.message:HOME_FAIL); render(); return; } toast(FIN_FAIL); b.disabled=false; };
+  $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ if(!confirm("Finish the IM review of "+doc.wr+"? The facilitator gets the decisions.")) return; b.disabled=true; try{ await finish(doc); }catch(e){ return finErr(e,b); } celebrate(); render(); });
   $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
-  const cc=doc.call; let ccT; const ccSave=()=>{ clearTimeout(ccT); ccT=setTimeout(()=>saveDoc(doc).catch(()=>{}),1000); };
-  $$("[data-icdate]",m).forEach(el=>el.onchange=()=>{ cc.date=el.value; render(); ccSave(); });
-  $$("[data-dfinish]",m).forEach(b=>b.onclick=async()=>{ const box=b.closest(".edit"); const dec=$("[name=ddec]",box).value, com=$("[name=dcom]",box).value.trim(); if(!confirm("Finish the IM review of "+doc.wr+": "+dec+"? The facilitator gets the decision.")) return; b.disabled=true; doc.final={dec,com,by:S.me.name||S.me.email,at:new Date().toISOString()}; try{ await finish(doc); }catch(e){ toast("Couldn’t finish: "+e.message); b.disabled=false; return; } celebrate(); render(); });
+  const cc=doc.call; let ccT; const ccSave=()=>{ clearTimeout(ccT); ccT=setTimeout(()=>saveDoc(doc).catch(e=>{ if(e.stale){ toast(e.message); render(); } }),1000); };
+  $$("[data-icdate]",m).forEach(el=>el.onchange=()=>{ cc.date=el.value; cc.picked=true; render(); ccSave(); });
+  $$("[data-dfinish]",m).forEach(b=>b.onclick=async()=>{ const box=b.closest(".edit"); const dec=$("[name=ddec]",box).value, com=$("[name=dcom]",box).value.trim(); if(!confirm("Finish the IM review of "+doc.wr+": "+dec+"? The facilitator gets the decision.")) return; b.disabled=true; try{ await finish(doc,{dec,com,by:S.me.name||S.me.email,at:new Date().toISOString()}); }catch(e){ return finErr(e,b); } celebrate(); render(); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
 window.addEventListener("hashchange",()=>{ S.edit=null; S.focus=-1; const r=route(); if(r.view==="review") S.filter=String(r.rep||"").charAt(0)==="h"?"changed":"look"; window.scrollTo(0,0); render(); });
 setInterval(async()=>{ if(document.hidden||route().view==="review") return; await refreshQueue(); render(); },60000);
-/* the review page says so when someone else saves the same submission (November 5, 2026) */
-const STALE='<div class="card stalenote" style="border-left:4px solid var(--warn)"><b>Someone else just saved this submission.</b> <span class="muted">Saving keeps their changes and adds yours.</span></div>';
-function staleHtml(doc){ return S.stale[doc.rep]?STALE:''; }
-setInterval(async()=>{ const r=route(); if(r.view!=="review"||document.hidden||S.stale[r.rep]) return; const doc=S.docs[r.rep], o=doc&&OPENED.get(doc); if(!o||doc.hist||S.saving[r.rep]) return;
-  try{ const g=await get("rev-"+safe(r.rep)); if(!g.data||S.docs[r.rep]!==doc||S.saving[r.rep]||sigOf(g.data)===o.sig) return;
-    S.stale[r.rep]=true; const h=$("#main .dhead"); if(h&&route().rep===r.rep&&!$("#main .stalenote")) h.insertAdjacentHTML("afterend",STALE); }catch(e){} },60000);
+const busy=()=>{ const a=document.activeElement; return S.saving>0||S.edit!=null||!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); };
+async function refreshOpen(){ const r=route(); if(!S.loaded||document.hidden||r.view!=="review"||!r.rep) return; const d=S.docs[r.rep]; if(!d||d.hist||busy()) return;
+  const was=d.status, before=rowSig(d); let n; try{ n=await pullDoc(r.rep); await refreshQueue(); }catch(e){ return; }
+  if(!n||route().rep!==r.rep||busy()) return; if(rowSig(n)===before&&!notHome(n)) return;
+  const y=window.scrollY, f=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("[data-row]"); render(); window.scrollTo(0,y); if(f) refocus(f.dataset.row);
+  if(was!=="decided"&&n.status==="decided") toast((n.decidedBy||"Someone")+" finished this review"+(n.decidedAt?" on "+fmtDE(n.decidedAt)+" at "+fmtT(n.decidedAt):"")+"."); }
+setInterval(refreshOpen,45000);
 
 /* ---------- start: sign in, then the gate decides who gets in ---------- */
-function start(){ const rs=RS(); if(!rs){ setTimeout(start,100); return; }
+function start(){ toastEl(); const rs=RS(); if(!rs){ setTimeout(start,100); return; }
   rs.requireAccess(PROJECT,{toolName:"IM Review",eyebrow:"Governance · Information Management"}).then(load).catch(e=>{ console.error("im-review",e); }); }
-window.__imr={S,load,render};
+window.__imr={S,load,render,refreshOpen,todayS,defaultCall};
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else start();
 })();
 
