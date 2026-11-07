@@ -1,8 +1,9 @@
 name: MMS Daily Digest
 
 # Sends each facilitator their end-of-day MMS email. Runs at 37 minutes past each
-# afternoon hour on weekdays; the script itself only sends in the hour chosen in
-# MMS Settings > Daily Digest (Eastern time), so daylight saving needs no change here.
+# afternoon hour on weekdays; the script sends on the first run at or after the hour chosen
+# in MMS Settings > Daily Digest (Eastern time), once a day. GitHub often runs schedules late
+# or skips some, so later runs pick it up; a cache entry for the day stops a second send.
 # Turned on by two repository secrets: MMS_DATA_TOKEN and MMS_MAIL_FLOW_URL.
 
 on:
@@ -30,11 +31,22 @@ jobs:
   digest:
     runs-on: ubuntu-latest
     steps:
+      - name: Today (Eastern)
+        id: day
+        run: echo "day=$(TZ=America/New_York date +%F)" >> "$GITHUB_OUTPUT"
+      - name: Already sent today?
+        id: seen
+        uses: actions/cache/restore@v4
+        with:
+          path: mms/.digest-done
+          key: mms-digest-done-${{ steps.day.outputs.day }}
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
       - name: Build and send the digests
+        id: run
+        if: steps.seen.outputs.cache-hit != 'true' || inputs.force
         working-directory: mms
         env:
           MMS_DATA_TOKEN: ${{ secrets.MMS_DATA_TOKEN }}
@@ -42,3 +54,9 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
           FORCE: ${{ inputs.force && '1' || '0' }}
         run: node digest-run.mjs
+      - name: Remember today is done
+        if: steps.run.outputs.done == '1' && steps.seen.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: mms/.digest-done
+          key: mms-digest-done-${{ steps.day.outputs.day }}
