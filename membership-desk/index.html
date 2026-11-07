@@ -1071,6 +1071,18 @@ renderHome();
 /* a link from an email opens the set-up straight away: #todo/<id> */
 function fromHash(){const v=/^#(home|todo|pip|cases|done|help)$/.exec(location.hash||"");if(v){go(v[1]);return;}const m=/^#todo\/(.+)$/.exec(location.hash||"");if(m){const x=TODO.find(t=>t.id===decodeURIComponent(m[1]));go("todo");if(x)setTimeout(()=>openPane(x),150);}}
 fromHash();window.addEventListener("hashchange",fromHash);
+ /* ---------- Shared Rules (Jonna, Nov 7, 2026): the IIF amount and the start-date cutoff day come from Member 360, Settings, Shared Rules, so the Desk's wording always matches the rules in use. ---------- */
+ (async()=>{try{let tok="";for(let i=0;i<30&&!tok;i++){try{tok=window.ResourcesSession&&ResourcesSession.token&&ResourcesSession.token();}catch(e){}if(!tok)await new Promise(r=>setTimeout(r,1000));}if(!tok)return;
+  const r=await fetch("https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/member-360/data/settings",{headers:{Authorization:"Bearer "+tok},cache:"no-store"});if(!r.ok)return;
+  const j=await r.json();const s=(((j.data||{}).docs||{})["settings/main"]||{}).shared||{};
+  const amt=+s.iifMemberMin>0?+s.iifMemberMin:1000,d=(+s.startCutoffDay>=1&&+s.startCutoffDay<=28)?+s.startCutoffDay:15;
+  const ord=n=>n+((n%100>=11&&n%100<=13)?"th":({1:"st",2:"nd",3:"rd"}[n%10]||"th"));const amtT="$"+amt.toLocaleString("en-US");
+  const fix=x=>typeof x==="string"?x.replace(/\$1,000/g,amtT).replace(/\bthe 15th rule\b/gi,m=>m.replace("15th",ord(d))):x;
+  KINDS.iif.what=fix(KINDS.iif.what);
+  HELP.forEach(tp=>{tp.lead=fix(tp.lead);(tp.steps||[]).forEach(st=>{st[0]=fix(st[0]);st[1]=fix(st[1]);});});
+  const dt=HELP.find(tp=>tp.id==="dates");const st=dt&&dt.steps.find(x=>/Non-Lenders/.test(x[0]));
+  if(st){st[0]="Non-Lenders: the "+ord(d)+" Rule";st[1]="Paid on the 1st through the "+ord(d)+", the membership starts that month. Paid on the "+ord(d+1)+" or later, it starts the next month. Paid October "+Math.max(1,d-5)+" starts October 1; paid October "+(d+5)+" starts November 1; paid December "+(d+1)+" starts January 1.";}
+ }catch(e){console.error("shared rules",e);}})();
 if(new Date().getMonth()===11)document.documentElement.setAttribute("data-season","december");
 };
 </script>
