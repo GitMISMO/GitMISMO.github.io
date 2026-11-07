@@ -281,7 +281,7 @@ h1{font-size:25px;font-weight:700;margin:0 0 4px}
 .step.cur{border-color:var(--sky);box-shadow:0 0 0 2px var(--sky-wash)}
 .seg{display:inline-flex;border:1px solid var(--border-strong);border-radius:6px;overflow:hidden;background:var(--surface)}
 .seg button{border:0;background:none;padding:7px 12px;font-size:13px;font-weight:600;color:var(--ink-2);cursor:pointer;font-family:inherit;white-space:nowrap}
-.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.seg button:is([aria-pressed="true"],[aria-selected="true"]){background:var(--navy);color:#fff}
 .seg button b{font-weight:700;opacity:.8;margin-left:4px}
 .dtools{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
 .dtools .sp{flex:1}
@@ -469,7 +469,7 @@ kbd{display:inline-block;min-width:18px;text-align:center;font:600 11px var(--di
 .sc-k>div{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:10px 13px}
 .sc-k b{display:block;font-size:24px;line-height:1.15}.sc-k span{font-size:12px;color:rgba(255,255,255,.7)}
 .sc-k em{font-style:normal;font-weight:700}.sc-k em.up{color:#7ee0b8}.sc-k em.dn{color:#ff9b8f}
-.seg.dark{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}.seg.dark button{color:rgba(255,255,255,.8)}.seg.dark button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}
+.seg.dark{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.06)}.seg.dark button{color:rgba(255,255,255,.8)}.seg.dark button:is([aria-pressed="true"],[aria-selected="true"]){background:var(--sky);color:var(--navy-deep)}
 .chart.dark{position:relative;z-index:1}.chart.dark .ax-d,.ax-d{font-size:11px;fill:rgba(255,255,255,.6)}
 .chart.dark .pk{font-size:11px;font-weight:700;fill:#fff}
 .chart.dark .col-bg{fill:transparent}.chart.dark .col:hover .col-bg{fill:rgba(255,255,255,.07)}
@@ -622,11 +622,11 @@ select.inp.sel{min-width:0;width:auto}
 .cp-list{grid-template-columns:repeat(auto-fill,minmax(290px,1fr))}
 .cp-out .seg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;border:0;background:none;overflow:visible}
 .cp-out .seg button{border:1px solid var(--border-strong);border-radius:5px;padding:9px 10px;background:var(--surface)}
-.cp-out .seg button[aria-pressed="true"]{border-color:var(--navy)}
+.cp-out .seg button:is([aria-pressed="true"],[aria-selected="true"]){border-color:var(--navy)}
 .callp .cp-t textarea{min-height:44px}
 .card.draft,.card.callp{margin-bottom:18px}
 .cp-out .seg{width:100%;padding:0;height:auto;min-height:0}
-.cp-out .seg button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+.cp-out .seg button:is([aria-pressed="true"],[aria-selected="true"]){background:var(--navy);color:#fff;border-color:var(--navy)}
 .cp-list{grid-template-columns:repeat(auto-fill,minmax(360px,1fr))}
 .cp-c b{white-space:nowrap}
 
@@ -688,6 +688,9 @@ em,i,cite,address,dfn{font-style:normal}
 /* Coming to AWG: whole names, and the cards fill the row */
 .up .up-m b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.up .up-m em{white-space:normal}
 @media(max-width:560px){.chart.dark{overflow-x:auto}.chart.dark svg{min-width:520px}}
+
+/* phones: buttons big enough to tap on a call */
+@media(max-width:560px){.btn.sm,.racts .btn,.seg button,.dtools .btn{min-height:40px}.btn{min-height:40px}}
 </style>
 <script src="/assets/session.js"></script>
 </head>
@@ -793,7 +796,10 @@ const first=n=>String(n||"").trim().split(/\s+/)[0]||"";
 const safe=s=>String(s).toLowerCase().replace(/[^a-z0-9-]/g,"-").slice(0,80);
 const nwj=L=>L.filter(Boolean).map(x=>'<span class="nw">'+esc(x)+'</span>').join(' · ');
 const pct=(a,b)=>b?Math.round(a/b*100):0;
-const today=()=>new Date().toISOString().slice(0,10);
+/* today in Eastern time (AWG calls are set in ET), not UTC */
+const today=()=>{ try{ const t=new Date().toLocaleDateString("en-CA",{timeZone:"America/New_York"}); if(/^\d{4}-\d{2}-\d{2}$/.test(t)) return t; }catch(e){} return new Date().toISOString().slice(0,10); };
+const fmtDE=iso=>{ try{ return new Date(iso).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric",timeZone:"America/New_York"}); }catch(e){ return fmtD(iso); } };
+const fmtT=iso=>{ try{ return new Date(iso).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",timeZone:"America/New_York"}).toLowerCase()+" ET"; }catch(e){ return ""; } };
 const daysTo=d=>Math.round((new Date(String(d).slice(0,10)+"T12:00:00")-new Date(today()+"T12:00:00"))/864e5);
 const ago=iso=>{ if(!iso) return ""; const d=Math.floor((Date.now()-new Date(iso))/864e5); return d<=0?"today":d===1?"1 day":d+" days"; };
 const YR=String(new Date().getFullYear());
@@ -802,60 +808,6 @@ const YR=String(new Date().getFullYear());
 async function get(n){ const r=await fetch(U(n),{headers:{Authorization:"Bearer "+tok()},cache:"no-store"}); if(r.status===404) return {data:null,sha:null}; if(!r.ok) throw new Error(n+" "+r.status); const j=await r.json(); return {data:(j&&j.data)||null,sha:(j&&j.sha)||null}; }
 async function put(n,content,sha){ return fetch(U(n),{method:"PUT",headers:{"Content-Type":"application/json",Authorization:"Bearer "+tok()},body:JSON.stringify({content,sha:sha||undefined})}); }
 async function update(n,fn){ for(let i=0;i<5;i++){ const g=await get(n); const next=fn(g.data?clone(g.data):null); const r=await put(n,next,g.sha); if(r.ok) return next; if(r.status!==409&&r.status!==422) throw new Error("save "+r.status); await new Promise(s=>setTimeout(s,300+i*400)); } throw new Error("busy"); }
-
-/* ---------- saving without undoing anyone's work (November 5, 2026) ----------
-   A submission can sit open for hours, and this page only re-reads it after its own saves.
-   Saving used to put back this screen's whole call record (and any row note it still had)
-   unless it was missing a recorded call, so votes, an outcome or a call date someone else
-   saved were undone, and a note someone else removed came back. Now a save carries only what
-   was changed on this screen since the submission was loaded (or last saved here). Everything
-   else keeps its newest value; the change is merged into the latest copy at the moment it is
-   written, and again on a retry. If two people changed the same note, vote or field, the
-   person saving is asked which to keep, and the review page says so when someone else saves
-   the same submission. The roster and the reviewers list work the same way. */
-const OPENED=new WeakMap();   // a submission as loaded or saved -> {base: that copy, sig: how it read}
-const sigOf=d=>JSON.stringify(Object.assign({},d,{timing:null}));
-const noteOpened=d=>{ if(d&&typeof d==="object") OPENED.set(d,{base:clone(d),sig:sigOf(d)}); return d; };
-const baseOf=d=>{ const o=d&&OPENED.get(d); return o?o.base:null; };
-const normVal=v=>v===undefined||v===null||v===""?"":typeof v==="number"||typeof v==="boolean"?String(v):typeof v==="string"?v:JSON.stringify(v);
-const sameVal=(x,y)=>normVal(x)===normVal(y);
-const showVal=v=>{ const t=normVal(v); return t===""?"(blank)":t.slice(0,80); };
-function askClash(what,lines){ return window.confirm("While you had "+what+" open, someone else saved something different in the same "+(lines.length===1?"place":"places")+":\n\n"+lines.map(l=>"• "+l).join("\n")+"\n\nOK keeps yours. Cancel keeps theirs for "+(lines.length===1?"this one":"these")+" — your other changes still save."); }
-/* lists two people can both add to (the reviewers): keep their additions, add mine, apply my removals */
-function mergeList(cur,mine,base){ cur=Array.isArray(cur)?cur:[]; mine=Array.isArray(mine)?mine:[]; base=Array.isArray(base)?base:[];
-  const key=x=>JSON.stringify(x), had=new Set(base.map(key)), keep=new Set(mine.map(key));
-  const out=cur.filter(x=>!(had.has(key(x))&&!keep.has(key(x)))), have=new Set(out.map(key));
-  mine.forEach(x=>{ if(!had.has(key(x))&&!have.has(key(x))){ out.push(x); have.add(key(x)); } }); return out; }
-/* the call record's fields (and each member's vote) changed here, and which of them someone else
-   changed to something different. Who was there follows the call date (it comes from Meeting
-   Trackers), so it only counts as changed here when the date was. */
-function callChanges(cur,mine,base){ base=base||{}; cur=cur||{}; const out=[], date=!sameVal(mine.date,base.date);
-  Object.keys(Object.assign({},mine,base)).forEach(k=>{ if(k==="votes") return; if((k==="present"||k==="others")&&!date) return; if(sameVal(mine[k],base[k])) return;
-    out.push({k,clash:!sameVal(cur[k],base[k])&&!sameVal(cur[k],mine[k]),theirs:cur[k],yours:mine[k]}); });
-  const V=mine.votes||{}, BV=base.votes||{}, CV=cur.votes||{};
-  Object.keys(Object.assign({},V,BV)).forEach(n=>{ if(sameVal(V[n],BV[n])) return; out.push({k:"votes",n,clash:!sameVal(CV[n],BV[n])&&!sameVal(CV[n],V[n]),theirs:CV[n]||"For",yours:V[n]||"For"}); });
-  return out; }
-function callOnto(cur,mine,changes,skip){ const out=clone(cur||{});
-  changes.forEach(c=>{ if(skip(c)) return; if(c.k==="votes"){ out.votes=Object.assign({},out.votes||{}); if(mine.votes&&mine.votes[c.n]!==undefined) out.votes[c.n]=mine.votes[c.n]; else delete out.votes[c.n]; return; }
-    if(mine[c.k]===undefined) delete out[c.k]; else out[c.k]=clone(mine[c.k]); });
-  return out; }
-/* the roster as typed, laid over the newest roster. Rows line up with the roster as this page
-   loaded it (a removed row is null); rows past its end were added here. memo holds the answer to
-   "keep yours?" so a retry doesn't ask again. */
-function rosterOnto(cur,mine,base,memo){ cur=clone(cur); base=base||{}; const out=cur, plan=[], lines=[];
-  const key=m=>JSON.stringify(["cop","name","org"].map(k=>normVal(m&&m[k]).trim())), real=m=>!!(m&&(m.cop||m.name)), who=m=>[m.name,m.cop].filter(Boolean).join(", ");
-  Object.keys(Object.assign({},mine,base)).forEach(k=>{ if(k==="members"||sameVal(mine[k],base[k])) return; const c=!sameVal(cur[k],base[k])&&!sameVal(cur[k],mine[k]);
-    if(c) lines.push(k+" — theirs: "+showVal(cur[k])+"   ·   yours: "+showVal(mine[k])); plan.push({c,go:()=>{ if(mine[k]===undefined) delete out[k]; else out[k]=clone(mine[k]); }}); });
-  const M=(cur.members||[]).slice(), B=base.members||[], Y=mine.members||[];
-  B.forEach((b,i)=>{ const y=Y[i]; if(real(y)&&key(y)===key(b)) return; const j=M.findIndex(x=>x&&key(x)===key(b));
-    if(j>=0){ plan.push({go:()=>{ M[j]=real(y)?clone(y):null; }}); return; }
-    if(!real(y)) return;   /* removed here, and already changed or removed by someone else: theirs stands */
-    lines.push(who(b)+" — someone else changed or removed this row; yours: "+who(y));
-    plan.push({c:true,go:()=>{ const s=i<M.length&&M[i]&&!B.some(x=>key(x)===key(M[i]))?i:-1; if(s>=0) M[s]=clone(y); else M.push(clone(y)); }}); });
-  Y.slice(B.length).forEach(y=>{ if(real(y)) plan.push({go:()=>{ if(!M.some(x=>x&&key(x)===key(y))) M.push(clone(y)); }}); });
-  if(lines.length&&memo.keep===undefined) memo.keep=askClash("the roster",lines);
-  plan.forEach(p=>{ if(!p.c||memo.keep!==false) p.go(); });
-  out.members=M.filter(real); return out; }
 /* Claude, through the relay's Ask route on this project (the key stays in the relay) */
 async function ask(prompt){ const r=await fetch(RELAY+"/"+PROJECT+"/ask",{method:"POST",cache:"no-store",headers:{Authorization:"Bearer "+tok(),"Content-Type":"application/json"},body:JSON.stringify({prompt})}); const b=await r.json().catch(()=>({})); if(!r.ok) throw new Error((b&&b.message)||("Claude "+r.status)); return String((b&&b.text)||""); }
 
@@ -883,8 +835,7 @@ const ROSTER0={chair:"Mark Kleingers (Actualize Consulting)",vice:"Chris Trujill
   {cop:"Secondary CoP",name:"Mark Friend",org:"Fannie Mae"},{cop:"Title & Closing CoP",name:"Bryan Bedard",org:"Rocket Close"},{cop:"Property & Valuation Services CoP",name:"Chris Williams",org:"AIMS Dashboard"}],
   vacant:["Servicing CoP","eMortgage CoP","HERO CoP","Business Process Model CoP"]};
 const CALLS0=["2026-11-12","2026-11-26","2026-12-10","2026-12-24"];
-const rosterIn=cfg=>(cfg&&cfg.roster&&(cfg.roster.members||[]).length)?cfg.roster:ROSTER0;
-const roster=()=>rosterIn(S.cfg);
+const roster=()=>(S.cfg.roster&&(S.cfg.roster.members||[]).length)?S.cfg.roster:ROSTER0;
 const voters=()=>(roster().members||[]).filter(m=>m.name&&!/vacant/i.test(m.name));
 const quorumNeed=()=>(+roster().need>0)?+roster().need:Math.floor(voters().length/2)+1;
 /* the next AWG calls: the dates staff keep on the Roster and Calls page, then every other Thursday */
@@ -892,14 +843,20 @@ function nextCalls(n){ const L=(S.cfg.calls||CALLS0).filter(d=>d>=today()&&!mism
   while(L.length<n){ const d=new Date(last+"T12:00:00"); d.setDate(d.getDate()+14); last=d.toISOString().slice(0,10); if(last>=today()&&!mismoHoliday(last)) L.push(last); } return L.slice(0,n); }
 
 /* ---------- state ---------- */
-const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{},bt:null,up:[],filter:"awg",edit:null,loaded:false,rowPg:{},dec:{page:0,size:10,year:"all",q:""},saving:{},stale:{},cfgBase:{}};
+const S={me:{name:"",email:""},role:"",queue:{},docs:{},learn:{},cfg:{},bt:null,up:[],filter:"awg",edit:null,loaded:false,rowPg:{},dec:{page:0,size:10,year:"all",q:""}};
 const canEdit=()=>{ try{ if(RS()&&RS().canEdit) return !!RS().canEdit(PROJECT); }catch(e){} return S.role==="admin"||S.role==="staff"; };
 const sameNm=(a,b)=>{ a=String(a||"").replace(/\(.*\)/,"").trim().toLowerCase(); b=String(b||"").trim().toLowerCase(); return !!a&&a===b; };
 /* the AWG chair and facilitator record decisions: whoever is on the Who Records Decisions list, or the chair,
    vice chair or facilitator in Meeting Trackers' roster (Mark and Erin) */
 /* who records decisions here (Jonna, Nov 2): Erin Bittenbender (AWG facilitator) and Mark Kleingers (AWG chair). MISMO staff admins can step in. */
 const RECORDERS=[{n:"Erin Bittenbender",e:"ebittenbender@mismo.org"},{n:"Mark Kleingers",e:"mkleingers@mismo.org"}];
-const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const em=String(S.me.email||"").toLowerCase(); return RECORDERS.some(r=>sameNm(r.n,S.me.name)||(r.e&&r.e===em)); };
+/* who records: the Who Records Decisions list (config.reviewers), plus the chair and facilitator (not the vice chair, Jonna Nov 6) on
+   Meeting Trackers' roster. With no list yet: Erin and Mark. */
+const recorderEmails=()=>((S.cfg&&S.cfg.reviewers)||[]).map(x=>String(x||"").trim().toLowerCase()).filter(Boolean);
+const rosterLeads=()=>{ const R=(S.cfg&&S.cfg.roster)||{}; return [R.chair,R.fac].filter(Boolean); };
+const canReview=()=>{ if(S.role==="admin") return true; if(!canEdit()) return false; const em=String(S.me.email||"").toLowerCase(), L=recorderEmails();
+  if(em&&L.includes(em)) return true; if(rosterLeads().some(n=>sameNm(n,S.me.name))) return true;
+  return !L.length&&RECORDERS.some(r=>sameNm(r.n,S.me.name)||(r.e&&r.e===em)); };
 const isAdmin=()=>S.role==="admin";
 const route=()=>{ const h=location.hash.replace(/^#\/?/,""); const [a,b,c]=h.split("/"); return {view:a||"waiting",rep:b?decodeURIComponent(b):"",from:c?decodeURIComponent(c):""}; };
 function backLink(href,label){ const f=route().from, q=f&&S.queue[f]; if(q) return '<a class="back" href="#/review/'+encodeURIComponent(f)+'">‹ Back to the '+esc((q.wr?q.wr+" ":"")+(q.resub?"Resubmission":"Submission"))+'</a><a class="back" style="margin-left:16px" href="'+href+'">'+label+'</a>'; return '<a class="back" href="'+href+'">‹ '+label+'</a>'; }
@@ -924,56 +881,33 @@ async function load(role){
   const yr=new Date().getFullYear();
   const [q,cfg,bt,l1,l0,up,att,wrs]=await Promise.all(["queue","config","backtest","learn-"+yr,"learn-"+(yr-1),"upcoming","attendance","wrs"].map(n=>get(n).catch(()=>({data:null}))));
   S.att=Object.fromEntries(Object.entries(att.data||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k))); S.wrs=(wrs.data&&wrs.data.items)||{};
-  S.queue=(q.data&&q.data.items)||{}; S.cfg=cfg.data||{}; S.cfgBase=clone(S.cfg); S.bt=bt.data||null;
+  S.queue=(q.data&&q.data.items)||{}; S.cfg=cfg.data||{}; S.bt=bt.data||null;
   S.up=(up.data&&up.data.items)||[]; S.upAt=(up.data&&up.data.asOf)||"";
   S.learn=Object.assign({},(l0.data&&l0.data.rows)||{},(l1.data&&l1.data.rows)||{});
   S.loaded=true; render();
 }
-async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=noteOpened(g.data); return S.docs[rep]||null; }
+async function openDoc(rep){ if(S.docs[rep]) return S.docs[rep]; const g=await get("rev-"+safe(rep)); if(g.data) S.docs[rep]=g.data; return S.docs[rep]||null; }
 async function refreshQueue(){ try{ const q=await get("queue"); S.queue=(q.data&&q.data.items)||{}; }catch(e){} }
-/* save one submission: only the notes, draft, call record and decision changed here go onto the
-   newest copy (November 5, 2026; see "saving without undoing") */
-const STATUS_KEYS=["status","decidedBy","decidedAt","outcome"];
+/* someone else recorded AWG's decision while this page had an older copy */
+function staleErr(srv){ const e=new Error((srv.decidedBy||"Someone")+" recorded AWG’s decision"+(srv.outcome?" ("+srv.outcome+")":"")+(srv.calls&&srv.calls.length&&srv.calls[srv.calls.length-1].at?" on "+fmtDE(srv.calls[srv.calls.length-1].at)+" at "+fmtT(srv.calls[srv.calls.length-1].at):"")+". Your change wasn’t saved; the page now shows the decision."); e.stale=true; e.srv=srv; return e; }
+/* save one submission; on a clash keep the newest note on each row and the newest call record */
 async function saveDoc(doc){
-  S.docs[doc.rep]=doc; const pend=doc.hist||doc.status==="decided"&&!doc._finishedAt?0:(tmPend[doc.rep]||0);
-  const base=baseOf(doc); let keep=null;   // keep: what to leave as someone else saved it, asked once
-  S.saving[doc.rep]=(S.saving[doc.rep]||0)+1;
-  let merged;
-  try{ merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv) return doc; const out=clone(srv);
-    if(!base){ /* a copy this page didn't load (shouldn't happen): the old rules */
-      (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; if(r.note&&(!o.note||String(r.note.at)>=String(o.note.at))) o.note=r.note; else if(!r.note&&o.note&&r._clr&&String(r._clr)>String(o.note.at)) delete o.note; });
-      if(doc.draft&&(!out.draft||String(doc.draft.at)>=String(out.draft.at))) out.draft=doc.draft;
-      const stale=(doc.calls||[]).length<(out.calls||[]).length||out.status==="decided"&&doc.status!=="decided";
-      if(!stale&&doc.call&&(!out.call||String(doc.call.at||"")>=String(out.call.at||""))) out.call=doc.call;
-      out.calls=doc.calls&&doc.calls.length>=(out.calls||[]).length?doc.calls:out.calls;
-      if(!stale) STATUS_KEYS.forEach(k=>{ if(doc[k]!=null) out[k]=doc[k]; });
-      if(!doc.hist) out.timing=mergeTiming(out.timing,doc,pend); return out; }
-    const R=doc.rows||[], B=base.rows||[], O=out.rows||[];
-    const notes=R.map((r,i)=>i).filter(i=>O[i]&&B[i]&&!sameVal(R[i].note,B[i].note));
-    /* recording a call (carry or decide) adds to calls; someone else may have recorded one meanwhile */
-    const myCalls=!sameVal(doc.calls,base.calls), theirCalls=!sameVal(out.calls,base.calls);
-    const ch=doc.call&&!myCalls&&!theirCalls?callChanges(out.call,doc.call,base.call):[];
-    const st=!myCalls&&!theirCalls?STATUS_KEYS.filter(k=>doc[k]!=null&&!sameVal(doc[k],base[k])):[];
-    if(!keep){ const nt=n=>n&&n.t?n.t.slice(0,60)+(n.by?" ("+first(n.by)+")":""):"no note";
-      const noteCl=notes.filter(i=>!sameVal(O[i].note,B[i].note)&&!sameVal(O[i].note,R[i].note));
-      const lines=noteCl.map(i=>"The note on item "+(R[i].item||i+1)+" — theirs: "+nt(O[i].note)+"   ·   yours: "+nt(R[i].note))
-        .concat(ch.filter(c=>c.clash).map(c=>(c.k==="votes"?c.n+"’s vote":"The call’s "+c.k)+" — theirs: "+showVal(c.theirs)+"   ·   yours: "+showVal(c.yours)))
-        .concat(st.filter(k=>!sameVal(out[k],base[k])&&!sameVal(out[k],doc[k])).map(k=>"The "+k+" — theirs: "+showVal(out[k])+"   ·   yours: "+showVal(doc[k])))
-        .concat(myCalls&&theirCalls?["The call record — someone else recorded "+(doc.wr||"this submission")+"’s AWG call too"]:[]);
-      keep=lines.length&&!askClash((doc.wr?doc.wr+" ":"")+"this submission",lines)?{notes:noteCl,call:true}:{notes:[],call:false}; }
-    /* kept theirs for a call both recorded: nothing is saved, so finishing stops instead of emailing a decision that isn't on record */
-    if(myCalls&&theirCalls&&keep.call) throw new Error("someone else already recorded this call. Reload the page to see it");
-    notes.forEach(i=>{ if(keep.notes.includes(i)) return; if(R[i].note) O[i].note=clone(R[i].note); else delete O[i].note; });
-    if(doc.draft&&!sameVal(doc.draft,base.draft)&&(!out.draft||String(doc.draft.at)>=String(out.draft.at))) out.draft=clone(doc.draft);
-    if(myCalls&&(!theirCalls||!keep.call)){ /* this screen recorded the call: its record stands */
-      out.calls=clone(doc.calls); if(doc.call) out.call=clone(doc.call); STATUS_KEYS.forEach(k=>{ if(doc[k]!=null) out[k]=doc[k]; }); }
-    else if(!myCalls&&!theirCalls){ /* a call record someone else has since recorded is never touched (theirCalls) */
-      const skip=c=>keep.call&&c.clash; if(ch.length) out.call=callOnto(out.call,doc.call,ch,skip);
-      st.forEach(k=>{ if(!(keep.call&&!sameVal(out[k],base[k])&&!sameVal(out[k],doc[k]))) out[k]=doc[k]; }); }
+  if(!doc._finishing) S.docs[doc.rep]=doc; const pend=doc.hist||doc.status==="decided"&&!doc._finishedAt?0:(tmPend[doc.rep]||0);
+  let merged; S.saving=(S.saving||0)+1;
+  try{ merged=await update("rev-"+safe(doc.rep),srv=>{ if(!srv){ const x=clone(doc); delete x._finishing; return x; }
+    if(srv.status==="decided"&&!srv.hist&&(doc.status!=="decided"||doc._finishing)) throw staleErr(srv);
+    const out=clone(srv);
+    (doc.rows||[]).forEach((r,i)=>{ const o=out.rows[i]; if(!o) return; if(r.note&&(!o.note||String(r.note.at)>=String(o.note.at))) o.note=r.note; else if(!r.note&&o.note&&r._clr&&String(r._clr)>String(o.note.at)) delete o.note; });
+    if(doc.draft&&(!out.draft||String(doc.draft.at)>=String(out.draft.at))) out.draft=doc.draft;
+    /* a copy that hasn't seen the latest recorded call (a late autosave) never undoes it */ const stale=(doc.calls||[]).length<(out.calls||[]).length||out.status==="decided"&&doc.status!=="decided";
+    if(!stale&&doc.call&&(!out.call||String(doc.call.at||"")>=String(out.call.at||""))) out.call=doc.call;
+    out.calls=doc.calls&&doc.calls.length>=(out.calls||[]).length?doc.calls:out.calls;
+    if(!stale) ["status","decidedBy","decidedAt","outcome"].forEach(k=>{ if(doc[k]!=null) out[k]=doc[k]; });
     if(!doc.hist) out.timing=mergeTiming(out.timing,doc,pend); return out; }); }
-  finally{ S.saving[doc.rep]--; }
-  tmPend[doc.rep]=Math.max(0,(tmPend[doc.rep]||0)-pend); delete merged._finishedAt; delete doc._finishedAt;
-  (merged.rows||[]).forEach(r=>delete r._clr); S.docs[doc.rep]=noteOpened(merged); S.stale[doc.rep]=false; return merged;
+  catch(e){ if(e.stale){ S.docs[doc.rep]=e.srv; refreshQueue(); } throw e; }
+  finally{ S.saving--; }
+  tmPend[doc.rep]=Math.max(0,(tmPend[doc.rep]||0)-pend); delete merged._finishedAt; delete merged._finishing; delete doc._finishedAt;
+  (merged.rows||[]).forEach(r=>delete r._clr); S.docs[doc.rep]=merged; return merged;
 }
 /* ---------- reading the AWG Submission Form (the same MISMO Submission Review Form IM uses) ---------- */
 const sx=v=>v==null?"":String(v).replace(/\r/g,"").trim();
@@ -1055,20 +989,24 @@ async function claudeRead(form,soft,progress){
   const room=Math.max(700,ASK_CAP-AWG_PERSONA.length-headC.length-AWG_ASK_TAIL.length-intro.length-30);
   const use=(pick.length?pick:rows).slice(0,400); const chunks=[]; let cur=[]; let len=0;
   use.forEach(r=>{ const l=rowLine(r).slice(0,Math.min(260,room)); if(len+l.length+1>room&&cur.length){ chunks.push(cur); cur=[]; len=0; } cur.push(l); len+=l.length+1; }); if(cur.length) chunks.push(cur);
-  const out=[]; let k=0;
+  const out=[]; let k=0, failed=0;
   for(const c of chunks.slice(0,8)){ k++; if(progress) progress(k,Math.min(8,chunks.length));
     const p=(AWG_PERSONA+"\n\n"+headC+"\n\n"+intro+(chunks.length>1?" (part "+k+" of "+Math.min(8,chunks.length)+")":"")+"\n"+c.join("\n")+"\n\n"+AWG_ASK_TAIL).slice(0,ASK_CAP);
-    try{ let j=repairJson(await ask(p)); if(!j) j=repairJson(await ask(p.replace("Give your first impression; do not deliberate.","Answer at once with your first impression."))); if(j) out.push(j); }catch(e){ if(!out.length&&k===1) throw e; } }
+    try{ let j=repairJson(await ask(p)); if(!j) j=repairJson(await ask(p.replace("Give your first impression; do not deliberate.","Answer at once with your first impression."))); if(j) out.push(j); else failed++; }catch(e){ if(!out.length&&k===1) throw e; failed++; } }
   if(!out.length) return null;
-  const rank=r=>Math.max(0,REC.indexOf(r)); const rec=out.map(o=>o.rec).filter(r=>REC.includes(r)).sort((a,b)=>rank(b)-rank(a))[0]||"Approve";
+  const rank=r=>Math.max(0,REC.indexOf(r)); const rec=out.map(o=>normRec(o.rec)).filter(Boolean).sort((a,b)=>rank(b)-rank(a))[0]||"Approve";
   const notes=[]; out.forEach(o=>(o.notes||[]).forEach(n=>{ if(n&&n.t&&!notes.some(x=>x.t===n.t)) notes.push({area:n.area||"Structure",t:String(n.t).slice(0,240),items:(n.items||[]).map(String).slice(0,30),src:"claude"}); }));
-  return {rec,sum:[...new Set(out.map(o=>String(o.sum||"").trim()).filter(Boolean))].slice(0,3).join(" ").slice(0,600),notes:notes.slice(0,10)}; }
+  return {rec,sum:[...new Set(out.map(o=>String(o.sum||"").trim()).filter(Boolean))].slice(0,3).join(" ").slice(0,600),notes:notes.slice(0,10),parts:{n:chunks.length,read:out.length,failed}}; }
+/* Claude's recommendation in whatever capitals or wording it used: Approve, Approve With Conditions or Send Back */
+function normRec(x){ const t=String(x||"").trim().toLowerCase(); if(!t) return ""; if(/condition/.test(t)) return "Approve With Conditions"; if(/send.?back|return|reject|deny/.test(t)) return "Send Back"; if(/approv/.test(t)) return "Approve"; return ""; }
 
 /* the draft = the software checks + Claude's read; Claude can only make it stricter by one step at most from clean */
 async function buildDraft(form,progress){ const soft=softDraft(form); let cl=null, err="";
   try{ cl=await claudeRead(form,soft,progress); }catch(e){ err=e.message||"Claude couldn’t be reached"; }
   const rank=r=>Math.max(0,REC.indexOf(r)); const rec=cl?(rank(cl.rec)>=rank(soft.rec)?cl.rec:soft.rec):soft.rec;
-  return {rec,why:soft.why,sum:cl?cl.sum:"",notes:(cl?cl.notes:[]).concat(soft.notes),soft:soft.rec,claude:cl?cl.rec:null,err,at:new Date().toISOString(),by:S.me.name||""}; }
+  /* say plainly when Claude's read is only part of the submission: parts that failed (often the hourly limit), or parts past the 8 it reads */
+  const P=cl&&cl.parts, asked=P?Math.min(8,P.n):0, partial=!P||P.read>=P.n?"":P.failed?"Claude read "+P.read+" of "+P.n+" parts of this submission; "+P.failed+" didn’t come back (often the hourly limit). Ask Claude again later for a fuller read.":"Claude read the first "+asked+" of "+P.n+" parts of this submission (it reads at most "+asked+"); the software checks covered every row.";
+  return {rec,why:soft.why,sum:cl?cl.sum:"",notes:(cl?cl.notes:[]).concat(soft.notes),soft:soft.rec,claude:cl?cl.rec:null,err,partial,parts:P||null,at:new Date().toISOString(),by:S.me.name||""}; }
 /* ---------- shell and search ---------- */
 function shell(body){ const r=route(), w=Object.values(S.queue).filter(isOpen).length, v=r.view==="review"?"waiting":r.view;
   $$(".hq nav button[data-hq]").forEach(b=>{ if(b.dataset.hq===v) b.setAttribute("aria-current","page"); else b.removeAttribute("aria-current"); });
@@ -1080,7 +1018,7 @@ window.__imrSearch=function(){ const out=[]; const go=h=>()=>{ location.hash=h; 
   [["On the Agenda","#/"],["Decided","#/decided"],["Trends","#/trends"],["How the Draft Is Doing","#/draft"],["Help","#/help"]].forEach(([n,h])=>out.push({group:"Pages",name:n,where:"",go:go(h)}));
   return out; };
 function render(){ if(!S.loaded) return; const r=route();
-  if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d) return shell(desk(d)); shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(route().rep===r.rep) shell(x?desk(x):'<div class="empty">That submission isn’t here. It may have been withdrawn.</div>'); }); return; }
+  if(r.view==="review"&&r.rep){ const d=S.docs[r.rep]; if(d){ repairHome(d); return shell(desk(d)); } shell('<div class="empty">Opening the submission…</div>'); openDoc(r.rep).then(x=>{ if(x) repairHome(x); if(route().rep===r.rep) shell(x?desk(x):'<div class="empty">That submission isn’t here. It may have been withdrawn.</div>'); }); return; }
   const V={decided:decidedView,trends:trendsView,draft:draftView,help:helpView,add:addView}[r.view]; shell(V?V():home()); }
 
 /* ---------- home ---------- */
@@ -1163,15 +1101,14 @@ const areaChip=a=>'<span class="ar" style="--ac:'+(ACOL[a]||"var(--ink-3)")+'">'
 function draftCard(doc){ const D=doc.draft; if(!D) return '<div class="card"><h3>The Draft</h3><div class="empty">No draft yet.</div></div>';
   const byA={}; (D.notes||[]).forEach(n=>(byA[n.area]=byA[n.area]||[]).push(n));
   return '<div class="card draft"><div class="dr-h"><span class="lbl">The Draft Recommends</span>'+rchip(D.rec)+'<span class="sp"></span>'+(canReview()&&doc.status!=="decided"&&!doc.hist?'<button type="button" class="btn sm ghost" data-redraft="1">Ask Claude Again</button>':'')+'</div>'+
-    (D.pending?'<p class="dr-sum muted">Claude is reading the rows…</p>':D.sum?'<p class="dr-sum">'+esc(D.sum)+'</p>':'')+'<p class="muted dr-why">'+esc(D.why||"")+(D.claude?' Claude’s read: '+esc(D.claude)+'; the software checks: '+esc(D.soft)+'.':D.err?' Claude couldn’t be reached ('+esc(D.err)+'), so this is the software checks alone.':!D.at&&!D.pending?' This is the software checks for now; Claude’s read comes when the AWG chair or facilitator opens it.':'')+'</p>'+
+    (D.pending?'<p class="dr-sum muted">Claude is reading the rows…</p>':D.sum?'<p class="dr-sum">'+esc(D.sum)+'</p>':'')+'<p class="muted dr-why">'+esc(D.why||"")+(D.claude?' Claude’s read: '+esc(rlab(D.claude))+'; the software checks: '+esc(rlab(D.soft))+'.'+(D.partial?' <b class="dr-part">'+esc(D.partial)+'</b>':''):D.err?' Claude couldn’t be reached ('+esc(D.err)+'), so this is the software checks alone.':!D.at&&!D.pending?' This is the software checks for now; Claude’s read comes when the AWG chair or facilitator opens it.':'')+'</p>'+
     (Object.keys(byA).length?'<div class="dr-notes">'+Object.entries(byA).sort((a,b)=>AREAS.indexOf(a[0])-AREAS.indexOf(b[0])).map(([a,L])=>'<div class="dr-a">'+areaChip(a)+'<ul>'+L.map(n=>'<li>'+esc(n.t)+(n.items&&n.items.length?' <button type="button" class="lnk" data-items="'+esc(n.items.join(","))+'">'+(n.items.length===1?'Item '+esc(n.items[0]):n.items.length+' items')+'</button>':'')+(n.src==="claude"?' <span class="by-c">Claude</span>':'')+'</li>').join("")+'</ul></div>').join("")+'</div>':'<p class="muted">Nothing architectural to raise.</p>')+'</div>'; }
 
 /* the call record: who was there, quorum, the vote, conditions */
 function attFor(date){ return ((S.att||{})[date])||null; }
-function callPanel(doc){
-  /* a call record filled in for the screen is not a change someone made: the copy saves compare
-     against carries it too, so it never replaces one someone else saved (November 5, 2026) */
-  const c=doc.call||(doc.call={date:nextCalls(1)[0],method:"Standard Meeting",votes:{},outcome:"",conditions:"",notes:""}, baseOf(doc)&&!baseOf(doc).call&&(baseOf(doc).call=clone(doc.call)), doc.call); const can=canReview()&&doc.status!=="decided";
+function callPanel(doc){ const c=doc.call||(doc.call={date:nextCalls(1)[0],method:"Standard Meeting",votes:{},outcome:"",conditions:"",notes:""}); const can=canReview()&&doc.status!=="decided";
+  /* arrived without a call date: use the call the date box shows, so the record never has a blank date */
+  if(!c.date&&doc.status!=="decided") c.date=nextCalls(1)[0];
   /* who was there comes from Meeting Trackers (Erin logs it there); this only records the vote */
   const a=attFor(c.date), V=voters(), need=quorumNeed(); const known=!!(a&&a.present&&a.present.length);
   c.present=known?a.present.slice():[]; c.others=known?(a.others||[]).slice():[];
@@ -1219,7 +1156,8 @@ function desk(doc){ if(doc.hist) (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flag
   const calls=doc.calls||[]; const E=estAWG({rows:R.length,awgRows:awgR.length,flagged:flagged.length,awgBoth:R.filter(r=>isAwgRow(r)&&(r.flags||[]).length).length});
   return '<div class="dhead"><div class="t">'+backLink(decided?'#/decided':'#/',decided?'All Decisions':'The Agenda')+'<h1 style="margin-top:6px">'+esc((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||""))+'</h1><div class="sub">'+[nwj([doc.wg,doc.at&&!doc.hist?(doc.fromIm?"From IM Review "+fmtD(doc.at):"Brought in "+fmtD(doc.at)+(doc.by?" by "+doc.by:"")):"",doc.category]),decided||doc.hist?'':'<span class="nw est" title="'+esc(E.tip)+'">'+esc(fmtMin(E.min))+' to review</span>'].filter(Boolean).join(' · ')+'</div>'+(doc.resub?'<div class="resub"><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span><span>'+nwj([doc.resub.first?'first submitted '+fmtD(doc.resub.first):'',doc.resub.date?'resubmitted '+fmtD(doc.resub.date):''])+'</span></div>':'')+'</div>'+
     '<div class="prog">'+(decided?ochip(doc.outcome)+'<span>'+esc(fmtD(doc.decidedAt))+'</span>':(q.status==="carried"?'<b>Carried</b><span>from '+esc(fmtS(q.lastCall))+'</span>':'<b>'+R.length+'</b><span>rows · '+awgR.length+' marked AWG</span>'))+'</div></div>'+
-    staleHtml(doc)+(doc.fromIm?'<div class="card fromim"><b>From IM Review.</b> <span class="muted">IM approved it '+esc(fmtD(doc.fromIm.decidedAt))+(doc.fromIm.decidedBy?' ('+esc(doc.fromIm.decidedBy)+')':'')+'. '+((doc.rows||[]).length)+' rows IM approved come here, with IM’s final wording'+(Object.entries(doc.fromIm.counts||{}).filter(x=>/Denied|Returned|Withdrawn/.test(x[0])&&x[1]).length?'; rows IM denied or returned stay behind':'')+'.</span></div>':'')+
+    (notHome(doc)?'<div class="card homeb" style="border-left:4px solid var(--warn)"><b>AWG’s '+(doc.status==="carried"?'call record':'decision')+' is saved, but it hasn’t reached the work request in the MMS yet.</b> '+(canEdit()?'<button type="button" class="btn sm pri" data-resend="1">Send to the MMS Again</button>':'<span class="muted">MISMO staff or the AWG chair and facilitator can send it on by opening this page.</span>')+'</div>':'')+
+    (doc.fromIm?'<div class="card fromim"><b>From IM Review.</b> <span class="muted">IM approved it '+esc(fmtD(doc.fromIm.decidedAt))+(doc.fromIm.decidedBy?' ('+esc(doc.fromIm.decidedBy)+')':'')+'. '+((doc.rows||[]).length)+' rows IM approved come here, with IM’s final wording'+(Object.entries(doc.fromIm.counts||{}).filter(x=>/Denied|Returned|Withdrawn/.test(x[0])&&x[1]).length?'; rows IM denied or returned stay behind':'')+'.</span></div>':'')+
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: record a call, carry it, decide it. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
     (doc.summary?'<div class="card summ"><span class="lbl">Submission Summary</span><p>'+esc(doc.summary)+'</p>'+(doc.artifacts||doc.structure?'<p class="muted">'+esc([doc.artifacts&&"Artifacts: "+doc.artifacts,doc.structure&&doc.structure+" rows on the Proposed Structure tab",doc.imOutcome&&"IM: "+doc.imOutcome+(doc.imDate?" "+fmtD(doc.imDate):"")].filter(Boolean).join(" · "))+'</p>':'')+'</div>':'')+
     docsHtml(q,doc,doc.rep)+earlierHtml(doc)+
@@ -1232,18 +1170,34 @@ function desk(doc){ if(doc.hist) (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flag
 function earlierHtml(doc){ if(!doc.wr) return ''; const L=Object.values(S.queue).filter(x=>x.rep!==doc.rep&&x.wr===doc.wr&&x.status==="decided").sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt))); if(!L.length) return '';
   return '<div class="card earlier"><h3>Earlier AWG Decisions on '+esc(doc.wr)+'<small>'+L.length+' on record</small></h3><div class="subs">'+L.map(x=>subCard(x).replace('href="#/review/'+encodeURIComponent(x.rep)+'"','href="#/review/'+encodeURIComponent(x.rep)+'/'+encodeURIComponent(doc.rep)+'"')).join('')+'</div></div>'; }
 /* ---------- recording ---------- */
+/* Record the Decision / Save and Carry: the page shows it as recorded only once the call record is saved. Then the
+   queue (what the MMS reads) is told; if that step fails the record stays saved and the page offers Send to the MMS Again. */
 async function finish(doc){ const c=doc.call, by=S.me.name||S.me.email||"", at=new Date().toISOString(); const V=voters(), known=(c.present||[]).length>0, here=V.filter(m=>(c.present||[]).includes(m.name)), who=known?here:V;
   const rec=Object.assign({},c,{need:quorumNeed(),seats:V.length,quorum:known?here.length>=quorumNeed():null,line:minutesLine(doc,c,who.filter(m=>(c.votes||{})[m.name]==="Objects"),who.filter(m=>(c.votes||{})[m.name]==="Abstains")),by,at});
-  doc.calls=(doc.calls||[]).concat([rec]);
-  if(c.outcome==="Carried to Next Call"){ const nx=nextAfter(c.date); doc.call={date:nx,method:c.method,votes:{},outcome:"",conditions:"",notes:""}; doc.status="carried"; await saveDoc(doc);
-    const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"carried",lastCall:c.date,nextCall:nx,calls:doc.calls.length}); return o; }); S.queue=q.items; toast("Saved. It stays on the agenda for "+fmtS(nx)+"."); return false; }
-  doc.status="decided"; doc.outcome=c.outcome; doc.decidedAt=c.date; doc.decidedBy=by; doc._finishedAt=at; const sd=await saveDoc(doc); const tm=sd.timing||{};
-  const agreed=recMatches(doc.draft&&doc.draft.rec,c.outcome);
-  if(!doc.test){ const lr={rep:doc.rep,wr:doc.wr,at,rec:(doc.draft&&doc.draft.rec)||"",soft:(doc.draft&&doc.draft.soft)||"",claude:(doc.draft&&doc.draft.claude)||"",outcome:c.outcome,agreed,calls:doc.calls.length,rows:(doc.rows||[]).length,by}; S.learn[doc.rep]=lr; try{ await update("learn-"+String(c.date).slice(0,4),cur=>{ const o=cur||{rows:{}}; o.rows=o.rows||{}; o.rows[doc.rep]=lr; return o; }); }catch(e){} }
-  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[doc.rep]=Object.assign({},o.items[doc.rep]||{},{status:"decided",outcome:c.outcome,decidedAt:c.date,decidedBy:by,present:known?here.length:null,conds:c.outcome==="Conditional Approval"?String(c.conditions||"").slice(0,200):"",calls:doc.calls.length,agreed,estMin:tm.est||null,activeMin:tm.activeMin!=null?tm.activeMin:null}); return o; }); S.queue=q.items;
-  const it=S.queue[doc.rep]||{}, flow=it.flow||S.cfg.flow;
-  if(!doc.test&&flow&&it.fac&&it.fac.email){ try{ await fetch(flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"AWG decision: "+(doc.wr||"")+" "+(doc.name||""),body:"AWG reviewed "+(doc.wr||"")+" "+(doc.name||"")+" on "+fmtD(c.date)+": "+c.outcome+"."+(c.conditions?"\n\n"+(c.outcome==="Conditional Approval"?"Conditions: ":"What needs to change: ")+c.conditions:"")+"\n\n"+rec.line+"\n\nSee the call record and the rows: https://resources.mismo.org/awg-review/#/review/"+encodeURIComponent(doc.rep),html:"",from:it.from||S.cfg.from||""})}); }catch(e){} }
+  const fin=clone(doc); fin.calls=(doc.calls||[]).concat([rec]); fin._finishing=true;
+  const home=async sd=>{ try{ await sendHome(sd); }catch(e){ e.home=true; throw e; } };
+  if(c.outcome==="Carried to Next Call"){ const nx=nextAfter(c.date); fin.call={date:nx,method:c.method,votes:{},outcome:"",conditions:"",notes:""}; fin.status="carried";
+    const sd=await saveDoc(fin); await home(sd); toast("Saved. It stays on the agenda for "+fmtS(nx)+"."); return false; }
+  Object.assign(fin,{status:"decided",outcome:c.outcome,decidedAt:c.date,decidedBy:by,_finishedAt:at}); const sd=await saveDoc(fin); await home(sd);
   toast("AWG decision recorded: "+c.outcome); return true; }
+/* a saved call record the queue (what the MMS reads) hasn't caught up with */
+const notHome=d=>{ if(!d||d.hist) return false; const q=S.queue[d.rep]; if(!q) return false; const n=(d.calls||[]).length;
+  return d.status==="decided"?q.status!=="decided":d.status==="carried"?(q.status!=="carried"&&q.status!=="decided")||(q.calls||0)<n:false; };
+async function sendHome(doc){ const last=(doc.calls||[]).slice(-1)[0]||doc.call||{}, n=(doc.calls||[]).length;
+  if(doc.status==="carried"){ let already=false; const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; const x=o.items[doc.rep]; already=!!(x&&(x.status==="decided"||(x.status==="carried"&&(x.calls||0)>=n))); if(already) return o; o.items[doc.rep]=Object.assign({},x||{},{status:"carried",lastCall:last.date,nextCall:(doc.call&&doc.call.date)||"",calls:n}); return o; }); S.queue=q.items; return {already}; }
+  const out=doc.outcome||last.outcome, by=doc.decidedBy||last.by||"", at=last.at||new Date().toISOString(), tm=doc.timing||{};
+  const V=voters(), pres=Array.isArray(last.present)&&last.present.length?V.filter(m=>last.present.includes(m.name)).length:null;
+  const agreed=recMatches(doc.draft&&doc.draft.rec,out);
+  if(!doc.test){ const lr={rep:doc.rep,wr:doc.wr,at,rec:(doc.draft&&doc.draft.rec)||"",soft:(doc.draft&&doc.draft.soft)||"",claude:(doc.draft&&doc.draft.claude)||"",outcome:out,agreed,calls:n,rows:(doc.rows||[]).length,by}; S.learn[doc.rep]=lr; try{ await update("learn-"+String(doc.decidedAt||at).slice(0,4),cur=>{ const o=cur||{rows:{}}; o.rows=o.rows||{}; o.rows[doc.rep]=lr; return o; }); }catch(e){} }
+  let already=false;
+  const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; const x=o.items[doc.rep]; already=!!(x&&x.status==="decided"); if(already) return o; o.items[doc.rep]=Object.assign({},x||{},{status:"decided",outcome:out,decidedAt:doc.decidedAt,decidedBy:by,present:pres,conds:out==="Conditional Approval"?String(last.conditions||"").slice(0,200):"",calls:n,agreed,estMin:tm.est||null,activeMin:tm.activeMin!=null?tm.activeMin:null}); return o; }); S.queue=q.items;
+  const it=S.queue[doc.rep]||{}, flow=it.flow||S.cfg.flow;
+  if(!already&&!doc.test&&flow&&it.fac&&it.fac.email){ try{ await fetch(flow,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({to:it.fac.email,cc:"",subject:"AWG decision: "+(doc.wr||"")+" "+(doc.name||""),body:"AWG reviewed "+(doc.wr||"")+" "+(doc.name||"")+" on "+fmtD(last.date)+": "+out+"."+(last.conditions?"\n\n"+(out==="Conditional Approval"?"Conditions: ":"What needs to change: ")+last.conditions:"")+"\n\n"+(last.line||"")+"\n\nSee the call record and the rows: https://resources.mismo.org/awg-review/#/review/"+encodeURIComponent(doc.rep),html:"",from:it.from||S.cfg.from||""})}); }catch(e){} } return {already}; }
+const HOME_FAIL="AWG’s decision is saved, but it hasn’t reached the work request in the MMS yet. Click Send to the MMS Again.";
+const FIN_FAIL="Couldn’t save AWG’s decision. Nothing was lost. Check your connection, then try again.";
+S.repair={};
+function repairHome(d){ if(!notHome(d)||!canEdit()||S.repair[d.rep]) return; S.repair[d.rep]=1;
+  sendHome(d).then(h=>{ if(!h.already) toast("AWG’s decision is now on its way to the work request."); if(route().rep===d.rep) render(); }).catch(()=>{ if(route().rep===d.rep) render(); }); }
 
 function exportXl(doc){ loadXlsx().then(()=>{ const c=(doc.calls||[]).slice(-1)[0]||doc.call||{};
   const H=["Item #","Approval Body","Review Decision (IM AWG Only)","Review Comments (IM AWG Only)","Change Type","Change Target Type","Original/Old Value","Reference Model Location of Target (XPATH)","Parent CONTAINER Name","CONTAINER Name","Data Point Name","Attribute Name","Data Point/Attribute Enumeration Name","Definition","RELATIONSHIP: Verb Phrase","RELATIONSHIP: From","RELATIONSHIP: To","Submitter Comments","Architecture Checks"];
@@ -1330,7 +1284,7 @@ function setupView(){ const R=roster(), ed=isAdmin()||S.role==="staff"; const di
     '<div class="g2"><div class="card"><h3>Voting Members<small>'+voters().length+' assigned · '+quorumNeed()+' needed for quorum</small></h3><div class="ros">'+(R.members||[]).map((m,i)=>'<div class="ros-r"><input class="inp" data-ros="'+i+'|cop" value="'+esc(m.cop)+'" aria-label="Community of Practice"'+dis+'><input class="inp" data-ros="'+i+'|name" value="'+esc(m.name)+'" aria-label="Name"'+dis+'><input class="inp" data-ros="'+i+'|org" value="'+esc(m.org||"")+'" aria-label="Company"'+dis+'>'+(ed?'<button type="button" class="btn sm ghost" data-rosdel="'+i+'" aria-label="Remove">×</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><button type="button" class="btn sm" data-rosadd="1">Add a Voting Member</button><button type="button" class="btn sm pri" data-rossave="1">Save the Roster</button></div>':'')+
       '<h3 style="margin-top:16px">Chairs and Facilitator</h3><div class="ros">'+[["chair","Chair"],["vice","Vice Chair"],["fac","Facilitator"]].map(([k,l])=>'<label class="ros-l">'+l+'<input class="inp" data-rk="'+k+'" value="'+esc(R[k]||"")+'"'+dis+'></label>').join("")+'</div>'+(R.vacant&&R.vacant.length?'<p class="note">Vacant seats: '+esc(R.vacant.join(", "))+'.</p>':'')+'</div>'+
     '<div class="card"><h3>AWG Calls<small>Thursdays, 2:00–3:00 pm ET</small></h3><div class="calls">'+C.map(d=>'<div class="call-r'+(d<today()?' past':'')+'"><b>'+esc(fmtL(d))+'</b><span class="muted">'+(d<today()?'held':daysTo(d)===0?'today':'in '+daysTo(d)+' days')+'</span><span class="sp"></span>'+(ed?'<button type="button" class="btn sm ghost" data-calldel="'+d+'">Remove</button>':'')+'</div>').join("")+'</div>'+(ed?'<div class="racts"><input type="date" class="inp" id="calladd"><button type="button" class="btn sm pri" data-calladd="1">Add a Call</button></div>':'')+'<p class="note">After the last date here, the portal assumes every other Thursday.</p>'+
-      '<h3 style="margin-top:16px">Who Records Decisions</h3><p class="muted">'+((S.cfg.reviewers||[]).length?esc(S.cfg.reviewers.join(", ")):'Anyone with edit access to AWG Review (set in People &amp; Access). Add emails here to limit it to the AWG chair and facilitator.')+'</p>'+(isAdmin()?'<div class="racts"><input class="inp" id="revs" placeholder="emails, comma separated" value="'+esc((S.cfg.reviewers||[]).join(", "))+'"><button type="button" class="btn sm" data-revsave="1">Save</button></div>':'')+'</div></div>'; }
+      '<h3 style="margin-top:16px">Who Records Decisions</h3><p class="muted">'+((S.cfg.reviewers||[]).length?esc(S.cfg.reviewers.join(", "))+'. They record decisions, with the chair, vice chair and facilitator from Meeting Trackers and MISMO staff admins. Everyone else with access can follow along.':'No list yet, so Erin Bittenbender and Mark Kleingers record decisions, with the chair, vice chair and facilitator from Meeting Trackers and MISMO staff admins.')+'</p>'+(isAdmin()?'<div class="racts"><input class="inp" id="revs" placeholder="emails, comma separated" value="'+esc((S.cfg.reviewers||[]).join(", "))+'"><button type="button" class="btn sm" data-revsave="1">Save</button></div>':'')+'</div></div>'; }
 
 /* ---------- bring in a submission from MISMO Connect ---------- */
 S.add=null;
@@ -1357,17 +1311,23 @@ async function addGo(){ const A=S.add, f=A.form; const v=id=>($("#"+id)||{}).val
     const doc={rep,wr:f.wr,name:f.name,wg:f.wg,cop:f.cop,file:A.file,at:new Date().toISOString(),by:S.me.name||"",summary:f.summary,category:f.category,artifacts:f.artifacts,structure:f.structure,imOutcome:f.imOutcome,imDate:f.imDate,resub:+f.resub>0?{n:String(f.resub),first:f.firstDate,date:f.resubDate,why:f.resubWhy}:null,url:/^https:\/\//.test(A.url)?A.url:"",rows:f.rows,draft,call:{date:call,method:"Standard Meeting",present:[],others:[],votes:{},outcome:"",conditions:"",notes:""},calls:[],status:"awaiting",test};
     const r=await put("rev-"+rep,doc); if(!r.ok) throw new Error("Couldn’t save ("+r.status+")");
     const item={rep,wr:f.wr,name:f.name,wrName:W.name||"",wg:f.wg,ticket:W.ticket||"",status:"awaiting",sentAt:doc.at,sentBy:doc.by,rows:f.rows.length,awgRows:f.rows.filter(isAwgRow).length,flagged:f.rows.filter(x=>(x.flags||[]).length).length,rec:draft.rec,nextCall:call,test,resub:+f.resub>0,fac:{name:fac,email:A.facEmail},docs:W.docs||[],flow:S.cfg.flow||"",from:S.cfg.from||""};
-    const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[rep]=item; return o; }); S.queue=q.items; S.docs[rep]=noteOpened(doc); S.add=null; toast("On the agenda for "+fmtS(call)); location.hash="#/review/"+encodeURIComponent(rep); }
+    const q=await update("queue",cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; o.items[rep]=item; return o; }); S.queue=q.items; S.docs[rep]=doc; S.add=null; toast("On the agenda for "+fmtS(call)); location.hash="#/review/"+encodeURIComponent(rep); }
   catch(e){ A.busy=""; A.err=e.message; render(); toast("Couldn’t bring it in: "+e.message); } }
 /* ---------- wiring ---------- */
-let tt; function toast(m){ let t=$(".toast"); if(!t){ t=document.createElement("div"); t.className="toast"; document.body.appendChild(t); } t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,3600); }
+/* toasts are a polite live region, so screen readers hear saves and errors */
+let tt; function toastEl(){ let t=$(".toast"); if(!t&&document.body){ t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.setAttribute("aria-live","polite"); t.hidden=true; document.body.appendChild(t); } return t; }
+function toast(m){ const t=toastEl(); if(!t) return; t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,m.length>90?7000:3600); }
+/* filter rows of buttons marked as tab lists are tabs to assistive tech */
+function tabRoles(m){ $$('[role="tablist"]',m).forEach(tl=>$$("button",tl).forEach(b=>{ const on=b.getAttribute("aria-pressed")==="true"||b.getAttribute("aria-selected")==="true"; b.setAttribute("role","tab"); b.setAttribute("aria-selected",String(on)); b.removeAttribute("aria-pressed"); })); }
+/* after a note is saved or removed, keep keyboard focus on that row */
+function refocus(i){ const el=document.querySelector('.rows [data-row="'+i+'"]'); if(!el) return; const bt=el.querySelector(".racts button"); if(bt) bt.focus({preventScroll:true}); else { el.tabIndex=-1; el.focus({preventScroll:true}); } }
 function keep(fn){ const y=window.scrollY; return async(...a)=>{ await fn(...a); window.scrollTo(0,y); }; }
 const RM_=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches; const seenView={};
 function countUp(m){ const v=route().view; if(RM_||seenView[v]) return; seenView[v]=1; $$("[data-count]",m).forEach(el=>{ const to=+el.dataset.count; if(!(to>0)) return; const t0=performance.now(), dur=700; const step=t=>{ const k=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-k,3); el.textContent=Math.round(to*e).toLocaleString(); if(k<1) requestAnimationFrame(step); }; el.textContent="0"; requestAnimationFrame(step); }); }
 function celebrate(){ if(RM_) return; const c=document.createElement("canvas"); c.className="confetti"; c.width=innerWidth; c.height=innerHeight; document.body.appendChild(c); const x=c.getContext("2d"); const cols=["#74bfeb","#0f7b5c","#2477b8","#eda100","#e87ba4"]; const P=Array.from({length:120},()=>({x:innerWidth/2,y:innerHeight*0.35,vx:(Math.random()-.5)*14,vy:Math.random()*-12-3,r:Math.random()*5+3,c:cols[Math.random()*cols.length|0],a:Math.random()*6})); const t0=performance.now();
   (function f(t){ const k=(t-t0)/1600; x.clearRect(0,0,c.width,c.height); P.forEach(p=>{ p.vy+=0.38; p.x+=p.vx; p.y+=p.vy; p.a+=0.2; x.save(); x.globalAlpha=Math.max(0,1-k); x.translate(p.x,p.y); x.rotate(p.a); x.fillStyle=p.c; x.fillRect(-p.r,-p.r/2,p.r*2,p.r); x.restore(); }); if(k<1) requestAnimationFrame(f); else c.remove(); })(t0); }
-async function saveCfg(fn,msg){ try{ const o=await update("config",cur=>fn(cur||{})); S.cfg=o; S.cfgBase=clone(o); toast(msg||"Saved"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); }
-function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
+async function saveCfg(fn,msg){ try{ const o=await update("config",cur=>fn(cur||{})); S.cfg=o; toast(msg||"Saved"); }catch(e){ toast("Couldn’t save that. Try again."); } render(); }
+function wire(){ const m=$("#main"); tabRoles(m); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-years]",m).forEach(b=>b.onclick=()=>{ S.homeYears=+b.dataset.years; seenView.waiting=1; render(); });
   $$("[data-upall]",m).forEach(b=>b.onclick=()=>{ S.upAll=!S.upAll; seenView.waiting=1; render(); });
   $$("[data-docsall]",m).forEach(b=>b.onclick=()=>{ S.docsAll=S.docsAll===b.dataset.docsall?"":b.dataset.docsall; render(); });
@@ -1384,25 +1344,23 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-addgo]",m).forEach(b=>b.onclick=()=>addGo());
   /* roster and calls */
   const R=()=>clone(roster());
-  $$("[data-rossave]",m).forEach(b=>b.onclick=()=>{ const r=R(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); $$("[data-rk]",m).forEach(inp=>r[inp.dataset.rk]=inp.value.trim());
-    /* only the rows and names changed here go onto the newest roster (November 5, 2026) */
-    const was=clone(rosterIn(S.cfgBase)), memo={}; saveCfg(c=>Object.assign(c,{roster:rosterOnto(rosterIn(c),r,was,memo)}),"Roster saved"); });
+  $$("[data-rossave]",m).forEach(b=>b.onclick=()=>{ const r=R(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); $$("[data-rk]",m).forEach(inp=>r[inp.dataset.rk]=inp.value.trim()); r.members=r.members.filter(x=>x.cop||x.name); saveCfg(c=>Object.assign(c,{roster:r}),"Roster saved"); });
   $$("[data-rosadd]",m).forEach(b=>b.onclick=()=>{ const r=R(); $$("[data-ros]",m).forEach(inp=>{ const [i,k]=inp.dataset.ros.split("|"); r.members[+i][k]=inp.value.trim(); }); r.members.push({cop:"",name:"",org:""}); S.cfg.roster=r; render(); });
-  $$("[data-rosdel]",m).forEach(b=>b.onclick=()=>{ const r=R(); r.members[+b.dataset.rosdel]=null; const was=clone(rosterIn(S.cfgBase)), memo={}; saveCfg(c=>Object.assign(c,{roster:rosterOnto(rosterIn(c),r,was,memo)}),"Removed"); });
+  $$("[data-rosdel]",m).forEach(b=>b.onclick=()=>{ const r=R(); r.members.splice(+b.dataset.rosdel,1); saveCfg(c=>Object.assign(c,{roster:r}),"Removed"); });
   $$("[data-calldel]",m).forEach(b=>b.onclick=()=>saveCfg(c=>Object.assign(c,{calls:(c.calls||CALLS0).filter(d=>d!==b.dataset.calldel)}),"Call removed"));
   $$("[data-calladd]",m).forEach(b=>b.onclick=()=>{ const d=($("#calladd",m)||{}).value; if(!d) return toast("Pick a date first"); saveCfg(c=>Object.assign(c,{calls:[...new Set((c.calls||CALLS0).concat([d]))].sort()}),"Call added"); });
-  $$("[data-revsave]",m).forEach(b=>b.onclick=()=>{ const L=(($("#revs",m)||{}).value||"").split(/[,;\s]+/).map(x=>x.trim().toLowerCase()).filter(x=>/@/.test(x)); const was=(S.cfgBase.reviewers||[]).slice(); saveCfg(c=>Object.assign(c,{reviewers:mergeList(c.reviewers,L,was)}),"Saved"); });
+  $$("[data-revsave]",m).forEach(b=>b.onclick=()=>{ const L=(($("#revs",m)||{}).value||"").split(/[,;\s]+/).map(x=>x.trim().toLowerCase()).filter(x=>/@/.test(x)); saveCfg(c=>Object.assign(c,{reviewers:L}),"Saved"); });
   /* the desk */
   const r=route(); if(r.view!=="review") return; const doc=S.docs[r.rep]; if(!doc) return;
-  const save=keep(async()=>{ try{ await saveDoc(doc); }catch(e){ toast("Couldn’t save. Check your connection and try again."); } render(); });
+  const save=keep(async(fi)=>{ try{ await saveDoc(doc); }catch(e){ toast(e.stale?e.message:"Couldn’t save. Check your connection and try again."); } render(); if(fi!=null&&typeof fi!=="object") refocus(fi); });
   /* one autosave timer for the page (not one per render), so finishing can cancel it */
-  const saveSoon=()=>{ clearTimeout(S.saveT); S.saveT=setTimeout(()=>{ if(doc.status!=="decided") saveDoc(doc).catch(()=>toast("Couldn’t save. Check your connection.")); },1200); };
+  const saveSoon=()=>{ clearTimeout(S.saveT); S.saveT=setTimeout(()=>{ if(doc.status!=="decided") saveDoc(doc).catch(e=>{ if(e.stale){ toast(e.message); render(); } else toast("Couldn’t save. Check your connection."); }); },1200); };
   $$("[data-f]",m).forEach(b=>b.onclick=()=>{ S.filter=b.dataset.f; S.edit=null; render(); });
   $$("[data-items]",m).forEach(b=>b.onclick=()=>{ S.items=b.dataset.items.split(","); S.filter="items"; render(); const t=$(".dtools",$("#main")); if(t) t.scrollIntoView({block:"start",behavior:"smooth"}); });
   $$("[data-chg]",m).forEach(b=>b.onclick=keep(async()=>{ S.edit=+b.dataset.chg; render(); }));
   $$("[data-cancel]",m).forEach(b=>b.onclick=keep(async()=>{ S.edit=null; render(); }));
-  $$("[data-save]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.save], t=($("textarea[name=note]",b.closest(".edit"))||{}).value||""; if(t.trim()) x.note={t:t.trim(),by:S.me.name||S.me.email,at:new Date().toISOString()}; else { delete x.note; x._clr=new Date().toISOString(); } S.edit=null; render(); save(); });
-  $$("[data-clr]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.clr]; delete x.note; x._clr=new Date().toISOString(); S.edit=null; render(); save(); });
+  $$("[data-save]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.save], t=($("textarea[name=note]",b.closest(".edit"))||{}).value||""; if(t.trim()) x.note={t:t.trim(),by:S.me.name||S.me.email,at:new Date().toISOString()}; else { delete x.note; x._clr=new Date().toISOString(); } S.edit=null; render(); refocus(x.i); save(x.i); });
+  $$("[data-clr]",m).forEach(b=>b.onclick=()=>{ const x=doc.rows[+b.dataset.clr]; delete x.note; x._clr=new Date().toISOString(); S.edit=null; render(); refocus(x.i); save(x.i); });
   const c=doc.call;
   $$("[data-attopen]",m).forEach(b=>b.onclick=keep(async()=>{ S.attOpen=S.attOpen===doc.rep?"":doc.rep; render(); }));
   $$("[data-cf]",m).forEach(el=>el.onchange=el.oninput=()=>{ const k=el.dataset.cf; c[k]=el.value; if(k==="date"){ render(); } else { const ml=$("#minline"); if(ml&&c.outcome){ const V=(c.present||[]).length?voters().filter(x=>(c.present||[]).includes(x.name)):voters(); ml.textContent=minutesLine(doc,c,V.filter(x=>(c.votes||{})[x.name]==="Objects"),V.filter(x=>(c.votes||{})[x.name]==="Abstains")); } } saveSoon(); });
@@ -1412,30 +1370,31 @@ function wire(){ const m=$("#main"); $$(".chart",m).forEach(tipOn); countUp(m);
   $$("[data-vote]",m).forEach(b=>b.onclick=keep(async()=>{ const [n,v]=b.dataset.vote.split("|"); c.votes=Object.assign({},c.votes||{}); if(v==="For") delete c.votes[n]; else c.votes[n]=v; render(); saveSoon(); }));
   $$("[data-out]",m).forEach(b=>b.onclick=keep(async()=>{ c.outcome=b.dataset.out; render(); saveSoon(); }));
   $$("[data-copymin]",m).forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText($("#minline").textContent); toast("Copied for the minutes"); }catch(e){ toast("Select the text and copy it"); } });
-  $$("[data-redraft]",m).forEach(b=>b.onclick=async()=>{ b.disabled=true; b.textContent="Asking Claude…"; try{ const d=await buildDraft({rows:doc.rows,wr:doc.wr,name:doc.name,summary:doc.summary,category:doc.category,artifacts:doc.artifacts,wg:doc.wg},(k,n)=>{ b.textContent="Claude: part "+k+" of "+n+"…"; }); if(d.err&&doc.draft&&doc.draft.claude){ toast("Claude couldn’t be reached ("+d.err+"). The earlier draft stays."); render(); return; } doc.draft=d; await saveDoc(doc); try{ await update("queue",cur=>{ const o=cur||{items:{}}; if(o.items&&o.items[doc.rep]) o.items[doc.rep].rec=d.rec; return o; }); S.queue[doc.rep]&&(S.queue[doc.rep].rec=d.rec); }catch(e){} toast(d.err?"Claude couldn’t be reached; the software checks are current":"The draft is updated"); }catch(e){ toast("Couldn’t update the draft: "+e.message); } render(); });
+  $$("[data-redraft]",m).forEach(b=>b.onclick=async()=>{ b.disabled=true; b.textContent="Asking Claude…"; try{ const d=await buildDraft({rows:doc.rows,wr:doc.wr,name:doc.name,summary:doc.summary,category:doc.category,artifacts:doc.artifacts,wg:doc.wg},(k,n)=>{ b.textContent="Claude: part "+k+" of "+n+"…"; }); if(d.err&&doc.draft&&doc.draft.claude){ toast("Claude couldn’t be reached ("+d.err+"). The earlier draft stays."); render(); return; } doc.draft=d; await saveDoc(doc); try{ await update("queue",cur=>{ const o=cur||{items:{}}; if(o.items&&o.items[doc.rep]) o.items[doc.rep].rec=d.rec; return o; }); S.queue[doc.rep]&&(S.queue[doc.rep].rec=d.rec); }catch(e){} toast(d.err?"Claude couldn’t be reached; the software checks are current":d.partial?"The draft is updated. "+d.partial:"The draft is updated"); }catch(e){ toast("Couldn’t update the draft: "+e.message); } render(); });
   $$("[data-finish]",m).forEach(b=>b.onclick=async()=>{ const carry=c.outcome==="Carried to Next Call"; if(!confirm(carry?"Save this call and carry "+(doc.wr||"the submission")+" to the next call?":"Record AWG’s decision on "+(doc.wr||"this submission")+": "+c.outcome+"?"+(doc.test?"":" The facilitator gets an email."))) return; b.disabled=true; clearTimeout(S.saveT);
-    try{ const done=await finish(doc); if(done) celebrate(); }catch(e){ toast("Couldn’t record it: "+e.message); b.disabled=false; return; } render(); });
+    try{ const done=await finish(doc); if(done) celebrate(); }catch(e){ if(e.stale||e.home){ toast(e.stale?e.message:HOME_FAIL); render(); return; } toast(FIN_FAIL); b.disabled=false; return; } render(); });
+  $$("[data-resend]",m).forEach(b=>b.onclick=async()=>{ b.disabled=true; try{ await sendHome(S.docs[r.rep]||doc); toast("AWG’s decision is now on its way to the work request."); }catch(e){ toast("Still couldn’t reach it. Check your connection and try again in a minute."); } render(); });
   $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
 }
 document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
 window.addEventListener("hashchange",()=>{ S.edit=null; const r=route(); if(r.view==="review") S.filter="awg"; window.scrollTo(0,0); render(); });
 setInterval(async()=>{ if(document.hidden||route().view==="review"||route().view==="add"||route().view==="setup") return; await refreshQueue(); render(); },60000);
-/* the review page says so when someone else saves the same submission (November 5, 2026) */
-const STALE='<div class="card stalenote" style="border-left:4px solid var(--warn)"><b>Someone else just saved this submission.</b> <span class="muted">Saving keeps their changes and adds yours.</span></div>';
-function staleHtml(doc){ return S.stale[doc.rep]?STALE:''; }
-setInterval(async()=>{ const r=route(); if(r.view!=="review"||document.hidden||S.stale[r.rep]) return; const doc=S.docs[r.rep], o=doc&&OPENED.get(doc); if(!o||doc.hist||S.saving[r.rep]) return;
-  try{ const g=await get("rev-"+safe(r.rep)); if(!g.data||S.docs[r.rep]!==doc||S.saving[r.rep]||sigOf(g.data)===o.sig) return;
-    S.stale[r.rep]=true; const h=$("#main .dhead"); if(h&&route().rep===r.rep&&!$("#main .stalenote")) h.insertAdjacentHTML("afterend",STALE); }catch(e){} },60000);
 
 /* ---------- start: sign in, then the gate decides who gets in ---------- */
-function start(){ const rs=RS(); if(!rs){ setTimeout(start,100); return; }
+function start(){ toastEl(); const rs=RS(); if(!rs){ setTimeout(start,100); return; }
   rs.requireAccess(PROJECT,{toolName:"AWG Review",eyebrow:"Governance · Architecture Workgroup"}).then(load).catch(e=>{ console.error("awg-review",e); }); }
-window.__awgr={S,load,render,readForm,softDraft,rowFlags,buildDraft};
+/* attendance and the roster come from Meeting Trackers: re-read them while the page stays open (inside the page's
+   code, so it can see the page's data). An open submission someone else just decided reloads to show the decision. */
+const busy=()=>{ const a=document.activeElement; return S.saving>0||S.edit!=null||!!(a&&/^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)); };
+async function refreshOpen(){ if(document.hidden||!S.loaded) return; try{ const [att,cfg]=await Promise.all(["attendance","config"].map(n=>get(n).catch(()=>({data:null})))); const A=Object.fromEntries(Object.entries((att&&att.data)||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k)));
+  let ch=JSON.stringify(A)!==JSON.stringify(S.att||{})||(cfg&&cfg.data&&(JSON.stringify(cfg.data.roster)!==JSON.stringify((S.cfg||{}).roster)||JSON.stringify(cfg.data.reviewers||[])!==JSON.stringify((S.cfg||{}).reviewers||[]))); S.att=A; if(cfg&&cfg.data) S.cfg=Object.assign({},S.cfg,{roster:cfg.data.roster,reviewers:cfg.data.reviewers||S.cfg.reviewers,calls:cfg.data.calls||S.cfg.calls,when:cfg.data.when||S.cfg.when});
+  const r=route(), d=r.view==="review"&&S.docs[r.rep]; let note="";
+  if(d&&!d.hist&&d.status!=="decided"){ const g=await get("rev-"+safe(r.rep)).catch(()=>null); if(g&&g.data&&g.data.status==="decided"&&!busy()){ S.docs[r.rep]=g.data; await refreshQueue(); ch=true; note=staleErr(g.data).message.replace(/ Your change.*$/,""); } }
+  if(!ch) return; if(r.view!=="review"||!busy()){ const y=window.scrollY; render(); window.scrollTo(0,y); } if(note) toast(note); }catch(e){} }
+setInterval(refreshOpen,120000);
+window.__awgr={S,load,render,readForm,softDraft,rowFlags,buildDraft,refreshOpen,today};
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else start();
 })();
-/* attendance and the roster come from Meeting Trackers: re-read them while the page stays open */
-setInterval(async()=>{ if(document.hidden||!S.loaded) return; try{ const [att,cfg]=await Promise.all(["attendance","config"].map(n=>get(n).catch(()=>({data:null})))); const A=Object.fromEntries(Object.entries((att&&att.data)||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k)));
-  const ch=JSON.stringify(A)!==JSON.stringify(S.att||{})||(cfg&&cfg.data&&JSON.stringify(cfg.data.roster)!==JSON.stringify((S.cfg||{}).roster)); if(!ch) return; S.att=A; if(cfg&&cfg.data) S.cfg=Object.assign({},S.cfg,{roster:cfg.data.roster,calls:cfg.data.calls||S.cfg.calls,when:cfg.data.when||S.cfg.when}); if(route().view!=="review"||!S.edit) render(); }catch(e){} },120000);
 
 </script>
 <script>
