@@ -1,0 +1,42 @@
+name: Sponsorship Background Work
+
+# Opens the Sponsorship Portal every hour so new applications from the prospectuses, MISMO Money
+# payments and returning prospects are handled even when nobody opens it. The portal's own code
+# does the work (GitMISMO/sponsorship, tests/background.js); its saves go into the private
+# sponsorship-data repo with SPONSOR_DATA_TOKEN, the same key the Summit Sponsor Feed uses,
+# which needs Contents: Read and write on GitMISMO/sponsorship-data.
+# Each run's summary says what it did. A failed run emails whoever last changed this file.
+
+on:
+  schedule:
+    - cron: '23 11-23 * * *'   # every hour, about 7 AM to 7 PM ET
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sponsorship-background
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: GitMISMO/sponsorship
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install the browser
+        working-directory: tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+      - name: Open the portal and let it do its work
+        working-directory: tests
+        env:
+          SPONSORSHIP_DATA_TOKEN: ${{ secrets.SPONSOR_DATA_TOKEN }}
+        run: node background.js
