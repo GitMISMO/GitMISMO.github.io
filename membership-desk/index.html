@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws https://cdnjs.cloudflare.com; frame-src 'self'; object-src 'none'; base-uri 'self'"><!-- Page safety list (Jonna, Nov 7, 2026): the only places this page may load code from or send data to. -->
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Membership Desk</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
@@ -1175,5 +1175,15 @@ if(new Date().getMonth()===11)document.documentElement.setAttribute("data-season
   paint();
 })();
 </script>
-</body>
+<script>(function(){/* Version stamp and update notice (Jonna, Nov 7, 2026): Help shows which version of the Desk is open; every 15 minutes the page checks for a newer one and asks to reload. */
+let fp="",at="",newer=false;
+async function rd(){const r=await fetch(location.pathname+"?ver="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const t=await r.text();const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return {fp:[...new Uint8Array(b)].slice(0,4).map(x=>x.toString(16).padStart(2,"0")).join(""),at:r.headers.get("last-modified")||""};}
+function txt(){const d=Date.parse(at);return "Version "+fp+(isNaN(d)?"":", published "+new Date(d).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" at "+new Date(d).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}))+(window.DESK_TEST?" (test copy)":"");}
+function paint(){const h=document.getElementById("v-help");if(h&&fp){let x=document.getElementById("ver-line");if(!x){x=document.createElement("div");x.id="ver-line";x.style.cssText="margin:18px 0 6px;font-size:12px;color:var(--ink-3,#5b7489)";h.appendChild(x);}if(x.textContent!==txt())x.textContent=txt();}
+  if(newer&&!document.getElementById("ver-bar")){const b=document.createElement("div");b.id="ver-bar";b.setAttribute("role","status");b.style.cssText="position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:9999;background:var(--surface,#fff);color:var(--ink,#0d314c);border:1px solid var(--border-strong,#adc4d6);border-left:4px solid var(--sky,#74bfeb);border-radius:6px;box-shadow:0 8px 24px rgba(6,32,47,.18);padding:9px 12px;display:flex;gap:12px;align-items:center;font-size:13px;max-width:calc(100vw - 32px)";
+    const s=document.createElement("span");s.textContent="The Membership Desk has been updated. Reload to get the latest version.";const k=document.createElement("button");k.type="button";k.className="btn";k.textContent="Reload";k.addEventListener("click",()=>location.reload());b.appendChild(s);b.appendChild(k);document.body.appendChild(b);}}
+(async()=>{try{const v=await rd();fp=v.fp;at=v.at;paint();}catch(e){console.error("version",e);}
+  const h=document.getElementById("v-help");if(h)new MutationObserver(()=>{if(fp&&!document.getElementById("ver-line"))paint();}).observe(h,{childList:true});
+  setInterval(async()=>{if(document.visibilityState==="hidden"||!fp||newer)return;try{const v=await rd();if(v.fp!==fp){newer=true;paint();}}catch(e){}},15*60000);})();})();
+</script></body>
 </html>
