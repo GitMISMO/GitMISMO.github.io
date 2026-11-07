@@ -13,6 +13,11 @@ on:
   schedule:
     - cron: '23 11-23 * * *'   # every hour, about 7 AM to 7 PM ET
   workflow_dispatch:
+    inputs:
+      recover_log:
+        description: 'Recover the activity history from the data repo (one time; safe to repeat)'
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -49,3 +54,9 @@ jobs:
           SPONSORSHIP_DATA_TOKEN: ${{ secrets.SPONSOR_DATA_TOKEN }}
           HEALTH_NOW: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
         run: node health.js
+      - name: Recover the activity history
+        if: ${{ inputs.recover_log }}
+        working-directory: tests
+        env:
+          SPONSORSHIP_DATA_TOKEN: ${{ secrets.SPONSOR_DATA_TOKEN }}
+        run: node recover-log.js
