@@ -7,7 +7,7 @@
    It only sends when Settings > Daily Digest in the MMS says:
      - the digest is On,
      - "Sent By" is "The scheduled sender on GitHub",
-     - today is a send day, and this hour (Eastern) is the send hour.
+     - today is a send day, it is the send hour (Eastern) or later, and today's digest has not gone yet.
    Two repository secrets switch it on; without them it says so and stops:
      MMS_DATA_TOKEN       a read-only GitHub token for mms-data, meeting-trackers-data and the so-*-data repositories
      MMS_MAIL_FLOW_URL    the MMS email flow's HTTP link (the same one in Settings > Notifications)
@@ -35,7 +35,9 @@ if (!FORCE) {
   if (!settings.on) { console.log('The digest is off in Settings.'); process.exit(0); }
   if (settings.sender !== 'action') { console.log('Settings say the MMS sends the digest, not this scheduled sender.'); process.exit(0); }
   if (!settings.days.includes(et.dow)) { console.log('Not a send day.'); process.exit(0); }
-  if (Math.floor(et.min / 60) !== settings.hour) { console.log(`Not the send hour (now ${Math.floor(et.min / 60)}:00 ET, sending at ${settings.hour}:00).`); process.exit(0); }
+  /* GitHub often runs scheduled jobs late or skips them, so send on the first run at or after the send hour.
+     The workflow remembers a day once it is done, so later runs that day stop before reaching here. */
+  if (Math.floor(et.min / 60) < settings.hour) { console.log(`Not the send hour yet (now ${Math.floor(et.min / 60)}:00 ET, sending at ${settings.hour}:00).`); process.exit(0); }
 }
 
 /* the MMS */
@@ -105,3 +107,5 @@ for (const m of list) {
 }
 if (!FLOW && !DRY) console.log('Built the digests but did not send them: add the MMS_MAIL_FLOW_URL secret.');
 console.log(`${sent} digest${sent === 1 ? '' : 's'} sent.`);
+/* tell the workflow today is done (not for dry runs, and not when nothing could be sent yet) */
+if (!DRY && (FLOW || HELD) && process.env.GITHUB_OUTPUT) { const fs = await import('fs'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'done=1\n'); fs.writeFileSync('.digest-done', new Date().toISOString()); }
