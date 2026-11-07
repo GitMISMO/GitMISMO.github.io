@@ -2015,6 +2015,20 @@ p,.sub,.lede{text-wrap:pretty}
 .cres-sum{margin-left:8px;font-size:11.5px}
 .pref-row{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--rule);cursor:pointer}.pref-row input{margin-top:3px;width:16px;height:16px;flex:0 0 auto}.pref-row span{display:flex;flex-direction:column}.pref-row em{font-style:normal;color:var(--ink-3);font-size:12.5px}
 .cd-box{max-height:60vh;overflow:auto;border:1px solid var(--border);border-radius:6px;font-size:13px}.cd-l{display:grid;grid-template-columns:22px 1fr;gap:4px;padding:4px 8px;border-bottom:1px solid var(--rule)}.cd-l b{color:var(--ink-3)}.cd-add{background:var(--good-bg)}.cd-add b{color:var(--good)}.cd-del{background:var(--bad-bg)}.cd-del span{text-decoration:line-through}.cd-del b{color:var(--bad)}.cd-same{color:var(--ink-2)}.cd-gap{text-align:center;color:var(--ink-3);padding:2px}
+/* phone layout leftovers (Nov 7): the Governance docket card stacks its action under the title; the Resource Center
+   hero fits a phone; the Help role buttons wrap instead of running off the hero */
+@media(max-width:600px){
+  .dk{grid-template-columns:30px minmax(0,1fr)}
+  .dk-r{grid-column:2 / -1;justify-content:flex-start;flex-wrap:wrap;gap:8px;width:auto}
+  .rc2-hero{grid-template-columns:minmax(0,1fr)}
+  .rc2-quick{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rc2-q{white-space:normal;min-width:0}
+  .hx-roles{flex-wrap:wrap;overflow-x:visible}
+}
+.gov-next{margin-top:14px}
+.gn{padding:8px 12px;border:1px dashed var(--border);border-radius:7px;margin-bottom:6px;cursor:pointer;font-size:13px;line-height:1.35}
+.gn:hover{border-color:var(--accent);background:var(--surface-2,rgba(0,0,0,.02))}
+.gn .muted{font-size:12px;margin-top:2px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -3888,6 +3902,17 @@ VIEWS.reviews=function(){
 };
 
 /* ---------------- Governance ---------------- */
+/* under the docket, what reaches Governance next: work at the stage just before each Governance stop */
+function govNextUp(list,dkp){
+  if(dkp&&dkp.items&&dkp.items.length<list.length) return '';
+  const before={kickoff:'cfp','gc-comment':'designation','gc-publish':'post'};
+  const on=GOV_STAGES.filter(k=>before[k]&&stages().some(s=>s.key===before[k])&&stages().some(s=>s.key===k));
+  const nx=liveTickets().filter(t=>t.state==='active'&&!t.rides&&on.some(k=>before[k]===t.stage)).sort((a,b)=>stageIndex(b.stage)-stageIndex(a.stage)||(stageAge(b)||0)-(stageAge(a)||0)).slice(0,6);
+  if(!nx.length) return '';
+  const to=t=>stageDef(on.find(k=>before[k]===t.stage)).name;
+  return '<div class="gov-next"><div class="dk-gh" style="--sc:var(--ink-3)"><i></i>Coming to '+esc(govName())+' Next<b>'+nx.length+'</b></div>'+
+    nx.map(t=>'<div class="gn" role="button" tabindex="0" data-open="'+esc(t.id)+'"><div class="gn-m"><b>'+esc(t.wr)+'</b> '+esc(t.name)+'<div class="muted">Now at '+esc(stageDef(t.stage).name)+' · next: '+esc(to(t))+(t.facilitator?' · '+esc(t.facilitator):'')+'</div></div></div>').join('')+'</div>';
+}
 VIEWS.governance=function(){
   const act=liveTickets().filter(t=>t.state==='active'), g=govName(), td=today(), yr=td.slice(0,4);
   const list=act.filter(t=>GOV_STAGES.includes(t.stage)).sort((a,b)=>stageIndex(a.stage)-stageIndex(b.stage)||(stageAge(b)||0)-(stageAge(a)||0));
@@ -3906,7 +3931,7 @@ VIEWS.governance=function(){
   const lgp=pageOf('gov-log:'+lf,log,fitN(420,48,5)); /* fill the screen, no empty well under it */
   const logB=log.length?'<ol class="tl">'+lgp.items.map(([v,t])=>'<li data-open="'+esc(t.id)+'" class="'+(v.outcome==='Approved'?'ok':'no')+'"><span class="tl-d">'+esc(fmtS(v.date))+'</span><div><b>'+esc(t.wr)+'</b> '+esc(t.name)+'<div class="tl-s">'+esc(stageDef(v.stage).name)+' · <span class="chip '+(v.outcome==='Approved'?'good':'bad')+'">'+esc(v.outcome)+'</span>'+(Object.keys(v.members||{}).length?' · '+Object.values(v.members).filter(x=>/approve|yes|agree/i.test(x)).length+' of '+Object.keys(v.members).length+' in favor':(v.method&&!/Smartsheet/.test(v.method)?' · '+esc(v.method):''))+(v.tally?' · '+esc(v.tally):'')+'</div></div></li>').join('')+'</ol>':'<div class="lane-e">'+(lf==='all'?'Decisions show here once they’re recorded.':'No decisions match.')+'</div>';
   return '<div class="pagehead slim"><div><h1>Governance</h1><div class="sub">The '+esc(govBody())+' docket, with every decision and vote on record.</div></div><div class="acts">'+(list.length?'<button class="btn" id="agenda" type="button">Copy Agenda</button>':'')+'</div></div>'+figs+
-    '<div class="split2"><section class="pane"><header><h3>The Docket</h3><span class="muted">'+list.length+' waiting</span></header><div class="pane-b">'+(grp?'<div class="dk-g">'+grp+'</div>':'<div class="lane-e"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing is waiting on '+esc(g)+'</div>')+'</div>'+dkp.bar+'</section>'+
+    '<div class="split2"><section class="pane"><header><h3>The Docket</h3><span class="muted">'+list.length+' waiting</span></header><div class="pane-b">'+(grp?'<div class="dk-g">'+grp+'</div>':'<div class="lane-e"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing is waiting on '+esc(g)+'</div>')+govNextUp(list,dkp)+'</div>'+dkp.bar+'</section>'+
     '<section class="pane gov-log"><header><h3>Decision Log</h3>'+logH+'</header><div class="pane-b">'+logB+'</div>'+lgp.bar+'</section></div>';
 };
 
