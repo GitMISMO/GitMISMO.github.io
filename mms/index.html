@@ -2058,7 +2058,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-07T19:06:51Z',fp:'f1bc2662'};
+window.__mmsBuild={at:'2026-11-07T19:34:26Z',fp:'72bbab93'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2486,7 +2486,7 @@ async function tidyOutbox(){
 
 /* ---------- automations that run whenever the page is open ---------- */
 async function runAutomations(){
-  if(!S.ready || !S.canWrite || S.partial) return;
+  if(!S.ready || !S.canWrite || S.partial || S.stale) return;   /* an out-of-date tab doesn't run automatic steps */
   try{ await retryMail(); }catch(e){} try{ await tidyOutbox(); }catch(e){}
   const td=today(), R=S.notify.reminders||{};
   for(const t of liveTickets()){
@@ -6837,7 +6837,7 @@ const HELP_TOPICS={
   notif:['Notifications','staff',
     'Notifications is the MMS outbox: every email it creates, such as stage-change notices, reminders and digests.',
     ['Until the system goes live, email is on hold: every email waits under Held (Preview) so you can read exactly what people would get. Held emails are never sent later.',
-     'Delete one with Delete, or clear the list with Delete These. Set or clear the hold date in Settings › Notifications.',
+     'Delete one with Delete, or clear the list with Delete These. Deleted emails wait under Recently Deleted for 60 days, where Put Back returns one as it was. Set or clear the hold date in Settings › Notifications.',
      'After the hold, until the email flow is connected, emails wait under To Send. Open one and click Open in Outlook to send it from your mailbox.',
      'Click Mark Sent when it has gone, or Mark All Sent for the whole list.',
      'An email that didn’t go (the flow was down, or nobody had an address on file) shows under Didn’t Send with the reason. The MMS tries again on its own, up to five times.',
@@ -6966,9 +6966,10 @@ const HELP_TOPICS={
   health:['System Health','*',
     'One page that says whether every part the MMS depends on is working, in plain words, with who fixes it. Staff only.',
     ['Click System Health in the left rail, under Settings. A number on it means something is red or yellow.',
-     'Each line is green (working), gray (nothing to check yet), yellow (watch it) or red (needs fixing): saving, loading, storage, email, the Daily Digest, the Initiative Hub, public comments, the website feed, SharePoint files, the IM and AWG portals and AI review.',
+     'Each line is green (working), gray (nothing to check yet), yellow (watch it) or red (needs fixing): saving, loading, storage, email, the Daily Digest, the Initiative Hub, public comments, the website feed, SharePoint files, the IM and AWG portals, Elections HQ, Meeting Trackers and AI review.',
      'Errors on This Page lists anything that went wrong since you opened the MMS; the Team Error Log shows everyone’s errors for the last 7 days.',
      'It checks again every 5 minutes while the MMS is open. Check Again runs it now; Copy Report copies it to paste into an email or a chat with Claude.',
+     'If a tab is left open on an older version of the MMS, it says so, asks you to reload, and stops its automatic steps until you do.',
      'On weekdays the GitHub digest run reads the last check, adds what it can see itself, and emails Jonna if anything is red or yellow, even when nobody has the MMS open.'],
     ['Settings › Notifications holds the email flow and Files flow links the checks read.'],
     [['Open System Health','health']]],
@@ -7704,7 +7705,8 @@ function hRows(){
     else if(pend) row('save','Saving','warn',pend+' change'+(pend===1?' is':'s are')+' still saving'+(hr.status&&hr.status.lastError?' ('+hr.why()+')':'')+'.');
     else row('save','Saving','ok','Every change is saved.'); }
   else row('save','Saving','ok','Every change is saved.');
-  row('load','Loading',S.partial?'bad':'ok',S.partial?'Part of the MMS didn’t load, so automatic steps are paused in this tab. Reload; if it keeps happening, the save service may be down.':'Everything loaded.',S.partial?'Perry':'');
+  if(S.stale) row('load','Loading','warn','This tab is an older version of the MMS. Reload to get the new one; until then it doesn’t run automatic steps.');
+  else row('load','Loading',S.partial?'bad':'ok',S.partial?'Part of the MMS didn’t load, so automatic steps are paused in this tab. Reload; if it keeps happening, the save service may be down.':'Everything loaded.',S.partial?'Perry':'');
   const fs=hFiles(), top=fs[0];
   row('store','Storage',top&&top.p>=90?'bad':top&&top.p>=70?'warn':'ok',top?(top.p>=70?'The '+top.n+' file is '+top.p+'% full. It needs splitting before it fills.':'Every file has room. The fullest is '+top.n+', '+top.p+'% full.'):'Every file has room.',top&&top.p>=70?'Jonna (ask Claude)':'');
   /* email */
@@ -7812,6 +7814,15 @@ wireMain=function(m){ _wireH(m); if(S.view!=='health') return;
   const c=$('#hh-copy',m); if(c) c.onclick=async()=>{ const H=S.health; const txt='MMS System Health, '+hWhen(H.at)+(window.__mmsBuild?' (version '+window.__mmsBuild.fp+')':'')+'\n\n'+H.rows.map(r=>(r.level==='bad'?'RED':r.level==='warn'?'YELLOW':'OK')+'  '+r.label+': '+r.text+(r.who&&r.level!=='ok'&&r.level!=='info'?' (Who fixes it: '+r.who+')':'')).join('\n')+((window.__mmsErrs||[]).length?'\n\nErrors on this page:\n'+window.__mmsErrs.map(e=>e.at+' '+e.msg).join('\n'):'');
     try{ await navigator.clipboard.writeText(txt); toast('Report copied'); }catch(e){ toast('Couldn’t copy'); } }; };
 (function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); hLogEnsure(); hGhRun().then(hCheck); hCheck(); setInterval(()=>{ hGhRun().then(hCheck); },5*60000); setTimeout(hLogTidy,60000); },500); })();
+
+/* Out-of-date tabs: every 10 minutes (and when the tab comes back into view) compare this tab's version with the
+   live page. An older tab stops its automatic steps and asks to be reloaded; people's own saves still merge safely. */
+async function hVersionCheck(){ if(S.mode!=='relay'||!window.__mmsBuild||S.stale) return;
+  try{ const t=await fetch('/mms/?v='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.text():''); const m=t.match(/__mmsBuild=\{at:'([^']+)',fp:'([0-9a-f]+)'\}/);
+    if(m&&m[2]!==window.__mmsBuild.fp&&m[1]>window.__mmsBuild.at){ S.stale=true; S.autoOn=false; hStaleBar(); hCheck(); } }catch(e){} }
+function hStaleBar(){ if($('#stalebar')) return; const b=document.createElement('div'); b.id='stalebar'; b.className='banner warn'; b.setAttribute('role','status'); b.style.cssText='position:sticky;top:0;z-index:51;margin:0;display:flex;gap:12px;align-items:center;justify-content:center';
+  b.innerHTML='<span>A newer version of the MMS is out. Reload to get it; until then this tab doesn’t run automatic steps.</span><button class="btn sm pri" type="button">Reload</button>'; b.querySelector('button').onclick=()=>location.reload(); document.body.prepend(b); }
+(function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); setInterval(hVersionCheck,10*60000); document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') hVersionCheck(); }); },1000); })();
 
 /* ---------- moving the old one-file SharePoint list into year files (Nov 7, 2026) ----------
    The door now files each work request's file list by year (ssfiles-2026 ...). Entries still in the old "ssfiles"
