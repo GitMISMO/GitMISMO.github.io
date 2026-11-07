@@ -51,6 +51,7 @@ jobs:
         env:
           MMS_DATA_TOKEN: ${{ secrets.MMS_DATA_TOKEN }}
           MMS_MAIL_FLOW_URL: ${{ secrets.MMS_MAIL_FLOW_URL }}
+          MMS_MAIL_KEY: ${{ secrets.MMS_MAIL_KEY }}
           DRY_RUN: ${{ inputs.dry_run && '1' || '0' }}
           FORCE: ${{ inputs.force && '1' || '0' }}
         run: node digest-run.mjs
