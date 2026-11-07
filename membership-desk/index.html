@@ -555,10 +555,10 @@ const count=(el,to,f)=>{el.textContent=f(to);};
 
 /* ---------- the kinds of work ---------- */
 const KINDS={
- square:{name:"Square Set-Up",plural:"Square Set-Ups",k:"#74bfeb",from:"MISMO Money",what:"Paid through Square for a special rate. Set the company up in Aptify as a MISMO member."},
+ square:{name:"Square Set-Up",plural:"Square Set-Ups",k:"#74bfeb",from:"MISMO Money",what:"Paid through Square for a special rate. The company's IIF quotation is already in Aptify: update it to the amount paid and ship it."},
  members:{name:"New Member",plural:"New Members",k:"#5fd39a",from:"Member 360",what:"Signed by the MISMO team. Set the company up in Aptify with the level and dates shown."},
  free:{name:"Free Membership",plural:"Free Memberships",k:"#b79cff",from:"Member 360",what:"A complimentary membership. Set it up in Aptify with no invoice."},
- iif:{name:"IIF Lender",plural:"IIF Lenders",k:"#f0b94a",from:"Member 360",what:"Paid $1,000 or more to the Innovation Investment Fund. Turn the lender on as a MISMO member."}};
+ iif:{name:"IIF Lender",plural:"IIF Lenders",k:"#f0b94a",from:"Member 360",what:"Paid $1,000 or more to the Innovation Investment Fund. The IIF quotation is already in Aptify: update it to the amount paid and ship it to turn the lender on as a MISMO member."}};
 const slug=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const TODO=[];Object.keys(KINDS).forEach(k=>(D.todo[k]||[]).forEach(x=>TODO.push(Object.assign({kind:k,id:(k==="members"?"m":k==="square"?"sq":k)+"-"+(x.cid||slug(x.name))},x))));
 const FIN=(D.mine||[]).slice();/* finished on this desk, newest first (from the shared record) */
@@ -676,7 +676,7 @@ function dsiMerge(x){const s=JSON.parse(JSON.stringify(x.setup||{}));const d=((D
     if(/Lender or/.test(m))return !s.memberType;if(/sector/.test(m))return !s.sector;return true;});
   s.deskAdded=d;return s;}
 function dsiForm(x,s){const miss=s.missing||[],has=re=>miss.some(m=>re.test(m));
-  const box=h("div",{class:"sect need"},h("h3",null,"Still Needed"),h("p",null,"Member 360 doesn't have these yet. Get them from the member and add them here. They're saved with this set-up and go to Member 360 on their own."));
+  const box=h("div",{class:"sect need"},h("h3",null,"Still Needed (Optional)"),h("p",null,"Member 360 doesn't have these yet. Add whatever you can get from the member. None of it is required, and you can mark this set up without it. What you add is saved with this set-up and goes to Member 360 on its own."));
   const f=h("div",{class:"need-f"}),I={};
   const inp=(k,label,ph,type,wide)=>{const i=h("input",{type:type||"text",placeholder:ph||"",autocomplete:"off"});I[k]=i;f.appendChild(h("label",{class:"need-l"+(wide?" wide":"")},h("span",null,label),i));};
   const sel=(k,label,opts)=>{const s=h("select",null,h("option",{value:""},"Choose…"),...opts.map(o=>h("option",{value:o},o)));I[k]=s;f.appendChild(h("label",{class:"need-l"},h("span",null,label),s));};
@@ -762,6 +762,8 @@ function openPane(x){cur=x;const K=KINDS[x.kind];$("pane-t").textContent=x.name;
  const kv=(rows)=>h("div",{class:"kv"},...rows.flatMap(r=>[h("div",null,r[0]),h("div",null,r[1])]));
  const left=h("div",{class:"pcol"});B.appendChild(left);
  /* a Square set-up shows every section of MISMO Money's set-up email, as MISMO Money sends them (Jonna, Nov 5, 2026) */
+ /* Square deals ship the IIF quotation already in Aptify for the amount paid (Jonna, Nov 6, 2026) */
+ if(x.kind==="square"&&Array.isArray(x.details))x.details=x.details.map(sec=>Array.isArray(sec)&&Array.isArray(sec[1])?[sec[0],sec[1].map(r=>Array.isArray(r)&&r[0]==="Product"?["Product","Innovation Investment Fee: update the IIF quotation already in Aptify to the amount paid and ship it"]:r)]:sec);
  if(x.kind==="square"&&Array.isArray(x.details)&&x.details.length)x.details.forEach(sec=>{if(Array.isArray(sec)&&Array.isArray(sec[1]))left.appendChild(h("div",{class:"sect"},h("h3",null,String(sec[0])),kv(sec[1].filter(r=>Array.isArray(r)).map(r=>[String(r[0]),String(r[1]==null?"":r[1])]))));});
  else if(x.setup&&typeof deskSetup==="function")deskSetup(x,left,kv);
  else left.appendChild(h("div",{class:"sect"},h("h3",null,"Set Up in Aptify"),kv([["Company",x.name],x.website?["Website",h("a",{href:/^https?:\/\//i.test(x.website)?x.website:"https://"+x.website,target:"_blank",rel:"noopener"},x.website)]:(x.kind==="members"?["Website","Not given yet. Ask the member, or check their email domain."]:null),["Aptify Company ID",x.cid||"New to Aptify, or not known"],["Level",x.level],["Price",money(x.price)],x.special?["Special",x.special+" (put it in the order line's description)"]:null,["Membership Starts",fmt(x.start)],["Membership Through",fmt(x.end)]].filter(Boolean))));
@@ -783,7 +785,7 @@ h("div",{class:"fld"},h("label",{for:"f-end"},"Membership Through"),fen,h("small
 h("div",{class:"fld wide"},h("label",{for:"f-note"},"Note"),note),
    h("div",{class:"acts"},save,h("button",{type:"button",class:"btn ghost",onclick:closePane},"Cancel"),say))));
  left.appendChild(h("div",{class:"sect"},h("h3",null,"Why It's Here"),h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)"},K.what+(x.paid?" Paid "+fmt(x.paid)+".":""))));
- const st=[x.kind==="square"?["Email","MISMO Money emailed the membership team with a link to this set-up."]:["On Your To Do",K.from+" added it here when it needed setting up in Aptify."],["Set Up in Aptify","Add the company, the membership order and the dates shown."],["Enter the IDs and Dates","The Aptify Company ID, order number and membership dates, then Mark Set Up. The dates go back to Member 360."],["Everyone Sees It",x.kind==="square"?"MISMO Money ties the Square payment to the order the next time it's opened.":"It moves to Completed with your name and the date, and Jonna, Amy and Kelly can see it."]];
+ const st=[x.kind==="square"?["Email","MISMO Money emailed the membership team with a link to this set-up."]:["On Your To Do",K.from+" added it here when it needed setting up in Aptify."],["Set Up in Aptify",(x.kind==="square"||x.kind==="iif")?"Find the company's IIF quotation in Aptify, change it to the amount paid and ship it. If there isn't one, add the membership order with the dates shown.":"Add the company, the membership order and the dates shown."],["Enter the IDs and Dates","The Aptify Company ID, order number and membership dates, then Mark Set Up. The dates go back to Member 360."],["Everyone Sees It",x.kind==="square"?"MISMO Money ties the Square payment to the order the next time it's opened.":"It moves to Completed with your name and the date, and Jonna, Amy and Kelly can see it."]];
  B.appendChild(h("div",{class:"sect",style:"grid-column:1/-1"},h("h3",null,"How This Works"),h("div",{class:"steps"},...st.map((s,i)=>h("div",{class:i===2?"now":""},h("b",null,h("i",null,String(i+1)),s[0]),s[1])))));
  $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");setTimeout(()=>cid.focus(),240);}
 
@@ -906,12 +908,12 @@ const HELP=[
  {id:"start",k:"#74bfeb",name:"How It Works",lead:"Everything that needs setting up in Aptify for MISMO comes to this page, oldest first. You set it up in Aptify as usual, then come back here and record the Aptify IDs, so MISMO Money, Member 360 and the MISMO team all see it's done. No emails back and forth.",
   steps:[["Find What's Waiting","Square set-ups also arrive as an email from MISMO Money to membership@mismo.org, with an Open in the Membership Desk button. New members, free memberships and IIF lenders appear on Home, under Your To Do, on their own."],
    ["Open It","The email button, or selecting it under Your To Do on Home, opens that exact item, with everything you need on the left: company, level, price, special rate and membership dates. Sign in with your own MISMO sign-in if asked."],
-   ["Set It Up in Aptify","Add or find the company in Aptify and create the membership order with the level, price and dates shown. Put any special rate (TMC, Broker, ACUMA) in the order line's description."],
+   ["Set It Up in Aptify","Add or find the company in Aptify and create the membership order with the level, price and dates shown. Put any special rate (TMC, Broker, ACUMA) in the order line's description. For Square set-ups and IIF lenders, update the IIF quotation already in Aptify to the amount paid and ship it instead."],
    ["Record the IDs and Mark Set Up","Back here, enter the Aptify Company ID (required), the Aptify order number and, if you added a person, the Aptify Person ID. Select Mark Set Up. It moves to Completed."]],
   notes:["<b>Marked one by mistake?</b> Select Undo in the message at the bottom of the screen right after. Later than that, email Jonna and she'll reopen it.","<b>Nothing arrives by email?</b> Everything waiting is always on Home, under Your To Do, oldest first, so you can work straight from there.","<b>The boxes at the top of Home</b> show how things stand: what's left to set up, payments waiting, what's been completed and how many cases closed the same day. Select any box to go to it. The ring shows how much of all the set-up work that has come in is done."]},
  {id:"square",k:"#74bfeb",name:"Square Set-Ups",lead:"A company paid MISMO through Square for a special rate (TMC, Broker or ACUMA). MISMO Money sees the payment and sends the set-up here.",
   steps:[["Check the Details","The left side shows the company, the level, the special rate, what they paid and the membership dates."],
-   ["Set Up in Aptify","Add or find the company, then create the membership order at the level and price shown. Put the special rate in the order line's description so it's clear why the price differs."],
+   ["Set Up in Aptify","Find the company's IIF quotation, which is already in Aptify. Update it to the amount paid, put the special rate in the order line's description, and ship it. If there's no quotation, add the membership order at the level and price shown."],
    ["Record the IDs","Enter the Aptify Company ID and the order number. The order number is what lets MISMO Money tie the Square payment to the right order."],
    ["What Happens Next","MISMO Money marks the set-up done and ties the order the next time it's opened, then watches for the payment in Aptify. Once Aptify shows it paid, it moves from Waiting for the Aptify Payment to Paid and in Aptify."]],
   notes:["<b>Don't know the Company ID?</b> If the company isn't in Aptify yet, add it first; the ID it gets is the one to enter here."]},
@@ -929,7 +931,7 @@ const HELP=[
   notes:["<b>Subsidiaries.</b> A company Member 360 has marked as a subsidiary of another member (for example First Funding under First American) comes here as a free Corporate membership, with its parent named. Set it up the same way, at Corporate with no invoice. Member 360 then counts it as a Subsidiary member."]},
  {id:"iif",k:"#f0b94a",name:"IIF Lenders",lead:"A lender paid $1,000 or more to the Innovation Investment Fund (IIF), which makes them a MISMO member, but Aptify doesn't show them as a member yet.",
   steps:[["Check the Details","The lender and what they paid are on the left."],
-   ["Turn Them On in Aptify","Set the lender up as a MISMO member in Aptify, the same way as other IIF lenders."],
+   ["Turn Them On in Aptify","The lender's IIF quotation is already in Aptify. Update it to the amount they paid and ship it."],
    ["Record the IDs","Enter the Aptify Company ID and select Mark Set Up."],
    ["What Happens Next","Member 360's IIF numbers and member counts pick them up on the next Aptify pull."]],
   notes:[]},
