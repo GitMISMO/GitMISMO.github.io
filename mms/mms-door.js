@@ -176,7 +176,7 @@
         /* the copy this change started from: given by the page when it knows it (an action begun on an older
            copy), else the latest this tab has. Only fields that differ from it are applied over newer saves. */
         var b = base !== undefined ? base : (f.loaded ? docIn(f, path) : undefined);
-        f.pending.push({ kind: kind, path: path, data: data, base: b ? clone(b) : null, res: res, rej: rej }); f.view = null;
+        f.pending.push({ kind: kind, path: path, data: data, base: b ? clone(b) : null, res: res, rej: rej, at: now() }); f.view = null; persist();
         notify(f, true);
         schedule(f, FLUSH_MS);
       };
@@ -184,6 +184,17 @@
       else { if (!f.loaded) ensure(f).catch(function () {}); go(); }
     });
   }
+  /* changes waiting to save are also kept in this browser, so closing the tab while offline or signed out loses
+     nothing: they go out the next time the MMS opens here (each carries the copy it began from, so it only
+     changes what it changed). Kept a week at most. */
+  var KEEP = 'pendingSaves';
+  function persist() { try { var all = []; Object.keys(F).forEach(function (k) { F[k].pending.forEach(function (op) { all.push({ kind: op.kind, path: op.path, data: op.data, base: op.base, at: op.at || now() }); }); });
+    if (all.length) localStorage.setItem(KEEP, JSON.stringify(all)); else localStorage.removeItem(KEEP); } catch (e) {} }
+  function replayKept() { var L = []; try { L = JSON.parse(localStorage.getItem(KEEP) || '[]'); } catch (e) {} if (!L.length) return;
+    try { localStorage.removeItem(KEEP); } catch (e) {}
+    var fresh = L.filter(function (op) { return op && op.path && now() - (op.at || 0) < 7 * 864e5; }); if (!fresh.length) return;
+    fresh.forEach(function (op) { queue(op.path, op.kind, op.data, op.base === null ? undefined : op.base).catch(function () {}); });
+    toast(fresh.length + ' change' + (fresh.length === 1 ? '' : 's') + ' from your last visit that hadn’t saved ' + (fresh.length === 1 ? 'is' : 'are') + ' being saved now.'); }
   function schedule(f, ms) { if (f.timer) return; f.timer = setTimeout(function () { f.timer = null; flush(f); }, ms); }
   /* GitHub makes one commit to a branch at a time, so saves go out one after another */
   var putChain = Promise.resolve();
@@ -199,7 +210,7 @@
         var finish = function () {
           f.pending = f.pending.filter(function (op) { return batch.indexOf(op) < 0; }); f.view = null;
           batch.forEach(function (op) { if (op.kind === 'create' && op.exists) op.rej(err('EXISTS', 'Already filed')); else op.res(); });
-          notify(f, false); saved();
+          persist(); notify(f, false); saved();
         };
         if (same(next, f.server)) { finish(); return; }
         if (JSON.stringify(next, null, 2).length > MAX_FILE) throw err('TOO_BIG', 'This part of the MMS has grown too big to save in one piece.');
@@ -224,7 +235,7 @@
         else setTimeout(function () { schedule(f, 0); }, RETRY_MS);
         problem(e); return;
       }
-      f.pending = f.pending.filter(function (op) { return batch.indexOf(op) < 0; }); f.view = null;
+      f.pending = f.pending.filter(function (op) { return batch.indexOf(op) < 0; }); f.view = null; persist();
       batch.forEach(function (op) { op.rej(e); });
       notify(f, false); problem(e, true);
     }).then(function () { f.flushing = false; if (f.pending.length && !f.waitingSignIn) schedule(f, FLUSH_MS); });
@@ -419,7 +430,7 @@
       gate('loading');
       return ensure(file('config'));
     }).then(function () {
-      ready = true; starting = false; gate(null); resumeWrites();
+      ready = true; starting = false; gate(null); resumeWrites(); setTimeout(replayKept, 4000);
       readyWaiters.splice(0).forEach(function (r) { r(); });
     }, function (e) {
       starting = false;
