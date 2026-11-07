@@ -1,0 +1,36 @@
+# MMS Robot: the MMS's automatic steps every 30 minutes, whether or not anyone has the MMS open.
+# What it does and the secrets it needs are described at the top of .github/mms-robot/robot.mjs.
+name: MMS Robot
+on:
+  schedule:
+    - cron: '7,37 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: mms-robot
+  cancel-in-progress: false
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            mms
+            .github/mms-robot
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install the browser
+        run: |
+          npm init -y >/dev/null
+          npm install --no-save playwright@1.48.2
+          npx playwright install --with-deps chromium
+      - name: Run the MMS's automatic steps
+        env:
+          MMS_ROBOT_TOKEN: ${{ secrets.MMS_ROBOT_TOKEN }}
+          MMS_DATA_TOKEN: ${{ secrets.MMS_DATA_TOKEN }}
+          MMS_MAIL_KEY: ${{ secrets.MMS_MAIL_KEY }}
+        run: node .github/mms-robot/robot.mjs
