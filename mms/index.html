@@ -7724,7 +7724,8 @@ function hRows(){
   const lc=(S.commentsAll||[])[0];
   row('cmt','Public Comments','info',lc?'Last comment arrived '+hWhen(lc.submittedAt)+'.':'No comments have come in yet.');
   const fsst=S.feedState||{};
-  if(fsst.error&&(!fsst.at||String(fsst.tried||'')>String(fsst.at))) row('feed','Website Feed','bad','The website’s Open for Comment list didn’t update ('+fsst.error+').','Perry');
+  if(fsst.error==='UNKNOWN_PROJECT') row('feed','Website Feed','info','Not switched on yet: the website feed (mms-feed) still needs setting up on the save service. That’s on Perry’s list.');
+  else if(fsst.error&&(!fsst.at||String(fsst.tried||'')>String(fsst.at))) row('feed','Website Feed','bad','The website’s Open for Comment list didn’t update ('+fsst.error+').','Perry');
   else row('feed','Website Feed',fsst.at?'ok':'info',fsst.at?'Last published '+hWhen(fsst.at)+' ('+(fsst.count||0)+' open for comment).':'Publishes on its own when the list changes.');
   const fl=NET.files||{};
   if(!N.docFlowUrl) row('files','SharePoint Files','warn','No Files flow link in Settings › Notifications, so files can’t be listed or uploaded.','Jonna');
