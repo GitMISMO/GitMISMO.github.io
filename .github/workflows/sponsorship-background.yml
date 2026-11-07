@@ -5,6 +5,8 @@ name: Sponsorship Background Work
 # does the work (GitMISMO/sponsorship, tests/background.js); its saves go into the private
 # sponsorship-data repo with SPONSOR_DATA_TOKEN, the same key the Summit Sponsor Feed uses,
 # which needs Contents: Read and write on GitMISMO/sponsorship-data.
+# The 8 am Eastern run (or one started by hand) also checks the flows and data feeds the
+# portal depends on (tests/health.js) and fails if one has stopped working.
 # Each run's summary says what it did. A failed run emails whoever last changed this file.
 
 on:
@@ -40,3 +42,10 @@ jobs:
         env:
           SPONSORSHIP_DATA_TOKEN: ${{ secrets.SPONSOR_DATA_TOKEN }}
         run: node background.js
+      - name: Daily health check of the flows
+        if: always()
+        working-directory: tests
+        env:
+          SPONSORSHIP_DATA_TOKEN: ${{ secrets.SPONSOR_DATA_TOKEN }}
+          HEALTH_NOW: ${{ github.event_name == 'workflow_dispatch' && '1' || '' }}
+        run: node health.js
