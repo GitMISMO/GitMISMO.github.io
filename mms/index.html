@@ -2058,7 +2058,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-07T19:34:26Z',fp:'72bbab93'};
+window.__mmsBuild={at:'2026-11-07T20:52:58Z',fp:'f46aabaf'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -4419,12 +4419,15 @@ async function publishFeed(force){
   if(feedBusy||S.mode!=='relay'||!S.isStaff||!S.canWrite||S.partial||!S.autoOn) return; const tok=window.ResourcesSession&&ResourcesSession.token(); if(!tok) return;
   const doc=webFeed(), s0=JSON.stringify(doc.commentPeriods)+JSON.stringify(doc.recent), sig=mtHash8(s0)+s0.length; const st=S.feedState||{};
   if(!force&&st.sig===sig) return;
+  /* the website feed isn't set up yet (or keeps failing the same way): try again hourly, not every pass */
+  if(!force&&st.error&&st.tried&&Date.now()-Date.parse(st.tried)<60*60000) return;
   feedBusy=true;
   try{
     const r=await fetch(RELAY()+'/mms-feed/commit',{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({files:[{path:'docs/standards.json',content:JSON.stringify(doc,null,2)}],message:'MMS: open comment periods for the website ('+doc.commentPeriods.length+')'})});
     const b=await r.json().catch(()=>({}));
     S.feedState=Object.assign({},st,r.ok?{sig,at:new Date().toISOString(),by:S.me.name||'',count:doc.commentPeriods.length,error:''}:{error:(b&&b.error)||('HTTP '+r.status),tried:new Date().toISOString()});
-    await write('config','feed',S.feedState);
+    /* a repeat of the same failure isn't saved again within 6 hours (keeps the save history clean) */
+    if(r.ok||st.error!==S.feedState.error||!st.tried||Date.now()-Date.parse(st.tried)>6*3600000) await write('config','feed',S.feedState);
   }catch(e){ S.feedState=Object.assign({},st,{error:'unreachable',tried:new Date().toISOString()}); }
   feedBusy=false;
 }
@@ -7683,7 +7686,7 @@ hubSync=async function(){ await _hubSyncBack(); try{ await hubWriteBack(); }catc
 /* ================= System Health, part 2 (Nov 7, 2026) =================
    A staff page modelled on Summit HQ's System Health: one line per part the MMS depends on, green, yellow
    or red, in plain words, with who fixes it. Checks again every 5 minutes while the MMS is open. A staff tab
-   files the result as health/latest so the GitHub digest sender can email Jonna when something is wrong,
+   files the result as health/latest (when it changes, or every 6 hours) so the GitHub digest sender can email Jonna when something is wrong,
    even on days nobody opens the MMS. Errors anyone hits are kept for 14 days in the Team Error Log. */
 const H_MAX=940000;
 function hWhen(iso){ if(!iso) return ''; const d=new Date(iso); if(isNaN(d)) return ''; const t=d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
@@ -7768,9 +7771,13 @@ S.health=S.health||null;
 function hCheck(){ try{ const R=hRows(); S.health={at:new Date().toISOString(),rows:R,level:hLevel(R)}; hFile(); hDot(); if(S.view==='health') renderAll(); }catch(e){} }
 function hDot(){ const b=$('#nav-health'); if(!b||!S.health) return; const n=S.health.rows.filter(r=>r.level==='bad').length, w=S.health.rows.filter(r=>r.level==='warn').length; b.hidden=!(n||w); b.textContent=n||w; b.classList.toggle('warn',!!n); }
 /* a staff tab files the result for the GitHub sender: when it changes, or hourly */
-let hFiledSig='', hFiledAt=0;
+let hFiledSig='', hFiledAt=0, hHealthSub=false;
 async function hFile(){ if(S.mode!=='relay'||!S.isStaff||!S.canWrite||S.partial||!S.autoOn||S.viewAs) return;
-  const H=S.health, sig=JSON.stringify(H.rows.map(r=>[r.k,r.level])); if(sig===hFiledSig&&Date.now()-hFiledAt<60*60000) return;
+  if(!hHealthSub){ hHealthSub=true; try{ Store.sub('health',o=>{ const first=S.healthFiled===undefined; S.healthFiled=(o||{}).latest||null; if(first&&S.health) hFile(); }); }catch(e){} return; }   /* first pass: read what's filed */
+  if(S.healthFiled===undefined) return;   /* not read yet: the next check files it */
+  const H=S.health, sig=JSON.stringify(H.rows.map(r=>[r.label,r.level])); const F=S.healthFiled;
+  if(!hFiledSig&&F&&F.rows){ hFiledSig=JSON.stringify(F.rows.map(r=>[r.label,r.level])); hFiledAt=Date.parse(F.at)||0; }   /* a fresh tab (or the robot) starts from what's filed */
+  if(sig===hFiledSig&&Date.now()-hFiledAt<6*3600000) return;
   hFiledSig=sig; hFiledAt=Date.now(); try{ await Store.set('health','latest',{at:H.at,by:S.me.name||'',level:H.level,rows:H.rows.map(r=>({label:r.label,level:r.level,text:r.text,who:r.who}))}); }catch(e){} }
 /* the Team Error Log: each person's errors for the day, kept 14 days */
 S.errlog=S.errlog||{}; let hLogSub=false, hLogT=null, hLogSent=0;
