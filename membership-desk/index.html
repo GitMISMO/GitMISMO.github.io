@@ -524,7 +524,9 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     const [T,S,C,Dn,I]=await Promise.all(["todos","square","cases","done","invoices"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
     if(!T.data&&!S.data&&T.err&&S.err){say("The Membership Desk couldn't load","Please refresh. If it keeps happening, email Jonna.");return;}
     const t=T.data||{},s=S.data||{},items=((Dn.data&&Dn.data.items)||[]).filter(x=>!x.undone),doneIds=new Set(items.map(x=>x.id));
-    const keep=(k,L)=>(L||[]).map(x=>Object.assign({},x,{id:idOf(k,x)})).filter(x=>!doneIds.has(x.id));
+    /* a set-up marked done before it had an Aptify ID still counts once the ID arrives (Jonna, Nov 7, 2026) */
+    const doneCid=new Set(items.filter(x=>x.cid).map(x=>String(x.id||"").split("-")[0]+"|"+x.cid));
+    const keep=(k,L)=>(L||[]).map(x=>Object.assign({},x,{id:idOf(k,x)})).filter(x=>!doneIds.has(x.id)&&!(x.cid&&doneCid.has(PRE[k]+"|"+x.cid)));
     const tt=t.todo||{},td=t.done||{};
     window.DESK={asOf:today(),inv:((I&&I.data&&I.data.items)||[]),pip:t.pip||[],invPaid:t.invPaid||{},
       todo:{square:keep("square",s.pending),members:keep("members",tt.members),free:keep("free",tt.free),iif:keep("iif",tt.iif)},
