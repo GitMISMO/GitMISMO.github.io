@@ -8,7 +8,7 @@
   --navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
   --ground:#f1f6fa;--surface:#ffffff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;
   --border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
-  --ink:#0d314c;--ink-2:#456179;--ink-3:#7794aa;
+  --ink:#0d314c;--ink-2:#456179;--ink-3:#5a7489;
   --good:#0f7b5c;--bad:#b3372c;--warn:#a2701a;
   --good-bg:#e3f4ed;--bad-bg:#fbe9e7;--warn-bg:#fbf1dc;--info-bg:#e4f2fb;--hold-bg:#efe9f7;--hold:#6b4fa0;
   --accent:#2477b8;--accent-soft:#e4f2fb;
@@ -1915,7 +1915,6 @@ p,.sub,.lede{text-wrap:pretty}
   .st-grid .st-t:last-child:nth-child(odd),.kpis .kp:last-child:nth-child(odd){grid-column:1/-1}
 }
 @media(max-width:1250px) and (min-width:601px){.kpis .kp:last-child:nth-child(4n+3){grid-column:span 2}}
-.t2-acts .btn{white-space:nowrap}
 @media(max-width:600px){.wkd .wl{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2}}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .att4 button[aria-pressed="true"]{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}:root:not([data-theme="light"]) .att4 button[aria-pressed="true"] b{color:var(--navy-deep)}}
 :root[data-theme="dark"] .att4 button[aria-pressed="true"]{background:var(--sky);border-color:var(--sky);color:var(--navy-deep)}:root[data-theme="dark"] .att4 button[aria-pressed="true"] b{color:var(--navy-deep)}
@@ -2001,6 +2000,16 @@ p,.sub,.lede{text-wrap:pretty}
 /* digest Send On: room between each box and its day (Nov 4) */
 .kv .f .dg-days label,.dg-kv .dg-days label{display:inline-flex!important;align-items:center;gap:8px!important;text-transform:none;margin:0}
 .kv .f .dg-days input{margin:0!important}
+/* review fixes (Nov 2026) */
+.linkish{background:none;border:0;padding:0;color:var(--link,var(--accent));font:inherit;text-decoration:underline;cursor:pointer}
+/* readable info chips in dark mode (4.5:1 on the chip background) */
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.info{color:#8cc4f5}}
+:root[data-theme="dark"] .chip.info{color:#8cc4f5}
+/* phones: work request tabs keep short labels and wrap to two rows, nothing hidden off to the side */
+@media(max-width:600px){.wh-tabs{flex-wrap:wrap!important;overflow:visible!important;width:auto!important}.wh-tabs [data-ptab] span{display:inline!important;font-size:11.5px}.wh-tabs [data-ptab]{min-height:36px}}
+/* phones: segmented controls and small buttons are easy to tap */
+@media(max-width:600px){.seg button,.btn.sm{min-height:36px;padding-top:7px;padding-bottom:7px}}
+.feed-prev{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}.feed-prev>[data-open]{cursor:pointer}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2190,9 +2199,15 @@ const Store={db:null,mem:null,subs:{},
     }
     (this.subs[coll]=this.subs[coll]||[]).push(cb); setTimeout(()=>cb(clone(this.mem[coll]||{}),{}),0); return ()=>{};
   },
-  async set(coll,id,data){
-    if(this.db){ return this.db.collection(coll).doc(id).set(clone(data)); }
+  async set(coll,id,data,base){
+    if(this.db){ const ref=this.db.collection(coll).doc(id); return base!==undefined&&ref.set.length>1?ref.set(clone(data),{base:clone(base)}):ref.set(clone(data)); }
     (this.mem[coll]=this.mem[coll]||{})[id]=clone(data); (this.subs[coll]||[]).forEach(cb=>cb(clone(this.mem[coll]),{}));
+  },
+  /* file it only if nobody has yet: 'ok', 'exists' or 'fail' (the claim that stops two open tabs sending one email twice) */
+  async create(coll,id,data){
+    if(this.db){ const ref=this.db.collection(coll).doc(id); if(!ref.create){ const g=await ref.get(); if(g.exists) return 'exists'; await ref.set(clone(data)); return 'ok'; }
+      try{ await ref.create(clone(data)); return 'ok'; }catch(e){ return e&&e.code==='EXISTS'?'exists':'fail'; } }
+    const c=(this.mem[coll]=this.mem[coll]||{}); if(c[id]!==undefined) return 'exists'; c[id]=clone(data); (this.subs[coll]||[]).forEach(cb=>cb(clone(this.mem[coll]),{})); return 'ok';
   },
   async del(coll,id){
     if(this.db){ return this.db.collection(coll).doc(id).delete(); }
@@ -2201,9 +2216,9 @@ const Store={db:null,mem:null,subs:{},
 };
 let pendingSaves=0;
 function saveState(ok,msg){ const el=$('#savestate'); if(!el) return; if(ok===false){ el.textContent='Not saved: '+msg; el.className='savestate err'; return; } el.className='savestate'; el.textContent=pendingSaves?'Saving…':(S.mode==='memory'?'Not connected: changes stay on this screen':''); }
-async function write(coll,id,data){
+async function write(coll,id,data,base){
   pendingSaves++; saveState();
-  try{ await Store.set(coll,id,data); pendingSaves--; saveState(); return true; }
+  try{ await Store.set(coll,id,data,base); pendingSaves--; saveState(); return true; }
   catch(e){ pendingSaves--; saveState(false,(e&&e.message)||'try again'); toast('That change did not save. '+((e&&e.message)||'')); return false; }
 }
 async function remove(coll,id){ try{ await Store.del(coll,id); }catch(e){ toast('Could not delete: '+((e&&e.message)||'')); } }
@@ -2219,6 +2234,8 @@ function govBody(){ return proc().gov||S.people.gc||'GC'; }
 function stageIndex(k){ return stages().findIndex(s=>s.key===k); }
 function nextStage(t,from){
   const list=stages(); let i=list.findIndex(s=>s.key===(from||t.stage));
+  /* at a stage that has been switched off: carry on from where that stage sits in the full list, never from the start */
+  if(i<0){ const all=allStages(), at=all.findIndex(s=>s.key===(from||t.stage)); if(at>=0){ const later=all.slice(at+1).map(s=>s.key); i=list.findIndex(s=>later.includes(s.key))-1; if(i<-1) i=list.length; } }
   for(let j=i+1;j<list.length;j++){
     const k=list[j].key;
     if(k==='cfp' && !(t.cfp&&t.cfp.needed)) continue;
@@ -2264,7 +2281,7 @@ function whoseMove(t){
       if(sub==='director'||sub==='discuss') return {role:'director',label:'Director',text:sub==='discuss'?'Talk it over and update the designation':'Recommend the designation'};
       return {role:'vps',label:peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'Designation Approver',text:'Approve the recommended designation'};
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
-    case 'comment': return sub==='setup'?{role:'website',label:'Website Admin',text:'Post to the standards page and set the dates'}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)};
+    case 'comment': return sub==='setup'?{role:'website',label:'Website Admin',text:'Post to the standards page and set the dates'}:(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
     case 'post': return {role:'facilitator',label:'Facilitator',text:'Report what came back from comment'};
     case 'gc-publish': return {role:'gov',label:g,text:g+' approval to publish as '+(isStandard(t)?'Candidate Recommendation':'Final')};
     case 'release': return {role:'website',label:'Website Admin',text:'Publish the pages and announcement'};
@@ -2308,64 +2325,18 @@ function stalled(t){ const a=stageAge(t); return t.state==='active' && t.stage!=
 let lastUndo=null;
 function byName(b){ return b==='Smartsheet'?'From the old MMS':(b||''); }
 function hist(t,text,extra){ t.history=t.history||[]; t.history.push(Object.assign({at:new Date().toISOString(),by:S.me.name||'Someone',text},extra||{})); }
-
-/* ---------- saving without overwriting anyone (November 5, 2026) ----------
-   A change often starts from a copy of the work request taken a while before it is saved: a
-   dialog (Record Decision, Start Work, Change Target Date...) can sit open for minutes or hours
-   while the MMS picks up other people's saves. Saving used to send that whole older copy, and the
-   save relay took every field that differed from the newest one as a change, so anything someone
-   else saved in the meantime was quietly put back. Now the MMS remembers the versions of each work
-   request it has shown. A save works out what this person changed from the version they started
-   from and lays only that over the newest copy (lists such as the history keep everyone's lines);
-   the relay then merges that into the latest record as it writes, and again if someone saved
-   first. If two people changed the same field, the person saving is asked which to keep. */
-const SEEN={};   // work request id -> the versions this page has shown [{at: its updatedAt, t: a copy}], newest last
-function noteSeen(t){ if(!t||!t.id) return; const k=t.updatedAt||'', L=SEEN[t.id]||(SEEN[t.id]=[]); if(L.some(v=>v.at===k)) return; L.push({at:k,t:clone(t)}); if(L.length>6) L.shift(); }
-function seenAt(id,at){ const L=SEEN[id]||[]; for(let i=L.length-1;i>=0;i--) if(L[i].at===(at||'')) return L[i].t; return null; }
-function normVal(v){ if(v===undefined||v===null||v==='') return ''; if(typeof v==='number'||typeof v==='boolean') return String(v); if(typeof v==='string') return v; return JSON.stringify(v); }
-const sameVal=(x,y)=>normVal(x)===normVal(y);
-const isObj=v=>!!v&&typeof v==='object'&&!Array.isArray(v);
-/* lists two people can both add to (history, decisions): keep their additions, add mine, apply my removals */
-function mergeList(cur,mine,base){ cur=Array.isArray(cur)?cur:[]; mine=Array.isArray(mine)?mine:[]; base=Array.isArray(base)?base:[];
-  const key=x=>JSON.stringify(x), had=new Set(base.map(key)), keep=new Set(mine.map(key));
-  const out=cur.filter(x=>!(had.has(key(x))&&!keep.has(key(x)))), have=new Set(out.map(key));
-  mine.forEach(x=>{ if(!had.has(key(x))&&!have.has(key(x))){ out.push(clone(x)); have.add(key(x)); } }); return out; }
-/* mine laid over the newest copy (cur): only what differs from the version it started from (base)
-   is taken. A field both changed is noted in cl; paths in theirs keep the newest copy's value. */
-function merge3(cur,mine,base,path,cl,theirs){ const out=isObj(cur)?clone(cur):{};
-  Object.keys(Object.assign({},mine,base)).forEach(k=>{ const p=path?path+'.'+k:k, m=mine[k], b=base[k], c=isObj(cur)?cur[k]:undefined;
-    if(sameVal(m,b)) return;                                   // not changed here: the newest value stands
-    if(!sameVal(c,b)&&Array.isArray(m)&&Array.isArray(b)){ out[k]=mergeList(c,m,b); return; }
-    if(!sameVal(c,b)&&isObj(m)&&isObj(b)&&isObj(c)){ out[k]=merge3(c,m,b,p,cl,theirs); return; }
-    if(!sameVal(c,b)&&!sameVal(c,m)){ if(cl) cl.push({p,theirs:c,yours:m}); if(theirs&&theirs.has(p)) return; }
-    if(m===undefined) delete out[k]; else out[k]=clone(m); });
-  return out; }
-let lastUserAct=0; ['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{ lastUserAct=Date.now(); },{capture:true,passive:true}));
-/* the save laid over the newest copy; null when the person chose to keep someone else's move */
-function onNewest(t,origin){
-  const latest=S.tickets[t.id]; origin=origin||seenAt(t.id,t.updatedAt);
-  if(!latest||!origin||latest===t||sameVal(latest,origin)) return t;   // new, or nobody saved since it was read
-  const cl=[]; merge3(latest,t,origin,'',cl);
-  const show=cl.filter(c=>!/^(updatedAt|updatedBy|stageSince)$/.test(c.p)); let theirs=null;
-  /* asked only when the person just did something: a background move never stops to ask */
-  if(show.length&&Date.now()-lastUserAct<30000){
-    const lab=p=>p.split('.').pop().replace(/([a-z])([A-Z])/g,'$1 $2').replace(/^./,x=>x.toUpperCase());
-    const sh=v=>{ const x=normVal(v); return x===''?'(blank)':x.slice(0,70); };
-    const moved=show.some(c=>c.p==='stage'||c.p==='state'||c.p==='sub');
-    if(!window.confirm('While you had '+(t.wr||'this work request')+' open, someone else saved a different value in the same '+(show.length===1?'field':'fields')+':\n\n'+
-      show.slice(0,8).map(c=>'• '+lab(c.p)+' — theirs: '+sh(c.theirs)+'   ·   yours: '+sh(c.yours)).join('\n')+(show.length>8?'\n• and '+(show.length-8)+' more':'')+
-      '\n\nOK keeps yours. '+(moved?'Cancel keeps theirs, and this change is not saved.':'Cancel keeps theirs for '+(show.length===1?'this field':'these fields')+'; your other changes still save.'))){
-      if(moved){ toast('Not saved: '+(t.wr||'the work request')+' keeps the change someone else made.'); return null; }
-      theirs=new Set(cl.map(c=>c.p)); }
-  }
-  return merge3(latest,t,origin,'',null,theirs);
-}
+/* the copies of each work request this tab has seen, by updatedAt: an action that began on an older copy
+   (a pop-up left open while someone else saved) sends that copy as its base, so only what the action
+   changed is saved over the newer record, never the rest of it */
+const TVER={};
+function noteVersions(map){ Object.values(map||{}).forEach(t=>{ if(!t||!t.id) return; const v=TVER[t.id]=TVER[t.id]||{}; const k=t.updatedAt||''; if(!(k in v)){ v[k]=JSON.stringify(t); const ks=Object.keys(v); if(ks.length>6) delete v[ks[0]]; } }); }
+function startedFrom(t){ const v=TVER[t.id]; if(!v) return undefined; const k=t.updatedAt||''; return k in v?JSON.parse(v[k]):undefined; }
 async function saveTicket(t,msg,before){
-  t=onNewest(t); if(!t) return null;
+  const base=startedFrom(t);
   t.updatedAt=new Date().toISOString(); t.updatedBy=S.me.name||'';
-  S.tickets[t.id]=t; noteSeen(t); renderAll();
-  const ok=await write('tickets',t.id,t);
-  if(ok && msg){ lastUndo=before?{id:t.id,before,after:clone(t)}:null; toast(msg,!!before); }
+  S.tickets[t.id]=t; renderAll();
+  const ok=await write('tickets',t.id,t,base);
+  if(ok && msg){ lastUndo=before?{id:t.id,before,at:new Date().toISOString(),what:msg}:null; toast(msg,!!before); }
   return ok;
 }
 async function move(t0,to,opts){
@@ -2376,9 +2347,12 @@ async function move(t0,to,opts){
   hist(t,opts.text||('Moved from '+stageDef(from).name+' to '+stageDef(to).name),{from,to,note:opts.note||''});
   stampDates(t,from,to);
   onEnter(t,to,from);
-  if(await saveTicket(t,opts.toast||(t.wr+' moved to '+stageDef(to).name),before)===null) return null;   /* kept someone else's move */
-  if(!opts.rider){ for(const r of ridersOf(t.id)){ if(r.stage!==to) await move(r,to,{rider:true,sub:to==='published'?'':t.sub,text:'Moved with '+t.wr+' (Reference Model release) to '+stageDef(to).name,toast:t.wr+' and the work riding with it moved to '+stageDef(to).name}); } }
-  if(from!==to) notifyEnter(t,to);
+  await saveTicket(t,opts.toast||(t.wr+' moved to '+stageDef(to).name),before);
+  /* the work riding with a release moves with it, and Undo takes the whole group back together */
+  if(!opts.rider){ const grp=lastUndo?[lastUndo]:[]; for(const r of ridersOf(t.id)){ if(r.stage!==to){ await move(r,to,{rider:true,sub:to==='published'?'':t.sub,text:'Moved with '+t.wr+' (Reference Model release) to '+stageDef(to).name,toast:t.wr+' and the work riding with it moved to '+stageDef(to).name}); if(lastUndo&&lastUndo.id===r.id) grp.push(lastUndo); } }
+    if(grp.length>1) lastUndo={group:grp,at:grp[0].at}; }
+  /* one stage email for a release: riders don't send their own */
+  if(from!==to&&!opts.rider) notifyEnter(t,to);
   return t;
 }
 async function setSub(t0,sub,text,patch,note){
@@ -2388,8 +2362,14 @@ async function setSub(t0,sub,text,patch,note){
 /* milestone dates for the metrics: stamped once, the first time a step is done */
 const STAMP_LEAVE={kickoff:'kickoffGc',cfp:'cfpPublished',aireview:'aiDecision',im:'imDecision',awg:'awgDecision',designation:'designation','gc-comment':'gcComment','gc-publish':'postGc'};
 const STAMP_ENTER={work:'workStart',comment:'commentPublished',published:'published'};
+/* a decision date is written only when the work moves FORWARD out of that step (approved), never when it is
+   turned down, sent back or moved backwards by hand */
+function ordOf(k){ const i=allStages().findIndex(s=>s.key===k); return k==='published'?999:i; }
 function stampDates(t,from,to){ if(from===to) return; t.dates=t.dates||{}; const d=today();
-  const k1=STAMP_LEAVE[from]; if(k1&&!t.dates[k1]) t.dates[k1]=d;
+  const fwd=ordOf(to)>ordOf(from);
+  const k1=STAMP_LEAVE[from]; if(fwd&&k1&&!t.dates[k1]) t.dates[k1]=d;
+  /* sent back to In Work from later on: the old Target to Submit to IM no longer applies (kept as prevTargetIM) */
+  if(to==='work'&&ordOf(from)>ordOf('work')&&t.dates.targetIM){ t.dates.prevTargetIM=t.dates.targetIM; t.dates.targetIM=''; hist(t,'Target to Submit to IM cleared (was '+fmt(t.dates.prevTargetIM)+'); set a new one on Key Dates'); }
   const k2=STAMP_ENTER[to]; if(k2&&!t.dates[k2]&&!(to==='comment'&&!t.dates.commentStart)) t.dates[k2]=d; } /* comment: stamped when it is actually posted (commentSetup) */
 /* what happens automatically when a ticket enters a stage */
 function onEnter(t,to){
@@ -2410,7 +2390,8 @@ function onEnter(t,to){
 }
 function mediaRequest(t,kind,text){
   const id=(t.id+'-'+kind).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,120);
-  const m={id,ticket:t.id,wr:t.wr,name:t.name,kind,text,status:'Requested',requested:today(),by:S.me.name||'',due:''};
+  if(t.rides) return; /* work riding with a release: the release's own request covers it */
+  const m={id,ticket:t.id,wr:t.wr,name:t.name,kind,text,status:'Requested',requested:today(),by:S.me.name||'',due:'',at:new Date().toISOString()};
   if(S.media[id] && S.media[id].status!=='Done') return;
   S.media[id]=m; write('media',id,m);
 }
@@ -2425,18 +2406,70 @@ function notifyEnter(t,to){
     html:(typeof stageMailHtml==='function'?stageMailHtml(t,to,ppl):''),ticket:t.id,kind:'stage',key:t.id+'-'+to+'-'+today()});
 }
 /* until the system goes live, nothing sends: every email waits in Notifications as a preview */
+/* Notifications groups: Held, To Send (queued or being sent), Didn’t Send (failed or nobody to send to), Sent */
+function mailGroup(m){ const s=m&&m.status; return s==='Didn’t Send'||s==='No Recipient'?'Failed':s==='Sending'?'Queued':s; }
 function mailHeld(){ const h=S.notify&&S.notify.holdUntil; return !!h&&today()<h; }
+/* An email is filed once, then sent. Filing is a claim on the server: when several people have the MMS open,
+   only the tab whose claim lands sends it, so nobody gets two copies. Emails are filed by month
+   ("2026-11_<key>") so no one file fills up. A preview made while email is on hold is filed under its own
+   key ("-held"), so once the hold lifts the real email still goes. */
+function mailKey(m,held){ return String(m.key||uid()).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,120)+(held?'-held':''); }
+function mailFiled(key,held){ return Object.values(S.outbox||{}).some(d=>d&&(d.k===key||(d.id===key&&!(d.status==='Held'&&!held)))); }
+async function postMail(doc){
+  const body={to:(doc.to||[]).join(';'),cc:(doc.cc||[]).join(';'),subject:doc.subject,body:doc.body,html:doc.html||'',kind:doc.kind||'',
+    token:(window.ResourcesSession&&ResourcesSession.token())||'',project:'mms'};
+  for(let i=0;i<3;i++){
+    try{ const r=await fetch(S.notify.flowUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+      if(r.ok) return {ok:true};
+      if(r.status<500&&r.status!==429) return {ok:false,error:'The email flow answered '+r.status}; }
+    catch(e){ if(i===2) return {ok:false,error:'Could not reach the email flow'}; }
+    await new Promise(res=>setTimeout(res,1500*(i+1)));
+  }
+  return {ok:false,error:'The email flow did not answer'};
+}
+async function sendFiled(id,doc){
+  const res=await postMail(doc); const patch=res.ok?{status:'Sent',sentAt:new Date().toISOString(),tries:(doc.tries||0)+1,error:''}:{status:'Didn’t Send',tries:(doc.tries||0)+1,error:res.error,triedAt:new Date().toISOString()};
+  /* a sent email keeps its words but not its formatting, to keep the monthly file small */
+  if(res.ok) patch.html='';
+  Object.assign(doc,patch); S.outbox[id]=doc; try{ await Store.set('outbox',id,doc); }catch(e){}
+  return res.ok;
+}
 async function queueMail(m){
-  const id=(m.key||uid()).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,140);
-  if(S.outbox[id]) return;
-  const held=mailHeld(); const doc=Object.assign({id,at:new Date().toISOString(),status:held?'Held':'Queued'},m); delete doc.key;
-  S.outbox[id]=doc; await write('outbox',id,doc);
-  if(!held&&S.notify.flowUrl){ try{ const r=await fetch(S.notify.flowUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:doc.to.join(';'),cc:(doc.cc||[]).join(';'),subject:doc.subject,body:doc.body,html:doc.html||'',from:S.notify.from})}); if(r.ok){ doc.status='Sent'; doc.sentAt=new Date().toISOString(); write('outbox',id,doc); } }catch(e){} }
+  const held=mailHeld(), key=mailKey(m,held);
+  if(mailFiled(key,held)) return false;
+  const to=(m.to||[]).filter(Boolean), cc=(m.cc||[]).filter(Boolean);
+  const id=today().slice(0,7)+'_'+key;
+  const doc=Object.assign({},m,{id,k:key,to,cc,at:new Date().toISOString(),status:held?'Held':(to.length?'Queued':'No Recipient')}); delete doc.key;
+  const got=await Store.create('outbox',id,doc);
+  if(got!=='ok'){ if(got==='fail') saveState(false,'An email could not be filed; it will be tried again'); return false; }
+  S.outbox[id]=doc;
+  if(held||!to.length||!S.notify.flowUrl) return true;
+  return sendFiled(id,doc);
+}
+/* emails that didn't go are tried again on the next pass (up to 5 times), by one tab at a time */
+async function retryMail(){
+  if(mailHeld()||!S.notify.flowUrl) return;
+  for(const [id,d] of Object.entries(S.outbox||{})){
+    if(!d||!(d.status==='Didn’t Send'||(d.status==='Queued'&&d.at&&Date.now()-Date.parse(d.at)>10*60000))||(d.tries||0)>=5) continue;
+    if(d.triedAt&&Date.now()-Date.parse(d.triedAt)<10*60000) continue;
+    const lock=Object.assign({},d,{triedAt:new Date().toISOString(),status:'Sending'}); const ok=await write('outbox',id,lock,d); if(!ok) continue;
+    await sendFiled(id,lock);
+  }
+}
+/* housekeeping, once a day by staff: held previews lose their formatting after 3 days and go after 30;
+   sent emails go after 90 days. Keeps every file far below its size limit. */
+async function tidyOutbox(){
+  if(!S.isStaff||!S.canWrite) return; const k='mms:outboxTidy'; try{ if(localStorage.getItem(k)===today()) return; localStorage.setItem(k,today()); }catch(e){}
+  const now=Date.now(), age=d=>(now-Date.parse(d.sentAt||d.at||0))/864e5;
+  for(const [id,d] of Object.entries(S.outbox||{})){ if(!d) continue;
+    if((d.status==='Held'&&age(d)>30)||(d.status==='Sent'&&age(d)>90)||(d.status==='No Recipient'&&age(d)>30)){ await remove('outbox',id); delete S.outbox[id]; continue; }
+    if((d.status==='Held'&&age(d)>3&&d.html)||(d.status==='Sent'&&d.html)){ const x=Object.assign({},d,{html:''}); await write('outbox',id,x,d); S.outbox[id]=x; } }
 }
 
 /* ---------- automations that run whenever the page is open ---------- */
 async function runAutomations(){
-  if(!S.ready || !S.canWrite) return;
+  if(!S.ready || !S.canWrite || S.partial) return;
+  try{ await retryMail(); }catch(e){} try{ await tidyOutbox(); }catch(e){}
   const td=today(), R=S.notify.reminders||{};
   for(const t of liveTickets()){
     if(t.state!=='active') continue;
@@ -2466,12 +2499,16 @@ function toast(msg,undo){
   const el=$('#toast'); $('#toast-msg').textContent=msg; $('#toast-undo').hidden=!undo; el.classList.add('on');
   clearTimeout(toastT); toastT=setTimeout(()=>el.classList.remove('on'),undo?7000:3500);
 }
+/* Undo puts the work request (and anything that moved with it) back, logs that it was undone, and takes back
+   the MISMO Media requests and the emails the move lined up, if they haven't gone yet */
 async function doUndo(){
   if(!lastUndo) return; const u=lastUndo; lastUndo=null; $('#toast').classList.remove('on');
-  /* undoes only this person's change: anything someone else saved since stays (November 5, 2026) */
-  const b=u.after?onNewest(clone(u.before),u.after):clone(u.before); if(!b) return;
-  if(u.after){ b.updatedAt=new Date().toISOString(); b.updatedBy=S.me.name||''; }
-  S.tickets[b.id]=b; noteSeen(b); renderAll(); await write('tickets',b.id,b); toast('Undone');
+  const L=u.group||[u], since=u.at||'', ids=L.map(x=>x.id); let kept=0;
+  for(const x of L){ const cur=S.tickets[x.id]; const b=clone(x.before); hist(b,'Undid the last change'+(x.what?' ('+x.what+')':''));
+    S.tickets[b.id]=b; await write('tickets',b.id,b,cur); }
+  if(since){ for(const m of Object.values(S.media||{})) if(m&&ids.includes(m.ticket)&&m.status==='Requested'&&(m.at||'')>=since){ const y=Object.assign({},m,{status:'Canceled',note:'Undone'}); S.media[y.id]=y; await write('media',y.id,y); }
+    for(const [id,d] of Object.entries(S.outbox||{})) if(d&&ids.includes(d.ticket)&&(d.at||'')>=since){ if(d.status==='Queued'||d.status==='Held'){ await remove('outbox',id); delete S.outbox[id]; } else if(d.status==='Sent') kept++; } }
+  renderAll(); toast(kept?'Undone. '+kept+' email'+(kept===1?' had':'s had')+' already gone out.':'Undone');
 }
 function modal(o){
   return new Promise(res=>{
@@ -2568,7 +2605,7 @@ function counts(){
   set('#nav-gov',liveTickets().filter(t=>t.state==='active'&&['kickoff','gc-comment','gc-publish'].includes(t.stage)).length);
   set('#nav-media',Object.values(S.media).filter(m=>m.status!=='Done').length);
   set('#nav-arch',Object.values(S.arch||{}).filter(a=>(a.status==='Requested'&&isRole('pm'))||(['Approved','In Progress'].includes(a.status)&&isRole('architect'))).length,true);
-  set('#nav-outbox',Object.values(S.outbox).filter(m=>m.status==='Queued'||m.status==='Held').length);
+  set('#nav-outbox',Object.values(S.outbox).filter(m=>mailHeld()?m.status==='Held':['Queued','Failed'].includes(mailGroup(m))).length);
   $('#nav-settings').hidden=!S.isStaff;
 }
 function go(view){ S.view=view; $$('#nav button[data-hq]').forEach(b=>{ if(b.dataset.hq===view) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); }); try{ history.replaceState(null,'','#'+view); }catch(e){} window.scrollTo(0,0); renderAll(); }
@@ -2933,6 +2970,8 @@ async function decide(t){
   x.votes=[...(x.votes||[]),rec];
   const dk={kickoff:'kickoffGc','gc-comment':'gcComment','gc-publish':'postGc'}[t.stage];
   if(v.out==='Approved'){ x.dates=Object.assign({},x.dates,{[dk]:rec.date}); const nx=nextStage(x); await move(x,nx,{text:g+' approved to '+what+' ('+fmt(rec.date)+')',note:v.note}); }
+  /* Kickoff not approved: the work never starts; it goes back to Approved – Set Up for staff. Comment or publish not approved: back to In Work. */
+  else if(v.out==='Not Approved'&&t.stage==='kickoff'){ await move(x,'approved',{text:g+' did not approve kicking off the workgroup ('+fmt(rec.date)+'); back to Approved – Set Up',note:v.note}); }
   else if(v.out==='Not Approved'){ await move(x,'work',{text:g+' did not approve ('+fmt(rec.date)+'); back to In Work',note:v.note}); }
   else { hist(x,g+' deferred the decision ('+fmt(rec.date)+')',{note:v.note}); await saveTicket(x,'Decision recorded',clone(t)); }
 }
@@ -2942,6 +2981,8 @@ async function commentSetup(t){
   if(!v) return; const x=clone(t), b=clone(t); const end=v.e||addDays(v.s||today(),days);
   x.dates=Object.assign({},x.dates,{commentStart:v.s||today(),commentEnd:end,commentPublished:x.dates&&x.dates.commentPublished||today()}); x.links=Object.assign({},x.links,{productPage:v.pp,resourceLibrary:v.rl}); x.sub='';
   hist(x,'Comment period set: '+fmt(x.dates.commentStart)+' to '+fmt(end)); await saveTicket(x,'Comment period set',b);
+  /* the work riding with this release shares its comment period */
+  for(const r of ridersOf(t.id)){ if(r.stage!=='comment') continue; const y=clone(r); y.dates=Object.assign({},y.dates,{commentStart:x.dates.commentStart,commentEnd:end,commentPublished:x.dates.commentPublished}); y.sub=''; hist(y,'Comment period set with '+t.wr+': '+fmt(x.dates.commentStart)+' to '+fmt(end)); await saveTicket(y); }
   queueMail({to:[emailOf(t.facilitator)].filter(Boolean),subject:t.wr+' '+t.name+' is open for comment',body:t.name+' is open for public comment from '+fmt(x.dates.commentStart)+' to '+fmt(end)+'.',ticket:t.id,kind:'stage',key:t.id+'-copen-'+x.dates.commentStart});
 }
 async function postReport(t){
@@ -2986,7 +3027,13 @@ async function newTicket(){
 async function mediaUpdate(id){
   const m=S.media[id]; if(!m) return;
   const v=await modal({title:m.kind,text:esc(m.wr+' '+m.name),ok:'Save',body:fld('Status',radios('st',['Requested','In Progress','Done'],m.status))+fld('Link',inp('link',m.link||'','https://'))+fld('Due',dateField('due',m.due||''))});
-  if(!v) return; const x=Object.assign({},m,{status:v.st,link:v.link,due:v.due}); S.media[id]=x; await write('media',id,x); renderAll();
+  if(!v) return; const x=Object.assign({},m,{status:v.st,link:v.link,due:v.due}); if(v.st==='Done'&&m.status!=='Done') x.done=x.done||today(); S.media[id]=x; await write('media',id,x);
+  /* a Call for Participation marked Done here publishes it: the work request moves on, same as Published on the work request */
+  const t=m.ticket&&S.tickets[m.ticket];
+  if(v.st==='Done'&&m.status!=='Done'&&m.kind==='Call for Participation'&&t&&t.state==='active'&&t.stage==='cfp'){
+    const y=clone(t); y.links=Object.assign({},y.links,{newsCfp:v.link||(y.links&&y.links.newsCfp)||''}); y.dates=Object.assign({},y.dates,{cfpPublished:x.done});
+    await move(y,nextStage(y),{text:'Call for Participation published '+fmt(x.done)+' (marked Done in MISMO Media by '+(S.me.name||'MISMO Media')+')'}); }
+  renderAll();
 }
 async function decideFromList(id){ const t=S.tickets[id]; if(t) decide(t); }
 
@@ -3145,7 +3192,7 @@ function relPanel(t){
   const row=x=>'<tr class="rowlink" data-open="'+esc(x.id)+'"><td class="nowrap">'+esc(x.wr)+'</td><td class="nm">'+esc(x.name)+'<div class="muted" style="font-size:12px;font-weight:400">'+esc(x.kind||'')+'</div></td><td>'+(x.state==='active'?stageChip(x):stateChip(x))+'</td><td style="font-size:12px">'+esc([x.classification,x.designation&&x.designation.license].filter(Boolean).join(' · ')||'Not designated yet')+'</td><td>'+(x.rides?'<span class="chip info">Moves With '+esc((S.tickets[x.rides]||{}).wr||x.rides)+'</span>':'')+'</td></tr>';
   if(kids.length) out+='<div class="psec full"><h4>Deliverables<span class="sp">'+(S.canWrite?'<button class="btn sm" data-x2="split" type="button">+ Add a Deliverable</button>':'')+'</span></h4><table class="tbl"><thead><tr><th>WR#</th><th>Deliverable</th><th>Stage</th><th>Designation</th><th></th></tr></thead><tbody>'+kids.map(row).join('')+'</tbody></table></div>';
   const riders=ridersOf(t.id);
-  if(riders.length) out+='<div class="psec full"><h4>Riding With This Release<span class="sp chip info">'+riders.length+'</span></h4><div class="muted" style="font-size:12.5px;margin:-4px 0 8px">These move with '+esc(t.wr)+' through every stage and publish with it.</div><table class="tbl"><thead><tr><th>WR#</th><th>Deliverable</th><th>Stage</th><th>Designation</th><th></th></tr></thead><tbody>'+riders.map(row).join('')+'</tbody></table></div>';
+  if(riders.length) out+='<div class="psec full"><h4>Riding with This Release<span class="sp chip info">'+riders.length+'</span></h4><div class="muted" style="font-size:12.5px;margin:-4px 0 8px">These move with '+esc(t.wr)+' through every stage and publish with it.</div><table class="tbl"><thead><tr><th>WR#</th><th>Deliverable</th><th>Stage</th><th>Designation</th><th></th></tr></thead><tbody>'+riders.map(row).join('')+'</tbody></table></div>';
   if(t.parent&&S.tickets[t.parent]){ const p=S.tickets[t.parent]; out='<div class="psec full"><h4>Part Of</h4><div class="rowlink" data-open="'+esc(p.id)+'" style="cursor:pointer"><b>'+esc(p.wr)+'</b> '+esc(p.name)+' <span class="muted">· '+(p.deliverables||[]).length+' deliverables</span></div>'+(t.rides?'<div class="banner info" style="margin:10px 0 0">Held for '+esc((S.tickets[t.rides]||{}).wr||t.rides)+' '+esc((S.tickets[t.rides]||{}).name||'')+'. It moves with that release and publishes with it.</div>':'')+'</div>'+out; }
   return out;
 }
@@ -3157,12 +3204,14 @@ async function hubSync(){
   try{
     const r=await fetch(window.__hqRelay.config.RELAY_URL+'/hub-requests/data/requests',{headers:{Authorization:'Bearer '+tok},cache:'no-store'});
     if(!r.ok) return; const b=await r.json(); S.hub=Object.values((b.data&&b.data.docs)||{});
-    if(S.canWrite) for(const x of S.hub){
+    if(S.canWrite&&!S.partial&&S.autoOn) for(const x of S.hub){
       if(!['approved','assigned','potential'].includes(x.status)||!x.wr) continue;
       const id=x.wr.replace(/[^A-Za-z0-9_-]/g,'_'); if(S.tickets[id]) continue;
       const q=x.req||{};
-      const t={id,wr:x.wr,uid:x.wr,name:q.title||x.wr,workgroup:q.cop||'',facilitator:x.facilitator||'',workType:q.maintenance?'Maintenance':'Initiative',reqType:q.isUpdate?'Update':'New',stage:'approved',sub:'',state:'active',stageSince:today(),dates:{submitted:x.submitted||'',bet:(x.updatedAt||'').slice(0,10)},history:[],source:'hub',hubId:x.id,createdAt:new Date().toISOString()};
-      hist(t,'Approved in the Initiative Hub ('+x.id+') and brought into the MMS'); S.tickets[id]=t; await write('tickets',id,t); notifyEnter(t,'approved');
+      const t={id,wr:x.wr,uid:x.wr,name:q.title||x.wr,workgroup:q.cop||'',facilitator:x.facilitator||'',workType:q.maintenance?'Maintenance':'Initiative',reqType:q.isUpdate?'Update':'New',stage:'approved',sub:'',state:'active',stageSince:today(),dates:{submitted:x.submitted||'',bet:atDay(x.updatedAt)},history:[],source:'hub',hubId:x.id,createdAt:new Date().toISOString()};
+      hist(t,'Approved in the Initiative Hub ('+x.id+') and brought into the MMS');
+      /* file it only if it isn't already there: never over a real work request */
+      const got=await Store.create('tickets',id,t); if(got!=='ok') continue; S.tickets[id]=t; notifyEnter(t,'approved');
     }
     if(S.view==='home') renderAll();
   }catch(e){}
@@ -3272,6 +3321,24 @@ function leadPanel(t){
   }
   return '<div class="psec full"><h4>Current Leadership</h4>'+sub+body+(snap&&snap.at&&L&&L.length?'<div class="lead-foot">Current as of '+esc(fmtS(atDay(snap.at)))+'</div>':'')+'</div>';
 }
+
+/* a release that is closed, canceled or split lets go of the work riding with it, and MISMO staff are told,
+   so nothing is left waiting on a release that will never move */
+const _saveTicketRide=saveTicket;
+saveTicket=async function(t,msg,before){ const ok=await _saveTicketRide(t,msg,before);
+  if(ok&&t&&(t.state==='closed'||t.state==='canceled'||t.split)){ const R=allTickets().filter(x=>x.rides===t.id&&x.state==='active');
+    for(const r of R){ try{ await unride(r); }catch(e){} }
+    if(R.length) queueMail({to:peopleFor('staff').map(p=>p.email),subject:t.wr+' '+t.name+' was '+(t.split?'split':t.state)+': '+R.length+' work request'+(R.length===1?'':'s')+' no longer ride with it',body:R.map(r=>r.wr+' '+r.name+' ('+stageDef(r.stage).name+')').join('\n')+'\n\nEach now moves on its own. Check where each one should go.',ticket:t.id,kind:'stage',key:t.id+'-unride-'+today()}); }
+  return ok; };
+
+/* a split work request finishes when all its deliverables have: Published if any was published, else Closed */
+const _saveTicketSplit=saveTicket;
+saveTicket=async function(t,msg,before){ const ok=await _saveTicketSplit(t,msg,before);
+  try{ if(ok&&t&&t.parent&&['published','closed','canceled'].includes(t.state)){ const p=S.tickets[t.parent];
+    if(p&&p.split&&p.state==='active'){ const kids=allTickets().filter(x=>x.parent===p.id); if(kids.length&&kids.every(k=>['published','closed','canceled'].includes(k.state))){
+      const x=clone(p), anyPub=kids.some(k=>k.state==='published'); x.state=anyPub?'published':'closed'; if(anyPub){ x.stage='published'; x.dates=Object.assign({},x.dates,{published:x.dates&&x.dates.published||today()}); } else x.dates=Object.assign({},x.dates,{closed:today()});
+      hist(x,'All '+kids.length+' deliverable'+(kids.length===1?' is':'s are')+' finished ('+kids.map(k=>k.wr+' '+k.state).join(', ')+'), so this work request is '+(anyPub?'published':'closed')); await _saveTicketSplit(x); } } } }catch(e){}
+  return ok; };
 
 /* ---------- who holds a role ---------- */
 function isRole(role,who){ who=who||viewer(); return (S.people.roles&&S.people.roles[role]||[]).some(p=>sameName(p.name,who.name)||(who.email&&p.email&&p.email.toLowerCase()===String(who.email).toLowerCase())); }
@@ -3497,7 +3564,6 @@ function wireArch(m){
   function same(a, b) { a = String(a || '').trim().toLowerCase(); b = String(b || '').trim().toLowerCase(); if (!a || !b) return false; if (a === b) return true; var fa = a.split(/\s+/), fb = b.split(/\s+/); return fa.length === 1 ? fa[0] === fb[0] : (fb.length === 1 ? fb[0] === fa[0] : false); }
 
   /* ---------- the process, from the same settings the MMS uses ---------- */
-  var BUILT = ['approved', 'cfp', 'kickoff', 'work', 'aireview', 'im', 'awg', 'designation', 'gc-comment', 'comment', 'post', 'gc-publish', 'release'];
   function proc(process) { var p = process || {}; return (p.presets && p.presets[p.active]) || { stages: [], gov: 'GC' }; }
   function stageName(P, k) { var s = (P.stages || []).find(function (x) { return x.key === k; }); return s ? s.name : (k === 'published' ? 'Published' : k); }
   var ENTRY = { approved: ['bet', 'submitted'], cfp: ['bet'], kickoff: ['cfpPublished', 'bet'], work: ['workStart', 'kickoffGc', 'bet'], aireview: ['aiSubmitted'], im: ['imSubmitted', 'aiDecision'], awg: ['awgSubmitted', 'imDecision'], designation: ['awgDecision'], 'gc-comment': ['designation', 'awgDecision'], comment: ['commentStart', 'commentPublished', 'gcComment'], post: ['commentEnd'], 'gc-publish': ['commentEnd', 'postGc'], release: ['postGc'] };
@@ -3506,21 +3572,95 @@ function wireArch(m){
     if (!since || imp) { var c = (ENTRY[t.stage] || []).map(function (k) { return d[k]; }).filter(function (x) { return x && x <= today; }).sort(); since = c.length ? c[c.length - 1] : (t.importedAt || t.stageSince || d.workStart || ''); }
     return diff(String(since).slice(0, 10), today); }
   function pastTarget(t, today) { var d = t.dates || {}; return t.state === 'active' && !t.split && !t.rides && d.targetIM && d.targetIM < today && ['approved', 'cfp', 'kickoff', 'work', 'aireview'].indexOf(t.stage) >= 0; }
-  /* The facilitator's next step, or null when the move is someone else's. Mirrors whoseMove() in the MMS. */
-  function facMove(t, P, today) {
-    if (t.state !== 'active' || t.split || t.rides || t.request) return null;
-    var sub = t.sub || '';
-    switch (t.stage) {
-      /* building work is only "your move" once its Target to Submit to IM is a week away or past, same as My Queue */
-      case 'work': { var tg = (t.dates || {}).targetIM; return (tg && (!today || diff(today, tg) <= 7)) ? 'Build the work product; submit for AI Review when ready' : null; }
-      case 'aireview': return sub === 'updates' ? 'Make the updates AI Review found, then resubmit' : (sub === 'reviewed' ? 'Read the AI Review and send it to IM, or make updates' : 'Run the AI Review on the submission');
-      case 'im': case 'awg': { var nm = t.stage === 'im' ? 'IM' : 'AWG'; if (sub === 'updates') return 'Make the ' + nm + ' updates, then resubmit'; if (sub === 'prep') return 'Submit to ' + nm; return null; }
-      case 'post': return 'Report what came back from comment';
-    }
-    var sd = (P.stages || []).find(function (s) { return s.key === t.stage; });
-    if (sd && sd.owner === 'facilitator' && BUILT.indexOf(t.stage) < 0) return sd.desc || ('Finish ' + sd.name);
-    return null;
+  /* ---------- whose move it is: the MMS's own My Queue rule, so the scheduled sender's email
+     matches My Queue. A copy of whoseMove() (app1.js) with its wrappers: Architecture Help
+     (archwr.js) and the IM Pre-Review step (imdesk.js); isMine() with the IM and AWG
+     facilitator rule (cpcard.js); dueNow() and waitingOn() (app1.js). The MMS passes its own
+     moveFor, which always wins; this is used when nothing is passed (the GitHub sender). ---------- */
+  var ASK_THIS = { hold: 'put this on hold', resume: 'resume this', close: 'close this', cancel: 'cancel this' };
+  function allPeople(people) { var p = people || {}, out = (p.facilitators || []).slice(); Object.keys(p.roles || {}).forEach(function (r) { out = out.concat(p.roles[r] || []); }); return out.filter(function (x) { return x && x.name; }); }
+  function personByName(people, n) { var all = allPeople(people), l = String(n || '').toLowerCase(); return all.find(function (p) { return String(p.name).toLowerCase() === l; }) || all.find(function (p) { return same(p.name, n); }); }
+  function peopleFor(ctx, role, t) {
+    if (role === 'facilitator') return t && t.facilitator ? [personByName(ctx.people, t.facilitator) || { name: t.facilitator, email: '' }] : [];
+    return ((ctx.people && ctx.people.roles && ctx.people.roles[role]) || []).filter(Boolean);
   }
+  function portalItemFor(ctx, t, k) {
+    var Q = (k === 'im' ? ctx.imPortalQ : ctx.awgPortalQ) || {};
+    return Object.keys(Q).map(function (x) { return Q[x]; }).filter(function (q) { return q && !q.hist && (q.status === 'awaiting' || q.status === 'carried') && (q.ticket === t.id || (!q.ticket && q.wr === t.wr)); })
+      .sort(function (a, b) { return (a.test ? 1 : 0) - (b.test ? 1 : 0); })[0] || null;
+  }
+  function archOpenFor(ctx, t) {
+    var A = ctx.arch || {};
+    return Object.keys(A).map(function (k) { return A[k]; }).filter(function (a) { return a && a.ticket === t.id && ['Done', 'Declined'].indexOf(a.status) < 0; })
+      .sort(function (a, b) { return String(b.id).localeCompare(String(a.id)); });
+  }
+  function baseMove(ctx, t) {
+    if (t.request) return { role: 'staff', text: (t.request.by || 'The facilitator') + ' asked to ' + (ASK_THIS[t.request.kind] || t.request.kind) };
+    if (t.split) return { role: '', text: '' };
+    if (t.rides && t.state === 'active') return { role: '', text: '' };
+    if (t.state === 'hold') return { role: 'staff', hold: true, text: 'On hold' + (t.holdReason ? ': ' + t.holdReason : '') };
+    if (t.state !== 'active') return { role: '', text: '' };
+    var g = 'Governance', sub = t.sub || '';
+    switch (t.stage) {
+      case 'approved': return { role: 'staff', text: 'Set the start date, size and target' };
+      case 'cfp': return sub === 'published' ? { role: 'staff', text: 'Confirm the Call for Participation is out' } : { role: 'media', text: 'Draft and publish the Call for Participation' };
+      case 'kickoff': return { role: 'gov', text: g + ' decision to kick off the workgroup' };
+      case 'work': return { role: 'facilitator', text: 'Build the work product; submit for AI Review when ready' };
+      case 'aireview':
+        if (sub === 'updates') return { role: 'facilitator', text: 'Make the updates AI Review found, then resubmit' };
+        if (sub === 'reviewed') return { role: 'facilitator', text: 'Read the AI Review and send to IM, or make updates' };
+        return { role: 'facilitator', text: 'Run the AI Review on the submission' };
+      case 'im': case 'awg': {
+        var nm = t.stage === 'im' ? 'IM' : 'AWG';
+        if (sub === 'updates') return { role: 'facilitator', text: 'Make the ' + nm + ' updates, then resubmit' };
+        if (sub === 'prep') return { role: 'facilitator', text: 'Submit to ' + nm + ' through MISMO Connect' };
+        var pq = portalItemFor(ctx, t, t.stage);
+        if (pq) return { role: 'imawg', text: pq.status === 'carried' ? 'Carried to the next AWG call' : (t.stage === 'awg' ? 'On the AWG agenda' : 'With the IM reviewers' + (pq.rows && pq.done ? ': ' + pq.done + ' of ' + pq.rows + ' rows decided' : '')) };
+        return { role: 'imawg', text: sub === 'in-review' ? nm + ' is reviewing' : t.stage === 'im' ? 'Run the IM Pre-Review and send it to IM Review' : 'Waiting for ' + nm + ' Review' };
+      }
+      case 'designation':
+        if (sub === 'vps') return { role: 'vps', text: t.designation && t.designation.auto ? 'Approve the recommended designation' : 'Approve the Director’s designation' };
+        if (sub === 'director' || sub === 'discuss') return { role: 'director', text: sub === 'discuss' ? 'Talk it over and update the designation' : 'Recommend the designation' };
+        return { role: 'vps', text: 'Approve the recommended designation' };
+      case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
+      case 'comment': return sub === 'setup' ? { role: 'website', text: 'Post to the standards page and set the dates' } : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
+      case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
+      case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
+      case 'release': return { role: 'website', text: 'Publish the pages and announcement' };
+    }
+    var sd = (ctx.P.stages || []).find(function (s) { return s.key === t.stage; }) || (t.stage === 'published' ? { key: 'published', name: 'Published', owner: '' } : { key: t.stage, name: t.stage, owner: 'staff' });
+    return { role: sd.owner || 'staff', text: sd.desc || ('Finish ' + sd.name) };
+  }
+  D.whoseMove = function (ctx, t) {
+    var w = baseMove(ctx, t);
+    /* Architecture Help (archwr.js): building work waits on its open architecture tasks */
+    if (t.stage === 'work' && t.state === 'active' && w.role === 'facilitator') { var L = archOpenFor(ctx, t); if (L.length) w = { role: w.role, text: 'Waiting on Architecture Help (' + L.map(function (a) { return a.id; }).join(', ') + '), then submit for AI Review' }; }
+    /* the IM Pre-Review (imdesk.js): the facilitator runs it and sends it to IM */
+    if (t.state === 'active' && !t.request && !t.split && !t.rides && t.stage === 'im' && ['', 'new', 'resubmitted'].indexOf(t.sub || '') >= 0 && !portalItemFor(ctx, t, 'im')) {
+      var Q = ctx.imq || {}, sent = Object.keys(Q).some(function (k) { var q = Q[k]; return q && q.ticket === t.id && q.status === 'awaiting'; });
+      w = sent ? { role: 'imawg', text: 'Sent to IM; it reaches IM Review when Erin or MISMO staff next open the MMS' } : { role: 'facilitator', text: 'Run the IM Pre-Review and send it to the IM reviewers' };
+    }
+    return w;
+  };
+  function isMine(ctx, t, who) {
+    if (!who || !who.name) return false;
+    var w = D.whoseMove(ctx, t); if (!w.role) return false;
+    var em = String(who.email || '').toLowerCase();
+    var mine = peopleFor(ctx, w.role, t).some(function (p) { return same(p.name, who.name) || (em && p.email && String(p.email).toLowerCase() === em); });
+    if (!mine) return false;
+    /* the IM and AWG facilitator: IM/AWG work is in IM Review, not her queue, unless she facilitates it (cpcard.js) */
+    if (w.role === 'imawg' && !same(t.facilitator, who.name)) return false;
+    return true;
+  }
+  function dueNow(t, today) { var d = t.dates || {}, soon = add(today, 7);
+    if (t.state === 'hold') return !!(t.holdUntil && t.holdUntil <= soon);
+    if (t.stage === 'work') return !!(d.targetIM && d.targetIM <= soon);
+    return true; }
+  /* moveFor(t, person): the next step when it is waiting on that person, else null (the MMS's waitingOn) */
+  D.moveFor = function (input) {
+    var n = et(input.now || new Date()), ctx = { people: input.people || {}, P: proc(input.process), arch: input.arch || {}, imq: input.imq || {}, imPortalQ: input.imPortalQ || {}, awgPortalQ: input.awgPortalQ || {} };
+    return function (t, person) { return isMine(ctx, t, person) && dueNow(t, n.ymd) ? (D.whoseMove(ctx, t).text || 'Your move') : null; };
+  };
 
   /* ---------- Meeting Trackers: which meetings still need attendance ---------- */
   function meetsOn(rule, ymd) {
@@ -3586,9 +3726,10 @@ function wireArch(m){
     var row = function (t, sub, badge, tone) { return { lead: t.wr, main: t.name, sub: sub, badge: badge, tone: tone, href: link(t) }; };
 
     if (on.yourMove) {
-      /* the MMS passes moveFor (its own My Queue rule), so the email and the queue always agree */
-      var ymPool = input.moveFor ? T.filter(function (t) { return (t.state === 'active' || t.state === 'hold') && !t.split; }) : act;
-      var ym = ymPool.map(function (t) { return [t, input.moveFor ? input.moveFor(t, person) : facMove(t, P, today)]; }).filter(function (x) { return x[1]; })
+      /* the MMS passes moveFor (its own My Queue rule); without it (the GitHub sender) the same rule, ported here */
+      var mf = input.moveFor || D.moveFor(input);
+      var ymPool = T.filter(function (t) { return (t.state === 'active' || t.state === 'hold') && !t.split; });
+      var ym = ymPool.map(function (t) { return [t, mf(t, person)]; }).filter(function (x) { return x[1]; })
         .sort(function (a, b) { return (pastTarget(b[0], today) - pastTarget(a[0], today)) || ((stageAge(b[0], today) || 0) - (stageAge(a[0], today) || 0)); });
       count.todo = ym.length;
       if (ym.length) S.push({ key: 'yourMove', title: 'Your Move', note: ym.length + ' waiting on you', tone: 'warn',
@@ -3933,7 +4074,7 @@ VIEWS.governance=function(){
   const lf=S.govLog||'all';
   const log=decided.filter(([v])=>lf==='all'||(lf==='yes'?v.outcome==='Approved':v.outcome!=='Approved'));
   const logH='<div class="seg sm" id="govlog">'+[['all','All'],['yes','Approved'],['no','Not Approved']].map(([k,l])=>'<button type="button" data-gl="'+k+'" aria-pressed="'+(lf===k)+'">'+l+'</button>').join('')+'</div>';
-  const lgp=pageOf('gov-log:'+lf,log,5);
+  const lgp=pageOf('gov-log:'+lf,log,fitN(420,48,5)); /* fill the screen, no empty well under it */
   const logB=log.length?'<ol class="tl">'+lgp.items.map(([v,t])=>'<li data-open="'+esc(t.id)+'" class="'+(v.outcome==='Approved'?'ok':'no')+'"><span class="tl-d">'+esc(fmtS(v.date))+'</span><div><b>'+esc(t.wr)+'</b> '+esc(t.name)+'<div class="tl-s">'+esc(stageDef(v.stage).name)+' · <span class="chip '+(v.outcome==='Approved'?'good':'bad')+'">'+esc(v.outcome)+'</span>'+(Object.keys(v.members||{}).length?' · '+Object.values(v.members).filter(x=>/approve|yes|agree/i.test(x)).length+' of '+Object.keys(v.members).length+' in favor':(v.method&&!/Smartsheet/.test(v.method)?' · '+esc(v.method):''))+(v.tally?' · '+esc(v.tally):'')+'</div></div></li>').join('')+'</ol>':'<div class="lane-e">'+(lf==='all'?'Decisions show here once they’re recorded.':'No decisions match.')+'</div>';
   return '<div class="pagehead slim"><div><h1>Governance</h1><div class="sub">The '+esc(govBody())+' docket, with every decision and vote on record.</div></div><div class="acts">'+(list.length?'<button class="btn" id="agenda" type="button">Copy Agenda</button>':'')+'</div></div>'+figs+
     '<div class="split2"><section class="pane"><header><h3>The Docket</h3><span class="muted">'+list.length+' waiting</span></header><div class="pane-b">'+(grp?'<div class="dk-g">'+grp+'</div>':'<div class="lane-e"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>Nothing is waiting on '+esc(g)+'</div>')+'</div>'+dkp.bar+'</section>'+
@@ -3943,8 +4084,10 @@ VIEWS.governance=function(){
 /* ---------------- Comment Periods ---------------- */
 VIEWS.comment=function(){
   const td=today(), lk=(S.lens||{}).cp||'';
-  const open=allTickets().filter(t=>t.stage==='comment'&&t.state==='active'&&t.sub!=='setup'&&t.dates&&t.dates.commentStart&&t.dates.commentEnd).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd));
-  const closed=allTickets().filter(t=>!open.includes(t)&&t.dates&&t.dates.commentStart&&t.dates.commentEnd&&t.dates.commentEnd<td&&daysBetween(t.dates.commentEnd,td)<=45).sort((a,b)=>b.dates.commentEnd.localeCompare(a.dates.commentEnd));
+  const posted=allTickets().filter(t=>t.stage==='comment'&&t.state==='active'&&t.sub!=='setup'&&t.dates&&t.dates.commentStart&&t.dates.commentEnd).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd));
+  /* a period whose start date is still ahead is Scheduled, not open */
+  const open=posted.filter(t=>t.dates.commentStart<=td), sched=posted.filter(t=>t.dates.commentStart>td);
+  const closed=allTickets().filter(t=>!posted.includes(t)&&t.dates&&t.dates.commentStart&&t.dates.commentEnd&&t.dates.commentEnd<td&&daysBetween(t.dates.commentEnd,td)<=45).sort((a,b)=>b.dates.commentEnd.localeCompare(a.dates.commentEnd));
   const setup=liveTickets().filter(t=>t.stage==='comment'&&t.sub==='setup');
   const soon=open.filter(t=>daysBetween(td,t.dates.commentEnd)<=7), next=open[0];
   const figs=lens('cp',[{key:'open',k:'Open Now',v:open.length,s:next?'Next closes '+fmtS(next.dates.commentEnd):'None open',c:'var(--c6)'},{key:'soon',k:'Closing in 7 Days',v:soon.length,s:'Facilitators report back the day after',c:'var(--c4)',cls:soon.length?'warnf':''},{key:'setup',k:'Not Posted Yet',v:setup.length,s:'Approved for comment',c:'var(--warn)'},{key:'closed',k:'Closed, Last 45 Days',v:closed.length,s:'Now in Post-Comment or later',c:'var(--ink-3)'}]);
@@ -3952,7 +4095,7 @@ VIEWS.comment=function(){
   const sdp=pageOf('cp-side',setup,fitN(480,190,2));
   const side=setup.length?'<section class="pane cp-side"><header><h3>Approved, Not Posted Yet</h3><span class="chip warn">'+setup.length+'</span></header><div class="pane-b">'+sdp.items.map((t,i)=>card2(t,{next:true,act:true,i})).join('')+'</div>'+sdp.bar+'</section>':'';
   if(lk==='setup') return head+(side||'<div class="empty">Everything approved for comment is posted.</div>');
-  let rows=lk==='open'?open:lk==='soon'?soon:lk==='closed'?closed:[...open,...closed];
+  let rows=lk==='open'?open:lk==='soon'?soon:lk==='closed'?closed:[...open,...sched,...closed];
   if(!rows.length) return head+'<div class="cp-wrap'+(side?' has-side':'')+'"><div class="empty">No comment periods match.</div>'+side+'</div>';
   const lo=addDays([td,...rows.map(t=>t.dates.commentStart)].sort()[0],-3), hi=addDays([addDays(td,14),...rows.map(t=>t.dates.commentEnd)].sort().slice(-1)[0],3);
   const span=Math.max(1,daysBetween(lo,hi)), X=d=>Math.max(0,Math.min(100,daysBetween(lo,d)/span*100));
@@ -3961,9 +4104,9 @@ VIEWS.comment=function(){
   const row=t=>{ const d=t.dates, isOpen=open.includes(t), l=X(d.commentStart), w=Math.max(1.2,X(d.commentEnd)-l), n=daysBetween(td,d.commentEnd), right=l+w<78, pct=isOpen?Math.max(0,Math.min(100,daysBetween(d.commentStart,td)/Math.max(1,daysBetween(d.commentStart,d.commentEnd))*100)):100;
     return '<div class="cp-row" data-open="'+esc(t.id)+'"><div class="cp-name">'+av(t.facilitator,'xs')+'<span><b>'+esc(t.name)+'</b><span>'+esc(t.wr)+' · '+esc(cpName(t)!==t.name?'Page: '+cpName(t):(t.facilitator||''))+'</span></span></div><div class="cp-track">'+ticks.map(m=>'<i class="cp-grid" style="left:'+X(m)+'%"></i>').join('')+'<i class="cp-now" style="left:'+X(td)+'%"></i><div class="cp-bar '+(isOpen?'open':'closed')+(isOpen&&n<=7?' soon':'')+'" style="left:'+l+'%;width:'+w+'%"><span class="cp-fill" style="width:'+pct+'%"></span></div><span class="cp-lab '+(right?'r':'l')+'" style="'+(right?'left:calc('+(l+w)+'% + 8px)':'right:calc('+(100-l)+'% + 8px)')+'">'+(isOpen?'<b>'+(n<=0?'Closes today':n+' day'+(n===1?'':'s')+' left')+'</b> · ':'')+esc(fmtS(d.commentStart))+' to '+esc(fmtS(d.commentEnd))+'</span></div></div>'; };
   const cpp=pageOf('cp-rows:'+lk,rows,fitN(500,50,5)), vis=cpp.items;
-  const o2=vis.filter(t=>open.includes(t)), c2=vis.filter(t=>!open.includes(t));
+  const o2=vis.filter(t=>open.includes(t)), s2=vis.filter(t=>sched.includes(t)), c2=vis.filter(t=>!open.includes(t)&&!sched.includes(t));
   return head+'<div class="cp-wrap'+(side?' has-side':'')+'"><div class="card cp"><h3>Comment Period Timeline<span class="sp cp-key"><span><i class="open"></i>Open now</span>'+(o2.some(t=>soon.includes(t))?'<span><i class="soon"></i>Closing in 7 days</span>':'')+'<span><i class="closed"></i>Closed in the last 45 days</span><span><i class="now"></i>Today</span></span></h3>'+axis+'<div class="cp-scroll">'+
-    (o2.length?'<div class="cp-grp">Open Now</div>'+o2.map(row).join(''):'')+(c2.length?'<div class="cp-grp">Recently Closed</div>'+c2.map(row).join(''):'')+'</div>'+cpp.bar+'</div>'+side+'</div>';
+    (o2.length?'<div class="cp-grp">Open Now</div>'+o2.map(row).join(''):'')+(s2.length?'<div class="cp-grp">Scheduled to Open</div>'+s2.map(row).join(''):'')+(c2.length?'<div class="cp-grp">Recently Closed</div>'+c2.map(row).join(''):'')+'</div>'+cpp.bar+'</div>'+side+'</div>';
 };
 
 /* ---------------- All Work ---------------- */
@@ -4027,15 +4170,15 @@ VIEWS.arch=function(){
 
 /* ---------------- Notifications ---------------- */
 VIEWS.outbox=function(){
-  const all=Object.values(S.outbox).sort((a,b)=>(b.at||'').localeCompare(a.at||'')), held=mailHeld(), mf=S.mailF||(held||all.some(m=>m.status==='Held')?'Held':'Queued'), mq=(S.mailQ||'').toLowerCase();
-  const L=all.filter(m=>(mf==='all'||m.status===mf)&&(!mq||((m.subject||'')+' '+(m.to||[]).join(' ')+' '+(m.body||'')).toLowerCase().includes(mq)));
+  const all=Object.values(S.outbox).sort((a,b)=>(b.at||'').localeCompare(a.at||'')), held=mailHeld(), mf=S.mailF||(held?'Held':all.some(m=>mailGroup(m)==='Failed')?'Failed':'Queued'), mq=(S.mailQ||'').toLowerCase();
+  const L=all.filter(m=>(mf==='all'||mailGroup(m)===mf)&&(!mq||((m.subject||'')+' '+(m.to||[]).join(' ')+' '+(m.body||'')).toLowerCase().includes(mq)));
   S._mailL=L.map(m=>m.id);
   const mlp=pageOf('mail:'+mf+':'+mq,L,fitN(330,66,5));
   const cur=L.find(m=>m.id===S.mailSel)||mlp.items[0];
-  const seg='<div class="seg sm" id="mailf">'+[['Held','Held (Preview)'],['Queued','To Send'],['Sent','Sent'],['all','All']].map(([k,l])=>'<button type="button" data-mf="'+k+'" aria-pressed="'+(mf===k)+'">'+l+' <b>'+all.filter(m=>k==='all'||m.status===k).length+'</b></button>').join('')+'</div>';
+  const seg='<div class="seg sm" id="mailf">'+[['Held','Held (Preview)'],['Queued','To Send'],['Failed','Didn’t Send'],['Sent','Sent'],['all','All']].filter(([k])=>k!=='Failed'||all.some(m=>mailGroup(m)==='Failed')).map(([k,l])=>'<button type="button" data-mf="'+k+'" aria-pressed="'+(mf===k)+'">'+l+' <b>'+all.filter(m=>k==='all'||mailGroup(m)===k).length+'</b></button>').join('')+'</div>';
   const item=m=>'<button type="button" class="mi'+(cur&&m.id===cur.id?' on':'')+(m.status==='Sent'?' sent':'')+'" data-mail="'+esc(m.id)+'"><span class="mi-dot"></span><span class="mi-m"><span class="mi-t"><b>'+esc((m.to||[]).map(mailWho).join(', ')||'No recipient')+'</b><em>'+esc(fmtS(atDay(m.at)))+'</em></span><span class="mi-s">'+esc(m.subject||'')+'</span><span class="mi-p">'+esc((m.body||'').slice(0,90))+'</span></span></button>';
   const read=cur?'<div class="mr-h"><div class="mr-s">'+esc(cur.subject||'')+'</div><div class="mr-to"><span>To</span> '+esc((cur.to||[]).join(', '))+'</div><div class="mr-to"><span>Queued</span> '+esc(fmt(atDay(cur.at)))+(cur.ticket&&S.tickets[cur.ticket]?' · <a href="#" data-open="'+esc(cur.ticket)+'">'+esc(S.tickets[cur.ticket].wr)+'</a>':'')+' · <span class="chip '+(cur.status==='Sent'?'good':cur.status==='Held'?'info':'warn')+'">'+esc(cur.status==='Queued'?'To Send':cur.status==='Held'?'Held, not sent':cur.status)+'</span></div></div>'+(cur.html?'<iframe class="mr-html" sandbox="" title="Email preview" srcdoc="'+esc(cur.html)+'"></iframe>':'<div class="mr-b">'+esc(cur.body||'')+'</div>')+'<div class="mr-a"><a class="btn pri" href="mailto:'+esc((cur.to||[]).join(';'))+'?subject='+encodeURIComponent(cur.subject||'')+'&body='+encodeURIComponent(cur.body||'')+'">Open in Outlook</a>'+(S.canWrite&&cur.status==='Queued'?'<button class="btn" data-sent="'+esc(cur.id)+'" type="button">Mark Sent</button>':'')+(S.canWrite&&S.isStaff?'<button class="btn danger" data-mdel="'+esc(cur.id)+'" type="button">Delete</button>':'')+'</div>':'<div class="lane-e" style="margin:auto;max-width:640px"><svg viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg><b style="color:var(--ink)">No Emails '+({Held:'Held',Queued:'to Send',Sent:'Sent'}[mf]||'Yet')+'</b>The MMS lines up an email when work arrives at a stage, a Target to Submit to IM is a week away, a comment period is about to end, or someone asks MISMO staff or the Program Manager for something.'+(held?' Until '+esc(fmt(S.notify.holdUntil))+' each one waits here as a preview.':'')+'</div>';
-  return '<div class="pagehead slim"><div><h1>Notifications</h1><div class="sub">Every email the MMS has lined up. '+(held?'Sending is on hold until '+esc(fmt(S.notify.holdUntil))+'. Nothing goes out; each email waits here as a preview.':S.notify.flowUrl?'They send automatically through the email flow.':'Until the email flow is connected, open each one to send it from Outlook.')+'</div></div><div class="acts">'+(all.some(m=>m.status==='Queued')&&S.canWrite?'<button class="btn" id="sentall" type="button">Mark All Sent</button>':'')+(S.isStaff&&S.canWrite&&L.length?' <button class="btn danger" id="mdelall" type="button" data-n="'+L.length+'">Delete '+(mf==='all'?'All':'These')+' '+L.length+'</button>':'')+'</div></div>'+
+  return '<div class="pagehead slim"><div><h1>Notifications</h1><div class="sub">Every email the MMS has lined up. '+(held?'Sending is on hold until '+esc(fmt(S.notify.holdUntil))+'. Nothing goes out; each email waits here as a preview.':S.notify.flowUrl?'They send automatically through the email flow; any that didn’t go are tried again and listed under Didn’t Send.':'Until the email flow is connected, open each one to send it from Outlook.')+'</div></div><div class="acts">'+(all.some(m=>m.status==='Queued')&&S.canWrite?'<button class="btn" id="sentall" type="button">Mark All Sent</button>':'')+(S.isStaff&&S.canWrite&&L.length?' <button class="btn danger" id="mdelall" type="button" data-n="'+L.length+'">Delete '+(mf==='all'?'All':'These')+' '+L.length+'</button>':'')+'</div></div>'+
     '<div class="mailbox"><section class="mlist"><header>'+seg+'<div class="tsearch sm"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="mq" placeholder="Search emails" value="'+esc(S.mailQ||'')+'"></div></header><div class="ml-b">'+(L.length?mlp.items.map(item).join(''):'<div class="lane-e">No emails here.</div>')+'</div>'+mlp.bar+'</section><section class="mread">'+read+'</section></div>';
 };
 
@@ -4362,13 +4505,13 @@ function wireDigest(m){
   $('#dgon',m).onchange=async()=>{ S.digestCfg=read(); await write('config','digest',S.digestCfg); toast(S.digestCfg.on?'Daily digest is on':'Daily digest is off'); renderAll(); };
   $('#dgwho',m).onchange=e=>{ S.dgPrev.who=e.target.value; paintPreview(m); };
   $('#dgas',m).onchange=e=>{ S.dgPrev.as=e.target.value; paintPreview(m); };
-  $('#dgtest',m).onclick=async()=>{ const one=S._dgOne; if(!one) return; if(!S.me.email){ toast('Your email is not on file'); return; } await sendDigests([Object.assign({},one,{to:[S.me.email],cc:[],empty:false,subject:'[Preview] '+one.subject})],'test'); toast(S.notify.flowUrl?'Preview sent to '+S.me.email:'Preview is in Notifications, ready to send'); };
-  $('#dgnow',m).onclick=async()=>{ const ok=await modal({title:'Send Today’s Digests Now?',body:'<p style="margin:0">Each facilitator who is ticked gets today’s email, with '+esc((MMSDigest.settings(S.digestCfg).cc||[]).join(', ')||'no one')+' copied.</p>',ok:'Send Now'}); if(!ok) return; const src=await loadDigestSources(true); const n=await sendDigests(MMSDigest.build(digestInput(src)),'now'); await write('config','digestLog',{date:today(),at:new Date().toISOString(),by:S.me.name||'',count:n,how:'by hand'}); toast(n+' digest'+(n===1?'':'s')+(S.notify.flowUrl?' sent':' queued in Notifications')); };
+  $('#dgtest',m).onclick=async()=>{ const one=S._dgOne; if(!one) return; if(!S.me.email){ toast('Your email is not on file'); return; } await sendDigests([Object.assign({},one,{to:[S.me.email],cc:[],empty:false,subject:'[Preview] '+one.subject})],'test'); const got=Object.values(S.outbox||{}).filter(d=>d&&d.kind==='digest'&&(d.to||[])[0]===S.me.email).sort((a,b)=>String(b.at).localeCompare(String(a.at)))[0]; toast(mailHeld()?'Preview saved in Notifications (email is on hold until '+fmt(S.notify.holdUntil)+')':got&&got.status==='Sent'?'Preview sent to '+S.me.email:got&&got.status==='Didn’t Send'?'The preview didn’t send: '+(got.error||'see Notifications'):'Preview is in Notifications, ready to send'); };
+  $('#dgnow',m).onclick=async()=>{ const gh=MMSDigest.settings(S.digestCfg).sender==='action'; const ok=await modal({title:'Send Today’s Digests Now?',body:'<p style="margin:0">Each facilitator who is ticked gets today’s email, with '+esc((MMSDigest.settings(S.digestCfg).cc||[]).join(', ')||'no one')+' copied.</p>'+(gh?'<p style="margin:8px 0 0" class="muted">The scheduled sender on GitHub also sends at '+esc(String(MMSDigest.settings(S.digestCfg).hour>12?MMSDigest.settings(S.digestCfg).hour-12:MMSDigest.settings(S.digestCfg).hour))+' pm. It skips anyone this sends to, so nobody gets two.</p>':''),ok:'Send Now'}); if(!ok) return; const src=await loadDigestSources(true); const n=await sendDigests(MMSDigest.build(digestInput(src)),'now'); await write('config','digestLog',{date:today(),at:new Date().toISOString(),by:S.me.name||'',count:n,how:'by hand'}); toast(mailHeld()?n+' digest'+(n===1?'':'s')+' saved as previews (email is on hold until '+fmt(S.notify.holdUntil)+')':n+' digest'+(n===1?'':'s')+(S.notify.flowUrl?' sent; see Notifications for any that didn’t go':' queued in Notifications')); };
   paintPreview(m);
 }
 /* sending on its own while staff have the MMS open */
 async function digestAuto(){
-  const c=MMSDigest.settings(S.digestCfg), held=mailHeld(); if((!held&&(!c.on||c.sender==='action'))||!S.isStaff||!S.canWrite||S.mode!=='relay') return;
+  const c=MMSDigest.settings(S.digestCfg), held=mailHeld(); if((!held&&(!c.on||c.sender==='action'))||!S.isStaff||!S.canWrite||S.mode!=='relay'||S.partial||!S.autoOn) return;
   const n=MMSDigest.et(new Date()); if(!c.days.includes(n.dow)||n.min<c.hour*60) return;
   const log=S.digestLog||{}; if(log.date===n.ymd) return;
   S.digestLog={date:n.ymd,at:new Date().toISOString(),by:S.me.name||'',count:0,how:'automatic'}; await write('config','digestLog',S.digestLog);
@@ -4418,14 +4561,14 @@ VIEWS.comment=function(){ const html=_commentView(); const L=S.comments||[]; con
 const WEB_RECENT=[["MISMO Mortgage Compliance Dataset FAQ","2026-10-12","mismo-mortgage-compliance-dataset-faq"],["MISMO Compliance Certification Disclaimer Statement","2026-10-12","mismo-compliance-certification-disclaimer-statement"],["MISMO eClosing System Certification Requirements v1","2026-10-12","mismo-eclosing-system-certification-requirements-v1"],["Executive Summary - MCD Workshop at the MISMO Winter Summit","2026-10-12","executive-summary-mcd-workshop-at-the-mismo-winter-summit"],["MISMO Mortgage Compliance Dataset Backgrounder","2026-10-12","mismo-mortgage-compliance-dataset-backgrounder"],["The Mortgage Compliance Dataset - An Industry Brief","2026-10-12","the-mortgage-compliance-dataset-an-industry-brief"],["Automated Valuation Model Testing Guidance and Best Practices","2026-08-19","automated-valuation-model-testing-guidance-and-best-practices"],["Fee Modernization White Paper","2026-03-16","fee-modernization-white-paper"]].map(([name,published,u])=>({name,published,url:'https://collaborate.mismo.org/viewdocument/'+u}));
 function webFeed(){
   const td=today();
-  const cps=allTickets().filter(t=>t.stage==='comment'&&t.state==='active'&&t.sub!=='setup'&&t.dates&&t.dates.commentStart&&t.dates.commentEnd&&t.dates.commentEnd>=addDays(td,-1)).sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))
+  const cps=allTickets().filter(t=>t.stage==='comment'&&t.state==='active'&&t.sub!=='setup'&&t.dates&&t.dates.commentStart&&t.dates.commentStart<=td&&t.dates.commentEnd&&t.dates.commentEnd>=addDays(td,-1)) /* not before it opens */.sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))
     .map(t=>({name:cpName(t),opens:t.dates.commentStart,closes:t.dates.commentEnd,wr:t.wr,workgroup:t.workgroup||'',commentForm:'https://resources.mismo.org/forms/comment/?wr='+encodeURIComponent(t.wr)}));
   const recent=((S.feedState&&S.feedState.recent)||WEB_RECENT);
   return {updated:td,libraryUrl:'https://collaborate.mismo.org/mismolibraries',recent,commentPeriods:cps,source:'MISMO Manufacturing System'};
 }
 let feedBusy=false;
 async function publishFeed(force){
-  if(feedBusy||S.mode!=='relay'||!S.isStaff||!S.canWrite) return; const tok=window.ResourcesSession&&ResourcesSession.token(); if(!tok) return;
+  if(feedBusy||S.mode!=='relay'||!S.isStaff||!S.canWrite||S.partial||!S.autoOn) return; const tok=window.ResourcesSession&&ResourcesSession.token(); if(!tok) return;
   const doc=webFeed(), s0=JSON.stringify(doc.commentPeriods)+JSON.stringify(doc.recent), sig=mtHash8(s0)+s0.length; const st=S.feedState||{};
   if(!force&&st.sig===sig) return;
   feedBusy=true;
@@ -4595,7 +4738,7 @@ function workgroupCard(){
   const rows=pg.items.map(([wg,w])=>{ const cur=Object.entries(w.fac).sort((a,b)=>b[1]-a[1]).map(x=>x[0]); const now=cur[0]||''; const mt=mtFacFor(wg); const differs=mt&&!sameName(mt,now);
     return '<tr><td><b>'+esc(wg)+'</b><div class="muted" style="font-size:12px">'+w.live+' live · '+w.done+' closed or published</div></td><td>'+esc(now||'—')+(cur.length>1?'<div class="muted" style="font-size:12px">also '+esc(cur.slice(1).join(', '))+'</div>':'')+(differs?'<div class="mtsay">Meeting Trackers says '+esc(mt)+'</div>':'')+'</td>'+
       (S.canWrite?'<td class="nowrap"><select data-wgsel="'+esc(wg)+'">'+facs.map(n=>'<option'+(sameName(n,differs?mt:now)?' selected':'')+'>'+esc(n)+'</option>').join('')+'</select> <button type="button" class="btn sm'+(differs?' pri':'')+'" data-wgset="'+esc(wg)+'">Hand Over</button></td>':'')+'</tr>'; }).join('');
-  return '<div class="card"><h3>Workgroups and Their Facilitators</h3><p class="muted" style="font-size:12.5px;margin:-4px 0 10px">Handing a workgroup over moves every one of its work requests, live and closed, to the new facilitator. Each one keeps who facilitated it before.</p><div class="seg sm" style="margin-bottom:8px">'+[['live','With Live Work'],['all','Every Workgroup']].map(([k,l])=>'<button type="button" data-wgscope="'+k+'" aria-pressed="'+(scope===k)+'">'+l+' <b>'+Object.values(W).filter(w=>k==='all'||w.live).length+'</b></button>').join('')+'</div><table class="tbl wgf"><thead><tr><th>Workgroup</th><th>Facilitator Now</th>'+(S.canWrite?'<th>Hand Over To</th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table>'+pg.bar+'</div>';
+  return '<div class="card"><h3>Workgroups and Their Facilitators</h3><p class="muted" style="font-size:12.5px;margin:-4px 0 10px">Handing a workgroup over moves every one of its work requests, live and closed, to the new facilitator. Each one keeps who facilitated it before.</p><div class="seg sm" style="margin-bottom:8px">'+[['live','With Live Work'],['all','Every Workgroup']].map(([k,l])=>'<button type="button" data-wgscope="'+k+'" aria-pressed="'+(scope===k)+'">'+l+' <b>'+Object.values(W).filter(w=>k==='all'||w.live).length+'</b></button>').join('')+'</div><table class="tbl wgf"><thead><tr><th>Workgroup</th><th>Facilitator Now</th>'+(S.canWrite?'<th>Hand Over to</th>':'')+'</tr></thead><tbody>'+rows+'</tbody></table>'+pg.bar+'</div>';
 }
 setTimeout(()=>{ const _settingsView1=VIEWS.settings;
 VIEWS.settings=function(){ let h=_settingsView1(); if(S.isStaff&&/data-plist="facilitators"/.test(h)){ h+=workgroupCard(); if(!digestSrc&&S.mode==='relay') loadDigestSources().then(()=>{ if(S.view==='settings') renderAll(); }); } return h; }; },0);
@@ -5801,10 +5944,13 @@ aiReview=function(t){ rvRun(t,'editor'); };
 WH_IC.check='M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11';
 function rvCard(rep){ const F=rep.findings||[]; const fx=F.filter(f=>f.sev==='fix').length;
   return '<button type="button" class="rv-card rv-'+esc(rep.readiness)+'" data-rvopen="'+esc(rep.id)+'"><span class="rv-ck">'+esc(rep.kind==='im'?'IM Pre-Review':'AI Review')+'</span><b>'+esc(rep.readinessLabel)+'</b><span class="rv-cm">'+fx+' must fix · '+(rep.kind==='im'?(rep.rows||[]).length+' rows to check':(rep.corrections||[]).length+' corrections')+'</span><span class="rv-cd">'+esc(fmtS(atDay(rep.at)))+' · '+esc(firstName(rep.by||''))+'</span></button>'; }
-function rvTabHtml(t){ rvEnsure(t); const L=rvFor(t), can=canAct(t)||S.isStaff;
-  return '<div class="psec full rv-tab"><h4>Reviews'+(can?'<span class="sp"><button type="button" class="btn sm" data-rvrun="editor">Run AI Review</button><button type="button" class="btn sm" data-rvrun="im">Run IM Pre-Review</button></span>':'')+'</h4>'+
+/* the IM Pre-Review is sent to IM, so it is offered only once the work request is at AI Review or IM Review */
+function imReady(t){ return t&&t.state==='active'&&['aireview','im'].includes(t.stage)&&!t.split&&!t.rides; }
+function rvTabHtml(t){ rvEnsure(t); const L=rvFor(t), can=canAct(t)||S.isStaff, canIM=can&&imReady(t);
+  return '<div class="psec full rv-tab"><h4>Reviews'+(can?'<span class="sp"><button type="button" class="btn sm" data-rvrun="editor">Run AI Review</button>'+(canIM?'<button type="button" class="btn sm" data-rvrun="im">Run IM Pre-Review</button>':'')+'</span>':'')+'</h4>'+
     '<p class="muted rv-why">Two steps before IM. <b>AI Review</b> reads the work product the way MISMO’s editor would (editor and readiness in one). <b>IM Pre-Review</b> then reads the IM Submission Form the way IM does, drafts IM’s decision for each row and sends it to the IM reviewers. Each one leaves a report here that facilitators and staff can open or download.</p>'+
-    (L.length?'<div class="rv-list">'+L.map(rvCard).join('')+'</div>':'<div class="rv-list">'+rvNone('editor',can)+rvNone('im',can)+'</div>')+'</div>'; }
+    (can&&!canIM&&t.state==='active'?'<p class="muted" style="font-size:12.5px;margin:0 0 8px">The IM Pre-Review opens once the work request is at AI Review or IM Review.</p>':'')+
+    (L.length?'<div class="rv-list">'+L.map(rvCard).join('')+'</div>':'<div class="rv-list">'+rvNone('editor',can)+rvNone('im',canIM)+'</div>')+'</div>'; }
 function rvNone(k,can){ const tag=can?'button type="button" data-rvrun="'+k+'"':'div'; return '<'+tag+' class="rv-card rv-none"><span class="rv-ck">'+(k==='im'?'IM Pre-Review':'AI Review')+'</span><b>Not run yet</b><span class="rv-cm">'+(k==='im'?'Checks the IM Submission Form, then sends it to IM':'Run it before submitting to IM')+'</span></'+(can?'button':'div')+'>'; }
 function rvLatestHtml(t){ rvEnsure(t); const L=rvFor(t); const ed=L.find(r=>r.kind==='editor'), im=L.find(r=>r.kind==='im');
   if(!ed&&!im&&!['work','aireview','im'].includes(t.stage)) return '';
@@ -5853,7 +5999,7 @@ function ssTabHtml(t){ ssEnsure(); const D=ssFor(t);
   const L=(D.links||[]);
   return '<div class="psec full ss-tab"><h4>Files<span class="sp muted" style="font-size:12px;font-weight:500">'+F.length+' in SharePoint · click one to open it in a new tab</span>'+ssAddBtn(t)+'</h4><div class="ss-up" id="ssup-'+esc(t.id)+'" hidden></div>'+
     (F.length?groups.map(g=>'<div class="ss-g">'+esc(g)+'</div><div class="ss-list">'+F.filter(f=>yr(f)===g).map(row).join('')+'</div>').join(''):'<div class="lead-empty">'+ssEmpty(t)+'</div>')+'</div>'+
-    (L.length?'<div class="psec full ss-tab"><h4>Links From Smartsheet</h4><div class="wh-chips">'+L.map(l=>'<a class="wh-chip" href="'+esc(l.u)+'" target="_blank" rel="noopener">'+whIc('link')+esc(l.n||l.col||l.u)+'<span>↗</span></a>').join('')+'</div></div>':''); }
+    (L.length?'<div class="psec full ss-tab"><h4>Links from Smartsheet</h4><div class="wh-chips">'+L.map(l=>'<a class="wh-chip" href="'+esc(l.u)+'" target="_blank" rel="noopener">'+whIc('link')+esc(l.n||l.col||l.u)+'<span>↗</span></a>').join('')+'</div></div>':''); }
 const _renderPanelSS=renderPanel;
 renderPanel=function(){ _renderPanelSS(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const pb=$('.pb',P); if(!pb||!$('.wh-tabs',pb)||$('[data-wtab="files"]',pb)) return;
   ssEnsure(); const D=ssFor(t); const n=D?(D.files||[]).length:0;
@@ -6035,6 +6181,8 @@ renderPanel=function(){ _renderPanelDG(); const P=$('#panel'); if(!S.panel||Stri
 const _directorRecDG=directorRec;
 directorRec=async function(t){ const before=JSON.stringify([t.designation&&t.designation.type,t.classification,t.designation&&t.designation.license,t.designation&&t.designation.royalty,t.designation&&t.designation.availableTo]);
   await _directorRecDG(t); const x=S.tickets[t.id]; if(!x) return; const d=x.designation||{}; const after=JSON.stringify([d.type,x.classification,d.license,d.royalty,d.availableTo]);
+  /* changed by hand: it is no longer "recommended automatically" */
+  if(after!==before&&d.auto){ const y=clone(x); y.designation=Object.assign({},y.designation,{auto:false,basis:'Set by '+(S.me.name||'MISMO staff')}); S.tickets[y.id]=y; await write('tickets',y.id,y); }
   if(after!==before){ toast('Designation saved: '+[d.type,x.classification,d.license,d.royalty,d.availableTo].filter(Boolean).join(' · ')); if(S.panel===t.id) renderPanel(); } };
 
 /* ---------- Nov 4 fixes ---------- */
@@ -6210,7 +6358,7 @@ async function editParts(t){ const base=S.tickets[t.id]||t; let rows=(base.parts
       '<div class="pt-ed">'+rows.map((r,i)=>'<div class="pt-row"><input data-pn="'+i+'" value="'+esc(r.name)+'" placeholder="Part name, e.g. v3.6.4 XML Schema"><select data-pk="'+i+'"><option value="">Kind…</option>'+KINDS.map(k=>'<option'+(k===r.kind?' selected':'')+'>'+esc(k)+'</option>').join('')+'</select><button type="button" class="btn sm ghost" data-px="'+i+'" title="Remove this part">×</button></div>').join('')+'</div>'+
       '<button type="button" class="dv-add" id="ptadd">+ Add a Part</button>';
     return body; };
-  const p=modal({title:'Parts With Their Own License Designation',text:esc(base.wr+' '+base.name),ok:'Save Parts',body:draw()});
+  const p=modal({title:'Parts with Their Own License Designation',text:esc(base.wr+' '+base.name),ok:'Save Parts',body:draw()});
   const box=$('.modal',root); const bd=$('.bd',box);
   const sync=()=>{ $$('[data-pn]',bd).forEach(i=>rows[+i.dataset.pn].name=i.value); $$('[data-pk]',bd).forEach(s=>rows[+s.dataset.pk].kind=s.value); };
   const wire=()=>{ $('#ptadd',bd).onclick=()=>{ sync(); rows.push({id:'p'+(Date.now()%100000),name:'',kind:''}); bd.innerHTML=draw(); wire(); const l=$$('[data-pn]',bd).pop(); l&&l.focus(); };
@@ -6226,7 +6374,7 @@ document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.tar
 
 /* Details tab: the parts, with a button to set them up */
 function partsSection(t){ const can=partsCanEdit(t)&&t.state==='active'&&!['gc-comment','comment','post','gc-publish','release'].includes(t.stage);
-  return '<div class="psec full pt-sec"><h4>Parts With Their Own License Designation<span class="sp muted" style="font-size:12px;font-weight:500">'+(hasParts(t)?t.parts.length+' part'+(t.parts.length===1?'':'s')+' · they move together':'One designation for the whole work request')+'</span>'+(can?'<button type="button" class="btn sm" data-partsedit="'+esc(t.id)+'" style="margin-left:10px">'+(hasParts(t)?'Edit the Parts':'+ Add Parts')+'</button>':'')+'</h4>'+
+  return '<div class="psec full pt-sec"><h4>Parts with Their Own License Designation<span class="sp muted" style="font-size:12px;font-weight:500">'+(hasParts(t)?t.parts.length+' part'+(t.parts.length===1?'':'s')+' · they move together':'One designation for the whole work request')+'</span>'+(can?'<button type="button" class="btn sm" data-partsedit="'+esc(t.id)+'" style="margin-left:10px">'+(hasParts(t)?'Edit the Parts':'+ Add Parts')+'</button>':'')+'</h4>'+
     (hasParts(t)?partsTable(t):'<p class="muted" style="margin:0;font-size:12.5px">If this work request has pieces that move together but each need their own license (for example a Reference Model release’s schema, LDD and iGuide), add them as parts.</p>')+'</div>'; }
 const _renderPanelPT=renderPanel;
 renderPanel=function(){ _renderPanelPT(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t||t.split) return;
@@ -6275,7 +6423,9 @@ const _vpAgreePT=vpAgree;
 vpAgree=function(t){ if(hasParts(t)) setTimeout(()=>{ const bd=$('#modal-root .modal .bd'); if(bd&&!$('.pt-wrap',bd)) bd.insertAdjacentHTML('afterbegin','<div style="margin-bottom:12px">'+partsTable(t)+'</div>'); },40); return _vpAgreePT(t); };
 /* when AWG's approval sets the designation automatically, every part gets its own recommendation too */
 const _withAutoDesignationPT=withAutoDesignation;
-withAutoDesignation=function(x){ const r=_withAutoDesignationPT(x); try{ if(hasParts(x)) x.parts=x.parts.map(p=>p.ds&&p.ds.license?p:Object.assign({},p,{ds:partRec(x,p)})); }catch(e){} return r; };
+withAutoDesignation=function(x){ const r=_withAutoDesignationPT(x); try{ if(hasParts(x)){ x.parts=x.parts.map(p=>p.ds&&p.ds.license?p:Object.assign({},p,{ds:partRec(x,p)}));
+    /* the work request's own designation mirrors part 1, so the two never disagree */
+    const p1=x.parts[0]&&x.parts[0].ds; if(p1){ x.designation=Object.assign({},x.designation,{type:p1.type||x.designation.type,license:p1.license||x.designation.license,royalty:p1.royalty||x.designation.royalty,availableTo:p1.availableTo||x.designation.availableTo}); if(p1.classification) x.classification=p1.classification; } } }catch(e){} return r; };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
@@ -6340,7 +6490,8 @@ function imDraftRows(P,findings,ai){
 async function imCreateDraft(t,rep,P,findings,ai){
   if(!P||!P.rows||!P.rows.length) return;
   const rows=imDraftRows(P,findings,ai);
-  const doc={rep:rep.id,ticket:t.id,wr:t.wr,name:t.name,at:rep.at,by:rep.by,rm:rep.rm||'',file:(rep.files||[])[0]||'',status:'draft',rows};
+  /* IM Review warns the reviewers (and turns off agree-all) when Claude's read or the Reference Model check didn't run */
+  const doc={rep:rep.id,ticket:t.id,wr:t.wr,name:t.name,at:rep.at,by:rep.by,rm:rep.rm||'',file:(rep.files||[])[0]||'',status:'draft',rows,aiNote:rep.aiNote||'',rmLoaded:!!rep.rm};
   S.imr[rep.id]=doc; await write(imColl(t.id),rep.id,doc);
   rep.imDraft=true; rep.imCounts=imTally(rows);
 }
@@ -6361,7 +6512,7 @@ VIEWS.imreview=function(){ imEnsureQ(); imCount();
   const L=Object.values(S.imq||{}).sort((a,b)=>String(b.sentAt||b.at).localeCompare(String(a.sentAt||a.at)));
   const aw=L.filter(q=>q.status==='awaiting'), dn=L.filter(q=>q.status==='decided').slice(0,20);
   const ks=imKindStats(), all=Object.values(S.iml||{}); const agree=all.length?Math.round(all.filter(x=>x.agreed).length/all.length*100):null;
-  const card=q=>'<button type="button" class="imq-card" data-imopen="'+esc(q.rep)+'"><span class="imq-wr">'+esc(q.wr)+'</span><b>'+esc(q.name)+'</b><span class="imq-m">'+esc(q.rows+' rows · '+(q.look||0)+' to look at · '+(q.clean||0)+' clean')+'</span><span class="imq-d">'+(q.status==='decided'?'Decided '+esc(fmtS(String(q.decidedAt||'').slice(0,10)))+' · '+esc((q.decidedBy||'').split(' ')[0])+(q.agree!=null?' · '+q.agree+'% agreed with the draft':''):'Sent '+esc(fmtS(String(q.sentAt||q.at).slice(0,10)))+(q.sentBy?' by '+esc(q.sentBy.split(' ')[0]):''))+'</span></button>';
+  const card=q=>'<button type="button" class="imq-card" data-imopen="'+esc(q.rep)+'"><span class="imq-wr">'+esc(q.wr)+'</span><b>'+esc(q.name)+'</b><span class="imq-m">'+esc(q.rows+' rows · '+(q.look||0)+' to look at · '+(q.clean||0)+' clean')+'</span><span class="imq-d">'+(q.status==='decided'?'Decided '+esc(fmtS(atDay(q.decidedAt)))+' · '+esc((q.decidedBy||'').split(' ')[0])+(q.agree!=null?' · '+q.agree+'% agreed with the draft':''):'Sent '+esc(fmtS(String(q.sentAt||q.at).slice(0,10)))+(q.sentBy?' by '+esc(q.sentBy.split(' ')[0]):''))+'</span></button>';
   return '<div class="pagehead"><div><h1>IM Review</h1><div class="sub">Each submission arrives with a draft decision for every row. Agree, or correct what the draft got wrong; every correction teaches the next draft.</div></div></div>'+
     '<div class="imq-stats"><div class="imq-stat"><b>'+aw.length+'</b><span>waiting for IM</span></div><div class="imq-stat"><b>'+(agree==null?'—':agree+'%')+'</b><span>of draft decisions IM agreed with'+(all.length?' ('+all.length+' rows)':'')+'</span></div><div class="imq-stat"><b>'+Object.keys(S.imauto||{}).filter(k=>S.imauto[k]).length+'</b><span>kinds of rows that arrive already approved</span></div></div>'+
     '<div class="card"><h3>Waiting for IM</h3>'+(aw.length?'<div class="imq-list">'+aw.map(card).join('')+'</div>':'<div class="lead-empty">Nothing waiting. A submission lands here when the facilitator sends their IM Pre-Review to IM.</div>')+'</div>'+
@@ -6390,7 +6541,7 @@ function imDeskHtml(doc){
     '<div class="imd-tabs" role="tablist">'+[['look','Needs a Look',nLook],['clean','Clean',nClean],['all','All Rows',(doc.rows||[]).length]].map(([k,l,n])=>'<button type="button" role="tab" data-imf="'+k+'" aria-selected="'+(F===k)+'">'+l+' <b>'+n+'</b></button>').join('')+
       (decided?'':'<span class="sp"></span><button type="button" class="btn sm" data-imall="'+F+'">Agree With All '+(F==='look'?'Shown':F==='clean'?'Clean Rows':'Remaining')+'</button>')+'</div>'+
     '<div class="imr-list">'+(R.length?R.map(row).join(''):'<div class="lead-empty">Nothing here.</div>')+'</div>'+
-    '<div class="imd-foot">'+(decided?'<span>Decided '+esc(fmtS(String(q.decidedAt||'').slice(0,10)))+' by '+esc(q.decidedBy||'')+'</span><button type="button" class="btn" data-imxl="1">Download the Decided Form</button>':'<span>'+(pending?pending+' row'+(pending===1?'':'s')+' still to decide':'Every row is decided')+'</span><button type="button" class="btn" data-imxl="1">Download for Excel</button><button type="button" class="btn pri" data-imfinish="1"'+(pending?' disabled':'')+'>Finish IM Review</button>')+'</div>';
+    '<div class="imd-foot">'+(decided?'<span>Decided '+esc(fmtS(atDay(q.decidedAt)))+' by '+esc(q.decidedBy||'')+'</span><button type="button" class="btn" data-imxl="1">Download the Decided Form</button>':'<span>'+(pending?pending+' row'+(pending===1?'':'s')+' still to decide':'Every row is decided')+'</span><button type="button" class="btn" data-imxl="1">Download for Excel</button><button type="button" class="btn pri" data-imfinish="1"'+(pending?' disabled':'')+'>Finish IM Review</button>')+'</div>';
 }
 async function imSaveDoc(doc){ S.imr[doc.rep]=doc; await write(imColl(doc.ticket),doc.rep,doc); }
 async function imFinish(doc){
@@ -6413,7 +6564,7 @@ async function imSend(t,rep){ imEnsureQ(); imEnsureR(t.id); const doc=S.imr[rep.
 }
 function imExport(doc){ const head=['Item #','Change Type','Change Target Type','Parent CONTAINER Name','CONTAINER Name','Data Point Name','Enumeration Name','Definition','Review Decision','Review Comments','Suggested Definition or Name','Draft Decision','IM Agreed With Draft'];
   const rows=(doc.rows||[]).map(r=>{ const f=r.final||{}; return [r.item,r.ct,r.tt,r.pc,r.cn,r.dp,r.en,r.def,f.dec||r.draft.dec,(f.agreed?r.draft.com:f.com)||r.draft.com||'',f.sug||r.draft.sug||'',r.draft.dec,f.dec?(f.agreed?'Yes':'No'):'']; });
-  const name='IM Review - '+doc.wr+' - '+String(doc.decidedAt||doc.at).slice(0,10);
+  const name='IM Review - '+doc.wr+' - '+atDay(doc.decidedAt||doc.at);
   if(window.XLSX){ const ws=XLSX.utils.aoa_to_sheet([head,...rows]); ws['!cols']=head.map((h,i)=>({wch:[8,16,16,22,22,28,24,60,24,60,50,24,10][i]})); const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Reference Model Changes'); XLSX.writeFile(wb,name+'.xlsx'); return; }
   const csv=[head,...rows].map(r=>r.map(c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"').join(',')).join('\r\n'); const a=document.createElement('a'); a.href=URL.createObjectURL(new Blob(['﻿',csv],{type:'text/csv'})); a.download=name+'.csv'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
 
@@ -6441,8 +6592,8 @@ wireMain=function(m){ _wireMainIM(m); if(S.view!=='imreview') return;
 /* the IM report gets a "Send to IM" button and shows the draft decisions */
 const _rvShowIM=rvShow;
 rvShow=function(rep){ _rvShowIM(rep); if(rep.kind!=='im'||!rep.imDraft) return; const box=$('#modal-root .rv-rep'); if(!box) return; const t=S.tickets[rep.ticket]; imEnsureQ(); const q=S.imq[rep.id];
-  const foot=$('footer',box); if(foot&&!q&&t&&!S.viewAs){ const b=document.createElement('button'); b.type='button'; b.className='btn pri'; b.textContent='Send to IM'; b.title='IM reviewers get the draft decision for every row and agree or correct it'; b.onclick=async()=>{ b.disabled=true; await imSend(t,rep); b.textContent='Sent to IM'; }; foot.appendChild(b); }
-  else if(foot&&q){ const s=document.createElement('span'); s.className='muted'; s.style.marginRight='auto'; s.textContent=q.status==='decided'?'IM decided this '+fmtS(String(q.decidedAt||'').slice(0,10)):'With the IM reviewers since '+fmtS(String(q.sentAt||'').slice(0,10)); foot.insertBefore(s,foot.firstChild); } };
+  const foot=$('footer',box); if(foot&&!q&&t&&!S.viewAs&&typeof imReady==='function'&&imReady(S.tickets[t.id]||t)){ const b=document.createElement('button'); b.type='button'; b.className='btn pri'; b.textContent='Send to IM'; b.title='IM reviewers get the draft decision for every row and agree or correct it'; b.onclick=async()=>{ b.disabled=true; const r=await imSend(t,rep); if(r===false){ b.disabled=false; return; } b.textContent='Sent to IM'; }; foot.appendChild(b); }
+  else if(foot&&q){ const s=document.createElement('span'); s.className='muted'; s.style.marginRight='auto'; s.textContent=q.status==='decided'?'IM decided this '+fmtS(atDay(q.decidedAt)):'With the IM reviewers since '+fmtS(atDay(q.sentAt)); foot.insertBefore(s,foot.firstChild); } };
 /* nav: IM Review sits after the Review Desk */
 (function(){ const nav=$('#nav'); if(!nav||$('[data-hq="imreview"]',nav)) return; const after=$('[data-hq="reviews"]',nav); const b=document.createElement('button'); b.type='button'; b.dataset.hq='imreview'; b.title='IM Review'; b.hidden=true; b.innerHTML='<svg viewBox="0 0 24 24"><path d="M4 4h16v12H5.2L4 17.2z"/><path d="M8 9l2.5 2.5L16 7"/></svg><span>IM Review</span><b id="nav-imreview" hidden></b>'; b.onclick=e=>{ if(e) e.stopPropagation(); window.open(IMR_URL_NAV,'imreview'); if(typeof go==='function') go('home'); }; if(after) after.after(b); else nav.appendChild(b); })();
 const _counts_im=typeof counts==='function'?counts:null;
@@ -6461,9 +6612,9 @@ async function imPush(rep){ const q=S.imq[rep], doc=S.imr[rep]; if(!q||!doc) ret
   /* a resubmission: IM decided this work request before. Link it to those decisions, whatever the form is called */
   let earlier=[]; try{ const pq=await rGet(IMR,'queue'); earlier=Object.values((pq&&pq.data&&pq.data.items)||S.imPortalQ||{}).filter(x=>x&&x.rep!==rep&&x.status==='decided'&&!x.test&&(x.ticket?x.ticket===t.id:(x.wr&&x.wr===t.wr))).sort((a,b)=>String(a.decidedAt).localeCompare(String(b.decidedAt))); }catch(e){}
   const last=earlier[earlier.length-1], resub=/IMSub[2-9]|resub/i.test(doc.file||'')||earlier.length>0;
-  const why=last?'IM decided it '+fmtS(String(last.decidedAt).slice(0,10))+(last.counts?': '+Object.entries(last.counts).filter(x=>x[1]).map(([d,n])=>n+' '+d.replace(/^Approved /,'').toLowerCase()).join(', '):''):'';
-  const rs=resub?{n:earlier.length?earlier.length+1:'',first:String((earlier[0]&&(earlier[0].sentAt||earlier[0].decidedAt))||(t.dates&&t.dates.imSubmitted)||'').slice(0,10),date:today(),why,prior:last?last.rep:''}:null;
-  const item=Object.assign({},q,{form:sp?{n:sp.n,u:sp.u}:null,docs:t.id&&typeof ssDocs==='function'?ssDocs(t):[],wg:t.workgroup||'',resub,prior:last?String(last.decidedAt).slice(0,10):'',fac:{name:t.facilitator||'',email:fac.email||''},flow:(S.notify&&S.notify.flowUrl&&!mailHeld()?S.notify.flowUrl:''),from:(S.notify&&S.notify.from)||''});
+  const why=last?'IM decided it '+fmtS(atDay(last.decidedAt))+(last.counts?': '+Object.entries(last.counts).filter(x=>x[1]).map(([d,n])=>n+' '+d.replace(/^Approved /,'').toLowerCase()).join(', '):''):'';
+  const rs=resub?{n:earlier.length?earlier.length+1:'',first:atDay((earlier[0]&&(earlier[0].sentAt||earlier[0].decidedAt))||(t.dates&&t.dates.imSubmitted)||''),date:today(),why,prior:last?last.rep:''}:null;
+  const item=Object.assign({},q,{form:sp?{n:sp.n,u:sp.u}:null,docs:t.id&&typeof ssDocs==='function'?ssDocs(t):[],wg:t.workgroup||'',resub,prior:last?atDay(last.decidedAt):'',fac:{name:t.facilitator||'',email:fac.email||''},flow:'',from:''}); /* the email flow link never goes to the portals: the MMS emails the facilitator when the decision comes home */
   try{ /* never overwrite a review IM has started or finished */
     await imrUpdate('rev-'+imrSafe(rep),cur=>cur&&(cur.status==='decided'||(cur.rows||[]).some(r=>r.final)||cur.final)?cur:Object.assign({},doc,{status:'awaiting',resub:rs}));
     await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; const old=o.items[rep]; if(!(old&&old.status==='decided')) o.items[rep]=Object.assign({},item,old?{done:old.done,lastAt:old.lastAt,lastBy:old.lastBy}:{}); return o; });
@@ -6524,7 +6675,13 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
   }catch(e){ console.warn('im sync',e); } finally{ imSyncing=false; } }
 const _imSend0=imSend;
 /* sending the IM Pre-Review to IM is the facilitator's "send to IM": a work request still at AI Review moves to IM Review with it */
-imSend=async function(t,rep){ await _imSend0(t,rep); const ok=await imPush(rep.id);
+/* one copy at IM at a time: sending again withdraws the earlier copy still waiting (after asking) */
+async function imWithdrawEarlier(t,rep){ const old=Object.values(S.imq||{}).filter(q=>q&&q.ticket===t.id&&q.rep!==rep.id&&q.status==='awaiting'); if(!old.length) return true;
+  const ok=await modal({title:'Replace What IM Has?',text:esc(t.wr+' '+t.name),ok:'Send This One Instead',body:'<p style="margin:0">IM already has an earlier IM Pre-Review of this work request waiting ('+old.map(q=>'sent '+fmtS(atDay(q.sentAt))).join(', ')+'). Sending this one takes that one back, so IM only sees the newest.</p>'}); if(!ok) return false;
+  for(const q of old){ const x=Object.assign({},q,{status:'withdrawn',withdrawnAt:new Date().toISOString(),withdrawnBy:S.me.name||''}); S.imq[q.rep]=x; await write('imqueue',q.rep,x);
+    try{ await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; const it=o.items&&o.items[q.rep]; if(it&&it.status!=='decided'){ it.status='withdrawn'; it.hist=true; } return o; }); }catch(e){} }
+  return true; }
+imSend=async function(t,rep){ if(!(await imWithdrawEarlier(t,rep))) return false; await _imSend0(t,rep); const ok=await imPush(rep.id);
   const cur=S.tickets[t.id]; if(cur&&cur.state==='active'&&['work','aireview'].includes(cur.stage)&&!cur.split&&!cur.rides){ const x=clone(cur); if(nextStage(x)==='im'||x.stage==='aireview'){ x.ai=Object.assign({},x.ai,{status:x.ai&&x.ai.status||'Passed'}); await move(x,'im',{sub:ok?'in-review':'new',dates:{aiDecision:(cur.dates&&cur.dates.aiDecision)||today()},text:'IM Pre-Review sent to the IM reviewers; moved to IM Review'+(ok?'':'. It reaches IM Review when Erin or MISMO staff next open the MMS'),toast:t.wr+' sent to IM Review'}); } }
   toast(ok?'Sent to IM Review':'Saved. It reaches IM Review when Erin or MISMO staff next open the MMS.'); };
 /* at IM Review with nothing sent yet, the next move is the facilitator's: run the IM Pre-Review and send it.
@@ -6543,7 +6700,7 @@ VIEWS.imreview=function(){ setTimeout(()=>{ if(S.view==='imreview') go('home'); 
 /* each work request shows IM's decisions on record, with a link to every row */
 function imDecHtml(t){ const L=Object.values(S.imPortalQ||{}).filter(q=>q.ticket===t.id&&q.status==='decided').sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
   if(!L.length) return ''; const c=q=>Object.entries(q.counts||{}).map(([d,n])=>n+' '+d.replace(/^Approved /,'').toLowerCase()).join(', ');
-  return '<div class="psec full imdec"><h4>IM Decisions<span class="sp muted" style="font-size:12px;font-weight:500">'+L.length+' on record</span></h4><div class="imdec-l">'+L.map(q=>'<a class="imdec-r" href="'+IMR_URL+'#/review/'+encodeURIComponent(q.rep)+'" target="_blank" rel="noopener"><span class="imdec-d">'+esc(fmtS(String(q.decidedAt).slice(0,10)))+(String(q.decidedAt).slice(0,4)!==String(new Date().getFullYear())?' '+esc(String(q.decidedAt).slice(0,4)):'')+'</span><span class="imdec-m"><b>'+esc((q.rows||0)+' rows'+(q.resub?' · resubmission':''))+'</b><em>'+esc(c(q))+'</em></span><span class="imdec-go">Every row ↗</span></a>').join('')+'</div></div>'; }
+  return '<div class="psec full imdec"><h4>IM Decisions<span class="sp muted" style="font-size:12px;font-weight:500">'+L.length+' on record</span></h4><div class="imdec-l">'+L.map(q=>'<a class="imdec-r" href="'+IMR_URL+'#/review/'+encodeURIComponent(q.rep)+'" target="_blank" rel="noopener"><span class="imdec-d">'+esc(fmtS(atDay(q.decidedAt)))+(String(q.decidedAt).slice(0,4)!==String(new Date().getFullYear())?' '+esc(String(q.decidedAt).slice(0,4)):'')+'</span><span class="imdec-m"><b>'+esc((q.rows||0)+' rows'+(q.resub?' · resubmission':''))+'</b><em>'+esc(c(q))+'</em></span><span class="imdec-go">Every row ↗</span></a>').join('')+'</div></div>'; }
 const _renderPanelIMD=renderPanel;
 renderPanel=function(){ _renderPanelIMD(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const pane=$('[data-wtab="rev"]',P); if(!pane||$('.imdec',pane)) return; const h=imDecHtml(t); if(h) pane.insertAdjacentHTML('afterbegin',h); };
 
@@ -6554,12 +6711,14 @@ function portalItemFor(t,k){ const Q=k==='im'?S.imPortalQ:S.awgPortalQ; return O
 function portalOpen(k,rep){ window.open((k==='im'?IMR_URL:AWGR_URL)+(rep?'#/review/'+encodeURIComponent(rep):''),k==='im'?'imreview':'awgreview'); }
 function imOutcome(doc,it){ const c=it.counts||imTally(doc.rows||[]); if(!(doc.rows||[]).length&&doc.final) c[doc.final.dec]=1; const ok=(c['Approved as Submitted']||0)+(c['Approved with Modification']||0); return {c,ok,ret:(c['Returned']||0)+(c['Deferred']||0),den:c['Denied']||0}; }
 async function imDecided(t,doc,it){ const o=imOutcome(doc,it), sum=Object.entries(o.c).filter(x=>x[1]).map(([k,n])=>n+' '+k.toLowerCase()).join(', ');
-  const who=(it.decidedBy||'IM')+' in IM Review', d=String(it.decidedAt||today()).slice(0,10);
+  const who=(it.decidedBy||'IM')+' in IM Review', d=atDay(it.decidedAt)||today();
   /* IM Review emails the facilitator itself only when it was given the email flow; otherwise (email on hold,
      or sent before go-live) the notice goes through Notifications (while email is on hold it waits there as a preview and is never sent later) */
-  if(!it.flow&&!doc.test){ const fac=personByName(t.facilitator); if(fac&&fac.email) try{ await queueMail({to:[fac.email],subject:'IM decision: '+t.wr+' '+t.name,body:'IM has decided '+t.wr+' '+t.name+': '+sum+'. Reviewed by '+who+'.\n\nSee every row: '+IMR_URL+'#/review/'+encodeURIComponent(doc.rep)+'\nOpen the work request in the MMS: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id),ticket:t.id,kind:'imdecision',key:'imdecision-'+doc.rep}); }catch(e){} }
+  if(!doc.test){ const fac=personByName(t.facilitator); if(fac&&fac.email) try{ await queueMail({to:[fac.email],subject:'IM decision: '+t.wr+' '+t.name,body:'IM has decided '+t.wr+' '+t.name+': '+sum+'. Reviewed by '+who+'.\n\nSee every row: '+IMR_URL+'#/review/'+encodeURIComponent(doc.rep)+'\nOpen the work request in the MMS: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id),ticket:t.id,kind:'imdecision',key:'imdecision-'+doc.rep}); }catch(e){} }
   t=latestTicket(t);
-  if(t.stage!=='im'){ const x=clone(t); hist(x,'IM decision ('+(doc.rows||[]).length+' rows): '+sum+'. Reviewed by '+who+'.'); await saveTicket(x,'IM decision brought in'); return; }
+  if(t.stage!=='im'){ const x=clone(t); hist(x,'IM decision ('+(doc.rows||[]).length+' rows): '+sum+'. Reviewed by '+who+'. It was not at IM Review ('+stageDef(t.stage).name+'), so it did not move; MISMO staff were told.'); await saveTicket(x,'IM decision brought in');
+    if(!doc.test) try{ await queueMail({to:peopleFor('staff').map(p=>p.email),subject:'Check: IM decided '+t.wr+' but it is at '+stageDef(t.stage).name,body:'IM decided '+t.wr+' '+t.name+' ('+sum+'), but the work request is at '+stageDef(t.stage).name+', not IM Review, so the MMS did not move it. Open it and move it if needed: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id),ticket:t.id,kind:'stage',key:'imoff-'+doc.rep}); }catch(e){}
+    return; }
   if(o.ret||!o.ok){ await setSub(t,'updates','IM decision '+fmt(d)+': '+sum+'. Updates needed before it goes back to IM. Reviewed by '+who+'.',{im:Object.assign({},t.im,{status:'Returned'}),dates:Object.assign({},t.dates,{imDecision:d})}); return; }
   const x=clone(t); x.im=Object.assign({},x.im,{status:'Approved'}); x.dates=Object.assign({},x.dates,{imDecision:d}); const nx=nextStage(x);
   let txt='IM approved '+fmt(d)+' ('+sum+'); moved to '+stageDef(nx).name+'. Reviewed by '+who+'.', y=x; if(nx==='designation'){ const a=withAutoDesignation(x); y=a.x; txt+=' '+a.text; }
@@ -6577,7 +6736,9 @@ async function awgRetryPending(items){ if(!(S.isStaff||isRole('imawg',S.me))) re
     try{ await awgPushFromIm(t,doc,Object.assign({},x,(items||{})[x.rep]||{})); await done(); }catch(e){ console.warn('awg push (retry)',e); } } }
 /* what IM approved goes to AWG Review: the rows IM approved, with IM's wording, the documents and the facilitator */
 async function awgUpdate(name,fn){ for(let i=0;i<5;i++){ const g=await rGet(AWGR,name); const next=fn(g&&g.data?JSON.parse(JSON.stringify(g.data)):null); const tok=window.ResourcesSession&&ResourcesSession.token(); const r=await fetch(RELAY()+'/'+AWGR+'/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content:next,sha:(g&&g.sha)||undefined})}); if(r.ok) return next; if(r.status===401||r.status===403) throw new Error('no access'); await new Promise(z=>setTimeout(z,300+i*400)); } throw new Error('busy'); }
-async function awgPushFromIm(t,doc,it){ const base=imrSafe((t.wr||'wr')+'-'+String(it.decidedAt||today()).slice(0,10).replace(/-/g,''));
+async function awgPushFromIm(t,doc,it){ const base=imrSafe((t.wr||'wr')+'-'+(atDay(it.decidedAt)||today()).replace(/-/g,''));
+  /* the next AWG call comes from AWG Review's settings: read them first if this page hasn't yet, so the date is never blank */
+  if(!((S.awgCfg||{}).calls||[]).length) try{ const c=await rGet(AWGR,'config'); S.awgCfg=Object.assign({},S.awgCfg||{},(c&&c.data)||{}); }catch(e){}
   /* one AWG submission per IM decision: the same decision sent again keeps its submission (and whatever AWG has
      done with it); a different IM decision on the same day gets its own */
   let rep=base; try{ const g=await rGet(AWGR,'queue'); const ex=(g&&g.data&&g.data.items)||{}; const same=Object.values(ex).find(x=>x&&x.fromImRep===doc.rep);
@@ -6586,7 +6747,7 @@ async function awgPushFromIm(t,doc,it){ const base=imrSafe((t.wr||'wr')+'-'+Stri
     ['body','at','alias','cg','rel','rf','rt','sc'].forEach(k=>{ if(r[k]) o[k]=r[k]; }); return o; });
   await ssReady(); const fac=personByName(t.facilitator)||{}; const docs=typeof ssDocs==='function'?ssDocs(t):[];
   const at=new Date().toISOString(); const nc=(((S.awgCfg||{}).calls)||[]).filter(x=>x>=today()).sort()[0]||'';
-  const adoc={rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',file:doc.file||'',at,by:'IM Review',fromIm:{rep:doc.rep,decidedAt:it.decidedAt,decidedBy:it.decidedBy,counts:it.counts||{}},imOutcome:'Approved',imDate:String(it.decidedAt||'').slice(0,10),resub:doc.resub||null,rows,status:'awaiting',calls:[],call:{date:nc,method:'Standard Meeting',present:[],others:[],votes:{},outcome:'',conditions:'',notes:''}};
+  const adoc={rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',file:doc.file||'',at,by:'IM Review',fromIm:{rep:doc.rep,decidedAt:it.decidedAt,decidedBy:it.decidedBy,counts:it.counts||{}},imOutcome:'Approved',imDate:atDay(it.decidedAt),resub:doc.resub||null,rows,status:'awaiting',calls:[],call:{date:nc,method:'Standard Meeting',present:[],others:[],votes:{},outcome:'',conditions:'',notes:''}};
   /* never overwrite a submission AWG already has: the chair may have drafted, recorded attendance or carried it */
   await awgUpdate('rev-'+rep,cur=>cur||adoc);
   await awgUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!o.items[rep]) o.items[rep]={rep,fromImRep:doc.rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',status:'awaiting',sentAt:at,sentBy:'IM Review',rows:rows.length,awgRows:rows.filter(r=>/awg/i.test(r.body||'')).length,resub:!!doc.resub,fac:{name:t.facilitator||'',email:fac.email||''},docs,flow:(S.notify&&S.notify.flowUrl&&!mailHeld()?S.notify.flowUrl:''),from:(S.notify&&S.notify.from)||'',fromIm:true}; return o; }); }
@@ -6597,7 +6758,8 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
   try{ const [q,cfg]=await Promise.all(['queue','config'].map(n=>rGet(AWGR,n).catch(()=>null))); S.awgPortalQ=(q&&q.data&&q.data.items)||{}; S.awgCfg=(cfg&&cfg.data)||{};
     if(!S.canWrite||!S.isStaff) return;
     // the email flow the portal uses to tell the facilitator
-    const fl=(S.notify&&S.notify.flowUrl&&!mailHeld())?S.notify.flowUrl:'', fr=(S.notify&&S.notify.from)||''; if(fl&&(S.awgCfg.flow!==fl||S.awgCfg.from!==fr)) try{ S.awgCfg=await awgUpdate('config',c=>Object.assign({},c||{},{flow:fl,from:fr})); }catch(e){}
+    /* the portals never hold the email flow link (anyone holding it could send email): clear any old copy */
+    if(S.awgCfg.flow) try{ S.awgCfg=await awgUpdate('config',c=>Object.assign({},c||{},{flow:'',from:''})); }catch(e){}
     // coming to AWG: work requests at IM now
     try{ const items=liveTickets().filter(t=>t.state==='active'&&t.stage==='im'&&!t.split&&!t.rides).map(t=>({wr:t.wr,name:t.name,wg:t.workgroup||'',fac:t.facilitator||'',sub:(({new:'waiting','in-review':'in review',resubmitted:'resubmitted',updates:'updates needed',prep:'facilitator prep'})[t.sub]||'waiting'),stageShort:'IM',since:(typeof stageEntered==='function'?stageEntered(t):(t.dates&&t.dates.imSubmitted))||''})).sort((a,b)=>a.wr.localeCompare(b.wr));
       const up=await rGet(AWGR,'upcoming'); if(JSON.stringify(((up&&up.data&&up.data.items)||[]))!==JSON.stringify(items)) await awgUpdate('upcoming',()=>({asOf:today(),items})); }catch(e){}
@@ -6610,12 +6772,12 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
       let it=null; try{ const o=await awgUpdate('queue',cur=>{ it=null; const x=cur&&cur.items&&cur.items[it0.rep]; if(!x||x.home||x.status!=='decided') return cur; x.home=true; x.homeBy=S.me.name||'MMS'; x.homeAt=new Date().toISOString(); it=Object.assign({},x); return cur; }); S.awgPortalQ=(o&&o.items)||S.awgPortalQ; }catch(e){ it=null; }
       if(!it) continue; let t=await freshTicket(t0.id)||t0;
       try{
-      const d=String(it.decidedAt||today()).slice(0,10), who=(it.decidedBy||'AWG')+' in AWG Review', out=it.outcome||'';
+      const d=atDay(it.decidedAt)||today(), who=(it.decidedBy||'AWG')+' in AWG Review', out=it.outcome||'';
       /* what AWG asked for when it sent it back is on the call record */
       let why=String(it.conds||'').trim(); if(!why&&/^Returned/.test(out)) try{ const rv=await rGet(AWGR,'rev-'+imrSafe(it.rep)); const c=rv&&rv.data&&((rv.data.calls||[]).slice(-1)[0]||rv.data.call); why=String((c&&c.conditions)||'').trim(); }catch(e){}
       if(why&&!it.conds) it.conds=why;
       /* AWG Review emails the facilitator only when it has the email flow; otherwise the notice waits in Notifications */
-      if(!(it.flow||S.awgCfg.flow)){ const fac=personByName(t.facilitator); if(fac&&fac.email) try{ await queueMail({to:[fac.email],subject:'AWG decision: '+t.wr+' '+t.name,body:'AWG reviewed '+t.wr+' '+t.name+' on '+fmt(d)+': '+out+'.'+(it.conds?'\n\n'+(/^Conditional/.test(out)?'Conditions: ':'What needs to change: ')+it.conds:'')+'\n\nSee the call record and the rows: '+AWGR_URL+'#/review/'+encodeURIComponent(it.rep)+'\nOpen the work request in the MMS: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id),ticket:t.id,kind:'awgdecision',key:'awgdecision-'+it.rep}); }catch(e){} }
+      if(true){ const fac=personByName(t.facilitator); if(fac&&fac.email) try{ await queueMail({to:[fac.email],subject:'AWG decision: '+t.wr+' '+t.name,body:'AWG reviewed '+t.wr+' '+t.name+' on '+fmt(d)+': '+out+'.'+(it.conds?'\n\n'+(/^Conditional/.test(out)?'Conditions: ':'What needs to change: ')+it.conds:'')+'\n\nSee the call record and the rows: '+AWGR_URL+'#/review/'+encodeURIComponent(it.rep)+'\nOpen the work request in the MMS: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id),ticket:t.id,kind:'awgdecision',key:'awgdecision-'+it.rep}); }catch(e){} }
       t=latestTicket(t);
       if(t.stage==='awg'){ if(/^(Approved|Conditional|Passed)/.test(out)){ const x=clone(t); x.awg=Object.assign({},x.awg,{status:out,voteMethod:'Meeting'}); x.dates=Object.assign({},x.dates,{awgDecision:d}); const nx=nextStage(x); let txt='AWG '+out.toLowerCase()+' '+fmt(d)+(it.conds?' (conditions: '+it.conds+')':'')+'; moved to '+stageDef(nx).name+'. Recorded by '+who+'.', y=x; if(nx==='designation'){ const a=withAutoDesignation(x); y=a.x; txt+=' '+a.text; } await move(y,nx,{sub:nx==='designation'?'vps':'',text:txt}); }
         else if(/^Returned to IM/.test(out)){ const x=clone(t); x.awg=Object.assign({},x.awg,{status:out}); await move(x,'im',{sub:'updates',text:'AWG returned it to IM '+fmt(d)+(why?': '+why:'')+'. Recorded by '+who+'.'}); }
@@ -6626,15 +6788,18 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
 const _imEnsureQ1=imEnsureQ; imEnsureQ=function(){ _imEnsureQ1(); setTimeout(awgSync,2500); };
 
 /* ---------- after approval: the designation is recommended automatically and goes to the Designation Approver ---------- */
-function autoDesignation(t){ const mode=a=>{ const c={}; a.filter(Boolean).forEach(v=>c[v]=(c[v]||0)+1); return Object.entries(c).sort((x,y)=>y[1]-x[1])[0]; };
+/* ONE rule for the designation: the same recommend() the recommendation panel and the parts use (by name, kind and
+   workgroup); the most common past designation is only the fallback when recommend() isn't there */
+function autoDesignation(t){ if(typeof recommend==='function'){ const r=recommend(t); return {ds:{type:r.type,license:r.license,royalty:r.royalty,availableTo:r.availableTo},cls:r.classification,basis:r.why.replace(/\.$/,'')}; }
+  const mode=a=>{ const c={}; a.filter(Boolean).forEach(v=>c[v]=(c[v]||0)+1); return Object.entries(c).sort((x,y)=>y[1]-x[1])[0]; };
   const past=Object.values(S.tickets||{}).filter(x=>x.id!==t.id&&x.designation&&x.designation.license);
   const same=past.filter(x=>(x.classification||'')===(t.classification||'')&&(x.workgroup||'')===(t.workgroup||'')), like=same.length>=2?same:past.filter(x=>(x.classification||'')===(t.classification||''));
   const base=like.length?like:past; const pick=k=>{ const m=mode(base.map(x=>x.designation[k])); return m?m[0]:''; };
   const ds={type:pick('type')||'Public',license:pick('license')||'Commercial Distributor',royalty:pick('royalty')||'Public for Free',availableTo:pick('availableTo')||'Public'};
   return {ds,basis:base.length?base.length+' earlier '+(same.length>=2?(t.workgroup||'')+' ':'')+'work product'+(base.length===1?'':'s'):'MISMO’s usual designation'}; }
-function withAutoDesignation(x){ const a=autoDesignation(x), days=(proc().commentDays||[30]); x.classification=x.classification||'Standard'; x.commentDays=x.commentDays||days[0]; x.releasePriority=x.releasePriority||'Medium'; x.productPageName=x.productPageName||x.name;
+function withAutoDesignation(x){ const a=autoDesignation(x), days=(proc().commentDays||[30]); x.classification=x.classification||a.cls||'Standard'; x.commentDays=x.commentDays||days[0]; x.releasePriority=x.releasePriority||'Medium'; x.productPageName=x.productPageName||x.name;
   x.designation=Object.assign({},x.designation||{},a.ds,{auto:true,basis:a.basis,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
-  return {x,text:'Designation recommended automatically from '+a.basis+': '+[a.ds.type,x.classification,a.ds.license,a.ds.royalty,a.ds.availableTo].filter(Boolean).join(', ')+'. Sent to '+(((typeof peopleFor==='function'?peopleFor('vps'):[])||[]).map(p=>p.name).filter(Boolean).join(' and ')||'the Designation Approver')+' for approval.'}; }
+  return {x,text:'Designation recommended automatically ('+a.basis+'): '+[a.ds.type,x.classification,a.ds.license,a.ds.royalty,a.ds.availableTo].filter(Boolean).join(', ')+'. Sent to '+(((typeof peopleFor==='function'?peopleFor('vps'):[])||[]).map(p=>p.name).filter(Boolean).join(' and ')||'the Designation Approver')+' for approval.'}; }
 
 /* ---------- Meeting Trackers → IM Review and AWG Review: the voting roster, the call dates and who was there ----------
    Erin keeps these in Meeting Trackers; the portals only record what was decided. */
@@ -6740,7 +6905,7 @@ const HELP_TOPICS={
     'Click any card to open its panel. The tabs across the top hold everything about it. The panel stays where you scrolled to while you work in it.',
     ['Overview: where it is, whose move it is, and the next step button. Depending on the step, it also shows Architecture Help, License Designation, the Comment Period Card, and Reviews and Decisions.',
      'Reviews and Decisions (on the Overview): each review step in order, with its decision and date. A step marked Before the MMS happened in the old process, so there is nothing to do for it now.',
-     'Details: workgroup, facilitator, size (the letter box on every card; hover it for the full name), classification and the rest of its record. Parts With Their Own License Designation is here too; see Parts in this Help.',
+     'Details: workgroup, facilitator, size (the letter box on every card; hover it for the full name), classification and the rest of its record. Parts with Their Own License Designation is here too; see Parts in this Help.',
      'Key Dates: start, Target to Submit to IM, comment period dates and what actually happened when. A box with no date stays blank. Once a resubmission is in, the date box shows Resubmitted to IM Review (or the step it went back to) and counts the days from then, not from the first time.',
      'Files: every document for this work request in SharePoint, including files added straight into its SharePoint folder. Click one to open it.',
      'Architecture: shows only when the work request has Architecture Help. It covers what was asked, who is working on it, the status, the hours and the notes.',
@@ -6856,7 +7021,7 @@ const HELP_TOPICS={
     'Settings changes how the MMS works without changing the page. Only MISMO staff see it.',
     ['Process: the steps, their owners and descriptions, and comment period lengths.',
      'People and Roles: facilitators and who fills each role, which decides whose queue a work request lands in and who is emailed. Click + Add on a list to add someone with their name and email. Click Edit next to a person to fix their name or email, or Remove to take them off.',
-     'Workgroups and Their Facilitators (under People and Roles): to give a workgroup a new facilitator, pick the person under Hand Over To and click Hand Over. Every work request in that workgroup, live and closed, moves to them and keeps who facilitated it before.',
+     'Workgroups and Their Facilitators (under People and Roles): to give a workgroup a new facilitator, pick the person under Hand Over to and click Hand Over. Every work request in that workgroup, live and closed, moves to them and keeps who facilitated it before.',
      'To move a single work request, change Facilitator on its Details tab and click Save Changes.',
      'Notifications: the email flow link, the sender, Hold All Email Until, reminder timing, and who hears when work arrives at each step.',
      'Daily Digest: who gets it, which days, who is copied, and which sections are on.',
@@ -6925,7 +7090,7 @@ const HELP_TOPICS={
     [['Open Comment Periods','comment']]],
   parts:['Parts: More Than One License Designation','facilitator staff approver',
     'Some work requests have pieces that need their own license, such as a reference model with three or four parts. Parts move through every step together, and each one gets its own License Designation.',
-    ['Open the work request and go to Details. Find Parts With Their Own License Designation.',
+    ['Open the work request and go to Details. Find Parts with Their Own License Designation.',
      'Click + Add Parts. Enter each part’s name and kind, then click Save Parts. Use Edit the Parts to change them later.',
      'Nothing else changes: the work request still goes through AI Review, IM and AWG as one.',
      'After AWG, the MMS recommends a designation for each part. The License Designation section shows a row per part.',
@@ -7307,10 +7472,52 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&S.view==='metrics'
 
 window.addEventListener('resize',()=>{ clearTimeout(window._mxRz); window._mxRz=setTimeout(()=>{ if(S.view==='metrics'){ S._lastHtml=''; renderAll(); } },250); });
 
+/* ================= Review fixes (Nov 2026): small additions layered on the screens above ================= */
+/* Pipeline Board: work requests sitting in a stage that has been switched off in Settings › Process are listed
+   for MISMO staff to move, instead of vanishing from the board */
+const _boardOff=VIEWS.board;
+VIEWS.board=function(){ const h=_boardOff(); const on=new Set(stages().map(s=>s.key));
+  const off=liveTickets().filter(t=>t.state==='active'&&!t.split&&!t.rides&&t.stage!=='published'&&!on.has(t.stage));
+  if(!off.length) return h;
+  return '<div class="banner warn" role="status" style="margin-bottom:10px"><b>'+off.length+' work request'+(off.length===1?' is':'s are')+' in a stage that’s switched off.</b> '+off.map(t=>'<button type="button" class="linkish" data-open="'+esc(t.id)+'">'+esc(t.wr)+' ('+esc(stageDef(t.stage).name)+')</button>').join(', ')+(S.isStaff?'. Open each one and use Move To to put it in a stage that’s on.':'.')+'</div>'+h; };
+
+/* Accessibility, everywhere at once:
+   - every field label is tied to its box (click the label, screen readers read the name)
+   - a pop-up takes the keyboard: focus goes into it, Tab stays inside, Esc closes only the pop-up,
+     and screen readers hear its title */
+let a11yN=0;
+function a11yLabels(root){ $$('.f > label:not([for]), .fld > label:not([for])',root).forEach(l=>{ let c=l.nextElementSibling; if(c&&!/^(INPUT|SELECT|TEXTAREA)$/.test(c.tagName)) c=c.querySelector&&c.querySelector('input:not([type=radio]):not([type=checkbox]),select,textarea'); if(!c||!/^(INPUT|SELECT|TEXTAREA)$/.test(c.tagName)) return; if(!c.id) c.id='fld-'+(++a11yN); l.htmlFor=c.id; }); }
+let a11yQ=false; new MutationObserver(()=>{ if(a11yQ) return; a11yQ=true; requestAnimationFrame(()=>{ a11yQ=false; try{ a11yLabels(document); }catch(e){} }); }).observe(document.body,{childList:true,subtree:true});
+(function(){ const root=$('#modal-root'); if(!root) return; let last=null;
+  new MutationObserver(()=>{ const m=$('.modal',root); if(!m||m===last){ if(!m) { if(last&&last._back&&document.contains(last._back)) try{ last._back.focus(); }catch(e){} last=null; } return; }
+    m._back=document.activeElement; last=m; const h=$('h3',m); if(h){ h.id=h.id||'mdl-'+(++a11yN); m.setAttribute('aria-labelledby',h.id); }
+    setTimeout(()=>{ if(m.contains(document.activeElement)) return; const f=$('input:not([type=hidden]):not([disabled]),select,textarea',m)||$('[data-m=ok]',m)||$('button',m); if(f) try{ f.focus(); }catch(e){} },30); }).observe(root,{childList:true,subtree:false});
+  /* Esc: close just the pop-up (as its Cancel/Keep Editing would), and stop it there so the work request stays open */
+  root.addEventListener('keydown',e=>{ const m=$('.modal',root); if(!m||e.key!=='Escape') return; e.stopPropagation(); e.preventDefault(); const c=$('[data-m=cancel],[data-m=keep]',m); if(c) c.click(); else root.innerHTML=''; },true);
+  root.addEventListener('keydown',e=>{ const m=$('.modal',root); if(!m) return;
+    if(e.key==='Tab'){ const F=$$('a[href],button:not([disabled]),input:not([disabled]):not([type=hidden]),select,textarea,[tabindex]:not([tabindex="-1"])',m).filter(x=>x.offsetParent!==null); if(!F.length) return;
+      const a=F[0], z=F[F.length-1]; if(e.shiftKey&&document.activeElement===a){ e.preventDefault(); z.focus(); } else if(!e.shiftKey&&document.activeElement===z){ e.preventDefault(); a.focus(); } } }); })();
+
+/* No empty wells: on wide screens a board of lanes (Review Desk, Architecture Help, MISMO Media) or a pair of
+   panes (Governance) that ends partway down the screen stretches to the bottom, so the page reads as one board */
+function fillWells(){ const m=$('#main'); if(!m) return; $$('.lanes,.split2',m).forEach(x=>x.style.minHeight=''); $$('.split2 > .pane',m).forEach(x=>{ x.style.maxHeight=''; x.style.height=''; });
+  if(window.innerWidth<901) return; const kids=[...m.children].filter(k=>k.offsetHeight>0); const last=kids[kids.length-1]; if(!last) return;
+  const r=last.getBoundingClientRect(), gap=window.innerHeight-r.bottom-24; if(gap<60) return;
+  if(last.matches('.lanes')) last.style.minHeight=Math.round(r.height+gap)+'px';
+  else if(last.matches('.split2')) $$(':scope > .pane',last).forEach(x=>{ x.style.maxHeight='none'; x.style.height=Math.round(r.height+gap)+'px'; }); }
+let fwQ=false; const fwRun=()=>{ if(fwQ) return; fwQ=true; requestAnimationFrame(()=>{ fwQ=false; try{ fillWells(); }catch(e){} }); };
+(function(){ const m=$('#main'); if(m) new MutationObserver(fwRun).observe(m,{childList:true}); window.addEventListener('resize',fwRun); })();
+
+/* Settings › Website: under the publish status, the cards exactly as the website shows them right now */
+const _feedCardFx=feedCard;
+feedCard=function(){ const h=_feedCardFx(); let L=[]; try{ const ids=new Set(webFeed().commentPeriods.map(c=>c.wr)); L=liveTickets().filter(t=>ids.has(t.wr)); }catch(e){}
+  return h+'<div class="card" style="margin-top:14px"><h3>What the Website Shows Now<span class="sp muted" style="font-size:12px;font-weight:500">'+L.length+' open for comment</span></h3>'+
+    (L.length?'<div class="feed-prev">'+L.map(t=>'<div role="button" tabindex="0" data-open="'+esc(t.id)+'">'+cpPreview(cpCardOf(t),t)+'</div>').join('')+'</div>':'<p class="muted" style="margin:0">Nothing is open for comment, so the website’s Open for Comment list is empty.</p>')+'</div>'; };
+
 /* ================= Unsaved changes in a work request: Save, Discard, and a check before leaving ================= */
-S._dirty=new Set(); S._dirtyFor=null;
+S._dirty=new Set(); S._dirtyFor=null; S._touched=new Set();
 function pnlDirty(){ return S._dirty.size>0&&S._dirtyFor===S.panel; }
-function pnlClear(){ S._dirty.clear(); S._dirtyFor=null; const b=$('#pnlbar'); if(b) b.remove(); }
+function pnlClear(){ S._dirty.clear(); S._touched.clear(); S._dirtyFor=null; const b=$('#pnlbar'); if(b) b.remove(); }
 const PNL_SEC={details:'Details',dates:'Key Dates',links:'Links'};
 function pnlBar(){ const P=$('#panel'); if(!P) return; let bar=$('#pnlbar',P);
   if(!pnlDirty()){ if(bar) bar.remove(); return; }
@@ -7325,8 +7532,9 @@ async function pnlSave(){ const t0=S.tickets[S._dirtyFor||S.panel]; if(!t0) retu
   const setK=(k,v,isDate)=>{ const parts=k.split('.'); let o=t; for(let j=0;j<parts.length-1;j++){ o[parts[j]]=o[parts[j]]||{}; o=o[parts[j]]; } const last=parts[parts.length-1];
     if((o[last]||'')!==v){ if(isDate&&k==='dates.targetIM'&&o[last]) t.targetChanges=(t.targetChanges||0)+1; o[last]=v; changed.push(k); } };
   [...S._dirty].forEach(id=>{ const sec=$('[data-sec="'+id+'"]',P); if(!sec) return;
-    $$('[data-k]',sec).forEach(i=>setK(i.dataset.k,i.value.trim(),false));
-    $$('[data-date]',sec).forEach(i=>{ const v=parseDate(i.value); if(v===null){ bad=true; return; } setK(i.dataset.date,v,true); }); });
+    /* only the boxes this person actually changed: a field someone else saved meanwhile is left as they set it */
+    $$('[data-k]',sec).forEach(i=>{ if(S._touched.has(i.dataset.k)) setK(i.dataset.k,i.value.trim(),false); });
+    $$('[data-date]',sec).forEach(i=>{ if(!S._touched.has(i.dataset.date)) return; const v=parseDate(i.value); if(v===null){ bad=true; return; } setK(i.dataset.date,v,true); }); });
   if(bad){ toast('A date did not read right. Try a format like 9/30/26.'); return false; }
   pnlClear();
   if(!changed.length){ toast('Nothing changed'); renderPanel(); return true; }
@@ -7334,7 +7542,7 @@ async function pnlSave(){ const t0=S.tickets[S._dirtyFor||S.panel]; if(!t0) retu
   await saveTicket(t,'Saved',before); return true; }
 function pnlDiscard(){ pnlClear(); renderPanel(); toast('Changes discarded'); }
 function pnlAsk(){ return new Promise(res=>{ const root=$('#modal-root');
-  root.innerHTML='<div class="modal" role="dialog" aria-modal="true"><div class="box"><header><h3>Save your changes?</h3></header><div class="bd"><p style="margin:0">You changed '+esc([...S._dirty].map(k=>PNL_SEC[k]||k).join(' and '))+' on this work request and have not saved yet.</p></div><footer><button class="btn" data-m="keep" type="button">Keep Editing</button><button class="btn danger" data-m="discard" type="button">Discard</button><button class="btn pri" data-m="save" type="button">Save</button></footer></div></div>';
+  root.innerHTML='<div class="modal" role="dialog" aria-modal="true"><div class="box"><header><h3>Save Your Changes?</h3></header><div class="bd"><p style="margin:0">You changed '+esc([...S._dirty].map(k=>PNL_SEC[k]||k).join(' and '))+' on this work request and have not saved yet.</p></div><footer><button class="btn" data-m="keep" type="button">Keep Editing</button><button class="btn danger" data-m="discard" type="button">Discard</button><button class="btn pri" data-m="save" type="button">Save</button></footer></div></div>';
   const done=v=>{ root.innerHTML=''; res(v); }; $$('[data-m]',root).forEach(b=>b.onclick=()=>done(b.dataset.m)); setTimeout(()=>{ const s=$('[data-m=save]',root); if(s) s.focus(); },30); }); }
 async function pnlLeave(){ if(!pnlDirty()) return true; const a=await pnlAsk(); if(a==='save') return await pnlSave(); if(a==='discard'){ pnlClear(); return true; } return false; }
 /* hold the panel still while someone is typing: other saves arriving don't wipe their edits */
@@ -7344,7 +7552,7 @@ const _openPanelGuard=openPanel, _closePanelGuard=closePanel;
 openPanel=function(id){ if(pnlDirty()&&id!==S.panel){ pnlLeave().then(ok=>{ if(ok) _openPanelGuard(id); }); return; } _openPanelGuard(id); };
 closePanel=function(){ if(pnlDirty()){ pnlLeave().then(ok=>{ if(ok) _closePanelGuard(); }); return; } pnlClear(); _closePanelGuard(); };
 document.addEventListener('input',e=>{ const el=e.target; if(!el.closest||!el.closest('#panel')) return; if(!el.matches('[data-k],[data-date]')) return; const sec=el.closest('[data-sec]'); if(!sec) return;
-  if(S._dirtyFor!==S.panel){ S._dirty.clear(); S._dirtyFor=S.panel; } S._dirty.add(sec.dataset.sec); pnlBar(); },true);
+  if(S._dirtyFor!==S.panel){ S._dirty.clear(); S._touched.clear(); S._dirtyFor=S.panel; } S._dirty.add(sec.dataset.sec); S._touched.add(el.dataset.k||el.dataset.date); pnlBar(); },true);
 document.addEventListener('change',e=>{ const el=e.target; if(el.closest&&el.closest('#panel')&&el.matches('select[data-k],input[data-date]')) el.dispatchEvent(new Event('input',{bubbles:true})); },true);
 /* a section's own Save button saves everything changed */
 document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('#panel [data-save]'); if(!b) return; e.stopImmediatePropagation(); e.preventDefault(); if(pnlDirty()) pnlSave(); else toast('Nothing changed'); },true);
@@ -7435,7 +7643,15 @@ function seedHistory(t){
 }
 async function importData(txt,over,msg){
   let arr, whole=null; try{ arr=JSON.parse(txt); if(!Array.isArray(arr)){ whole=arr; arr=arr.tickets?Object.values(arr.tickets):[]; } }catch(e){ msg.textContent='That isn’t a readable export.'; return; }
-  if(whole){ for(const a of Object.values(whole.arch||{})){ if(a&&a.id&&(over||!S.arch[a.id])){ S.arch[a.id]=a; await write('arch',a.id,a); } } if(whole.leaders&&whole.leaders.list){ S.leaderSnap=whole.leaders; await write('config','leaders',whole.leaders); } if(whole.process&&whole.process.presets){ S.process=whole.process; await write('config','process',whole.process); } if(whole.people&&whole.people.roles){ S.people=whole.people; await write('config','people',whole.people); } if(whole.notify){ S.notify=whole.notify; await write('config','notify',whole.notify); } for(const m of Object.values(whole.media||{})){ if(m&&m.id){ S.media[m.id]=m; await write('media',m.id,m); } } }
+  /* settings come back only when asked, after a confirm that says what changes; the email settings (flow link,
+     hold date) never come from a file. Architecture Help and MISMO Media records follow "Replace". */
+  if(whole){ for(const a of Object.values(whole.arch||{})){ if(a&&a.id&&(over||!S.arch[a.id])){ S.arch[a.id]=a; await write('arch',a.id,a); } }
+    for(const m of Object.values(whole.media||{})){ if(m&&m.id&&(over||!S.media[m.id])){ S.media[m.id]=m; await write('media',m.id,m); } }
+    const has=[whole.process&&whole.process.presets&&'the stages (Process)',whole.people&&whole.people.roles&&'People and Roles',whole.leaders&&whole.leaders.list&&'the workgroup leaders list'].filter(Boolean);
+    if(has.length&&await modal({title:'Restore Settings Too?',ok:'Restore Settings',cancel:'Work Requests Only',body:'<p style="margin:0 0 8px">This backup also holds '+esc(has.join(', '))+'. Restoring replaces what’s in Settings now with the backup’s copy.</p><p class="muted" style="margin:0;font-size:12.5px">Email settings (the flow link and the hold date) are never restored from a file.</p>'})){
+      if(whole.leaders&&whole.leaders.list){ S.leaderSnap=whole.leaders; await write('config','leaders',whole.leaders); }
+      if(whole.process&&whole.process.presets){ S.process=whole.process; await write('config','process',whole.process); }
+      if(whole.people&&whole.people.roles){ S.people=whole.people; await write('config','people',whole.people); } } }
   if(!arr.length){ msg.textContent='Nothing to import.'; return; }
   let n=0, skip=0; S.importing=true; msg.innerHTML='<span class="spin"></span> Importing…';
   const queue=arr.slice(); const work=async()=>{ while(queue.length){ const t=queue.shift(); if(!t||!t.id) continue; if(S.tickets[t.id]&&!over){ skip++; continue; }
@@ -7538,9 +7754,12 @@ async function boot(){
   try{ const rs=window.ResourcesSession&&window.ResourcesSession.current(); if(rs){ S.me.name=S.me.name||rs.name||''; S.me.email=S.me.email||rs.email||''; S.relayRole=window.ResourcesSession.role&&window.ResourcesSession.role('mms'); if(S.relayRole==='view') S.canWrite=false; } }catch(e){}
   if(!ok && window.__mmsSeed){ const sd=window.__mmsSeed; Store.mem={tickets:sd.tickets||{},config:{},outbox:sd.outbox||{},media:sd.media||{},arch:sd.arch||{}}; if(sd.me) S.me=sd.me; }
   try{ S.sample=window.claude&&await window.claude.use('sample'); }catch(e){ S.sample=null; }
-  const done=()=>{ if(S.loaded.tickets&&S.loaded.config&&!S.ready){ S.ready=true; computeRole(); setupViewAs(); if(!location.hash&&!S.isStaff&&(S.people.facilitators||[]).some(f=>sameName(f.name,S.me.name))) S.view='mine'; go(S.view); runAutomations(); setInterval(runAutomations,5*60000); hubSync(); setInterval(hubSync,5*60000); electionsSync(); } else if(S.ready){ computeRole(); renderAll(); } };
-  const timer=setTimeout(()=>{ if(!S.ready){ S.loaded.tickets=S.loaded.config=true; done(); toast('The MMS records are taking a while to load; what shows may be out of date.'); } },12000);
-  Store.sub('tickets',o=>{ S.tickets=tidyImported(o); Object.values(S.tickets).forEach(noteSeen); S.loaded.tickets=true; clearTimeout(timer); done(); });
+  const done=()=>{ if(S.loaded.tickets&&S.loaded.config&&!S.ready){ S.ready=true; computeRole(); setupViewAs(); if(!location.hash&&!S.isStaff&&(S.people.facilitators||[]).some(f=>sameName(f.name,S.me.name))) S.view='mine'; go(S.view); startAuto(); } else if(S.ready){ computeRole(); renderAll(); } };
+  /* the automations (reminders, Hub import, website feed, digest) only ever run on the whole list of work
+     requests: with part of it missing they would re-create real work requests and empty the website list */
+  const startAuto=()=>{ if(S.autoOn||S.partial||!S.ready) return; S.autoOn=true; runAutomations(); setInterval(runAutomations,5*60000); hubSync(); setInterval(hubSync,5*60000); electionsSync(); };
+  const timer=setTimeout(()=>{ if(!S.ready){ S.partial=!S.loaded.tickets; S.loaded.tickets=S.loaded.config=true; done(); partialBanner(); } },12000);
+  Store.sub('tickets',o=>{ noteVersions(o); S.tickets=tidyImported(o); S.loaded.tickets=true; clearTimeout(timer); if(S.partial){ S.partial=false; partialBanner(); } done(); startAuto(); });
   Store.sub('config',o=>{ if(o.process&&o.process.presets){ S.process=o.process; Object.values(o.process.presets).forEach(pr=>(pr.stages||[]).forEach(s=>{ if(/^(gc-comment|gc-publish)$/.test(s.key)&&/^\S+ Approval to (Comment|Publish)$/.test(s.name||'')) s.name=s.name.replace(/^\S+ /,'Governance '); })); } if(o.people&&o.people.roles) S.people=o.people; if(o.notify) S.notify=Object.assign(clone(DEFAULT_NOTIFY),o.notify); if(o.leaders&&o.leaders.list&&(!S.leaderSnap||(o.leaders.at||'')>=(S.leaderSnap.at||''))) S.leaderSnap=o.leaders; if(o.digest) S.digestCfg=o.digest; if(o.digestLog) S.digestLog=o.digestLog; if(o.feed) S.feedState=o.feed; S.cfgDocs=o; S.loaded.config=true; done(); });
   Store.sub('cstatus',o=>{ S.cstat=o||{}; if(S.ready&&(S.view==='comment'||S.panel)) renderAll(); });
   Store.sub('outbox',o=>{ S.outbox=o; if(S.ready) counts(); if(S.ready&&S.view==='outbox') renderAll(); });
@@ -7548,6 +7767,9 @@ async function boot(){
   Store.sub('media',o=>{ S.media=o; if(S.ready) counts(); if(S.ready&&S.view==='media') renderAll(); });
   renderWho();
 }
+function partialBanner(){ let b=$('#partialbar'); if(!S.partial){ if(b) b.remove(); return; }
+  if(!b){ b=document.createElement('div'); b.id='partialbar'; b.className='banner warn'; b.setAttribute('role','status'); b.style.cssText='position:sticky;top:0;z-index:50;margin:0'; document.body.prepend(b); }
+  b.textContent='Some MMS records haven’t loaded yet, so lists may be incomplete. The MMS keeps trying and fills in on its own; reminders and the website list wait until everything is in.'; }
 function computeRole(){
   const nm=(S.me.name||'').toLowerCase(), em=(S.me.email||'').toLowerCase();
   const inList=l=>(l||[]).some(p=>sameName(p.name,nm)||(em&&(p.email||'').toLowerCase()===em));
@@ -7566,40 +7788,6 @@ function renderWho(){
   w.innerHTML='<span class="whochip" title="'+esc(full)+'"><span class="av">'+esc(ini)+'</span><span class="fn">'+esc(full.split(' ')[0])+'</span><span class="cv">\u25be</span></span>';
 }
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot); else boot();
-
-/* ================= Typing survives a refresh (November 6, 2026) =================
-   When someone else saves, the open work request redraws to show their change. Details, Key Dates
-   and Links already hold still while you edit them; this does the same for every other box in the
-   panel (a history note, a note for the architect, a part name, a card's wording): anything typed and
-   not yet sent is put back after the redraw, with the cursor where it was. Boxes you haven't touched
-   show the newest values. Text you have just sent (Add, Save, Enter) is not put back. */
-(function(){
-  const BOX='textarea,input:not([type=hidden]):not([type=checkbox]):not([type=radio]):not([type=file]):not([type=button]):not([type=submit]):not([type=search])';
-  const typed=el=>el.matches(BOX)&&!el.matches('[data-k],[data-date]');
-  const keyOf=el=>{ if(el.id) return '#'+el.id; const a=[...el.attributes].filter(x=>/^(name|data-[\w-]+)$/.test(x.name)).map(x=>x.name+'='+x.value).join('&'); return el.tagName+'|'+a+'|'+(el.placeholder||''); };
-  const boxes=P=>{ const seen={}, out=[]; $$('input,textarea',P).forEach(el=>{ if(!typed(el)) return; const k=keyOf(el); const n=seen[k]=(seen[k]||0)+1; out.push({el,id:k+'#'+n}); }); return out; };
-  let sent={}, sentAt=0;   // what the boxes held when the person last pressed something that sends
-  const markSent=()=>{ const P=$('#panel'); if(!P) return; sent={}; boxes(P).forEach(b=>{ if(b.el.value) sent[b.id]=b.el.value; }); sentAt=Date.now(); };
-  document.addEventListener('click',e=>{ const b=e.target.closest&&e.target.closest('#panel button,#panel [data-x],#panel [data-act],#panel [role=button]'); if(b&&!b.matches('[data-ptab]')) markSent(); },true);
-  document.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.isComposing&&e.target.closest&&e.target.closest('#panel')&&e.target.matches('input')) markSent(); },true);
-  const _renderPanelTyped=renderPanel;
-  renderPanel=function(){
-    const P=$('#panel'), id=S.panel, keep=[]; let focus=null;
-    const fresh=Date.now()-sentAt<60000;
-    if(P&&id&&P.classList.contains('on')&&P.dataset.for3===String(id)){
-      boxes(P).forEach(b=>{ const el=b.el;
-        if(el.value!==el.defaultValue&&!(fresh&&sent[b.id]===el.value)) keep.push({id:b.id,v:el.value});
-        if(el===document.activeElement) focus={id:b.id,s:el.selectionStart,e:el.selectionEnd}; });
-    }
-    _renderPanelTyped();
-    const P2=$('#panel'); if(P2) P2.dataset.for3=S.panel?String(S.panel):'';
-    if(!P2||S.panel!==id||(!keep.length&&!focus)) return;
-    const at={}; boxes(P2).forEach(b=>{ at[b.id]=b.el; });
-    keep.forEach(x=>{ const el=at[x.id]; if(el&&el.value===el.defaultValue) el.value=x.v; });
-    if(focus){ const el=at[focus.id]; if(el&&el.isConnected&&document.activeElement!==el&&!($('#modal-root')&&$('#modal-root').children.length)){
-      try{ el.focus({preventScroll:true}); if(focus.s!=null&&el.setSelectionRange) el.setSelectionRange(focus.s,focus.e); }catch(e){} } }
-  };
-})();
 })();
 
 </script>

@@ -16,7 +16,7 @@ import { createRequire } from 'module';
 import zlib from 'zlib';
 const require = createRequire(import.meta.url);
 const D = require('./digest.js');
-const TOKEN = process.env.MMS_DATA_TOKEN, FLOW = process.env.MMS_MAIL_FLOW_URL, DRY = process.env.DRY_RUN === '1', FORCE = process.env.FORCE === '1';
+const TOKEN = process.env.MMS_DATA_TOKEN, FLOW = process.env.MMS_MAIL_FLOW_URL, MAILKEY = process.env.MMS_MAIL_KEY || '', DRY = process.env.DRY_RUN === '1', FORCE = process.env.FORCE === '1';
 if (!TOKEN) { console.log('Not switched on yet: add the MMS_DATA_TOKEN secret.'); process.exit(0); }
 
 async function gh(repo, path) {
@@ -92,20 +92,45 @@ for (const p of ((config.people || {}).facilitators || [])) {
   }
 }
 
-const list = D.build({ now, tickets, process: config.process, people: config.people, arch, media, comments, mt, hours, settings: config.digest });
+/* the MMS's own IM queue, so "your move" matches My Queue exactly (sent to IM = not the facilitator's move) */
+const imq = docsOf(await gh('mms-data', 'data/imqueue.json'), 'imqueue');
+const list = D.build({ now, tickets, process: config.process, people: config.people, arch, media, comments, mt, hours, imq, settings: config.digest });
+
+/* anyone whose digest the MMS already sent today (Send Now, or the MMS sender) is skipped */
+const mk = s => String(s).replace(/[^A-Za-z0-9_-]/g, '-').slice(0, 120);
+const sentToday = new Set();
+for (const n of ['outbox', 'outbox-' + et.ymd.slice(0, 7)]) {
+  try { Object.values(docsOf(await gh('mms-data', `data/${n}.json`), 'outbox')).forEach(d => { if (d && d.status === 'Sent') sentToday.add(d.k || d.id); }); } catch (e) { console.log(`Could not read ${n}: ${e.message}`); }
+}
 const N = config.notify || {}, holdUntil = ('holdUntil' in N) ? N.holdUntil : '2026-11-20';
-const HELD = !!holdUntil && new Date().toISOString().slice(0, 10) < holdUntil;
+const HELD = !!holdUntil && et.ymd < holdUntil;   /* the Eastern date: the evening of Nov 19 is still Nov 19 */
 if (HELD) console.log(`Email is on hold until ${holdUntil}: building the digests but not sending them. Staff see them in MMS Notifications as Held.`);
-let sent = 0;
+let sent = 0, failed = 0, want = 0;
+async function post(m) {
+  const body = JSON.stringify({ to: m.to.join(';'), cc: m.cc.join(';'), subject: m.subject, body: m.text, html: m.html, kind: 'digest', key: MAILKEY });
+  for (let i = 0; i < 3; i++) {
+    try {
+      const r = await fetch(FLOW, { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-mms-key': MAILKEY }, body });
+      if (r.ok) return true;
+      console.log(`  The flow answered ${r.status}${i < 2 ? '; trying again' : ''}`);
+      if (r.status < 500 && r.status !== 429) return false;
+      const ra = +(r.headers.get('retry-after') || 0); await new Promise(res => setTimeout(res, Math.min(30, ra || 5 * (i + 1)) * 1000));
+    } catch (e) { console.log(`  Could not reach the flow: ${e.message}`); await new Promise(res => setTimeout(res, 5000 * (i + 1))); }
+  }
+  return false;
+}
 for (const m of list) {
   if (!m.to.length) { console.log(`Skipped ${m.name}: no email on file.`); continue; }
   if (m.empty && settings.skipEmpty) { console.log(`Skipped ${m.name}: nothing to report.`); continue; }
+  if (sentToday.has(mk('digest-' + m.name + '-' + et.ymd))) { console.log(`Skipped ${m.name}: the MMS already sent today's digest.`); continue; }
   console.log(`${DRY ? '[dry run] ' : ''}${m.name}: ${m.subject} (${m.sections} sections)`);
   if (DRY || !FLOW || HELD) continue;
-  const r = await fetch(FLOW, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ to: m.to.join(';'), cc: m.cc.join(';'), subject: m.subject, body: m.text, html: m.html, from: ((config.notify || {}).from) || 'workrequests@mismo.org', kind: 'digest' }) });
-  if (r.ok) sent++; else console.log(`  Not sent: the flow answered ${r.status}`);
+  want++;
+  if (await post(m)) sent++; else { failed++; console.log(`  NOT SENT to ${m.name}`); }
 }
 if (!FLOW && !DRY) console.log('Built the digests but did not send them: add the MMS_MAIL_FLOW_URL secret.');
-console.log(`${sent} digest${sent === 1 ? '' : 's'} sent.`);
-/* tell the workflow today is done (not for dry runs, and not when nothing could be sent yet) */
-if (!DRY && (FLOW || HELD) && process.env.GITHUB_OUTPUT) { const fs = await import('fs'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'done=1\n'); fs.writeFileSync('.digest-done', new Date().toISOString()); }
+console.log(`${sent} digest${sent === 1 ? '' : 's'} sent${failed ? `, ${failed} not sent` : ''}.`);
+/* the day counts as done only when every digest went (or when email is on hold); a failure fails the run,
+   so GitHub emails the repository owner, and the next run that afternoon tries again */
+if (!DRY && (HELD || (FLOW && !failed)) && process.env.GITHUB_OUTPUT) { const fs = await import('fs'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'done=1\n'); fs.writeFileSync('.digest-done', new Date().toISOString()); }
+if (failed) process.exit(1);

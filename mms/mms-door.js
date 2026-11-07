@@ -62,9 +62,13 @@
     var seg = String(path).split('/');
     if (seg.length !== 2) throw err('invalid_argument', 'Not a document path: ' + path);
     if (seg[0] === 'tickets') return { file: shard(seg[1]), coll: seg[0], id: seg[1] };
+    /* emails are filed by month (outbox-2026-11 ...) so no file fills up; older ones stay in "outbox" */
+    if (seg[0] === 'outbox') { var mo = String(seg[1]).match(/^(\d{4}-\d{2})_/); return { file: mo ? 'outbox-' + mo[1] : 'outbox', coll: seg[0], id: seg[1] }; }
     return { file: safe(seg[0]).slice(0, 40), coll: seg[0], id: seg[1] };
   }
+  function monthsBack(n) { var out = [], d = new Date(); d.setDate(1); for (var i = 0; i < n; i++) { var k = d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2); if (k >= '2026-11') out.push('outbox-' + k); d.setMonth(d.getMonth() - 1); } return out; }
   function filesOfColl(coll) {
+    if (coll === 'outbox') return ['outbox'].concat(monthsBack(3));
     if (coll !== 'tickets') return [safe(coll).slice(0, 40)];
     var out = ['tickets-other'], y = new Date().getFullYear() + 1;
     for (var i = FIRST_YEAR; i <= y; i++) out.push('tickets-' + i);
@@ -148,6 +152,8 @@
   function applyOps(content, ops) {
     ops.forEach(function (op) {
       if (op.kind === 'set') content.docs[op.path] = mergeSet(content.docs[op.path], op);
+      /* create: only when nobody has filed it yet (a claim: two tabs can't both send the same email) */
+      else if (op.kind === 'create') { if (content.docs[op.path] !== undefined) op.exists = true; else { op.exists = false; content.docs[op.path] = clone(op.data); } }
       else if (op.kind === 'update') content.docs[op.path] = Object.assign({}, content.docs[op.path] || {}, clone(op.data));
       else if (op.kind === 'delete') delete content.docs[op.path];
     });
@@ -158,7 +164,7 @@
 
   /* ---------- saving ---------- */
   var previewWarned = 0;
-  function queue(path, kind, data) {
+  function queue(path, kind, data, base) {
     if (PREVIEW) {
       if (now() - previewWarned > 4000) { previewWarned = now(); toast('This is the preview of the MMS on resources.mismo.org — nothing here is saved yet.', 'bad'); }
       return Promise.reject(err('invalid_argument', 'Preview: not saved'));
@@ -167,8 +173,10 @@
     return new Promise(function (res, rej) {
       var go = function () {
         if (kind === 'update' && f.loaded && docIn(f, path) === null) { rej(err('not-found', 'No document to update: ' + path)); return; }
-        var base = f.loaded ? docIn(f, path) : undefined;
-        f.pending.push({ kind: kind, path: path, data: data, base: base ? clone(base) : null, res: res, rej: rej }); f.view = null;
+        /* the copy this change started from: given by the page when it knows it (an action begun on an older
+           copy), else the latest this tab has. Only fields that differ from it are applied over newer saves. */
+        var b = base !== undefined ? base : (f.loaded ? docIn(f, path) : undefined);
+        f.pending.push({ kind: kind, path: path, data: data, base: b ? clone(b) : null, res: res, rej: rej }); f.view = null;
         notify(f, true);
         schedule(f, FLUSH_MS);
       };
@@ -188,12 +196,16 @@
     var attempt = function () {
       return ensure(f).then(function () {
         var next = applyOps(clone(f.server), batch);
+        var finish = function () {
+          f.pending = f.pending.filter(function (op) { return batch.indexOf(op) < 0; }); f.view = null;
+          batch.forEach(function (op) { if (op.kind === 'create' && op.exists) op.rej(err('EXISTS', 'Already filed')); else op.res(); });
+          notify(f, false); saved();
+        };
+        if (same(next, f.server)) { finish(); return; }
         if (JSON.stringify(next, null, 2).length > MAX_FILE) throw err('TOO_BIG', 'This part of the MMS has grown too big to save in one piece.');
         return put(f.name, { content: next, sha: f.sha }).then(function (b) {
           f.server = next; f.sha = (b && b.sha) || f.sha; f.loadedAt = now();
-          f.pending = f.pending.filter(function (op) { return batch.indexOf(op) < 0; }); f.view = null;
-          batch.forEach(function (op) { op.res(); });
-          notify(f, false); saved();
+          finish();
         });
       }).catch(function (e) {
         if (e && e.status === 409 && tries < 8) {
@@ -273,7 +285,8 @@
     return {
       id: p.id, path: path,
       get: function () { return need().then(function () { return docSnap(path, docValue(path), false); }); },
-      set: function (data) { return queue(path, 'set', data); },
+      set: function (data, opts) { return queue(path, 'set', data, opts && opts.base !== undefined ? opts.base : undefined); },
+      create: function (data) { return queue(path, 'create', data); },
       update: function (patch) { return queue(path, 'update', patch); },
       delete: function () { return queue(path, 'delete', null); },
       onSnapshot: function (cb, errCb) {
@@ -294,11 +307,20 @@
       get: function () { return loadColl(coll).then(function () { var s = collSnap(coll, null, false); if (max && s.docs.length > max) { s.docs = s.docs.slice(0, max); s.size = s.docs.length; } return s; }); },
       onSnapshot: function (cb, errCb) {
         var l = { coll: coll, cb: cb, primed: false, last: {} }; collL.push(l);
-        loadColl(coll).then(function () {
-          if (l.primed) return;
-          var docs = collDocs(coll); Object.keys(docs).forEach(function (p) { l.last[p] = JSON.stringify(docs[p]); });
-          l.primed = true; cb(collSnap(coll, null, false));
-        }).catch(function (e) { if (errCb) errCb(e); });
+        /* a file that fails to load is tried again (5 s, 10 s ... every minute) until it comes in; the page
+           hears about the failure so it can say so and hold back anything that needs the whole list */
+        var tries = 0;
+        var prime = function () {
+          loadColl(coll).then(function () {
+            if (l.primed) return;
+            var docs = collDocs(coll); Object.keys(docs).forEach(function (p) { l.last[p] = JSON.stringify(docs[p]); });
+            l.primed = true; cb(collSnap(coll, null, false));
+          }).catch(function (e) {
+            if (errCb) errCb(e);
+            if (collL.indexOf(l) >= 0 && !l.primed) setTimeout(prime, Math.min(60000, 5000 * Math.pow(2, tries++)));
+          });
+        };
+        prime();
         return function () { var i = collL.indexOf(l); if (i >= 0) collL.splice(i, 1); };
       }
     };

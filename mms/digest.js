@@ -84,7 +84,6 @@
   function same(a, b) { a = String(a || '').trim().toLowerCase(); b = String(b || '').trim().toLowerCase(); if (!a || !b) return false; if (a === b) return true; var fa = a.split(/\s+/), fb = b.split(/\s+/); return fa.length === 1 ? fa[0] === fb[0] : (fb.length === 1 ? fb[0] === fa[0] : false); }
 
   /* ---------- the process, from the same settings the MMS uses ---------- */
-  var BUILT = ['approved', 'cfp', 'kickoff', 'work', 'aireview', 'im', 'awg', 'designation', 'gc-comment', 'comment', 'post', 'gc-publish', 'release'];
   function proc(process) { var p = process || {}; return (p.presets && p.presets[p.active]) || { stages: [], gov: 'GC' }; }
   function stageName(P, k) { var s = (P.stages || []).find(function (x) { return x.key === k; }); return s ? s.name : (k === 'published' ? 'Published' : k); }
   var ENTRY = { approved: ['bet', 'submitted'], cfp: ['bet'], kickoff: ['cfpPublished', 'bet'], work: ['workStart', 'kickoffGc', 'bet'], aireview: ['aiSubmitted'], im: ['imSubmitted', 'aiDecision'], awg: ['awgSubmitted', 'imDecision'], designation: ['awgDecision'], 'gc-comment': ['designation', 'awgDecision'], comment: ['commentStart', 'commentPublished', 'gcComment'], post: ['commentEnd'], 'gc-publish': ['commentEnd', 'postGc'], release: ['postGc'] };
@@ -93,21 +92,95 @@
     if (!since || imp) { var c = (ENTRY[t.stage] || []).map(function (k) { return d[k]; }).filter(function (x) { return x && x <= today; }).sort(); since = c.length ? c[c.length - 1] : (t.importedAt || t.stageSince || d.workStart || ''); }
     return diff(String(since).slice(0, 10), today); }
   function pastTarget(t, today) { var d = t.dates || {}; return t.state === 'active' && !t.split && !t.rides && d.targetIM && d.targetIM < today && ['approved', 'cfp', 'kickoff', 'work', 'aireview'].indexOf(t.stage) >= 0; }
-  /* The facilitator's next step, or null when the move is someone else's. Mirrors whoseMove() in the MMS. */
-  function facMove(t, P, today) {
-    if (t.state !== 'active' || t.split || t.rides || t.request) return null;
-    var sub = t.sub || '';
-    switch (t.stage) {
-      /* building work is only "your move" once its Target to Submit to IM is a week away or past, same as My Queue */
-      case 'work': { var tg = (t.dates || {}).targetIM; return (tg && (!today || diff(today, tg) <= 7)) ? 'Build the work product; submit for AI Review when ready' : null; }
-      case 'aireview': return sub === 'updates' ? 'Make the updates AI Review found, then resubmit' : (sub === 'reviewed' ? 'Read the AI Review and send it to IM, or make updates' : 'Run the AI Review on the submission');
-      case 'im': case 'awg': { var nm = t.stage === 'im' ? 'IM' : 'AWG'; if (sub === 'updates') return 'Make the ' + nm + ' updates, then resubmit'; if (sub === 'prep') return 'Submit to ' + nm; return null; }
-      case 'post': return 'Report what came back from comment';
-    }
-    var sd = (P.stages || []).find(function (s) { return s.key === t.stage; });
-    if (sd && sd.owner === 'facilitator' && BUILT.indexOf(t.stage) < 0) return sd.desc || ('Finish ' + sd.name);
-    return null;
+  /* ---------- whose move it is: the MMS's own My Queue rule, so the scheduled sender's email
+     matches My Queue. A copy of whoseMove() (app1.js) with its wrappers: Architecture Help
+     (archwr.js) and the IM Pre-Review step (imdesk.js); isMine() with the IM and AWG
+     facilitator rule (cpcard.js); dueNow() and waitingOn() (app1.js). The MMS passes its own
+     moveFor, which always wins; this is used when nothing is passed (the GitHub sender). ---------- */
+  var ASK_THIS = { hold: 'put this on hold', resume: 'resume this', close: 'close this', cancel: 'cancel this' };
+  function allPeople(people) { var p = people || {}, out = (p.facilitators || []).slice(); Object.keys(p.roles || {}).forEach(function (r) { out = out.concat(p.roles[r] || []); }); return out.filter(function (x) { return x && x.name; }); }
+  function personByName(people, n) { var all = allPeople(people), l = String(n || '').toLowerCase(); return all.find(function (p) { return String(p.name).toLowerCase() === l; }) || all.find(function (p) { return same(p.name, n); }); }
+  function peopleFor(ctx, role, t) {
+    if (role === 'facilitator') return t && t.facilitator ? [personByName(ctx.people, t.facilitator) || { name: t.facilitator, email: '' }] : [];
+    return ((ctx.people && ctx.people.roles && ctx.people.roles[role]) || []).filter(Boolean);
   }
+  function portalItemFor(ctx, t, k) {
+    var Q = (k === 'im' ? ctx.imPortalQ : ctx.awgPortalQ) || {};
+    return Object.keys(Q).map(function (x) { return Q[x]; }).filter(function (q) { return q && !q.hist && (q.status === 'awaiting' || q.status === 'carried') && (q.ticket === t.id || (!q.ticket && q.wr === t.wr)); })
+      .sort(function (a, b) { return (a.test ? 1 : 0) - (b.test ? 1 : 0); })[0] || null;
+  }
+  function archOpenFor(ctx, t) {
+    var A = ctx.arch || {};
+    return Object.keys(A).map(function (k) { return A[k]; }).filter(function (a) { return a && a.ticket === t.id && ['Done', 'Declined'].indexOf(a.status) < 0; })
+      .sort(function (a, b) { return String(b.id).localeCompare(String(a.id)); });
+  }
+  function baseMove(ctx, t) {
+    if (t.request) return { role: 'staff', text: (t.request.by || 'The facilitator') + ' asked to ' + (ASK_THIS[t.request.kind] || t.request.kind) };
+    if (t.split) return { role: '', text: '' };
+    if (t.rides && t.state === 'active') return { role: '', text: '' };
+    if (t.state === 'hold') return { role: 'staff', hold: true, text: 'On hold' + (t.holdReason ? ': ' + t.holdReason : '') };
+    if (t.state !== 'active') return { role: '', text: '' };
+    var g = 'Governance', sub = t.sub || '';
+    switch (t.stage) {
+      case 'approved': return { role: 'staff', text: 'Set the start date, size and target' };
+      case 'cfp': return sub === 'published' ? { role: 'staff', text: 'Confirm the Call for Participation is out' } : { role: 'media', text: 'Draft and publish the Call for Participation' };
+      case 'kickoff': return { role: 'gov', text: g + ' decision to kick off the workgroup' };
+      case 'work': return { role: 'facilitator', text: 'Build the work product; submit for AI Review when ready' };
+      case 'aireview':
+        if (sub === 'updates') return { role: 'facilitator', text: 'Make the updates AI Review found, then resubmit' };
+        if (sub === 'reviewed') return { role: 'facilitator', text: 'Read the AI Review and send to IM, or make updates' };
+        return { role: 'facilitator', text: 'Run the AI Review on the submission' };
+      case 'im': case 'awg': {
+        var nm = t.stage === 'im' ? 'IM' : 'AWG';
+        if (sub === 'updates') return { role: 'facilitator', text: 'Make the ' + nm + ' updates, then resubmit' };
+        if (sub === 'prep') return { role: 'facilitator', text: 'Submit to ' + nm + ' through MISMO Connect' };
+        var pq = portalItemFor(ctx, t, t.stage);
+        if (pq) return { role: 'imawg', text: pq.status === 'carried' ? 'Carried to the next AWG call' : (t.stage === 'awg' ? 'On the AWG agenda' : 'With the IM reviewers' + (pq.rows && pq.done ? ': ' + pq.done + ' of ' + pq.rows + ' rows decided' : '')) };
+        return { role: 'imawg', text: sub === 'in-review' ? nm + ' is reviewing' : t.stage === 'im' ? 'Run the IM Pre-Review and send it to IM Review' : 'Waiting for ' + nm + ' Review' };
+      }
+      case 'designation':
+        if (sub === 'vps') return { role: 'vps', text: t.designation && t.designation.auto ? 'Approve the recommended designation' : 'Approve the Director’s designation' };
+        if (sub === 'director' || sub === 'discuss') return { role: 'director', text: sub === 'discuss' ? 'Talk it over and update the designation' : 'Recommend the designation' };
+        return { role: 'vps', text: 'Approve the recommended designation' };
+      case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
+      case 'comment': return sub === 'setup' ? { role: 'website', text: 'Post to the standards page and set the dates' } : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
+      case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
+      case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
+      case 'release': return { role: 'website', text: 'Publish the pages and announcement' };
+    }
+    var sd = (ctx.P.stages || []).find(function (s) { return s.key === t.stage; }) || (t.stage === 'published' ? { key: 'published', name: 'Published', owner: '' } : { key: t.stage, name: t.stage, owner: 'staff' });
+    return { role: sd.owner || 'staff', text: sd.desc || ('Finish ' + sd.name) };
+  }
+  D.whoseMove = function (ctx, t) {
+    var w = baseMove(ctx, t);
+    /* Architecture Help (archwr.js): building work waits on its open architecture tasks */
+    if (t.stage === 'work' && t.state === 'active' && w.role === 'facilitator') { var L = archOpenFor(ctx, t); if (L.length) w = { role: w.role, text: 'Waiting on Architecture Help (' + L.map(function (a) { return a.id; }).join(', ') + '), then submit for AI Review' }; }
+    /* the IM Pre-Review (imdesk.js): the facilitator runs it and sends it to IM */
+    if (t.state === 'active' && !t.request && !t.split && !t.rides && t.stage === 'im' && ['', 'new', 'resubmitted'].indexOf(t.sub || '') >= 0 && !portalItemFor(ctx, t, 'im')) {
+      var Q = ctx.imq || {}, sent = Object.keys(Q).some(function (k) { var q = Q[k]; return q && q.ticket === t.id && q.status === 'awaiting'; });
+      w = sent ? { role: 'imawg', text: 'Sent to IM; it reaches IM Review when Erin or MISMO staff next open the MMS' } : { role: 'facilitator', text: 'Run the IM Pre-Review and send it to the IM reviewers' };
+    }
+    return w;
+  };
+  function isMine(ctx, t, who) {
+    if (!who || !who.name) return false;
+    var w = D.whoseMove(ctx, t); if (!w.role) return false;
+    var em = String(who.email || '').toLowerCase();
+    var mine = peopleFor(ctx, w.role, t).some(function (p) { return same(p.name, who.name) || (em && p.email && String(p.email).toLowerCase() === em); });
+    if (!mine) return false;
+    /* the IM and AWG facilitator: IM/AWG work is in IM Review, not her queue, unless she facilitates it (cpcard.js) */
+    if (w.role === 'imawg' && !same(t.facilitator, who.name)) return false;
+    return true;
+  }
+  function dueNow(t, today) { var d = t.dates || {}, soon = add(today, 7);
+    if (t.state === 'hold') return !!(t.holdUntil && t.holdUntil <= soon);
+    if (t.stage === 'work') return !!(d.targetIM && d.targetIM <= soon);
+    return true; }
+  /* moveFor(t, person): the next step when it is waiting on that person, else null (the MMS's waitingOn) */
+  D.moveFor = function (input) {
+    var n = et(input.now || new Date()), ctx = { people: input.people || {}, P: proc(input.process), arch: input.arch || {}, imq: input.imq || {}, imPortalQ: input.imPortalQ || {}, awgPortalQ: input.awgPortalQ || {} };
+    return function (t, person) { return isMine(ctx, t, person) && dueNow(t, n.ymd) ? (D.whoseMove(ctx, t).text || 'Your move') : null; };
+  };
 
   /* ---------- Meeting Trackers: which meetings still need attendance ---------- */
   function meetsOn(rule, ymd) {
@@ -173,9 +246,10 @@
     var row = function (t, sub, badge, tone) { return { lead: t.wr, main: t.name, sub: sub, badge: badge, tone: tone, href: link(t) }; };
 
     if (on.yourMove) {
-      /* the MMS passes moveFor (its own My Queue rule), so the email and the queue always agree */
-      var ymPool = input.moveFor ? T.filter(function (t) { return (t.state === 'active' || t.state === 'hold') && !t.split; }) : act;
-      var ym = ymPool.map(function (t) { return [t, input.moveFor ? input.moveFor(t, person) : facMove(t, P, today)]; }).filter(function (x) { return x[1]; })
+      /* the MMS passes moveFor (its own My Queue rule); without it (the GitHub sender) the same rule, ported here */
+      var mf = input.moveFor || D.moveFor(input);
+      var ymPool = T.filter(function (t) { return (t.state === 'active' || t.state === 'hold') && !t.split; });
+      var ym = ymPool.map(function (t) { return [t, mf(t, person)]; }).filter(function (x) { return x[1]; })
         .sort(function (a, b) { return (pastTarget(b[0], today) - pastTarget(a[0], today)) || ((stageAge(b[0], today) || 0) - (stageAge(a[0], today) || 0)); });
       count.todo = ym.length;
       if (ym.length) S.push({ key: 'yourMove', title: 'Your Move', note: ym.length + ' waiting on you', tone: 'warn',
