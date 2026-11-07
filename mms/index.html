@@ -2222,6 +2222,9 @@ const Store={db:null,mem:null,subs:{},
 let pendingSaves=0;
 function saveState(ok,msg){ const el=$('#savestate'); if(!el) return; if(ok===false){ el.textContent='Not saved: '+msg; el.className='savestate err'; return; } el.className='savestate'; el.textContent=pendingSaves?'Saving…':(S.mode==='memory'?'Not connected: changes stay on this screen':''); }
 async function write(coll,id,data,base){
+  /* a work request saved from an older copy (a background tidy-up, a pop-up left open) carries the copy it
+     started from, so only what it changed is applied over anything newer */
+  if(coll==='tickets'&&base===undefined&&data&&typeof startedFrom==='function'){ const b=startedFrom(data); if(b) base=b; }
   pendingSaves++; saveState();
   try{ await Store.set(coll,id,data,base); pendingSaves--; saveState(); return true; }
   catch(e){ pendingSaves--; saveState(false,(e&&e.message)||'try again'); toast('That change did not save. '+((e&&e.message)||'')); return false; }
@@ -2341,11 +2344,12 @@ async function saveTicket(t,msg,before){
   t.updatedAt=new Date().toISOString(); t.updatedBy=S.me.name||'';
   S.tickets[t.id]=t; renderAll();
   const ok=await write('tickets',t.id,t,base);
-  if(ok && msg){ lastUndo=before?{id:t.id,before,at:new Date().toISOString(),what:msg}:null; toast(msg,!!before); }
+  if(ok && msg){ lastUndo=before?{id:t.id,before,at:S._actAt||t.updatedAt,what:msg}:null; toast(msg,!!before); }
   return ok;
 }
 async function move(t0,to,opts){
   opts=opts||{}; const t=clone(t0), before=clone(S.tickets[t0.id]||t0);
+  if(!opts.rider) S._actAt=new Date().toISOString(); /* Undo takes back what this move set off (media requests, emails) from here on */
   const from=t.stage; t.stage=to; t.sub=opts.sub||''; t.stageSince=today(); t.state=to==='published'?'published':(t.state==='hold'?'active':t.state);
   if(to==='published'){ t.dates=t.dates||{}; t.dates.published=t.dates.published||today(); }
   Object.assign(t,opts.patch||{}); if(opts.dates){ t.dates=Object.assign(t.dates||{},opts.dates); }
@@ -2358,6 +2362,7 @@ async function move(t0,to,opts){
     if(grp.length>1) lastUndo={group:grp,at:grp[0].at}; }
   /* one stage email for a release: riders don't send their own */
   if(from!==to&&!opts.rider) notifyEnter(t,to);
+  if(!opts.rider){ if(lastUndo&&!lastUndo.at) lastUndo.at=S._actAt; S._actAt=null; }
   return t;
 }
 async function setSub(t0,sub,text,patch,note){
