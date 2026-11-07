@@ -1979,6 +1979,7 @@ p,.sub,.lede{text-wrap:pretty}
 .hh-note{font-size:12.5px;color:var(--ink-2);line-height:1.45}
 .hh-log{margin:0;padding-left:18px;font-size:12.5px;line-height:1.45}.hh-log li{margin-bottom:5px}
 @media(max-width:900px){.hh-grid,.hh-two{grid-template-columns:1fr}}
+.hh-ver{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:11.5px;color:var(--ink-2)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2052,6 +2053,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
+window.__mmsBuild={at:'2026-11-07T18:32:18Z',fp:'5b719d81'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7777,7 +7779,7 @@ VIEWS.health=function(){
   const errs=E.length?'<ol class="hh-log">'+E.slice(0,10).map(e=>'<li><b>'+esc(hWhen(e.at))+'</b> '+esc(e.msg)+(e.n>1?' <span class="muted">×'+e.n+'</span>':'')+'</li>').join('')+'</ol>':'<p class="muted" style="margin:0">None since this page was opened.</p>';
   const wk=addDays(today(),-7), team=Object.values(S.errlog||{}).filter(d=>d&&d.date>=wk).flatMap(d=>(d.items||[]).map(i=>Object.assign({who:d.who},i))).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
   const teamH=team.length?'<ol class="hh-log">'+team.slice(0,12).map(e=>'<li><b>'+esc(hWhen(e.at))+'</b> '+esc((e.who||'').split(' ')[0])+': '+esc(e.msg)+(e.n>1?' <span class="muted">×'+e.n+'</span>':'')+'</li>').join('')+'</ol>':'<p class="muted" style="margin:0">No errors logged by anyone in the last 7 days.</p>';
-  return '<div class="pagehead slim"><div><h1>System Health</h1><div class="sub">Checked '+esc(hWhen(H.at))+'; it checks again every 5 minutes while the MMS is open.</div></div><div class="acts"><button class="btn" id="hh-copy" type="button">Copy Report</button><button class="btn pri" id="hh-again" type="button">Check Again</button></div></div>'+
+  return '<div class="pagehead slim"><div><h1>System Health</h1><div class="sub">Checked '+esc(hWhen(H.at))+'; it checks again every 5 minutes while the MMS is open.'+(window.__mmsBuild?' <span class="hh-ver" title="When this version of the MMS was built, and its fingerprint">Version '+esc(hWhen(window.__mmsBuild.at))+' · '+esc(window.__mmsBuild.fp)+'</span>':'')+'</div></div><div class="acts"><button class="btn" id="hh-copy" type="button">Copy Report</button><button class="btn pri" id="hh-again" type="button">Check Again</button></div></div>'+
     '<div class="card hh-sum '+(bad?'bad':warn?'warn':'ok')+'"><span class="hh-big">'+esc(head)+'</span><span class="muted">'+(bad||warn?'Each line below says what’s wrong and who fixes it.':'Every part the MMS depends on answered normally.')+'</span></div>'+
     '<div class="hh-grid">'+R.filter(r=>r.k!=='errs').map(rowH).join('')+'</div>'+
     '<div class="hh-two"><div class="card"><h3>Storage</h3>'+bars+'<p class="muted hh-note">Each file can hold about 1 MB. Emails are filed by month, so none fills up.</p></div>'+
@@ -7792,7 +7794,7 @@ counts=function(){ _countsH(); const b=$('#nav-healthbtn'); if(b) b.hidden=!S.is
 const _wireH=wireMain;
 wireMain=function(m){ _wireH(m); if(S.view!=='health') return;
   const a=$('#hh-again',m); if(a) a.onclick=async()=>{ ghRunAt=0; await hGhRun(); hCheck(); toast('Checked just now'); };
-  const c=$('#hh-copy',m); if(c) c.onclick=async()=>{ const H=S.health; const txt='MMS System Health, '+hWhen(H.at)+'\n\n'+H.rows.map(r=>(r.level==='bad'?'RED':r.level==='warn'?'YELLOW':'OK')+'  '+r.label+': '+r.text+(r.who&&r.level!=='ok'&&r.level!=='info'?' (Who fixes it: '+r.who+')':'')).join('\n')+((window.__mmsErrs||[]).length?'\n\nErrors on this page:\n'+window.__mmsErrs.map(e=>e.at+' '+e.msg).join('\n'):'');
+  const c=$('#hh-copy',m); if(c) c.onclick=async()=>{ const H=S.health; const txt='MMS System Health, '+hWhen(H.at)+(window.__mmsBuild?' (version '+window.__mmsBuild.fp+')':'')+'\n\n'+H.rows.map(r=>(r.level==='bad'?'RED':r.level==='warn'?'YELLOW':'OK')+'  '+r.label+': '+r.text+(r.who&&r.level!=='ok'&&r.level!=='info'?' (Who fixes it: '+r.who+')':'')).join('\n')+((window.__mmsErrs||[]).length?'\n\nErrors on this page:\n'+window.__mmsErrs.map(e=>e.at+' '+e.msg).join('\n'):'');
     try{ await navigator.clipboard.writeText(txt); toast('Report copied'); }catch(e){ toast('Couldn’t copy'); } }; };
 (function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); hLogEnsure(); hGhRun().then(hCheck); hCheck(); setInterval(()=>{ hGhRun().then(hCheck); },5*60000); setTimeout(hLogTidy,60000); },500); })();
 
