@@ -980,15 +980,15 @@ const PIP_WHAT=["IIF","Membership Dues","Renewal","Other"];
 function invState(v){if(v.paidBy)return {paid:true,d:String(v.paidAt||"").slice(0,10),how:"Marked paid by "+String(v.paidByName||"the desk").split(" ")[0]+(v.paidAt?" on "+fmt(String(v.paidAt).slice(0,10)):"")+(v.paidNote?" · "+v.paidNote:"")};
  const a=INVPAID[v.id];if(a)return {paid:true,auto:true,d:a.d,how:"Paid in Aptify, "+money(a.n)+" by "+fmt(a.d)};return {paid:false};}
 function pipRows(){const open=INV.filter(v=>!v.archived&&!invState(v).paid).map(v=>({src:"inv",v,name:v.name,lender:!!v.lender,amount:+v.amount||0,d:v.date||"",what:v.what||"",num:v.number||""}));
- const has=p=>open.some(r=>!r.lender&&((r.v.cid&&String(r.v.cid)===String(p.cid))||slug(r.name)===slug(p.name)));
- const ren=PIP.filter(p=>!has(p)).map(p=>({src:"m360",p,name:p.name,lender:false,amount:+p.amount||0,d:"",what:(p.level?p.level+" ":"")+"renewal · "+p.stage,num:""}));
+ const has=p=>open.some(r=>!!r.lender===!!p.lender&&((r.v.cid&&String(r.v.cid)===String(p.cid))||slug(r.name)===slug(p.name)));
+ const ren=PIP.filter(p=>!has(p)).map(p=>({src:"m360",p,name:p.name,lender:!!p.lender,amount:+p.amount||0,d:"",what:(p.level?p.level+" ":"")+(p.kind==="new"?"new member":"renewal")+" · "+p.stage,num:"",kind:p.kind||"renewal"}));
  return open.concat(ren).sort((a,b)=>String(a.d||"9999").localeCompare(String(b.d||"9999"))||a.name.localeCompare(b.name));}
 const pipSum=L=>L.reduce((s,r)=>s+(r.amount||0),0);
 function pipBadge(){const n=pipRows().length,nb=$("nb-pip");if(nb){nb.textContent=n||"";nb.hidden=!n;}}
 function pipRow(r){const age=r.d?Math.max(0,days(r.d,TODAY)):null;
  return h("button",{type:"button",class:"row r2",style:"--k:"+(r.lender?"#f0b94a":"#5fd39a"),onclick:()=>openInv(r)},h("span",{class:"dot"}),
   h("span",{class:"nm",title:r.name},r.name,h("small",null,[r.amount?money(r.amount):"",r.what,r.d?"invoiced "+fmt(r.d):"",r.src==="m360"?"from Member 360":""].filter(Boolean).join(" · "))),
-  h("span",{class:"age"+(age!=null&&age>30?" late":"")},age==null?"Renewal":age===0?"Today":age+(age===1?" day":" days")));}
+  h("span",{class:"age"+(age!=null&&age>30?" late":"")},age==null?(r.kind==="new"?"New Member":"Renewal"):age===0?"Today":age+(age===1?" day":" days")));}
 function renderPip(){const L=pipRows(),len=L.filter(r=>r.lender),non=L.filter(r=>!r.lender);
  const paid=INV.filter(v=>!v.archived&&invState(v).paid&&days(invState(v).d||TODAY,TODAY)<=60).sort((a,b)=>String(invState(b).d).localeCompare(String(invState(a).d)));
  const old=L.filter(r=>r.d).sort((a,b)=>a.d.localeCompare(b.d))[0];
@@ -1036,9 +1036,9 @@ function openInv(r){cur=r||{add:true};const B=$("pane-b");B.textContent="";const
    h("div",{class:"acts"},go,h("button",{type:"button",class:"btn ghost",onclick:closePane},"Cancel"),say))));
   $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");setTimeout(()=>nm.focus(),240);return;}
  const age=r.d?Math.max(0,days(r.d,TODAY)):null;$("pane-t").textContent=r.name;
- if(r.src==="m360"){const p=r.p;$("pane-s").textContent="Non-Lender renewal · from Member 360";
-  B.appendChild(h("div",{class:"sect"},h("h3",null,"The Renewal"),kv([["Company",p.name],["Aptify Company ID",p.cid||"Not recorded"],["Level",p.level],["Dues",p.amount?money(p.amount):""],["Stage in Member 360",p.stage],["Relationship Owner",p.owner||"Unassigned"]])));
-  B.appendChild(h("div",{class:"sect"},h("h3",null,"How It Comes Off"),h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)"},"This renewal is "+p.stage+" in Member 360, so it shows here on its own. It comes off when Member 360 moves it on, which it does when the payment reaches Aptify. Nothing to enter here.")));
+ if(r.src==="m360"){const p=r.p;$("pane-s").textContent=(p.kind==="new"?(p.lender?"Lender":"Non-Lender")+" new member":"Non-Lender renewal")+" · from Member 360";
+  B.appendChild(h("div",{class:"sect"},h("h3",null,p.kind==="new"?"The New Member":"The Renewal"),kv([["Company",p.name],["Aptify Company ID",p.cid||"Not recorded"],["Level",p.level],["Dues",p.amount?money(p.amount):""],["Stage in Member 360",p.stage],["Relationship Owner",p.owner||"Unassigned"]])));
+  B.appendChild(h("div",{class:"sect"},h("h3",null,"How It Comes Off"),h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)"},(p.kind==="new"?"This prospect is ":"This renewal is ")+p.stage+" in Member 360, so it shows here on its own. It comes off when Member 360 moves it on, which it does when the payment reaches Aptify. Nothing to enter here.")));
   $("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");return;}
  const v=r.v,s=invState(v);$("pane-s").textContent=(v.lender?"Lender":"Non-Lender")+" invoice · "+(s.paid?"paid":(age==null?"not paid yet":"waiting "+age+(age===1?" day":" days")));
  B.appendChild(h("div",{class:"sect"},h("h3",null,"The Invoice"),kv([["Company",v.name],["Aptify Company ID",v.cid||"Not entered"],["Lender or Non-Lender",v.lender?"Lender":"Non-Lender"],["What It's For",v.what],["Amount",money(+v.amount||0)],["Invoice Date",fmt(v.date)],["Invoice or Order Number",v.number],["Added By",(v.byName||"")+(v.at?", "+fmt(String(v.at).slice(0,10)):"")],["Note",v.note]])));
