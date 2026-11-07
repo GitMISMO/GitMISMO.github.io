@@ -2,6 +2,8 @@
 <html lang="en" data-rs-gate>
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<!-- the page safety list: the only places this page may load code from or send data to -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws https://*.environment.api.powerplatform.com https://*.logic.azure.com https://api.github.com; frame-src 'self' blob: data:; object-src 'none'; base-uri 'self'; form-action 'self'">
 <title>MMS · MISMO Manufacturing System</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
@@ -1980,6 +1982,9 @@ p,.sub,.lede{text-wrap:pretty}
 .hh-log{margin:0;padding-left:18px;font-size:12.5px;line-height:1.45}.hh-log li{margin-bottom:5px}
 @media(max-width:900px){.hh-grid,.hh-two{grid-template-columns:1fr}}
 .hh-ver{display:inline-block;margin-left:8px;padding:1px 8px;border-radius:10px;background:var(--surface);border:1px solid var(--border);font-size:11.5px;color:var(--ink-2)}
+.tr-list{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+.tr-row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px}
+.tr-row .muted{font-size:12px;margin-top:2px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2053,7 +2058,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-07T18:32:18Z',fp:'5b719d81'};
+window.__mmsBuild={at:'2026-11-07T19:06:51Z',fp:'f1bc2662'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2068,6 +2073,8 @@ window.__mmsErrs=window.__mmsErrs||[]; window.__mmsNet=window.__mmsNet||{};
     try{ window.dispatchEvent(new Event('mms-err')); }catch(e){} }
   window.addEventListener('error',e=>add('error',e.message||(e.error&&e.error.message),(e.filename||'')+(e.lineno?':'+e.lineno:'')));
   window.addEventListener('unhandledrejection',e=>{ const r=e.reason; add('promise',(r&&(r.message||r.code))||String(r||'')); });
+  /* anything the page safety list (Content-Security-Policy) blocks shows up here, so a missed address is found at once */
+  document.addEventListener('securitypolicyviolation',e=>add('blocked','Blocked by the page safety list: '+(e.blockedURI||'')+' ('+(e.violatedDirective||e.effectiveDirective||'')+')'));
   window.__mmsErrAdd=add;
   const NET=window.__mmsNet, real=window.fetch.bind(window);
   function kindOf(u){ u=String(u||''); const N=(window.__mms&&window.__mms.notify)||{};
@@ -2078,6 +2085,8 @@ window.__mmsErrs=window.__mmsErrs||[]; window.__mmsNet=window.__mmsNet||{};
     if(/\/mms-feed\//.test(u)) return 'feed';
     if(/\/im-review\/(data|file)\//.test(u)) return 'im';
     if(/\/awg-review\/(data|file)\//.test(u)) return 'awg';
+    if(/\/elections-hq\/data\//.test(u)) return 'elections';
+    if(/\/meeting-trackers\/data\//.test(u)) return 'mt';
     if(/\/mms\/data\//.test(u)) return 'data';
     return ''; }
   window.fetch=function(input,init){ const u=typeof input==='string'?input:(input&&input.url)||''; const k=kindOf(u);
@@ -2516,7 +2525,7 @@ async function doUndo(){
   for(const x of L){ const cur=S.tickets[x.id]; const b=clone(x.before); hist(b,'Undid the last change'+(x.what?' ('+x.what+')':''));
     S.tickets[b.id]=b; await write('tickets',b.id,b,cur); }
   if(since){ for(const m of Object.values(S.media||{})) if(m&&ids.includes(m.ticket)&&m.status==='Requested'&&(m.at||'')>=since){ const y=Object.assign({},m,{status:'Canceled',note:'Undone'}); S.media[y.id]=y; await write('media',y.id,y); }
-    for(const [id,d] of Object.entries(S.outbox||{})) if(d&&ids.includes(d.ticket)&&(d.at||'')>=since){ if(d.status==='Queued'||d.status==='Held'){ await remove('outbox',id); delete S.outbox[id]; } else if(d.status==='Sent') kept++; } }
+    for(const [id,d] of Object.entries(S.outbox||{})) if(d&&ids.includes(d.ticket)&&(d.at||'')>=since){ if(d.status==='Queued'||d.status==='Held'){ if(typeof setAside==='function') await setAside('outbox',id,d,'Taken back by Undo'); await remove('outbox',id); delete S.outbox[id]; } else if(d.status==='Sent') kept++; } }
   renderAll(); toast(kept?'Undone. '+kept+' email'+(kept===1?' had':'s had')+' already gone out.':'Undone');
 }
 function modal(o){
@@ -7127,10 +7136,10 @@ wireMain=function(m){ _wireMainHelp(m);
 /* Notifications: delete one email or the whole list shown (staff) */
 const _wireMainMail=wireMain;
 wireMain=function(m){ _wireMainMail(m);
-  $$('[data-mdel]',m).forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const id=b.dataset.mdel; delete S.outbox[id]; S.mailSel=''; await remove('outbox',id); toast('Email deleted'); renderAll(); });
+  $$('[data-mdel]',m).forEach(b=>b.onclick=async e=>{ e.stopPropagation(); const id=b.dataset.mdel; if(typeof setAside==='function') await setAside('outbox',id,S.outbox[id],'Deleted from Notifications'); delete S.outbox[id]; S.mailSel=''; await remove('outbox',id); toast('Email deleted. Notifications › Recently Deleted can put it back.'); renderAll(); });
   const da=$('#mdelall',m); if(da) da.onclick=async()=>{ const ids=(S._mailL||[]).slice(); if(!ids.length) return;
-    const ok=await modal({title:'Delete '+ids.length+' Email'+(ids.length===1?'':'s')+'?',body:'<p style="margin:0">They come off the Notifications list for good. Nothing is sent.</p>',ok:'Delete'}); if(!ok) return;
-    for(const id of ids){ delete S.outbox[id]; await remove('outbox',id); } S.mailSel=''; toast(ids.length+' deleted'); renderAll(); };
+    const ok=await modal({title:'Delete '+ids.length+' Email'+(ids.length===1?'':'s')+'?',body:'<p style="margin:0">They come off the Notifications list. Nothing is sent. For 60 days, Recently Deleted can put them back.</p>',ok:'Delete'}); if(!ok) return;
+    for(const id of ids){ if(typeof setAside==='function') await setAside('outbox',id,S.outbox[id],'Deleted from Notifications'); delete S.outbox[id]; await remove('outbox',id); } S.mailSel=''; toast(ids.length+' deleted'); renderAll(); };
 };
 window.__mmsMail={queue:m=>queueMail(m),held:()=>mailHeld()};
 window.__mmsRv={readFile:f=>rvReadFile(f),editorChecks:(r,c)=>rvEditorChecks(r,c),aiEditor:(r,c)=>rvAiEditor(r,c,()=>{}),build:(k,t,r,f,a,c)=>rvBuildReport(k,t,r,f,a,c),show:r=>rvShow(r),html:(r,w)=>rvReportHtml(r,w),expected:t=>rvExpectedBoiler(t)};
@@ -7724,7 +7733,10 @@ function hRows(){
   else row('hub','Initiative Hub','ok','Checked '+hWhen(hb.okAt)+'. '+(S.hubBackAt?'Last wrote status back '+hWhen(S.hubBackAt)+'.':'Nothing to write back yet: no Hub request is in the MMS.'));
   /* comments, the website, files */
   const lc=(S.commentsAll||[])[0];
-  row('cmt','Public Comments','info',lc?'Last comment arrived '+hWhen(lc.submittedAt)+'.':'No comments have come in yet.');
+  const openCp=liveTickets().filter(t=>t.state==='active'&&t.stage==='comment'&&(!(t.dates||{}).commentStart||t.dates.commentStart<=today())).length;
+  const quiet=!lc||hAgoMin(lc.submittedAt)>30*1440;
+  if(openCp&&quiet&&relay) row('cmt','Public Comments','warn','No comments in 30 days while '+openCp+' work product'+(openCp===1?' is':'s are')+' open for comment. If people have commented, the comment form flow may have stopped.','Jonna (the flow’s owner)');
+  else row('cmt','Public Comments','info',lc?'Last comment arrived '+hWhen(lc.submittedAt)+'.':'No comments have come in yet.');
   const fsst=S.feedState||{};
   if(fsst.error==='UNKNOWN_PROJECT') row('feed','Website Feed','info','Not switched on yet: the website feed (mms-feed) still needs setting up on the save service. That’s on Perry’s list.');
   else if(fsst.error&&(!fsst.at||String(fsst.tried||'')>String(fsst.at))) row('feed','Website Feed','bad','The website’s Open for Comment list didn’t update ('+fsst.error+').','Perry');
@@ -7737,6 +7749,9 @@ function hRows(){
   [['im','IM Review Portal',S.imPortalQ],['awg','AWG Review Portal',S.awgPortalQ]].forEach(([k,label,q])=>{ const e=NET[k]||{}, waiting=Object.values(q||{}).filter(x=>x&&x.status!=='decided'&&!x.test).length;
     if(e.failAt&&(!e.okAt||e.failAt>e.okAt)) row(k,label,'bad','Couldn’t reach the portal'+(e.status?' (answered '+e.status+')':'')+'. Hand-offs and decisions wait until it answers.','Perry');
     else row(k,label,e.okAt?'ok':'info',e.okAt?'Reachable. '+waiting+' waiting there.':'Not checked from this page yet.'); });
+  [['elections','Elections HQ','workgroup leaders',S.leaderSnap&&S.leaderSnap.at],['mt','Meeting Trackers','meeting schedules',null]].forEach(([k,label,what,at])=>{ const e=NET[k]||{};
+    if(e.failAt&&(!e.okAt||e.failAt>e.okAt)) row(k,label,'bad','Couldn’t read '+what+(e.status?' (answered '+e.status+')':'')+'. The MMS keeps the last copy it had.','Perry, or '+label+'’s Claude');
+    else row(k,label,e.okAt?'ok':'info',e.okAt?'Read '+what+' '+hWhen(e.okAt)+'.':(at?'Last read '+hWhen(at)+'.':'Not read from this page yet.')); });
   const ai=NET.ai||{};
   if(ai.limitAt&&hAgoMin(ai.limitAt)<60) row('ai','AI Review','warn','Hit its hourly limit at '+hWhen(ai.limitAt)+'. Reviews can be run again shortly.','Perry (raise the limit)');
   else if(ai.failAt&&(!ai.okAt||ai.failAt>ai.okAt)) row('ai','AI Review','bad','Didn’t answer'+(ai.status?' ('+ai.status+')':'')+'.','Perry');
@@ -7831,6 +7846,37 @@ async function ssMove(){
   }catch(e){ return 'fail'; }
 }
 (function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); setTimeout(()=>{ if(S.autoOn) ssMove(); },20000); },1000); })();
+
+/* ---------- Recently Deleted: nothing a person deletes is gone for good (Nov 7, 2026) ----------
+   Emails deleted from Notifications, and queued emails that Undo takes back, are set aside in "trash" for 60 days
+   and can be put back from Notifications › Recently Deleted. (Automatic tidying of old sent emails and logs is a
+   retention rule, not a person deleting, so it isn't kept.) */
+S.trash=S.trash||{}; let trSub=false;
+function trEnsure(){ if(trSub||!(Store.db||Store.mem)) return; trSub=true; try{ Store.sub('trash',o=>{ S.trash=o||{}; if(S.view==='outbox') renderAll(); }); }catch(e){} }
+function trKey(coll,id){ return (coll+'__'+id).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,150); }
+async function setAside(coll,id,doc,why){
+  if(!doc) return; trEnsure(); const d=clone(doc); if(d.html&&d.html.length>20000) d.html='';   /* keeps the file small; the words stay */
+  const t={coll,id,data:d,why:why||'Deleted',by:(S.me&&S.me.name)||'',at:new Date().toISOString()};
+  const k=trKey(coll,id); S.trash[k]=t; try{ await Store.set('trash',k,t); }catch(e){} }
+async function trRestore(k){ const t=S.trash[k]; if(!t) return false;
+  if(t.coll==='outbox'){ S.outbox[t.id]=t.data; await write('outbox',t.id,t.data); }
+  else await write(t.coll,t.id,t.data);
+  delete S.trash[k]; try{ await Store.del('trash',k); }catch(e){} return true; }
+async function trTidy(){ if(!S.isStaff||!S.canWrite||S.partial) return; const cut=Date.now()-60*864e5;
+  const all=Object.entries(S.trash||{}).sort((a,b)=>String(b[1].at||'').localeCompare(String(a[1].at||'')));
+  for(const [k,t] of all.filter(([k,t],i)=>i>=300||Date.parse(t.at||0)<cut)) try{ await Store.del('trash',k); delete S.trash[k]; }catch(e){} }
+async function trOpen(){ trEnsure();
+  const L=Object.entries(S.trash||{}).filter(([k,t])=>t&&t.coll==='outbox').sort((a,b)=>String(b[1].at||'').localeCompare(String(a[1].at||'')));
+  const body=L.length?'<p class="muted" style="margin:0 0 10px;font-size:12.5px">Kept 60 days. Putting one back returns it to Notifications as it was; an email that hadn’t gone yet will send once email is on.</p><div class="tr-list">'+L.slice(0,60).map(([k,t])=>'<div class="tr-row"><div><b>'+esc(t.data.subject||'(no subject)')+'</b><div class="muted">'+esc(t.why)+(t.by?' by '+esc(t.by):'')+' · '+esc(hWhen(t.at))+'</div></div><button class="btn sm" type="button" data-trput="'+esc(k)+'">Put Back</button></div>').join('')+'</div>':'<p class="muted" style="margin:0">Nothing has been deleted in the last 60 days.</p>';
+  const p=modal({title:'Recently Deleted Emails',body,ok:'Done',cancel:'Close'});
+  $$('#modal-root [data-trput]').forEach(b=>b.onclick=async()=>{ b.disabled=true; const ok=await trRestore(b.dataset.trput); if(ok){ b.closest('.tr-row').remove(); toast('Put back in Notifications'); renderAll(); } else b.disabled=false; });
+  await p; }
+const _vOutboxTr=VIEWS.outbox;
+VIEWS.outbox=function(){ trEnsure(); const h=_vOutboxTr(); if(!S.isStaff) return h; const n=Object.values(S.trash||{}).filter(t=>t&&t.coll==='outbox').length;
+  return h.replace('<div class="acts">','<div class="acts"><button class="btn" id="tropen" type="button">Recently Deleted'+(n?' ('+n+')':'')+'</button> '); };
+const _wireTr=wireMain;
+wireMain=function(m){ _wireTr(m); const b=$('#tropen',m); if(b) b.onclick=()=>trOpen(); };
+(function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); setTimeout(()=>{ if(S.isStaff){ trEnsure(); setTimeout(trTidy,30000); } },15000); },1000); })();
 
 /* ---------- settings ---------- */
 let setTab='process';
