@@ -1,0 +1,49 @@
+name: Summit Agenda Feed (Summit Agenda page)
+
+# Reads Summit HQ's website agenda (General Sessions and Workshop running order, with speakers)
+# and updates summit-agenda/agenda.json and the headshots in summit-agenda/photos/.
+# The Summit Agenda page reads that file. A summit appears only once "Show on the Website Agenda"
+# is on for it in Summit HQ; until then the page keeps what is typed on it.
+# Needs a token that can read GitMISMO/summit-hq-data: SUMMIT_DATA_TOKEN if set,
+# otherwise SPONSOR_DATA_TOKEN (the "Summit Sponsor Feed" token).
+
+on:
+  schedule:
+    - cron: '7,37 11-23 * * 1-5'   # weekdays, every 30 minutes about 6 AM to 7 PM ET
+    - cron: '7 11 * * 0,6'         # weekends, once in the morning
+  workflow_dispatch:
+  push:
+    paths:
+      - 'summit-agenda/build-agenda.mjs'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: summit-agenda-feed
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Read Summit HQ and build agenda.json
+        run: node summit-agenda/build-agenda.mjs
+        env:
+          SUMMIT_DATA_TOKEN: ${{ secrets.SUMMIT_DATA_TOKEN || secrets.SPONSOR_DATA_TOKEN }}
+      - name: Commit if changed
+        run: |
+          if [ -n "$(git status --porcelain summit-agenda/)" ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+            git add -A summit-agenda/
+            git commit -m "Summit agenda: update from Summit HQ"
+            git pull --rebase
+            git push
+          else
+            echo "No change."
+          fi
