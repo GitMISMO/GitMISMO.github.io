@@ -1,6 +1,7 @@
 // Summit sponsor feed for the website.
 // Reads the Sponsorship Portal records (private GitMISMO/sponsorship-data, data/applications.json)
-// and writes sponsors/winter-2027.json: name, tier, link, logo and what each sponsor is sponsoring.
+// and writes one file per 2027 summit (sponsors/winter-2027.json, spring-2027.json, fall-2027.json):
+// name, tier, link, logo and what each sponsor is sponsoring.
 // No contacts, amounts or payment details are published.
 // The Summit home, Sponsors and Agenda pages read this file (Nav Behavior module __mmSpons).
 //
@@ -11,11 +12,14 @@ import fs from 'node:fs';
 
 const TOKEN = process.env.SPONSOR_DATA_TOKEN || '';
 const SRC = 'https://api.github.com/repos/GitMISMO/sponsorship-data/contents/data/applications.json';
-const OUT = 'sponsors/winter-2027.json';
-const SUMMIT = '2027 Winter Summit';
-const EVENTS = ['2027 Series', 'Winter 2027'];
 const SHOW = ['Paid', 'Approved', 'Pending Payment', 'In Kind'];
-const SEASON = 'Winter'; // which summit of the series this feed is for
+// One feed per summit of the 2027 Series. A Series record counts toward every summit unless its custom
+// package lists only some of them; a single-summit record ("Winter 2027") counts toward that summit only.
+const SUMMITS = [
+  { season: 'Winter', summit: '2027 Winter Summit', out: 'sponsors/winter-2027.json', events: ['2027 Series', 'Winter 2027'] },
+  { season: 'Spring', summit: '2027 Spring Summit', out: 'sponsors/spring-2027.json', events: ['2027 Series', 'Spring 2027'] },
+  { season: 'Fall', summit: '2027 Fall Summit', out: 'sponsors/fall-2027.json', events: ['2027 Series', 'Fall 2027'] },
+];
 const TIERS = { PLATINUM: 'Platinum', GOLD: 'Gold', SILVER: 'Silver', BRONZE: 'Bronze' };
 const HL = 'https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/';
 
@@ -76,12 +80,16 @@ async function main() {
   const r = await fetch(SRC, { headers: { authorization: `Bearer ${TOKEN}`, accept: 'application/vnd.github.raw', 'user-agent': 'mismo-sponsor-feed' } });
   if (!r.ok) throw new Error(`Could not read the Portal records (${r.status}). The token needs read access to GitMISMO/sponsorship-data.`);
   const docs = (await r.json()).docs || {};
+  for (const S of SUMMITS) build(S, docs);
+}
+
+function build({ season: SEASON, summit: SUMMIT, out: OUT, events: EVENTS }, docs) {
   const seen = new Map();
   for (const a of Object.values(docs)) {
     if (!EVENTS.includes(a.event) || !SHOW.includes(a.status)) continue;
     // A 2027 Series record with a custom package covers only the summits listed in it, each at its
     // own tier, opportunity and day (Connections Map: "Reading Sponsorship Portal records").
-    // A Spring & Fall package has no Winter line, so it is not a Winter sponsor.
+    // For example a Spring & Fall package has no Winter line, so it is not a Winter sponsor.
     let level = a.level2027, opp = a.opportunity, day = a.day;
     const lines = (Array.isArray(a.custom) ? a.custom : (a.custom && typeof a.custom === 'object' ? Object.values(a.custom) : [])).filter((c) => c && c.s);
     if (a.event === '2027 Series' && lines.length) {
@@ -108,11 +116,12 @@ async function main() {
   let prev = null;
   try { prev = JSON.parse(fs.readFileSync(OUT, 'utf8')); } catch {}
   if (prev && JSON.stringify({ ...prev, updated: undefined }) === JSON.stringify({ ...body, updated: undefined })) {
-    console.log('No change.');
+    console.log(`${SUMMIT}: no change.`);
     return;
   }
   fs.mkdirSync('sponsors', { recursive: true });
   fs.writeFileSync(OUT, JSON.stringify({ updated: new Date().toISOString(), ...body }, null, 1) + '\n');
+  console.log(`${SUMMIT}: ${sponsors.length} sponsors`);
   for (const s of sponsors) console.log(`${s.tier.padEnd(8)} ${s.name}${s.logo ? '' : '  (no logo yet)'}${s.placements.map((p) => '  · ' + p.day + ' ' + p.title).join('')}`);
 }
 
