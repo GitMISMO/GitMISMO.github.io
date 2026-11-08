@@ -34,3 +34,30 @@ jobs:
           MMS_DATA_TOKEN: ${{ secrets.MMS_DATA_TOKEN }}
           MMS_MAIL_KEY: ${{ secrets.MMS_MAIL_KEY }}
         run: node .github/mms-robot/robot.mjs
+  facilitators:
+    # names only, for other systems (Summit HQ): resources.mismo.org/mms/facilitators.json, changed only when the list changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            mms
+            .github/mms-robot
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Publish the facilitator list
+        env:
+          MMS_DATA_TOKEN: ${{ secrets.MMS_DATA_TOKEN }}
+        run: |
+          node .github/mms-robot/publish-facilitators.mjs
+          if git diff --quiet -- mms/facilitators.json && git ls-files --error-unmatch mms/facilitators.json >/dev/null 2>&1; then exit 0; fi
+          git config user.name "MMS Robot"
+          git config user.email "workrequests@mismo.org"
+          git add mms/facilitators.json
+          git commit -q -m "MMS: facilitator list for other systems"
+          for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep $((i*5)); done
+          exit 1
