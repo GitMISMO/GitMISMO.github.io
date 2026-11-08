@@ -1,0 +1,80 @@
+{
+ "updated": "2026-11-08T02:02:34.672Z",
+ "summit": "2027 Fall Summit",
+ "source": "Sponsorship Portal",
+ "sponsors": [
+  {
+   "name": "Factual Data",
+   "tier": "Platinum",
+   "url": "https://www.factualdata.com",
+   "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/fdlogo3f573562e07844af9b9962043e03b7a4.png",
+   "placements": []
+  },
+  {
+   "name": "ICE Mortgage Technology",
+   "tier": "Platinum",
+   "url": "https://www.icemortgagetechnology.com",
+   "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/ice_mt_primary_logo.jpg",
+   "placements": []
+  },
+  {
+   "name": "Xactus",
+   "tier": "Platinum",
+   "url": "https://xactus.com",
+   "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/xactus_logo_color_rgb_pos.png?sfvrsn=5e2eeb00_1",
+   "placements": [
+    {
+     "title": "Evening Reception",
+     "type": "Networking",
+     "match": "Reception",
+     "order": 5,
+     "day": "Tuesday"
+    }
+   ]
+  },
+  {
+   "name": "Dark Matter Technologies",
+   "tier": "Gold",
+   "url": "https://dmatter.com",
+   "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/dark-matter-technologies-logo-stacked6fa6033e932640bfb486c1edc3c7c9f2.png",
+   "placements": []
+  },
+  {
+   "name": "Optimal Blue",
+   "tier": "Gold",
+   "url": "https://www.optimalblue.com",
+   "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/ob-logo-2025-_horizontal-color_-_2_.png",
+   "placements": []
+  },
+  {
+   "name": "FICO",
+   "tier": "Bronze",
+   "url": "https://www.fico.com",
+   "logo": "https://resources.mismo.org/sponsors/logos/fico.png",
+   "placements": [
+    {
+     "title": "Afternoon Snack Break",
+     "type": "Break",
+     "match": "Afternoon",
+     "order": 4,
+     "day": "Tuesday"
+    }
+   ]
+  },
+  {
+   "name": "First American",
+   "tier": "Bronze",
+   "url": "https://www.firstam.com",
+   "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/first-american-logo.png",
+   "placements": [
+    {
+     "title": "Morning Coffee Break",
+     "type": "Break",
+     "match": "Morning Break",
+     "order": 2,
+     "day": "Tuesday"
+    }
+   ]
+  }
+ ]
+}
