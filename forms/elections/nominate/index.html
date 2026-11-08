@@ -448,7 +448,7 @@ var EF = (function(){
       '<fieldset><legend id="ef-stlg">A few words for the ballot</legend><div class="field wide"><label for="ef-statement">Why this person is a good fit <span class="efn">(a few sentences; shown to voters)</span></label><textarea id="ef-statement" name="statement" rows="4" maxlength="1200"></textarea></div></fieldset>'+
       '<fieldset><legend>Before you send it</legend><label class="ack"><input type="checkbox" name="ack"> <span>The nominee works for a MISMO member company and can take part in the meetings this role needs.</span></label></fieldset>'+
       '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>'+
-      '<button class="btn pri" type="submit" id="ef-go">Send the Nomination</button><div class="err" id="ef-err" role="alert"></div></form>';
+      '<div class="efn" style="margin:0 0 12px">Who sees this: the MISMO staff running the election. If the nomination is accepted and the nominee agrees, their name, company, title and statement appear on the public ballot.</div><button class="btn pri" type="submit" id="ef-go">Send the Nomination</button><div class="err" id="ef-err" role="alert"></div></form>';
     var f=el.querySelector("form");
     function seatBox(){
       var cy=radio(f,"cycle"); var x=open.filter(function(o){ return o.cycle===cy; })[0]; var box=f.querySelector("#ef-seat"); var fs=f.querySelector("#ef-seatbox");
@@ -483,7 +483,7 @@ var EF = (function(){
         nominee:{first:val(f,"first"), last:val(f,"last"), email:val(f,"email"), company:val(f,"company"), title:val(f,"title")},
         self:self, nominator: self?null:{name:val(f,"byFirst")+" "+val(f,"byLast"), email:val(f,"byEmail"), company:val(f,"byCompany")},
         aware: self?"yes":(radio(f,"aware")||"no"), statement:val(f,"statement"), submittedAt:new Date().toISOString(),
-        hp: !!val(f,"website") || (Date.now()-started)<4000};
+        hp: !!val(f,"website")};
       var b=f.querySelector("#ef-go"); b.disabled=true; b.textContent="Sending…";
       Promise.resolve(cfg.submit(rec)).then(function(){
         el.innerHTML='<div class="ef">'+hero+'<div class="done"><b>Thank you. Your nomination is in.</b>MISMO staff will review it and confirm with '+(self?"you":e(rec.nominee.first))+' before the ballot goes out. Questions? Write to elections@mismo.org.<div style="margin-top:12px"><button class="btn" type="button" id="ef-again">Nominate Someone Else</button></div></div></div>';
@@ -503,7 +503,7 @@ var EF = (function(){
       '<fieldset><legend>About you</legend><div class="fgrid">'+fld("first","First Name","text",true,"given-name")+fld("last","Last Name","text",true,"family-name")+fld("email","Work Email","email",true,"email")+fld("company","Company","text",true,"organization")+fld("title","Job Title","text",false,"organization-title")+'</div></fieldset>'+
       (multi?'<fieldset><legend>Which '+GL+' are you voting in?</legend><div class="field"><select name="group" id="ef-g" required><option value="">Choose one</option>'+sl.groups.map(function(g){ return '<option>'+e(g.name)+'</option>'; }).join("")+'</select></div><div class="efn" style="margin-top:6px">Taking part in more than one? Send one ballot for each.</div></fieldset>':'')+
       '<fieldset><legend>Your votes</legend><div id="ef-seats">'+(multi?'<div class="efn">Choose the '+GL+' first.</div>':'')+'</div></fieldset>'+
-      '<fieldset><legend>Before you send it</legend><label class="ack"><input type="checkbox" name="ack"> <span>I\'m casting this ballot for my company, and my company is sending only one'+(sl.type==="aof"?' for this '+GL:'')+'.</span></label></fieldset>'+
+      '<fieldset><legend>Before you send it</legend><label class="ack"><input type="checkbox" name="ack"> <span>I\'m casting this ballot for my company, and my company is sending only one'+(sl.type==="aof"?' for this '+GL:'')+'.</span></label><div class="efn" style="margin-top:8px">Who sees this: the MISMO staff running the election see your ballot, including your choices. It is used only to count votes and confirm one vote per company.</div></fieldset>'+
       '<div class="hp" aria-hidden="true"><label>Leave this empty<input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>'+
       '<button class="btn pri" type="submit" id="ef-go">Cast My Ballot</button><div class="err" id="ef-err" role="alert"></div></form>';
     var f=el.querySelector("form");
@@ -529,7 +529,7 @@ var EF = (function(){
       [].forEach.call(f.querySelectorAll(".seatq[data-seat]"),function(q){ var picks=[].map.call(q.querySelectorAll("input:checked"),function(i){ return i.value; }).filter(function(v){ return v!=="abstain"; }); choices[q.dataset.seat]=picks; if(q.querySelector("input:checked")) any=true; });
       if(!any) return void(er.textContent="Choose at least one person. Leave a position blank if you don't want to vote for it.");
       if(!val(f,"ack")) return void(er.textContent="Please tick the box before sending.");
-      var rec={id:id("v"), kind:"ballot", cycle:sl.cycle, group:g, voter:{first:val(f,"first"), last:val(f,"last"), email:val(f,"email"), company:val(f,"company"), title:val(f,"title")}, code:cfg.code||"", choices:choices, submittedAt:new Date().toISOString(), hp: !!val(f,"website") || (Date.now()-started)<4000};
+      var rec={id:id("v"), kind:"ballot", cycle:sl.cycle, group:g, voter:{first:val(f,"first"), last:val(f,"last"), email:val(f,"email"), company:val(f,"company"), title:val(f,"title")}, code:cfg.code||"", choices:choices, submittedAt:new Date().toISOString(), hp: !!val(f,"website")};
       var b=f.querySelector("#ef-go"); b.disabled=true; b.textContent="Sending…";
       Promise.resolve(cfg.submit(rec)).then(function(){
         el.innerHTML='<div class="ef">'+hero+'<div class="done"><b>Thank you. Your ballot is in.</b>Results will be announced '+(sl.announce?e(fmt(sl.announce)):"soon")+'.'+(multi?'<div style="margin-top:12px"><button class="btn" type="button" id="ef-again">Vote in Another '+GL+'</button></div>':'')+'</div></div>';
