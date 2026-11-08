@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-06",
+ "updated": "2026-11-08",
  "source": "Member 360",
  "lender": {
   "Chair": [
@@ -282,10 +282,6 @@
     "logo": "https://resources.mismo.org/champions/logos/arch-mortgage-insurance-company-a56aadc3.jpg"
    },
    {
-    "name": "Consolidated Analytics, Inc.",
-    "logo": "https://resources.mismo.org/champions/logos/consolidated-analytics-inc-4e708e77.png"
-   },
-   {
     "name": "Enact",
     "logo": "https://resources.mismo.org/champions/logos/enact-11f51d57.png"
    },
@@ -336,12 +332,21 @@
     "logo": "https://resources.mismo.org/champions/logos/assurant-411dbcf0.png"
    },
    {
+    "name": "Asurity",
+    "website": "https://asurity.com",
+    "logo": "https://resources.mismo.org/champions/logos/asurity-3be3e5f3.png"
+   },
+   {
     "name": "BNY",
     "logo": "https://resources.mismo.org/champions/logos/bny-c28383b7.png"
    },
    {
     "name": "Brody Gapp LLP",
     "logo": "https://resources.mismo.org/champions/logos/brody-gapp-llp-b4b6afc8.png"
+   },
+   {
+    "name": "Consolidated Analytics, Inc.",
+    "logo": "https://resources.mismo.org/champions/logos/consolidated-analytics-inc-4e708e77.png"
    },
    {
     "name": "Copperlane",
@@ -354,6 +359,10 @@
    {
     "name": "Ernst & Young LLP",
     "logo": "https://resources.mismo.org/champions/logos/ernst-young-llp-e3c521ae.png"
+   },
+   {
+    "name": "Falcon Capital Advisors",
+    "logo": "https://resources.mismo.org/champions/logos/falcon-capital-advisors-02a07f2c.png"
    },
    {
     "name": "FICS",
