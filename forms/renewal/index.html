@@ -1244,6 +1244,13 @@ function boot(){
   }
   showWaiting("Opening your renewal\u2026", "One moment.", false);
   post("load").then(function(d){
+    /* A renewal page is open only while its renewal is going on (7 Nov 2026). A closed one carries
+       nothing about the company, so there is nothing to show but that. */
+    if (d && d.closed){
+      showWaiting("This renewal page is closed",
+        "It opens again when your next renewal comes round, and we will email you a new link then. If you need anything from a past renewal, email certifications@mismo.org.", false);
+      return;
+    }
     if (!d || d.error || !d.org) throw new Error(d && d.error || "no record");
     el("wait-wrap").hidden = true;
     el("form-wrap").hidden = false;
