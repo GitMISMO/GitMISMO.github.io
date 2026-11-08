@@ -851,6 +851,23 @@ function cdBuild(rows){const pick=(r,ks)=>{for(const k of ks){if(r[k]!=null&&r[k
   const latest=cs.map(x=>x.d).sort().pop()||"";
   return {data:{asOf:cdDate(now),total:cs.length,months,topicsY:tally("t"),channelY:tally("c"),byY:tally("b"),sameDay:same.length,closed:closed.length,list,latest,source:"Aptify view Member 360 - MISMO Cases (Case Category = MISMO)",writtenAt:now.toISOString(),writtenBy:((window.__deskMe&&window.__deskMe().name)||"")},left,inYear:Y.length,latest};}
 function cdLib(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((ok,no)=>{const s=document.createElement("script");s.src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js";s.onload=()=>ok(window.XLSX);s.onerror=()=>no(new Error("Couldn't load the Excel reader. Check the connection and try again."));document.head.appendChild(s);});}
+/* ---------- The weekly Aptify email brings in the cases by itself (Jonna, Nov 8, 2026) ----------
+   Reporting Services emails Member 360's weekly Aptify workbook (report Member360_AptifyPull), which has a MISMO Cases sheet
+   with the same columns as the Aptify view Member 360 - MISMO Cases. When a Desk administrator has the Desk open and that
+   email is newer than the cases shown here, the Desk reads the sheet and saves it exactly as Weekly Case Update would.
+   Dropping a file by hand still works, and a newer hand drop always wins. */
+async function caseAuto(){try{if(!(window.__deskAdmin&&window.__deskAdmin()))return;const RS=window.ResourcesSession,tk=RS&&RS.token?RS.token():"";if(!tk)return;
+  const R="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/member-360",H={headers:{Authorization:"Bearer "+tk},cache:"no-store"};
+  const g=await fetch(R+"/data/aptifypull",H);if(!g.ok)return;const j=await g.json(),d=((((j&&j.data)||{}).docs)||{})["aptifypull/main"];
+  if(!d||!d.ok||!d.path||!d.receivedAt)return;const c=D.cases||{};if(c.fromEmail===d.receivedAt||String(c.writtenAt||"")>=String(d.receivedAt))return;
+  const f=await fetch(R+"/file/"+d.path,H);if(!f.ok)return;const b=String(((await f.json())||{}).content||"").replace(/\s/g,"");if(!b)return;
+  const bin=atob(b),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  const X=await cdLib(),wb=X.read(u,{type:"array",cellDates:true}),ws=wb.Sheets["MISMO Cases"];if(!ws)return;
+  const r=cdBuild(X.utils.sheet_to_json(ws,{defval:""}));
+  r.data.writtenBy="the weekly Aptify email";r.data.fromEmail=d.receivedAt;r.data.source="Reporting Services report Member360_AptifyPull, sheet MISMO Cases (Case Category = MISMO)";
+  await window.__deskSaveCases(r.data);D.cases=r.data;
+ }catch(e){console.error("weekly cases",e);}}
+setTimeout(caseAuto,8000);
 function caseDrop(){const box=$("case-drop");if(!box)return;box.hidden=!(window.__deskAdmin&&window.__deskAdmin());if(box.hidden||box.dataset.ready)return;box.dataset.ready="1";
   const msg=h("div",{class:"cd-msg"}),inp=h("input",{type:"file",accept:".xlsx,.xls,.csv",hidden:""}),pick=h("button",{type:"button",class:"link",style:"margin:0"},"choose the file"),zone=h("div",{class:"cd-zone"},h("b",null,"Drop this week's case export here"),h("span",null,"or ",pick));
   let pend=null;const act=h("div",{class:"cd-act",hidden:""});
