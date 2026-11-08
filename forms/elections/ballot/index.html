@@ -324,7 +324,7 @@ input.t[aria-invalid="true"]{border-color:var(--f-bad);background:var(--f-bad-so
 .ef .opt.on{border-color:var(--navy-mid);background:var(--accent-soft)}
 .ef .seatq{padding:14px 0;border-top:1px solid var(--rule)}
 .ef .seatq:first-of-type{border-top:0;padding-top:0}
-.ef .seatq h4{margin:0 0 8px;font-size:15px}
+.ef .seatq h4{margin:0 0 8px;font-size:15px;display:flex;align-items:baseline;gap:6px}
 .ef .seatq h4 small{font-weight:500;color:var(--ink-3);margin-left:6px}
 .ef .ack{display:flex;gap:10px;align-items:flex-start;font-size:14px}
 .ef .ack input{margin:3px 0 0;width:16px;height:16px;flex:0 0 auto}
@@ -428,7 +428,7 @@ var EF = (function(){
   function radio(root,n){ var x=root.querySelector('[name="'+n+'"]:checked'); return x?x.value:""; }
   function fld(name,label,type,req,extra){ return '<div class="field"><label for="ef-'+name+'">'+e(label)+(req?'':' <span class="efn">(optional)</span>')+'</label><input id="ef-'+name+'" name="'+name+'" type="'+(type||"text")+'" autocomplete="'+(extra||"off")+'"'+(req?' required':'')+'></div>'; }
   var LONG={aof:"Area of Focus Co-Chairs", domain:"Business Domain Leadership", goc:"Governance Committee", board:"Board of Directors"};
-  var WHAT={aof:"Two Co-Chairs for each Area of Focus", domain:"A Chair and a Vice Chair for each Business Domain (a company may lead only one domain)", goc:"The five members who confirm MISMO's process was followed", board:"Recommend someone for MISMO's Board of Directors"};
+  var WHAT={aof:"Two Co-Chairs for each Area of Focus", domain:"A Chair and a Vice Chair for each Business Domain (a company may hold one Chair and one Vice Chair across all eight)", goc:"The five members who confirm MISMO's process was followed", board:"Recommend someone for MISMO's Board of Directors"};
   function fmt(s){ var m=String(s||"").match(/^(\d{4})-(\d{2})-(\d{2})/); if(!m) return ""; var d=new Date(+m[1],+m[2]-1,+m[3]); return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getDay()]+", "+["January","February","March","April","May","June","July","August","September","October","November","December"][d.getMonth()]+" "+d.getDate(); }
 
   function nominate(el, cfg){
@@ -509,12 +509,13 @@ var EF = (function(){
     function draw(g){ var box=f.querySelector("#ef-seats"); if(!g){ box.innerHTML='<div class="efn">Choose the '+GL+' first.</div>'; return; }
       var seats=g.seats.filter(function(s){ return s.nominees.length; }); if(!seats.length){ box.innerHTML='<div class="efn">There are no confirmed nominees on this ballot yet.</div>'; return; }
       box.innerHTML=seats.map(function(s){ var many=s.count>1;
-        return '<div class="seatq" data-seat="'+e(s.id)+'" data-count="'+s.count+'"><h4>'+e(s.position)+'<small>'+(many?'vote for up to '+s.count:'vote for one')+'</small></h4><div class="opts">'+
+        return '<div class="seatq" data-seat="'+e(s.id)+'" data-count="'+s.count+'"><h4>'+e(s.position)+'<small>'+(many?'vote for up to '+s.count:'vote for one')+'</small><button type="button" data-clear="'+e(s.id)+'" style="margin-left:auto;background:none;border:0;padding:0 2px;font:inherit;font-size:13px;color:#1a74b8;text-decoration:underline;cursor:pointer">Clear</button></h4><div class="opts">'+
           s.nominees.map(function(n){ return '<label class="opt"><input type="'+(many?"checkbox":"radio")+'" name="s_'+e(s.id)+'" value="'+e(n.id)+'"><span><b>'+e(n.name)+'</b><small>'+e([n.title,n.company].filter(Boolean).join(", "))+'</small>'+(n.statement?'<small style="margin-top:6px">'+e(n.statement)+'</small>':'')+'</span></label>'; }).join("")+
           '</div></div>'; }).join(""); }
     if(allIn) draw(ALL); else if(!multi) draw(sl.groups[0]);
     else { var gs=f.querySelector("#ef-g"); gs.onchange=function(){ draw(sl.groups.filter(function(g){ return g.name===gs.value; })[0]); };
       if(cfg.group && sl.groups.some(function(g){ return g.name===cfg.group; })){ gs.value=cfg.group; gs.onchange(); } }
+    f.addEventListener("click",function(ev){ var b=ev.target.closest&&ev.target.closest("[data-clear]"); if(!b) return; ev.preventDefault(); var q=b.closest(".seatq"); [].forEach.call(q.querySelectorAll("input"),function(i){ i.checked=false; }); [].forEach.call(q.querySelectorAll(".opt"),function(o){ o.classList.remove("on"); }); });
     f.addEventListener("change",function(ev){ var t=ev.target; if(t.type==="checkbox" && t.name.indexOf("s_")===0){ var q=t.closest(".seatq"), max=+q.dataset.count; if(t.value==="abstain" && t.checked) [].forEach.call(q.querySelectorAll("input"),function(i){ if(i!==t) i.checked=false; }); else { var ab=q.querySelector('input[value="abstain"]'); if(ab && t.checked) ab.checked=false; var on=q.querySelectorAll("input:checked"); if(on.length>max){ t.checked=false; f.querySelector("#ef-err").textContent="You can choose up to "+max+" for "+q.querySelector("h4").firstChild.textContent+"."; } } }
       [].forEach.call(f.querySelectorAll(".opt"),function(o){ var i=o.querySelector("input"); o.classList.toggle("on",!!(i&&i.checked)); }); });
     f.addEventListener("submit",function(ev){
@@ -573,5 +574,3 @@ var EF = (function(){
 </script>
 </body>
 </html>
-
-<!-- Elections HQ ballot · closes at the set time (November 6, 2026) -->
