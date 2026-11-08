@@ -337,6 +337,11 @@ input.t[aria-invalid="true"]{border-color:var(--f-bad);background:var(--f-bad-so
 .ef .err{color:var(--bad);font-size:14px;margin-top:10px}
 .ef .done{padding:24px 22px;border:1px solid var(--good);background:var(--good-soft);border-radius:8px}
 .ef .done b{font-size:17px;display:block;margin-bottom:4px}
+.ef .rcpt{margin-top:16px;padding:14px 16px;border:1px solid var(--line,#d5dde5);background:var(--card,#fff);border-radius:6px}
+.ef .rcpt .rn{font-size:14px}.ef .rcpt .rn b{display:inline;font-size:16px;letter-spacing:.06em;margin:0 0 0 6px}
+.ef .rcpt ul{margin:10px 0;padding:0;list-style:none}.ef .rcpt li{padding:6px 0;border-top:1px solid var(--line,#e3e8ee);font-size:14px}.ef .rcpt li span{display:block;font-size:12px;opacity:.75}
+.ef .rcpt .rh{font-size:13px;opacity:.85;margin-bottom:10px}
+@media print{.ef .hero,.ef #ef-again,.ef #ef-print{display:none}}
 .ef .closed{padding:22px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2)}
 </style>
 </head>
@@ -531,9 +536,15 @@ var EF = (function(){
       if(!val(f,"ack")) return void(er.textContent="Please tick the box before sending.");
       var rec={id:id("v"), kind:"ballot", cycle:sl.cycle, group:g, voter:{first:val(f,"first"), last:val(f,"last"), email:val(f,"email"), company:val(f,"company"), title:val(f,"title")}, code:cfg.code||"", choices:choices, submittedAt:new Date().toISOString(), hp: !!val(f,"website")};
       var b=f.querySelector("#ef-go"); b.disabled=true; b.textContent="Sending…";
+      /* the receipt: what they chose, read from the ballot itself */
+      var mine=[].map.call(f.querySelectorAll(".seatq[data-seat]"),function(q){ var hd=q.querySelector("h4"); var who=[].map.call(q.querySelectorAll("input:checked"),function(i){ var o=i.closest(".opt"); var nm=o&&o.querySelector("b"); return (nm?nm.textContent:(o?o.textContent:i.value)).trim(); });
+        return {pos:(hd&&hd.firstChild?hd.firstChild.textContent:"").trim(), who:who}; }).filter(function(x){ return x.who.length; });
+      var rno=String(rec.id).toUpperCase().replace(/^(.{4})(.{4})/,"$1-$2-");
+      var receipt='<div class="rcpt"><div class="rn">Receipt number <b>'+e(rno)+'</b></div><ul>'+mine.map(function(x){ return '<li><span>'+e(x.pos)+'</span>'+e(x.who.join(", "))+'</li>'; }).join("")+'</ul><div class="rh">Keep this number. If you have a question about your ballot, send it to elections@mismo.org.</div><button class="btn" type="button" id="ef-print">Print This Receipt</button></div>';
       Promise.resolve(cfg.submit(rec)).then(function(){
-        el.innerHTML='<div class="ef">'+hero+'<div class="done"><b>Thank you. Your ballot is in.</b>Results will be announced '+(sl.announce?e(fmt(sl.announce)):"soon")+'.'+(multi?'<div style="margin-top:12px"><button class="btn" type="button" id="ef-again">Vote in Another '+GL+'</button></div>':'')+'</div></div>';
+        el.innerHTML='<div class="ef">'+hero+'<div class="done"><b>Thank you. Your ballot is in.</b>Results will be announced '+(sl.announce?e(fmt(sl.announce)):"soon")+'.'+receipt+(multi?'<div style="margin-top:12px"><button class="btn" type="button" id="ef-again">Vote in Another '+GL+'</button></div>':'')+'</div></div>';
         var a=el.querySelector("#ef-again"); if(a) a.onclick=function(){ ballot(el,cfg); };
+        var pr=el.querySelector("#ef-print"); if(pr) pr.onclick=function(){ window.print(); };
         if(cfg.onDone) cfg.onDone(rec);
       },function(err){ b.disabled=false; b.textContent="Cast My Ballot"; er.textContent="That didn't go through. Please try again, or email elections@mismo.org."+(err&&err.message?" ("+err.message+")":""); });
     });
