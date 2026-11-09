@@ -1,15 +1,15 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CMSP &amp; AMSP Path Sections (Preview)</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap"><style>body{margin:0;font-family:"IBM Plex Sans",sans-serif;background:#fff} .nav{height:64px;background:#071d2e;color:#fff;display:flex;align-items:center;padding:0 40px;font-weight:800;font-size:24px} .nav b{color:#74bfeb} .wrap{max-width:1120px;margin:0 auto;padding:40px 24px 70px} .sep{margin:70px 0 0;border-top:1px dashed #cfdeeb;padding-top:12px;color:#6c899f;font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase}</style></head><body><div class="nav">MI<b>S</b>MO</div><div class="wrap">
 <style>
 /* MISMO professional certification path (Perry, 9 Nov 2026). Everything is scoped to .mpath; no scripts. */
-.mpath{--ink:#0f314c;--text:#44607a;--blue:#1a8fe3;--blue-ink:#1a74b8;--line:#cfdeeb;--tint:#e3f1fc;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.55;max-width:1120px}
+.mpath{--ink:#0d314c;--text:#44607a;--blue:#1a8fe3;--blue-ink:#1a74b8;--line:#cfdeeb;--tint:#e3f1fc;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.6;max-width:1120px}
 .mpath *{box-sizing:border-box}
-.mpath .ey{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
-.mpath h2.t{font-size:38px;line-height:1.12;margin:6px 0 0;font-weight:700;color:var(--ink)}
+.mpath .ey{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+.mpath h2.t{font-size:38px;line-height:1.2;margin:6px 0 0;font-weight:700;color:var(--ink)}
 .mpath .rule{width:76px;height:4px;border-radius:2px;background:linear-gradient(90deg,#1a8fe3,#74bfeb);margin:14px 0 18px}
 .mpath .lede{color:var(--text);font-size:17px;max-width:780px;margin:0}
 .mpath input.tb{position:absolute;opacity:0;pointer-events:none}
-.mpath .tabs{display:inline-flex;gap:4px;background:#eef5fb;border:1px solid var(--line);border-radius:999px;padding:4px;margin:22px 0 8px}
-.mpath .tabs label{padding:8px 18px;border-radius:999px;font-weight:600;font-size:14.5px;color:var(--text);cursor:pointer}
+.mpath .tabs{display:inline-flex;gap:4px;background:#eef5fb;border:1px solid var(--line);border-radius:8px;padding:4px;margin:22px 0 8px}
+.mpath .tabs label{padding:8px 18px;border-radius:6px;white-space:nowrap;font-weight:600;font-size:14.5px;color:var(--text);cursor:pointer}
 .mpath #mpc-a:checked ~ .tabs label[for=mpc-a],.mpath #mpc-b:checked ~ .tabs label[for=mpc-b]{background:var(--ink);color:#fff}
 .mpath #mpc-a:focus-visible ~ .tabs label[for=mpc-a],.mpath #mpc-b:focus-visible ~ .tabs label[for=mpc-b]{outline:2px solid #74bfeb;outline-offset:2px}
 .mpath .panel{display:none} .mpath #mpc-a:checked ~ .pa,.mpath #mpc-b:checked ~ .pb{display:block}
@@ -18,11 +18,11 @@
 .mpath .st .n{position:absolute;left:-23px;top:0;width:42px;height:42px;border-radius:50%;background:var(--tint);color:var(--blue-ink);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 0 0 1px var(--line)}
 .mpath .st.us .n{background:var(--ink);color:#fff}
 .mpath .st h3{font-size:18px;margin:0;font-weight:700;color:var(--ink)}
-.mpath .who{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:2px 9px;margin-left:10px;vertical-align:3px;background:var(--tint);color:var(--blue-ink)}
+.mpath .who{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;padding:2px 8px;margin-left:10px;vertical-align:3px;background:var(--tint);color:var(--blue-ink)}
 .mpath .st.us .who{background:var(--ink);color:#fff}
 .mpath .st p{margin:6px 0 0;color:var(--text);max-width:860px}
 .mpath .term{border-bottom:2px dotted var(--blue);color:var(--ink);font-weight:600;cursor:help;position:relative;outline:none}
-.mpath .term .tip{display:none;position:absolute;left:0;top:calc(100% + 10px);z-index:20;width:min(400px,80vw);background:var(--ink);color:#fff;border-radius:12px;padding:14px 16px;font-weight:400;font-size:14.5px;line-height:1.5;box-shadow:0 18px 40px -16px rgba(7,29,46,.6)}
+.mpath .term .tip{display:none;position:absolute;left:0;top:calc(100% + 10px);z-index:20;width:min(320px,80vw);background:var(--ink);color:#fff;border-radius:12px;padding:14px 16px;font-weight:400;font-size:14.5px;line-height:1.5;box-shadow:0 18px 40px -16px rgba(7,29,46,.6)}
 .mpath .term .tip b{color:#74bfeb;display:block;margin-bottom:4px} .mpath .term .tip a{color:#a9d8f3;font-weight:700}
 .mpath .term:hover .tip,.mpath .term:focus .tip,.mpath .term:focus-within .tip{display:block}
 .mpath .prices{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;max-width:720px}
@@ -45,15 +45,15 @@
 <div class="sep">The AMSP page</div>
 <style>
 /* MISMO professional certification path (Perry, 9 Nov 2026). Everything is scoped to .mpath; no scripts. */
-.mpath{--ink:#0f314c;--text:#44607a;--blue:#1a8fe3;--blue-ink:#1a74b8;--line:#cfdeeb;--tint:#e3f1fc;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.55;max-width:1120px}
+.mpath{--ink:#0d314c;--text:#44607a;--blue:#1a8fe3;--blue-ink:#1a74b8;--line:#cfdeeb;--tint:#e3f1fc;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.6;max-width:1120px}
 .mpath *{box-sizing:border-box}
-.mpath .ey{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
-.mpath h2.t{font-size:38px;line-height:1.12;margin:6px 0 0;font-weight:700;color:var(--ink)}
+.mpath .ey{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+.mpath h2.t{font-size:38px;line-height:1.2;margin:6px 0 0;font-weight:700;color:var(--ink)}
 .mpath .rule{width:76px;height:4px;border-radius:2px;background:linear-gradient(90deg,#1a8fe3,#74bfeb);margin:14px 0 18px}
 .mpath .lede{color:var(--text);font-size:17px;max-width:780px;margin:0}
 .mpath input.tb{position:absolute;opacity:0;pointer-events:none}
-.mpath .tabs{display:inline-flex;gap:4px;background:#eef5fb;border:1px solid var(--line);border-radius:999px;padding:4px;margin:22px 0 8px}
-.mpath .tabs label{padding:8px 18px;border-radius:999px;font-weight:600;font-size:14.5px;color:var(--text);cursor:pointer}
+.mpath .tabs{display:inline-flex;gap:4px;background:#eef5fb;border:1px solid var(--line);border-radius:8px;padding:4px;margin:22px 0 8px}
+.mpath .tabs label{padding:8px 18px;border-radius:6px;white-space:nowrap;font-weight:600;font-size:14.5px;color:var(--text);cursor:pointer}
 .mpath #mp-a:checked ~ .tabs label[for=mp-a],.mpath #mp-b:checked ~ .tabs label[for=mp-b]{background:var(--ink);color:#fff}
 .mpath #mp-a:focus-visible ~ .tabs label[for=mp-a],.mpath #mp-b:focus-visible ~ .tabs label[for=mp-b]{outline:2px solid #74bfeb;outline-offset:2px}
 .mpath .panel{display:none} .mpath #mp-a:checked ~ .pa,.mpath #mp-b:checked ~ .pb{display:block}
@@ -62,11 +62,11 @@
 .mpath .st .n{position:absolute;left:-23px;top:0;width:42px;height:42px;border-radius:50%;background:var(--tint);color:var(--blue-ink);font-weight:700;font-size:16px;display:flex;align-items:center;justify-content:center;border:3px solid #fff;box-shadow:0 0 0 1px var(--line)}
 .mpath .st.us .n{background:var(--ink);color:#fff}
 .mpath .st h3{font-size:18px;margin:0;font-weight:700;color:var(--ink)}
-.mpath .who{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:2px 9px;margin-left:10px;vertical-align:3px;background:var(--tint);color:var(--blue-ink)}
+.mpath .who{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;padding:2px 8px;margin-left:10px;vertical-align:3px;background:var(--tint);color:var(--blue-ink)}
 .mpath .st.us .who{background:var(--ink);color:#fff}
 .mpath .st p{margin:6px 0 0;color:var(--text);max-width:860px}
 .mpath .term{border-bottom:2px dotted var(--blue);color:var(--ink);font-weight:600;cursor:help;position:relative;outline:none}
-.mpath .term .tip{display:none;position:absolute;left:0;top:calc(100% + 10px);z-index:20;width:min(400px,80vw);background:var(--ink);color:#fff;border-radius:12px;padding:14px 16px;font-weight:400;font-size:14.5px;line-height:1.5;box-shadow:0 18px 40px -16px rgba(7,29,46,.6)}
+.mpath .term .tip{display:none;position:absolute;left:0;top:calc(100% + 10px);z-index:20;width:min(320px,80vw);background:var(--ink);color:#fff;border-radius:12px;padding:14px 16px;font-weight:400;font-size:14.5px;line-height:1.5;box-shadow:0 18px 40px -16px rgba(7,29,46,.6)}
 .mpath .term .tip b{color:#74bfeb;display:block;margin-bottom:4px} .mpath .term .tip a{color:#a9d8f3;font-weight:700}
 .mpath .term:hover .tip,.mpath .term:focus .tip,.mpath .term:focus-within .tip{display:block}
 .mpath .prices{margin-top:12px;border:1px solid var(--line);border-radius:12px;overflow:hidden;max-width:720px}

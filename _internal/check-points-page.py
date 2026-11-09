@@ -17,7 +17,9 @@ def ck(c, m, d=None): print(('PASS ' if c else 'FAIL ') + m + ('' if c or d is N
 with sync_playwright() as p:
     b = p.chromium.launch(); ctx = b.new_context(viewport={'width': 1280, 'height': 900}, color_scheme='dark'); pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
     pg.goto('http://127.0.0.1:8797/forms/points/index.html'); pg.wait_for_timeout(400)
-    ck(pg.evaluate("document.documentElement.getAttribute('data-theme') !== 'dark'") and pg.inner_text('#theme-btn') == 'Dark', 'light by default, even with the computer in dark mode')
+    ck(pg.evaluate("document.documentElement.getAttribute('data-theme') !== 'dark'") and not pg.query_selector('#theme-btn'), 'light, like the website, even with the computer in dark mode')
+    ck(pg.is_visible('header.mm-header') and pg.is_visible('.mm-nav') and 'Check Your' in pg.inner_text('h1'), 'the website’s header, menus and hero, from the page template')
+    ck(not pg.query_selector('link[href*="fonts.googleapis"]'), 'no web font: the site’s own font stack')
     pg.fill('#email', 'jordan.sample@example.com'); pg.click('#send1'); pg.wait_for_timeout(200)
     ck('isn’t open yet' in pg.inner_text('#e1'), 'until the flow is set up, step 1 says the calculator isn’t open yet')
     got = []
