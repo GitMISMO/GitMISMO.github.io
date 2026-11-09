@@ -1,0 +1,408 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CMSP &amp; AMSP Points Calculator | MISMO</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --navy:#0d314c; --navy-mid:#14486e; --sky:#74bfeb; --sky-soft:#94c8e9; --sky-wash:#e4f2fb;
+  --ground:#f1f6fa; --surface:#ffffff; --surface-2:#f6fafd; --surface-3:#e9f1f8;
+  --border:#d5e2ed; --border-strong:#adc4d6; --rule:#e5eef5;
+  --ink:#0d314c; --ink-2:#456179; --ink-3:#6f8ca3;
+  --good:#0f7b5c; --good-wash:#e3f3ec; --good-line:#b5ddca; --good-ink:#0b5c44;
+  --warn:#a2701a; --warn-wash:#fbf1de; --warn-line:#ecd3a3; --warn-ink:#7a5413;
+  --edu-wash:#f3ecdf; --edu-ink:#7a5413; --track:#e9f1f8; --pend:#adc4d6;
+  --btn-ink:#ffffff; --focus:#2477b8;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
+    --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
+    --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#86a8bf; --navy-mid:#7fc0ea; --sky-wash:#123143;
+    --good:#4fc79b; --good-wash:#0f3a31; --good-line:#1f6b55; --good-ink:#9fe3c8;
+    --warn:#e0a83c; --warn-wash:#3a2c12; --warn-line:#6b5220; --warn-ink:#f1d08f;
+    --edu-wash:#3a2c12; --edu-ink:#f1d08f; --track:#173c52; --pend:#2f6688;
+    --btn-ink:#06202f; --focus:#74bfeb;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
+  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
+  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#86a8bf; --navy-mid:#7fc0ea; --sky-wash:#123143;
+  --good:#4fc79b; --good-wash:#0f3a31; --good-line:#1f6b55; --good-ink:#9fe3c8;
+  --warn:#e0a83c; --warn-wash:#3a2c12; --warn-line:#6b5220; --warn-ink:#f1d08f;
+  --edu-wash:#3a2c12; --edu-ink:#f1d08f; --track:#173c52; --pend:#2f6688;
+  --btn-ink:#06202f; --focus:#74bfeb;
+  color-scheme:dark;
+}
+:root{box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*,*::before,*::after{box-sizing:inherit;}
+body{margin:0; background:var(--ground); color:var(--ink); font-family:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; font-size:15px; line-height:1.55; -webkit-font-smoothing:antialiased;}
+body::before{content:""; position:fixed; inset:0 0 auto; height:env(safe-area-inset-top,0px); z-index:10; background:#0d314c;}
+h1,h2{margin:0; font-weight:600; letter-spacing:-.012em;}
+h1{font-size:28px; line-height:1.2;} h2{font-size:17px;}
+a{color:var(--navy-mid);}
+:focus-visible{outline:3px solid var(--focus); outline-offset:2px; border-radius:6px;}
+.mast{background:#0d314c; color:#fff; padding:14px 22px; display:flex; align-items:center; gap:16px;}
+.plate{background:#fff; border-radius:5px; padding:9px 13px; display:flex; align-items:center; line-height:0;}
+.plate svg{height:24px; width:auto; display:block;}
+.mrule{width:1px; align-self:stretch; background:rgba(116,191,235,.4);}
+.mname{font-size:15px; font-weight:500; color:#a9d8f3;}
+.mright{margin-left:auto; display:flex; align-items:center; gap:14px;}
+.eyebrow{font-size:11px; letter-spacing:.11em; text-transform:uppercase; color:rgba(255,255,255,.62);}
+.theme-btn{background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.2); color:#fff; border-radius:5px; padding:5px 10px; font-size:11.5px; cursor:pointer; font-family:inherit; min-height:32px;}
+.theme-btn:hover{background:rgba(255,255,255,.18);}
+.proto{background:var(--sky-wash); border-bottom:1px solid var(--border); color:var(--ink-2); font-size:13px; padding:8px 22px; text-align:center;}
+.wrap{max-width:900px; margin:0 auto; padding:28px 20px 56px;}
+.steps{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:26px; list-style:none; padding:0;}
+.step{display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:10px 14px; font-size:13px; color:var(--ink-2); min-width:0;}
+.step b{display:block; color:var(--ink); font-size:13.5px; font-weight:600;}
+.step .tx{min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.step .n{width:26px; height:26px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:var(--surface-3); color:var(--navy-mid); font-weight:600; flex:0 0 auto; font-size:13px;}
+.step.done .n{background:var(--good); color:var(--btn-ink);}
+.step.cur{border-color:var(--navy-mid); box-shadow:0 0 0 2px rgba(116,191,235,.45);}
+.step.cur .n{background:var(--navy-mid); color:var(--btn-ink);}
+.sub{margin:6px 0 0; color:var(--ink-2); font-size:14.5px; max-width:70ch;}
+.card{background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:22px; margin-top:20px;}
+.field{margin-top:18px;}
+.field label{display:block; font-size:13px; font-weight:600; color:var(--ink-2); margin-bottom:6px;}
+input[type=email],input[type=text],select{width:100%; font-family:inherit; font-size:15px; padding:10px 12px; border:1px solid var(--border-strong); border-radius:8px; background:var(--surface); color:var(--ink); min-height:44px;}
+.inline{display:flex; gap:10px; align-items:stretch;} .inline input{flex:1; min-width:0;}
+.code-in{font-family:'IBM Plex Mono',monospace; letter-spacing:.3em; font-size:20px !important; max-width:220px;}
+.btns{display:flex; gap:10px; margin-top:22px; flex-wrap:wrap;}
+.btn{font-family:inherit; font-size:15px; font-weight:600; border-radius:9px; padding:10px 18px; cursor:pointer; min-height:44px; display:inline-flex; align-items:center; justify-content:center; gap:8px;}
+.btn.pri{background:var(--ink); color:var(--surface); border:1px solid var(--ink);}
+.btn.sec{background:var(--surface); color:var(--navy-mid); border:1px solid var(--border-strong);}
+.btn:disabled{opacity:.5; cursor:not-allowed;}
+.linkbtn{background:none; border:0; padding:0; font:inherit; color:var(--navy-mid); text-decoration:underline; cursor:pointer;}
+.err{color:#b3372c; font-size:13.5px; margin-top:8px; min-height:1px;}
+:root[data-theme="dark"] .err{color:#f08579;}
+.devcode{display:inline-block; margin-top:14px; background:var(--surface-2); border:1px dashed var(--border-strong); border-radius:8px; padding:8px 12px; font-size:13px; color:var(--ink-2);}
+.devcode b{font-family:'IBM Plex Mono',monospace; color:var(--ink); letter-spacing:.12em;}
+.lbl{font-size:13px; font-weight:600; color:var(--ink-2); margin-top:22px;}
+.seg{display:inline-flex; border:1px solid var(--border-strong); border-radius:9px; overflow:hidden; margin-top:8px; flex-wrap:wrap;}
+.seg button{font-family:inherit; font-size:14px; padding:9px 16px; border:0; background:var(--surface); color:var(--navy-mid); cursor:pointer; border-right:1px solid var(--border-strong); min-height:44px;}
+.seg button:last-child{border-right:0;}
+.seg button[aria-pressed="true"]{background:var(--ink); color:var(--surface); font-weight:600;}
+.banner{display:flex; gap:12px; align-items:flex-start; border-radius:10px; padding:13px 15px; border:1px solid;}
+.banner svg{flex:0 0 auto; margin-top:2px;}
+.banner.ok{background:var(--good-wash); border-color:var(--good-line); color:var(--good-ink);}
+.banner.short{background:var(--warn-wash); border-color:var(--warn-line); color:var(--warn-ink);}
+.meters{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:18px;}
+.meters.one{grid-template-columns:1fr;}
+.meter .t{display:flex; justify-content:space-between; font-size:13.5px; color:var(--ink-2); gap:8px;}
+.meter .t b{color:var(--ink); font-size:15px; font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums;}
+.bar{height:9px; border-radius:99px; background:var(--track); overflow:hidden; margin-top:6px; display:flex;}
+.bar i{display:block; height:100%; background:var(--good); transition:width .3s ease;}
+.bar i.short{background:var(--warn);} .bar i.p{background:repeating-linear-gradient(135deg,var(--pend) 0 4px,transparent 4px 8px);}
+.rows{margin-top:10px; border-top:1px solid var(--rule);}
+.row{display:grid; grid-template-columns:1fr 140px 112px 44px; align-items:center; gap:12px; padding:11px 2px; border-bottom:1px solid var(--rule); font-size:14.5px;}
+.row .w{font-weight:500;} .row .d{display:block; font-size:12.5px; color:var(--ink-3);}
+.row .src{font-size:12.5px; color:var(--ink-3);}
+.row .pts{text-align:right; font-weight:600; font-family:'IBM Plex Mono',monospace; font-variant-numeric:tabular-nums;}
+.chip{display:inline-block; font-size:11.5px; font-weight:600; border-radius:999px; padding:2px 9px; justify-self:start; white-space:nowrap;}
+.chip.p{background:var(--sky-wash); color:var(--navy-mid);} .chip.e{background:var(--edu-wash); color:var(--edu-ink);}
+.chip.wait{background:var(--warn-wash); color:var(--warn-ink); margin-left:6px;}
+details.more{margin-top:14px; border:1px solid var(--border); border-radius:9px; background:var(--surface-2);}
+details.more summary{cursor:pointer; padding:11px 14px; color:var(--navy-mid); font-weight:500; min-height:44px; display:flex; align-items:center; list-style:none;}
+details.more summary::-webkit-details-marker{display:none;}
+details.more summary::after{content:""; margin-left:auto; width:8px; height:8px; border-right:2px solid currentColor; border-bottom:2px solid currentColor; transform:rotate(45deg); transition:transform .2s;}
+details.more[open] summary::after{transform:rotate(-135deg);}
+details.more .rows{margin:0 14px 10px;}
+.grid3{display:grid; grid-template-columns:1.2fr 1.4fr .8fr; gap:10px;}
+.toast{position:fixed; left:50%; bottom:calc(20px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%); background:var(--ink); color:var(--surface); padding:11px 16px; border-radius:9px; font-size:14px; max-width:min(92vw,560px); box-shadow:0 6px 24px rgba(6,32,47,.25); z-index:20;}
+.how{margin-top:28px; font-size:13.5px; color:var(--ink-2);}
+.how summary{cursor:pointer; color:var(--navy-mid); font-weight:500;}
+.how ul{margin:10px 0 0; padding-left:20px;} .how li{margin:4px 0;}
+.hidden{display:none !important;}
+@media (max-width:640px){
+  .mast{padding:11px 16px; gap:11px;} .eyebrow{display:none;}
+  .steps{grid-template-columns:1fr;} .meters{grid-template-columns:1fr;}
+  .row{grid-template-columns:1fr auto; } .row .src{display:none;} .row .chip{grid-column:1;} .row .pts{grid-row:1 / span 2; grid-column:2;}
+  .grid3{grid-template-columns:1fr;} .inline{flex-direction:column;} h1{font-size:24px;}
+}
+@media (prefers-reduced-motion: reduce){ .bar i{transition:none;} }
+</style>
+</head>
+<body>
+__LOGO__
+<header class="mast">
+  <div class="plate"><svg role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"></use></svg></div>
+  <div class="mrule"></div>
+  <div class="mname">CMSP &amp; AMSP Points</div>
+  <div class="mright"><span class="eyebrow">Certification</span><button class="theme-btn" id="theme-btn" type="button">Dark</button></div>
+</header>
+<main class="wrap">
+  <ol class="steps" aria-label="Steps">
+    <li class="step" id="st1"><span class="n">1</span><span class="tx"><b>Your Email</b><span id="st1t">Where we send your points</span></span></li>
+    <li class="step" id="st2"><span class="n">2</span><span class="tx"><b>Your Inbox</b><span id="st2t">A personal link</span></span></li>
+    <li class="step" id="st3"><span class="n">3</span><span class="tx"><b>Your Points</b><span>From MISMO’s records</span></span></li>
+  </ol>
+
+  <section id="v1">
+    <h1>Check Your CMSP or AMSP Points</h1>
+    <p class="sub">We add up the points in MISMO’s records for you: Summits, webinars, Boot Camps, workgroup meetings and leadership roles. Enter the email you register for MISMO events with, and we’ll email you a personal link to your points.</p>
+    <div class="card">
+      <form id="f1" novalidate>
+        <div class="field" style="margin-top:0"><label for="email">Your Email</label><input id="email" type="email" autocomplete="email" required placeholder="name@company.com"></div>
+        <details class="more" id="oldbox" style="margin-top:12px"><summary>Used another email before?</summary>
+          <div class="field"><label for="oldin">Old Emails</label><input id="oldin" type="text" placeholder="old.name@previouscompany.com" autocomplete="off">
+          <p class="sub" style="margin:6px 0 0;font-size:13px">If you registered for MISMO events with a former work email, add it, separating more than one with commas. Its activities count once MISMO confirms they’re yours.</p></div></details>
+        <div class="err" id="e1" role="alert"></div>
+        <div class="btns" style="margin-top:14px"><button class="btn pri" type="submit" id="send1">Email Me My Points</button></div>
+      </form>
+    </div>
+  </section>
+
+  <section id="v2" class="hidden">
+    <h1>Check Your Inbox</h1>
+    <p class="sub">We’re sending a link to <b id="masked"></b>. It comes from certifications@mismo.org, usually within a couple of minutes, and opens your points.</p>
+    <div class="card">
+      <p class="sub" style="margin:0">Not there? Check your junk or spam folder. You can ask again up to five times a day.</p>
+      <div class="btns" style="margin-top:14px"><button class="btn sec" type="button" id="back1">Use a Different Email</button></div>
+    </div>
+  </section>
+
+  <section id="v3" class="hidden">
+    <h1 id="hello">Your Points</h1>
+    <p class="sub" id="hsub"></p>
+    <div class="lbl" id="seglbl">I’m Applying For</div>
+    <div class="seg" role="group" aria-labelledby="seglbl">
+      <button type="button" data-s="cmsp-new" aria-pressed="false">CMSP · New</button>
+      <button type="button" data-s="cmsp-ren" aria-pressed="true">CMSP · Renewal</button>
+      <button type="button" data-s="amsp-ren" aria-pressed="false">AMSP · Renewal</button>
+    </div>
+    <section class="card" aria-live="polite">
+      <div id="banner"></div>
+      <div id="meters"></div>
+      <h2 style="margin-top:24px" id="subhead">What You’ll Submit</h2>
+      <div class="rows" id="sel"></div>
+      <details class="more hidden" id="restbox"><summary id="restsum"></summary><div class="rows" id="rest"></div></details>
+    </section>
+
+    <section class="card">
+      <h2>Used Another Email Before?</h2>
+      <p class="sub">If you’ve registered for MISMO events with an old work email, ask again and add it under “Used another email before?” Its activities arrive as totals, marked for MISMO to confirm.</p>
+      <div class="btns" style="margin-top:4px"><button class="btn sec" type="button" id="askold">Ask Again with an Old Email</button></div>
+    </section>
+
+    <section class="card">
+      <h2>Something Missing?</h2>
+      <p class="sub">Some activities aren’t in MISMO’s records, such as articles, panels and Shorts. Add them here. MISMO checks them before they count.</p>
+      <form id="f5" novalidate>
+        <div class="grid3 field">
+          <div><label for="mcat">What You Did</label><select id="mcat"></select></div>
+          <div><label for="mwhat">Which One</label><input id="mwhat" type="text" placeholder="Name it the way MISMO would know it"></div>
+          <div><label for="mwhen">Date</label><input id="mwhen" type="text" placeholder="MM/DD/YYYY" inputmode="numeric"></div>
+        </div>
+        <div class="err" id="e5" role="status"></div>
+        <div class="btns" style="margin-top:12px"><button class="btn sec" type="submit">Add This Activity</button></div>
+      </form>
+    </section>
+
+    <div class="btns"><button class="btn pri" type="button" id="go"></button><button class="btn sec" type="button" id="restart">Check Another Email</button></div>
+
+    <details class="how"><summary>How Points Are Worked Out</summary>
+      <ul>
+        <li>CMSP, new: 100 points, at least 25 of them participation. Up to 75 education points count.</li>
+        <li>CMSP renewal: 25 points from the last 24 months, at least 15 of them participation.</li>
+        <li>AMSP renewal: 10 participation points from the last 24 months.</li>
+        <li>Summit: 4 participation points, once per Summit even if you registered in person and virtually. A registration counts once the event has happened.</li>
+        <li>Webinar or MISMO course: 2 points. The Digital Closing &amp; eMortgage Boot Camp: 3 points. Both count as education for CMSP and as participation for AMSP.</li>
+        <li>MISMO Boot Camp: 50 education points for CMSP, counted once.</li>
+        <li>Workgroup attendance: 3 participation points for each calendar year, January to December, in which you attended at least a third of a workgroup’s meetings, and for the past 12 months on the same rule, from Meeting Trackers. Where most of a group’s meetings are logged, the total is the meetings its schedule says it held; otherwise it’s the meetings logged. Either way a year needs at least 4 meetings, and one-off events don’t count as a workgroup year. Anything missing, add under “Something Missing?” A past year counts toward a renewal if it ended in the last 24 months.</li>
+        <li>Chair or vice chair: 10 participation points a year, from MISMO’s leadership list.</li>
+        <li>You only submit what you need: we pick the activities that meet the requirement with the fewest extra points, the most recent first.</li>
+      </ul>
+    </details>
+  </section>
+</main>
+<div class="toast hidden" id="toast" role="status"></div>
+<script type="application/json" id="data">__DATA__</script>
+<script>
+(function theme(){
+  var btn = document.getElementById("theme-btn");
+  function cur(){ return document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light"; }   /* light unless chosen (Perry, 6 Nov 2026) */
+  function paint(){ btn.textContent = cur() === "dark" ? "Light" : "Dark"; }
+  btn.addEventListener("click", function(){ document.documentElement.setAttribute("data-theme", cur() === "dark" ? "light" : "dark"); paint();
+    try{ localStorage.setItem("mismo.portal.theme", cur()); }catch(e){} });
+  try{ var saved = localStorage.getItem("mismo.portal.theme"); if(saved) document.documentElement.setAttribute("data-theme", saved); }catch(e){}
+  paint();
+})();
+(function app(){
+  /* Points calculator (Perry, 9 Nov 2026). Step 1 asks the certification system (through a Power Automate flow) to
+     email a personal link; cms-data's points.js sends it from certifications@mismo.org. The link carries the person's
+     own activities in its #fragment, which never reaches a server; nothing personal is on this page otherwise.
+     FLOW_ENDPOINT: the "MISMO Points - Request" flow's address; until it's set, step 1 says the calculator isn't open yet. */
+  var FLOW_ENDPOINT = '';
+  var B = null;
+  try { var mh = /[#&]d=([A-Za-z0-9_-]+)/.exec(location.hash); if (mh) { var b64 = mh[1].replace(/-/g, '+').replace(/_/g, '/'); while (b64.length % 4) b64 += '=';
+    B = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), function(c){ return c.charCodeAt(0); }))); if (!B || B.v !== 1) B = null; } } catch (e) { B = null; }
+  var AS_OF = B ? B.asOf : new Date().toISOString().slice(0, 10), EV = B ? B.a : [];
+  var REC = B ? { f: B.f, a: EV.map(function(_, i){ return i; }), w: B.w, l: B.l, amb: B.amb } : null;
+  /* another email's activities: dates and kinds only, so they show without names, waiting for MISMO to confirm */
+  function otherItems(scen){
+    var R = RULES[scen], since = R.months ? monthsBack(AS_OF, R.months) : '0000', edu = R.partOnly ? 'p' : 'e', bc = false, out = [];
+    ((B && B.o) || []).forEach(function(o){ var d = o[0], k = o[1]; if (d < since || d > AS_OF) return; var x = null;
+      if (k === 's') x = { pts: 4, cat: 'p', what: 'A Summit' }; else if (k === 'w') x = { pts: 2, cat: edu, what: 'A webinar or course' };
+      else if (k === 'd') x = { pts: 3, cat: edu, what: 'The Digital Closing & eMortgage Boot Camp' }; else if (k === 'g') x = { pts: 3, cat: 'p', what: 'A workgroup year' };
+      else if (k === 'l') x = { pts: 10, cat: 'p', what: 'A leadership role' }; else if (k === 'b' && R.name === 'CMSP' && !bc) { bc = true; x = { pts: 50, cat: 'e', what: 'MISMO Boot Camp' }; }
+      if (x) out.push({ label: x.what, detail: 'under your other email', date: d, pts: x.pts, cat: x.cat, src: 'Your other email', wait: true }); });
+    return out;
+  }
+  var RULES = {
+    'cmsp-new': { name: 'CMSP', verb: 'Application', rP: 25, rT: 100, cap: 75, months: 0, needTxt: 'A new CMSP needs 100 points, at least 25 of them participation (education counts up to 75).' },
+    'cmsp-ren': { name: 'CMSP', verb: 'Renewal', rP: 15, rT: 25, cap: Infinity, months: 24, needTxt: 'A CMSP renewal needs 25 points from the last 24 months, at least 15 of them participation.' },
+    'amsp-ren': { name: 'AMSP', verb: 'Renewal', rP: 10, rT: 10, cap: Infinity, months: 24, partOnly: true, needTxt: 'An AMSP renewal needs 10 participation points from the last 24 months.' }
+  };
+  var MANUAL = [['Board Member', 10, 'p'], ['Committee, Council or Forum Chair, or Workgroup Chair or Vice Chair', 10, 'p'], ['Information Management (IM) Representative', 5, 'p'],
+    ['Architecture Workgroup (AWG) Representative', 5, 'p'], ['Education Council Representative', 5, 'p'], ['MISMO Boot Camp Instructor', 5, 'p'], ['Developed a MISMO Webinar', 5, 'p'],
+    ['Authored a Published MISMO-Related Industry Article', 3, 'p'], ['Summit Presentation Panel', 2, 'p'], ['Industry Panel or Presentation on MISMO Topics', 2, 'p'],
+    ['Developed a MISMO Short', 1, 'p'], ['MISMO Ambassador During a Summit', 1, 'p']];
+  var S = { email: '', rec: null, code: '', scen: 'cmsp-ren', extra: [], manual: [], olds: {} };
+  var $ = function(id){ return document.getElementById(id); };
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function longDate(d){ var p = d.split('-'); return ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][+p[1]-1] + ' ' + (+p[2]) + ', ' + p[0]; }
+  function monthsBack(d, n){ var x = new Date(d + 'T12:00:00Z'); x.setUTCMonth(x.getUTCMonth() - n); return x.toISOString().slice(0, 10); }
+  async function hash(e){ var b = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(e.trim().toLowerCase()));
+    return Array.from(new Uint8Array(b)).map(function(x){ return x.toString(16).padStart(2, '0'); }).join('').slice(0, 20); }
+  function mask(e){ var p = e.split('@'); return (p[0] ? p[0][0] : '') + '•••@' + (p[1] || ''); }
+  var toastT; function toast(t){ var el = $('toast'); el.textContent = t; el.classList.remove('hidden'); clearTimeout(toastT); toastT = setTimeout(function(){ el.classList.add('hidden'); }, 4200); }
+  function setStep(n){ ['st1','st2','st3'].forEach(function(id, i){ var el = $(id); el.className = 'step' + (i + 1 < n ? ' done' : i + 1 === n ? ' cur' : '');
+      el.querySelector('.n').innerHTML = i + 1 < n ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>' : String(i + 1);
+      if (i + 1 === n) el.setAttribute('aria-current', 'step'); else el.removeAttribute('aria-current'); });
+    $('v1').classList.toggle('hidden', n !== 1); $('v2').classList.toggle('hidden', n !== 2); $('v3').classList.toggle('hidden', n !== 3); window.scrollTo(0, 0); }
+  /* every activity a record holds, for one scenario */
+  function itemsOf(rec, scen, pending, srcNote){
+    var R = RULES[scen], out = [], since = R.months ? monthsBack(AS_OF, R.months) : '0000';
+    var edu = R.partOnly ? 'p' : 'e', bcSeen = false;
+    (rec.a || []).slice().sort(function(x, y){ return EV[y][1] < EV[x][1] ? -1 : 1; }).forEach(function(i){
+      var e = EV[i], d = e[1]; if (d < since || d > AS_OF) return;
+      if (e[2] === 's') out.push({ label: e[0], date: d, pts: 4, cat: 'p', src: 'Summit registration' });
+      else if (e[2] === 'w') out.push({ label: e[0], date: d, pts: 2, cat: edu, src: 'Webinar registration' });
+      else if (e[2] === 'd') out.push({ label: e[0], date: d, pts: 3, cat: edu, src: 'Boot Camp registration' });
+      else if (e[2] === 'b' && R.name === 'CMSP' && !bcSeen) { bcSeen = true; out.push({ label: e[0], date: d, pts: 50, cat: 'e', src: 'Boot Camp, counted once' }); }
+    });
+    (rec.w || []).forEach(function(w){ if (w[5] < since || w[5] > AS_OF) return;
+      out.push({ label: w[0], grp: w[0], year: w[1], att: w[2], tot: w[3], later: w[4], date: w[5], pts: 3, cat: 'p', src: 'Meeting Trackers', wait: !!rec.amb }); });
+    (rec.l || []).forEach(function(l){ var d = l[2] + '-01-01'; if (d < since) return;
+      out.push({ label: l[0] + ', ' + l[1], detail: l[2] + ' · leadership list', date: d, pts: 10, cat: 'p', src: 'Leadership list', wait: !!rec.amb }); });
+    out.forEach(function(x){ if (pending) { x.wait = true; x.src = srcNote || x.src; } });
+    return out;
+  }
+  /* the fewest extra points that meet the requirement, then the fewest activities, newest first */
+  function knap(items, maxS){ var dp = []; dp[0] = { c: 0, ix: [] };
+    items.forEach(function(it, i){ for (var s = maxS - it.pts; s >= 0; s--) { var a = dp[s]; if (!a) continue; var b = dp[s + it.pts];
+      if (!b || a.c + 1 < b.c) dp[s + it.pts] = { c: a.c + 1, ix: a.ix.concat(i) }; } });
+    return dp; }
+  function pick(items, R){
+    var P = items.filter(function(x){ return x.cat === 'p'; }), E = items.filter(function(x){ return x.cat === 'e'; });
+    var byNew = function(a, b){ return a.date < b.date ? 1 : -1; }; P.sort(byNew); E.sort(byNew);
+    var maxS = R.rT + 60, dP = knap(P, maxS), dE = knap(E, maxS), best = null;
+    for (var sp = R.rP; sp <= maxS; sp++) { if (!dP[sp]) continue;
+      for (var se = 0; se <= maxS; se++) { if (!dE[se]) continue;
+        if (sp + Math.min(se, R.cap) >= R.rT) { var cost = sp + se, cnt = dP[sp].c + dE[se].c;
+          if (!best || cost < best.cost || (cost === best.cost && cnt < best.cnt)) best = { cost: cost, cnt: cnt, sel: dP[sp].ix.map(function(i){ return P[i]; }).concat(dE[se].ix.map(function(i){ return E[i]; })) };
+          break; } } }
+    return best ? best.sel : null;
+  }
+  function sums(sel, R){ var p = 0, e = 0; sel.forEach(function(x){ if (x.cat === 'p') p += x.pts; else e += x.pts; }); return { p: p, e: e, t: p + Math.min(e, R.cap) }; }
+  /* a workgroup's years show as one row: each year that counts, with its attendance (Perry, 3 Nov 2026) */
+  function merge(list){
+    var out = [], at = {};
+    list.forEach(function(x){
+      if (!x.grp) { out.push(x); return; }
+      var k = x.grp + (x.wait ? '|w' : ''), m = at[k];
+      if (!m) { m = at[k] = { label: x.grp, years: [], pts: 0, cat: 'p', src: 'Meeting Trackers', wait: x.wait, date: x.date }; out.push(m); }
+      m.years.push(x); m.pts += x.pts; if (x.date > m.date) m.date = x.date;
+    });
+    out.forEach(function(m){ if (!m.years) return; m.years.sort(function(a, b){ return a.year < b.year ? 1 : -1; });
+      m.detail = (m.years.length === 1 ? '1 year' : m.years.length + ' years') + ' at a third or more of meetings: ' + m.years.map(function(y){
+        return y.year + ' (' + y.att + ' of ' + y.tot + (y.later ? ', ' + y.later + ' still to come' : '') + ')'; }).join(', '); });
+    return out;
+  }
+  function rowHtml(x){
+    return '<div class="row"><span><span class="w">' + esc(x.label) + '</span>' + (x.wait ? '<span class="chip wait">Waiting for MISMO to Confirm</span>' : '') +
+      '<span class="d">' + esc(x.years ? x.detail : x.detail ? x.detail + ' · ' + longDate(x.date) : longDate(x.date)) + '</span></span>' +
+      '<span class="src">' + esc(x.src) + '</span><span class="chip ' + x.cat + '">' + (x.cat === 'p' ? 'Participation' : 'Education') + '</span><span class="pts">' + x.pts + '</span></div>';
+  }
+  function meter(label, have, need, pend, extra){
+    var w = Math.min(100, need ? have / need * 100 : 100), wp = Math.max(0, Math.min(100 - w, need ? pend / need * 100 : 0));
+    return '<div class="meter"><div class="t"><span>' + label + '</span><span><b>' + have + '</b> of ' + need + ' needed' + (extra || '') + '</span></div>' +
+      '<div class="bar" role="img" aria-label="' + label + ': ' + have + ' of ' + need + '"><i class="' + (have >= need ? '' : 'short') + '" style="width:' + w + '%"></i>' + (wp ? '<i class="p" style="width:' + wp + '%"></i>' : '') + '</div></div>';
+  }
+  var CHECK = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>';
+  var INFO = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>';
+  function render(){
+    var R = RULES[S.scen];
+    document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.s === S.scen ? 'true' : 'false'); });
+    var mine = S.rec ? itemsOf(S.rec, S.scen) : [];
+    var others = otherItems(S.scen);
+    var since = R.months ? monthsBack(AS_OF, R.months) : '0000';
+    var man = S.manual.filter(function(m){ return m.date >= since; }).map(function(m){ return { label: m.label, detail: m.what, date: m.date, pts: m.pts, cat: R.partOnly ? 'p' : m.cat, src: 'Added by you', wait: true }; });
+    var sure = mine.filter(function(x){ return !x.wait; }), waiting = mine.filter(function(x){ return x.wait; }).concat(others, man), all = sure.concat(waiting);
+    var sel = pick(sure, R), mode = 'ok';
+    if (!sel) { sel = pick(all, R); mode = sel ? 'pending' : 'short'; }
+    if (!sel) sel = all.slice();
+    var s = sums(sel, R), pend = sums(sel.filter(function(x){ return x.wait; }), R), sureS = { p: s.p - pend.p, t: s.t - pend.t };
+    var shown = merge(sel), n = shown.length, ban;
+    if (mode === 'ok') ban = '<div class="banner ok">' + CHECK + '<span><b>You have enough.</b> ' + R.needTxt + ' ' + (n === 1 ? 'This activity makes ' : 'These ' + n + ' activities make ') + (s.t === R.rT ? 'exactly ' : '') + s.t + '.</span></div>';
+    else if (mode === 'pending') ban = '<div class="banner short">' + INFO + '<span><b>You’ll have enough once MISMO confirms the activities marked below.</b> ' + R.needTxt + '</span></div>';
+    else { var needT = Math.max(0, R.rT - s.t), needP = Math.max(0, R.rP - s.p);
+      ban = '<div class="banner short">' + INFO + '<span><b>Not enough yet.</b> ' + R.needTxt + ' You need ' + (R.partOnly ? needP + ' more' : needT + ' more' + (needP ? ', at least ' + needP + ' of them participation' : '')) + '. Add activities that aren’t in our records below.</span></div>'; }
+    $('banner').innerHTML = ban;
+    $('meters').className = 'meters' + (R.partOnly ? ' one' : '');
+    $('meters').innerHTML = (R.partOnly ? '' : meter('Total', sureS.t, R.rT, pend.t, R.cap !== Infinity && s.e > R.cap ? ' (education counted up to ' + R.cap + ')' : '')) + meter('Participation', sureS.p, R.rP, pend.p);
+    $('subhead').textContent = mode === 'short' ? 'Counting Toward Your Points' : 'What You’ll Submit';
+    var order = function(a, b){ return (b.cat === 'p') - (a.cat === 'p') || (a.date < b.date ? 1 : -1); };
+    shown.sort(order);
+    $('sel').innerHTML = shown.length ? shown.map(rowHtml).join('') : '<p class="sub" style="padding:12px 2px">Nothing in MISMO’s records for this period yet.</p>';
+    var rest = merge(all.filter(function(x){ return sel.indexOf(x) < 0; })).sort(order);
+    $('restbox').classList.toggle('hidden', !rest.length);
+    $('restsum').textContent = 'Also on record, not needed: ' + rest.length + (rest.length === 1 ? ' activity' : ' activities');
+    $('rest').innerHTML = rest.map(rowHtml).join('');
+    $('go').textContent = 'Start My ' + R.name + ' ' + R.verb + (n && mode !== 'short' ? (n === 1 ? ' with This Activity' : ' with These ' + n) : '');
+  }
+  $('mcat').innerHTML = '<option value="">Choose an activity</option>' + MANUAL.map(function(m, i){ return '<option value="' + i + '">' + esc(m[0]) + ' (' + m[1] + ')</option>'; }).join('');
+  $('f1').addEventListener('submit', async function(ev){ ev.preventDefault(); var e = $('email').value.trim().toLowerCase();
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) { $('e1').textContent = 'Enter an email address, like name@company.com.'; $('email').focus(); return; }
+    var old = $('oldin').value.split(/[,;\s]+/).map(function(x){ return x.trim().toLowerCase(); }).filter(function(x){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x) && x !== e; }).slice(0, 5);
+    if (!FLOW_ENDPOINT) { $('e1').textContent = 'The calculator isn’t open yet. Email certifications@mismo.org and we’ll work out your points with you.'; return; }
+    $('e1').textContent = ''; $('send1').disabled = true; $('send1').textContent = 'Sending…';
+    try { var r = await fetch(FLOW_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: e, old: old.join(',') }) });
+      if (!r.ok) throw new Error(String(r.status)); }
+    catch (er) { $('e1').textContent = 'That didn’t go through. Try again in a minute, or email certifications@mismo.org.'; $('send1').disabled = false; $('send1').textContent = 'Email Me My Points'; return; }
+    $('send1').disabled = false; $('send1').textContent = 'Email Me My Points';
+    $('masked').textContent = mask(e); $('st1t').textContent = mask(e); setStep(2); $('back1').focus(); });
+  $('back1').addEventListener('click', function(){ setStep(1); $('email').focus(); });
+  document.querySelectorAll('.seg button').forEach(function(b){ b.addEventListener('click', function(){ S.scen = b.dataset.s; render(); }); });
+  $('askold').addEventListener('click', function(){ history.replaceState(null, '', location.pathname); B = null; $('oldbox').open = true; setStep(1); $('email').focus(); });
+  $('f5').addEventListener('submit', function(ev){ ev.preventDefault(); var i = $('mcat').value, what = $('mwhat').value.trim(), when = $('mwhen').value.trim();
+    var m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(when);
+    if (i === '' || !what || !m) { $('e5').textContent = 'Choose what you did, name it, and give the date as MM/DD/YYYY.'; return; }
+    var d = m[3] + '-' + ('0' + m[1]).slice(-2) + '-' + ('0' + m[2]).slice(-2);
+    if (d > AS_OF) { $('e5').textContent = 'Give a date that has already passed.'; return; }
+    var c = MANUAL[+i]; S.manual.push({ label: c[0], what: what, date: d, pts: c[1], cat: c[2] });
+    $('mcat').value = ''; $('mwhat').value = ''; $('mwhen').value = '';
+    var R = RULES[S.scen]; $('e5').textContent = d < (R.months ? monthsBack(AS_OF, R.months) : '0000') ? 'Added, but it’s older than 24 months, so it only counts toward a new CMSP.' : 'Added. It shows as waiting for MISMO to confirm.'; render(); });
+  /* the application: a new CMSP's form, or the renewal form, in a new tab so this list stays open to copy from */
+  $('go').addEventListener('click', function(){ window.open(S.scen === 'cmsp-new' ? '/forms/cmsp/' : '/forms/renewal/', '_blank', 'noopener'); });
+  $('restart').addEventListener('click', function(){ history.replaceState(null, '', location.pathname); $('email').value = ''; $('oldin').value = ''; $('st1t').textContent = 'Where we send your points'; setStep(1); $('email').focus(); });
+  if (B) {   /* opened from the emailed link */
+    S.rec = REC; S.manual = [];
+    var first = B.f ? B.f.charAt(0).toUpperCase() + B.f.slice(1) : '';
+    $('hello').textContent = first ? 'Your Points, ' + first : 'Your Points';
+    var n = (B.a || []).length + (B.w || []).length + (B.l || []).length;
+    $('hsub').textContent = n ? 'From MISMO’s records of Summits, webinars, Boot Camps, workgroup meetings and leadership roles, up to ' + longDate(AS_OF) + '.' :
+      'We didn’t find MISMO event records under this email. If you’ve used another email, ask again with it, or add your activities yourself below.';
+    $('st1t').textContent = 'Done'; $('st2t').textContent = 'Opened'; setStep(3); render();
+  } else setStep(1);
+})();
+</script>
+</body>
+</html>
