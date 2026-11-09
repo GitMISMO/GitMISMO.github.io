@@ -11,7 +11,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A standard set of loan data fields and delivery file format that mortgage lenders and independent mortgage banks provide to regulators for the…",
-"x": "Mortgage Compliance MCD",
+"x": "Mortgage Compliance Risk, Compliance & Governance MCD",
 "h": "/initiative-hub/mcd-dashboard.html"
 },
 {
@@ -19,7 +19,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A standardized probability score — the estimated likelihood an AVM value falls within ±10% of market value — that lets lenders and investors compare…",
-"x": "Originations Valuation",
+"x": "Originations Valuation Third Party Services CCS",
 "h": "/initiative-hub/ccs-dashboard.html"
 },
 {
@@ -27,7 +27,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A standardized dataset for exchanging title order information, so a lender placing a title order sends the same structured set of fields every time…",
-"x": "Title & Closing",
+"x": "Title & Closing Close and Fund",
 "h": "/initiative-hub/title-order-dashboard.html"
 },
 {
@@ -35,7 +35,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "Six dataset specifications that let title and closing documents move between parties as data rather than as documents: the ALTA Title Commitment, the…",
-"x": "Title & Closing",
+"x": "Title & Closing Close and Fund",
 "h": "/initiative-hub/title-closing-dashboard.html"
 },
 {
@@ -43,7 +43,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A best-practice guide for lenders testing the AVMs they rely on, covering both accuracy testing and Common Confidence Score testing — a repeatable…",
-"x": "Valuation",
+"x": "Valuation Third Party Services",
 "h": "/initiative-hub/avm-testing-dashboard.html"
 },
 {
@@ -51,7 +51,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "Best-practice guidelines for testing AVMs for discriminatory patterns — disparate treatment and disparate impact — giving small and mid-sized lenders…",
-"x": "Valuation",
+"x": "Valuation Third Party Services",
 "h": "/initiative-hub/"
 },
 {
@@ -59,7 +59,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A common framework for exchanging transactional appraisal order information, built around the new terminology introduced by the FHFA's Uniform…",
-"x": "Valuation",
+"x": "Valuation Third Party Services",
 "h": "/initiative-hub/"
 },
 {
@@ -67,7 +67,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "An AI governance toolkit — five practical artifacts (Governance Policy, AI System Inventory, and System Risk Assessment now available; Performance…",
-"x": "Artificial Intelligence Governance AI",
+"x": "Artificial Intelligence Governance Risk, Compliance & Governance AI AI Artificial Intelligence",
 "h": "/initiative-hub/"
 },
 {
@@ -75,7 +75,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A MISMO-developed, consensus-based industry template for Master Bailee Agreements (MBAs) — the tri-party agreements among lender, warehouse lender,…",
-"x": "eMortgage",
+"x": "eMortgage Risk, Compliance & Governance",
 "h": "/initiative-hub/tpa-dashboard.html"
 },
 {
@@ -91,7 +91,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A standardized, extensible dataset defining the core information needed to board newly originated loans into servicing systems consistently and…",
-"x": "Servicing",
+"x": "Servicing LBDS Loan Boarding Data Segment",
 "h": "/initiative-hub/lbds-dashboard.html"
 },
 {
@@ -99,7 +99,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A standard mapping specification for the Commitment File — the artifact retail lenders include as part of a servicing transfer or loan sale,…",
-"x": "Secondary",
+"x": "Secondary Secondary Market",
 "h": "/initiative-hub/"
 },
 {
@@ -107,7 +107,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "Implementation guidance for representing FICO 10T and VantageScore 4.0 credit scores, plus up to 36 months of prior-payment (\"trended\") data, within…",
-"x": "Credit Reporting",
+"x": "Credit Reporting Third Party Services",
 "h": "/initiative-hub/"
 },
 {
@@ -115,7 +115,7 @@
 "k": "Initiative",
 "o": "hub",
 "d": "A MISMO-backed replacement for the EDI 260 X12 Application for Mortgage Insurance Benefits — the dataset servicers use to file claims with GSEs and…",
-"x": "Mortgage Insurance MI",
+"x": "Mortgage Insurance Third Party Services MI MI Mortgage Insurance",
 "h": "/initiative-hub/"
 },
 {
