@@ -149,6 +149,10 @@ __LOGO__
     <p class="sub">We add up the points in MISMO’s records for you: Summits, webinars, Boot Camps, workgroup meetings and leadership roles. Enter the email you register for MISMO events with, and we’ll email you a personal link to your points.</p>
     <div class="card">
       <form id="f1" novalidate>
+        <div class="lbl" id="pathlbl" style="margin-top:0">I’m Working Toward</div>
+        <div class="seg" role="group" aria-labelledby="pathlbl" id="pathseg" style="margin-bottom:14px">
+          <button type="button" data-path="cmsp-new" aria-pressed="true">CMSP · New</button><button type="button" data-path="cmsp-ren" aria-pressed="false">CMSP · Renewal</button><button type="button" data-path="amsp-ren" aria-pressed="false">AMSP · Renewal</button>
+        </div>
         <div class="field" style="margin-top:0"><label for="email">Your Email</label><input id="email" type="email" autocomplete="email" required placeholder="name@company.com"></div>
         <details class="more" id="oldbox" style="margin-top:12px"><summary>Used another email before?</summary>
           <div class="field"><label for="oldin">Old Emails</label><input id="oldin" type="text" placeholder="old.name@previouscompany.com" autocomplete="off">
@@ -241,6 +245,11 @@ __LOGO__
      FLOW_ENDPOINT: the "MISMO Points - Request" flow's address; until it's set, step 1 says the calculator isn't open yet. */
   var FLOW_ENDPOINT = 'https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/16/workflows/ea84ea6edcae42e0b4517199e5a20246/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZLsTm1j1dJM9eJMsE4HjuiKVef2O1SWqBZDly9ez-sY';   /* "MISMO Points - Request" (9 Nov 2026) */
   var B = null;
+  /* The path (Perry, 9 Nov 2026): ?for=cmsp-new|cmsp-ren|amsp-ren from the CMSP or AMSP page, or chosen at step 1;
+     remembered in this browser, so the emailed link opens on the same path. */
+  var PATHS = ['cmsp-new', 'cmsp-ren', 'amsp-ren'], PATH_KEY = 'mismo.points.path';
+  var PATH = (function(){ var q = new URLSearchParams(location.search).get('for'); if (PATHS.indexOf(q) >= 0) return q;
+    try { var t = localStorage.getItem(PATH_KEY); if (PATHS.indexOf(t) >= 0) return t; } catch (e) {} return 'cmsp-new'; })();
   try { var mh = /[#&]d=([A-Za-z0-9_-]+)/.exec(location.hash); if (mh) { var b64 = mh[1].replace(/-/g, '+').replace(/_/g, '/'); while (b64.length % 4) b64 += '=';
     B = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), function(c){ return c.charCodeAt(0); }))); if (!B || B.v !== 1) B = null; } } catch (e) { B = null; }
   var AS_OF = B ? B.asOf : new Date().toISOString().slice(0, 10), EV = B ? B.a : [];
@@ -349,6 +358,7 @@ __LOGO__
     var sel = pick(sure, R), mode = 'ok';
     if (!sel) { sel = pick(all, R); mode = sel ? 'pending' : 'short'; }
     if (!sel) sel = all.slice();
+    S.sel = sel; S.mode = mode;
     var s = sums(sel, R), pend = sums(sel.filter(function(x){ return x.wait; }), R), sureS = { p: s.p - pend.p, t: s.t - pend.t };
     var shown = merge(sel), n = shown.length, ban;
     if (mode === 'ok') ban = '<div class="banner ok">' + CHECK + '<span><b>You have enough.</b> ' + R.needTxt + ' ' + (n === 1 ? 'This activity makes ' : 'These ' + n + ' activities make ') + (s.t === R.rT ? 'exactly ' : '') + s.t + '.</span></div>';
@@ -373,6 +383,7 @@ __LOGO__
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)) { $('e1').textContent = 'Enter an email address, like name@company.com.'; $('email').focus(); return; }
     var old = $('oldin').value.split(/[,;\s]+/).map(function(x){ return x.trim().toLowerCase(); }).filter(function(x){ return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(x) && x !== e; }).slice(0, 5);
     if (!FLOW_ENDPOINT) { $('e1').textContent = 'The calculator isn’t open yet. Email certifications@mismo.org and we’ll work out your points with you.'; return; }
+    try { localStorage.setItem(PATH_KEY, PATH); } catch (er) {}
     $('e1').textContent = ''; $('send1').disabled = true; $('send1').textContent = 'Sending…';
     try { var r = await fetch(FLOW_ENDPOINT, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: e, old: old.join(',') }) });
       if (!r.ok) throw new Error(String(r.status)); }
@@ -391,10 +402,42 @@ __LOGO__
     $('mcat').value = ''; $('mwhat').value = ''; $('mwhen').value = '';
     var R = RULES[S.scen]; $('e5').textContent = d < (R.months ? monthsBack(AS_OF, R.months) : '0000') ? 'Added, but it’s older than 24 months, so it only counts toward a new CMSP.' : 'Added. It shows as waiting for MISMO to confirm.'; render(); });
   /* the application: a new CMSP's form, or the renewal form, in a new tab so this list stays open to copy from */
-  $('go').addEventListener('click', function(){ window.open(S.scen === 'cmsp-new' ? '/forms/cmsp/' : '/forms/renewal/', '_blank', 'noopener'); });
+  /* Start My Application (Perry, 9 Nov 2026): opens the right form with the activities picked above in its #pts= fragment,
+     in the application's own choices, so nobody retypes them. */
+  var CAT = { summit: 'MISMO Summit Attendance — 4 points per Summit', webinar: 'Attended a MISMO Monthly Webinar — 2 points per webinar',
+    dcem: 'Attended the Digital Closing & eMortgage Boot Camp — 3 points', bootcamp: 'Completed the MISMO Boot Camp Course — 50 points',
+    group: 'Workgroup Attendance (at Least 33% of Meetings) — 3 points per workgroup per year', lead: 'Committee, Council or Forum Chair, or Workgroup Chair or Vice Chair — 10 points per year of service' };
+  var MANUAL_CAT = { 'Board Member': 'Board Member — 10 points per year of service', 'Committee, Council or Forum Chair, or Workgroup Chair or Vice Chair': CAT.lead,
+    'Information Management (IM) Representative': 'Information Management (IM) Representative — 5 points per year of service', 'Architecture Workgroup (AWG) Representative': 'Architecture Workgroup (AWG) Representative — 5 points per year of service',
+    'Education Council Representative': 'Education Council Representative — 5 points per year of service', 'MISMO Boot Camp Instructor': 'MISMO Boot Camp Instructor — 5 points',
+    'Developed a MISMO Webinar': 'Developed a MISMO Webinar — 5 points per webinar', 'Authored a Published MISMO-Related Industry Article': 'Authored a Published MISMO-Related Industry Article — 3 points per article' };
+  function handoff(){
+    var amsp = S.scen === 'amsp-ren', rows = { education: [], participation: [] };
+    var put = function(c, x, what, link, units){ if (!c) return; var k = amsp ? 'participation' : (x.cat === 'e' ? 'education' : 'participation');
+      rows[k].push({ c: c, w: what, d: x.date, u: units || 1, l: link }); };
+    merge(S.sel || []).forEach(function(x){
+      var rec = 'MISMO records, from the points calculator';
+      if (x.years) put(CAT.group, x, x.label + ' (' + x.years.map(function(y){ return y.year; }).join(', ') + ')', rec, x.years.length);
+      else if (x.src === 'Summit registration') put(CAT.summit, x, x.label, rec);
+      else if (x.src === 'Webinar registration') put(CAT.webinar, x, x.label, rec);
+      else if (x.src === 'Boot Camp registration') put(CAT.dcem, x, x.label, rec);
+      else if (x.src === 'Boot Camp, counted once') put(CAT.bootcamp, x, x.label, rec);
+      else if (x.src === 'Leadership list') put(CAT.lead, x, x.label, rec);
+      else if (x.src === 'Added by you') put(MANUAL_CAT[x.label], x, x.detail || x.label, 'Added by you, for MISMO to confirm');
+      else if (x.src === 'Your other email') put({ 'A Summit': CAT.summit, 'A webinar or course': CAT.webinar, 'The Digital Closing & eMortgage Boot Camp': CAT.dcem,
+        'A workgroup year': CAT.group, 'A leadership role': CAT.lead, 'MISMO Boot Camp': CAT.bootcamp }[x.label], x, x.label + ' (under another email)', 'Another email, for MISMO to confirm');
+    });
+    var o = { v: 1, kind: S.scen === 'cmsp-new' ? 'Initial certification' : 'Renewal', rows: rows };
+    var b64 = btoa(String.fromCharCode.apply(null, new TextEncoder().encode(JSON.stringify(o)))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    return (amsp ? '/forms/amsp/' : '/forms/cmsp/') + '?kind=' + (S.scen === 'cmsp-new' ? 'new' : 'renew') + '#pts=' + b64;
+  }
+  $('go').addEventListener('click', function(){ window.open(handoff(), '_blank', 'noopener'); });
+  function paintPath(){ document.querySelectorAll('#pathseg [data-path]').forEach(function(b){ b.setAttribute('aria-pressed', b.dataset.path === PATH ? 'true' : 'false'); }); }
+  document.querySelectorAll('#pathseg [data-path]').forEach(function(b){ b.addEventListener('click', function(){ PATH = b.dataset.path; paintPath(); }); });
+  paintPath();
   $('restart').addEventListener('click', function(){ history.replaceState(null, '', location.pathname); $('email').value = ''; $('oldin').value = ''; $('st1t').textContent = 'Where we send your points'; setStep(1); $('email').focus(); });
   if (B) {   /* opened from the emailed link */
-    S.rec = REC; S.manual = [];
+    S.rec = REC; S.manual = []; S.scen = PATH;
     var first = B.f ? B.f.charAt(0).toUpperCase() + B.f.slice(1) : '';
     $('hello').textContent = first ? 'Your Points, ' + first : 'Your Points';
     var n = (B.a || []).length + (B.w || []).length + (B.l || []).length;
