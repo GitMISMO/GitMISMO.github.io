@@ -6,7 +6,9 @@ import sys
 SRC = os.path.dirname(os.path.dirname(os.path.abspath(__file__))); W = '/tmp/ptspage'
 shutil.rmtree(W, ignore_errors=True); os.makedirs(W + '/forms/points')
 s = open(SRC + '/forms/points/index.html', encoding='utf-8').read()
-open(W + '/forms/points/index.html', 'w', encoding='utf-8').write(s)                                    # as it ships: no flow yet
+import re
+s = re.sub(r"var FLOW_ENDPOINT = '[^']*';", "var FLOW_ENDPOINT = '';", s, count=1)          # closed: no flow set
+open(W + '/forms/points/index.html', 'w', encoding='utf-8').write(s)
 open(W + '/forms/points/flow.html', 'w', encoding='utf-8').write(s.replace("var FLOW_ENDPOINT = '';", "var FLOW_ENDPOINT = 'https://flow.test/points';"))
 srv = http.server.ThreadingHTTPServer(('127.0.0.1', 8797), functools.partial(http.server.SimpleHTTPRequestHandler, directory=W)); threading.Thread(target=srv.serve_forever, daemon=True).start()
 LINK = json.load(open(sys.argv[1]))['link'].split('#', 1)[1]

@@ -239,7 +239,7 @@ __LOGO__
      email a personal link; cms-data's points.js sends it from certifications@mismo.org. The link carries the person's
      own activities in its #fragment, which never reaches a server; nothing personal is on this page otherwise.
      FLOW_ENDPOINT: the "MISMO Points - Request" flow's address; until it's set, step 1 says the calculator isn't open yet. */
-  var FLOW_ENDPOINT = '';
+  var FLOW_ENDPOINT = 'https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/16/workflows/ea84ea6edcae42e0b4517199e5a20246/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ZLsTm1j1dJM9eJMsE4HjuiKVef2O1SWqBZDly9ez-sY';   /* "MISMO Points - Request" (9 Nov 2026) */
   var B = null;
   try { var mh = /[#&]d=([A-Za-z0-9_-]+)/.exec(location.hash); if (mh) { var b64 = mh[1].replace(/-/g, '+').replace(/_/g, '/'); while (b64.length % 4) b64 += '=';
     B = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), function(c){ return c.charCodeAt(0); }))); if (!B || B.v !== 1) B = null; } } catch (e) { B = null; }
