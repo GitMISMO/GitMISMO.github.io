@@ -3,7 +3,6 @@ e = lambda s: _h.escape(s, quote=True)
 R = 'https://resources.mismo.org'; W = 'https://collaborate.mismo.org/mismowebsite'; IC = W + '/standards-resources/certification/individual-certifications'
 CSS = """
 <style>
-/* MISMO professional certification path (Perry, 9 Nov 2026). Everything is scoped to .mpath; no scripts. */
 .mpath{--ink:#0d314c;--text:#44607a;--blue:#1a8fe3;--blue-ink:#1a74b8;--line:#cfdeeb;--tint:#e3f1fc;color:var(--ink);font-family:inherit;font-size:16px;line-height:1.6;max-width:1120px}
 .mpath *{box-sizing:border-box}
 .mpath .ey{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
@@ -103,8 +102,8 @@ cm = section('Certified MISMO Standards Professional', 'Your Path to CMSP', 'Sev
 am = section('Associate MISMO Standards Professional', 'Your Path to AMSP', 'A shorter path: no reference and no separate exam. Passing the MISMO Boot Camp exam is the proof.', 'Become an AMSP', 'Renew My AMSP', amsp_a, amsp_b)
 import os
 O = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'website-sections') + '/'
-open(O + 'cmsp-path-section.html', 'w', encoding='utf-8').write('<!-- Paste into the CMSP page on collaborate.mismo.org (Higher Logic), in place of “Five Steps to CMSP”. Perry, 9 Nov 2026. -->\n' + cm)
-open(O + 'amsp-path-section.html', 'w', encoding='utf-8').write('<!-- Paste into the AMSP page on collaborate.mismo.org (Higher Logic), in place of its steps section. Perry, 9 Nov 2026. -->\n' + am)
+open(O + 'cmsp-path-section.html', 'w', encoding='utf-8').write(cm)
+open(O + 'amsp-path-section.html', 'w', encoding='utf-8').write(am)
 prev = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>CMSP &amp; AMSP Path Sections (Preview)</title>'
         '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap"><style>body{margin:0;font-family:"IBM Plex Sans",sans-serif;background:#fff} '
         '.nav{height:64px;background:#071d2e;color:#fff;display:flex;align-items:center;padding:0 40px;font-weight:800;font-size:24px} .nav b{color:#74bfeb} .wrap{max-width:1120px;margin:0 auto;padding:40px 24px 70px} '
@@ -149,8 +148,8 @@ points_html = (PCSS + '\n<div class="mpts" id="points"><div class="ey">Earning P
   + f'<a href="{R}/forms/points/?for=cmsp-new">Check My Points&nbsp;&rarr;</a></div></div>\n')
 cta_html = (PCSS + f'\n<div class="mcta"><div><h2>Become a CMSP</h2><p>Check your points, line up your reference, and apply. MISMO takes it from there and emails you at every step.</p></div>'
   + f'<div class="b"><a class="p1" href="{R}/forms/points/?for=cmsp-new">Check My Points&nbsp;&rarr;</a><a class="p2" href="{R}/forms/cmsp/?kind=new">Start My Application</a></div></div>\n')
-open(O + 'cmsp-points-section.html', 'w', encoding='utf-8').write('<!-- CMSP page: replaces "Earning Points" (Participation and Education Points). Perry, 9 Nov 2026. -->\n' + points_html)
-open(O + 'cmsp-bottom-section.html', 'w', encoding='utf-8').write('<!-- CMSP page: replaces the bottom "Become a CMSP / Enroll in the CMSP Program" block. Perry, 9 Nov 2026. -->\n' + cta_html)
+open(O + 'cmsp-points-section.html', 'w', encoding='utf-8').write(points_html)
+open(O + 'cmsp-bottom-section.html', 'w', encoding='utf-8').write(cta_html)
 # the whole page as it would read, built from the website page template (its header, menus and the Home hero,
 # verbatim, with only the words and buttons changed), with what's kept, new and updated marked
 import re as _re, os as _os
@@ -177,12 +176,8 @@ glance = ('<div class="glance"><div><b>100</b><span>Points to sit for the exam</
 page = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The CMSP Page, Reworked (Preview)</title><style>' + tcss
         + ' .wrap{max-width:1120px;margin:0 auto;padding:10px clamp(20px,5vw,48px) 70px} .glance{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}'
         '.glance div{border:1px solid #cfdeeb;border-radius:12px;padding:18px} .glance b{display:block;font-size:34px;color:#1a74b8} .glance span{font-weight:700;color:#0d314c} .glance small{display:block;color:#44607a;font-size:14.5px;margin-top:4px}'
-        '.tagbar{display:inline-block;margin:44px 0 12px;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;padding:4px 10px} .tagbar.k{background:#eef3f8;color:#546f88} .tagbar.n{background:#e3f3ec;color:#0b5c44} .tagbar.u{background:#fdf1d8;color:#8a6412}'
+        '.gap{height:56px} .tagbar{display:inline-block;margin:44px 0 12px;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;padding:4px 10px} .tagbar.k{background:#eef3f8;color:#546f88} .tagbar.n{background:#e3f3ec;color:#0b5c44} .tagbar.u{background:#fdf1d8;color:#8a6412}'
         '@media (max-width:760px){.glance{grid-template-columns:1fr}}</style></head><body>'
-        + header + '<div class="wrap" style="padding-bottom:0">' + tag('Kept: the hero, with Check My Points and See Your Path as its buttons', 'u') + '</div>' + hero
-        + '<div class="wrap">' + tag('Kept: At a Glance', 'k') + glance
-        + tag('New: Your Path to CMSP, replacing Five Steps, CMSP Fees and Renewal', 'n') + cm
-        + tag('Updated: What Counts for Points, with the calculator', 'u') + points_html
-        + tag('New: the call to action, replacing “Enroll in the CMSP Program”', 'n') + cta_html + '</div></body></html>')
+        + header + hero + '<div class="wrap"><div class="gap"></div>' + glance + '<div class="gap"></div>' + cm + '<div class="gap"></div>' + points_html + '<div class="gap"></div>' + cta_html + '</div></body></html>')
 open(O + 'preview-cmsp-page.html', 'w', encoding='utf-8').write(page)
 print('cmsp page blocks written')
