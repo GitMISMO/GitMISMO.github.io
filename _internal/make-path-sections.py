@@ -1,6 +1,6 @@
 import html as _h
 e = lambda s: _h.escape(s, quote=True)
-R = 'https://resources.mismo.org'; W = 'https://collaborate.mismo.org/mismowebsite'
+R = 'https://resources.mismo.org'; W = 'https://collaborate.mismo.org/mismowebsite'; IC = W + '/standards-resources/certification/individual-certifications'
 CSS = """
 <style>
 /* MISMO professional certification path (Perry, 9 Nov 2026). Everything is scoped to .mpath; no scripts. */
@@ -58,7 +58,7 @@ COMP = 'If your company is a MISMO Champion member, it gets a set number of comp
 LT = ('<span class="term" tabindex="0">MISMO’s Leadership Team<span class="tip" role="tooltip"><b>MISMO’s Leadership Team</b>The people who lead MISMO’s work: the chairs and vice chairs of its communities of practice, '
       'workgroups and councils, and MISMO’s Board. Any of them can be your reference. Not sure who to ask? <a href="mailto:certifications@mismo.org">Email us</a>.</span></span>')
 def section(ey, title, lede, a_label, b_label, pa, pb):
-    return (CSS + f'\n<div class="mpath"><div class="ey">{e(ey)}</div><h2 class="t">{e(title)}</h2><div class="rule"></div><p class="lede">{lede}</p>'
+    return (CSS + f'\n<div class="mpath" id="steps"><div class="ey">{e(ey)}</div><h2 class="t">{e(title)}</h2><div class="rule"></div><p class="lede">{lede}</p>'
             f'<input class="tb" type="radio" name="mp-tab" id="mp-a" checked><input class="tb" type="radio" name="mp-tab" id="mp-b">'
             f'<div class="tabs"><label for="mp-a">{e(a_label)}</label><label for="mp-b">{e(b_label)}</label></div>'
             f'<div class="panel pa">{pa}</div><div class="panel pb">{pb}</div></div>\n')
@@ -69,19 +69,19 @@ cmsp_a = ('<div class="path">'
   + step(4, 'We Verify', True, 'We confirm your points and your reference. Points from MISMO’s own records are already checked, so this is quick.')
   + step(5, 'Enroll in the Program', True, 'Enrollment includes the CMSP exam. ' + COMP,
          prices([('CMSP, with the exam', '$500', '$900', False), ('CMSP for current AMSPs, with the exam', '$400', '$800', False), ('With your company’s Champion comp', '$0', '$0', True)]))
-  + step(6, 'Take the Exam', False, 'Once you’re enrolled, we open the exam in TopClass and email you how to get in. 150 minutes, open book; 75% or higher passes.')
+  + step(6, 'Take the Exam', False, 'Once you’re enrolled, we open the exam in TopClass and email you how to get in. 150 minutes, open book; 75% or higher passes. If you don’t pass, you have 10 days to take a second exam; after that there’s a six-month wait, and each re-test is $100 for members, $300 for non-members.')
   + step(7, 'Get Certified', True, 'When your pass is recorded, your certificate arrives by email and you’re listed among current CMSPs. We remind you before it’s time to renew.')
   + '</div>' + ready('Two things to do now; MISMO emails you at every step after that.', ('Check My Points', 'Find out if you have the 100 you need', R + '/forms/points/?for=cmsp-new'),
-                     ('Start My Application', 'Once you have your points and your reference', R + '/forms/cmsp/?kind=new'), [('CMSP Exam Study Guide', W + '/cmsp-exam-study'), ('Current CMSPs', W + '/current-cmsps')]))
+                     ('Start My Application', 'Once you have your points and your reference', R + '/forms/cmsp/?kind=new'), [('CMSP Exam Study Guide', IC + '/cmsp-exam-study'), ('Current CMSPs', IC + '/current-cmsps')]))
 cmsp_b = ('<div class="path">'
-  + step(1, 'Check Your Points', False, 'Renewing takes 25 points from the last two years, at least 15 of them participation. The calculator adds up what MISMO has on record.')
+  + step(1, 'Check Your Points', False, 'Renewing takes 25 points from the last two years, at least 15 of them participation. The calculator adds up what MISMO has on record. Renew within a year of your expiration date, or you’ll need to start again, exam included.')
   + step(2, 'Renew', False, 'Your points carry over from the calculator. If your company is a MISMO Champion member, you’ll see how many comps it has left.')
   + step(3, 'We Verify', True, 'We confirm your points. Points from MISMO’s own records are already checked, so this is quick.')
   + step(4, 'Your Renewal Fee, or a Comp', True, 'If your company has a comp left, we apply it and let its primary contact know; otherwise we email you how to pay.',
          prices([('CMSP renewal', '$100', '$200', False), ('With your company’s Champion comp', '$0', '$0', True)]))
   + step(5, 'Renewed', True, 'Your new certificate arrives by email, valid for two more years, and you stay listed among current CMSPs.')
   + '</div>' + ready('We remind you by email before your CMSP is due, with a link to renew.', ('Check My Points', 'Find out if you have the 25 you need', R + '/forms/points/?for=cmsp-ren'),
-                     ('Start My Renewal', 'Once you have your points', R + '/forms/cmsp/?kind=renew'), [('Current CMSPs', W + '/current-cmsps')]))
+                     ('Start My Renewal', 'Once you have your points', R + '/forms/cmsp/?kind=renew'), [('CMSP Exam Study Guide', IC + '/cmsp-exam-study'), ('Current CMSPs', IC + '/current-cmsps')]))
 amsp_a = ('<div class="path">'
   + step(1, 'Pass the MISMO Boot Camp Exam', False, 'Take MISMO Boot Camp and pass its exam. Keep your proof of passing; you’ll attach it to your application.')
   + step(2, 'Apply', False, 'Attach your Boot Camp exam result, and if your company is a MISMO Champion member, you’ll see how many comps it has left.')
@@ -89,16 +89,16 @@ amsp_a = ('<div class="path">'
   + step(4, 'Enroll in the Program', True, COMP, prices([('AMSP', '$200', '$400', False), ('With your company’s Champion comp', '$0', '$0', True)]))
   + step(5, 'Get Certified', True, 'Your certificate arrives by email and you’re listed among current AMSPs. We remind you before it’s time to renew.')
   + '</div>' + ready('Two things to do; MISMO emails you at every step after that.', ('About MISMO Boot Camp', 'Where the AMSP starts', W + '/events/boot-camp'),
-                     ('Start My Application', 'Once you’ve passed the Boot Camp exam', R + '/forms/amsp/?kind=new'), [('Current AMSPs', W + '/current-amsps'), ('Thinking of the CMSP?', W + '/standards-resources/certification/professional-certifications/cmsp')]))
+                     ('Start My Application', 'Once you’ve passed the Boot Camp exam', R + '/forms/amsp/?kind=new'), [('Current AMSPs', IC + '/current-amsps'), ('Thinking of the CMSP?', IC + '/cmsp')]))
 amsp_b = ('<div class="path">'
-  + step(1, 'Check Your Points', False, 'Renewing takes 10 participation points from the last two years. The calculator adds up what MISMO has on record.')
+  + step(1, 'Check Your Points', False, 'Renewing takes 10 participation points from the last two years. The calculator adds up what MISMO has on record. Renew within a year of your expiration date, or you’ll need to start again.')
   + step(2, 'Renew', False, 'Your points carry over from the calculator. If your company is a MISMO Champion member, you’ll see how many comps it has left.')
   + step(3, 'We Verify', True, 'We confirm your points.')
   + step(4, 'Your Renewal Fee, or a Comp', True, 'If your company has a comp left, we apply it and let its primary contact know; otherwise we email you how to pay.',
          prices([('AMSP renewal', '$75', '$150', False), ('With your company’s Champion comp', '$0', '$0', True)]))
   + step(5, 'Renewed', True, 'Your new certificate arrives by email, valid for two more years, and you stay listed among current AMSPs.')
   + '</div>' + ready('We remind you by email before your AMSP is due, with a link to renew.', ('Check My Points', 'Find out if you have the 10 you need', R + '/forms/points/?for=amsp-ren'),
-                     ('Start My Renewal', 'Once you have your points', R + '/forms/amsp/?kind=renew'), [('Current AMSPs', W + '/current-amsps')]))
+                     ('Start My Renewal', 'Once you have your points', R + '/forms/amsp/?kind=renew'), [('Current AMSPs', IC + '/current-amsps')]))
 cm = section('Certified MISMO Standards Professional', 'Your Path to CMSP', 'Seven steps, in order. You do four of them; MISMO does the rest and emails you at each one.', 'Become a CMSP', 'Renew My CMSP', cmsp_a, cmsp_b)
 am = section('Associate MISMO Standards Professional', 'Your Path to AMSP', 'A shorter path: no reference and no separate exam. Passing the MISMO Boot Camp exam is the proof.', 'Become an AMSP', 'Renew My AMSP', amsp_a, amsp_b)
 import os
@@ -115,3 +115,64 @@ prev = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="
 prev = prev.replace('#mp-a:checked', '#mpc-a:checked', 0)
 open(O + 'preview.html', 'w', encoding='utf-8').write(prev)
 print('sections written')
+
+# ---------- the rest of the CMSP page (Perry, 9 Nov 2026): What Counts for Points (updated) and the call to action (new) ----------
+PCSS = """
+<style>
+.mpts{--ink:#0f314c;--text:#44607a;--blue:#1a8fe3;--line:#cfdeeb;color:var(--ink);font-family:inherit;line-height:1.55;max-width:1120px}
+.mpts *{box-sizing:border-box} .mpts .ey{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--blue)}
+.mpts h2{font-size:34px;line-height:1.15;margin:6px 0 0;font-weight:700} .mpts .rule{width:76px;height:4px;border-radius:2px;background:linear-gradient(90deg,#1a8fe3,#74bfeb);margin:14px 0 18px}
+.mpts .cols{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:start}
+.mpts .box{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fff}
+.mpts .box h3{margin:0;padding:14px 18px;font-size:17px;background:#f3f8fc;border-bottom:1px solid var(--line)} .mpts .box h3 small{display:block;font-weight:400;color:var(--text);font-size:14px;margin-top:2px}
+.mpts .r{display:grid;grid-template-columns:52px 1fr;gap:12px;align-items:center;padding:10px 18px;border-top:1px solid #eef3f8} .mpts .r:first-of-type{border-top:0}
+.mpts .r b{font-size:20px;color:#1a74b8;text-align:center} .mpts .r span{color:var(--ink);font-size:15px} .mpts .r em{font-style:normal;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#0b5c44;background:#e3f3ec;border-radius:999px;padding:1px 8px;margin-left:6px}
+.mpts .calc{margin-top:16px;border:1px solid #9fd0f3;background:#f1f8fe;border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:center}
+.mpts .calc p{margin:0;color:var(--text);font-size:15px} .mpts .calc b{color:var(--ink)} .mpts .calc a{margin-left:auto;background:var(--blue);color:#fff;border-radius:8px;padding:10px 16px;font-weight:700;text-decoration:none;white-space:nowrap}
+.mcta{background:#0f314c;color:#fff;border-radius:18px;padding:34px 36px;display:flex;gap:28px;align-items:center;flex-wrap:wrap;font-family:inherit;max-width:1120px}
+.mcta h2{margin:0;font-size:30px;color:#fff} .mcta p{margin:6px 0 0;color:#a9d8f3;font-size:16px;max-width:560px}
+.mcta .b{margin-left:auto;display:flex;gap:12px;flex-wrap:wrap} .mcta a{border-radius:10px;padding:12px 20px;font-weight:700;text-decoration:none;font-size:15.5px}
+.mcta a.p1{background:#1a8fe3;color:#fff} .mcta a.p2{background:#fff;color:#0f314c}
+@media (max-width:760px){ .mpts .cols{grid-template-columns:1fr} .mpts .calc{flex-wrap:wrap} .mpts .calc a{margin-left:0} .mcta .b{margin-left:0} }
+</style>"""
+def plist(title, sub, rows):
+    return f'<div class="box"><h3>{e(title)}<small>{e(sub)}</small></h3>' + ''.join(f'<div class="r"><b>{n}</b><span>{e(t)}{"<em>New</em>" if new else ""}</span></div>' for n, t, new in rows) + '</div>'
+points_html = (PCSS + '\n<div class="mpts" id="points"><div class="ey">Earning Points</div><h2>What Counts for Points</h2><div class="rule"></div><div class="cols">'
+  + plist('Participation Points', 'At least 25 of your 100 points, and at least 15 of your 25 renewal points.', [
+      (10, 'Board member, Committee / Council / Forum Chair, Workgroup Chair or Vice Chair, per year', False), (5, 'Workgroup representative to IM, the Architecture Workgroup or the Education Council, per year', False),
+      (5, 'Developing a MISMO Webinar', False), (5, 'Serving as a MISMO Boot Camp instructor', False), (4, 'MISMO Summit attendance', False),
+      (3, 'Workgroup attendance, per workgroup per year, at a third or more of its meetings', False), (3, 'Authoring a published MISMO-related industry article', False),
+      (2, 'Serving on a Summit presentation panel', False), (2, 'Serving on an industry panel or presentation on MISMO topics', False), (1, 'Developing a MISMO Short', False), (1, 'Serving as a MISMO Ambassador during a Summit', False)])
+  + plist('Education Points', 'Up to 75 of the 100 points needed.', [
+      (50, 'Completing the MISMO Boot Camp Course', False), (3, 'Attending the Digital Closing & eMortgage Boot Camp', False), (2, 'Attending each MISMO Monthly Webinar', False)])
+  + '</div><div class="calc"><p><b>Rather not add it up?</b> The points calculator finds what MISMO already has on record for you, picks what to submit, and carries it into your application.</p>'
+  + f'<a href="{R}/forms/points/?for=cmsp-new">Check My Points</a></div></div>\n')
+cta_html = (PCSS + f'\n<div class="mcta"><div><h2>Become a CMSP</h2><p>Check your points, line up your reference, and apply. MISMO takes it from there and emails you at every step.</p></div>'
+  + f'<div class="b"><a class="p1" href="{R}/forms/points/?for=cmsp-new">Check My Points</a><a class="p2" href="{R}/forms/cmsp/?kind=new">Start My Application</a></div></div>\n')
+open(O + 'cmsp-points-section.html', 'w', encoding='utf-8').write('<!-- CMSP page: replaces "Earning Points" (Participation and Education Points). Perry, 9 Nov 2026. -->\n' + points_html)
+open(O + 'cmsp-bottom-section.html', 'w', encoding='utf-8').write('<!-- CMSP page: replaces the bottom "Become a CMSP / Enroll in the CMSP Program" block. Perry, 9 Nov 2026. -->\n' + cta_html)
+# the whole page as it would read, with what's kept, new and updated marked
+tag = lambda t, c: f'<div class="tagbar {c}">{t}</div>'
+hero = ('<div class="hero"><div class="in"><div class="ey2">Individual Certifications</div><h1>Become a CMSP</h1><p>MISMO’s designation of excellence for advanced standards expertise.</p>'
+        '<p>The CMSP is point-based. You need 100 points to sit for the exam, and 25 points every two years to maintain it.</p>'
+        f'<div class="hb"><a class="h1" href="{R}/forms/points/?for=cmsp-new">Check My Points</a><a class="h2" href="#steps">See Your Path →</a><a class="h3" href="{IC}/current-cmsps">See Current CMSPs</a></div></div></div>')
+glance = ('<div class="glance"><div><b>100</b><span>Points to sit for the exam</span><small>At least 25 must be participation points. Education points can cover up to 75.</small></div>'
+          '<div><b>75%</b><span>Passing score</span><small>The exam is 150 minutes and open book.</small></div><div><b>25</b><span>Points every two years</span><small>To maintain certification, including at least 15 participation points.</small></div></div>')
+page = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>The CMSP Page, Reworked (Preview)</title>'
+        '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&amp;display=swap"><style>'
+        'body{margin:0;font-family:"IBM Plex Sans",sans-serif;background:#fff;color:#0f314c} .nav{height:64px;background:#071d2e;color:#fff;display:flex;align-items:center;padding:0 40px;font-weight:800;font-size:24px} .nav b{color:#74bfeb}'
+        '.hero{background:radial-gradient(1200px 400px at 80% 0%,#173a57,#071d2e);color:#fff;padding:56px 24px} .hero .in{max-width:1120px;margin:0 auto} .ey2{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#74bfeb}'
+        '.hero h1{font-size:46px;margin:8px 0 10px} .hero p{color:#cfe6f6;max-width:640px;margin:6px 0;font-size:17px} .hb{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px} .hb a{border-radius:10px;padding:12px 20px;font-weight:700;text-decoration:none}'
+        '.hb .h1{background:#1a8fe3;color:#fff} .hb .h2{background:#fff;color:#0f314c} .hb .h3{color:#a9d8f3;border:1px solid #2f6688}'
+        '.wrap{max-width:1120px;margin:0 auto;padding:10px 24px 70px} .sec{margin-top:34px} .glance{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}'
+        '.glance div{border:1px solid #cfdeeb;border-radius:14px;padding:18px} .glance b{display:block;font-size:34px;color:#1a74b8} .glance span{font-weight:700} .glance small{display:block;color:#44607a;font-size:14px;margin-top:4px}'
+        '.tagbar{display:inline-block;margin:44px 0 12px;font-size:11.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;border-radius:999px;padding:4px 12px} .tagbar.k{background:#eef3f8;color:#546f88} .tagbar.n{background:#e3f3ec;color:#0b5c44} .tagbar.u{background:#fdf1d8;color:#8a6412}'
+        '.tagbar.hz{margin-top:20px} @media (max-width:760px){.glance{grid-template-columns:1fr} .hero h1{font-size:34px}}'
+        '</style></head><body><div class="nav">MI<b>S</b>MO</div>'
+        + '<div class="wrap" style="padding-top:0">' + tag('Kept: hero, with the typo fixed and Check My Points added; “See Your Path” replaces “See the Five Steps”', 'u hz') + '</div>' + hero
+        + '<div class="wrap">' + tag('Kept: At a Glance', 'k') + glance
+        + tag('New: Your Path to CMSP, replacing Five Steps, CMSP Fees and Renewal', 'n') + cm
+        + tag('Updated: What Counts for Points, with the Digital Closing & eMortgage Boot Camp and the calculator', 'u') + points_html
+        + tag('New: the call to action, replacing “Enroll in the CMSP Program”', 'n') + cta_html + '</div></body></html>')
+open(O + 'preview-cmsp-page.html', 'w', encoding='utf-8').write(page)
+print('cmsp page blocks written')
