@@ -16,8 +16,14 @@ pts = {'v': 1, 'kind': 'Initial certification', 'rows': {'education': [{'c': 'Co
 frag = base64.urlsafe_b64encode(json.dumps(pts).encode()).decode().rstrip('=')
 with sync_playwright() as p:
     b = p.chromium.launch(); ctx = b.new_context(viewport={'width': 1280, 'height': 900}, color_scheme='dark'); pg = ctx.new_page(); errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
+    pg.goto('http://127.0.0.1:8798/forms/cmsp/'); pg.evaluate("() => localStorage.setItem('mismo.portal.theme', 'dark')"); pg.goto('about:blank')
     pg.goto('http://127.0.0.1:8798/forms/cmsp/#pts=' + frag); pg.wait_for_timeout(1200)
-    ck(pg.evaluate("document.documentElement.getAttribute('data-theme') !== 'dark'"), 'CMSP form: light, even with the computer in dark mode')
+    ck(pg.evaluate("document.documentElement.getAttribute('data-theme') !== 'dark'"), 'CMSP form: light, even with the computer in dark mode and dark saved from before')
+    btn = pg.query_selector('#theme')
+    if btn:
+        btn.evaluate('b => b.click()'); pg.wait_for_timeout(150)
+        ck(pg.evaluate("document.documentElement.getAttribute('data-theme')") == 'dark', '...and the first Dark Mode click switches to dark, even on a dark-mode computer')
+        btn.evaluate('b => b.click()'); pg.wait_for_timeout(150)
     ck('We added 4 activities from your points calculator' in pg.inner_text('body'), 'the calculator’s activities arrive, with a note saying so')
     ed = pg.eval_on_selector_all('[data-arow="education"][data-c="what"]', 'e => e.map(x => x.value)'); pa = pg.eval_on_selector_all('[data-arow="participation"][data-c="what"]', 'e => e.map(x => x.value)')
     ck(ed == ['MISMO Boot Camp, March 2025', 'MISMO Webinar: Data Quality'] and pa[:2] == ['MISMO Fall Summit 2026', 'Loan Boarding workgroup (2025, Past 12 Months)'], '...as education and participation rows', (ed, pa))

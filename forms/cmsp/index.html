@@ -2180,7 +2180,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* ================= theme ================= */
   function toggleTheme(){
     var cur = document.documentElement.getAttribute("data-theme");
-    if(!cur) cur = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    if(!cur) cur = "light";   // the page is light unless Dark Mode was chosen (Perry, 10 Nov 2026)
     var next = cur === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     try{ localStorage.setItem(THEMEKEY, next); }catch(e){}
@@ -2197,7 +2197,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function initTheme(){
     var t = null;
     try{ t = localStorage.getItem(THEMEKEY); }catch(e){}
-    if(t) document.documentElement.setAttribute("data-theme", t);
+    /* light only, like the website (Perry, 10 Nov 2026): there is no Dark Mode button here, so a dark choice saved
+       in this browser from before is ignored rather than leaving the page stuck in dark */
     paintThemeBtn(t || "light");
   }
 

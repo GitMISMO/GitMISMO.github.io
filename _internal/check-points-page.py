@@ -20,6 +20,10 @@ with sync_playwright() as p:
     ck(pg.evaluate("document.documentElement.getAttribute('data-theme') !== 'dark'") and not pg.query_selector('#theme-btn'), 'light, like the website, even with the computer in dark mode')
     ck(pg.is_visible('header.mm-header') and pg.is_visible('.mm-nav') and 'Check Your' in pg.inner_text('h1'), 'the website’s header, menus and hero, from the page template')
     ck(not pg.query_selector('link[href*="fonts.googleapis"]'), 'no web font: the site’s own font stack')
+    bg = lambda sel: pg.evaluate(f"getComputedStyle(document.querySelector('{sel}')).backgroundColor")
+    lum = lambda rgb: (lambda v: 0.2126*v[0] + 0.7152*v[1] + 0.0722*v[2])([int(x) for x in rgb[rgb.index('(')+1:rgb.index(')')].split(',')[:3]])
+    ck(all(lum(bg(sel)) > 200 for sel in ['#v1 .card', '.steps .step', 'body']) and lum(pg.evaluate("getComputedStyle(document.querySelector('#pathlbl')).color")) < 120,
+       'with the computer in dark mode, the cards and steps are light and the labels dark (they were navy on navy)', [bg(x) for x in ['#v1 .card', '.steps .step']])
     pg.fill('#email', 'jordan.sample@example.com'); pg.click('#send1'); pg.wait_for_timeout(200)
     ck('isn’t open yet' in pg.inner_text('#e1'), 'until the flow is set up, step 1 says the calculator isn’t open yet')
     got = []

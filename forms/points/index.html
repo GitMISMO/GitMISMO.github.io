@@ -116,18 +116,7 @@ div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
   --btn-ink:#ffffff; --focus:#2477b8;
   color-scheme:light;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
-    --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
-    --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#86a8bf; --navy-mid:#7fc0ea; --sky-wash:#123143;
-    --good:#4fc79b; --good-wash:#0f3a31; --good-line:#1f6b55; --good-ink:#9fe3c8;
-    --warn:#e0a83c; --warn-wash:#3a2c12; --warn-line:#6b5220; --warn-ink:#f1d08f;
-    --edu-wash:#3a2c12; --edu-ink:#f1d08f; --track:#173c52; --pend:#2f6688;
-    --btn-ink:#06202f; --focus:#74bfeb;
-    color-scheme:dark;
-  }
-}
+/* light only, like the website: no longer follows the computer’s dark mode (Perry, 10 Nov 2026) */
 :root[data-theme="dark"]{
   --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
   --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
