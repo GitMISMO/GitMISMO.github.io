@@ -1,19 +1,7 @@
 {
- "updated": "2026-11-09T20:50:03.721Z",
+ "updated": "2026-11-10T17:56:34.512Z",
  "source": "https://www.mba.org/conferences-and-education/education-courses/complimentary-education",
  "mismo": [
-  {
-   "id": "81558",
-   "date": "2026-11-10",
-   "label": "November 10, 2026",
-   "title": "5 Key MISMO Initiatives Impacting Today’s Lenders",
-   "fullTitle": "5 Key MISMO Initiatives Impacting Today’s Lenders - November 2026",
-   "start": "12:00 PM",
-   "end": "12:30 PM",
-   "endsAt": "2026-11-10T12:30:00-05:00",
-   "url": "https://www.mba.org/conferences-and-education/event/2026/11/10/default-calendar/5-key-mismo-initiatives-impacting-today-s-lenders-november-2026-81558",
-   "register": "https://ebiz.mba.org/ebusiness/Meetings/MeetingRegistration.aspx?ID=81558"
-  },
   {
    "id": "83571",
    "date": "2026-11-18",
@@ -25,6 +13,18 @@
    "endsAt": "2026-11-18T13:00:00-05:00",
    "url": "https://www.mba.org/conferences-and-education/event/2026/11/18/default-calendar/ai-governance-crosswalk-fannie-mae-freddie-mac-and-mismo-s-frame-83571",
    "register": "https://ebiz.mba.org/ebusiness/Meetings/MeetingRegistration.aspx?ID=83571"
+  },
+  {
+   "id": "83572",
+   "date": "2026-12-08",
+   "label": "December 8, 2026",
+   "title": "Introducing the MISMO eHELOC Standard and FAQ",
+   "fullTitle": "Introducing the MISMO eHELOC Standard and FAQ",
+   "start": "12:00 PM",
+   "end": "1:00 PM",
+   "endsAt": "2026-12-08T13:00:00-05:00",
+   "url": "https://www.mba.org/conferences-and-education/event/2026/12/08/default-calendar/introducing-the-mismo-eheloc-standard-and-faq-83572",
+   "register": "https://ebiz.mba.org/ebusiness/Meetings/MeetingRegistration.aspx?ID=83572"
   }
  ]
 }
