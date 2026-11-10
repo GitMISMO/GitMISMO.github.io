@@ -210,3 +210,22 @@ page = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="
         + header + hero + '<div class="wrap"><div style="height:80px"></div>' + lead_html + '<div class="gap"></div>' + glance + '<div class="gap"></div>' + cm + '<div class="gap"></div>' + points_html + '<div class="gap"></div>' + cta_html + '</div></body></html>')
 open(O + 'preview-cmsp-page.html', 'w', encoding='utf-8').write(page)
 print('cmsp page blocks written')
+
+# ---------- the whole CMSP page body, for one paste into Higher Logic (Perry, 10 Nov 2026) ----------
+BCSS = """<style>
+.mcms-wrap{max-width:1120px;margin:0 auto;padding:0 clamp(20px,5vw,48px);box-sizing:border-box}
+.mcms-gap{height:56px} .mcms-gap.top{height:80px}
+.mcms-glance{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;font-family:inherit}
+.mcms-glance>div{border:1px solid #cfdeeb;border-radius:12px;padding:18px 20px;background:#fff}
+.mcms-glance b{display:block;font-size:34px;line-height:1.2;color:#1a74b8} .mcms-glance span{font-weight:700;color:#0d314c}
+.mcms-glance small{display:block;color:#44607a;font-size:14.5px;line-height:1.6;margin-top:4px}
+@media (max-width:760px){ .mcms-glance{grid-template-columns:1fr} .mcms-gap{height:40px} .mcms-gap.top{height:48px} }
+</style>"""
+GL = ('<div class="mcms-glance"><div><b>100</b><span>Points to Sit for the Exam</span><small>At least 25 must be participation points. Education points can cover up to 75.</small></div>'
+      '<div><b>75%</b><span>Passing Score</span><small>The exam is 150 minutes and open book.</small></div>'
+      '<div><b>25</b><span>Points Every Two Years</span><small>To maintain certification, including at least 15 participation points.</small></div></div>')
+body = (BCSS + '\n' + hero + '\n<div class="mcms-wrap"><div class="mcms-gap top"></div>' + lead_html + '<div class="mcms-gap"></div>' + GL
+        + '<div class="mcms-gap"></div>' + cm + '<div class="mcms-gap"></div>' + points_html + '<div class="mcms-gap"></div>' + cta_html + '<div class="mcms-gap"></div></div>\n')
+body = _re.sub(r'<!--.*?-->', '', body, flags=_re.S)
+open(O + 'cmsp-page-body.html', 'w', encoding='utf-8').write(body)
+print('cmsp page body written', len(body))
