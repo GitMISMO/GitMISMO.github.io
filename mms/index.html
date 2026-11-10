@@ -2058,7 +2058,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-07T21:20:52Z',fp:'642faed0'};
+window.__mmsBuild={at:'2026-11-09T23:59:26Z',fp:'0033af8b'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -4563,7 +4563,8 @@ move=async function(t0,to,opts){
 let linksSwept=false;
 async function sweepLinks(){
   if(linksSwept||!S.isStaff||!S.canWrite||!S.ready) return; linksSwept=true;
-  for(const t of liveTickets()){ const al=autoLinks(t); if(!al) continue; const x=clone(t); x.links=al.links; S.tickets[x.id]=x; await write('tickets',x.id,x); }
+  /* each one is read fresh just before it's saved: a move made meanwhile (an ended comment period, say) is never overwritten */
+  for(const t0 of liveTickets()){ const t=S.tickets[t0.id]; if(!t) continue; const al=autoLinks(t); if(!al) continue; const x=clone(t); x.links=al.links; S.tickets[x.id]=x; await write('tickets',x.id,x,t); }
 }
 
 /* ---------- facilitators: hand-overs keep the history ---------- */
@@ -6876,7 +6877,8 @@ const HELP_TOPICS={
      'Notifications: the email flow link, the sender, Hold All Email Until, reminder timing, and who hears when work arrives at each step.',
      'Daily Digest: who gets it, which days, who is copied, and which sections are on.',
      'Website: the feed of open comment periods to mismo.org.',
-     'Import and Backup: bring in or save a copy of the records.'],
+     'Import and Backup: bring in or save a copy of the records.',
+     'The facilitator list here is also published, names only, for other MISMO systems such as Summit HQ (resources.mismo.org/mms/facilitators.json). It updates within half an hour of a change.'],
     ['Who can sign in is set in People and Access on resources.mismo.org, not here. A new facilitator needs both: added here, and given access there.','Editing a facilitator’s name also updates the work requests that show it, and logs the change in their History.','If Meeting Trackers lists a different facilitator for a workgroup, the row says Meeting Trackers says, with that name, and the Hand Over button is highlighted.'],
     [['Open Settings','settings']]],
   mt:['Rosters and Attendance Come from Meeting Trackers','staff imawg',
@@ -6960,7 +6962,7 @@ const HELP_TOPICS={
     'Every work request starts in the Initiative Hub. The MMS brings it in on its own once it is approved.',
     ['Anyone submits a work request in the Initiative Hub (Resource Center › Submit a Work Request).',
      'MISMO staff confirm it, and it goes for approval there.',
-     'Once it is approved and has a WR number, the MMS adds it at Approved – Set Up within a few minutes, linked back to its Hub request, and tells the people on it.',
+     'Once it is approved and has a WR number, the MMS adds it at Approved – Set Up within half an hour (sooner when someone on staff has the MMS open), linked back to its Hub request, and tells the people on it.',
      'From then on, the MMS tracks it. Open the Hub request from the work request’s Links.',
      'Work from the Hub uses the Hub’s sizes for the whole job: Extra-Small 3 months, Small 6 months, Medium 9 months, Large 1 year. The MMS brings in the size and target date the requester gave in the Hub.',
      'At Start Work, the Target to Submit to IM is set at the halfway point of the job. Change it on Key Dates if it is not right.'],
@@ -6972,6 +6974,7 @@ const HELP_TOPICS={
      'Each line is green (working), gray (nothing to check yet), yellow (watch it) or red (needs fixing): saving, loading, storage, email, the Daily Digest, the Initiative Hub, public comments, the website feed, SharePoint files, the IM and AWG portals, Elections HQ, Meeting Trackers and AI review.',
      'Errors on This Page lists anything that went wrong since you opened the MMS; the Team Error Log shows everyone’s errors for the last 7 days.',
      'It checks again every 5 minutes while the MMS is open. Check Again runs it now; Copy Report copies it to paste into an email or a chat with Claude.',
+     'The MMS Robot runs the same checks, and the MMS’s automatic steps (reminders, retrying emails, bringing in approved Hub requests, IM and AWG hand-offs), every 30 minutes even when nobody has the MMS open. It signs its changes “MMS Robot”.',
      'If a tab is left open on an older version of the MMS, it says so, asks you to reload, and stops its automatic steps until you do.',
      'On weekdays the GitHub digest run reads the last check, adds what it can see itself, and emails Jonna if anything is red or yellow, even when nobody has the MMS open.'],
     ['Settings › Notifications holds the email flow and Files flow links the checks read.'],
@@ -7733,7 +7736,7 @@ function hRows(){
   const hb=NET.hub||{};
   if(!relay) row('hub','Initiative Hub','info','Only checked on resources.mismo.org.');
   else if(hb.failAt&&(!hb.okAt||hb.failAt>hb.okAt)) row('hub','Initiative Hub','bad','Couldn’t read the Initiative Hub'+(hb.status?' (answered '+hb.status+')':'')+'. New approved requests won’t come in until it answers.','Perry');
-  else if(!hb.okAt) row('hub','Initiative Hub','info',S.autoOn?'Not checked yet.':'Checked from staff tabs every 5 minutes.');
+  else if(!hb.okAt) row('hub','Initiative Hub','info',S.autoOn?'Not checked yet.':'Checked every 30 minutes by the MMS Robot, and every 5 minutes from staff tabs.');
   else if(S.autoOn&&hAgoMin(hb.okAt)>16) row('hub','Initiative Hub','warn','Last checked '+hWhen(hb.okAt)+'; it should check every 5 minutes.');
   else row('hub','Initiative Hub','ok','Checked '+hWhen(hb.okAt)+'. '+(S.hubBackAt?'Last wrote status back '+hWhen(S.hubBackAt)+'.':'Nothing to write back yet: no Hub request is in the MMS.'));
   /* comments, the website, files */
@@ -7809,7 +7812,7 @@ VIEWS.health=function(){
     '<div class="hh-two"><div class="card"><h3>Storage</h3>'+bars+'<p class="muted hh-note">Each file can hold about 1 MB. Emails are filed by month, so none fills up.</p></div>'+
     '<div class="card"><h3>Errors on This Page'+(E.length?'<span class="sp chip warn">'+E.length+'</span>':'')+'</h3>'+errs+'</div></div>'+
     '<div class="hh-two"><div class="card"><h3>Team Error Log (Last 7 Days)</h3>'+teamH+'</div>'+
-    '<div class="card"><h3>What Isn’t Watched from Here</h3><p class="hh-note" style="margin-top:0">These only show up once their work lands, so a stop can’t be seen from the MMS: the public comment form flow, the MMS Comments flow into GitHub, and the website pages themselves. Power Automate emails a flow’s owner when it keeps failing.</p><p class="hh-note" style="margin:0">On weekdays, GitHub’s digest run reads the last check and emails '+esc(((S.notify||{}).healthTo||['jcritchley@mba.org']).join(', '))+' if something is red or yellow, even when nobody has the MMS open.</p></div></div>';
+    '<div class="card"><h3>What Isn’t Watched from Here</h3><p class="hh-note" style="margin-top:0">These only show up once their work lands, so a stop can’t be seen from the MMS: the public comment form flow, the MMS Comments flow into GitHub, and the website pages themselves. Power Automate emails a flow’s owner when it keeps failing.</p><p class="hh-note" style="margin:0">On weekdays, GitHub’s digest run reads the last check and emails '+esc(((S.notify||{}).healthTo||['jcritchley@mba.org']).join(', '))+' if something is red or yellow. The MMS Robot runs these checks every 30 minutes, so they stay fresh even when nobody has the MMS open.</p></div></div>';
 };
 (function(){ const s=$('#nav-settings'); if(!s||$('[data-hq="health"]')) return; const b=document.createElement('button'); b.type='button'; b.dataset.hq='health'; b.title='System Health'; b.hidden=true; b.id='nav-healthbtn';
   b.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>System Health</span><b id="nav-health" hidden></b>'; s.parentNode.insertBefore(b,s.nextSibling); })();
