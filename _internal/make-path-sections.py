@@ -150,6 +150,35 @@ cta_html = (PCSS + f'\n<div class="mcta"><div><h2>Become a CMSP</h2><p>Check you
   + f'<div class="b"><a class="p1" href="{R}/forms/points/?for=cmsp-new">Check My Points&nbsp;&rarr;</a><a class="p2" href="{R}/forms/cmsp/?kind=new">Start My Application</a></div></div>\n')
 open(O + 'cmsp-points-section.html', 'w', encoding='utf-8').write(points_html)
 open(O + 'cmsp-bottom-section.html', 'w', encoding='utf-8').write(cta_html)
+# ---------- the opening section (Perry chose Option D, 9 Nov 2026): the statement, then four values ----------
+LCSS = """
+<style>
+.mlead{--ink:#0d314c;--text:#44607a;max-width:1120px;color:var(--ink);font-family:inherit}
+.mlead *{box-sizing:border-box}
+.mlead h2{margin:0;font-size:50px;font-weight:700;line-height:1.12;letter-spacing:-.015em;color:var(--ink)}
+.mlead .stmt{margin:18px 0 0;font-size:24px;line-height:1.5;font-weight:500;color:#2b4a63;max-width:1000px}
+.mlead .vals{margin-top:44px;padding-top:40px;border-top:1px solid #cfdeeb;display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:32px}
+.mlead .v{display:flex;flex-direction:column;gap:14px}
+.mlead .ic{width:52px;height:52px;border-radius:10px;background:#e3f1fc;display:flex;align-items:center;justify-content:center}
+.mlead .ic svg{width:28px;height:28px;fill:none;stroke:#1a8fe3;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mlead h3{margin:0;font-size:20px;font-weight:700;color:var(--ink)}
+.mlead p.d{margin:0;font-size:17px;line-height:1.6;color:var(--text)}
+@media (max-width:760px){ .mlead h2{font-size:34px} .mlead .stmt{font-size:19px} .mlead .vals{margin-top:32px;padding-top:28px;gap:26px} }
+</style>"""
+LICON = {
+ 'badge': '<path d="M12 3l2.4 4.9 5.4.8-3.9 3.8.9 5.4L12 15.4l-4.8 2.5.9-5.4-3.9-3.8 5.4-.8z"/>',
+ 'rise': '<path d="M4 17l5-5 4 4 7-7"/><path d="M15 9h5v5"/>',
+ 'team': '<circle cx="8" cy="9" r="3"/><circle cx="16.5" cy="10" r="2.5"/><path d="M3 19c.8-3 2.8-4.5 5-4.5s4.2 1.5 5 4.5"/><path d="M13.5 18.5c.6-2 2-3 3-3s2.4 1 3 3"/>',
+ 'star': '<path d="M5 20V5a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v15l-7-4z"/>'}
+LVALS = [('badge', 'Proven Expertise', 'A credential earned through MISMO’s exam and verified participation, recognized across the mortgage industry.'),
+         ('rise', 'Career Growth', 'Stand out on implementation, data and technology teams as the person who knows the standards.'),
+         ('team', 'Stronger Teams', 'Bring standards know-how in-house, so your organization gets more from MISMO.'),
+         ('star', 'Recognition', 'CMSPs are listed on the MISMO website and recognized at MISMO Summits.')]
+lead_html = (LCSS + '\n<div class="mlead"><h2>Standards Expertise, Recognized</h2>'
+  '<p class="stmt">The CMSP recognizes the professionals who make the mortgage industry’s data work: people who know MISMO standards deeply and help their organizations, and the industry, put them to use.</p>'
+  '<div class="vals">' + ''.join(f'<div class="v"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">{LICON[k]}</svg></div><h3>{e(t)}</h3><p class="d">{e(d)}</p></div>' for k, t, d in LVALS)
+  + '</div></div>\n')
+open(O + 'cmsp-lead-section.html', 'w', encoding='utf-8').write(lead_html)
 # the whole page as it would read, built from the website page template (its header, menus and the Home hero,
 # verbatim, with only the words and buttons changed), with what's kept, new and updated marked
 import re as _re, os as _os
@@ -178,6 +207,6 @@ page = ('<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="
         '.glance div{border:1px solid #cfdeeb;border-radius:12px;padding:18px} .glance b{display:block;font-size:34px;color:#1a74b8} .glance span{font-weight:700;color:#0d314c} .glance small{display:block;color:#44607a;font-size:14.5px;margin-top:4px}'
         '.gap{height:56px} .tagbar{display:inline-block;margin:44px 0 12px;font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border-radius:4px;padding:4px 10px} .tagbar.k{background:#eef3f8;color:#546f88} .tagbar.n{background:#e3f3ec;color:#0b5c44} .tagbar.u{background:#fdf1d8;color:#8a6412}'
         '@media (max-width:760px){.glance{grid-template-columns:1fr}}</style></head><body>'
-        + header + hero + '<div class="wrap"><div class="gap"></div>' + glance + '<div class="gap"></div>' + cm + '<div class="gap"></div>' + points_html + '<div class="gap"></div>' + cta_html + '</div></body></html>')
+        + header + hero + '<div class="wrap"><div style="height:80px"></div>' + lead_html + '<div class="gap"></div>' + glance + '<div class="gap"></div>' + cm + '<div class="gap"></div>' + points_html + '<div class="gap"></div>' + cta_html + '</div></body></html>')
 open(O + 'preview-cmsp-page.html', 'w', encoding='utf-8').write(page)
 print('cmsp page blocks written')
