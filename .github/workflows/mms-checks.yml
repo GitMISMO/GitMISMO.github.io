@@ -11,16 +11,15 @@ permissions:
 jobs:
   checks:
     runs-on: ubuntu-latest
+    # Playwright's own image has the browser and everything it needs, so no system packages are downloaded each run
+    # (Nov 11: a run failed when GitHub's runner couldn't reach the Ubuntu package servers)
+    container: mcr.microsoft.com/playwright:v1.48.2-noble
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-      - name: Install the test browser
+      - name: Get Playwright (the browser is already in the container)
         run: |
           npm init -y >/dev/null
-          npm install --no-save playwright@1.48.2
-          npx playwright install --with-deps chromium
+          for i in 1 2 3; do npm install --no-save playwright@1.48.2 && break; sleep 10; done
       - name: Run the checks
         run: node .github/mms-checks/check.mjs
