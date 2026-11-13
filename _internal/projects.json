@@ -305,6 +305,7 @@
     "repo": "GitMISMO/GitMISMO-initiative-hub-requests",
     "branch": "main",
     "origin": "https://resources.mismo.org",
+    "formOrigins": ["https://collaborate.mismo.org", "https://www.mismo.org"],
     "writable": [
       "data/"
     ]
@@ -478,6 +479,7 @@
     "repo": "GitMISMO/GitMISMO-glossary-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
+    "formOrigins": ["https://collaborate.mismo.org", "https://www.mismo.org"],
     "writable": [
       "data/"
     ]
