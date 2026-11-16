@@ -1,10 +1,10 @@
 {
  "note": "Current CMSPs and AMSPs, name and company only. Written by the Individual certifications job in cms-data; not edited by hand.",
- "updated": "2026-10-29",
+ "updated": "2026-11-16",
  "programs": {
   "CMSP": {
    "title": "Current CMSPs",
-   "count": 38,
+   "count": 39,
    "people": [
     {
      "name": "Kasie Woolrich (Lynn)",
@@ -21,6 +21,10 @@
     {
      "name": "Erin Bittenbender",
      "company": "PhoenixTeam"
+    },
+    {
+     "name": "Elizabeth Bowser",
+     "company": "Fannie Mae"
     },
     {
      "name": "Lynn Calahan",
