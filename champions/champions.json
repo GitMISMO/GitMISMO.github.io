@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-08",
+ "updated": "2026-11-16",
  "source": "Member 360",
  "lender": {
   "Chair": [
@@ -427,6 +427,10 @@
    {
     "name": "TELUS Digital",
     "logo": "https://resources.mismo.org/champions/logos/telus-digital-df1e9c97.jpeg"
+   },
+   {
+    "name": "TransUnion",
+    "website": "https://transunion.com"
    },
    {
     "name": "Trisotech",
