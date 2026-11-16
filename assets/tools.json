@@ -276,6 +276,13 @@
       "path": "/cms/"
     },
     {
+      "key": "cert-completions",
+      "label": "Certification Completions",
+      "colour": "#BE123C",
+      "group": "Certification",
+      "path": "/cert-completions/"
+    },
+    {
       "key": "as-falcon",
       "label": "Falcon Capital Advisors LLC",
       "sum": "Assessor Portal (Falcon Capital Advisors LLC)",
