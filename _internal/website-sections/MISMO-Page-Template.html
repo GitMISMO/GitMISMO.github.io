@@ -42,7 +42,7 @@ body{font-family:var(--mm-font);color:var(--mm-ink);background:var(--mm-page);fo
 .mm-nav>li{position:relative;display:flex;align-items:center;list-style:none}
 .mm-nav-link{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:21px;color:#ffffff;text-decoration:none;white-space:nowrap}
 .mm-nav>li:hover>.mm-nav-link,.mm-nav-link:focus-visible{color:var(--mm-sky)}
-.mm-chev{width:11px;height:8px}
+.mm-chev{display:none}
 /* Dropdown menus: measured from the live site (opens on hover or keyboard focus) */
 .mm-dd{display:none;position:absolute;left:0;top:100%;z-index:20;min-width:250px;margin:0;padding:8px 0;list-style:none;background:#0b2740;border-top:2px solid var(--mm-blue);border-radius:0 0 8px 8px;box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
 .mm-nav>li:hover>.mm-dd,.mm-nav>li:focus-within>.mm-dd{display:block}
@@ -114,46 +114,46 @@ div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
 <body>
 
 <header class="mm-header">
-  <a class="mm-logo" href="https://collaborate.mismo.org/mismowebsite/home"><img src="https://higherlogicdownload.s3.amazonaws.com/MISMO/LogoImages/6e07790a-6fc9-43dc-b9d6-9178e00c3342_mismo-reverse-nav-logo.png" alt="MISMO logo. This will take you to the homepage"></a>
+  <a class="mm-logo" href="https://www.mismo.org/home"><img src="https://higherlogicdownload.s3.amazonaws.com/MISMO/LogoImages/6e07790a-6fc9-43dc-b9d6-9178e00c3342_mismo-reverse-nav-logo.png" alt="MISMO logo. This will take you to the homepage"></a>
   <nav aria-label="Main">
   <ul class="mm-nav" id="mm-nav">
-    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/membership" aria-haspopup="true">Membership <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <li><a class="mm-nav-link" href="https://www.mismo.org/membership" aria-haspopup="true">Membership <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       <ul class="mm-dd">
-        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/member-directory">MISMO Members</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/lender-champions">Our Lender Champions</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/industry-champions">Our Industry Champions</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/membership/iif">Innovation Investment Fund</a></li>
+        <li><a href="https://www.mismo.org/membership/member-directory">MISMO Members</a></li>
+        <li><a href="https://www.mismo.org/membership/lender-champions">Our Lender Champions</a></li>
+        <li><a href="https://www.mismo.org/membership/industry-champions">Our Industry Champions</a></li>
+        <li><a href="https://www.mismo.org/membership/iif">Innovation Investment Fund</a></li>
       </ul>
     </li>
-    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/standards-resources" aria-haspopup="true">Standards &amp; Resources <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <li><a class="mm-nav-link" href="https://www.mismo.org/standards-resources" aria-haspopup="true">Standards &amp; Resources <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       <ul class="mm-dd">
-        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/business-glossary">Business Glossary</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/certification">Certifications</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/mismo-link">MISMO Link</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/standards-resources/digital-mortgage-resource-center">Digital Mortgage Resource Center</a></li>
+        <li><a href="https://www.mismo.org/standards-resources/business-glossary">Business Glossary</a></li>
+        <li><a href="https://www.mismo.org/standards-resources/certification">Certifications</a></li>
+        <li><a href="https://www.mismo.org/standards-resources/mismo-link">MISMO Link</a></li>
+        <li><a href="https://www.mismo.org/standards-resources/digital-mortgage-resource-center">Digital Mortgage Resource Center</a></li>
       </ul>
     </li>
-    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/get-involved" aria-haspopup="true">Get Involved <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <li><a class="mm-nav-link" href="https://www.mismo.org/get-involved" aria-haspopup="true">Get Involved <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       <ul class="mm-dd">
-        <li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/workgroups">Communities &amp; Workgroups</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/get-involved/communities">Collaborate (Members Only)</a></li>
+        <li><a href="https://www.mismo.org/get-involved/workgroups">Communities &amp; Workgroups</a></li>
+        <li><a href="https://www.mismo.org/get-involved/communities">Collaborate (Members Only)</a></li>
       </ul>
     </li>
-    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/events" aria-haspopup="true">Events <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <li><a class="mm-nav-link" href="https://www.mismo.org/events" aria-haspopup="true">Events <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       <ul class="mm-dd">
-        <li><a href="https://collaborate.mismo.org/mismowebsite/events/summit">MISMO Summit</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/events/education">Education</a></li>
+        <li><a href="https://www.mismo.org/events/summit">MISMO Summit</a></li>
+        <li><a href="https://www.mismo.org/events/education">Education</a></li>
       </ul>
     </li>
-    <li><a class="mm-nav-link" href="https://collaborate.mismo.org/mismowebsite/about-mismo" aria-haspopup="true">About MISMO <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    <li><a class="mm-nav-link" href="https://www.mismo.org/about-mismo" aria-haspopup="true">About MISMO <svg class="mm-chev" viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       <ul class="mm-dd">
-        <li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/news">News</a></li>
-        <li><a href="https://collaborate.mismo.org/mismowebsite/about-mismo/contributor-awards">Contributor Awards</a></li>
+        <li><a href="https://www.mismo.org/about-mismo/news">News</a></li>
+        <li><a href="https://www.mismo.org/about-mismo/contributor-awards">Contributor Awards</a></li>
       </ul>
     </li>
   </ul>
   </nav>
-  <a class="mm-login" href="https://collaborate.mismo.org/mismowebsite/home">Log In</a>
+  <a class="mm-login" href="https://www.mismo.org/home">Log In</a>
   <button type="button" class="mm-burger" aria-label="Open menu" aria-expanded="false" aria-controls="mm-nav"><span></span><span></span><span></span></button>
 </header>
 <script>
@@ -172,7 +172,7 @@ div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
 <h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Where Our Industry<span style="display: block; color: #74bfeb;">Builds What’s Next</span></h1>
 <p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">MISMO is the shared infrastructure that helps mortgage finance move with greater clarity, consistency, and confidence.</p>
 <p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3; max-width: 52ch;">By bringing industry participants together around common standards, MISMO helps reduce friction and create a stronger foundation for what comes next.</p>
-<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="https://collaborate.mismo.org/mismowebsite/membership" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Explore Membership&nbsp;→</a> <a href="https://collaborate.mismo.org/mismowebsite/about-mismo" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid rgba(255,255,255,.6);">Explore MISMO</a></div>
+<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="https://www.mismo.org/membership" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Explore Membership&nbsp;→</a> <a href="https://www.mismo.org/about-mismo" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.18); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid rgba(255,255,255,.6);">Explore MISMO</a></div>
 </div>
 <div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
 <div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">People</div>
@@ -201,7 +201,7 @@ div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
     <div class="mm-field"><label class="mm-label" for="topic">Topic</label><select class="mm-select" id="topic"><option>Membership</option><option>Workgroups</option><option>Events</option><option>Standards</option></select></div>
     <div class="mm-field"><label class="mm-label" for="msg">Message</label><textarea class="mm-textarea" id="msg"></textarea></div>
     <label class="mm-check"><input type="checkbox"> I agree to be contacted by MISMO staff about this request.</label>
-    <div class="mm-actions"><button class="mm-btn mm-btn-primary" type="submit">Submit Request&nbsp;&rarr;</button><a class="mm-btn mm-btn-secondary" href="https://collaborate.mismo.org/mismowebsite/home">Back to Home</a></div>
+    <div class="mm-actions"><button class="mm-btn mm-btn-primary" type="submit">Submit Request&nbsp;&rarr;</button><a class="mm-btn mm-btn-secondary" href="https://www.mismo.org/home">Back to Home</a></div>
   </form>
 </main>
 
