@@ -2191,5 +2191,6 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 /* Phone and tablet menu: the hamburger opens the same menu as a panel under the header bar. */
 (function(){var h=document.querySelector(".mm-header"),b=h.querySelector(".mm-burger");b.addEventListener("click",function(){var o=h.classList.toggle("is-open");b.setAttribute("aria-expanded",o?"true":"false");b.setAttribute("aria-label",o?"Close menu":"Open menu");});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&h.classList.contains("is-open")){h.classList.remove("is-open");b.setAttribute("aria-expanded","false");b.focus();}});})();
 </script>
+<script>/* Log In returns to this exact page (keeps any code in the address) */(function(){var a=document.querySelectorAll('a.mm-login');if(!a.length)return;var u='https://www.mismo.org/signed-in?to='+encodeURIComponent(location.href.split('#')[0]);var h='https://www.mismo.org/HigherLogic/Security/OAUTH/SignIn.aspx?ReturnUrl='+encodeURIComponent(u);for(var i=0;i<a.length;i++)a[i].setAttribute('href',h);})();</script>
 </body>
 </html>

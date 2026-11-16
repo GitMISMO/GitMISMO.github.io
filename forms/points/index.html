@@ -613,5 +613,6 @@ body{background:#fff}
   } else setStep(1);
 })();
 </script>
+<script>/* Log In returns to this exact page (keeps any code in the address) */(function(){var a=document.querySelectorAll('a.mm-login');if(!a.length)return;var u='https://www.mismo.org/signed-in?to='+encodeURIComponent(location.href.split('#')[0]);var h='https://www.mismo.org/HigherLogic/Security/OAUTH/SignIn.aspx?ReturnUrl='+encodeURIComponent(u);for(var i=0;i<a.length;i++)a[i].setAttribute('href',h);})();</script>
 </body>
 </html>
