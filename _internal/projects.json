@@ -483,5 +483,14 @@
     "writable": [
       "data/"
     ]
+  },
+  "cert-completions": {
+    "repo": "GitMISMO/cms-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "readable": [
+      "data/accounting/"
+    ],
+    "writable": []
   }
 }
