@@ -12,7 +12,8 @@
    "end": "1:00 PM",
    "endsAt": "2026-11-18T13:00:00-05:00",
    "url": "https://www.mba.org/conferences-and-education/event/2026/11/18/default-calendar/ai-governance-crosswalk-fannie-mae-freddie-mac-and-mismo-s-frame-83571",
-   "register": "https://ebiz.mba.org/ebusiness/Meetings/MeetingRegistration.aspx?ID=83571"
+   "register": "https://ebiz.mba.org/ebusiness/Meetings/MeetingRegistration.aspx?ID=83571",
+   "summary": "This session offers a practical crosswalk of Fannie Mae’s and Freddie Mac’s AI governance requirements and MISMO’s FRAME (Framework for Responsible AI in the Mortgage Ecosystem). MISMO President Brian Vieaux will moderate a conversation with MISMO Members James Brody of Brody Gapp LLP; Brooke Anderson Tompkins, CEO of Bridge AIvisory; and Suha Zehl, CEO of Z Technology Solutions. The panel will examine where the GSE requirements align, where they differ, and how FRAME can help organizations build and strengthen their governance programs."
   },
   {
    "id": "83572",
@@ -24,7 +25,8 @@
    "end": "1:00 PM",
    "endsAt": "2026-12-08T13:00:00-05:00",
    "url": "https://www.mba.org/conferences-and-education/event/2026/12/08/default-calendar/introducing-the-mismo-eheloc-standard-and-faq-83572",
-   "register": "https://ebiz.mba.org/ebusiness/Meetings/MeetingRegistration.aspx?ID=83572"
+   "register": "https://ebiz.mba.org/ebusiness/Meetings/MeetingRegistration.aspx?ID=83572",
+   "summary": "As eHELOC adoption continues to grow, understanding the underlying technology, legal framework, and implementation considerations is essential. This webinar explores the fundamentals of eHELOCs, including SMART Docs®, legal credibility, using remote online notarization in an eHELOC transaction while introducing the new MISMO eHELOC FAQ as a practical resource for answering common questions and promoting consistent industry practices."
   }
  ]
 }

@@ -68,6 +68,10 @@ async function main() {
     const text = decode(html);
     const re = new RegExp(`(${MONTHS.join('|')}) (\\d{1,2}), (\\d{4})\\s+(\\d{1,2}:\\d\\d\\s*[AP]M)\\s*[-–]\\s*(\\d{1,2}:\\d\\d\\s*[AP]M)`, 'i');
     const t = text.match(re);
+    // Short description for the webinar's own pop-up on the Education page (#webinar-<id>)
+    const sm = text.match(/Non-Member Price\s*\$[\d.,]+\s*(.+?)\s*(?:Date and Time:|Objectives:|Speaker\(s\):|Similar Events)/i);
+    let summary = sm ? sm[1].trim() : '';
+    if (summary.length > 700) { const cut = summary.slice(0, 700); const dot = cut.lastIndexOf('. '); summary = (dot > 200 ? cut.slice(0, dot + 1) : cut.replace(/\s+\S*$/, '') + '…'); }
     const [y, mo, d] = e.ymd.split('-').map(Number);
     const start = t ? t[4].replace(/\s+/g, ' ').toUpperCase() : '';
     const end = t ? t[5].replace(/\s+/g, ' ').toUpperCase() : '';
@@ -82,6 +86,7 @@ async function main() {
       start, end, endsAt: endIso,
       url: e.url,
       register: `https://ebiz.mba.org/ebusiness/Meetings/MeetingRegistration.aspx?ID=${e.id}`,
+      summary,
     };
     out.mismo.push(item);
     await sleep(300);
