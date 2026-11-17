@@ -2058,7 +2058,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-17T02:42:52Z',fp:'21a80988'};
+window.__mmsBuild={at:'2026-11-17T03:23:15Z',fp:'bbbff978'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -4414,7 +4414,7 @@ const feedFile=u=>{ try{ return decodeURIComponent(String(u).split(/[?#]/)[0].sp
 function webRecent(){
   const mms=allTickets().filter(t=>t.stage==='published'&&!t.split&&t.dates&&t.dates.published).map(t=>{ const L=t.links||{};
     const url=feedWww(L.resourceLibrary||L.crResourceLibrary||L.productPage||L.crProductPage); if(!/^https:\/\//.test(url)) return null;
-    const o={id:t.id,name:cpPublic(t),published:String(t.dates.published).slice(0,10),url};
+    const o={id:t.id,name:String((t.cpCard&&t.cpCard.title)||'').trim()||cpPublic(t),published:String(t.dates.published).slice(0,10),url};
     if(/member/i.test((t.designation||{}).availableTo||'')) o.memberOnly=true;
     else if(L.nonMember){ o.licence=o.name; o.nonMemberAccess=L.nonMember; const f=feedFile(L.nonMember); if(/\.[a-z0-9]{2,5}$/i.test(f)) o.fileName=f; }
     return o; }).filter(Boolean);
@@ -4422,7 +4422,7 @@ function webRecent(){
   const seen=new Set();
   return mms.concat(lib).sort((a,b)=>String(b.published).localeCompare(String(a.published))).filter(r=>{ const k=r.url.split(/[?#]/)[0].toLowerCase(); if(seen.has(k)) return false; seen.add(k); return true; }).slice(0,12); }
 /* the public list leaves off staff notes kept in the product page name, e.g. "(existing page)" */
-const cpPublic=t=>String(cpName(t)||'').replace(/\s*\([^()]*\bpages?\b[^()]*\)/gi,'').replace(/\s{2,}/g,' ').trim()||t.name;
+const cpPublic=t=>{ const n=String(cpName(t)||'').replace(/\s*\([^()]*\bpages?\b[^()]*\)/gi,'').replace(/\s{2,}/g,' ').trim(); return n&&n.length<=100?n:t.name; };   /* a long product-page note isn't a name */
 function webFeed(){
   const td=today();
   const cps=allTickets().filter(t=>t.stage==='comment'&&t.state==='active'&&t.sub!=='setup'&&t.dates&&t.dates.commentStart&&t.dates.commentStart<=td&&t.dates.commentEnd&&t.dates.commentEnd>=addDays(td,-1)) /* not before it opens */.sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))
