@@ -445,7 +445,7 @@ var EF = (function(){
     if(!open.length){ el.innerHTML='<div class="ef">'+hero+'<div class="closed"><b>Nominations are closed right now.</b><br>Questions? Write to elections@mismo.org.</div></div>'; return; }
     var pre=cfg.preset||open[0].cycle;
     el.innerHTML='<form class="ef" novalidate>'+hero+
-      '<fieldset><legend>Which election?</legend><div class="opts">'+open.map(function(x){ return '<label class="opt'+(x.cycle===pre?" on":"")+'"><input type="radio" name="cycle" value="'+e(x.cycle)+'"'+(x.cycle===pre?" checked":"")+'><span><b>'+e(LONG[x.type]||x.name)+'</b><small>'+e(WHAT[x.type]||"")+(x.closes?' · nominations close '+e(fmt(x.closes)):'')+'</small></span></label>'; }).join("")+'</div></fieldset>'+
+      '<fieldset><legend>Which election?</legend><div class="opts">'+open.map(function(x){ return '<label class="opt'+(x.cycle===pre?" on":"")+'"><input type="radio" name="cycle" value="'+e(x.cycle)+'"'+(x.cycle===pre?" checked":"")+'><span><b>'+e(LONG[x.type]||x.name)+'</b><small>'+e(WHAT[x.type]||"")+(x.closesLabel?' · nominations close '+e(x.closesLabel):x.closes?' · nominations close '+e(fmt(x.closes)):'')+'</small></span></label>'; }).join("")+'</div></fieldset>'+
       '<fieldset id="ef-seatbox"><legend>Seat</legend><div class="fgrid" id="ef-seat"></div></fieldset>'+
       '<fieldset><legend>Are you nominating yourself?</legend><div class="opts"><label class="opt on"><input type="radio" name="self" value="yes" checked><span><b>Yes, I\'m nominating myself</b></span></label><label class="opt"><input type="radio" name="self" value="no"><span><b>No, I\'m nominating someone else</b></span></label></div></fieldset>'+
       '<fieldset><legend id="ef-nlg">Your details</legend><div class="fgrid">'+fld("first","First Name","text",true,"given-name")+fld("last","Last Name","text",true,"family-name")+fld("email","Work Email","email",true,"email")+fld("company","Company","text",true,"organization")+fld("title","Job Title","text",true,"organization-title")+'</div></fieldset>'+
@@ -577,7 +577,7 @@ var EF = (function(){
   var q=new URLSearchParams(location.search), host=document.getElementById("ef-host");
 
   fetch("/elections-hq/slates/nominate.json",{cache:"no-store"}).then(function(r){ return r.ok?r.json():null; }).catch(function(){ return null; }).then(function(cfg){
-    var els=((cfg&&cfg.elections)||[]).map(function(x){ x.open=isOpen(x.mode,x.from,x.until); return x; });
+    var els=((cfg&&cfg.elections)||[]).map(function(x){ x.open=isOpen(x.mode,x.from,x.until) && !(x.untilAt && x.mode!=="open" && Date.now()>Date.parse(x.untilAt)); return x; });
     var pre=q.get("e"); if(pre && !els.some(function(x){ return x.cycle===pre && x.open; })) pre="";
     EF.nominate(host,{elections:els, preset:pre, submit:function(rec){ return send("elections-nomination",rec); }});
   });
