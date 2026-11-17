@@ -38,6 +38,14 @@ async function relay(route) {
   if (m === 'OPTIONS') return route.fulfill({ status: 204, headers: { 'access-control-allow-origin': '*', 'access-control-allow-headers': '*', 'access-control-allow-methods': '*' } });
   if (kind === 'ask') return route.fulfill(json(503, { error: 'UNAVAILABLE', message: 'AI review runs only from a person’s MMS' }));
   if (kind === 'file' && /^so-/.test(project)) { try { const f = await ghGet(project + '-data', rest, RO); stat.reads++; return f ? route.fulfill(json(200, f.data)) : route.fulfill(json(404, { error: 'NOT_FOUND' })); } catch (e) { return route.fulfill(json(e.status || 502, { error: 'GITHUB' })); } }
+  /* the website's comment-period list: the robot publishes it too, so a period that ends drops off the website with nobody's MMS open */
+  if (project === 'mms-feed' && kind === 'commit' && m === 'POST') { try { const b = JSON.parse(req.postData() || '{}'); const out = [];
+      for (const f of (b.files || []).filter(f => /^docs\/[a-z0-9._-]+\.json$/i.test(f.path || ''))) {
+        const h = await fetch(`${GH}/repos/${ORG}/mismo-standards/contents/${f.path}`, { headers: ghHead(RW) }); if (h.status !== 200 && h.status !== 404) return route.fulfill(json(h.status === 403 ? 403 : 404, { error: 'UNKNOWN_PROJECT' }));
+        const sha = h.status === 200 ? (await h.json()).sha : undefined; const text = typeof f.content === 'string' ? f.content : JSON.stringify(f.content, null, 2);
+        const r = await fetch(`${GH}/repos/${ORG}/mismo-standards/contents/${f.path}`, { method: 'PUT', headers: Object.assign({ 'Content-Type': 'application/json' }, ghHead(RW)), body: JSON.stringify(Object.assign({ message: b.message || 'MMS Robot: ' + f.path, content: Buffer.from(text).toString('base64'), committer: { name: 'MMS Robot', email: 'workrequests@mismo.org' } }, sha ? { sha } : {})) });
+        if (!r.ok) return route.fulfill(json(r.status === 404 ? 404 : r.status, { error: r.status === 404 ? 'UNKNOWN_PROJECT' : 'GITHUB' })); out.push(f.path); stat.writes++; }
+      return route.fulfill(json(200, { ok: true, files: out })); } catch (e) { return route.fulfill(json(502, { error: 'GITHUB' })); } }
   const repo = REPO[project]; if (!repo || kind !== 'data') return route.fulfill(json(404, { error: 'UNKNOWN_PROJECT' }));
   const path = `data/${rest}.json`, tok = WRITE.has(project) ? RW : RO;
   try {
