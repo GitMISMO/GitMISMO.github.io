@@ -319,6 +319,23 @@ span.l small{font-weight:400;color:var(--f-ink3)}
 .side ol li:before{content:counter(s);width:34px;height:34px;border-radius:8px;background:#e3f1fc;color:#1a74b8;display:flex;align-items:center;justify-content:center;font-weight:700}
 .side ol li b{display:block;font-size:15px}
 .side ol li span{color:var(--f-ink2);font-size:14px}
+/* pictures you drag in, and the YouTube details for a video request (Nov 17, 2026) */
+.yt{grid-column:1/-1}
+.yt[hidden],#ytOtherBox[hidden]{display:none}
+select.t{width:100%;height:44px;padding:0 12px;border:1px solid var(--f-field);border-radius:6px;background:#fff;color:var(--f-ink);font:inherit;font-size:15px}
+select.t:focus{outline:2px solid #74bfeb;outline-offset:0;border-color:#74bfeb}
+.drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:22px 16px;border:1.5px dashed var(--f-field);border-radius:10px;background:var(--f-wash);text-align:center;color:var(--f-ink2);font-size:14px;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop.over{border-color:#1a8fe3;background:#e3f1fc}
+.drop:focus-visible{outline:2px solid #74bfeb;outline-offset:2px}
+.drop svg{width:28px;height:28px;color:#1a8fe3;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.drop b{color:var(--f-ink)}
+.drop small{font-size:12.5px;color:var(--f-ink3)}
+.files{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px}
+.files:empty{display:none}
+.files li{position:relative;border:1px solid var(--f-line);border-radius:8px;overflow:hidden;background:#fff}
+.files img{display:block;width:100%;height:92px;object-fit:cover;background:var(--f-wash)}
+.files span{display:block;padding:6px 32px 6px 8px;font-size:12.5px;color:var(--f-ink2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.files button{position:absolute;right:5px;bottom:4px;width:24px;height:24px;border:0;border-radius:50%;background:var(--f-bad-soft);color:var(--f-bad);font:inherit;font-size:15px;line-height:24px;cursor:pointer}
 </style>
 </head>
 <body>
@@ -457,10 +474,18 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         <div class="full"><span class="l" id="type-l">Type of Request <i>*</i> <small>(pick the closest)</small></span><div class="chips" id="type" role="radiogroup" aria-labelledby="type-l"></div></div>
         <div class="full"><label class="l" for="title">Give It a Short Name <i>*</i></label><input class="t" id="title" maxlength="160" placeholder="e.g. LinkedIn post for the eNote webinar"></div>
         <div class="full"><label class="l" for="details">Details <i>*</i></label><textarea class="t" id="details" maxlength="4000" placeholder="What it is, the key message, anything that must be included, and where it should go"></textarea></div>
+<div class="yt" id="yt" hidden><div class="grid">
+<div class="sec">For YouTube</div>
+<div class="full"><label class="l" for="ytTitle">Video Title <small>(optional)</small></label><input class="t" id="ytTitle" maxlength="100" placeholder="The title as it should appear on YouTube"></div>
+<div class="full"><label class="l" for="ytDescription">Description <small>(optional)</small></label><textarea class="t" id="ytDescription" maxlength="5000" placeholder="The description as it should appear under the video"></textarea></div>
+<div><label class="l" for="ytPlaylist">Playlist <small>(optional)</small></label><select class="t" id="ytPlaylist"><option value="">No playlist</option><option>MISMO Mic&#39;d Up</option><option>Webinars</option><option>MISMO FRAME</option><option>MISMO Initiatives</option><option>MISMO Link</option><option>Mortgage Compliance Dataset (MCD) Learning Series</option><option value="__other">Other (a new playlist)</option></select></div>
+<div id="ytOtherBox" hidden><label class="l" for="ytPlaylistOther">New Playlist Name <i>*</i></label><input class="t" id="ytPlaylistOther" maxlength="120" placeholder="e.g. Decision Modeling"></div>
+</div></div>
         <div><label class="l" for="neededBy">Needed By <i>*</i></label><input class="t" id="neededBy" type="date"><label class="firm"><input type="checkbox" id="firm"> This date is firm</label></div>
         <div><label class="l" for="audience">Audience <small>(optional)</small></label><input class="t" id="audience" maxlength="200" placeholder="e.g. members, lenders, the workgroup"></div>
         <div class="full"><label class="l" for="event">Related Event <small>(optional)</small></label><input class="t" id="event" maxlength="160" placeholder="e.g. Winter Summit, a webinar, a workgroup meeting"></div>
-        <div class="full"><label class="l" for="links">Links to Files or Drafts <small>(optional)</small></label><textarea class="t" id="links" maxlength="1500" style="min-height:70px" placeholder="SharePoint, OneDrive or Google Drive links, one per line"></textarea><span class="hint">Share a link instead of attaching a file. Make sure the Strategic Growth team can open it.</span></div>
+        <div class="full"><label class="l" for="links">Links to Files or Drafts <small>(optional)</small></label><textarea class="t" id="links" maxlength="1500" style="min-height:70px" placeholder="SharePoint, OneDrive or Google Drive links, one per line"></textarea><span class="hint">For videos and large files, share a link. Make sure the Strategic Growth team can open it.</span></div>
+<div class="full"><span class="l" id="pics-l">Pictures and Thumbnails <small>(optional)</small></span><div class="drop" id="drop" role="button" tabindex="0" aria-labelledby="pics-l" aria-describedby="pics-h"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-3"/></svg><div><b>Drag pictures here</b> or click to choose</div><small id="pics-h">PNG, JPG, GIF or WebP, up to 10 MB each, 6 at most</small></div><input type="file" id="pics" accept="image/png,image/jpeg,image/gif,image/webp" multiple hidden><ul class="files" id="files" aria-label="Pictures to send"></ul></div>
       </div>
       <div class="vh" aria-hidden="true"><label for="website">Website</label><input id="website" tabindex="-1" autocomplete="off"></div>
       <button class="go" type="submit" id="go">Send the Request&nbsp;→</button>
@@ -495,7 +520,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
      workflow files anything marked form = "media-request" on the MISMO Media Requests page
      (GitMISMO/marketing-hq-data, data/inbox.json), never on the MISMO Matters list. */
   var FLOW_ENDPOINT = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/22/workflows/079f28100f45415abc3b901e4de228b8/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=lTOTIX-ERFzdl0GX0LvXYSQRaRmu9cb9dRW-8l3sQjY";
-  var ROLES = ["MISMO Staff", "Facilitator", "Other"];
+  var FILE_ENDPOINT = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/27/workflows/3197f57e784c445bab6fbc267d19858d/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=wRDmkUoUjm_82IIEogiSFNNvXRSZqf_iL1wGUEDa9LQ"; /* MISMO Media - Request Files: saves each picture in Q Drive > MISMO > Active Documents > Marketing > MISMO Media Requests */
+var ROLES = ["MISMO Staff", "Facilitator", "Other"];
   var TYPES = [["linkedin","LinkedIn Post"],["matters","MISMO Matters Item"],["email","Email Blast"],["community","Community Post"],["video","Video or YouTube"],["summit","Summit Promotion"],["graphic","Graphic or Image"],["print","Flyer, One-Pager or Print"],["signage","Event Signage or Banner"],["swag","Swag or Pins"],["slides","Slides or Presentation"],["web","Website Update"],["press","Press Release or News"],["other","Something Else"]];
   var $ = function (id) { return document.getElementById(id); };
   var startedAt = Date.now(), pick = { role: "", type: "" }, busy = false;
@@ -504,9 +530,45 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       return '<button type="button" class="chip" role="radio" data-v="' + v + '" aria-checked="' + (pick[box] === v) + '" aria-pressed="' + (pick[box] === v) + '">' + l + '</button>'; }).join("");
   }
   ["role", "type"].forEach(function (box) {
-    $(box).addEventListener("click", function (e) { var b = e.target.closest("[data-v]"); if (!b) return; pick[box] = b.dataset.v; draw(box, box === "role" ? ROLES : TYPES); $(box).removeAttribute("aria-invalid"); var again = $(box).querySelector('[data-v="' + b.dataset.v + '"]'); if (again) again.focus(); });
+    $(box).addEventListener("click", function (e) { var b = e.target.closest("[data-v]"); if (!b) return; pick[box] = b.dataset.v; draw(box, box === "role" ? ROLES : TYPES); if (box === "type") ytShow(); $(box).removeAttribute("aria-invalid"); var again = $(box).querySelector('[data-v="' + b.dataset.v + '"]'); if (again) again.focus(); });
   });
   draw("role", ROLES); draw("type", TYPES);
+/* the YouTube details show only for a video request */
+function ytShow() { var on = pick.type === "video"; $("yt").hidden = !on; }
+$("ytPlaylist").addEventListener("change", function () { var o = this.value === "__other"; $("ytOtherBox").hidden = !o; if (o) $("ytPlaylistOther").focus(); });
+/* pictures: drag them onto the box or click it to choose; each is sent on its own before the request */
+var PICS = [], MAXPICS = 6, MAXMB = 10, OKTYPES = /^image\/(png|jpe?g|gif|webp)$/i;
+function drawPics() {
+  $("files").innerHTML = PICS.map(function (f, i) { return '<li><img alt="" src="' + f.url + '"><span title="' + esc(f.file.name) + '">' + esc(f.file.name) + '</span><button type="button" data-i="' + i + '" aria-label="Remove ' + esc(f.file.name) + '">&times;</button></li>'; }).join("");
+}
+function addPics(list) {
+  var skipped = [];
+  Array.prototype.forEach.call(list || [], function (file) {
+    if (!OKTYPES.test(file.type || "")) { skipped.push(file.name + " (not a picture)"); return; }
+    if (file.size > MAXMB * 1024 * 1024) { skipped.push(file.name + " (over " + MAXMB + " MB)"); return; }
+    if (PICS.length >= MAXPICS) { skipped.push(file.name + " (" + MAXPICS + " at most)"); return; }
+    PICS.push({ file: file, url: URL.createObjectURL(file) });
+  });
+  drawPics();
+  if (skipped.length) say("<b>Some files weren’t added:</b><ul>" + skipped.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>"); else $("msg").hidden = true;
+}
+$("drop").addEventListener("click", function () { $("pics").click(); });
+$("drop").addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); $("pics").click(); } });
+$("pics").addEventListener("change", function () { addPics(this.files); this.value = ""; });
+["dragenter", "dragover"].forEach(function (t) { $("drop").addEventListener(t, function (e) { e.preventDefault(); $("drop").classList.add("over"); }); });
+["dragleave", "drop"].forEach(function (t) { $("drop").addEventListener(t, function (e) { e.preventDefault(); $("drop").classList.remove("over"); }); });
+$("drop").addEventListener("drop", function (e) { addPics(e.dataTransfer && e.dataTransfer.files); });
+$("files").addEventListener("click", function (e) { var b = e.target.closest("[data-i]"); if (!b) return; var i = +b.dataset.i; URL.revokeObjectURL(PICS[i].url); PICS.splice(i, 1); drawPics(); });
+function b64(file) { return new Promise(function (ok, no) { var r = new FileReader(); r.onload = function () { ok(String(r.result).split(",")[1] || ""); }; r.onerror = no; r.readAsDataURL(file); }); }
+function upFiles() {
+  var out = [];
+  return PICS.reduce(function (p, f, i) { return p.then(function () {
+    $("go").textContent = "Sending picture " + (i + 1) + " of " + PICS.length + "…";
+    return b64(f.file).then(function (c) { return fetch(FILE_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify({ name: f.file.name, type: f.file.type, content: c }) }); })
+      .then(function (r) { if (!r.ok) { var e = new Error("picture"); e.pic = "We couldn’t attach " + f.file.name + ". Pictures must be PNG, JPG, GIF or WebP and under " + MAXMB + " MB. Remove it and try again."; throw e; } return r.json(); })
+      .then(function (j) { out.push({ name: f.file.name, path: String((j && j.path) || "") }); });
+  }); }, Promise.resolve()).then(function () { $("go").textContent = "Sending…"; return out; });
+}
   var today = new Date(); $("neededBy").min = today.toISOString().slice(0, 10);
   function val(id) { return ($(id).value || "").replace(/[ \t]+/g, " ").trim(); }
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
@@ -521,6 +583,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     mark("title", val("title").length < 3, "Give the request a short name.");
     mark("details", val("details").length < 10, "Add a few details about what you need.");
     mark("neededBy", !/^\d{4}-\d{2}-\d{2}$/.test(val("neededBy")), "Add the date you need it by.");
+if (pick.type === "video" && $("ytPlaylist").value === "__other") mark("ytPlaylistOther", val("ytPlaylistOther").length < 2, "Name the new YouTube playlist.");
     return bad;
   }
   function thanks(body) {
@@ -538,12 +601,13 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var body = { form: "media-request", firstName: val("firstName"), lastName: val("lastName"), email: val("email").toLowerCase(),
       role: pick.role, group: val("group"), type: pick.type, title: val("title"), details: ($("details").value || "").trim(),
       neededBy: val("neededBy"), firm: $("firm").checked, audience: val("audience"), event: val("event"), links: ($("links").value || "").trim(),
+      ytTitle: pick.type === "video" ? val("ytTitle") : "", ytDescription: pick.type === "video" ? ($("ytDescription").value || "").trim() : "", ytPlaylist: pick.type === "video" ? ($("ytPlaylist").value === "__other" ? val("ytPlaylistOther") : $("ytPlaylist").value) : "",
       page: document.referrer || "", submittedAt: new Date().toISOString(), startedAt: startedAt, website: $("website").value };
     if (body.website || Date.now() - startedAt < 3000) { thanks(body); return; }   /* a robot: thank it and send nothing */
     busy = true; $("go").disabled = true; $("go").textContent = "Sending…"; $("msg").hidden = true;
-    fetch(FLOW_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(body) })
+    upFiles().then(function (files) { body.files = files; return fetch(FLOW_ENDPOINT, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(body) }); })
       .then(function (r) { if (!r.ok) throw new Error("status " + r.status); thanks(body); })
-      .catch(function () { say("We couldn’t reach MISMO just now. Check your connection and try again; your answers are still here."); })
+      .catch(function (err) { if (err && err.pic) { say(esc(err.pic)); return; } say("We couldn’t reach MISMO just now. Check your connection and try again; your answers are still here."); })
       .then(function () { busy = false; var g = $("go"); if (g) { g.disabled = false; g.innerHTML = "Send the Request&nbsp;→"; } });
   });
 })();
