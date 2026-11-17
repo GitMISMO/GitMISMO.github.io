@@ -2058,7 +2058,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-09T23:59:26Z',fp:'0033af8b'};
+window.__mmsBuild={at:'2026-11-17T00:22:26Z',fp:'3bf942eb'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2366,7 +2366,7 @@ async function move(t0,to,opts){
   onEnter(t,to,from);
   await saveTicket(t,opts.toast||(t.wr+' moved to '+stageDef(to).name),before);
   /* the work riding with a release moves with it, and Undo takes the whole group back together */
-  if(!opts.rider){ const grp=lastUndo?[lastUndo]:[]; for(const r of ridersOf(t.id)){ if(r.stage!==to){ await move(r,to,{rider:true,sub:to==='published'?'':t.sub,text:'Moved with '+t.wr+' (Reference Model release) to '+stageDef(to).name,toast:t.wr+' and the work riding with it moved to '+stageDef(to).name}); if(lastUndo&&lastUndo.id===r.id) grp.push(lastUndo); } }
+  if(!opts.rider){ const grp=lastUndo?[lastUndo]:[]; for(const r of ridersOf(t.id)){ /* a rider that is already further along (its own comment period done) waits for the release to catch up, and is never moved back */ if(r.stage!==to&&(r.stage===from||ordOf(r.stage)<ordOf(to))){ await move(r,to,{rider:true,sub:to==='published'?'':t.sub,text:'Moved with '+t.wr+' (Reference Model release) to '+stageDef(to).name,toast:t.wr+' and the work riding with it moved to '+stageDef(to).name}); if(lastUndo&&lastUndo.id===r.id) grp.push(lastUndo); } }
     if(grp.length>1) lastUndo={group:grp,at:grp[0].at}; }
   /* one stage email for a release: riders don't send their own */
   if(from!==to&&!opts.rider) notifyEnter(t,to);
