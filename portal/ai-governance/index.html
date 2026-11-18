@@ -471,7 +471,7 @@ function sample(){
 }
 
 /* ---------- state ---------- */
-var KEY = "mismo.aigov.portal.draft.v1", S;
+var KEY = "resources:ai-governance-portal:draft", S;
 function load(){ try { var t = localStorage.getItem(KEY); if (t){ var x = JSON.parse(t); if (x && x.v === 1) return x; } } catch (e) {} return sample(); }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} savedAt = new Date(); paintSaved(); }
 var savedAt = null;
