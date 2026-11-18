@@ -492,5 +492,13 @@
       "data/accounting/"
     ],
     "writable": []
+  },
+  "mms-feed": {
+    "repo": "GitMISMO/mismo-standards",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "docs/"
+    ]
   }
 }
