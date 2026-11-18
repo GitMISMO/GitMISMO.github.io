@@ -89,5 +89,7 @@ for (let i = 0; i < 60; i++) { const busy = await page.evaluate(() => !!(window.
 const sum = await page.evaluate(() => ({ tickets: Object.keys(__mms.tickets || {}).length, health: __mms.health && __mms.health.level, red: __mms.health ? __mms.health.rows.filter(r => r.level === 'bad').map(r => r.label) : [], stale: !!__mms.stale })).catch(() => ({}));
 await browser.close();
 console.log(`Opened the MMS (${sum.tickets} work requests). Reads ${stat.reads}, saves ${stat.writes}, conflicts retried ${stat.conflicts}, read-only refusals ${stat.denied}. Emails posted ${stat.mail}${stat.mailFailed ? ` (${stat.mailFailed} refused)` : ''}. Health: ${sum.health}${sum.red && sum.red.length ? ' (red: ' + sum.red.join(', ') + ')' : ''}.`);
+try { const { publishWorkProducts } = await import('./publish-work-products.mjs'); const w = await publishWorkProducts({ RW, GH, ORG }); if (w.ready) console.log(`Work products: ${w.ready} to publish, ${w.files} file${w.files === 1 ? '' : 's'} saved${w.failed ? `, ${w.failed} could not be published` : ''}.`); }
+catch (e) { console.log('Work products: not published (' + (e.status || e.message) + ')'); }
 const real = errs.filter(m => !/Failed to fetch|NetworkError/.test(m));
 if (real.length) { console.log('Page errors: ' + real.length + (process.env.SHOW_ERRORS ? ' ' + real.slice(0, 3).join(' | ') : '')); process.exit(1); }
