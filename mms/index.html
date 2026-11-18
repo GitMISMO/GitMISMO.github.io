@@ -2063,7 +2063,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-18T20:18:58Z',fp:'b93b0ab8'};
+window.__mmsBuild={at:'2026-11-18T22:28:41Z',fp:'a9b51892'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2350,7 +2350,11 @@ function hist(t,text,extra){ t.history=t.history||[]; t.history.push(Object.assi
    (a pop-up left open while someone else saved) sends that copy as its base, so only what the action
    changed is saved over the newer record, never the rest of it */
 const TVER={};
-function noteVersions(map){ Object.values(map||{}).forEach(t=>{ if(!t||!t.id) return; const v=TVER[t.id]=TVER[t.id]||{}; const k=t.updatedAt||''; if(!(k in v)){ v[k]=JSON.stringify(t); const ks=Object.keys(v); if(ks.length>6) delete v[ks[0]]; } }); }
+/* the latest copy seen for each updatedAt wins (Nov 18 fix, found by the ten-person stress test): a save that was
+   merged with someone else's change keeps its updatedAt, so the copy this tab showed before the merge and the merged
+   copy share a key; keeping the first one made a later note use the pre-merge copy as its base and undo the other
+   person's change (a work request moved back to the stage it had just left) */
+function noteVersions(map){ Object.values(map||{}).forEach(t=>{ if(!t||!t.id) return; const v=TVER[t.id]=TVER[t.id]||{}; const k=t.updatedAt||''; const s=JSON.stringify(t); if(v[k]===s) return; delete v[k]; v[k]=s; const ks=Object.keys(v); if(ks.length>6) delete v[ks[0]]; }); }
 function startedFrom(t){ const v=TVER[t.id]; if(!v) return undefined; const k=t.updatedAt||''; return k in v?JSON.parse(v[k]):undefined; }
 async function saveTicket(t,msg,before){
   const base=startedFrom(t);
