@@ -1985,6 +1985,11 @@ p,.sub,.lede{text-wrap:pretty}
 .tr-list{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
 .tr-row{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px 10px;border:1px solid var(--border);border-radius:7px;font-size:13px}
 .tr-row .muted{font-size:12px;margin-top:2px}
+/* Work products upload progress (Nov 18) */
+.wp-prog{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:900;max-width:min(560px,calc(100vw - 32px));padding:10px 14px;border-radius:8px;background:var(--card,#fff);color:var(--ink,#0d314c);border:1px solid var(--line,#d6e2ec);box-shadow:0 6px 22px rgba(13,49,76,.18);font-size:13px}
+.wp-prog.ok{border-color:var(--good)}.wp-prog.bad{border-color:var(--bad);color:var(--bad)}
+.wp-prog[hidden]{display:none}
+.wp-sec .tog{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:13px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2058,7 +2063,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-18T03:08:22Z',fp:'d8f16980'};
+window.__mmsBuild={at:'2026-11-18T18:53:59Z',fp:'ded2e71c'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2725,6 +2730,7 @@ function stageActions(t){
     case 'release': add('Mark Published →',()=>markPublished(t),'pri'); break;
     default: if(!STAGE_KEYS.includes(t.stage)) add('Done: Move On →',()=>move(t,nextStage(t),{text:stageDef(t.stage).name+' done'}),'pri');
   }
+  if(t.stage==='published'&&S.canWrite&&S.isStaff&&typeof wpResend==='function') A.push({label:(t.wp&&t.wp.id)?'Update on the Website':'Put on the Website',fn:()=>wpResend(t),cls:'ghost'});
   if(S.canWrite&&(S.isStaff||sameName(t.facilitator,viewer().name))&&!t.parent&&!t.rides) A.push({label:'Split into Deliverables',fn:()=>splitT(t),cls:'ghost'});
   return A;
 }
@@ -2908,10 +2914,14 @@ async function postReport(t){
   else await move(x,nextStage(x),{text:x.commentReport+'; ready for '+govName()+' approval to publish as '+(isStandard(x)?'Candidate Recommendation':'Final'),note:v.note});
 }
 async function markPublished(t){
-  const v=await modal({title:'Published',ok:'Mark Published',body:fld('Published',dateField('d',today()))+fld('Announcement Link',inp('news',(t.links&&t.links.newsFinal)||'','https://'))+fld('MISMO.org Product Page',inp('pp',(t.links&&t.links.productPage)||'','https://'))+fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'))+fld('Non-Member Download',inp('nm',(t.links&&t.links.nonMember)||'','https://'),'For the website: the file non-members get after the license form. Leave blank if it’s for members only.')});
-  if(!v) return; const x=clone(t); x.links=Object.assign({},x.links,{newsFinal:v.news,productPage:v.pp,resourceLibrary:v.rl,nonMember:(v.nm||'').trim()}); x.dates=Object.assign({},x.dates,{published:v.d});
+  const wpGet={f:null};
+  const p=modal({title:'Published',ok:'Mark Published',validate:v=>typeof wpCheck==='function'?wpCheck(v):'',body:fld('Published',dateField('d',today()))+fld('Announcement Link',inp('news',(t.links&&t.links.newsFinal)||'','https://'))+fld('MISMO.org Product Page',inp('pp',(t.links&&t.links.productPage)||'','https://'))+fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'),'Optional from now on: the website lists the work product from the MMS.')+(typeof wpForm==='function'?wpForm(t):'')});
+  wpGet.f=typeof wpWatch==='function'?wpWatch():null; const v=await p;
+  if(!v) return; const x=clone(t); x.links=Object.assign({},x.links,{newsFinal:v.news,productPage:v.pp,resourceLibrary:v.rl}); x.dates=Object.assign({},x.dates,{published:v.d});
   await move(x,'published',{text:'Published as '+(isStandard(x)?'Candidate Recommendation':'Final')+' '+fmt(v.d)});
+  if(v.wpon&&typeof wpQueue==='function') await wpQueue(S.tickets[x.id]||x,v,wpGet.f&&wpGet.f());
 }
+
 async function moveTo(t){
   const opts=stages().map(s=>[s.key,s.name]);
   const v=await modal({title:'Move to a Stage',text:'For one-off fixes. The move is logged.',ok:'Move',body:fld('Stage',sel('to',opts,t.stage))+fld('Why',inp('why','','Optional'))});
@@ -6102,6 +6112,66 @@ renderPanel=function(){ const P=$('#panel'), id=S.panel, same=!!(P&&id&&P.datase
   if(id&&S.panel===id&&y>0){ const pb=$('.pb',$('#panel')); if(pb){ pb.scrollTop=y; requestAnimationFrame(()=>{ if(S.panel===id&&pb.isConnected&&pb.scrollTop<y) pb.scrollTop=y; }); } }
   if(window.scrollY!==wy) window.scrollTo(0,wy); };
 
+/* ---------- Work products on the website (Nov 18, 2026) ----------
+   The MMS is the one place work products come from. Mark Published also lists the work product on the website's
+   Find a Work Product (resources.mismo.org/work-products/catalog.json) and posts its public files there.
+   The files go up in small pieces through the save service (wpup-*) with the listing (wpqueue); the MMS Robot joins
+   them and publishes within half an hour. Members-only products are listed with no public files. */
+const WP_CAT='https://resources.mismo.org/work-products/catalog.json', WP_MAX=100*1048576, WP_PIECE=600*1024;
+const WP_LIC=[['1','1. Read Only'],['2','2. Internal Use Only'],['3','3. Restricted Content'],['4','4. Commercial Distributor Usage'],['5','5. Non-Commercial Usage']];
+let wpCat=null;
+async function wpCatalog(){ if(wpCat) return wpCat; try{ const r=await fetch(WP_CAT,{cache:'no-store'}); wpCat=r.ok?await r.json():{products:[]}; }catch(e){ wpCat={products:[]}; } return wpCat; }
+const wpSlug=s=>String(s||'').toLowerCase().replace(/[®™]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,90);
+function wpLicOf(t){ const l=String((t.designation||{}).license||''); return /read/i.test(l)?'1':/internal/i.test(l)?'2':/restrict/i.test(l)?'3':/non-?commercial/i.test(l)?'5':'4'; }
+function wpFileName(n){ const m=String(n).match(/^(.*?)(\.[A-Za-z0-9]{1,6})?$/); return (wpSlug(m[1])||'file')+(m[2]||'').toLowerCase(); }
+function wpDisplay(n){ const m=String(n).match(/^(.*?)(?:\.([A-Za-z0-9]{1,6}))?$/); return m[1].replace(/[_]+/g,' ').replace(/\s+/g,' ').trim()+(m[2]?' ('+m[2].toUpperCase()+')':''); }
+function wpForm(t){ const W=t.wp||{}; const title=W.title||String((t.cpCard&&t.cpCard.title)||'').trim()||cpPublic(t);
+  const mo=W.membersOnly!=null?W.membersOnly:/member/i.test((t.designation||{}).availableTo||'');
+  return '<div class="wp-sec"><h4 style="margin:16px 0 4px">Website: Find a Work Product</h4>'+
+    '<label class="tog"><input type="checkbox" name="wpon"'+(W.off?'':' checked')+'> List it on the website, with its public files</label>'+
+    fld('Website Id',inp('wpid',W.id||wpSlug(title),'e.g. mortgage-compliance-dataset-mcd'),'An id already on the website updates that listing; a new id adds one. Ids never change once listed.')+
+    fld('Title',inp('wptitle',title))+
+    fld('Summary',ta('wpsum',W.summary||(t.cpCard&&t.cpCard.text)||'','One or two plain sentences on what it is'))+
+    fld('Category',inp('wpcat',W.category||'','e.g. Digital Mortgage, Credit, Closing'))+
+    fld('Version',inp('wpver',W.version||String(t.wr||'').replace(/_/g,'-')))+
+    fld('Status',sel('wpst',['Candidate Recommendation','Recommendation','Final'],W.status||(isStandard(t)?'Candidate Recommendation':'Final')))+
+    fld('License',sel('wplic',WP_LIC,String(W.license||wpLicOf(t))))+
+    '<label class="tog"><input type="checkbox" name="wpmo"'+(mo?' checked':'')+'> Members only (listed with the Resource Library link, no public files)</label>'+
+    fld('Public Files','<input type="file" name="wpfiles" multiple>','Each 100 MB or less. Keep this tab open while they upload.')+
+    fld('Other Names People Search For',inp('wpalias',(W.aliases||[]).join(', '),'Optional, separated by commas'))+'</div>'; }
+/* the chosen files (a file box's value is only its name) and the ids already on the website */
+function wpWatch(){ let files=[]; const i=document.querySelector('#modal-root input[name=wpfiles]'); if(i) i.addEventListener('change',()=>{ files=[...i.files]; });
+  wpCatalog().then(c=>{ const box=document.querySelector('#modal-root .wp-sec'); if(!box||!(c.products||[]).length) return; const dl=document.createElement('datalist'); dl.id='wpids';
+    dl.innerHTML=c.products.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.title)+'</option>').join(''); box.appendChild(dl); const w=box.querySelector('[name=wpid]'); if(w) w.setAttribute('list','wpids'); });
+  return ()=>files; }
+function wpCheck(v){ if(!v.wpon) return ''; if(!wpSlug(v.wpid)) return 'Add a website id.'; if(!String(v.wptitle||'').trim()) return 'Add the title for the website.'; return ''; }
+function wpB64(u8){ let s=''; for(let i=0;i<u8.length;i+=32768) s+=String.fromCharCode.apply(null,u8.subarray(i,i+32768)); return btoa(s); }
+function wpSay(m,cls){ let b=document.getElementById('wpprog'); if(!b){ b=document.createElement('div'); b.id='wpprog'; b.className='wp-prog'; document.body.appendChild(b); } b.className='wp-prog '+(cls||''); b.textContent=m; b.hidden=!m; if(cls==='ok'||cls==='bad') setTimeout(()=>{ if(b.textContent===m) b.hidden=true; },9000); }
+async function wpPut(name,content){ const tok=window.ResourcesSession&&ResourcesSession.token(); if(!RELAY()||!tok) throw new Error('signed out');
+  for(let a=0;a<4;a++){ try{ const r=await fetch(RELAY()+'/mms/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content})}); if(r.ok) return; if(r.status===401||r.status===403) throw new Error('no access'); }catch(e){ if(/no access|signed out/.test(e.message)) throw e; } await new Promise(z=>setTimeout(z,800*(a+1))); }
+  throw new Error('the save service is busy'); }
+async function wpQueue(t,v,files){
+  files=(files||[]).filter(Boolean); const id=wpSlug(v.wpid); const mo=!!v.wpmo;
+  const big=files.filter(f=>f.size>WP_MAX); if(big.length) toast(big.map(f=>f.name).join(', ')+' is over 100 MB, so it wasn’t posted. Send it to Jonna.');
+  files=mo?[]:files.filter(f=>f.size<=WP_MAX);
+  const key=(id.slice(0,60)+'-'+Date.now().toString(36)); const out=[];
+  try{
+    for(const [fi,f] of files.entries()){ const u8=new Uint8Array(await f.arrayBuffer()); const n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
+      for(let i=0;i<n;i++){ wpSay('Uploading '+f.name+' for the website: '+Math.round(i/n*100)+'% ('+(fi+1)+' of '+files.length+'). Keep this tab open.'); await wpPut('wpup-'+key+'-'+fi+'-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
+      out.push({name:wpDisplay(f.name),file:wpFileName(f.name),bytes:u8.length,chunks:n}); }
+  }catch(e){ wpSay('The files didn’t upload ('+e.message+'). Open the work request and use Website › Send Again.','bad'); return false; }
+  const product={title:String(v.wptitle).trim(),summary:String(v.wpsum||'').trim(),category:String(v.wpcat||'').trim()||null,version:String(v.wpver||'').trim()||null,status:v.wpst||null,
+    published:v.d||today(),license:+v.wplic||null,membersOnly:mo,libraryUrl:feedWww(v.rl)||null,aliases:String(v.wpalias||'').split(',').map(s=>s.trim()).filter(Boolean)};
+  const doc={key,ticket:t.id,wr:t.wr,id,product,files:out,status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''};
+  await write('wpqueue',key,doc);
+  const x=clone(S.tickets[t.id]||t); x.wp=Object.assign({},product,{id,key,queuedAt:doc.at});
+  hist(x,'Sent to the website’s Find a Work Product ('+(mo?'members only, no public files':out.length+' public file'+(out.length===1?'':'s'))+'); it’s posted within half an hour');
+  await saveTicket(x); wpSay('Sent to the website. It’s posted within half an hour.','ok'); return true; }
+/* a published work request: list it, update its listing or send its files again */
+async function wpResend(t){ const p=modal({title:'Website: Find a Work Product',ok:'Send to the Website',validate:v=>wpCheck(Object.assign({wpon:true},v)),
+    body:fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'),'Optional')+wpForm(t).replace(/<label class="tog"><input type="checkbox" name="wpon"[^>]*>[^<]*<\/label>/,'')});
+  const g=wpWatch(); const v=await p; if(!v) return; v.wpon=true; v.d=(t.dates&&t.dates.published)||today(); await wpQueue(S.tickets[t.id]||t,v,g()); }
+
 /* =====================================================================
    Architecture Help on the work request (Nov 4, Jonna)
    - A work request's architecture tasks show on the work request itself:
@@ -6909,7 +6979,7 @@ const HELP_TOPICS={
      'To move a single work request, change Facilitator on its Details tab and click Save Changes.',
      'Notifications: the email flow link, the sender, Hold All Email Until, reminder timing, and who hears when work arrives at each step.',
      'Daily Digest: who gets it, which days, who is copied, and which sections are on.',
-     'Website: the feed of open comment periods to mismo.org.',
+     'Website: the feed of open comment periods to mismo.org. Work products and their public files are listed on the website from Mark Published (resources.mismo.org/work-products/catalog.json); a published work request can be updated there with Update on the Website.',
      'Import and Backup: bring in or save a copy of the records.',
      'The facilitator list here is also published, names only, for other MISMO systems such as Summit HQ (resources.mismo.org/mms/facilitators.json). It updates within half an hour of a change.'],
     ['Who can sign in is set in People and Access on resources.mismo.org, not here. A new facilitator needs both: added here, and given access there.','Editing a facilitator’s name also updates the work requests that show it, and logs the change in their History.','If Meeting Trackers lists a different facilitator for a workgroup, the row says Meeting Trackers says, with that name, and the Hand Over button is highlighted.'],
@@ -7112,7 +7182,7 @@ const RC2_STAGE_HOW={
   comment:['Post its Comment Period Card on mismo.org and announce it.','Moves to Post-Comment by itself when the period ends.'],
   post:['Report what came back from the comment period.','Comments from the website form land on the work request.'],
   'gc-publish':['Governance approves it to publish.','Staff record the vote; approved work goes to Release.'],
-  release:['Announce it and put the pages live.','MISMO Media gets the release request on its own.']
+  release:['Announce it, then Mark Published.','Mark Published also lists it on the website’s Find a Work Product with its public files (members-only products are listed without files); it is posted within half an hour. MISMO Media gets the release request on its own.']
 };
 const GOV_DESC={'Business Executive Team (BET)':'Approves new work and sets priorities.','Residential Standards Governance Committee':'Governs residential standards.','Commercial Standards Governance Committee':'Governs commercial standards.','Council of Chairs':'Workgroup and community chairs.','Education Council':'Guides MISMO education.'};
 function rc2Tile(x,c){ const [n,d,u,ic]=x, int=/^go:/.test(u);
@@ -7731,6 +7801,8 @@ function hAgoMin(iso){ return iso?(Date.now()-Date.parse(iso))/60000:Infinity; }
 const H_RANK={ok:0,info:0,warn:1,bad:2};
 S.ghRun=S.ghRun||null; let ghRunAt=0;
 async function hGhRun(){ if(Date.now()-ghRunAt<30*60000) return; ghRunAt=Date.now();
+  /* the website's work products list: its own checks (Nov 18) */
+  try{ const w=await fetch('https://resources.mismo.org/work-products/checks.json',{cache:'no-store'}); S.wpChecks=w.ok?await w.json():null; }catch(e){}
   try{ const r=await fetch('https://api.github.com/repos/GitMISMO/GitMISMO.github.io/actions/workflows/mms-digest.yml/runs?per_page=5',{cache:'no-store'});
     if(!r.ok) return; const b=await r.json(); const runs=(b.workflow_runs||[]).filter(x=>x.status==='completed');
     S.ghRun=runs[0]?{at:runs[0].updated_at,ok:runs[0].conclusion==='success',url:runs[0].html_url,lastFail:(runs.find(x=>x.conclusion!=='success')||{}).updated_at||''}:null; }catch(e){} }
@@ -7782,6 +7854,9 @@ function hRows(){
   if(fsst.error==='UNKNOWN_PROJECT') row('feed','Website Feed','info','Not switched on yet: the website feed (mms-feed) still needs setting up on the save service. That’s on Perry’s list.');
   else if(fsst.error&&(!fsst.at||String(fsst.tried||'')>String(fsst.at))) row('feed','Website Feed','bad','The website’s Open for Comment list didn’t update ('+fsst.error+').','Perry');
   else row('feed','Website Feed',fsst.at?'ok':'info',fsst.at?'Last published '+hWhen(fsst.at)+' ('+(fsst.count||0)+' open for comment).':'Publishes on its own when the list changes.');
+  const wc=S.wpChecks;
+  if(wc&&(wc.filesWithoutLicense||[]).length) row('wp','Website Work Products','warn',(wc.filesWithoutLicense.length===1?'One work product has':wc.filesWithoutLicense.length+' work products have')+' public files but no license: '+wc.filesWithoutLicense.slice(0,6).join(', ')+'. Set it with Update on the Website.','Jonna');
+  else if(wc) row('wp','Website Work Products','ok',(wc.products||0)+' work products listed on the website; every one with files has a license.');
   const fl=NET.files||{};
   if(!N.docFlowUrl) row('files','SharePoint Files','warn','No Files flow link in Settings › Notifications, so files can’t be listed or uploaded.','Jonna');
   else if(fl.failAt&&(!fl.okAt||fl.failAt>fl.okAt)) row('files','SharePoint Files','bad','The Files flow didn’t answer'+(fl.status?' ('+fl.status+')':'')+'. Lists and uploads on the Files tab won’t work.','Jonna (the flow’s owner)');
