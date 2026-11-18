@@ -142,9 +142,9 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <thead><tr>
       <th data-sort="completedOn">Completed</th><th data-sort="org">Company</th><th data-sort="program">Certification</th><th data-sort="type">Type</th>
       <th data-sort="order">Aptify Order</th><th class="num" data-sort="fee">Fee</th><th data-sort="paidOn">Paid</th>
-      <th data-sort="assessor">Assessor</th><th class="num" data-sort="assessorFee">Assessor's Fee</th><th class="num" data-sort="mismoNet">MISMO's Share</th>
+      <th data-sort="assessor">Assessor</th><th class="num" data-sort="assessorFee">Assessor's Fee</th><th data-sort="assessorInvoice">Assessor Invoice</th><th class="num" data-sort="mismoNet">MISMO's Share</th>
     </tr></thead>
-    <tbody id="rows"><tr><td colspan="10" class="empty">Loading&hellip;</td></tr></tbody>
+    <tbody id="rows"><tr><td colspan="11" class="empty">Loading&hellip;</td></tr></tbody>
     <tfoot id="foot"></tfoot>
   </table></div></div>
   <p class="note" id="note"></p>
@@ -177,7 +177,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var q = state.q.trim().toLowerCase();
     return (data.rows || []).filter(inPeriod).filter(function (r) {
       if (!q) return true;
-      return [r.org, r.program, r.product, r.order, r.assessor, r.type, r.aptifyCompanyId].join(" ").toLowerCase().indexOf(q) >= 0;
+      return [r.org, r.program, r.product, r.order, r.assessor, r.type, r.aptifyCompanyId, r.assessorInvoice].join(" ").toLowerCase().indexOf(q) >= 0;
     }).sort(function (a, b) {
       var x = a[state.sort], y = b[state.sort];
       if (x == null && y == null) return 0; if (x == null) return 1; if (y == null) return -1;
@@ -216,7 +216,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         lastMonth = r.month;
         var m = list.filter(function (x) { return x.month === r.month; });
         html += '<tr class="monthrow"><td colspan="5">' + esc(monthName(r.month)) + " · " + m.length + " completed</td>" +
-          '<td class="num">' + usd(sum(m, "fee")) + '</td><td></td><td></td><td class="num">' + usd(sum(m, "assessorFee")) + '</td><td class="num">' + usd(sum(m, "mismoNet")) + "</td></tr>";
+          '<td class="num">' + usd(sum(m, "fee")) + '</td><td></td><td></td><td class="num">' + usd(sum(m, "assessorFee")) + '</td><td></td><td class="num">' + usd(sum(m, "mismoNet")) + "</td></tr>";
       }
       var paidCell = r.paidOn ? '<span class="tag good">Paid</span><span class="sub">' + esc(fmt(r.paidOn)) +
           (r.fee != null && r.paidAmount != null && r.paidAmount !== r.fee ? " \u00b7 order payment " + usd(r.paidAmount) : "") + "</span>"
@@ -226,19 +226,19 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         "<td><b>" + esc(r.org) + "</b>" + (r.aptifyCompanyId ? '<span class="sub">Aptify ' + esc(r.aptifyCompanyId) + "</span>" : "") + "</td>" +
         "<td>" + esc(r.program) + (r.product ? '<span class="sub">' + esc(r.product) + "</span>" : "") + "</td>" +
         "<td>" + esc(r.type) + "</td><td>" + esc(r.order || "") + '</td><td class="num">' + usd(r.fee) + "</td><td>" + paidCell + "</td>" +
-        "<td>" + esc(r.assessor || "") + '</td><td class="num">' + usd(r.assessorFee) + '</td><td class="num">' + usd(r.mismoNet) + "</td></tr>";
+        "<td>" + esc(r.assessor || "") + '</td><td class="num">' + usd(r.assessorFee) + "</td><td>" + (r.assessorInvoice ? esc(r.assessorInvoice) + (r.assessorInvoiceDate ? '<span class="sub">' + esc(r.assessorInvoiceDate) + "</span>" : "") : "") + '</td><td class="num">' + usd(r.mismoNet) + "</td></tr>";
     });
-    $("rows").innerHTML = html || '<tr><td colspan="10" class="empty">Nothing completed' + (state.q ? " matches that search" : " in " + esc(label())) + ".</td></tr>";
+    $("rows").innerHTML = html || '<tr><td colspan="11" class="empty">Nothing completed' + (state.q ? " matches that search" : " in " + esc(label())) + ".</td></tr>";
     $("foot").innerHTML = list.length ? '<tr><td colspan="5">' + list.length + (list.length === 1 ? " certification" : " certifications") + "</td>" +
-      '<td class="num">' + usd(sum(list, "fee")) + '</td><td>' + usd(sum(list, "paidAmount")) + '</td><td></td><td class="num">' + usd(sum(list, "assessorFee")) + '</td><td class="num">' + usd(sum(list, "mismoNet")) + "</td></tr>" : "";
+      '<td class="num">' + usd(sum(list, "fee")) + '</td><td>' + usd(sum(list, "paidAmount")) + '</td><td></td><td class="num">' + usd(sum(list, "assessorFee")) + '</td><td></td><td class="num">' + usd(sum(list, "mismoNet")) + "</td></tr>" : "";
     try { localStorage.setItem("resources:cert-completions:view", JSON.stringify({ period: state.period })); } catch (e) {}
   }
   function csvCell(v) { var s = v == null ? "" : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
   function download() {
     var list = rowsNow();
-    var head = ["Completed On", "Month", "Recorded In", "Company", "Aptify Company ID", "Program", "Product", "Type", "Aptify Order", "Fee", "Order Payment", "Paid On", "Paid By", "Assessor", "Assessor's Fee", "MISMO's Share"];
+    var head = ["Completed On", "Month", "Recorded In", "Company", "Aptify Company ID", "Program", "Product", "Type", "Aptify Order", "Fee", "Order Payment", "Paid On", "Paid By", "Assessor", "Assessor's Fee", "Assessor Invoice", "MISMO's Share"];
     var lines = [head.join(",")].concat(list.map(function (r) {
-      return [r.completedOn, r.month, r.source, r.org, r.aptifyCompanyId, r.program, r.product, r.type, r.order, r.fee, r.paidAmount, r.paidOn, r.paidHow, r.assessor, r.assessorFee, r.mismoNet].map(csvCell).join(",");
+      return [r.completedOn, r.month, r.source, r.org, r.aptifyCompanyId, r.program, r.product, r.type, r.order, r.fee, r.paidAmount, r.paidOn, r.paidHow, r.assessor, r.assessorFee, r.assessorInvoice, r.mismoNet].map(csvCell).join(",");
     }));
     var blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
     var a = document.createElement("a"); a.href = URL.createObjectURL(blob);
@@ -256,7 +256,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       th.addEventListener("click", function () { var k = th.getAttribute("data-sort"); state.dir = state.sort === k ? -state.dir : (k === "completedOn" ? -1 : 1); state.sort = k; draw(); });
     });
   }
-  function fail(msg) { $("rows").innerHTML = '<tr><td colspan="10" class="empty">' + esc(msg) + "</td></tr>"; }
+  function fail(msg) { $("rows").innerHTML = '<tr><td colspan="11" class="empty">' + esc(msg) + "</td></tr>"; }
   function load() {
     var tok = ""; try { tok = window.ResourcesSession.token() || ""; } catch (e) {}
     return fetch(RELAY + "/" + PROJECT + "/file/" + FILE, { headers: { Authorization: "Bearer " + tok } })
