@@ -309,6 +309,51 @@ td select.in{padding:5px 8px;font-size:13px}
 .ai b{color:var(--accent)}
 .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:5px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:50;max-width:calc(100vw - 32px)}
 .muted{color:var(--ink-3)}
+/* sign-in walkthrough */
+.gate{padding-block:26px 60px}
+.gate .lead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+.gate .lead h2{font-size:22px}
+.gate .lead p{margin:4px 0 0;color:var(--ink-2);max-width:70ch}
+.gsteps{display:flex;gap:0;margin-left:auto;border:1px solid var(--border);border-radius:6px;overflow:hidden;background:var(--surface)}
+.gsteps span{padding:7px 12px;font-size:12.5px;color:var(--ink-3);border-right:1px solid var(--border);white-space:nowrap}
+.gsteps span:last-child{border-right:0}
+.gsteps span.on{background:var(--navy);color:#fff;font-weight:600}
+.gsteps span.done{color:var(--good);font-weight:600}
+.gcols{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:18px;align-items:start}
+@media (max-width:860px){.gcols{grid-template-columns:1fr}.gsteps{margin-left:0}}
+.inbox{border:1px solid var(--border);border-radius:8px;background:var(--surface);box-shadow:var(--shadow);overflow:hidden}
+.inbox .ihead{padding:12px 16px;border-bottom:1px solid var(--rule);font-size:13px;color:var(--ink-2);display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 10px}
+.inbox .ihead b{color:var(--ink-3);font-weight:500}
+.inbox .ihead .subj{grid-column:1/-1;font-size:16px;font-weight:600;color:var(--ink);margin-top:4px}
+.inbox .tag{margin-left:6px}
+.mail{background:#eef3f7;padding:20px}
+.mail .card{max-width:560px;margin:0 auto;background:#fff;color:#0d314c;border-radius:4px;overflow:hidden;font-size:14.5px;line-height:1.55}
+.mail .mh{background:#0d314c;padding:14px 20px;display:flex;align-items:center;gap:12px}
+.mail .mh .logoplate{padding:6px 10px}.mail .mh .logoplate .wordmark{height:16px}
+.mail .mh span{color:#a9d8f3;font-size:13px;font-weight:500}
+.mail .mb{padding:20px 22px}
+.mail .ctx{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#6c899f;font-weight:600;margin-bottom:10px}
+.mail p{margin:0 0 12px}
+.mail .rows{border:1px solid #e6eef4;border-radius:4px;margin:14px 0}
+.mail .rows div{display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px;padding:8px 12px;font-size:13.5px}
+.mail .rows div+div{border-top:1px solid #e6eef4}
+.mail .rows b{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#6c899f;font-weight:700;padding-top:2px}
+.mail .mbtn{display:inline-block;background:#0d314c;color:#fff;border:0;border-radius:4px;padding:11px 22px;font-weight:600;font-size:14.5px;cursor:pointer;font-family:inherit}
+.mail .mbtn:hover{background:#14486e}
+.mail .code{color:#0d314c;font-family:var(--mono);font-size:30px;letter-spacing:.18em;font-weight:600;background:#e4f2fb;border-radius:4px;padding:12px 16px;text-align:center;margin:8px 0 14px}
+.mail .note{background:#f2f7fb;border-left:3px solid #74bfeb;padding:10px 12px;font-size:13px;color:#456179;margin-top:14px}
+.mail .mf{padding:12px 22px;border-top:1px solid #e6eef4;font-size:12px;color:#7794aa}
+.how{display:flex;flex-direction:column;gap:12px}
+.how ol{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--ink-2)}
+.how ol b{color:var(--ink)}
+.signbox{display:flex;flex-direction:column;gap:14px}
+.signbox h3{font-size:20px}
+.signbox .who{display:flex;gap:12px;align-items:center;padding:12px 14px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2)}
+.signbox .who .mono{width:40px;height:40px;border-radius:50%;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.codein{font-family:var(--mono);font-size:28px;letter-spacing:.3em;text-align:center;padding:12px}
+.remember{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
+.remember input{width:18px;height:18px;margin-top:2px;accent-color:var(--good)}
+.err{color:var(--bad);font-size:13.5px;font-weight:500}
 .sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .tblwrap,.q,.panel,.trig{position:relative}
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
@@ -362,6 +407,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   </div>
 </div></div>
 
+<section class="wrap gate" id="gate" hidden></section>
 <section class="hero" id="hero"></section>
 <div class="wrap"><nav class="steps" id="steps" aria-label="Steps"></nav></div>
 <main class="wrap" id="main"></main>
@@ -452,9 +498,9 @@ function sample(){
   b["UD-1.1"] = { text: "Classifies uploaded income documents and extracts key figures into the loan file for underwriter confirmation.", docs: [] };
   b["HO-1.C1"] = { text: "", docs: ["d11"], drafted: true };
   return {
-    v: 1, view: "company", step: 1, ucSel: 0, ucTab: "triggers", areaSel: "UD", qFilter: "all", submitted: false, attest: false,
+    v: 2, view: "company", step: 1, ucSel: 0, ucTab: "triggers", areaSel: "UD", qFilter: "all", submitted: false, attest: false,
     product: {
-      a01: "Northbeam Mortgage Technologies, Inc.", a02n: "Dana Whitfield", a02t: "Director, Compliance Programs", a02e: "dana.whitfield@northbeam.example", a02p: "",
+      a01: "Northbeam Mortgage Technologies, Inc.", a02n: "Jonathan Kearns", a02t: "Example User", a02e: "jonathan.kearns@northbeam.example", a02p: "",
       a03n: "Marcus Lee", a03t: "Principal Engineer", a03e: "marcus.lee@northbeam.example", a04n: "", a04t: "", a04e: "",
       b01: "Northbeam Loan Assistant", b02: "4.2.x", b03: "", b04: "Vendor-hosted SaaS", b05: "2", b06: "2025-09-15"
     },
@@ -472,7 +518,7 @@ function sample(){
 
 /* ---------- state ---------- */
 var KEY = "resources:ai-governance-portal:draft", S;
-function load(){ try { var t = localStorage.getItem(KEY); if (t){ var x = JSON.parse(t); if (x && x.v === 1) return x; } } catch (e) {} return sample(); }
+function load(){ try { var t = localStorage.getItem(KEY); if (t){ var x = JSON.parse(t); if (x && x.v === 2) return x; } } catch (e) {} return sample(); }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} savedAt = new Date(); paintSaved(); }
 var savedAt = null;
 S = load();
@@ -782,6 +828,55 @@ document.addEventListener("change", function(e){
 document.addEventListener("dragleave", function(e){ var z = e.target.closest && e.target.closest("#drop"); if (z) z.classList.remove("over"); });
 document.addEventListener("drop", function(e){ var z = e.target.closest && e.target.closest("#drop"); if (z){ e.preventDefault(); z.classList.remove("over"); if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files); } });
 
+/* ---------- sign-in walkthrough (draft: shows each screen and email; nothing is sent) ---------- */
+var SKEY = "resources:ai-governance-portal:signedin", G = { s: 0, code: "482913", err: "" };
+function signedIn(){ try { return sessionStorage.getItem(SKEY) === "1"; } catch (e) { return !!signedIn._m; } }
+function setSigned(v){ try { if (v) sessionStorage.setItem(SKEY, "1"); else sessionStorage.removeItem(SKEY); } catch (e) {} signedIn._m = v; }
+function maskEmail(e){ var p = String(e || "").split("@"); if (p.length < 2) return e; return p[0].slice(0, 2) + "\u2022\u2022\u2022\u2022\u2022\u2022@" + p[1]; }
+function logoSvg(){ return '<span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>'; }
+function mailFrame(subject, inner, label){
+  var pr = S.product;
+  return '<div class="inbox" aria-label="' + esc(label) + '"><div class="ihead"><b>From</b><span>MISMO Certifications &lt;certifications@mismo.org&gt;</span><b>To</b><span>' + esc(pr.a02n) + " &lt;" + esc(maskEmail(pr.a02e)) + '&gt;</span><div class="subj">' + esc(subject) + '<span class="tag">Preview, not sent</span></div></div>' +
+    '<div class="mail"><div class="card"><div class="mh">' + logoSvg() + '<span>AI Governance Certification</span></div><div class="mb">' + inner + '</div><div class="mf">MISMO Certifications · certifications@mismo.org</div></div></div></div>';
+}
+function paintGate(){
+  var g = $("gate"), pr = S.product, first = (pr.a02n || "").split(" ")[0] || "there", labels = ["The Invitation", "Sign In", "The Code", "Signed In"];
+  var steps = '<div class="gsteps">' + labels.map(function(l, i){ return '<span class="' + (i === G.s ? "on" : i < G.s ? "done" : "") + '">' + (i < G.s ? "&#10003; " : "") + l + "</span>"; }).join("") + "</div>";
+  var h = '<div class="lead"><div><span class="code">HOW SIGN-IN WORKS · DRAFT</span><h2>' + ["The email that opens the portal", "Their portal asks who they are", "A code arrives by email", ""][G.s] + "</h2><p>" +
+    ["Once the application is paid, MISMO opens the company's portal and this invitation goes to the primary contact. Click the button in the email to follow it through.",
+     "The link is theirs alone, but the link by itself never opens the portal. A one-time code goes to the email MISMO has on file, so a forwarded link is no use to anyone else.",
+     "The code is good for 10 minutes and works once. In the real portal it only arrives by email; here it is shown in the preview so you can try it."][G.s] + "</p></div>" + steps + "</div>";
+  if (G.s === 0){
+    h += '<div class="gcols">' + mailFrame("Your MISMO AI Governance Certification portal is ready",
+      '<div class="ctx">AI Governance Certification · ' + esc(pr.a01) + "</div><p>Hello " + esc(first) + ",</p><p>Thank you, your payment has been received. Your certification portal for <b>" + esc(pr.b01) + "</b> is ready. It's where you tell us about the product, upload your documents and answer the governance questions for each AI use case.</p>" +
+      '<div class="rows"><div><b>Product</b><span>' + esc(pr.b01) + " " + esc(pr.b02) + '</span></div><div><b>Use Cases</b><span>' + S.ucs.length + ' listed on your application</span></div><div><b>Assessor</b><span>Actualize Consulting</span></div></div>' +
+      '<p><button type="button" class="mbtn" data-g="1">Open My Portal</button></p><div class="note">This link is yours. When you open it we email you a sign-in code, so it only works for you. To add teammates, open the portal and choose Add a Teammate; each person signs in with their own code.</div>', "Invitation email") +
+      '<div class="panel how"><div class="pb"><div class="sectlabel">What Happens</div><ol><li><b>Application paid.</b> The CMS opens the portal and this email goes out (only once MISMO approves it).</li><li><b>They click Open My Portal.</b> The portal knows which company it is, but asks for a code first.</li><li><b>A six-digit code is emailed</b> to the address on file. Good for 10 minutes.</li><li><b>Signed in.</b> On their own device they stay signed in for 30 days; otherwise they sign in again with a new code.</li><li><b>Teammates</b> are added from the portal and get their own codes. MISMO can open any company\'s portal from the CMS.</li></ol></div></div></div>';
+  } else if (G.s === 1){
+    h += '<div class="gcols"><div class="panel"><div class="pb signbox"><h3>Sign in to your certification portal</h3><div class="who"><span class="mono">' + esc(first.charAt(0)) + '</span><div><b>' + esc(pr.a01) + '</b><br><span class="muted" style="font-size:13px">' + esc(pr.b01) + " · AI Governance Certification</span></div></div>" +
+      "<p style=\"margin:0\">We'll email a six-digit sign-in code to <b>" + esc(maskEmail(pr.a02e)) + '</b>.</p><div><button class="btn" type="button" data-g="2">Email Me a Code</button></div><p class="muted" style="margin:0;font-size:13px">Not you, or need a different address? Email certifications@mismo.org.</p></div></div>' +
+      '<div class="panel how"><div class="pb"><div class="sectlabel">Why a Code</div><ol><li>No password for the company to create or forget.</li><li>A forwarded or leaked link is useless without the inbox.</li><li>Only addresses MISMO has on file for this application, plus teammates they add, can get a code.</li></ol></div></div></div>';
+  } else if (G.s === 2){
+    h += '<div class="gcols">' + mailFrame("Your MISMO sign-in code",
+      '<div class="ctx">Sign-In Code · AI Governance Certification</div><p>Hello ' + esc(first) + ",</p><p>Here is your code to sign in to the " + esc(pr.b01) + ' certification portal:</p><div class="code">' + G.code.slice(0, 3) + " " + G.code.slice(3) + '</div><p>It works once and expires in 10 minutes.</p><div class="note">If you didn\'t ask for this code, you can ignore this email. Nobody can sign in without it.</div>', "Sign-in code email") +
+      '<div class="panel"><div class="pb signbox"><h3>Enter your code</h3><p class="muted" style="margin:0">We sent it to ' + esc(maskEmail(pr.a02e)) + '.</p><label class="sr" for="codein">Six-digit code</label><input class="in codein" id="codein" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000">' +
+      (G.err ? '<div class="err" role="alert">' + esc(G.err) + "</div>" : "") +
+      '<label class="remember"><input type="checkbox" id="remember" checked> Keep me signed in on this device for 30 days</label><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn" type="button" data-g="3">Sign In</button><button class="btn ghost" type="button" data-g="fill">Fill It In for Me</button></div><p class="muted" style="margin:0;font-size:13px">Didn\'t get it? <button type="button" class="linkbtn" data-g="1">Send a new code</button></p></div></div></div>';
+  }
+  g.innerHTML = h;
+}
+function showGate(on){
+  $("gate").hidden = !on; $("hero").hidden = on; $("steps").parentNode.hidden = on; $("main").hidden = on;
+  if (on) paintGate();
+}
+document.addEventListener("click", function(e){
+  var b = e.target.closest("[data-g]"); if (!b) return;
+  var v = b.getAttribute("data-g");
+  if (v === "fill"){ var i = $("codein"); if (i){ i.value = G.code.slice(0, 3) + " " + G.code.slice(3); i.focus(); } return; }
+  if (v === "3"){ var c = (($("codein") || {}).value || "").replace(/\D/g, ""); if (c !== G.code){ G.err = c ? "That code doesn't match. Check the email and try again." : "Enter the six-digit code from the email."; paintGate(); return; } G.err = ""; setSigned(true); showGate(false); S.view = "company"; paintView(); render(); window.scrollTo(0, 0); toast("Signed in as " + S.product.a02n); return; }
+  G.s = +v; G.err = ""; paintGate(); window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
 /* theme */
 (function theme(){
   var btn = $("theme-btn");
@@ -792,7 +887,9 @@ document.addEventListener("drop", function(e){ var z = e.target.closest && e.tar
   paint();
 })();
 var bandWrap = document.querySelector(".band .wrap"); var rb = document.createElement("button"); rb.type = "button"; rb.id = "reset"; rb.className = "btn ghost sm"; rb.textContent = "Restore the Sample"; bandWrap.appendChild(rb);
-paintView(); render();
+var sb = document.createElement("button"); sb.type = "button"; sb.id = "seesign"; sb.className = "btn ghost sm"; sb.textContent = "See Sign-In"; bandWrap.appendChild(sb);
+sb.addEventListener("click", function(){ setSigned(false); G.s = 0; G.err = ""; showGate(true); window.scrollTo(0, 0); });
+paintView(); render(); showGate(!signedIn());
 })();
 </script>
 
