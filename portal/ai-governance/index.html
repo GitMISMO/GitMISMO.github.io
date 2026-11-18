@@ -1,0 +1,800 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>AI Governance Certification Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: navy masthead, a hero that shows where the company is in the journey, four big steps,
+   then the work area. Squared shapes throughout; navy-biased neutrals; IBM Plex. */
+:root{
+  --navy:#0d314c; --navy-deep:#06202f; --navy-mid:#14486e; --sky:#74bfeb; --sky-soft:#a9d8f3; --sky-wash:#e4f2fb;
+  --ground:#f1f6fa; --surface:#ffffff; --surface-2:#f6fafd; --surface-3:#e9f1f8;
+  --border:#d5e2ed; --border-strong:#adc4d6; --rule:#e5eef5;
+  --ink:#0d314c; --ink-2:#456179; --ink-3:#7794aa;
+  --good:#0f7b5c; --good-wash:#e3f4ee; --bad:#b3372c; --bad-wash:#fbeceb; --warn:#a2701a; --warn-wash:#fbf2e0;
+  --lv-f:#2477b8; --lv-m:#8a5a00; --lv-v:#0f7b5c; --lv-f-w:#e6f0f9; --lv-m-w:#fbf1dc; --lv-v-w:#e3f4ee;
+  --accent:#14486e; --accent-ink:#ffffff; --focus:#2477b8;
+  --hero-a:#0d314c; --hero-b:#14486e;
+  --shadow:0 1px 2px rgba(13,49,76,.06),0 6px 20px rgba(13,49,76,.06);
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
+  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
+  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#7a9db4; --sky-wash:#123a52;
+  --good:#4fc79b; --good-wash:#0f3a30; --bad:#f08579; --bad-wash:#3e1d1b; --warn:#e0a83c; --warn-wash:#3a2c10;
+  --lv-f:#6fb0ef; --lv-m:#e0a83c; --lv-v:#4fc79b; --lv-f-w:#123a52; --lv-m-w:#3a2c10; --lv-v-w:#0f3a30;
+  --accent:#74bfeb; --accent-ink:#06202f; --focus:#74bfeb;
+  --hero-a:#06202f; --hero-b:#0d314c; color-scheme:dark; } }
+:root[data-theme="dark"]{
+  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
+  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
+  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#7a9db4; --sky-wash:#123a52;
+  --good:#4fc79b; --good-wash:#0f3a30; --bad:#f08579; --bad-wash:#3e1d1b; --warn:#e0a83c; --warn-wash:#3a2c10;
+  --lv-f:#6fb0ef; --lv-m:#e0a83c; --lv-v:#4fc79b; --lv-f-w:#123a52; --lv-m-w:#3a2c10; --lv-v-w:#0f3a30;
+  --accent:#74bfeb; --accent-ink:#06202f; --focus:#74bfeb;
+  --hero-a:#06202f; --hero-b:#0d314c; color-scheme:dark; }
+
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
+h1,h2,h3,h4{letter-spacing:-.012em;text-wrap:balance;margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* masthead */
+.mast{background:var(--navy);color:#fff;position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.mast .wrap{display:flex;align-items:center;gap:14px;min-height:58px;padding-block:8px}
+.logoplate{background:#fff;border-radius:5px;padding:8px 12px;display:flex;align-items:center;line-height:0;position:relative}
+.logoplate .wordmark{height:22px;width:auto}
+.mast .vr{width:1px;height:26px;background:rgba(116,191,235,.4)}
+.mast .pname{color:var(--sky-soft);font-weight:500;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mast .right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.mast .eyebrow{text-transform:uppercase;letter-spacing:.11em;font-size:11px;color:rgba(255,255,255,.62);white-space:nowrap}
+.theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;padding:5px 10px;font-size:11.5px;cursor:pointer;font-family:inherit}
+.theme-btn:hover{background:rgba(255,255,255,.18)}
+@media (max-width:560px){.mast .eyebrow{display:none}.mast .vr{display:none}}
+
+/* draft band + view switch */
+.band{background:var(--surface);border-bottom:1px solid var(--border)}
+.band .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-block:8px}
+.draftnote{font-size:13px;color:var(--ink-2);display:flex;gap:8px;align-items:center;min-width:0}
+.draftnote b{color:var(--warn);font-weight:600;text-transform:uppercase;letter-spacing:.08em;font-size:11px;border:1px solid var(--warn);padding:1px 6px;border-radius:3px}
+.seg{display:flex;border:1px solid var(--border-strong);border-radius:5px;overflow:hidden;margin-left:auto}
+.seg button{background:transparent;border:0;padding:6px 12px;font-size:13px;cursor:pointer;color:var(--ink-2);white-space:nowrap}
+.seg button+button{border-left:1px solid var(--border-strong)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:#fff}
+:root[data-theme="dark"] .seg button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .seg button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}}
+
+/* hero */
+.hero{background:linear-gradient(135deg,var(--hero-a),var(--hero-b));color:#fff;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(116,191,235,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(116,191,235,.07) 1px,transparent 1px);background-size:32px 32px;pointer-events:none}
+.hero .wrap{position:relative;z-index:1;padding-block:26px 22px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:24px;align-items:center}
+.hero .kicker{text-transform:uppercase;letter-spacing:.12em;font-size:11.5px;color:var(--sky);font-weight:600}
+.hero h1{font-size:clamp(24px,3.2vw,34px);font-weight:700;margin-top:6px;line-height:1.15}
+.hero h1 span{color:var(--sky)}
+.hero p.sub{color:var(--sky-soft);margin:8px 0 0;max-width:62ch}
+.hero .meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;font-size:13px;color:rgba(255,255,255,.78)}
+.hero .meta b{color:#fff;font-weight:600}
+.ring{width:132px;height:132px;position:relative;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.ring .pct{font-family:var(--mono);font-size:28px;font-weight:600}
+.ring .cap{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--sky-soft)}
+.journey{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0;margin-top:20px;grid-column:1/-1}
+.jstop{position:relative;padding-top:18px;font-size:12px;color:rgba(255,255,255,.62);min-width:0}
+.jstop::before{content:"";position:absolute;top:6px;left:0;right:0;height:2px;background:rgba(255,255,255,.18)}
+.jstop .dot{position:absolute;top:0;left:0;width:14px;height:14px;border-radius:50%;background:var(--hero-b);border:2px solid rgba(255,255,255,.35)}
+.jstop.done{color:var(--sky-soft)}.jstop.done::before{background:var(--sky)}.jstop.done .dot{background:var(--sky);border-color:var(--sky)}
+.jstop.now{color:#fff;font-weight:600}.jstop.now .dot{background:#fff;border-color:var(--sky);box-shadow:0 0 0 4px rgba(116,191,235,.35)}
+.jstop .who{display:block;font-weight:400;font-size:11px;color:rgba(255,255,255,.5);margin-top:1px}
+@media (max-width:760px){.hero .wrap{grid-template-columns:1fr}.ring{display:none}.journey{grid-template-columns:repeat(7,minmax(74px,1fr));overflow-x:auto;padding-bottom:4px}}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:-1px;padding-block:18px 0}
+.stepbtn{display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;cursor:pointer;min-width:0;box-shadow:var(--shadow)}
+.stepbtn:hover{border-color:var(--border-strong)}
+.stepbtn[aria-current="step"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
+.stepbtn .n{flex:none;width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-weight:600;background:var(--surface-3);color:var(--ink-2)}
+.stepbtn[aria-current="step"] .n{background:var(--accent);color:var(--accent-ink)}
+.stepbtn.ok .n{background:var(--good);color:#fff}
+.stepbtn .t{font-weight:600;font-size:14px;line-height:1.25}
+.stepbtn .s{font-size:12px;color:var(--ink-3);display:block;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stepbtn>span:last-child{min-width:0}
+@media (max-width:820px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:420px){.stepbtn .s{display:none}}
+
+main{padding-block:22px 60px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow)}
+.ph{display:flex;align-items:flex-start;gap:12px;padding:18px 20px 0;flex-wrap:wrap}
+.ph h2{font-size:20px;font-weight:700}
+.ph p{margin:4px 0 0;color:var(--ink-2);font-size:14px;max-width:72ch}
+.ph .tools{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.pb{padding:18px 20px 20px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+.fgrid{display:grid;grid-template-columns:repeat(var(--cols),minmax(0,1fr));gap:14px 18px}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 18px}
+@media (max-width:760px){.grid2,.grid3,.fgrid{grid-template-columns:1fr}}
+.sectlabel{font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);margin:6px 0 10px;display:flex;align-items:center;gap:10px}
+.sectlabel::after{content:"";flex:1;height:1px;background:var(--rule)}
+.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
+.fld.wide{grid-column:1/-1}
+.fld label{font-size:13.5px;font-weight:600}
+.fld label .req{color:var(--bad);margin-left:2px}
+.fld .help{font-size:12.5px;color:var(--ink-3);margin-top:-2px}
+.in{width:100%;background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:9px 11px;min-width:0}
+.in:hover{border-color:var(--border-strong)}
+.in:focus{background:var(--surface);border-color:var(--focus);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 22%,transparent)}
+textarea.in{min-height:92px;resize:vertical;line-height:1.5}
+.from{font-size:11px;font-weight:500;color:var(--good);background:var(--good-wash);padding:1px 6px;border-radius:3px;margin-left:6px;letter-spacing:.02em}
+
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:5px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:9px 16px;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--accent);border-color:var(--border-strong)}
+.btn.ghost:hover{border-color:var(--accent);filter:none}
+.btn.sm{padding:6px 11px;font-size:13px}
+.btn.good{background:var(--good);border-color:var(--good);color:#fff}
+.btn[disabled]{opacity:.45;cursor:not-allowed;filter:none}
+.tag{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:3px;border:1px solid var(--border);color:var(--ink-2);background:var(--surface-2);white-space:nowrap}
+.tag.F{color:var(--lv-f);background:var(--lv-f-w);border-color:transparent}
+.tag.M{color:var(--lv-m);background:var(--lv-m-w);border-color:transparent}
+.tag.V{color:var(--lv-v);background:var(--lv-v-w);border-color:transparent}
+.tag.trig{text-transform:none;letter-spacing:0;font-weight:500;background:var(--sky-wash);color:var(--navy-mid);border-color:transparent}
+:root[data-theme="dark"] .tag.trig{color:var(--sky)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tag.trig{color:var(--sky)}}
+.code{font-family:var(--mono);font-size:12px;color:var(--ink-3);font-weight:500}
+.foot-actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+.attest{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2)}
+.attest input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--good)}
+
+/* documents */
+.drop{display:block;position:relative;border:2px dashed var(--border-strong);border-radius:8px;padding:30px 20px;text-align:center;background:var(--surface-2);cursor:pointer;transition:background .15s,border-color .15s}
+.drop:hover,.drop.over{border-color:var(--accent);background:var(--sky-wash)}
+.drop .big{font-size:19px;font-weight:700}
+.drop p{margin:6px auto 0;color:var(--ink-2);max-width:60ch;font-size:14px}
+.drop .icon{width:46px;height:46px;margin:0 auto 10px;border-radius:50%;background:var(--accent);color:var(--accent-ink);display:flex;align-items:center;justify-content:center}
+.areas{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:16px}
+@media (max-width:820px){.areas{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.area{border:1px solid var(--border);border-radius:6px;padding:10px 12px;background:var(--surface);cursor:pointer;text-align:left;min-width:0}
+.area:hover{border-color:var(--border-strong)}
+.area[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.area .c{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);font-weight:600}
+.area .nm{font-size:13px;font-weight:600;line-height:1.25;margin-top:2px;min-height:2.5em}
+.area .ct{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:12px;color:var(--ink-3)}
+.area .bar{flex:1;height:4px;background:var(--surface-3);border-radius:2px;overflow:hidden}
+.area .bar i{display:block;height:100%;background:var(--good)}
+.area.empty .ct{color:var(--warn)}
+.tblwrap{overflow-x:auto;margin-top:16px;border:1px solid var(--border);border-radius:6px}
+table.docs{width:100%;border-collapse:collapse;min-width:640px;font-size:14px}
+table.docs th{background:var(--surface-3);text-align:left;font-size:12px;font-weight:600;color:var(--ink-2);padding:8px 12px;border-bottom:1px solid var(--border-strong);white-space:nowrap}
+table.docs td{padding:8px 12px;border-bottom:1px solid var(--rule);vertical-align:middle}
+table.docs tr:last-child td{border-bottom:0}
+table.docs .fname{font-weight:500;word-break:break-word}
+table.docs .fsz{color:var(--ink-3);font-size:12px}
+.ftype{display:inline-flex;width:34px;height:20px;align-items:center;justify-content:center;font-size:10px;font-weight:700;border-radius:3px;color:#fff;margin-right:8px;font-family:var(--mono);vertical-align:middle}
+.sorted{font-size:11.5px;color:var(--ink-3);display:block;margin-top:2px}
+.sorted.guess{color:var(--warn)}
+td select.in{padding:5px 8px;font-size:13px}
+.iconbtn{background:transparent;border:1px solid transparent;border-radius:4px;padding:4px 7px;cursor:pointer;color:var(--ink-3)}
+.iconbtn:hover{border-color:var(--border);color:var(--bad)}
+.callout{display:flex;gap:14px;align-items:flex-start;border:1px solid var(--border);border-left:4px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:14px 16px;margin-top:16px}
+.callout.next{border-left-color:var(--warn)}
+.callout h4{font-size:15px}
+.callout p{margin:3px 0 0;font-size:13.5px;color:var(--ink-2)}
+.callout .grow{flex:1;min-width:0}
+
+/* use cases */
+.ucgrid{display:grid;grid-template-columns:270px minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.ucgrid{grid-template-columns:1fr}}
+.uclist{display:flex;flex-direction:column;gap:8px;position:sticky;top:76px}
+@media (max-width:900px){.uclist{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px}.uclist .uccard{min-width:220px}}
+.uccard{display:block;width:100%;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;cursor:pointer;box-shadow:var(--shadow)}
+.uccard[aria-current="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent),var(--shadow)}
+.uccard .uid{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.uccard .unm{font-weight:600;margin-top:2px;line-height:1.3}
+.uccard .ubar{height:5px;background:var(--surface-3);border-radius:3px;margin-top:10px;overflow:hidden}
+.uccard .ubar i{display:block;height:100%;background:var(--accent)}
+.uccard .ust{font-size:12px;color:var(--ink-3);margin-top:5px;display:flex;justify-content:space-between;gap:8px}
+.addbtn{border:1px dashed var(--border-strong);background:transparent;border-radius:6px;padding:11px;cursor:pointer;color:var(--accent);font-weight:600}
+.addbtn:hover{border-color:var(--accent);background:var(--surface)}
+.subtabs{display:flex;gap:0;border-bottom:1px solid var(--border);padding:0 20px;margin-top:14px;overflow-x:auto}
+.subtabs button{background:none;border:0;padding:10px 4px;margin-right:22px;font-weight:600;font-size:14px;color:var(--ink-3);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;display:flex;gap:8px;align-items:center}
+.subtabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--sky)}
+.subtabs .cnt{font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--ink-3);background:var(--surface-3);padding:1px 6px;border-radius:3px}
+.subtabs .cnt.done{background:var(--good-wash);color:var(--good)}
+
+.trigs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:760px){.trigs{grid-template-columns:1fr}}
+.trig{border:1px solid var(--border);border-radius:6px;padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:8px}
+.trig.y{border-color:var(--accent);background:var(--sky-wash)}
+.trig.n{background:var(--surface-2)}
+.trig .top{display:flex;gap:10px;align-items:flex-start}
+.trig .tid{font-family:var(--mono);font-size:11.5px;font-weight:600;background:var(--surface-3);color:var(--ink-2);padding:2px 6px;border-radius:3px;flex:none;margin-top:2px}
+.trig .tq{font-weight:600;line-height:1.35}
+.trig .tm{font-size:13px;color:var(--ink-2)}
+.yn{display:flex;gap:8px;margin-top:auto;align-items:center;flex-wrap:wrap}
+.yn button{min-width:72px;padding:7px 14px;border-radius:5px;border:1px solid var(--border-strong);background:var(--surface);cursor:pointer;font-weight:600}
+.yn button[aria-pressed="true"].yes{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.yn button[aria-pressed="true"].no{background:var(--ink-2);border-color:var(--ink-2);color:var(--surface)}
+.yn .adds{font-size:12px;color:var(--ink-3);margin-left:auto}
+.trigsum{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:12px 16px;border-radius:6px;background:var(--surface-2);border:1px solid var(--border);margin-bottom:14px;font-size:14px}
+.trigsum .big{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--accent)}
+
+.qlayout{display:grid;grid-template-columns:220px minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:900px){.qlayout{grid-template-columns:1fr}}
+.anav{display:flex;flex-direction:column;gap:4px;position:sticky;top:76px}
+@media (max-width:900px){.anav{position:static;flex-direction:row;overflow-x:auto;padding-bottom:4px}}
+.anav button{display:flex;align-items:center;gap:8px;text-align:left;background:transparent;border:1px solid transparent;border-radius:5px;padding:7px 9px;cursor:pointer;font-size:13.5px;color:var(--ink-2);white-space:nowrap}
+.anav button:hover{background:var(--surface-2)}
+.anav button[aria-pressed="true"]{background:var(--surface-3);color:var(--ink);font-weight:600;border-color:var(--border)}
+.anav .c{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-3);width:22px}
+.anav .k{margin-left:auto;font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+.anav .k.done{color:var(--good);font-weight:600}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+.filters .seg{margin-left:0}
+.q{border:1px solid var(--border);border-radius:6px;background:var(--surface);padding:16px 18px;display:flex;flex-direction:column;gap:9px;scroll-margin-top:84px}
+.q+.q{margin-top:12px}
+.q.answered{border-left:4px solid var(--good)}
+.q.drafted{border-left:4px solid var(--warn)}
+.q .qhead{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.q .qt{font-size:16px;font-weight:600;line-height:1.35}
+.q .why{font-size:13px;color:var(--ink-2)}
+.q .upl{font-size:12.5px;color:var(--ink-3);display:flex;gap:6px}
+.q .upl b{color:var(--ink-2);font-weight:600;white-space:nowrap}
+.q .state{margin-left:auto;font-size:12px;font-weight:600}
+.q .state.ok{color:var(--good)}.q .state.dr{color:var(--warn)}.q .state.todo{color:var(--ink-3)}
+.draftbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--warn-wash);color:var(--ink);border-radius:5px;padding:8px 12px;font-size:13px}
+.draftbar b{color:var(--warn)}
+.draftbar .btn{margin-left:auto}
+.evid{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface-2);border-radius:4px;padding:3px 4px 3px 8px;font-size:12.5px;max-width:100%}
+.chip span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip button{border:0;background:none;cursor:pointer;color:var(--ink-3);padding:0 4px;font-size:15px;line-height:1}
+.chip button:hover{color:var(--bad)}
+.evid select{max-width:280px;padding:5px 8px;font-size:12.5px}
+
+/* review */
+.revgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.rcard{border:1px solid var(--border);border-radius:6px;padding:16px;background:var(--surface);display:flex;flex-direction:column;gap:10px}
+.rcard .rh{display:flex;gap:14px;align-items:center}
+.mini{width:58px;height:58px;flex:none;position:relative}
+.mini svg{width:100%;height:100%;transform:rotate(-90deg)}
+.mini b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:14px}
+.checks{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;font-size:13.5px}
+.checks li{display:flex;gap:8px;align-items:flex-start}
+.checks .mk{flex:none;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;margin-top:1px}
+.checks .mk.ok{background:var(--good);color:#fff}.checks .mk.no{background:var(--warn-wash);color:var(--warn);border:1px solid var(--warn)}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:2px}
+.levels{display:flex;gap:6px;flex-wrap:wrap}
+.done-screen{text-align:center;padding:36px 20px}
+.done-screen .ok{width:64px;height:64px;border-radius:50%;background:var(--good);color:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:30px}
+.timeline{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px;text-align:left}
+@media (max-width:760px){.timeline{grid-template-columns:1fr 1fr}}
+.timeline div{border:1px solid var(--border);border-radius:6px;padding:12px;background:var(--surface-2)}
+.timeline b{display:block;font-size:13.5px}
+.timeline span{font-size:12.5px;color:var(--ink-2)}
+
+/* assessor */
+.asum{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+@media (max-width:760px){.asum{grid-template-columns:1fr 1fr}}
+.tile{border:1px solid var(--border);border-radius:6px;padding:12px 14px;background:var(--surface)}
+.tile .v{font-family:var(--mono);font-size:24px;font-weight:600}
+.tile .l{font-size:12px;color:var(--ink-3);text-transform:uppercase;letter-spacing:.07em}
+.matur{display:flex;gap:0;border:1px solid var(--border);border-radius:6px;overflow:hidden;margin-bottom:16px}
+.matur div{flex:1;padding:12px 14px;background:var(--surface);border-right:1px solid var(--border);min-width:0}
+.matur div:last-child{border-right:0}
+.matur div.got{background:var(--good-wash)}
+.matur div.cap{background:var(--bad-wash)}
+.matur b{display:block;font-size:14px}
+.matur span{font-size:12.5px;color:var(--ink-2)}
+.rate{display:flex;gap:6px;flex-wrap:wrap}
+.rate button{border:1px solid var(--border-strong);background:var(--surface);border-radius:5px;padding:6px 11px;cursor:pointer;font-size:13px;font-weight:600}
+.rate button[aria-pressed="true"].S{background:var(--good);border-color:var(--good);color:#fff}
+.rate button[aria-pressed="true"].N{background:var(--bad);border-color:var(--bad);color:#fff}
+.rate button[aria-pressed="true"].M{background:var(--warn);border-color:var(--warn);color:#fff}
+.answerbox{background:var(--surface-2);border:1px solid var(--rule);border-radius:5px;padding:10px 12px;font-size:14px;white-space:pre-wrap}
+.answerbox.empty{color:var(--ink-3);font-style:italic}
+.verify{font-size:13px;color:var(--ink-2);border-left:3px solid var(--sky);padding-left:10px}
+.verify .flag{color:var(--warn);font-weight:600;font-size:11.5px;display:block;margin-top:3px}
+.ai{border:1px dashed var(--border-strong);border-radius:5px;padding:9px 12px;font-size:13px;background:var(--surface)}
+.ai b{color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 16px;border-radius:5px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:50;max-width:calc(100vw - 32px)}
+.muted{color:var(--ink-3)}
+.sr{position:absolute;left:0;top:0;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tblwrap,.q,.panel,.trig{position:relative}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
+0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58
+355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320
+c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
+-297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243
+-4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198
+0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3
+-104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245
+-337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17
+246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49
+203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12
+26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57
+187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44
+-204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288
+-20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92
+-51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12
+-24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297
+3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146
+-106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0
+-356 -14z"/></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263
+13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19
+-16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20
+-222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0
+46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62
+-220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6
+355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
+52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol></defs></svg>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></div>
+    <div class="vr"></div>
+    <div class="pname">AI Governance Certification</div>
+    <div class="right"><span class="eyebrow">Programs &amp; Operations</span><button class="theme-btn" id="theme-btn" type="button">Dark</button></div>
+  </div>
+</header>
+
+<div class="band"><div class="wrap">
+  <div class="draftnote"><b>Draft</b><span>Sample company for review. Nothing is sent or uploaded.</span></div>
+  <div class="seg" role="group" aria-label="Whose view">
+    <button type="button" id="v-company" data-view="company" aria-pressed="true">Company View</button>
+    <button type="button" id="v-assessor" data-view="assessor" aria-pressed="false">Assessor Preview</button>
+  </div>
+</div></div>
+
+<section class="hero" id="hero"></section>
+<div class="wrap"><nav class="steps" id="steps" aria-label="Steps"></nav></div>
+<main class="wrap" id="main"></main>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+var DATA = {"areas":[{"code":"UD","name":"Use-Case Documentation"},{"code":"OA","name":"Ownership and Accountability"},{"code":"RA","name":"Risk Assessment"},{"code":"DG","name":"Data Governance"},{"code":"TE","name":"Testing"},{"code":"HO","name":"Human Oversight"},{"code":"TP","name":"Third-Party Oversight"},{"code":"MO","name":"Monitoring"},{"code":"CM","name":"Change Management"},{"code":"ER","name":"Governance Recordkeeping and Evidence Retention"}],"product":[{"k":"a01","sec":"Applicant","label":"Legal Organization Name","type":"Text","opts":null,"req":true,"help":"The legal applicant name."},{"k":"a02n","sec":"Primary Contact","label":"Name","type":"Text","opts":null,"req":true,"help":null},{"k":"a02t","sec":"Primary Contact","label":"Title","type":"Text","opts":null,"req":false,"help":null},{"k":"a02e","sec":"Primary Contact","label":"Email","type":"Text","opts":null,"req":true,"help":null},{"k":"a02p","sec":"Primary Contact","label":"Phone","type":"Text","opts":null,"req":false,"help":null},{"k":"a03n","sec":"Technical Contact","label":"Name","type":"Text","opts":null,"req":false,"help":null},{"k":"a03t","sec":"Technical Contact","label":"Title","type":"Text","opts":null,"req":false,"help":null},{"k":"a03e","sec":"Technical Contact","label":"Email","type":"Text","opts":null,"req":false,"help":null},{"k":"a04n","sec":"Executive Sponsor","label":"Name","type":"Text","opts":null,"req":false,"help":null},{"k":"a04t","sec":"Executive Sponsor","label":"Title","type":"Text","opts":null,"req":false,"help":null},{"k":"a04e","sec":"Executive Sponsor","label":"Email","type":"Text","opts":null,"req":false,"help":null},{"k":"b01","sec":"Product Scope","label":"Product Name","type":"Text","opts":null,"req":true,"help":"The product you are submitting for certification."},{"k":"b02","sec":"Product Scope","label":"Version or Release Range","type":"Text","opts":null,"req":true,"help":"Use the same version wording in every piece of evidence."},{"k":"b03","sec":"Product Scope","label":"What the Product Does","type":"Long text","opts":null,"req":true,"help":"Which modules or components are inside the certification boundary?"},{"k":"b04","sec":"Product Scope","label":"Deployment Model","type":"Select","opts":"Vendor-hosted SaaS | Customer-hosted | Hybrid | On-premises / Installed | Other","req":true,"help":null},{"k":"b05","sec":"Product Scope","label":"Number of AI Use Cases","type":"Number","opts":"1 to 40","req":true,"help":"One profile is created for each."},{"k":"b06","sec":"Product Scope","label":"Production / General Availability Date","type":"Date","opts":null,"req":true,"help":null}],"usecase":[{"k":"uc-name","label":"Use Case Name","type":"Text","opts":null,"req":true,"help":"A short business-facing name, such as Borrower FAQ Assistant."},{"k":"uc-cap","label":"AI Capability or Feature","type":"Text","opts":null,"req":true,"help":"The AI-enabled feature behind it, such as a generative chatbot."},{"k":"uc-purpose","label":"Business Purpose","type":"Long text","opts":null,"req":true,"help":"What is this use of AI meant to accomplish?"},{"k":"uc-status","label":"Production Status","type":"Select","opts":"Production - In Scope | In Development - Future Version | Retired / Disabled","req":true,"help":null},{"k":"uc-date","label":"Production / GA Date","type":"Date","opts":null,"req":true,"help":null},{"k":"uc-users","label":"Intended Users","type":"Text","opts":null,"req":true,"help":"Borrowers, servicing staff, underwriters, and so on."},{"k":"uc-inputs","label":"Key Inputs","type":"Long text","opts":null,"req":true,"help":"The main data or information it consumes."},{"k":"uc-outputs","label":"Key Outputs","type":"Long text","opts":null,"req":true,"help":"The main thing it produces."},{"k":"uc-influence","label":"How the Output Is Used","type":"Long text","opts":null,"req":true,"help":"Does it inform, recommend, or carry out a decision or action?"},{"k":"uc-tech","label":"Technology Type","type":"Select","opts":"Internally Developed ML/AI | Third-Party Model | Generative AI / LLM | External AI API / Service | Rules + ML/AI | Multiple / Hybrid | Other","req":true,"help":null},{"k":"uc-resp","label":"Responsibility Model","type":"Select","opts":"Vendor-Controlled | Customer-Controlled | Shared","req":true,"help":null},{"k":"uc-owner","label":"Accountable Owner","type":"Text","opts":null,"req":true,"help":"The named person accountable for this use case."},{"k":"uc-limits","label":"Known Limitations and Key Risk Notes","type":"Long text","opts":null,"req":true,"help":"What should the assessor understand up front?"}],"triggers":[{"id":"T01","name":"Customer / Consumer Facing","q":"Will a customer or consumer directly see or interact with the AI output?","means":"For example a borrower-facing chatbot or an AI-written message sent to a customer. Staff-only use is not direct customer exposure."},{"id":"T02","name":"Consequential Influence","q":"Does the AI materially influence a financial, customer, compliance, safety or operational outcome?","means":"Include recommendations people act on, even when a person makes the final call."},{"id":"T03","name":"Automated Action / Workflow","q":"Does the AI carry out an action, or play a material part in an automated workflow?","means":"For example automatically routing, assigning, approving or updating a record without a person in between."},{"id":"T04","name":"Sensitive / Protected Data","q":"Does this use case use, produce or process sensitive, protected or regulated data?","means":"For example borrower financial information, credit data, or other protected personal information."},{"id":"T05","name":"Generative AI","q":"Does this use case generate or transform content using generative AI?","means":"Large language model answers, summaries, rewritten text, generated documents or images."},{"id":"T06","name":"Customer Action Material to Safe Use","q":"Does safe or effective use depend on something the customer has to do?","means":"Customer configuration, customer-supplied data, review, monitoring, escalation or any other required customer action."},{"id":"T07","name":"Human Review Is a Material Control","q":"Is human review, approval, override or intervention relied on as a material control?","means":"Answer Yes when that human step is a key part of keeping the risk in check — whether your staff or the customer's."},{"id":"T08","name":"Material Third Party","q":"Does this use case materially rely on an external model, provider, data source, API, service or subprocessor?","means":"Material means a failure or change there could meaningfully affect your outputs, data protection, compliance or continuity."},{"id":"T09","name":"Material AI Incident / Failure","q":"Has a material AI-related incident or failure occurred that needs assessment, remediation or closure?","means":"Include incidents you have already handled, so the assessor can review the response and the closure records."},{"id":"T10","name":"Material Change Requiring Revalidation","q":"Has a material change occurred that requires post-change validation or risk reassessment under your change process?","means":"Use your own documented change rules. This asks whether such a change happened, not just whether a process exists."}],"questions":[{"id":"UD-1.1","a":"UD","lv":"F","t":[],"q":"Describe this use case: what it does, who uses it, what goes in, what comes out, and who owns it.","req":"The vendor captures current use-case information for the assessment, including the certified product/version, use-case purpose, users, key inputs/outputs, how the AI output is used, and accountable owner.","up":"Completed use-case information covering product/version, purpose, users, inputs/outputs, decision influence, and owner; existing use-case documentation may be provided as supporting evidence.","ver":"The assessor verifies the completed use-case information includes the certified product/version, purpose, users, key inputs/outputs, decision influence, and accountable owner and is consistent with the other evidence provided.","vchk":"Reads as verbatim"},{"id":"UD-1.2","a":"UD","lv":"F","t":[],"q":"What is this AI meant to be used for — and what is it not meant to be used for?","req":"The vendor documents the intended use, unsupported or prohibited uses, and known limitations for the use case.","up":"Use-case documentation or user/implementation guidance listing intended use, unsupported/prohibited uses, and known limitations.","ver":"The assessor verifies the use-case documentation or user/implementation guidance clearly states the intended use, unsupported or prohibited uses, and known material limitations.","vchk":"Reads as verbatim"},{"id":"UD-1.C1","a":"UD","lv":"F","t":["T01"],"q":"What do customers or consumers see that tells them AI is involved, and what it can and cannot do?","req":"The vendor provides required customer or consumer notices, limitations, or AI-use disclosures when the applicable condition is present.","up":"Applicable customer/consumer notice, disclosure, limitation statement, or implementation guidance.","ver":"The assessor verifies, when the condition applies, that the customer/consumer notice, disclosure, limitation statement, or implementation guidance clearly communicates the applicable AI use, material limitations, and required cautions.","vchk":"Reads as verbatim"},{"id":"UD-2.1","a":"UD","lv":"M","t":[],"q":"Where does the approved, version-controlled documentation for this use case live, and what does it say about dependencies, deployment and who is responsible for what?","req":"The vendor maintains approved, version-controlled use-case documentation that identifies key dependencies, deployment context, and vendor/customer/shared responsibilities.","up":"Approved, version-controlled use-case document showing dependencies, deployment context, and responsibility boundaries.","ver":"The assessor verifies the approved, version-controlled use-case documentation identifies the owner, effective date/version, key dependencies, deployment context, and vendor/customer/shared responsibility boundaries.","vchk":"Reads as verbatim"},{"id":"UD-2.2","a":"UD","lv":"M","t":[],"q":"How often is that documentation reviewed and updated, and who does it?","req":"The vendor documents and follows a process for reviewing and updating use-case documentation on a defined schedule and after material changes.","up":"Documented review/update procedure or standard; plus at least one completed scheduled or change-triggered review/update record.","ver":"The assessor verifies the documented review/update procedure defines who performs the review, the review frequency, material-change triggers, and update controls, and that the completed review/update record shows the process was followed.","vchk":"Reads as verbatim"},{"id":"UD-2.C1","a":"UD","lv":"M","t":["T06"],"q":"What guidance do you give customers for the things they have to do to use this safely and effectively?","req":"The vendor provides customer enablement guidance that supports safe, compliant, and effective use when material controls or responsibilities depend on customer action.","up":"Current customer implementation/use guidance, configuration/data requirements, limitations, review/monitoring expectations, and relevant training/support/change notices.","ver":"The assessor verifies, when the condition applies, that the customer implementation/use guidance addresses the applicable configuration or data requirements, limitations, review or monitoring responsibilities, escalation expectations, and relevant training/support.","vchk":"Reads as verbatim"},{"id":"UD-3.1","a":"UD","lv":"V","t":[],"q":"How can an assessor find the testing, monitoring, change, incident and approval records that belong to this use case and this product version?","req":"The vendor maintains current use-case information and assessment evidence that allow the assessor to identify the testing, monitoring, change, incident, and approval evidence associated with the use case and certified product version.","up":"Applicable testing, monitoring, change, incident, and approval evidence associated with the use case and requirement(s).","ver":"The assessor verifies the testing, monitoring, change, incident, and approval records can be associated with the applicable use case, certified product version, and requirement(s).","vchk":"Reads as verbatim"},{"id":"UD-3.2","a":"UD","lv":"V","t":[],"q":"How do you check that your use-case documentation is still complete and accurate, and what do you do about gaps you find?","req":"The vendor periodically reviews use-case documentation for completeness and accuracy and documents any corrections or accepted gaps.","up":"Completed documentation-quality review and evidence that identified corrections were completed or formally accepted.","ver":"The assessor verifies the completed documentation-quality review identifies any gaps or corrections and shows they were completed or formally accepted.","vchk":"Reads as verbatim"},{"id":"OA-1.0","a":"OA","lv":"F","t":[],"q":"What AI governance policy or standard applies to this product, who owns it, and how often is it reviewed?","req":"The vendor maintains a current AI governance policy, standard, or equivalent framework that applies to the certified product and has an accountable owner and review cadence.","up":"Current AI governance policy/standard/framework; named owner; approval/authority record; review date or cadence.","ver":"The assessor verifies the AI governance policy, standard, or equivalent framework is current, applies to the certified product, identifies an accountable owner, and defines the review cadence.","vchk":"Reads as verbatim"},{"id":"OA-1.1","a":"OA","lv":"F","t":[],"q":"Who is the named person accountable for this use case, and what authority do they have?","req":"The vendor assigns a current accountable business or product owner with authority for the use case.","up":"Ownership record naming the accountable business/product owner and role/authority.","ver":"The assessor verifies the ownership record or RACI identifies an accountable business or product owner with authority for the use case.","vchk":"Reads as verbatim"},{"id":"OA-1.2","a":"OA","lv":"F","t":[],"q":"When something goes wrong with the AI, who is told and in what order — and where does your responsibility end and the customer’s begin?","req":"The vendor documents a basic escalation path and vendor/customer/shared responsibility boundaries.","up":"Escalation path and vendor/customer/shared responsibility matrix or equivalent documentation.","ver":"The assessor verifies the documented escalation path identifies escalation triggers, responsible contacts or functions, handoffs, and vendor/customer/shared responsibility boundaries.","vchk":"Reads as verbatim"},{"id":"OA-2.1","a":"OA","lv":"M","t":[],"q":"Which roles do what across your AI work — build, review, approve, monitor, escalate — and who holds authority for approvals, exceptions and risk acceptance?","req":"The vendor formalizes stakeholders, RACI, approval authority, and decision rights for the use case.","up":"Approved RACI/governance record showing stakeholders, approval authority, and decision rights.","ver":"The assessor verifies the approved RACI or governance record defines responsible, accountable, consulted, and informed parties and the authority for approvals, exceptions, risk acceptance, and material changes.","vchk":"Reads as verbatim"},{"id":"OA-2.2","a":"OA","lv":"M","t":[],"q":"What has to happen before an exception or an accepted risk is allowed, and who can sign it off?","req":"The vendor ensures required reviews, approvals, and escalations are performed by the assigned roles and are recorded.","up":"Representative approval, review, exception, and/or escalation records.","ver":"The assessor verifies completed approval, review, exception, or escalation records show the documented governance process was followed by the assigned roles.","vchk":"Reads as verbatim"},{"id":"OA-3.1","a":"OA","lv":"V","t":[],"q":"How does governance oversight of this use case actually happen — who meets, how often, and what gets decided?","req":"The vendor subjects material use-case decisions to qualified review or challenge appropriate to risk and complexity.","up":"Qualified review/challenge record showing questions/findings and disposition.","ver":"The assessor verifies the qualified review or challenge record addresses material assumptions, evidence, or conclusions and documents resolution or acceptance.","vchk":"Reads as verbatim"},{"id":"OA-3.2","a":"OA","lv":"V","t":[],"q":"Show a decision or action this oversight produced and how it was followed through.","req":"The vendor provides periodic AI governance reporting to management and records resulting decisions, actions, and closure.","up":"Periodic management report/dashboard plus meeting/decision records and action closure evidence.","ver":"The assessor verifies the management reporting and decision/action records address relevant performance, risk, incidents, exceptions, or material changes and show resulting actions or closure.","vchk":"Reads as verbatim"},{"id":"RA-1.1","a":"RA","lv":"F","t":[],"q":"What risk level did you give this use case before considering any controls, and why?","req":"The vendor documents an initial risk level before considering controls (inherent risk) and supporting rationale for the use case.","up":"Completed risk-characterization record showing the initial risk level (inherent risk) and use-case-specific rationale.","ver":"The assessor verifies the completed risk-characterization record documents the initial risk level before considering controls (inherent risk) and a use-case-specific rationale consistent with the use case characteristics.","vchk":"Reads as verbatim"},{"id":"RA-1.2","a":"RA","lv":"F","t":[],"q":"What could go wrong with this use case, and who would be affected?","req":"The vendor identifies material risk pathways, affected parties, the mortgage/business process influenced, key dependencies, and known limitations.","up":"Risk/impact summary identifying key risk pathways, affected parties, mortgage/business process, dependencies, and limitations.","ver":"The assessor verifies the impact or risk assessment identifies material risk pathways, affected parties, the mortgage/business process influenced, key dependencies, and known limitations.","vchk":"Reads as verbatim"},{"id":"RA-1.3","a":"RA","lv":"F","t":[],"q":"Which laws, regulations and contractual obligations apply to this product’s use of AI — or on what basis have you determined that none materially apply?","req":"The vendor identifies applicable legal, regulatory, compliance, contractual, and policy obligations, or documents a supported determination that no material obligation applies.","up":"Legal/regulatory/compliance/contractual/policy applicability review or documented determination that no material obligation applies.","ver":"The assessor verifies the legal/regulatory/compliance applicability review identifies material obligations and constraints or documents a supported determination that no material obligation applies.","vchk":"Reads as verbatim"},{"id":"RA-2.1","a":"RA","lv":"M","t":[],"q":"What is your documented process for assessing AI risk, and how was it applied here?","req":"The vendor performs a formal risk assessment that evaluates the initial risk level before considering controls (inherent risk), mapped controls, residual risk, applicable requirements, and risk acceptance.","up":"Approved formal risk assessment showing the initial risk level (inherent risk), mapped controls, residual risk, actions/conditions, and acceptance/approval.","ver":"The assessor verifies the approved formal risk assessment documents the initial risk level before considering controls (inherent risk), mapped controls, residual risk, applicable requirements, actions or conditions, and approval or acceptance.","vchk":"Reads as verbatim"},{"id":"RA-2.2","a":"RA","lv":"M","t":[],"q":"What controls reduce the risks you identified, and what risk is left over?","req":"The vendor documents and follows a risk review and acceptance process with a defined review cadence, decision authority, escalation path, and completed records showing the process was followed.","up":"Documented risk review/acceptance procedure or standard; plus representative completed review/approval/escalation records.","ver":"The assessor verifies the documented risk review/acceptance process defines the review cadence, decision authority, escalation path, and acceptance expectations, and that completed review records show the process was followed.","vchk":"Reads as verbatim"},{"id":"RA-2.3","a":"RA","lv":"M","t":[],"q":"When is this risk assessment redone — on a schedule, or triggered by something?","req":"The vendor documents how material legal, regulatory, compliance, contractual, or policy obligations identified for the use case are addressed by controls, owners, evidence, and approval/acceptance decisions.","up":"the legal/regulatory/compliance applicability review and, where material obligations are identified, the requirement-to-control/owner/evidence mapping and approval or acceptance record. If no material obligation is identified, the uploaded applicability review should document that conclusion.","ver":"The assessor verifies the applicability review and requirement/control mapping show how identified material obligations are addressed by controls, owners, supporting evidence, and approval or acceptance decisions.","vchk":"Reads as verbatim"},{"id":"RA-2.C1","a":"RA","lv":"M","t":["T02","T03","T04"],"q":"What extra governance did you apply because of the characteristics you flagged in the trigger questions?","req":"The vendor applies additional governance review, approval, escalation, or acceptance when the applicable higher-impact use-case condition is present.","up":"Evidence of the additional review, approval, escalation, documentation, or acceptance required for the triggered characteristic(s).","ver":"The assessor verifies, when the condition applies, that the approval, escalation, or risk-acceptance records show the required additional governance action was performed and followed through.","vchk":"Reads as verbatim"},{"id":"RA-3.1","a":"RA","lv":"V","t":[],"q":"Show a completed risk review and the actions that came out of it.","req":"The vendor subjects risk assumptions, initial risk-level assignment, control conclusions, and residual-risk decisions to qualified challenge appropriate to the use case.","up":"Qualified risk review/challenge record and documented resolution/acceptance of questions or findings.","ver":"The assessor verifies the qualified challenge record addresses material risk assumptions, initial risk-level assignment, control conclusions, and residual-risk decisions and documents resolution or acceptance.","vchk":"Reads as verbatim"},{"id":"RA-3.2","a":"RA","lv":"V","t":[],"q":"How do you confirm the controls you relied on are actually working?","req":"The vendor refreshes the risk assessment on a defined schedule and after material changes, incidents, monitoring findings, or other material risk triggers.","up":"Most recent scheduled risk review and any relevant event-driven refresh records.","ver":"The assessor verifies the periodic or event-driven risk review records show the risk assessment was refreshed as required and that material actions or decisions were documented.","vchk":"Reads as verbatim"},{"id":"DG-1.1","a":"DG","lv":"F","t":[],"q":"What data does this use case use, where does it come from, and what is it allowed to be used for?","req":"The vendor identifies material data sources, categories, sensitivity, permitted use/access, primary security/privacy considerations, and material limitations.","up":"Current data inventory/data flow identifying material sources, data categories, sensitivity, permitted use/access, security/privacy handling, and limitations.","ver":"The assessor verifies the evidence provided, including Current data inventory/data flow identifying material sources, data categories, sensitivity, permitted use/access, security/privacy handling, and limitations, is current and sufficient to demonstrate that the vendor identifies material data sources, categories, sensitivity, permitted use/access, primary security/privacy considerations, and material limitations.","vchk":"Confirm against workbook"},{"id":"DG-1.2","a":"DG","lv":"F","t":[],"q":"Who can access this data and the model, and how is that access controlled?","req":"The vendor documents data ownership and known quality, coverage, or representativeness constraints.","up":"Data owner/steward record and documentation of known quality, coverage, bias, or representativeness limitations.","ver":"The assessor verifies the evidence provided, including Data owner/steward record and documentation of known quality, coverage, bias, or representativeness limitations, is current and sufficient to demonstrate that the vendor documents data ownership and known quality, coverage, or representativeness constraints.","vchk":"Confirm against workbook"},{"id":"DG-2.1","a":"DG","lv":"M","t":[],"q":"What does your data governance standard set out — permitted use, access and security, retention, lineage, quality checks — and who is responsible for each?","req":"The vendor formally defines permitted use, access/security, retention, lineage, quality checks, and responsibilities.","up":"Approved data governance procedure/standard covering permitted use, access/security, retention, lineage, quality checks, and responsibilities.","ver":"The assessor verifies the evidence provided, including Approved data governance procedure/standard covering permitted use, access/security, retention, lineage, quality checks, and responsibilities, is current and sufficient to demonstrate that the vendor formally defines permitted use, access/security, retention, lineage, quality checks, and responsibilities.","vchk":"Confirm against workbook"},{"id":"DG-2.2","a":"DG","lv":"M","t":[],"q":"How long is this data kept, and how is it disposed of?","req":"The vendor retains representative completed records showing that the defined data controls were followed.","up":"Representative access approvals, quality checks, lineage/transformation records, retention/deletion records, and issue follow-up as applicable.","ver":"The assessor verifies the evidence provided, including Representative access approvals, quality checks, lineage/transformation records, retention/deletion records, and issue follow-up as applicable, is current and sufficient to demonstrate that the vendor retains representative completed records showing that the defined data controls were followed.","vchk":"Confirm against workbook"},{"id":"DG-2.C1","a":"DG","lv":"M","t":["T04"],"q":"What extra protections are in place because this use case handles sensitive, protected or regulated data?","req":"The vendor implements additional privacy, permitted-use, or data-protection controls when sensitive or protected data is present.","up":"Use-case-specific privacy/data-protection requirements plus representative evidence of access restrictions, minimization, handling, or retention controls.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Use-case-specific privacy/data-protection requirements plus representative evidence of access restrictions, minimization, handling, or retention controls, is current and sufficient to demonstrate that the vendor implements additional privacy, permitted-use, or data-protection controls when sensitive or protected data is present.","vchk":"Confirm against workbook"},{"id":"DG-3.1","a":"DG","lv":"V","t":[],"q":"Show evidence that data quality is monitored and that issues get fixed.","req":"The vendor monitors data quality and data-control performance, investigates relevant drift, representativeness, coverage, privacy, or similar issues identified for the use case, and documents remediation or acceptance of material findings.","up":"Recent data-quality/control monitoring outputs plus records of investigation, remediation, or formal acceptance of material issues.","ver":"The assessor verifies the evidence provided, including Recent data-quality/control monitoring outputs plus records of investigation, remediation, or formal acceptance of material issues, is current and sufficient to demonstrate that the vendor monitors data quality and data-control performance, investigates relevant drift, representativeness, coverage, privacy, or similar issues identified for the use case, and documents remediation or acceptance of material findings.","vchk":"Confirm against workbook"},{"id":"DG-3.2","a":"DG","lv":"V","t":[],"q":"How do you trace data from source through to AI output?","req":"The vendor periodically evaluates whether data controls remain effective and whether material data issues or trends require control changes, remediation, or a supported no-change decision.","up":"Completed periodic data-control effectiveness review and resulting improvement or approved no-change decision.","ver":"The assessor verifies the evidence provided, including Completed periodic data-control effectiveness review and resulting improvement or approved no-change decision, is current and sufficient to demonstrate that the vendor periodically evaluates whether data controls remain effective and whether material data issues or trends require control changes, remediation, or a supported no-change decision.","vchk":"Confirm against workbook"},{"id":"TE-1.1","a":"TE","lv":"F","t":[],"q":"What testing has been done on this use case, by whom, and what was it meant to cover?","req":"The vendor performs basic testing for the assessed production version and documents the responsible role and intended testing scope.","up":"Basic test results or test summary for the assessed production version; documentation of testing scope/objectives and responsible role.","ver":"The assessor verifies the basic test evidence shows testing was performed for the assessed production version and identifies the responsible role and intended testing scope.","vchk":"Reads as verbatim"},{"id":"TE-1.2","a":"TE","lv":"F","t":[],"q":"What were the results, and what happened to anything that failed?","req":"The vendor documents known material defects or limitations identified through testing or use and records the applicable disposition, escalation, mitigation, or formal acceptance.","up":"Defect/limitation log or equivalent record showing material issues, disposition/escalation, mitigation, or formal acceptance.","ver":"The assessor verifies the defect, limitation, or issue record identifies material findings and documents the applicable disposition, escalation, mitigation, or formal acceptance.","vchk":"Reads as verbatim"},{"id":"TE-2.1","a":"TE","lv":"M","t":[],"q":"What does your written test plan cover — scenarios, methods, test data, acceptance criteria, and who runs it?","req":"The vendor maintains a written test plan that defines risk-relevant coverage, scenarios, methods, data or test conditions, and responsible roles.","up":"Approved written test plan covering risk-relevant scenarios, methods/conditions, data, and responsible roles.","ver":"The assessor verifies the written test plan defines risk-relevant coverage, scenarios, methods, test data or conditions, and responsible roles.","vchk":"Reads as verbatim"},{"id":"TE-2.2","a":"TE","lv":"M","t":[],"q":"How are test failures tracked, fixed and retested?","req":"The vendor maintains documented test cases that define expected results, acceptance criteria, and exception or defect handling.","up":"Documented test cases/equivalent artifacts with expected results, acceptance criteria, and defect/exception handling.","ver":"The assessor verifies the documented test cases define expected results, acceptance criteria, and exception or defect handling.","vchk":"Reads as verbatim"},{"id":"TE-2.C1","a":"TE","lv":"M","t":["T01","T02","T03","T04","T05"],"q":"How does your test plan cover each characteristic you flagged in the trigger questions?","req":"The vendor includes additional test coverage for the applicable use-case condition(s) identified during use-case intake.","up":"Test-plan/test-case coverage addressing each characteristic that triggered this requirement.","ver":"The assessor verifies, when the condition applies, that the test plan and test cases include additional coverage appropriate to the applicable use-case characteristics.","vchk":"Reads as verbatim"},{"id":"TE-3.1","a":"TE","lv":"V","t":[],"q":"How often is this retested, and when was it last done?","req":"The vendor performs testing on a defined schedule or at required lifecycle points and retains recent or representative results.","up":"Recent/representative completed test results showing the defined test cadence or lifecycle trigger was followed.","ver":"The assessor verifies the test execution results show testing was performed on the defined schedule or required lifecycle points and that recent or representative results were retained.","vchk":"Reads as verbatim"},{"id":"TE-3.2","a":"TE","lv":"V","t":[],"q":"Show recent completed test results for this use case.","req":"The vendor documents testing results, material exceptions or defects, and resulting decisions and completes required follow-through, including revalidation when required.","up":"Test result/exception records, defect dispositions, decisions, and revalidation evidence where triggered.","ver":"The assessor verifies the test results, defect/exception records, and closure or revalidation records show material findings were evaluated and required follow-through was completed.","vchk":"Reads as verbatim"},{"id":"TE-3.3","a":"TE","lv":"V","t":[],"q":"How do you decide whether test results are good enough, and what happens when they are not?","req":"The vendor subjects test design, coverage, results, and conclusions to qualified challenge appropriate to risk and complexity.","up":"Qualified review/challenge of test design, coverage, thresholds, results, and conclusions.","ver":"The assessor verifies the validation or challenge record demonstrates qualified review of test design, coverage, results, and conclusions appropriate to the use case.","vchk":"Reads as verbatim"},{"id":"TE-3.C1","a":"TE","lv":"V","t":["T01","T02","T03","T04","T05"],"q":"What specialized testing have you completed for each characteristic that needed extra coverage, and what did it find?","req":"The vendor performs specialized testing for each applicable use-case condition that triggered additional testing at Managed maturity.","up":"Completed specialized testing results for each characteristic that activated TE-2.C1, with documented findings/limitations.","ver":"The assessor verifies, when the condition applies, that specialized test results demonstrate the additional testing identified for the use case was performed and material findings were evaluated and addressed.","vchk":"Reads as verbatim"},{"id":"HO-1.1","a":"HO","lv":"F","t":[],"q":"Where does a person sit in this workflow, and what can they do?","req":"The vendor documents the oversight and intervention model for the use case, or documents the rationale for no routine human review.","up":"Documented oversight/intervention model or documented rationale for no routine human review.","ver":"The assessor verifies the evidence provided, including Documented oversight/intervention model or documented rationale for no routine human review, is current and sufficient to demonstrate that the vendor documents the oversight and intervention model for the use case, or documents the rationale for no routine human review.","vchk":"Confirm against workbook"},{"id":"HO-1.2","a":"HO","lv":"F","t":[],"q":"How does someone know when to step in?","req":"The vendor defines a basic escalation and intervention path appropriate to the use case.","up":"Basic escalation/intervention procedure showing triggers, responsible parties, authority, and response actions.","ver":"The assessor verifies the evidence provided, including Basic escalation/intervention procedure showing triggers, responsible parties, authority, and response actions, is current and sufficient to demonstrate that the vendor defines a basic escalation and intervention path appropriate to the use case.","vchk":"Confirm against workbook"},{"id":"HO-1.C1","a":"HO","lv":"F","t":["T02"],"q":"How can an authorized person intervene or override the AI when it influences a consequential outcome?","req":"The vendor defines escalation and authorized intervention or override capability for use cases with consequential influence.","up":"Consequential-use intervention/override procedure showing triggers, authority, and response path.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Consequential-use intervention/override procedure showing triggers, authority, and response path, is current and sufficient to demonstrate that the vendor defines escalation and authorized intervention or override capability for use cases with consequential influence.","vchk":"Confirm against workbook"},{"id":"HO-1.C2","a":"HO","lv":"F","t":["T03"],"q":"How can an automated action or workflow be stopped, recovered or brought to a safe state?","req":"The vendor provides appropriate fallback, recovery, interruption, shutdown, or safe-state capability for automated actions or materially disruptive automated workflows.","up":"Fallback/recovery/interruption/shutdown/safe-state procedure appropriate to the deployment model.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Fallback/recovery/interruption/shutdown/safe-state procedure appropriate to the deployment model, is current and sufficient to demonstrate that the vendor provides appropriate fallback, recovery, interruption, shutdown, or safe-state capability for automated actions or materially disruptive automated workflows.","vchk":"Confirm against workbook"},{"id":"HO-2.1","a":"HO","lv":"M","t":[],"q":"What instructions do human reviewers work from?","req":"The vendor formalizes oversight and intervention roles, authority, procedures, escalation, and decision rights.","up":"Approved oversight/intervention procedure defining roles, authority, timing, decision rights, exception handling, and fallback responsibilities.","ver":"The assessor verifies the evidence provided, including Approved oversight/intervention procedure defining roles, authority, timing, decision rights, exception handling, and fallback responsibilities, is current and sufficient to demonstrate that the vendor formalizes oversight and intervention roles, authority, procedures, escalation, and decision rights.","vchk":"Confirm against workbook"},{"id":"HO-2.2","a":"HO","lv":"M","t":[],"q":"How are overrides, escalations and exceptions recorded?","req":"The vendor retains representative completed records showing that oversight, escalation, and intervention were performed as documented.","up":"Representative review, alert, escalation, intervention, or exception records showing the control operated.","ver":"The assessor verifies the evidence provided, including Representative review, alert, escalation, intervention, or exception records showing the control operated, is current and sufficient to demonstrate that the vendor retains representative completed records showing that oversight, escalation, and intervention were performed as documented.","vchk":"Confirm against workbook"},{"id":"HO-2.C1","a":"HO","lv":"M","t":["T07"],"q":"How are human reviewers trained or qualified, and what current decision guidance do they use?","req":"The vendor trains human reviewers and provides current decision guidance when human review is relied on as a material control.","up":"Reviewer training/qualification records and current decision guidance/escalation instructions.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Reviewer training/qualification records and current decision guidance/escalation instructions, is current and sufficient to demonstrate that the vendor trains human reviewers and provides current decision guidance when human review is relied on as a material control.","vchk":"Confirm against workbook"},{"id":"HO-3.1","a":"HO","lv":"V","t":[],"q":"How do you check that human oversight is actually working rather than just being there on paper?","req":"The vendor periodically evaluates whether the oversight/intervention model is effective and documents improvements or an approved no-change decision.","up":"Completed oversight/intervention effectiveness review and resulting improvement or approved no-change decision.","ver":"The assessor verifies the evidence provided, including Completed oversight/intervention effectiveness review and resulting improvement or approved no-change decision, is current and sufficient to demonstrate that the vendor periodically evaluates whether the oversight/intervention model is effective and documents improvements or an approved no-change decision.","vchk":"Confirm against workbook"},{"id":"HO-3.C1","a":"HO","lv":"V","t":["T07"],"q":"What do the trends show about whether human review is timely, consistent and effective — and what did you do about it?","req":"The vendor evaluates human-review quality, override, exception, or reviewer-consistency trends when human review is a material control.","up":"Analysis of review quality, disagreement/error, override/exception, and timeliness trends plus resulting actions.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Analysis of review quality, disagreement/error, override/exception, and timeliness trends plus resulting actions, is current and sufficient to demonstrate that the vendor evaluates human-review quality, override, exception, or reviewer-consistency trends when human review is a material control.","vchk":"Confirm against workbook"},{"id":"TP-1.1","a":"TP","lv":"F","t":["T08"],"q":"Which external models, providers, data sources, APIs or subprocessors does this use case rely on, and what does each one do?","req":"The vendor identifies material third-party AI models, providers, subprocessors, and technical dependencies.","up":"Third-party inventory/dependency record showing provider/component, function, version where relevant, data access, and material reliance.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Third-party inventory/dependency record showing provider/component, function, version where relevant, data access, and material reliance, is current and sufficient to demonstrate that the vendor identifies material third-party AI models, providers, subprocessors, and technical dependencies.","vchk":"Confirm against workbook"},{"id":"TP-1.2","a":"TP","lv":"F","t":["T08"],"q":"Who is responsible for what between you, the provider and the customer — and what happens if a provider becomes unavailable?","req":"The vendor documents third-party roles, responsibility boundaries, limitations, and continuity implications.","up":"Documentation of vendor/provider/customer responsibilities, known limitations, change reliance, and continuity/fallback implications.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Documentation of vendor/provider/customer responsibilities, known limitations, change reliance, and continuity/fallback implications, is current and sufficient to demonstrate that the vendor documents third-party roles, responsibility boundaries, limitations, and continuity implications.","vchk":"Confirm against workbook"},{"id":"TP-2.1","a":"TP","lv":"M","t":["T08"],"q":"What due diligence did you do on these providers before relying on them?","req":"The vendor performs current AI-specific due diligence that supports approval of each material provider.","up":"Current AI-specific due-diligence record, approval, and any conditions/gaps for each material provider.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Current AI-specific due-diligence record, approval, and any conditions/gaps for each material provider, is current and sufficient to demonstrate that the vendor performs current AI-specific due diligence that supports approval of each material provider.","vchk":"Confirm against workbook"},{"id":"TP-2.2","a":"TP","lv":"M","t":["T08"],"q":"What do your contracts or terms with these providers require, and what information rights do you have?","req":"The vendor establishes contractual or equivalent controls that define responsibilities, information rights, change notice, incident handling, and performance expectations.","up":"Contract, terms, SLA, control statement, or equivalent documentation covering responsibilities, information rights, change notice, incident handling, and performance expectations.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including Contract, terms, SLA, control statement, or equivalent documentation covering responsibilities, information rights, change notice, incident handling, and performance expectations, is current and sufficient to demonstrate that the vendor establishes contractual or equivalent controls that define responsibilities, information rights, change notice, incident handling, and performance expectations.","vchk":"Confirm against workbook"},{"id":"TP-3.1","a":"TP","lv":"V","t":["T08"],"q":"How do you keep watch on these providers over time — performance, changes, incidents, continuity?","req":"The vendor periodically reviews material third-party performance, concentration, continuity/contingency, dependency risk, and relevant provider issues or changes and documents resulting remediation or acceptance.","up":"periodic provider reviews, performance/service reports, issue/change notices, concentration/substitutability analysis, continuity/contingency or exit/substitution planning, and resulting actions/closure evidence where relevant.","ver":"The assessor verifies, when the condition applies, that the evidence provided, including periodic provider reviews, performance/service reports, issue/change notices, concentration/substitutability analysis, continuity/contingency or exit/substitution planning, and resulting actions/closure evidence where relevant, is current and sufficient to demonstrate that the vendor periodically reviews material third-party performance, concentration, continuity/contingency, dependency risk, and relevant provider issues or changes and documents resulting remediation or acceptance.","vchk":"Confirm against workbook"},{"id":"MO-1.1","a":"MO","lv":"F","t":[],"q":"What do you monitor for this use case once it is live?","req":"The vendor defines a monitoring owner, method, frequency, and basic thresholds or review criteria and provides a current monitoring output or equivalent completed record showing monitoring is being performed for the production use case.","up":"Current monitoring plan/procedure plus one current dashboard, report, review record, or alert/configuration showing monitoring is active.","ver":"The assessor verifies the monitoring plan or procedure identifies the owner, method, frequency, and basic thresholds or review criteria and that a current monitoring output shows monitoring was performed.","vchk":"Reads as verbatim"},{"id":"MO-1.2","a":"MO","lv":"F","t":[],"q":"Who looks at that monitoring, how often, and what do they do with it?","req":"The vendor defines a basic issue-escalation and response process for monitoring findings.","up":"Documented monitoring issue/escalation process showing triggers/severity, responsible decision maker, response/containment, and follow-through.","ver":"The assessor verifies the issue-escalation and response procedure defines how monitoring findings are reviewed, escalated, assigned, and resolved.","vchk":"Reads as verbatim"},{"id":"MO-2.1","a":"MO","lv":"M","t":[],"q":"What are your monitoring metrics, thresholds, alerts and escalation paths?","req":"The vendor formalizes monitoring metrics, thresholds, alerts, cadence, and decision rights for the use case.","up":"Approved monitoring procedure defining metrics/review criteria, thresholds, alerts, cadence, escalation logic, and decision rights.","ver":"The assessor verifies the formal monitoring plan defines metrics, thresholds, alerts, cadence, and decision rights appropriate to the use case.","vchk":"Reads as verbatim"},{"id":"MO-2.2","a":"MO","lv":"M","t":[],"q":"How are customer complaints, corrections and reported issues captured and acted on?","req":"The vendor retains representative completed monitoring records showing review, escalation, and follow-through on material findings.","up":"Representative production monitoring reports/dashboards/alerts plus related tickets, incidents, decisions, and closure records.","ver":"The assessor verifies completed monitoring reports, alerts, review records, and issue records show monitoring was performed and material findings were escalated and followed through.","vchk":"Reads as verbatim"},{"id":"MO-2.C1","a":"MO","lv":"M","t":["T01","T02","T03","T04","T05"],"q":"What additional monitoring is in place for each characteristic you flagged in the trigger questions?","req":"The vendor implements enhanced monitoring dimensions or cadence for the applicable use-case condition(s) identified during use-case intake.","up":"Enhanced monitoring design and representative outputs addressing each characteristic that triggered this requirement; complaint/correction/override signals where relevant.","ver":"The assessor verifies, when the condition applies, that the monitoring plan, metrics, thresholds, or cadence include the additional monitoring appropriate to the applicable use-case characteristics.","vchk":"Reads as verbatim"},{"id":"MO-3.1","a":"MO","lv":"V","t":[],"q":"Show completed monitoring reviews and the actions or no-change decisions that came out of them.","req":"The vendor analyzes monitoring trends, exceptions, and control effectiveness over available operating history.","up":"Trend/exception/control-effectiveness analysis over available operating history and documented conclusions/actions.","ver":"The assessor verifies trend, drift, exception, or performance analyses evaluate monitoring results over available operating history and identify material patterns or issues.","vchk":"Reads as verbatim"},{"id":"MO-3.2","a":"MO","lv":"V","t":[],"q":"What do the trends over your operating history show, and what did you change as a result?","req":"The vendor uses monitoring evidence to document a change to thresholds/controls or an approved decision to keep them unchanged.","up":"Management decision record showing threshold/control recalibration or an approved no-change decision with rationale.","ver":"The assessor verifies monitoring-related decision and action records show the analysis resulted in a documented control/threshold change or an approved decision to retain the current approach.","vchk":"Reads as verbatim"},{"id":"MO-3.C1","a":"MO","lv":"V","t":["T01","T02","T03","T04","T05"],"q":"What specialized trend analysis have you done for each flagged characteristic, and what did it show?","req":"The vendor performs specialized trend, drift, subgroup, consumer-impact, safety, security, privacy, or compliance analysis for the applicable use-case condition(s) that triggered enhanced monitoring.","up":"Specialized trend/drift/subgroup/consumer-impact/safety/security/privacy/compliance analysis for the triggered dimension and follow-up.","ver":"The assessor verifies, when the condition applies, that specialized trend, drift, subgroup, consumer-impact, safety, security, privacy, or compliance analysis was performed where supported by sufficient operating history.","vchk":"Reads as verbatim"},{"id":"CM-1.1","a":"CM","lv":"F","t":[],"q":"How are changes to this use case controlled and approved?","req":"The vendor identifies changes affecting the use case and subjects them to basic review or approval.","up":"Change log, release tickets, or equivalent records showing relevant changes and basic review/approval.","ver":"The assessor verifies the change/release log and approval records identify material changes affecting the use case and show they received the required basic review or approval.","vchk":"Reads as verbatim"},{"id":"CM-1.2","a":"CM","lv":"F","t":[],"q":"Where is the version and material change history for the product being certified?","req":"The vendor maintains an identifiable assessed product/use-case version and material change history.","up":"Release/version record and material change history that can be reconciled to the certified product/use case.","ver":"The assessor verifies the version history or release records identify the assessed product/use-case version and material change history.","vchk":"Reads as verbatim"},{"id":"CM-2.1","a":"CM","lv":"M","t":[],"q":"How do you decide whether a change is material enough to need extra review?","req":"The vendor defines formal materiality criteria that determine testing, approval, documentation, notification, and other downstream requirements.","up":"Approved AI-relevant change-management procedure with materiality criteria and required testing, approval, documentation, notification, and roles.","ver":"The assessor verifies the documented change/materiality criteria define when testing, approval, documentation, notification, or other downstream requirements are required.","vchk":"Reads as verbatim"},{"id":"CM-2.2","a":"CM","lv":"M","t":[],"q":"How are AI incidents and failures identified, reported and escalated?","req":"The vendor retains representative completed change records showing that the formal change process was followed.","up":"Representative completed change records showing classification, impact assessment, testing, approval, documentation/inventory updates, and notification where applicable.","ver":"The assessor verifies representative completed change records show the formal change process, including required testing and approvals, was followed.","vchk":"Reads as verbatim"},{"id":"CM-2.C1","a":"CM","lv":"M","t":["T09"],"q":"For the material incident or failure you flagged: what was the impact, what did you do, and how was it closed?","req":"The vendor documents impact assessment, containment/remediation, responsible ownership, and follow-through to closure or formal acceptance when a material AI incident or failure occurs.","up":"Material AI incident/failure record showing impact assessment, containment/remediation, owner, follow-up, and closure/formal acceptance.","ver":"The assessor verifies, when the condition applies, that the incident/failure report, impact assessment, remediation records, and closure evidence document containment or remediation, ownership, follow-through, and closure or formal acceptance.","vchk":"Reads as verbatim"},{"id":"CM-3.1","a":"CM","lv":"V","t":[],"q":"Show a completed change that went through your process end to end.","req":"The vendor periodically evaluates whether change controls are effective and documents improvements or an approved no-change decision.","up":"Completed periodic change-control effectiveness review and resulting improvement or approved no-change decision.","ver":"The assessor verifies the completed change-control effectiveness review identifies material weaknesses or improvement opportunities and documents improvements or an approved no-change decision.","vchk":"Reads as verbatim"},{"id":"CM-3.2","a":"CM","lv":"V","t":[],"q":"How do you confirm that controls and documentation were updated after a change or incident?","req":"The vendor defines risk-based post-change validation and reassessment requirements for material changes.","up":"Documented post-change validation/reassessment rules showing which material changes trigger revalidation, risk review, approval, monitoring, or documentation updates.","ver":"The assessor verifies the change-management procedure defines risk-based post-change validation and reassessment requirements for material changes.","vchk":"Reads as verbatim"},{"id":"CM-3.C1","a":"CM","lv":"V","t":["T10"],"q":"For the material change you flagged: what post-change validation or risk reassessment was completed?","req":"The vendor completes the required post-change validation, risk reassessment, approval, and follow-through for applicable material changes.","up":"Completed post-change validation/reassessment package for each triggered material change, including results, residual issues, updated controls/docs, and approval.","ver":"The assessor verifies, when the condition applies, that post-change testing/revalidation results, risk reassessment, approval records, and follow-through demonstrate the required post-change work was completed.","vchk":"Reads as verbatim"},{"id":"ER-1.1","a":"ER","lv":"F","t":[],"q":"What AI governance records do you keep, where do they live, and who owns them?","req":"The vendor identifies governance record locations, owners, and basic retention expectations.","up":"Record/repository map identifying material governance record locations, owners, and retention expectations/basis.","ver":"The assessor verifies the recordkeeping procedure or governance documentation identifies record locations, owners, and basic retention expectations.","vchk":"Reads as verbatim"},{"id":"ER-1.2","a":"ER","lv":"F","t":[],"q":"How can a governance record be traced — where it is held, who owns it, and how its date, version and scope are recorded?","req":"The vendor maintains governance records with sufficient metadata to establish source, date, owner, scope/version, and linkage to the relevant use case or control.","up":"Representative governance records showing source/owner, date, product/use-case version/scope, and use-case/control identifiers.","ver":"The assessor verifies representative governance records include sufficient metadata to establish source, date, owner, scope/version, and linkage to the relevant use case or control.","vchk":"Reads as verbatim"},{"id":"ER-2.1","a":"ER","lv":"M","t":[],"q":"What is your documented retention standard for AI governance records, and who owns it?","req":"The vendor defines and controls formal retention, version, access, and retrieval procedures.","up":"Approved retention/version/access/retrieval procedure covering record types, retention, access, repository controls, retrieval, and disposition.","ver":"The assessor verifies the retention and retrieval procedure defines retention, version, access, and retrieval controls.","vchk":"Reads as verbatim"},{"id":"ER-2.2","a":"ER","lv":"M","t":[],"q":"How are these records protected from loss or unauthorized change?","req":"The vendor retrieves complete representative governance records using the documented retention and retrieval process.","up":"Representative retrieved record sets (for example approvals, testing, monitoring, changes, incidents, remediation) with required metadata.","ver":"The assessor verifies representative retrieved governance records are complete and were obtained using the documented retention and retrieval process.","vchk":"Reads as verbatim"},{"id":"ER-3.1","a":"ER","lv":"V","t":[],"q":"Show that records can actually be retrieved for a given use case and product version.","req":"The vendor maintains records that allow the assessor to reconstruct material lifecycle decisions from evidence through findings, remediation, approval, and closure.","up":"Linked lifecycle evidence set showing the path from evidence/findings through remediation, approvals, and closure.","ver":"The assessor verifies the lifecycle records allow material decisions to be traced from supporting evidence through findings, remediation, approval, and closure.","vchk":"Reads as verbatim"},{"id":"ER-3.2","a":"ER","lv":"V","t":[],"q":"How do you check that retention is being followed, and what happens when it is not?","req":"The vendor periodically reviews recordkeeping quality and documents correction or formal acceptance of identified gaps.","up":"Completed recordkeeping-quality review plus corrective-action/closure or formal acceptance records.","ver":"The assessor verifies the completed recordkeeping-quality review identifies gaps and shows they were corrected or formally accepted.","vchk":"Reads as verbatim"}]};
+</script>
+<script>
+(function(){
+"use strict";
+/* ---------- reference data ---------- */
+var AREAS = DATA.areas, TRIG = DATA.triggers, QS = DATA.questions, PF = DATA.product, UF = DATA.usecase;
+var AREA = {}; AREAS.forEach(function(a){ AREA[a.code] = a.name; });
+var TRIGBY = {}; TRIG.forEach(function(t){ TRIGBY[t.id] = t; });
+var LV = { F: "Foundational", M: "Managed", V: "Validated" };
+var SHORT = { UD:"Use-Case Docs", OA:"Ownership", RA:"Risk", DG:"Data", TE:"Testing", HO:"Human Oversight", TP:"Third Parties", MO:"Monitoring", CM:"Change", ER:"Records" };
+/* how a file name is sorted into a control area (draft: by name; next: by reading the file) */
+var KEYS = {
+  UD:["use case","usecase","user guide","implementation guide","product guide","disclosure","notice","model card","faq","product description","intended use"],
+  OA:["governance policy","ai policy","policy","framework","raci","charter","committee","ownership","accountab","org chart","board"],
+  RA:["risk","impact assessment","dpia","legal review","regulatory","fair lending","compliance review"],
+  DG:["data","lineage","privacy","pii","access control","data flow","inventory","quality"],
+  TE:["test","validation","qa","evaluation","eval","red team","benchmark","accuracy","defect"],
+  HO:["human","oversight","override","reviewer","intervention","escalation procedure","playbook","training record"],
+  TP:["vendor","third party","third-party","provider","contract","sla","msa","dpa","subprocessor","soc 2","soc2","due diligence"],
+  MO:["monitor","dashboard","drift","metric","alert","kpi","complaint"],
+  CM:["change","release","incident","postmortem","post-mortem","changelog","root cause","version history"],
+  ER:["record","retention","archive","evidence","repository","audit trail"]
+};
+function guessArea(name){
+  var n = name.toLowerCase().replace(/[_\-.]+/g, " "), best = null, score = 0;
+  Object.keys(KEYS).forEach(function(a){ var s = 0; KEYS[a].forEach(function(k){ if (n.indexOf(k) >= 0) s += k.length; }); if (s > score){ score = s; best = a; } });
+  return best;
+}
+
+/* ---------- sample state (a made-up company, clearly marked) ---------- */
+function sample(){
+  var docs = [
+    ["Northbeam AI Governance Policy v3.pdf", 812e3, "OA", true],
+    ["AI Oversight Committee Charter.pdf", 240e3, "OA", true],
+    ["RACI - AI Product Lifecycle.xlsx", 64e3, "OA", true],
+    ["Borrower Assistant Model Card.pdf", 410e3, "UD", false],
+    ["Loan Assistant Implementation Guide 4.2.pdf", 1.9e6, "UD", true],
+    ["AI Risk Assessment - Borrower Assistant.docx", 220e3, "RA", false],
+    ["Fair Lending Legal Review 2026.pdf", 380e3, "RA", true],
+    ["Data Flow and Lineage Map.pdf", 530e3, "DG", true],
+    ["Test Plan - Generative Answers.docx", 180e3, "TE", false],
+    ["Red Team Results Q3 2026.pdf", 760e3, "TE", false],
+    ["Human Review Playbook.pdf", 290e3, "HO", false],
+    ["LLM Provider MSA and DPA.pdf", 1.2e6, "TP", true],
+    ["Vendor Due Diligence - Model Provider.pdf", 450e3, "TP", true],
+    ["Monitoring Dashboard Export Oct 2026.pdf", 670e3, "MO", true],
+    ["Release Notes 4.0 to 4.2.pdf", 150e3, "CM", true],
+    ["Records Retention Standard.pdf", 120e3, "ER", true]
+  ].map(function(d, i){ return { id: "d" + (i + 1), name: d[0], size: d[1], area: d[2], all: d[3], sorted: "name" }; });
+  var uc1 = { id: "UC-001", f: {
+      "uc-name": "Borrower FAQ Assistant", "uc-cap": "Generative chatbot (large language model with retrieval)",
+      "uc-purpose": "Answers borrowers' questions about their loan application status, required documents and next steps, around the clock, so loan officers spend less time on routine questions.",
+      "uc-status": "Production - In Scope", "uc-date": "2025-09-15", "uc-users": "Borrowers, through the lender's online portal",
+      "uc-inputs": "The borrower's question, the loan file status from the LOS, and the lender's approved knowledge articles.",
+      "uc-outputs": "A plain-language answer with a link to the source article; a hand-off to a loan officer when it cannot answer.",
+      "uc-influence": "Informs only. It cannot change the loan file, make a credit decision or promise terms.",
+      "uc-tech": "Generative AI / LLM", "uc-resp": "Shared", "uc-owner": "Priya Shah, VP Product, AI Platforms",
+      "uc-limits": "It can misread unusual questions; every answer cites its source, and anything about rates, fees or eligibility goes to a person." },
+    trig: { T01:"y", T02:"n", T03:"n", T04:"y", T05:"y", T06:"y", T07:"n", T08:"y", T09:"n", T10:"n" }, ans: {} };
+  var uc2 = { id: "UC-002", f: {
+      "uc-name": "Income Document Classifier", "uc-cap": "Machine-learning document classification and data extraction",
+      "uc-purpose": "Sorts uploaded income documents (W-2s, pay stubs, tax returns) and pulls key figures into the loan file for an underwriter to confirm.",
+      "uc-status": "Production - In Scope", "uc-date": "2024-03-01", "uc-users": "Processors and underwriters",
+      "uc-inputs": "", "uc-outputs": "", "uc-influence": "", "uc-tech": "Internally Developed ML/AI", "uc-resp": "Vendor-Controlled",
+      "uc-owner": "", "uc-limits": "" },
+    trig: { T01:"n", T02:"y", T03:"y", T04:"y", T05:"n", T06:null, T07:"y", T08:null, T09:null, T10:null }, ans: {} };
+  /* answers: some written, some drafted from the documents and waiting to be checked */
+  var a = uc1.ans;
+  a["UD-1.1"] = { text: "The Borrower FAQ Assistant answers borrower questions in the lender's online portal. It reads the question, the loan file status and approved knowledge articles, and returns a cited answer or hands off to a loan officer. Owner: Priya Shah, VP Product, AI Platforms.", docs: ["d4","d5"] };
+  a["UD-1.2"] = { text: "Intended for questions about application status, documents and next steps. Not intended for rate quotes, eligibility or credit decisions, legal or tax advice; those are refused and routed to a person.", docs: ["d5"] };
+  a["UD-1.C1"] = { text: "Before the first answer the borrower sees: \"You're chatting with an AI assistant. It can explain your application and documents but can't approve loans or quote rates.\" Each answer carries an \"AI-generated\" label and a source link.", docs: ["d5"], drafted: true };
+  a["OA-1.0"] = { text: "The Northbeam AI Governance Policy (v3, approved March 2026) applies to every AI feature. It is owned by the Chief Risk Officer and reviewed every year, or sooner after a material incident.", docs: ["d1"], drafted: true };
+  a["OA-1.1"] = { text: "Priya Shah, VP Product, AI Platforms. She can pause the feature, approve releases and accept risks up to Medium; High risks go to the AI Oversight Committee.", docs: ["d1","d3"], drafted: true };
+  a["RA-1.1"] = { text: "Medium inherent risk: customer-facing generative output on borrower data, but informational only, with no decision rights.", docs: ["d6"] };
+  a["RA-1.2"] = { text: "", docs: [] };
+  a["DG-1.1"] = { text: "Loan file status fields from the LOS (no full SSN or bank account numbers), the borrower's question, and approved knowledge articles. Permitted use is limited to answering the borrower's own questions, per the Data Flow and Lineage Map.", docs: ["d8"], drafted: true };
+  a["TE-1.1"] = { text: "", docs: ["d9"] };
+  a["TP-1.1"] = { text: "One external large language model provider (hosted API, model version pinned per release) and the lender's LOS. Both are listed in the dependency inventory with data access and version.", docs: ["d12","d13"], drafted: true };
+  a["MO-1.1"] = { text: "Answer quality sampling (weekly), hand-off rate, refusal rate, borrower thumbs-down and complaints, and latency, on the monitoring dashboard.", docs: ["d14"] };
+  var b = uc2.ans;
+  b["UD-1.1"] = { text: "Classifies uploaded income documents and extracts key figures into the loan file for underwriter confirmation.", docs: [] };
+  b["HO-1.C1"] = { text: "", docs: ["d11"], drafted: true };
+  return {
+    v: 1, view: "company", step: 1, ucSel: 0, ucTab: "triggers", areaSel: "UD", qFilter: "all", submitted: false, attest: false,
+    product: {
+      a01: "Northbeam Mortgage Technologies, Inc.", a02n: "Dana Whitfield", a02t: "Director, Compliance Programs", a02e: "dana.whitfield@northbeam.example", a02p: "",
+      a03n: "Marcus Lee", a03t: "Principal Engineer", a03e: "marcus.lee@northbeam.example", a04n: "", a04t: "", a04e: "",
+      b01: "Northbeam Loan Assistant", b02: "4.2.x", b03: "", b04: "Vendor-hosted SaaS", b05: "2", b06: "2025-09-15"
+    },
+    fromApp: ["a01","a02n","a02t","a02e","b01"],
+    docs: docs, ucs: [uc1, uc2],
+    rate: { "UC-001": { "UD-1.1": { r: "S" }, "UD-1.2": { r: "S" }, "OA-1.0": { r: "M", note: "Policy says annual review; please send the last review record." } } },
+    ai: { "UC-001": {
+      "UD-1.1": ["Sufficient", "The profile names purpose, users, inputs, outputs and owner, and the model card and implementation guide match version 4.2."],
+      "UD-1.C1": ["Sufficient", "The disclosure wording is quoted and the implementation guide shows where it appears. Placement screenshots would make this stronger."],
+      "OA-1.0": ["Need More Information", "The policy is attached and names an owner, but nothing shows the annual review actually happened."],
+      "RA-1.2": ["Not Sufficient", "No answer yet. The risk assessment document lists harms, so this can likely be answered from it."]
+    } }
+  };
+}
+
+/* ---------- state ---------- */
+var KEY = "mismo.aigov.portal.draft.v1", S;
+function load(){ try { var t = localStorage.getItem(KEY); if (t){ var x = JSON.parse(t); if (x && x.v === 1) return x; } } catch (e) {} return sample(); }
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} savedAt = new Date(); paintSaved(); }
+var savedAt = null;
+S = load();
+
+/* ---------- helpers ---------- */
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){ return { "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]; }); }
+function toast(msg){ var t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(function(){ t.hidden = true; }, 2600); }
+function filled(v){ return v != null && String(v).trim() !== ""; }
+function fsize(n){ return n >= 1e6 ? (n / 1e6).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1e3)) + " KB"; }
+function ftype(n){ var e = (n.split(".").pop() || "").toLowerCase(); var c = { pdf:"#b3372c", doc:"#2477b8", docx:"#2477b8", xls:"#0f7b5c", xlsx:"#0f7b5c", csv:"#0f7b5c", ppt:"#c25a1d", pptx:"#c25a1d", png:"#6b5bb5", jpg:"#6b5bb5", jpeg:"#6b5bb5", zip:"#55687a" }[e] || "#55687a"; return '<span class="ftype" style="background:' + c + '">' + esc(e.slice(0, 4).toUpperCase() || "FILE") + "</span>"; }
+function ringSvg(p, size, stroke, track, color){ var r = (size - stroke) / 2, c = 2 * Math.PI * r; return '<svg viewBox="0 0 ' + size + " " + size + '" aria-hidden="true"><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + track + '" stroke-width="' + stroke + '"/><circle cx="' + size / 2 + '" cy="' + size / 2 + '" r="' + r + '" fill="none" stroke="' + color + '" stroke-width="' + stroke + '" stroke-linecap="round" stroke-dasharray="' + (c * p).toFixed(1) + " " + c.toFixed(1) + '"/></svg>'; }
+
+function qsFor(uc){ return QS.filter(function(q){ return !q.t.length || q.t.some(function(t){ return uc.trig[t] === "y"; }); }); }
+function ansOf(uc, id){ return uc.ans[id] || null; }
+function qState(uc, q){ var a = ansOf(uc, q.id); if (!a || !filled(a.text)) return a && a.drafted ? "todo" : "todo"; return a.drafted ? "drafted" : "done"; }
+function ucStats(uc){
+  var prof = UF.filter(function(f){ return f.req; }), pDone = prof.filter(function(f){ return filled(uc.f[f.k]); }).length;
+  var tDone = TRIG.filter(function(t){ return uc.trig[t.id]; }).length;
+  var qs = qsFor(uc), qDone = 0, qDraft = 0;
+  qs.forEach(function(q){ var s = qState(uc, q); if (s === "done") qDone++; else if (s === "drafted") qDraft++; });
+  var total = prof.length + TRIG.length + qs.length, done = pDone + tDone + qDone;
+  return { pDone: pDone, pTot: prof.length, tDone: tDone, tTot: TRIG.length, qDone: qDone, qDraft: qDraft, qTot: qs.length, pct: total ? done / total : 0 };
+}
+function prodStats(){ var req = PF.filter(function(f){ return f.req; }); var d = req.filter(function(f){ return filled(S.product[f.k]); }).length; return { done: d + (S.attest ? 1 : 0), tot: req.length + 1 }; }
+function overall(){
+  var p = prodStats(), docsOk = S.docs.length ? 1 : 0, d = p.done + docsOk, t = p.tot + 1;
+  S.ucs.forEach(function(u){ var s = ucStats(u); d += s.pDone + s.tDone + s.qDone; t += s.pTot + s.tTot + s.qTot; });
+  return t ? d / t : 0;
+}
+
+/* ---------- hero, steps ---------- */
+var JOURNEY = [
+  ["Applied", "Website form"], ["Invoice Paid", "MISMO"], ["Your Submission", "You are here"], ["MISMO Check", "Completeness"],
+  ["Assessment", "Actualize"], ["Determination", "Maturity by use case"], ["Certified", "Mark License"]
+];
+function paintHero(){
+  var p = overall(), now = S.submitted ? 3 : 2, pr = S.product, assessor = S.view === "assessor";
+  var h = '<div class="wrap"><div style="min-width:0">' +
+    '<div class="kicker">' + (assessor ? "Assessor Preview · Actualize" : "MISMO AI Governance Certification · Initial") + "</div>" +
+    "<h1>" + (assessor ? "Assess <span>" + esc(pr.b01 || "the product") + "</span>" : "Welcome, " + esc((pr.a02n || "").split(" ")[0] || "there") + ". Let's get <span>" + esc(pr.b01 || "your product") + "</span> certified.") + "</h1>" +
+    '<p class="sub">' + (assessor
+      ? "What the assessor sees once the company submits: every answer and document, the criteria to verify, a rating for each requirement and the maturity each use case reaches."
+      : "Four steps. Tell us about the product, drop in your documents, answer for each AI use case, then send it to MISMO. Everything saves as you go, and your team can pick up where you left off.") + "</p>" +
+    '<div class="meta"><span>Company <b>' + esc(pr.a01) + "</b></span><span>Version <b>" + esc(pr.b02 || "—") + "</b></span><span>Use cases <b>" + S.ucs.length + "</b></span><span>Documents <b>" + S.docs.length + "</b></span></div></div>" +
+    '<div class="ring" aria-label="' + Math.round(p * 100) + ' percent complete">' + ringSvg(p, 132, 10, "rgba(255,255,255,.15)", "#74bfeb") +
+    '<div class="lbl"><span class="pct">' + Math.round(p * 100) + '%</span><span class="cap">' + (S.submitted ? "Submitted" : "Complete") + "</span></div></div>" +
+    '<div class="journey">' + JOURNEY.map(function(j, i){ var c = i < now ? "done" : i === now ? "now" : ""; return '<div class="jstop ' + c + '"><span class="dot"></span>' + esc(j[0]) + '<span class="who">' + esc(i === now && !assessor ? "You are here" : j[1]) + "</span></div>"; }).join("") + "</div></div>";
+  $("hero").innerHTML = h;
+}
+var STEPS = [
+  { n: 1, t: "About Your Product", s: function(){ var p = prodStats(); return p.done + " of " + p.tot + " done"; }, ok: function(){ var p = prodStats(); return p.done === p.tot; } },
+  { n: 2, t: "Your Documents", s: function(){ return S.docs.length + " uploaded · " + AREAS.filter(function(a){ return S.docs.some(function(d){ return d.area === a.code; }); }).length + " of 10 areas"; }, ok: function(){ return S.docs.length > 0; } },
+  { n: 3, t: "Your AI Use Cases", s: function(){ var d = 0, t = 0; S.ucs.forEach(function(u){ var x = ucStats(u); d += x.qDone; t += x.qTot; }); return d + " of " + t + " answers"; }, ok: function(){ return S.ucs.length && S.ucs.every(function(u){ return ucStats(u).pct >= 1; }); } },
+  { n: 4, t: "Review and Submit", s: function(){ return S.submitted ? "Sent to MISMO" : "Check, sign and send"; }, ok: function(){ return S.submitted; } }
+];
+function paintSteps(){
+  if (S.view === "assessor"){ $("steps").innerHTML = ""; $("steps").hidden = true; return; }
+  $("steps").hidden = false;
+  $("steps").innerHTML = STEPS.map(function(s){ return '<button type="button" class="stepbtn' + (s.ok() ? " ok" : "") + '" data-step="' + s.n + '"' + (S.step === s.n ? ' aria-current="step"' : "") + '><span class="n">' + (s.ok() && S.step !== s.n ? "&#10003;" : s.n) + '</span><span><span class="t">' + esc(s.t) + '</span><span class="s">' + esc(s.s()) + "</span></span></button>"; }).join("");
+}
+function paintSaved(){ var el = $("savedline"); if (el && savedAt) el.textContent = "Saved " + savedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+function refreshChrome(){ paintHero(); paintSteps(); }
+
+/* ---------- field rendering ---------- */
+function fieldHTML(f, val, scope, fromApp){
+  var id = scope + "-" + f.k, inp;
+  if (f.type === "Long text") inp = '<textarea class="in" id="' + id + '" data-f="' + scope + '" data-k="' + f.k + '">' + esc(val) + "</textarea>";
+  else if (f.type === "Select") inp = '<select class="in" id="' + id + '" data-f="' + scope + '" data-k="' + f.k + '"><option value="">Choose…</option>' + String(f.opts || "").split("|").map(function(o){ o = o.trim(); return "<option" + (o === val ? " selected" : "") + ">" + esc(o) + "</option>"; }).join("") + "</select>";
+  else inp = '<input class="in" id="' + id + '" data-f="' + scope + '" data-k="' + f.k + '" type="' + (f.type === "Date" ? "date" : f.type === "Number" ? "number" : /email/i.test(f.label) ? "email" : "text") + '"' + (f.type === "Number" ? ' min="1" max="40"' : "") + ' value="' + esc(val) + '">';
+  return '<div class="fld' + (f.type === "Long text" ? " wide" : "") + '"><label for="' + id + '">' + esc(f.label) + (f.req ? '<span class="req" aria-hidden="true">*</span>' : "") + (fromApp ? '<span class="from">From your application</span>' : "") + "</label>" + (f.help ? '<span class="help">' + esc(f.help) + "</span>" : "") + inp + "</div>";
+}
+
+/* ---------- step 1 ---------- */
+function stepProduct(){
+  var secs = [], by = {};
+  PF.forEach(function(f){ if (f.k === "b05") return; if (!by[f.sec]){ by[f.sec] = []; secs.push(f.sec); } by[f.sec].push(f); });
+  var h = '<section class="panel"><div class="ph"><div><h2>About Your Product</h2><p>We filled in what your application already told us. Check it, add the rest, and confirm. This covers the whole product; each AI use case gets its own profile in step 3.</p></div></div><div class="pb">';
+  secs.forEach(function(sec){
+    var n = by[sec].filter(function(f){ return f.type !== "Long text"; }).length, cols = sec === "Product Scope" ? 2 : Math.max(1, Math.min(n, 4));
+    h += '<div class="sectlabel">' + esc(sec) + '</div><div class="fgrid" style="--cols:' + cols + ';margin-bottom:18px">' + by[sec].map(function(f){ return fieldHTML(f, S.product[f.k], "p", S.fromApp.indexOf(f.k) >= 0); }).join("") + "</div>";
+  });
+  h += '<div class="callout"><div class="grow"><h4>' + S.ucs.length + " AI use case" + (S.ucs.length === 1 ? "" : "s") + ' in this application</h4><p>Each one is assessed on its own and gets its own maturity level. Add or remove them in step 3; this count follows.</p></div><button class="btn ghost sm" type="button" data-go="3">Go to Use Cases</button></div>';
+  h += '<div class="attest" style="margin-top:16px"><input type="checkbox" id="attest" ' + (S.attest ? "checked" : "") + '><label for="attest"><b>I confirm</b> the product, version and number of AI use cases are complete and accurate, and every production use case in this version is included.<br><span class="muted" style="font-size:13px">Signed as ' + esc(S.product.a02n || "the primary contact") + (S.product.a02t ? ", " + esc(S.product.a02t) : "") + ".</span></label></div>";
+  h += '<div class="foot-actions"><span class="muted" id="savedline"></span><button class="btn" type="button" data-go="2">Next: Your Documents</button></div></div></section>';
+  return h;
+}
+
+/* ---------- step 2 ---------- */
+function stepDocs(){
+  var counts = {}; AREAS.forEach(function(a){ counts[a.code] = 0; }); S.docs.forEach(function(d){ if (counts[d.area] != null) counts[d.area]++; });
+  var filt = S.docFilter || "";
+  var list = S.docs.filter(function(d){ return !filt || d.area === filt; });
+  var h = '<section class="panel"><div class="ph"><div><h2>Your Documents</h2><p>Drop in everything at once: policies, model cards, risk assessments, test results, contracts, monitoring reports. No naming, no forms. We sort each file into the right control area; change it if we got it wrong.</p></div></div><div class="pb">' +
+    '<label class="drop" id="drop" for="files"><div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg></div><div class="big">Drop your files here, or choose them</div><p>Any number of files, up to 15 GB each. In this draft your files stay on your computer; nothing is uploaded.</p><input type="file" id="files" multiple class="sr"></label>' +
+    '<div class="sectlabel" style="margin-top:20px">Coverage by Control Area</div><div class="areas">' +
+    AREAS.map(function(a){ var c = counts[a.code]; return '<button type="button" class="area' + (c ? "" : " empty") + '" data-darea="' + a.code + '" aria-pressed="' + (filt === a.code) + '"><span class="c">' + a.code + '</span><div class="nm">' + esc(a.name) + '</div><div class="ct"><span class="bar"><i style="width:' + Math.min(100, c * 34) + '%"></i></span>' + (c ? c + " file" + (c === 1 ? "" : "s") : "Nothing yet") + "</div></button>"; }).join("") + "</div>" +
+    '<div class="tblwrap"><table class="docs"><thead><tr><th>File</th><th>Control Area</th><th>For</th><th><span class="sr">Remove</span></th></tr></thead><tbody>' +
+    (list.length ? list.map(function(d){
+      return "<tr><td>" + ftype(d.name) + '<span class="fname">' + esc(d.name) + '</span><span class="sorted' + (d.sorted === "guess" ? " guess" : "") + '">' + fsize(d.size) + " · " + (d.sorted === "you" ? "Sorted by you" : d.sorted === "guess" ? "Couldn't tell from the name. Please choose" : "Sorted from the file name") + "</span></td>" +
+        '<td><select class="in" data-docarea="' + d.id + '" aria-label="Control area for ' + esc(d.name) + '">' + (d.area ? "" : '<option value="">Choose…</option>') + AREAS.map(function(a){ return '<option value="' + a.code + '"' + (a.code === d.area ? " selected" : "") + ">" + esc(a.name) + "</option>"; }).join("") + "</select></td>" +
+        '<td><select class="in" data-docall="' + d.id + '" aria-label="Which use cases ' + esc(d.name) + ' covers"><option value="all"' + (d.all ? " selected" : "") + '>Every use case</option>' + S.ucs.map(function(u){ return '<option value="' + u.id + '"' + (!d.all && d.uc === u.id ? " selected" : "") + ">" + esc(u.f["uc-name"] || u.id) + "</option>"; }).join("") + "</select></td>" +
+        '<td><button class="iconbtn" type="button" data-docdel="' + d.id + '" aria-label="Remove ' + esc(d.name) + '">&#10005;</button></td></tr>';
+    }).join("") : '<tr><td colspan="4" class="muted" style="padding:18px">No files in this area yet.</td></tr>') + "</tbody></table></div>" +
+    (filt ? '<p style="margin:10px 0 0"><button type="button" class="linkbtn" data-darea="">Show all ' + S.docs.length + " files</button></p>" : "") +
+    '<div class="callout next"><div class="grow"><h4>Coming next: we read your documents and draft your answers</h4><p>Once your files are in, we read them and fill in as many answers as we can, each one linked to the document it came from. You check them, fix anything we misread, and answer what your documents don\'t cover. Answers marked “Drafted from your documents” in step 3 show how this will look.</p></div></div>' +
+    '<div class="foot-actions"><button class="btn ghost" type="button" data-go="1">Back</button><button class="btn" type="button" data-go="3">Next: Your AI Use Cases</button></div></div></section>';
+  return h;
+}
+
+/* ---------- step 3 ---------- */
+function stepUseCases(){
+  if (S.ucSel >= S.ucs.length) S.ucSel = 0;
+  var uc = S.ucs[S.ucSel], st = uc ? ucStats(uc) : null;
+  var h = '<div class="ucgrid"><div class="uclist">' + S.ucs.map(function(u, i){
+    var s = ucStats(u); return '<button type="button" class="uccard" data-uc="' + i + '" aria-current="' + (i === S.ucSel) + '"><div class="uid">' + esc(u.id) + '</div><div class="unm">' + esc(u.f["uc-name"] || "Unnamed use case") + '</div><div class="ubar"><i style="width:' + Math.round(s.pct * 100) + '%"></i></div><div class="ust"><span>' + Math.round(s.pct * 100) + "% done</span><span>" + s.qTot + " questions</span></div></button>";
+  }).join("") + '<button type="button" class="addbtn" id="adduc">+ Add a Use Case</button></div>';
+  if (!uc){ return h + '<section class="panel"><div class="pb">Add your first AI use case.</div></section></div>'; }
+  var tabs = [["profile", "Profile", st.pDone + "/" + st.pTot, st.pDone === st.pTot], ["triggers", "10 Quick Questions", st.tDone + "/" + st.tTot, st.tDone === st.tTot], ["questions", "Governance Questions", st.qDone + "/" + st.qTot, st.qDone === st.qTot]];
+  h += '<section class="panel" style="min-width:0"><div class="ph"><div><span class="code">' + esc(uc.id) + "</span><h2>" + esc(uc.f["uc-name"] || "Unnamed use case") + '</h2><p>Each use case is assessed on its own. Answer the 10 quick questions first: they decide which governance questions apply.</p></div><div class="tools">' + (S.ucs.length > 1 ? '<button class="btn ghost sm" type="button" id="deluc">Remove This Use Case</button>' : "") + "</div></div>" +
+    '<div class="subtabs" role="tablist">' + tabs.map(function(t){ return '<button type="button" role="tab" data-uctab="' + t[0] + '" aria-selected="' + (S.ucTab === t[0]) + '">' + t[1] + ' <span class="cnt' + (t[3] ? " done" : "") + '">' + t[2] + "</span></button>"; }).join("") + "</div>";
+  h += '<div class="pb">' + (S.ucTab === "profile" ? ucProfile(uc) : S.ucTab === "triggers" ? ucTriggers(uc) : ucQuestions(uc)) + "</div></section></div>";
+  return h;
+}
+function ucProfile(uc){
+  return '<div class="grid2">' + UF.map(function(f){ return fieldHTML(f, uc.f[f.k], "u", false); }).join("") + '</div><div class="foot-actions"><span class="muted" id="savedline"></span><button class="btn" type="button" data-uctab="triggers">Next: 10 Quick Questions</button></div>';
+}
+function ucTriggers(uc){
+  var qs = qsFor(uc), cond = qs.filter(function(q){ return q.t.length; }).length;
+  var h = '<div class="trigsum"><span class="big num">' + qs.length + '</span><span>governance questions apply to this use case: <b>57</b> everyone answers, plus <b>' + cond + "</b> from your Yes answers below.</span></div>";
+  h += '<div class="trigs">' + TRIG.map(function(t){
+    var v = uc.trig[t.id], adds = QS.filter(function(q){ return q.t.indexOf(t.id) >= 0; }).length;
+    return '<div class="trig ' + (v || "") + '"><div class="top"><span class="tid">' + t.id + '</span><div><div class="tq">' + esc(t.q) + '</div><div class="tm">' + esc(t.means) + '</div></div></div><div class="yn"><button type="button" class="yes" data-trig="' + t.id + '" data-v="y" aria-pressed="' + (v === "y") + '">Yes</button><button type="button" class="no" data-trig="' + t.id + '" data-v="n" aria-pressed="' + (v === "n") + '">No</button><span class="adds">' + (t.id === "T08" ? "Yes adds the 5 third-party questions" : "Yes adds up to " + adds + " question" + (adds === 1 ? "" : "s")) + "</span></div></div>";
+  }).join("") + "</div>";
+  h += '<div class="foot-actions"><button class="btn ghost" type="button" data-uctab="profile">Back to Profile</button><button class="btn" type="button" data-uctab="questions">Next: Governance Questions</button></div>';
+  return h;
+}
+function ucQuestions(uc){
+  var qs = qsFor(uc), area = S.areaSel, f = S.qFilter;
+  var byA = {}; qs.forEach(function(q){ (byA[q.a] = byA[q.a] || []).push(q); });
+  if (!byA[area]) area = S.areaSel = Object.keys(byA)[0];
+  var nav = '<div class="anav" role="group" aria-label="Control areas">' + AREAS.filter(function(a){ return byA[a.code]; }).map(function(a){
+    var l = byA[a.code], d = l.filter(function(q){ return qState(uc, q) === "done"; }).length;
+    return '<button type="button" data-qarea="' + a.code + '" aria-pressed="' + (a.code === area) + '"><span class="c">' + a.code + "</span>" + esc(SHORT[a.code]) + '<span class="k' + (d === l.length ? " done" : "") + '">' + d + "/" + l.length + "</span></button>";
+  }).join("") + "</div>";
+  var drafted = qs.filter(function(q){ return qState(uc, q) === "drafted"; }).length;
+  var list = (byA[area] || []).filter(function(q){ var s = qState(uc, q); return f === "all" || (f === "todo" && s === "todo") || (f === "drafted" && s === "drafted"); });
+  var open = TRIG.filter(function(t){ return !uc.trig[t.id]; }).length;
+  var h = '<div class="qlayout">' + nav + '<div style="min-width:0">' +
+    (open ? '<div class="callout next" style="margin-top:0;margin-bottom:12px"><div class="grow"><h4>' + open + " of the 10 quick questions still open</h4><p>Some questions below may still be added once you answer them.</p></div><button class=\"btn ghost sm\" type=\"button\" data-uctab=\"triggers\">Answer Them</button></div>" : "") +
+    '<div class="filters"><div class="seg" role="group" aria-label="Show"><button type="button" data-qf="all" aria-pressed="' + (f === "all") + '">All</button><button type="button" data-qf="todo" aria-pressed="' + (f === "todo") + '">Still to Answer</button><button type="button" data-qf="drafted" aria-pressed="' + (f === "drafted") + '">Drafted for You (' + drafted + ")</button></div>" +
+    '<span class="muted" style="font-size:13px">' + esc(AREA[area]) + "</span></div>";
+  h += list.length ? list.map(function(q){ return qCard(uc, q); }).join("") : '<div class="q"><span class="muted">Nothing here' + (f === "all" ? "" : " for this filter") + ".</span></div>";
+  var areas = AREAS.filter(function(a){ return byA[a.code]; }).map(function(a){ return a.code; }), i = areas.indexOf(area);
+  h += '<div class="foot-actions">' + (i > 0 ? '<button class="btn ghost" type="button" data-qarea="' + areas[i - 1] + '">Previous: ' + esc(SHORT[areas[i - 1]]) + "</button>" : "<span></span>") + (i < areas.length - 1 ? '<button class="btn" type="button" data-qarea="' + areas[i + 1] + '">Next: ' + esc(SHORT[areas[i + 1]]) + "</button>" : '<button class="btn" type="button" data-go="4">Review and Submit</button>') + "</div></div></div>";
+  return h;
+}
+function qCard(uc, q){
+  var a = ansOf(uc, q.id) || { text: "", docs: [] }, s = qState(uc, q);
+  var docs = (a.docs || []).map(function(id){ return S.docs.filter(function(d){ return d.id === id; })[0]; }).filter(Boolean);
+  var sug = S.docs.filter(function(d){ return d.area === q.a && (a.docs || []).indexOf(d.id) < 0; }), rest = S.docs.filter(function(d){ return d.area !== q.a && (a.docs || []).indexOf(d.id) < 0; });
+  return '<article class="q ' + (s === "done" ? "answered" : s === "drafted" ? "drafted" : "") + '" id="q-' + q.id + '"><div class="qhead"><span class="code">' + q.id + '</span><span class="tag ' + q.lv + '">' + LV[q.lv] + "</span>" +
+    q.t.filter(function(t){ return uc.trig[t] === "y"; }).map(function(t){ return '<span class="tag trig" title="' + esc(TRIGBY[t].q) + '">Because: ' + esc(TRIGBY[t].name) + "</span>"; }).join("") +
+    '<span class="state ' + (s === "done" ? "ok" : s === "drafted" ? "dr" : "todo") + '">' + (s === "done" ? "&#10003; Answered" : s === "drafted" ? "Check this" : "To answer") + "</span></div>" +
+    '<div class="qt">' + esc(q.q) + '</div><div class="why">' + esc(q.req) + "</div>" +
+    (a.drafted && filled(a.text) ? '<div class="draftbar"><span><b>Drafted from your documents.</b> Check it and change anything that\'s not right.</span><button class="btn sm good" type="button" data-ok="' + q.id + '">Looks Right</button></div>' : "") +
+    '<label class="sr" for="a-' + q.id + '">Your answer to ' + q.id + '</label><textarea class="in" id="a-' + q.id + '" data-ans="' + q.id + '" placeholder="Your answer">' + esc(a.text) + "</textarea>" +
+    '<div class="upl"><b>Evidence:</b><span>' + esc(q.up) + "</span></div>" +
+    '<div class="evid">' + docs.map(function(d){ return '<span class="chip">' + ftype(d.name) + "<span>" + esc(d.name) + '</span><button type="button" data-unlink="' + q.id + "|" + d.id + '" aria-label="Remove ' + esc(d.name) + '">&times;</button></span>'; }).join("") +
+    '<select class="in" data-link="' + q.id + '" aria-label="Attach a document to ' + q.id + '"><option value="">+ Attach a document…</option>' +
+    (sug.length ? '<optgroup label="' + esc(AREA[q.a]) + '">' + sug.map(function(d){ return '<option value="' + d.id + '">' + esc(d.name) + "</option>"; }).join("") + "</optgroup>" : "") +
+    (rest.length ? '<optgroup label="Other documents">' + rest.map(function(d){ return '<option value="' + d.id + '">' + esc(d.name) + "</option>"; }).join("") + "</optgroup>" : "") +
+    "</select></div></article>";
+}
+
+/* ---------- step 4 ---------- */
+function stepReview(){
+  if (S.submitted) return doneScreen();
+  var p = prodStats(), blockers = 0;
+  var h = '<section class="panel"><div class="ph"><div><h2>Review and Submit</h2><p>Here is what is complete and what is still open. Click anything open to go straight to it. You can submit once every use case is complete.</p></div></div><div class="pb"><div class="revgrid">';
+  var pl = [["Product details complete", p.done - (S.attest ? 1 : 0) === p.tot - 1, "1"], ["Product information confirmed", S.attest, "1"], ["Documents uploaded (" + S.docs.length + ")", S.docs.length > 0, "2"]];
+  var pp = pl.filter(function(x){ return x[1]; }).length / pl.length;
+  h += '<div class="rcard"><div class="rh"><div class="mini">' + ringSvg(pp, 58, 6, "var(--surface-3)", "var(--good)") + "<b>" + Math.round(pp * 100) + '%</b></div><div><span class="code">PRODUCT</span><h3 style="font-size:16px">' + esc(S.product.b01) + " " + esc(S.product.b02) + '</h3></div></div><ul class="checks">' +
+    pl.map(function(x){ if (!x[1]) blockers++; return '<li><span class="mk ' + (x[1] ? "ok" : "no") + '">' + (x[1] ? "&#10003;" : "!") + "</span>" + (x[1] ? esc(x[0]) : '<button class="linkbtn" type="button" data-go="' + x[2] + '">' + esc(x[0]) + "</button>") + "</li>"; }).join("") + "</ul></div>";
+  S.ucs.forEach(function(u, i){
+    var s = ucStats(u), yes = TRIG.filter(function(t){ return u.trig[t.id] === "y"; });
+    var lvls = { F: 0, M: 0, V: 0 }; qsFor(u).forEach(function(q){ lvls[q.lv]++; });
+    var rows = [["Profile complete (" + s.pDone + "/" + s.pTot + ")", s.pDone === s.pTot, "profile"], ["10 quick questions answered (" + s.tDone + "/10)", s.tDone === 10, "triggers"], ["Questions answered (" + s.qDone + "/" + s.qTot + ")", s.qDone === s.qTot, "questions"]];
+    if (s.qDraft) rows.push([s.qDraft + " drafted answer" + (s.qDraft === 1 ? "" : "s") + " to check", false, "questions", "drafted"]);
+    rows.forEach(function(r){ if (!r[1]) blockers++; });
+    h += '<div class="rcard"><div class="rh"><div class="mini">' + ringSvg(s.pct, 58, 6, "var(--surface-3)", "var(--accent)") + "<b>" + Math.round(s.pct * 100) + '%</b></div><div style="min-width:0"><span class="code">' + esc(u.id) + '</span><h3 style="font-size:16px">' + esc(u.f["uc-name"] || "Unnamed use case") + '</h3></div></div><ul class="checks">' +
+      rows.map(function(r){ return '<li><span class="mk ' + (r[1] ? "ok" : "no") + '">' + (r[1] ? "&#10003;" : "!") + "</span>" + (r[1] ? esc(r[0]) : '<button class="linkbtn" type="button" data-jump="' + i + "|" + r[2] + "|" + (r[3] || "") + '">' + esc(r[0]) + "</button>") + "</li>"; }).join("") + "</ul>" +
+      '<div class="levels"><span class="tag F">' + lvls.F + ' Foundational</span><span class="tag M">' + lvls.M + ' Managed</span><span class="tag V">' + lvls.V + " Validated</span></div>" +
+      '<div style="font-size:12.5px;color:var(--ink-2)">' + (yes.length ? "Flagged: " + yes.map(function(t){ return esc(t.name); }).join(", ") : "No characteristics flagged") + "</div></div>";
+  });
+  h += '</div><div class="attest" style="margin-top:18px"><input type="checkbox" disabled checked><div><b>Submitted by ' + esc(S.product.a02n) + "</b>, " + esc(S.product.a02t || "") + ' · <span class="num">' + new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) + '</span><br><span class="muted" style="font-size:13px">By submitting, you confirm these answers and documents are accurate and current for version ' + esc(S.product.b02) + ".</span></div></div>" +
+    '<div class="foot-actions"><button class="btn ghost" type="button" data-go="3">Back to Use Cases</button><span style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">' + (blockers ? '<span class="muted" style="font-size:13px">' + blockers + " item" + (blockers === 1 ? "" : "s") + " still open</span>" : "") +
+    '<button class="btn" type="button" id="submit"' + (blockers ? " disabled" : "") + ">Send to MISMO</button>" + (blockers ? '<button class="btn ghost sm" type="button" id="submitanyway">Preview the Submitted Screen</button>' : "") + "</span></div></div></section>";
+  return h;
+}
+function doneScreen(){
+  return '<section class="panel"><div class="done-screen"><div class="ok">&#10003;</div><h2>Sent to MISMO</h2><p class="muted" style="max-width:58ch;margin:8px auto 0">Thank you. Your submission is locked so the assessor reviews exactly what you sent. If they need anything else, the request appears here and we email ' + esc(S.product.a02e) + '.</p><div class="timeline">' +
+    "<div><b>1 · MISMO Check</b><span>We confirm everything is there, usually within two business days.</span></div><div><b>2 · Assessment</b><span>Actualize reviews each requirement against your answers and documents.</span></div><div><b>3 · Questions, If Any</b><span>Requests for more information come back to this page.</span></div><div><b>4 · Determination</b><span>Each use case gets its maturity level: Foundational, Managed or Validated.</span></div>" +
+    '</div><p style="margin-top:22px"><button class="btn ghost" type="button" id="unsubmit">Back to Editing (Draft Only)</button></p></div></section>';
+}
+
+/* ---------- assessor preview ---------- */
+function maturity(uc){
+  var r = (S.rate[uc.id] || {}), qs = qsFor(uc), res = {}, capped = false;
+  ["F","M","V"].forEach(function(l){
+    var l2 = qs.filter(function(q){ return q.lv === l; }), s = 0, n = 0, m = 0, open = 0;
+    l2.forEach(function(q){ var x = (r[q.id] || {}).r; if (x === "S") s++; else if (x === "N") n++; else if (x === "M") m++; else open++; });
+    res[l] = { tot: l2.length, s: s, n: n, m: m, open: open };
+  });
+  var level = null;
+  if (res.F.s === res.F.tot) { level = "Foundational"; if (res.M.s === res.M.tot) { level = "Managed"; if (res.V.s === res.V.tot) level = "Validated"; } }
+  return { res: res, level: level };
+}
+function assessorView(){
+  if (S.ucSel >= S.ucs.length) S.ucSel = 0;
+  var uc = S.ucs[S.ucSel], m = maturity(uc), qs = qsFor(uc), r = S.rate[uc.id] || {};
+  var area = S.aArea || "UD", byA = {}; qs.forEach(function(q){ (byA[q.a] = byA[q.a] || []).push(q); }); if (!byA[area]) area = Object.keys(byA)[0];
+  var rated = qs.filter(function(q){ return r[q.id] && r[q.id].r; }).length, need = qs.filter(function(q){ return r[q.id] && r[q.id].r === "M"; }).length, ns = qs.filter(function(q){ return r[q.id] && r[q.id].r === "N"; }).length;
+  var h = '<div class="ucgrid"><div class="uclist">' + S.ucs.map(function(u, i){ var mm = maturity(u); return '<button type="button" class="uccard" data-uc="' + i + '" aria-current="' + (i === S.ucSel) + '"><div class="uid">' + esc(u.id) + '</div><div class="unm">' + esc(u.f["uc-name"] || "Unnamed") + '</div><div class="ust"><span>' + (mm.level || "Not yet determined") + "</span></div></button>"; }).join("") +
+    '<div class="callout" style="margin-top:4px"><div class="grow"><h4 style="font-size:13.5px">How Maturity Is Set</h4><p style="font-size:12.5px">Cumulative. All Foundational requirements Sufficient gives Foundational; add every Managed for Managed; add every Validated for Validated. One Not Sufficient caps the use case at the level below. Need More Information must be cleared before results are released.</p></div></div></div>';
+  h += '<section class="panel" style="min-width:0"><div class="ph"><div><span class="code">' + esc(uc.id) + "</span><h2>" + esc(uc.f["uc-name"]) + '</h2><p>' + esc(uc.f["uc-purpose"] || "") + '</p></div></div><div class="pb">' +
+    '<div class="asum"><div class="tile"><div class="v">' + rated + "/" + qs.length + '</div><div class="l">Rated</div></div><div class="tile"><div class="v" style="color:var(--warn)">' + need + '</div><div class="l">Need More Info</div></div><div class="tile"><div class="v" style="color:var(--bad)">' + ns + '</div><div class="l">Not Sufficient</div></div><div class="tile"><div class="v" style="font-size:17px;padding-top:6px">' + (m.level || "Not yet") + '</div><div class="l">Maturity So Far</div></div></div>' +
+    '<div class="matur">' + ["F","M","V"].map(function(l){ var x = m.res[l], got = x.s === x.tot && x.tot, cap = x.n > 0; return '<div class="' + (got ? "got" : cap ? "cap" : "") + '"><b>' + LV[l] + '</b><span class="num">' + x.s + "/" + x.tot + " Sufficient" + (x.n ? " · " + x.n + " not" : "") + (x.m ? " · " + x.m + " need info" : "") + "</span></div>"; }).join("") + "</div>" +
+    '<div class="qlayout"><div class="anav" role="group" aria-label="Control areas">' + AREAS.filter(function(a){ return byA[a.code]; }).map(function(a){ var l = byA[a.code], d = l.filter(function(q){ return r[q.id] && r[q.id].r; }).length; return '<button type="button" data-aarea="' + a.code + '" aria-pressed="' + (a.code === area) + '"><span class="c">' + a.code + "</span>" + esc(SHORT[a.code]) + '<span class="k' + (d === l.length ? " done" : "") + '">' + d + "/" + l.length + "</span></button>"; }).join("") + '</div><div style="min-width:0">' +
+    byA[area].map(function(q){
+      var a = ansOf(uc, q.id) || {}, rr = r[q.id] || {}, ai = ((S.ai || {})[uc.id] || {})[q.id];
+      var docs = (a.docs || []).map(function(id){ return S.docs.filter(function(d){ return d.id === id; })[0]; }).filter(Boolean);
+      return '<article class="q"><div class="qhead"><span class="code">' + q.id + '</span><span class="tag ' + q.lv + '">' + LV[q.lv] + "</span>" + q.t.filter(function(t){ return uc.trig[t] === "y"; }).map(function(t){ return '<span class="tag trig">' + esc(TRIGBY[t].name) + "</span>"; }).join("") + '</div><div class="qt">' + esc(q.q) + "</div>" +
+        '<div class="answerbox' + (filled(a.text) ? "" : " empty") + '">' + (filled(a.text) ? esc(a.text) : "No answer yet") + "</div>" +
+        (docs.length ? '<div class="evid">' + docs.map(function(d){ return '<span class="chip" style="padding-right:8px">' + ftype(d.name) + "<span>" + esc(d.name) + "</span></span>"; }).join("") + "</div>" : "") +
+        '<div class="verify"><b>Verify:</b> ' + esc(q.ver) + (q.vchk === "Confirm against workbook" ? '<span class="flag">Wording to confirm against the 20 August workbook before assessors use it.</span>' : "") + "</div>" +
+        (ai ? '<div class="ai"><b>AI pre-assessment (phase 2 preview): ' + esc(ai[0]) + ".</b> " + esc(ai[1]) + "</div>" : "") +
+        '<div class="rate" role="group" aria-label="Rating for ' + q.id + '">' + [["S","Sufficient"],["N","Not Sufficient"],["M","Need More Information"]].map(function(x){ return '<button type="button" class="' + x[0] + '" data-rate="' + q.id + "|" + x[0] + '" aria-pressed="' + (rr.r === x[0]) + '">' + x[1] + "</button>"; }).join("") + "</div>" +
+        '<label class="sr" for="n-' + q.id + '">Note for ' + q.id + '</label><input class="in" id="n-' + q.id + '" data-note="' + q.id + '" placeholder="' + (rr.r === "M" ? "What the company needs to send (they see this)" : "Note (optional)") + '" value="' + esc(rr.note || "") + '"></article>';
+    }).join("") + "</div></div></div></section></div>";
+  return h;
+}
+
+/* ---------- render ---------- */
+function render(){
+  refreshChrome();
+  var m = $("main");
+  if (S.view === "assessor") m.innerHTML = assessorView();
+  else m.innerHTML = S.step === 1 ? stepProduct() : S.step === 2 ? stepDocs() : S.step === 3 ? stepUseCases() : stepReview();
+  paintSaved();
+}
+function go(step){ S.step = step; S.view = "company"; paintView(); save(); render(); window.scrollTo({ top: $("steps").offsetTop - 70, behavior: "smooth" }); }
+function paintView(){ ["company","assessor"].forEach(function(v){ $("v-" + v).setAttribute("aria-pressed", String(S.view === v)); }); }
+
+/* ---------- files ---------- */
+function addFiles(list){
+  var n = 0;
+  Array.prototype.forEach.call(list, function(f){
+    if (S.docs.some(function(d){ return d.name === f.name && d.size === f.size; })) return;
+    var a = guessArea(f.name); S.docs.push({ id: "d" + Date.now().toString(36) + n, name: f.name, size: f.size, area: a || "", all: true, sorted: a ? "name" : "guess" }); n++;
+  });
+  if (n){ save(); render(); toast(n + " file" + (n === 1 ? "" : "s") + " added and sorted"); }
+}
+
+/* ---------- events ---------- */
+document.addEventListener("click", function(e){
+  var t = e.target.closest("button, [data-darea]"); if (!t) return;
+  var d = t.dataset;
+  if (d.view){ S.view = d.view; paintView(); save(); render(); return; }
+  if (d.step){ go(+d.step); return; }
+  if (d.go){ go(+d.go); return; }
+  if (d.darea != null && t.tagName === "BUTTON"){ S.docFilter = S.docFilter === d.darea ? "" : d.darea; render(); return; }
+  if (d.docdel){ S.docs = S.docs.filter(function(x){ return x.id !== d.docdel; }); S.ucs.forEach(function(u){ Object.keys(u.ans).forEach(function(k){ u.ans[k].docs = (u.ans[k].docs || []).filter(function(x){ return x !== d.docdel; }); }); }); save(); render(); toast("File removed"); return; }
+  if (d.uc != null){ S.ucSel = +d.uc; save(); render(); return; }
+  if (d.uctab){ S.ucTab = d.uctab; save(); render(); return; }
+  if (d.trig){ var u = S.ucs[S.ucSel]; u.trig[d.trig] = u.trig[d.trig] === d.v ? null : d.v; save(); var y = window.scrollY; render(); window.scrollTo(0, y); return; }
+  if (d.qarea){ S.areaSel = d.qarea; save(); render(); var p = document.querySelector(".qlayout"); if (p) window.scrollTo({ top: p.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" }); return; }
+  if (d.qf){ S.qFilter = d.qf; save(); render(); return; }
+  if (d.ok){ var u2 = S.ucs[S.ucSel], a = u2.ans[d.ok]; if (a){ a.drafted = false; } save(); var y2 = window.scrollY; render(); window.scrollTo(0, y2); toast("Marked as checked"); return; }
+  if (d.unlink){ var pr = d.unlink.split("|"), a2 = S.ucs[S.ucSel].ans[pr[0]]; if (a2) a2.docs = a2.docs.filter(function(x){ return x !== pr[1]; }); save(); var y3 = window.scrollY; render(); window.scrollTo(0, y3); return; }
+  if (d.jump){ var j = d.jump.split("|"); S.step = 3; S.ucSel = +j[0]; S.ucTab = j[1]; if (j[2]) S.qFilter = j[2]; else if (j[1] === "questions") S.qFilter = "todo"; save(); render(); window.scrollTo({ top: $("steps").offsetTop - 70, behavior: "smooth" }); return; }
+  if (d.aarea){ S.aArea = d.aarea; render(); return; }
+  if (d.rate){ var q = d.rate.split("|"), uid = S.ucs[S.ucSel].id; S.rate[uid] = S.rate[uid] || {}; var cur = S.rate[uid][q[0]] || {}; cur.r = cur.r === q[1] ? null : q[1]; S.rate[uid][q[0]] = cur; save(); var y4 = window.scrollY; render(); window.scrollTo(0, y4); return; }
+  if (t.id === "adduc"){ var nid = "UC-" + String(S.ucs.length + 1).padStart(3, "0"); while (S.ucs.some(function(x){ return x.id === nid; })) nid = "UC-" + String(+nid.slice(3) + 1).padStart(3, "0"); S.ucs.push({ id: nid, f: {}, trig: {}, ans: {} }); S.ucSel = S.ucs.length - 1; S.ucTab = "profile"; S.product.b05 = String(S.ucs.length); save(); render(); toast("Use case added"); return; }
+  if (t.id === "deluc"){ if (t.dataset.sure){ S.ucs.splice(S.ucSel, 1); S.ucSel = 0; S.product.b05 = String(S.ucs.length); save(); render(); toast("Use case removed"); } else { t.dataset.sure = "1"; t.textContent = "Click Again to Remove"; t.classList.remove("ghost"); setTimeout(function(){ if (t.isConnected){ delete t.dataset.sure; t.textContent = "Remove This Use Case"; t.classList.add("ghost"); } }, 4000); } return; }
+  if (t.id === "submit" || t.id === "submitanyway"){ S.submitted = true; save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); return; }
+  if (t.id === "unsubmit"){ S.submitted = false; save(); render(); return; }
+  if (t.id === "reset"){ S = sample(); save(); render(); toast("Sample restored"); return; }
+});
+document.addEventListener("input", function(e){
+  var el = e.target, d = el.dataset;
+  if (d.f === "p"){ S.product[d.k] = el.value; save(); refreshChrome(); return; }
+  if (d.f === "u"){ var u = S.ucs[S.ucSel]; u.f[d.k] = el.value; save(); refreshChrome(); if (d.k === "uc-name"){ var c = document.querySelector('.uccard[aria-current="true"] .unm'); if (c) c.textContent = el.value || "Unnamed use case"; } return; }
+  if (d.ans){ var u2 = S.ucs[S.ucSel]; var a = u2.ans[d.ans] = u2.ans[d.ans] || { text: "", docs: [] }; a.text = el.value; a.drafted = false; save(); refreshChrome(); var card = el.closest(".q"); if (card){ var bar = card.querySelector(".draftbar"); if (bar) bar.remove(); card.className = "q" + (filled(a.text) ? " answered" : ""); var st = card.querySelector(".state"); if (st){ st.className = "state " + (filled(a.text) ? "ok" : "todo"); st.innerHTML = filled(a.text) ? "&#10003; Answered" : "To answer"; } } return; }
+  if (d.note){ var uid = S.ucs[S.ucSel].id; S.rate[uid] = S.rate[uid] || {}; (S.rate[uid][d.note] = S.rate[uid][d.note] || {}).note = el.value; save(); return; }
+});
+document.addEventListener("change", function(e){
+  var el = e.target, d = el.dataset;
+  if (el.id === "attest"){ S.attest = el.checked; save(); refreshChrome(); return; }
+  if (el.id === "files"){ addFiles(el.files); el.value = ""; return; }
+  if (d.docarea){ var x = S.docs.filter(function(z){ return z.id === d.docarea; })[0]; if (x){ x.area = el.value; x.sorted = "you"; } save(); render(); return; }
+  if (d.docall){ var x2 = S.docs.filter(function(z){ return z.id === d.docall; })[0]; if (x2){ x2.all = el.value === "all"; x2.uc = x2.all ? null : el.value; } save(); return; }
+  if (d.link){ if (!el.value) return; var u = S.ucs[S.ucSel], a = u.ans[d.link] = u.ans[d.link] || { text: "", docs: [] }; a.docs = (a.docs || []).concat(el.value); save(); var y = window.scrollY; render(); window.scrollTo(0, y); return; }
+  if (d.f === "p" || d.f === "u"){ render(); }
+});
+["dragover","dragenter"].forEach(function(ev){ document.addEventListener(ev, function(e){ var z = e.target.closest && e.target.closest("#drop"); if (z){ e.preventDefault(); z.classList.add("over"); } }); });
+document.addEventListener("dragleave", function(e){ var z = e.target.closest && e.target.closest("#drop"); if (z) z.classList.remove("over"); });
+document.addEventListener("drop", function(e){ var z = e.target.closest && e.target.closest("#drop"); if (z){ e.preventDefault(); z.classList.remove("over"); if (e.dataTransfer && e.dataTransfer.files) addFiles(e.dataTransfer.files); } });
+
+/* theme */
+(function theme(){
+  var btn = $("theme-btn");
+  function cur(){ var t = document.documentElement.getAttribute("data-theme"); if (t) return t; return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; }
+  function paint(){ btn.textContent = cur() === "dark" ? "Light" : "Dark"; }
+  btn.addEventListener("click", function(){ document.documentElement.setAttribute("data-theme", cur() === "dark" ? "light" : "dark"); paint(); try { localStorage.setItem("mismo.portal.theme", cur()); } catch (e) {} });
+  try { var saved = localStorage.getItem("mismo.portal.theme"); if (saved) document.documentElement.setAttribute("data-theme", saved); } catch (e) {}
+  paint();
+})();
+var bandWrap = document.querySelector(".band .wrap"); var rb = document.createElement("button"); rb.type = "button"; rb.id = "reset"; rb.className = "btn ghost sm"; rb.textContent = "Restore the Sample"; bandWrap.appendChild(rb);
+paintView(); render();
+})();
+</script>
+
+</body>
+</html>
