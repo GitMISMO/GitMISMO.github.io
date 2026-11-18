@@ -16,7 +16,8 @@ const SHOW = ['Paid', 'Approved', 'Pending Payment', 'In Kind'];
 // One feed per summit of the 2027 Series. A Series record counts toward every summit unless its custom
 // package lists only some of them; a single-summit record ("Winter 2027") counts toward that summit only.
 const SUMMITS = [
-  { season: 'Winter', summit: '2027 Winter Summit', out: 'sponsors/winter-2027.json', events: ['2027 Series', 'Winter 2027'] },
+  { season: 'Winter', summit: '2027 Winter Summit', out: 'sponsors/winter-2027.json', events: ['2027 Series', 'Winter 2027'],
+    workshop: { title: 'AI Governance in Practice Workshop', match: 'AI Governance in Practice' } },
   { season: 'Spring', summit: '2027 Spring Summit', out: 'sponsors/spring-2027.json', events: ['2027 Series', 'Spring 2027'] },
   { season: 'Fall', summit: '2027 Fall Summit', out: 'sponsors/fall-2027.json', events: ['2027 Series', 'Fall 2027'] },
 ];
@@ -45,8 +46,15 @@ const slug = (s) => s.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0-9]+/g, 
 
 // Where a sponsorship shows on the agenda and in "What Our Sponsors Power".
 // match = the agenda line it attaches to on that day.
-function placement(opp, day) {
+// Nov 18, 2026 (asked by the website's Claude): a Workshop sponsorship goes on that summit's Monday
+// workshop. The Portal records it with no day, so it takes Monday; the title and match are the summit's
+// workshop when it is named above, otherwise just "Workshop".
+function placement(opp, day, S) {
   const o = String(opp || '').toLowerCase();
+  if (/workshop/.test(o) && !/custom series/.test(o)) {
+    const w = (S && S.workshop) || { title: 'Workshop', match: 'Workshop' };
+    return { title: w.title, type: 'Workshop', match: w.match, order: 6, day: day || 'Monday' };
+  }
   if (!day || /custom series/.test(o)) return null;
   if (/breakfast/.test(o)) return { title: 'Breakfast', type: 'Break', match: 'Breakfast', order: 1 };
   if (/coffee|morning break/.test(o)) return { title: 'Morning Coffee Break', type: 'Break', match: 'Morning Break', order: 2 };
@@ -83,7 +91,8 @@ async function main() {
   for (const S of SUMMITS) build(S, docs);
 }
 
-function build({ season: SEASON, summit: SUMMIT, out: OUT, events: EVENTS }, docs) {
+function build(S, docs) {
+  const { season: SEASON, summit: SUMMIT, out: OUT, events: EVENTS } = S;
   const seen = new Map();
   for (const a of Object.values(docs)) {
     if (!EVENTS.includes(a.event) || !SHOW.includes(a.status)) continue;
@@ -102,14 +111,14 @@ function build({ season: SEASON, summit: SUMMIT, out: OUT, events: EVENTS }, doc
     const raw = String(a.company || '').trim();
     const name = NAMES[raw] || raw;
     if (!name) continue;
-    const p = placement(opp, day);
+    const p = placement(opp, day, S);
     const cur = seen.get(name);
     if (cur) { // one sponsor, several sponsorships: keep the highest tier, add each placement
       if (Object.values(TIERS).indexOf(tier) < Object.values(TIERS).indexOf(cur.tier)) cur.tier = tier;
-      if (p) cur.placements.push({ ...p, day });
+      if (p) cur.placements.push({ ...p, day: p.day || day });
       continue;
     }
-    seen.set(name, { name, tier, url: urlFor(name, a.contactEmail), logo: logoFor(name), placements: p ? [{ ...p, day }] : [] });
+    seen.set(name, { name, tier, url: urlFor(name, a.contactEmail), logo: logoFor(name), placements: p ? [{ ...p, day: p.day || day }] : [] });
   }
   const sponsors = [...seen.values()].sort((x, y) => Object.values(TIERS).indexOf(x.tier) - Object.values(TIERS).indexOf(y.tier) || x.name.localeCompare(y.name));
   const body = { summit: SUMMIT, source: 'Sponsorship Portal', sponsors };
