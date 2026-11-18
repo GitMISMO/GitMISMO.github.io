@@ -2063,7 +2063,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-18T18:53:59Z',fp:'ded2e71c'};
+window.__mmsBuild={at:'2026-11-18T20:18:58Z',fp:'b93b0ab8'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2698,7 +2698,7 @@ function stageActions(t){
     case 'approved': add('Start Work →',()=>startWork(t),'pri'); break;
     case 'cfp': add('Call for Participation Published →',()=>cfpDone(t),'pri'); break;
     case 'kickoff': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
-    case 'work': add('Submit for AI Review →',()=>submitAI(t),'pri'); add('Change Target Date',()=>changeTarget(t)); break;
+    case 'work': add('Submit for AI Review →',()=>submitAI(t),'pri'); add('Change Target Date',()=>changeTarget(t)); if(S.isStaff&&!(t.cfp&&t.cfp.needed)&&typeof askCfp==='function') add('Ask for a Call for Participation',()=>askCfp(t),'ghost'); break;
     case 'aireview':
       add(sub==='reviewed'?'Run AI Review Again':'Run AI Review',()=>aiReview(t),sub==='reviewed'?'':'pri');
       if(sub==='reviewed'||sub==='') add('Send to IM Review →',()=>move(t,nextStage(t),{dates:{aiDecision:today()},patch:{ai:Object.assign({},t.ai,{status:'Passed'})},text:'AI Review passed; sent to '+stageDef(nextStage(t)).name}),sub==='reviewed'?'pri':'');
@@ -3137,7 +3137,7 @@ async function hubSync(){
       const t={id,wr:x.wr,uid:x.wr,name:q.title||x.wr,workgroup:q.cop||'',facilitator:x.facilitator||'',workType:q.maintenance?'Maintenance':'Initiative',reqType:q.isUpdate?'Update':'New',stage:'approved',sub:'',state:'active',stageSince:today(),dates:{submitted:x.submitted||'',bet:atDay(x.updatedAt)},history:[],source:'hub',hubId:x.id,createdAt:new Date().toISOString()};
       hist(t,'Approved in the Initiative Hub ('+x.id+') and brought into the MMS');
       /* file it only if it isn't already there: never over a real work request */
-      const got=await Store.create('tickets',id,t); if(got!=='ok') continue; S.tickets[id]=t; notifyEnter(t,'approved');
+      const got=await Store.create('tickets',id,t); if(got!=='ok') continue; S.tickets[id]=t;   /* work starts on its own (hubstart.js), so no Set Up email */
     }
     if(S.view==='home') renderAll();
   }catch(e){}
@@ -6172,6 +6172,25 @@ async function wpResend(t){ const p=modal({title:'Website: Find a Work Product',
     body:fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'),'Optional')+wpForm(t).replace(/<label class="tog"><input type="checkbox" name="wpon"[^>]*>[^<]*<\/label>/,'')});
   const g=wpWatch(); const v=await p; if(!v) return; v.wpon=true; v.d=(t.dates&&t.dates.published)||today(); await wpQueue(S.tickets[t.id]||t,v,g()); }
 
+/* ---------- Work approved in the Initiative Hub starts on its own (Nov 18, 2026) ----------
+   The Hub already gives the size, the requested completion date, the facilitator and the CoP, so a Hub request
+   no longer waits in Approved › Set Up: it goes straight to In Work on the Hub's size scale (Jonna, Nov 2):
+   Extra-Small 3 months, Small 6, Medium 9, Large 1 year for the whole job; Target to Submit to IM at the halfway point.
+   A Call for Participation can still be asked for from the work request. Work requests added by hand keep Start Work. */
+function hubStartPlan(t){ const k={xs:'XS',s:'S',m:'M',l:'L'}[String(t.hubEffort||'').toLowerCase()]||'M', h=hubSize(k)||hubSize('M'), start=today();
+  return {h,start,target:addDays(start,Math.round(h[3]/2)),done:addDays(start,h[3])}; }
+async function hubAutoStart(){ if(!S.canWrite||!S.isStaff||S.partial||!S.autoOn||S.viewAs) return;
+  for(const t0 of allTickets().filter(t=>t.source==='hub'&&t.stage==='approved'&&t.state==='active'&&!t.split&&!t.noAutoStart)){
+    const t=(typeof freshTicket==='function'?await freshTicket(t0.id):null)||t0; if(t.stage!=='approved') continue;
+    const P=hubStartPlan(t), x=clone(t); x.size=P.h[0]; x.sizeScale='hub'; x.groupType=x.groupType||(/\bdwg\b|development workgroup/i.test(x.workgroup||'')?'DWG':'CoP'); x.cfp={needed:false};
+    x.dates=Object.assign({},x.dates,{workStart:P.start,targetIM:P.target,forecastIM:P.target,targetDone:P.done});
+    await move(x,nextStage(x,'kickoff'),{text:'Work started on its own from the Initiative Hub request ('+P.h[1]+', '+P.h[2]+'). Target to Submit to IM '+fmt(P.target),toast:t.wr+' started'}); } }
+const _hubSyncStart=hubSync;
+hubSync=async function(){ await _hubSyncStart(); try{ await hubAutoStart(); }catch(e){ console.warn('hub start',e); } };
+/* staff can still send it for a Call for Participation */
+async function askCfp(t){ const v=await modal({title:'Ask for a Call for Participation',text:esc(t.name)+'. MISMO Media drafts and publishes it; the work request waits in Call for Participation until it is published.',ok:'Ask MISMO Media',body:fld('Note',ta('note',''))});
+  if(!v) return; const x=clone(t); x.cfp={needed:true}; await move(x,'cfp',{text:'Call for Participation requested from MISMO Media',note:v.note}); }
+
 /* =====================================================================
    Architecture Help on the work request (Nov 4, Jonna)
    - A work request's architecture tasks show on the work request itself:
@@ -7068,7 +7087,7 @@ const HELP_TOPICS={
      'Once it is approved and has a WR number, the MMS adds it at Approved – Set Up within half an hour (sooner when someone on staff has the MMS open), linked back to its Hub request, and tells the people on it.',
      'From then on, the MMS tracks it. Open the Hub request from the work request’s Links.',
      'Work from the Hub uses the Hub’s sizes for the whole job: Extra-Small 3 months, Small 6 months, Medium 9 months, Large 1 year. The MMS brings in the size and target date the requester gave in the Hub.',
-     'At Start Work, the Target to Submit to IM is set at the halfway point of the job. Change it on Key Dates if it is not right.'],
+     'Work from the Hub starts on its own the day it arrives, with the Target to Submit to IM at the halfway point of the job. Change it on Key Dates if it is not right.'],
     ['Older work keeps its Smartsheet size: Small, Medium, Large or X-Large. Nothing from before is changed.','Nothing can be added to the MMS without going through the Initiative Hub.','The Initiative Hub sees where each work request stands: every five minutes the MMS writes its stage, key dates and a link back to the request in the Hub. The Hub\u2019s own fields are never changed.','The Overview shows how many requests are waiting to be confirmed or approved in the Hub.'],
     [['Submit a Work Request','https://resources.mismo.org/initiative-hub/work-requests.html#new']]],
   health:['System Health','*',
@@ -7170,7 +7189,7 @@ const RC2_GROUPS=[
     ['MISMO.org','The public website','https://www.mismo.org/','M12 2a10 10 0 100 20 10 10 0 000-20zM2 12h20']]]
 ];
 const RC2_STAGE_HOW={
-  approved:['Set the start date, size and Target to Submit to IM; decide on a Call for Participation.','Facilitator and workgroup are told it’s approved.'],
+  approved:['Work approved in the Initiative Hub starts on its own, on the Hub’s size, with the Target to Submit to IM at the halfway point. Work added by hand: set the start date, size and target with Start Work.','Staff can still ask for a Call for Participation from the work request.'],
   cfp:['Write and publish the Call for Participation.','MISMO Media gets the request on its own.'],
   kickoff:['Approve kicking off the Development Workgroup.','Staff record the decision; approved work moves to In Work.'],
   work:['Build the work product and keep the target date current.','Reminders before the target and when it passes.'],
