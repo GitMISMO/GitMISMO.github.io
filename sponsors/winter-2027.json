@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-07T19:09:11.950Z",
+ "updated": "2026-11-18T14:28:51.158Z",
  "summit": "2027 Winter Summit",
  "source": "Sponsorship Portal",
  "sponsors": [
@@ -37,14 +37,30 @@
    "tier": "Gold",
    "url": "https://dmatter.com",
    "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/dark-matter-technologies-logo-stacked6fa6033e932640bfb486c1edc3c7c9f2.png",
-   "placements": []
+   "placements": [
+    {
+     "title": "AI Governance in Practice Workshop",
+     "type": "Workshop",
+     "match": "AI Governance in Practice",
+     "order": 6,
+     "day": "Monday"
+    }
+   ]
   },
   {
    "name": "Optimal Blue",
    "tier": "Gold",
    "url": "https://www.optimalblue.com",
    "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/ob-logo-2025-_horizontal-color_-_2_.png",
-   "placements": []
+   "placements": [
+    {
+     "title": "AI Governance in Practice Workshop",
+     "type": "Workshop",
+     "match": "AI Governance in Practice",
+     "order": 6,
+     "day": "Monday"
+    }
+   ]
   },
   {
    "name": "California MBA",

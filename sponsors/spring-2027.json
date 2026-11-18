@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-08T02:02:34.671Z",
+ "updated": "2026-11-18T14:28:51.159Z",
  "summit": "2027 Spring Summit",
  "source": "Sponsorship Portal",
  "sponsors": [
@@ -44,7 +44,15 @@
    "tier": "Gold",
    "url": "https://dmatter.com",
    "logo": "https://higherlogicdownload.s3.amazonaws.com/MISMO/b0af7660-1193-44cf-ad90-4073559f7527/UploadedImages/dark-matter-technologies-logo-stacked6fa6033e932640bfb486c1edc3c7c9f2.png",
-   "placements": []
+   "placements": [
+    {
+     "title": "Workshop",
+     "type": "Workshop",
+     "match": "Workshop",
+     "order": 6,
+     "day": "Monday"
+    }
+   ]
   },
   {
    "name": "FICO",
