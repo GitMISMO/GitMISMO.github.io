@@ -502,13 +502,10 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <section class="panel">
     <span class="step" data-step="website">STEP 4</span>
     <h2>How You Appear on mismo.org</h2>
-    <p class="psub">This is what the public certification register shows for you. Correct anything that has moved on.</p>
+    <p class="psub">Your page on mismo.org shows your About Us and a link to your website. Correct anything that has moved on.</p>
+    <!-- No contact name or email (Jonna, 19 Nov 2026): the website no longer lists provider contacts, so the page stays current. -->
     <div class="grid2">
-      <div class="fld"><label for="w-name">Contact Name</label>
-        <input type="text" id="w-name" data-f="website.contact" autocomplete="off"></div>
-      <div class="fld"><label for="w-email">Contact Email</label>
-        <input type="email" id="w-email" data-f="website.contactEmail" autocomplete="off"></div>
-      <div class="fld"><label for="w-page">Webpage</label>
+      <div class="fld"><label for="w-page">Your Website</label>
         <input type="url" id="w-page" data-f="website.page" placeholder="https://" autocomplete="off"></div>
       <div class="fld"><label for="w-lastcheck">Last Confirmed</label>
         <input type="text" id="w-lastcheck" disabled></div>
@@ -992,12 +989,8 @@ function renderAttest(){
 
 function renderWebsite(){
   var w = R.website || {};
-  if (A.website.contact === undefined) A.website.contact = w.contact || "";
-  if (A.website.contactEmail === undefined) A.website.contactEmail = w.contactEmail || "";
   if (A.website.page === undefined) A.website.page = w.page || "";
   if (A.website.aboutUs === undefined) A.website.aboutUs = w.aboutUs || "";
-  el("w-name").value = A.website.contact;
-  el("w-email").value = A.website.contactEmail;
   el("w-page").value = A.website.page;
   el("w-about").value = A.website.aboutUs;
   el("w-lastcheck").value = w.lastUpdated ? longDate(w.lastUpdated) : "Not recorded";
@@ -1030,8 +1023,6 @@ function blockers(){
   if (!(A.attest.name || "").trim()) out.push("Step " + stepOf("attest") + ": type your printed name.");
   if (!(A.attest.title || "").trim()) out.push("Step " + stepOf("attest") + ": give your title.");
   if (!(A.attest.company || "").trim()) out.push("Step " + stepOf("attest") + ": give your company.");
-  if (!(A.website.contact || "").trim()) out.push("Step " + stepOf("website") + ": give a contact name for the register.");
-  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((A.website.contactEmail || "").trim())) out.push("Step " + stepOf("website") + ": give a contact email for the register.");
   return out;
 }
 function paintReady(){
@@ -1140,7 +1131,7 @@ function payload(){
       return { Section: q.section, Question: q.question, Answer: String((A.script || {})[q.id] || "").trim() || null,
                number: q.number || null, text: q.text };
     }) : [],
-    website: { contact: A.website.contact || null, contactEmail: A.website.contactEmail || null,
+    website: { contact: null, contactEmail: null,   /* no longer asked (19 Nov 2026); keys kept for the readers */
                page: A.website.page || null, aboutUs: A.website.aboutUs || null },
     attestation: {
       agreed: A.attest.agreed === true,
