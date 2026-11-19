@@ -2063,7 +2063,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-19T02:10:48Z',fp:'01a9da07'};
+window.__mmsBuild={at:'2026-11-19T02:56:01Z',fp:'836ccc66'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2867,7 +2867,7 @@ async function directorRec(t){
   const ds=t.designation||{};
   const v=await modal({title:'Recommend Designation',ok:'Send for Approval',body:
     fld('Comment Type',radios('type',['Public','Member'],ds.type||'Public'))+fld('Product Classification',radios('cls',['Standard','Collateral'],t.classification||'Standard'))+
-    fld('License Usage',radios('lic',['Commercial Distributor','Non Commercial Distributor','Internal Use Only','Copyright'],ds.license||''))+
+    fld('License Usage',radios('lic',['Commercial Distributor','Non Commercial Distributor','Internal Use Only','Copyright'],ds.license||''),typeof licHint==='function'?licHint():'')+
     fld('Royalty Status',sel('roy',['','Public for Free','Available to PUBLIC for FREE with COMMERCIAL USAGE LICENSE','Members Only for Free','Public for a Fee','Royalty Temp Waived'],ds.royalty))+
     fld('Available To',radios('avail',['Public','Members Only'],ds.availableTo||'Public'))+fld('Notes',ta('note',ds.notes||''))});
   if(!v) return; const x=clone(t); x.classification=v.cls; x.designation=Object.assign({},ds,{type:v.type,license:v.lic,royalty:v.roy,availableTo:v.avail,notes:v.note,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
@@ -6333,9 +6333,9 @@ function partsCanEdit(t){ return S.canWrite&&!S.viewAs&&(S.isStaff||sameName(t.f
 
 /* the parts table, used on the Overview, Details and Reviews and Decisions */
 function partsTable(t,o){ o=o||{}; const P=t.parts||[];
-  return '<div class="pt-wrap"><table class="tbl pt-tbl"><thead><tr><th>Part</th><th>Classification</th><th>Comment Type</th><th>License Usage</th><th>Royalty Status</th><th>Available To</th></tr></thead><tbody>'+
+  return '<div class="pt-wrap"><table class="tbl pt-tbl"><thead><tr><th>Part</th><th>Classification</th><th>Comment Type</th><th>License Usage</th><th>Royalty Status</th><th>Available To</th><th>Boilerplate at Publication</th></tr></thead><tbody>'+
     P.map(p=>{ const d=o.recommend?partDs(t,p):(p.ds||{}); const c=v=>'<td'+(v?'':' class="pt-miss"')+'>'+esc(v||'Not set')+'</td>';
-      return '<tr><td><b>'+esc(p.name)+'</b>'+(p.kind?'<div class="muted" style="font-size:11.5px">'+esc(p.kind)+'</div>':'')+'</td>'+c(d.classification)+c(d.type)+c(d.license)+c(d.royalty)+c(d.availableTo)+'</tr>'; }).join('')+'</tbody></table></div>'; }
+      return '<tr><td><b>'+esc(p.name)+'</b>'+(p.kind?'<div class="muted" style="font-size:11.5px">'+esc(p.kind)+'</div>':'')+'</td>'+c(d.classification)+c(d.type)+c(d.license)+c(d.royalty)+c(d.availableTo)+c(typeof bpAtPublication==='function'?bpAtPublication(d.classification,d.license):'')+'</tr>'; }).join('')+'</tbody></table>'+(typeof bpAtPublication==='function'&&new Set(P.map(p=>{ const d=o.recommend?partDs(t,p):(p.ds||{}); return bpAtPublication(d.classification,d.license); }).filter(Boolean)).size>1?'<p class="muted" style="font-size:12px;margin:6px 0 0">The parts carry different boilerplate, so the package also needs a README with a NOTICE saying which parts are Standards and which are Collateral, and the license for each (Boilerplate Guidance).</p>':'')+'</div>'; }
 
 /* set up the parts */
 async function editParts(t){ const base=S.tickets[t.id]||t; let rows=(base.parts||[]).map(p=>Object.assign({},p)); if(!rows.length) rows=[{id:'p1',name:'',kind:''}];
@@ -6412,6 +6412,30 @@ const _withAutoDesignationPT=withAutoDesignation;
 withAutoDesignation=function(x){ const r=_withAutoDesignationPT(x); try{ if(hasParts(x)){ x.parts=x.parts.map(p=>p.ds&&p.ds.license?p:Object.assign({},p,{ds:partRec(x,p)}));
     /* the work request's own designation mirrors part 1, so the two never disagree */
     const p1=x.parts[0]&&x.parts[0].ds; if(p1){ x.designation=Object.assign({},x.designation,{type:p1.type||x.designation.type,license:p1.license||x.designation.license,royalty:p1.royalty||x.designation.royalty,availableTo:p1.availableTo||x.designation.availableTo}); if(p1.classification) x.classification=p1.classification; } } }catch(e){} return r; };
+/* ---------- License Designation and the Boilerplate Guidance (Nov 19) ----------
+   From "How To - MISMO Work Product Boilerplate Language and Guidance" (04/30/2026):
+   what each License Usage means, and which of the six boilerplate versions a work product
+   must carry once it is published (license usage × Standard or Collateral). Shown wherever
+   the designation is recommended, decided and kept, so the facilitator knows which language
+   to put in before publication (AI Review already checks it). */
+const LIC_MEANING={
+  internal:'May be used within the organization only (End-User License).',
+  commercial:'May be used with business partners and built into products that are sold, but not sold on its own without MISMO’s written permission (Distributor License).',
+  noncommercial:'May be used with business partners, but not built into products that are sold (Non-Commercial Distributor License).'};
+function licKey(lic){ lic=String(lic||'').toLowerCase(); return /non/.test(lic)?'noncommercial':/internal/.test(lic)?'internal':/commercial/.test(lic)?'commercial':''; }
+function bpAtPublication(cls,lic){ const l=licKey(lic);
+  if(!l) return /copyright/i.test(lic||'')?'None in the Boilerplate Guidance (ask MISMO staff)':'';
+  return RV_BP_LABEL[l+'-'+(/standard/i.test(cls||'')?'standard':'collateral')]||''; }
+function licHint(){ return 'Commercial Distributor: '+LIC_MEANING.commercial+'<br>Non Commercial Distributor: '+LIC_MEANING.noncommercial+'<br>Internal Use Only: '+LIC_MEANING.internal+'<br>Each license and classification has its own boilerplate in the Boilerplate Guidance.'; }
+
+/* the License Designation section on the Overview: add the boilerplate it will carry */
+const _desigRowsBP=desigRows;
+desigRows=function(t){ const d=t.designation||{}; return _desigRowsBP(t).concat([['Boilerplate at Publication',bpAtPublication(t.classification,d.license)]]); };
+
+/* the recommendation: the boilerplate it would carry and what the license means */
+const _recPanelBP=recPanel;
+recPanel=function(t){ const h=_recPanelBP(t); if(!h||(typeof hasParts==='function'&&hasParts(t))) return h; const r=recommend(t), bp=bpAtPublication(r.classification,r.license), m=LIC_MEANING[licKey(r.license)];
+  return h.slice(0,-6)+'<div class="muted" style="font-size:12.5px;margin-top:6px">'+(bp?'Boilerplate at publication: <b>'+esc(bp)+'</b>. ':'')+(m?esc(r.license)+': '+esc(m):'')+'</div></div>'; };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
@@ -7045,6 +7069,7 @@ const HELP_TOPICS={
     ['Open My Queue. Look for Approve the recommended designation.',
      'Open the work request. The License Designation section on the Overview shows the recommendation, who set it and where it stands.',
      'If the recommendation is not right, change it first. A message confirms it: Designation saved.',
+     'The section also shows the Boilerplate at Publication: which of the six versions in the Boilerplate Guidance the work product must carry, from its license usage and whether it is a Standard or Collateral. Change the Designation explains what each license usage means.',
      'Click Approve the Designation and choose Approve, Needs Discussion or Not Yet.',
      'Waiting on approval and need to fix it? Click Change the Designation.',
      'Approved designations move on to Governance for approval to comment. The recommendation goes away, and Reviews and Decisions shows the designation that was chosen.'],
