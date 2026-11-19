@@ -481,6 +481,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 <div><label class="l" for="ytPlaylist">Playlist <small>(optional)</small></label><select class="t" id="ytPlaylist"><option value="">No playlist</option><option>MISMO Mic&#39;d Up</option><option>Webinars</option><option>MISMO FRAME</option><option>MISMO Initiatives</option><option>MISMO Link</option><option>Mortgage Compliance Dataset (MCD) Learning Series</option><option value="__other">Other (a new playlist)</option></select></div>
 <div id="ytOtherBox" hidden><label class="l" for="ytPlaylistOther">New Playlist Name <i>*</i></label><input class="t" id="ytPlaylistOther" maxlength="120" placeholder="e.g. Decision Modeling"></div>
 </div></div>
+<div class="yt" id="pr" hidden><div class="grid">
+<div class="sec">For a Press Release</div>
+<div><label class="l" for="prWp">Is it for a MISMO work product? <i>*</i></label><select class="t" id="prWp"><option value="">Choose one</option><option value="yes">Yes</option><option value="no">No</option></select></div>
+<div><label class="l" for="prWpName">Which work product? <small>(optional)</small></label><input class="t" id="prWpName" maxlength="160" placeholder="e.g. Mortgage Compliance Dataset"></div>
+</div></div>
         <div><label class="l" for="neededBy">Needed By <i>*</i></label><input class="t" id="neededBy" type="date"><label class="firm"><input type="checkbox" id="firm"> This date is firm</label></div>
         <div><label class="l" for="audience">Audience <small>(optional)</small></label><input class="t" id="audience" maxlength="200" placeholder="e.g. members, lenders, the workgroup"></div>
         <div class="full"><label class="l" for="event">Related Event <small>(optional)</small></label><input class="t" id="event" maxlength="160" placeholder="e.g. Winter Summit, a webinar, a workgroup meeting"></div>
@@ -534,7 +539,7 @@ var ROLES = ["MISMO Staff", "Facilitator", "Other"];
   });
   draw("role", ROLES); draw("type", TYPES);
 /* the YouTube details show only for a video request */
-function ytShow() { var on = pick.type === "video"; $("yt").hidden = !on; }
+function ytShow() { var on = pick.type === "video"; $("yt").hidden = !on; $("pr").hidden = pick.type !== "press"; }
 $("ytPlaylist").addEventListener("change", function () { var o = this.value === "__other"; $("ytOtherBox").hidden = !o; if (o) $("ytPlaylistOther").focus(); });
 /* pictures: drag them onto the box or click it to choose; each is sent on its own before the request */
 var PICS = [], MAXPICS = 6, MAXMB = 10, OKTYPES = /^image\/(png|jpe?g|gif|webp)$/i;
@@ -583,6 +588,7 @@ function upFiles() {
     mark("title", val("title").length < 3, "Give the request a short name.");
     mark("details", val("details").length < 10, "Add a few details about what you need.");
     mark("neededBy", !/^\d{4}-\d{2}-\d{2}$/.test(val("neededBy")), "Add the date you need it by.");
+if (pick.type === "press") mark("prWp", !$("prWp").value, "Say whether the press release is for a MISMO work product.");
 if (pick.type === "video" && $("ytPlaylist").value === "__other") mark("ytPlaylistOther", val("ytPlaylistOther").length < 2, "Name the new YouTube playlist.");
     return bad;
   }
@@ -601,6 +607,7 @@ if (pick.type === "video" && $("ytPlaylist").value === "__other") mark("ytPlayli
     var body = { form: "media-request", firstName: val("firstName"), lastName: val("lastName"), email: val("email").toLowerCase(),
       role: pick.role, group: val("group"), type: pick.type, title: val("title"), details: ($("details").value || "").trim(),
       neededBy: val("neededBy"), firm: $("firm").checked, audience: val("audience"), event: val("event"), links: ($("links").value || "").trim(),
+      workProduct: pick.type === "press" ? $("prWp").value : "", workProductName: pick.type === "press" ? val("prWpName") : "",
       ytTitle: pick.type === "video" ? val("ytTitle") : "", ytDescription: pick.type === "video" ? ($("ytDescription").value || "").trim() : "", ytPlaylist: pick.type === "video" ? ($("ytPlaylist").value === "__other" ? val("ytPlaylistOther") : $("ytPlaylist").value) : "",
       page: document.referrer || "", submittedAt: new Date().toISOString(), startedAt: startedAt, website: $("website").value };
     if (body.website || Date.now() - startedAt < 3000) { thanks(body); return; }   /* a robot: thank it and send nothing */
