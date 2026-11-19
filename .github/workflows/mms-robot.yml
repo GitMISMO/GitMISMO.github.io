@@ -48,15 +48,18 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Publish the facilitator list
+      - name: Publish the facilitator list and MISMO Media's announcement requests
+        # announcements: resources.mismo.org/mms/announcements.json, the facts MISMO Media drafts press releases from
         env:
           MMS_DATA_TOKEN: ${{ secrets.MMS_DATA_TOKEN }}
         run: |
           node .github/mms-robot/publish-facilitators.mjs
-          if git diff --quiet -- mms/facilitators.json && git ls-files --error-unmatch mms/facilitators.json >/dev/null 2>&1; then exit 0; fi
+          node .github/mms-robot/publish-announcements.mjs || echo "Announcements not published this run."
+          git add -N mms/facilitators.json mms/announcements.json 2>/dev/null || true
+          if git diff --quiet -- mms/facilitators.json mms/announcements.json && git ls-files --error-unmatch mms/facilitators.json >/dev/null 2>&1; then exit 0; fi
           git config user.name "MMS Robot"
           git config user.email "workrequests@mismo.org"
-          git add mms/facilitators.json
-          git commit -q -m "MMS: facilitator list for other systems"
+          git add mms/facilitators.json mms/announcements.json 2>/dev/null || git add mms/facilitators.json
+          git commit -q -m "MMS: facilitator list and announcement requests for other systems"
           for i in 1 2 3 4 5; do git pull -q --rebase origin main && git push -q origin HEAD:main && exit 0; sleep $((i*5)); done
           exit 1
