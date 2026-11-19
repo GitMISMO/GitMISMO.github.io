@@ -1,12 +1,45 @@
 {
- "updated": "2026-11-18T14:04:17.178Z",
+ "updated": "2026-11-19T23:35:58.940Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-18T03:35:51.258Z",
+ "sourceUpdated": "2026-11-19T23:34:39.589Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
    "city": "InterContinental New Orleans",
    "dates": "January 11–14, 2027",
+   "gs": {
+    "label": "General Sessions",
+    "day": "Tuesday",
+    "date": "Tuesday, January 12, 2027",
+    "room": "La Salle A/B",
+    "sessions": [
+     {
+      "start": "9:00 AM",
+      "end": "9:20 AM",
+      "kind": "Welcome",
+      "title": "Laissez les Bons Temps Rouler: What's Next for MISMO in 2027",
+      "desc": "New year, new ideas, New Orleans! Let the good times (and the standards) roll as Brian Vieaux and Amy Moses kick off the first industry conference of 2027. They’ll unveil the priorities that will guide MISMO’s work all year long and share how you can help shape what comes next.",
+      "sponsor": "",
+      "brk": false,
+      "people": [
+       {
+        "name": "Amy Moses",
+        "title": "VP, Strategic Growth",
+        "company": "MISMO",
+        "role": "Host",
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-amy-moses-064e4236.webp"
+       },
+       {
+        "name": "Brian Vieaux",
+        "title": "President",
+        "company": "MISMO",
+        "role": "Speaker",
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-brian-vieaux-1cdae0d6.webp"
+       }
+      ]
+     }
+    ]
+   },
    "grid": {
     "updated": "2026-11-18T03:35:51.258Z",
     "sessions": [
