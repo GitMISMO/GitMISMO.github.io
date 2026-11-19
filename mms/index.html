@@ -2069,7 +2069,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-19T03:11:48Z',fp:'9197de4b'};
+window.__mmsBuild={at:'2026-11-19T14:58:43Z',fp:'87531534'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2895,13 +2895,14 @@ async function decide(t){
   const g=govName(); const members=peopleFor('gov');
   const what={kickoff:'kick off the workgroup','gc-comment':'go out for public comment','gc-publish':'publish as '+(isStandard(t)?'a Candidate Recommendation':'Final')}[t.stage]||'approve';
   const body=fld('Decision',radios('out',['Approved','Not Approved','Deferred'],'Approved'))+fld('Decision Date',dateField('d',today()))+fld('How',radios('how',['Meeting','Electronic Vote'],'Meeting'))+
-    (members.length?fld('Each Member’s Vote','<div>'+members.map((p,i)=>'<div class="vote"><span class="nm">'+esc(p.name)+'</span>'+sel('m'+i,['Approve','Oppose','Abstain','Absent'],'Approve')+'</div>').join('')+'</div>'):fld('Votes',ta('votes','','e.g. 9 approve, 0 oppose, 1 abstain'),'Add '+g+' members in Settings to log each person’s vote.'))+fld('Notes',ta('note',''));
+    (members.length?fld('Each Member’s Vote','<div>'+members.map((p,i)=>'<div class="vote"><span class="nm">'+esc(p.name)+'</span>'+sel('m'+i,['Approve','Oppose','Abstain','Absent'],'Approve')+'</div>').join('')+'</div>'):fld('Votes',ta('votes','','e.g. 9 approve, 0 oppose, 1 abstain'),'Add '+g+' members in Settings to log each person’s vote.'))+(t.stage==='gc-comment'?fld('Approval to Publish','<label class="tog"><input type="checkbox" name="pub"> Also approved to publish as '+(isStandard(t)?'a Candidate Recommendation':'Final')+' if the comment period brings no material or significant changes</label>','Then, when the facilitator reports no material or significant changes, it goes straight to Release with no second approval.'):'')+fld('Notes',ta('note',''));
   const v=await modal({title:g+' Decision',text:'Approval to '+esc(what)+': '+esc(t.name),ok:'Record Decision',body});
   if(!v) return; const x=clone(t); const mem={}; members.forEach((p,i)=>mem[p.name]=v['m'+i]);
   const rec={stage:t.stage,date:v.d||today(),method:v.how,outcome:v.out,members:mem,tally:v.votes||'',note:v.note||'',by:S.me.name||''};
   x.votes=[...(x.votes||[]),rec];
   const dk={kickoff:'kickoffGc','gc-comment':'gcComment','gc-publish':'postGc'}[t.stage];
-  if(v.out==='Approved'){ x.dates=Object.assign({},x.dates,{[dk]:rec.date}); const nx=nextStage(x); await move(x,nx,{text:g+' approved to '+what+' ('+fmt(rec.date)+')',note:v.note}); }
+  const pre=t.stage==='gc-comment'&&v.out==='Approved'&&!!v.pub; if(pre){ rec.publishIfNoChanges=true; x.publishIfNoChanges={date:rec.date,by:S.me.name||''}; }
+  if(v.out==='Approved'){ x.dates=Object.assign({},x.dates,{[dk]:rec.date}); const nx=nextStage(x); await move(x,nx,{text:g+' approved to '+what+(pre?', and to publish as '+(isStandard(t)?'a Candidate Recommendation':'Final')+' if there are no material or significant changes':'')+' ('+fmt(rec.date)+')',note:v.note}); }
   /* Kickoff not approved: the work never starts; it goes back to Approved – Set Up for staff. Comment or publish not approved: back to In Work. */
   else if(v.out==='Not Approved'&&t.stage==='kickoff'){ await move(x,'approved',{text:g+' did not approve kicking off the workgroup ('+fmt(rec.date)+'); back to Approved – Set Up',note:v.note}); }
   else if(v.out==='Not Approved'){ await move(x,'work',{text:g+' did not approve ('+fmt(rec.date)+'); back to In Work',note:v.note}); }
@@ -2918,9 +2919,12 @@ async function commentSetup(t){
   queueMail({to:[emailOf(t.facilitator)].filter(Boolean),subject:t.wr+' '+t.name+' is open for comment',body:t.name+' is open for public comment from '+fmt(x.dates.commentStart)+' to '+fmt(end)+'.',ticket:t.id,kind:'stage',key:t.id+'-copen-'+x.dates.commentStart});
 }
 async function postReport(t){
-  const v=await modal({title:'What Came Back from Comment',text:esc(t.name)+'. With no material changes it goes to Governance for approval to publish; with material changes it goes back to In Work for a second comment period.',ok:'Save',body:fld('Comment Results',radios('r',[['none','No comments received'],['nochange','Comments received, no material changes'],['change','Material or significant changes needed']],'none'))+fld('Notes',ta('note',''))});
+  const pp=t.publishIfNoChanges, g=govName(), as=isStandard(t)?'a Candidate Recommendation':'Final';
+  const v=await modal({title:'What Came Back from Comment',text:esc(t.name)+'. '+(pp?esc(g)+' already approved publishing it as '+as+(pp.date?' ('+esc(fmt(pp.date))+')':'')+' if there are no material or significant changes, so with none it goes straight to Release.':'With no material changes it goes to Governance for approval to publish.')+' With material or significant changes it goes back to In Work for a second comment period.',ok:'Save',body:fld('Comment Results',radios('r',[['none','No comments received'],['nochange','Comments received, no material changes'],['change','Material or significant changes needed']],'none'))+(!pp&&S.isStaff?fld('Approval to Publish','<label class="tog"><input type="checkbox" name="pre"> '+esc(g)+' already approved publishing it if there are no material or significant changes</label>'):'')+fld('Notes',ta('note',''))});
   if(!v) return; const x=clone(t); x.commentReport={none:'Received No Comments',nochange:'Received Comments/No Changes Needed',change:'Received Comments/Changes Needed'}[v.r];
   if(v.r==='change'){ x.commentRound=(x.commentRound||1)+1; x.dates=Object.assign({},x.dates,{commentStart:'',commentEnd:''}); await move(x,'work',{text:'Material changes from comment; back to In Work for a second comment period',note:v.note}); }
+  else if(pp||v.pre){ if(!pp) x.publishIfNoChanges={date:(x.dates&&x.dates.gcComment)||'',by:S.me.name||'',later:true}; x.dates=Object.assign({},x.dates,{postGc:today()});
+    await move(x,nextStage(x,'gc-publish'),{text:x.commentReport+'; going out as '+as+' with no second approval: '+g+' approved publishing it'+(x.publishIfNoChanges.date?' on '+fmt(x.publishIfNoChanges.date):'')+' if there were no material or significant changes',note:v.note}); }
   else await move(x,nextStage(x),{text:x.commentReport+'; ready for '+govName()+' approval to publish as '+(isStandard(x)?'Candidate Recommendation':'Final'),note:v.note});
 }
 async function markPublished(t){
@@ -6443,6 +6447,33 @@ desigRows=function(t){ const d=t.designation||{}; return _desigRowsBP(t).concat(
 const _recPanelBP=recPanel;
 recPanel=function(t){ const h=_recPanelBP(t); if(!h||(typeof hasParts==='function'&&hasParts(t))) return h; const r=recommend(t), bp=bpAtPublication(r.classification,r.license), m=LIC_MEANING[licKey(r.license)];
   return h.slice(0,-6)+'<div class="muted" style="font-size:12.5px;margin-top:6px">'+(bp?'Boilerplate at publication: <b>'+esc(bp)+'</b>. ':'')+(m?esc(r.license)+': '+esc(m):'')+'</div></div>'; };
+/* ---------- Approval to comment that includes approval to publish (Nov 19) ----------
+   Jonna: Governance can approve a work product to go to comment AND to publish as Final
+   (collateral) or Candidate Recommendation (standard) if the comment period brings no material
+   or significant changes. Recorded on the Governance decision (t.publishIfNoChanges); when the
+   facilitator then reports no material changes, it skips Governance Approval to Publish and goes
+   to Release. More work will go this way in future.
+   One-time: WR2025_24 (Flood Risk Disclosure Guide, now the Homeowners Insurance Guide) had that
+   approval from Governance (Oct 1, 2026, brought over from Smartsheet), so the flag and the new
+   name are set the first time a staff tab or the MMS Robot runs its automatic steps. */
+const _runAutoPP=runAutomations;
+runAutomations=async function(){ await _runAutoPP(); try{ await ppOneTime(); }catch(e){} try{ await ppSweep(); }catch(e){} };
+/* already approved, but reported before the approval was noted: it doesn't wait for a second approval */
+async function ppSweep(){
+  if(!S.ready||!S.canWrite||S.partial||S.stale) return;
+  for(const t of liveTickets()){ if(t.state!=='active'||t.stage!=='gc-publish'||!t.publishIfNoChanges||!/No Changes|No Comments/i.test(t.commentReport||'')) continue;
+    const x=clone(t), p=t.publishIfNoChanges; x.dates=Object.assign({},x.dates,{postGc:today()});
+    await move(x,nextStage(x,'gc-publish'),{text:'Going out as '+(isStandard(t)?'a Candidate Recommendation':'Final')+' with no second approval: '+govName()+' approved publishing it'+(p.date?' on '+fmt(p.date):'')+' if there were no material or significant changes'}); }
+}
+async function ppOneTime(){
+  if(!S.ready||!S.canWrite||S.partial||S.stale||!S.isStaff||S.viewAs) return;
+  const t=S.tickets.WR2025_24; if(!t||t.state!=='active'||t.publishIfNoChanges||!['post','gc-publish'].includes(t.stage)) return;
+  const x=clone(t), d=(t.dates||{}).gcComment||'2026-10-01';
+  x.publishIfNoChanges={date:d,by:'Governance (from Smartsheet)'};
+  x.productPageName='Homeowners Insurance Guide';
+  hist(x,govName()+'’s approval to comment ('+fmt(d)+') also approved publishing as Final if there were no material or significant changes. Renamed for the final release: Homeowners Insurance Guide (was the Flood Risk Disclosure Guide).');
+  await saveTicket(x,'',clone(t));
+}
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
@@ -7022,7 +7053,8 @@ const HELP_TOPICS={
     'Governance approves kickoff, comment and publishing. MISMO staff record those approvals in the MMS.',
     ['Open Governance to see what is waiting on the committee, grouped by approval.',
      'After the meeting, click Record Decision on each one and enter the outcome and the votes.',
-     'Approved work moves on to the next step by itself.'],
+     'Approved work moves on to the next step by itself.',
+     'Approval to comment can include approval to publish: tick Also approved to publish if Governance approved publishing as Final (collateral) or Candidate Recommendation (standard) when the comment period brings no material or significant changes. Then, when the facilitator reports none, it goes straight to Release.'],
     ['The Governance number on the left rail is what is waiting on the committee.'],
     [['Open Governance','governance']]],
   settings:['Settings','staff',
@@ -7236,7 +7268,7 @@ const RC2_STAGE_HOW={
   designation:['Jonna approves the recommended designation (one per part, if it has parts).','The recommendation is drawn from past designations of the same kind.'],
   'gc-comment':['Governance approves it for public comment.','Staff record the vote; approved work goes to the website.'],
   comment:['Post its Comment Period Card on mismo.org and announce it.','Moves to Post-Comment by itself when the period ends.'],
-  post:['Report what came back from the comment period.','Comments from the website form land on the work request.'],
+  post:['Report what came back from the comment period.','Comments from the website form land on the work request. If Governance already approved publishing when there are no material or significant changes, a report of none sends it straight to Release.'],
   'gc-publish':['Governance approves it to publish.','Staff record the vote; approved work goes to Release.'],
   release:['Announce it, then Mark Published.','Mark Published also lists it on the website’s Find a Work Product with its public files (members-only products are listed without files); it is posted within half an hour. MISMO Media gets the release request, with the facts for the press release, on its own.']
 };
