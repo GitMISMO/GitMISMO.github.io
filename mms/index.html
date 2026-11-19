@@ -2069,7 +2069,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-19T14:58:43Z',fp:'87531534'};
+window.__mmsBuild={at:'2026-11-19T15:35:48Z',fp:'6d832782'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2929,7 +2929,7 @@ async function postReport(t){
 }
 async function markPublished(t){
   const wpGet={f:null};
-  const p=modal({title:'Published',ok:'Mark Published',validate:v=>typeof wpCheck==='function'?wpCheck(v):'',body:fld('Published',dateField('d',today()))+fld('Announcement Link',inp('news',(t.links&&t.links.newsFinal)||'','https://'))+fld('MISMO.org Product Page',inp('pp',(t.links&&t.links.productPage)||'','https://'))+fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'),'Optional from now on: the website lists the work product from the MMS.')+(typeof wpForm==='function'?wpForm(t):'')});
+  const p=modal({title:'Published',ok:'Mark Published',validate:v=>typeof wpCheck==='function'?wpCheck(v,t):'',body:fld('Published',dateField('d',today()))+fld('Announcement Link',inp('news',(t.links&&t.links.newsFinal)||'','https://'))+fld('MISMO.org Product Page',inp('pp',(t.links&&t.links.productPage)||'','https://'))+fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'),'Optional from now on: the website lists the work product from the MMS.')+(typeof wpForm==='function'?wpForm(t):'')});
   wpGet.f=typeof wpWatch==='function'?wpWatch():null; const v=await p;
   if(!v) return; const x=clone(t); x.links=Object.assign({},x.links,{newsFinal:v.news,productPage:v.pp,resourceLibrary:v.rl}); x.dates=Object.assign({},x.dates,{published:v.d});
   await move(x,'published',{text:'Published as '+(isStandard(x)?'Candidate Recommendation':'Final')+' '+fmt(v.d)});
@@ -6159,7 +6159,9 @@ function wpWatch(){ let files=[]; const i=document.querySelector('#modal-root in
   wpCatalog().then(c=>{ const box=document.querySelector('#modal-root .wp-sec'); if(!box||!(c.products||[]).length) return; const dl=document.createElement('datalist'); dl.id='wpids';
     dl.innerHTML=c.products.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.title)+'</option>').join(''); box.appendChild(dl); const w=box.querySelector('[name=wpid]'); if(w) w.setAttribute('list','wpids'); });
   return ()=>files; }
-function wpCheck(v){ if(!v.wpon) return ''; if(!wpSlug(v.wpid)) return 'Add a website id.'; if(!String(v.wptitle||'').trim()) return 'Add the title for the website.'; return ''; }
+function wpCheck(v,t){ if(!v.wpon) return ''; if(!wpSlug(v.wpid)) return 'Add a website id.'; if(!String(v.wptitle||'').trim()) return 'Add the title for the website.';
+  if(t&&t.wp&&t.wp.needsFinalFile&&!v.wpmo){ const i=document.querySelector('#modal-root input[name=wpfiles]'); if(!i||!i.files||!i.files.length) return 'Add the final file. The website still lists the comment-period file for this work product, and it would stay there.'; }
+  return ''; }
 function wpB64(u8){ let s=''; for(let i=0;i<u8.length;i+=32768) s+=String.fromCharCode.apply(null,u8.subarray(i,i+32768)); return btoa(s); }
 function wpSay(m,cls){ let b=document.getElementById('wpprog'); if(!b){ b=document.createElement('div'); b.id='wpprog'; b.className='wp-prog'; document.body.appendChild(b); } b.className='wp-prog '+(cls||''); b.textContent=m; b.hidden=!m; if(cls==='ok'||cls==='bad') setTimeout(()=>{ if(b.textContent===m) b.hidden=true; },9000); }
 async function wpPut(name,content){ const tok=window.ResourcesSession&&ResourcesSession.token(); if(!RELAY()||!tok) throw new Error('signed out');
@@ -6457,7 +6459,7 @@ recPanel=function(t){ const h=_recPanelBP(t); if(!h||(typeof hasParts==='functio
    approval from Governance (Oct 1, 2026, brought over from Smartsheet), so the flag and the new
    name are set the first time a staff tab or the MMS Robot runs its automatic steps. */
 const _runAutoPP=runAutomations;
-runAutomations=async function(){ await _runAutoPP(); try{ await ppOneTime(); }catch(e){} try{ await ppSweep(); }catch(e){} };
+runAutomations=async function(){ await _runAutoPP(); try{ await ppOneTime(); }catch(e){} try{ await ppSweep(); }catch(e){} try{ await wpPrefill(); }catch(e){} };
 /* already approved, but reported before the approval was noted: it doesn't wait for a second approval */
 async function ppSweep(){
   if(!S.ready||!S.canWrite||S.partial||S.stale) return;
@@ -6472,6 +6474,21 @@ async function ppOneTime(){
   x.publishIfNoChanges={date:d,by:'Governance (from Smartsheet)'};
   x.productPageName='Homeowners Insurance Guide';
   hist(x,govName()+'’s approval to comment ('+fmt(d)+') also approved publishing as Final if there were no material or significant changes. Renamed for the final release: Homeowners Insurance Guide (was the Flood Risk Disclosure Guide).');
+  await saveTicket(x,'',clone(t));
+}
+
+/* One-time (Jonna, Nov 19): when WR2025_24 is marked published it updates the website's existing listing
+   flood-risk-disclosure-guide instead of adding a second one: new title, license 4 (Commercial Distributor),
+   Final, the final file, and the old name kept as a search alias. Mark Published opens with these filled in
+   and won't go ahead without the final file, so the comment-period file can't stay listed. */
+async function wpPrefill(){
+  if(!S.ready||!S.canWrite||S.partial||S.stale||!S.isStaff||S.viewAs) return;
+  const t=S.tickets.WR2025_24; if(!t||t.state!=='active'||t.stage==='published'||(t.wp&&t.wp.id)) return;
+  const x=clone(t);
+  x.wp={id:'flood-risk-disclosure-guide',title:'Homeowners Insurance Guide',
+    summary:'The Homeowners Insurance Guide gives homeowners an at-a-glance overview of homeowners insurance: what their policy covers, where common gaps exist, and when additional coverage such as flood insurance may be needed. It replaces MISMO’s Flood Risk Disclosure Guide.',
+    status:'Final',license:4,membersOnly:false,aliases:['Flood Risk Disclosure Guide'],needsFinalFile:true};
+  hist(x,'Website listing set up for Mark Published: it updates the existing Find a Work Product entry (flood-risk-disclosure-guide) as the Homeowners Insurance Guide, Final, license 4 (Commercial Distributor), with “Flood Risk Disclosure Guide” kept as a search name. The final file is needed when it is marked published.');
   await saveTicket(x,'',clone(t));
 }
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
