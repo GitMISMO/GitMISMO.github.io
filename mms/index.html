@@ -1990,6 +1990,12 @@ p,.sub,.lede{text-wrap:pretty}
 .wp-prog.ok{border-color:var(--good)}.wp-prog.bad{border-color:var(--bad);color:var(--bad)}
 .wp-prog[hidden]{display:none}
 .wp-sec .tog{display:flex;gap:8px;align-items:center;margin:6px 0;font-size:13px}
+/* Nov 19: cards line up (see qcard.js): the step button at the bottom, full width */
+.lane .tk2{display:flex;flex-direction:column}
+.lane .tk2 .t2-nm{min-height:2.6em}
+.lane .tk2 .t2-ft{margin-top:auto}
+.lane .tk2 .t2-acts{flex-wrap:nowrap}
+.lane .tk2 .t2-acts .btn{flex:1 1 0;width:100%;justify-content:center;white-space:normal}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2063,7 +2069,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-19T02:56:01Z',fp:'836ccc66'};
+window.__mmsBuild={at:'2026-11-19T03:11:48Z',fp:'9197de4b'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -3023,14 +3029,15 @@ function recommend(t){
   else if(/dataset|reference model|\bapi\b|specification|schema|\bxml\b|\bjson\b|mapping|documents to data|as data|naming guide|glossary of|\bpart b\b/.test(nm)){ cls='Standard'; clsWhy='Datasets, Reference Model, API and specification work have been standards.'; }
   else { cls=t.classification||(t.workType==='Maintenance'?'Collateral':'Standard'); clsWhy='No clear signal in the name, so this follows '+(t.classification?'the classification on file':'the work type')+'.'; }
   let prof, why;
-  if(/\bmeg\b|eldd|logical data dictionary|enumeration/.test(nm)||/architecture workgroup/.test(wg)){ prof={type:'Member',license:'Internal Use Only',royalty:'Royalty Temp Waived',availableTo:'Members Only'}; why='Architecture Workgroup, MEG and enumeration work has gone out Member, Internal Use Only since 2025.'; }
-  else if(/business glossary/.test(wg+' '+nm)){ prof={type:'Member',license:'Commercial Distributor',royalty:'Royalty Temp Waived',availableTo:'Public'}; why='Business Glossary releases since 2025 have gone to Member comment, Commercial Distributor, available to the public.'; }
+  if(/\bmeg\b|eldd|logical data dictionary|enumeration/.test(nm)||/architecture workgroup/.test(wg)){ prof={type:'Member',license:'Internal Use Only',royalty:'Royalty Temp Waived',availableTo:'Members Only'}; why='Architecture Workgroup, MEG and enumeration work has gone out Internal Use Only, members only, since 2025.'; }
+  else if(/business glossary/.test(wg+' '+nm)){ prof={type:'Member',license:'Commercial Distributor',royalty:'Royalty Temp Waived',availableTo:'Public'}; why='Business Glossary releases since 2025 have gone out Commercial Distributor, available to the public.'; }
   else {
     prof={type:'Public',license:'Commercial Distributor',royalty:'Royalty Temp Waived',availableTo:'Public'}; why='This is how most work has gone out since 2025.';
     const prior=allTickets().filter(x=>x.id!==t.id&&x.workgroup&&x.workgroup===t.workgroup&&x.designation&&x.designation.license&&desDate(x)>=DES_SINCE).sort((a,b)=>desDate(b).localeCompare(desDate(a)))[0];
     if(prior&&prior.designation.type){ const d=prior.designation; prof={type:d.type,license:d.license,royalty:d.royalty||'Royalty Temp Waived',availableTo:d.availableTo||'Public'}; why='Same as '+prior.wr+' '+prior.name+', the last one from '+t.workgroup+' ('+fmtS(desDate(prior))+').'; }
   }
-  const P=pastDesignations(); const same=P.filter(x=>x.designation.type===prof.type&&x.designation.license===prof.license).length;
+  prof.type='Public'; /* Nov 19 (Jonna): comment type defaults to Public; change it on the designation when a work product should go to member comment */
+  const P=pastDesignations(); const same=P.filter(x=>x.designation.license===prof.license&&(x.designation.availableTo||'Public')===prof.availableTo).length;
   const days=(proc().commentDays||[30]).includes(30)?30:(proc().commentDays||[30])[0];
   return Object.assign({classification:cls,clsWhy,why,commentDays:days,match:same,of:P.length},prof);
 }
@@ -7069,6 +7076,7 @@ const HELP_TOPICS={
     ['Open My Queue. Look for Approve the recommended designation.',
      'Open the work request. The License Designation section on the Overview shows the recommendation, who set it and where it stands.',
      'If the recommendation is not right, change it first. A message confirms it: Designation saved.',
+     'Comment type is Public unless you change it. Change the Designation if a work product should go to member comment.',
      'The section also shows the Boilerplate at Publication: which of the six versions in the Boilerplate Guidance the work product must carry, from its license usage and whether it is a Standard or Collateral. Change the Designation explains what each license usage means.',
      'Click Approve the Designation and choose Approve, Needs Discussion or Not Yet.',
      'Waiting on approval and need to fix it? Click Change the Designation.',
@@ -7836,6 +7844,30 @@ async function hubWriteBack(){
 }
 const _hubSyncBack=hubSync;
 hubSync=async function(){ await _hubSyncBack(); try{ await hubWriteBack(); }catch(e){} };
+/* ---------- Cards line up (Nov 19) ----------
+   Jonna: "balance and uniformity to the boxes and buttons". In the lanes (My Queue, the
+   Review Desk and the other lane views) every card with a step button is as tall as the
+   tallest one on the page, and so is every card without one, so rows line up across lanes.
+   The step button sits at the bottom of the card at full width, so every button is the same
+   size. Phones show one lane at a time and keep natural heights. */
+(function(){
+  let raf=0;
+  function even(){ raf=0;
+    const wide=!window.matchMedia||!window.matchMedia('(max-width: 900px)').matches;
+    document.querySelectorAll('.lanes').forEach(L=>{
+      const cards=[...L.querySelectorAll('.lane .tk2')]; if(!cards.length) return;
+      cards.forEach(c=>{ c.style.minHeight=''; });
+      if(!wide) return;
+      [cards.filter(c=>c.querySelector('.t2-acts')),cards.filter(c=>!c.querySelector('.t2-acts'))].forEach(g=>{
+        const vis=g.filter(c=>c.offsetParent); if(vis.length<2) return;
+        const h=Math.max(...vis.map(c=>c.offsetHeight)); vis.forEach(c=>{ c.style.minHeight=h+'px'; }); });
+    }); }
+  function soon(){ if(!raf) raf=requestAnimationFrame(even); }
+  const host=document.getElementById('main')||document.body;
+  new MutationObserver(soon).observe(host,{childList:true,subtree:true});
+  addEventListener('resize',soon);
+  window.__evenCards=even;
+})();
 
 /* ================= System Health, part 2 (Nov 7, 2026) =================
    A staff page modelled on Summit HQ's System Health: one line per part the MMS depends on, green, yellow
