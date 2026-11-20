@@ -4,6 +4,7 @@
    (files/<id>/<file>, served at resources.mismo.org/work-products/files/...), adds or updates the product in
    data/products.json there (its own workflow then rebuilds catalog.json), marks the listing done and removes the pieces.
    Logs counts only. Needs MMS_ROBOT_TOKEN to include work-products. */
+import crypto from 'node:crypto'; import { checkBuf } from './filecheck.mjs';
 export async function publishWorkProducts({ RW, GH = 'https://api.github.com', ORG = 'GitMISMO' }) {
   const head = { Authorization: `Bearer ${RW}`, Accept: 'application/vnd.github+json', 'User-Agent': 'mms-robot', 'X-GitHub-Api-Version': '2022-11-28' };
   const url = (repo, p) => `${GH}/repos/${ORG}/${repo}/contents/${p.split('/').map(encodeURIComponent).join('/')}`;
@@ -31,9 +32,11 @@ export async function publishWorkProducts({ RW, GH = 'https://api.github.com', O
       for (const [fi, f] of (d.files || []).entries()) {
         const parts = [];
         for (let i = 0; i < f.chunks; i++) { const c = await get('mms-data', `data/wpup-${d.key}-${fi}-${i}.json`); if (!c) throw new Error('a piece of ' + f.file + ' is missing'); parts.push(Buffer.from(c.data.c || '', 'base64')); tidy.push([`data/wpup-${d.key}-${fi}-${i}.json`, c.sha]); }
-        const buf = Buffer.concat(parts); if (buf.length !== f.bytes) throw new Error(f.file + ' arrived incomplete');
+        const buf = Buffer.concat(parts); const bad = checkBuf(buf, f.file, f.bytes); if (bad) throw new Error(f.file + ' ' + bad); /* size and, for zips, "PK" + whole directory (Nov 20) */
         const path = `files/${d.id}/${f.file}`; const ex = await get('work-products', path, true).catch(() => null);
-        await put('work-products', path, buf, ex && ex.sha, `MMS: ${d.id} ${f.file}`); files++;
+        const saved = await put('work-products', path, buf, ex && ex.sha, `MMS: ${d.id} ${f.file}`); files++;
+        /* the saved copy must be exactly the file sent: GitHub's id for it is the hash of its bytes */
+        const want = crypto.createHash('sha1').update(`blob ${buf.length}\0`).update(buf).digest('hex'); if (saved !== want) throw new Error(f.file + ' was not saved whole');
         out.push({ name: f.name, file: f.file, url: PUB + encodeURIComponent(d.id) + '/' + encodeURIComponent(f.file), bytes: buf.length });
       }
       const i = list.findIndex(p => p.id === d.id), old = i >= 0 ? list[i] : {};
