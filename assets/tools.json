@@ -154,6 +154,13 @@
       "path": "/scheduler/"
     },
     {
+      "key": "industry-license",
+      "label": "Industry License HQ",
+      "colour": "#9D174D",
+      "group": "Planning",
+      "path": "/industry-license/"
+    },
+    {
       "key": "sponsorship",
       "label": "Sponsorship Portal",
       "colour": "#0EA5E9",

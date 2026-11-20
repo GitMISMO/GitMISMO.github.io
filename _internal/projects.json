@@ -500,5 +500,13 @@
     "writable": [
       "docs/"
     ]
+  },
+  "industry-license": {
+    "repo": "GitMISMO/industry-license-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ]
   }
 }
