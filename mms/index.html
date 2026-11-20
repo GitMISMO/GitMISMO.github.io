@@ -1999,6 +1999,11 @@ p,.sub,.lede{text-wrap:pretty}
 /* Nov 20: share link on the published work request */
 .wp-share-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .wp-share-u{flex:1 1 320px;min-width:0;background:var(--surface-2,var(--bg));border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:12.5px;overflow-wrap:anywhere;user-select:all}
+
+/* AI Review notes: Unsure and Pass (Nov 20) */
+.rv-fb{display:inline-flex;gap:4px;flex-wrap:wrap}
+.rv-fbb.rv-fb-unsure.on{background:#a86a00;border-color:#a86a00;color:#fff}
+.rv-fbb.rv-fb-pass.on{background:#5b6b7a;border-color:#5b6b7a;color:#fff}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2072,7 +2077,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T17:22:40Z',fp:'39cdf1e9'};
+window.__mmsBuild={at:'2026-11-20T18:52:30Z',fp:'3363e5d0'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2714,7 +2719,8 @@ function stageActions(t){
     case 'work': add('Submit for AI Review →',()=>submitAI(t),'pri'); add('Change Target Date',()=>changeTarget(t)); if(S.isStaff&&!(t.cfp&&t.cfp.needed)&&typeof askCfp==='function') add('Ask for a Call for Participation',()=>askCfp(t),'ghost'); break;
     case 'aireview':
       add(sub==='reviewed'?'Run AI Review Again':'Run AI Review',()=>aiReview(t),sub==='reviewed'?'':'pri');
-      if(sub==='reviewed'||sub==='') add('Send to IM Review →',()=>move(t,nextStage(t),{dates:{aiDecision:today()},patch:{ai:Object.assign({},t.ai,{status:'Passed'})},text:'AI Review passed; sent to '+stageDef(nextStage(t)).name}),sub==='reviewed'?'pri':'');
+      /* AI Review never holds a work request back (Nov 20): Send to IM Review is always there, whatever the review said or whether it ran */
+      add('Send to IM Review →',()=>move(t,nextStage(t),{dates:{aiDecision:today()},patch:{ai:Object.assign({},t.ai,{status:sub==='reviewed'?'Passed':'Sent on'})},text:(sub==='reviewed'?'AI Review passed; sent to ':'Sent to ')+stageDef(nextStage(t)).name}),sub==='reviewed'?'pri':'');
       if(sub!=='updates') add('Make Updates First',()=>setSub(t,'updates','Facilitator making updates from AI Review'));
       else add('Resubmit for AI Review',()=>setSub(t,'resubmitted','Resubmitted for AI Review'),'pri');
       break;
@@ -7053,7 +7059,7 @@ const HELP_TOPICS={
      'The review runs in a few minutes. You get a list of what to fix and what is only a suggestion.',
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
      'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.'],
-    ['Fixes are things IM will send back. Suggestions are up to you.','Run AI Review Again any time you change the documents.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+    ['Fixes are things IM will send back. Suggestions are up to you.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
     [['Open the Review Desk','reviews']]],
   handoff:['IM, AWG and Designation: What Happens on Its Own','*',
     'Once a submission is sent to IM, nobody has to move it by hand.',
@@ -7700,6 +7706,40 @@ function needLibs(){ if(window.JSZip&&window.XLSX) return Promise.resolve(); if(
   return libsP; }
 const _readFileLib=readFile; readFile=async function(f){ if(/\.(docx|xlsx|xls|pptx)$/i.test(f&&f.name||'')) try{ await needLibs(); }catch(e){} return _readFileLib(f); };
 const _imExportLib=imExport; imExport=async function(doc){ try{ await needLibs(); }catch(e){ toast('Couldn’t load the Excel tools; try again'); return; } return _imExportLib(doc); };
+/* ---------- AI Review and IM Pre-Review reports: Unsure and Pass, and Download for Excel (Nov 20, 2026) ----------
+   Each note's "Right?" now has Yes, No, Unsure and Pass. Only Yes and No teach the review (a rule people keep marking
+   No drops to Recommended; notes marked No are avoided); Unsure and Pass are recorded but teach nothing. Marking notes
+   is never required: nothing in the process waits on it. The report also downloads for Excel (a Summary sheet and a
+   Notes sheet with every note, its section and how it was marked). */
+const RV_FB_OPTS=[['right','Yes','This note was right'],['wrong','No','This note was wrong or not useful'],['unsure','Unsure','Not sure whether this note is right'],['pass','Pass','Skip this note']];
+const RV_FB_LABEL={right:'Yes',wrong:'No',unsure:'Unsure',pass:'Pass'};
+rvFbCell=function(rep,k){ const v=(S.rvfb[rvFbId(rep,k)]||{}).verdict||'';
+  return '<span class="rv-fb" data-fbk="'+esc(k)+'">'+RV_FB_OPTS.map(([val,lab,tip])=>'<button type="button" class="rv-fbb rv-fb-'+val+(val==='wrong'?' no':'')+(v===val?' on':'')+'" data-fbv="'+val+'" aria-pressed="'+(v===val)+'" title="'+tip+'">'+lab+'</button>').join('')+'</span>'; };
+rvFbStats=function(){ const st={}; Object.values(S.rvfb||{}).forEach(f=>{ if(!f||!f.rule||!['right','wrong'].includes(f.verdict)) return; const s=st[f.rule]=st[f.rule]||{right:0,wrong:0}; s[f.verdict]++; }); return st; };
+
+/* every note in the report, in the order the report shows them */
+function rvNotes(rep){ const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'f'+i},f)), out=[];
+  F.filter(f=>f.sev==='fix').forEach(f=>out.push({k:f._k,section:'Must Fix Before Submitting',area:f.area,where:f.where,issue:f.issue+(f.fb?' ('+f.fb+')':''),suggestion:f.suggestion}));
+  (rep.corrections||[]).forEach((c,i)=>out.push({k:'c'+i,section:'Editorial Corrections',area:c.category||'',where:c.where,issue:c.issue,suggestion:c.suggestion}));
+  (rep.rows||[]).forEach((r,i)=>out.push({k:'r'+i,section:'Rows IM May Question',area:r.likely,where:r.item,issue:r.note,suggestion:[r.name,r.def].filter(Boolean).join(' — ')}));
+  F.filter(f=>f.sev==='recommend').forEach(f=>out.push({k:f._k,section:'Recommended',area:f.area,where:f.where,issue:f.issue+(f.fb?' ('+f.fb+')':''),suggestion:f.suggestion}));
+  (rep.recommendations||[]).forEach((c,i)=>out.push({k:'m'+i,section:'Recommended',area:'Editorial',where:c.where,issue:c.issue,suggestion:c.suggestion}));
+  (rep.questions||[]).forEach(q=>out.push({k:'',section:'Questions for the Facilitator',area:'',where:'',issue:q,suggestion:''}));
+  return out; }
+async function rvExcel(rep){
+  try{ await needLibs(); }catch(e){ toast('Couldn’t load the Excel tools; try again'); return; }
+  const title=rep.kind==='im'?'IM Pre-Review':'AI Review';
+  const sum=[['Report',title+' Report'],['Work Request',rep.wr],['Name',rep.name],['Date',fmt(atDay(rep.at))],['Run By',rep.by||''],['Files',(rep.files||[]).join(', ')],['Result',rep.readinessLabel||''],['Summary',rep.summary||''],
+    ['Note','This report recommends; it doesn’t change the work product. Marking notes is optional and never holds up the work request.']];
+  const ws1=XLSX.utils.aoa_to_sheet(sum); ws1['!cols']=[{wch:16},{wch:100}];
+  const N=rvNotes(rep), head=['#','Section','Area','Where','What’s Wrong','What to Do','Right?','Marked By','Why'];
+  const rows=N.map((n,i)=>{ const fb=n.k?(S.rvfb[rvFbId(rep,n.k)]||{}):{}; return [i+1,n.section,n.area||'',n.where||'',n.issue||'',n.suggestion||'',RV_FB_LABEL[fb.verdict]||'',fb.verdict?(fb.by||''):'',fb.why||'']; });
+  const ws2=XLSX.utils.aoa_to_sheet([head,...rows]); ws2['!cols']=[5,26,18,28,60,60,9,18,40].map(w=>({wch:w})); ws2['!autofilter']={ref:'A1:I'+(rows.length+1)};
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws1,'Summary'); XLSX.utils.book_append_sheet(wb,ws2,'Notes');
+  XLSX.writeFile(wb,title+' - '+rep.wr+' - '+atDay(rep.at)+'.xlsx'); }
+const _rvShowX=rvShow;
+rvShow=function(rep){ _rvShowX(rep); const dl=$('#modal-root #rvdl'); if(!dl||$('#modal-root #rvxl')) return;
+  dl.insertAdjacentHTML('afterend','<button class="btn" id="rvxl" type="button">Download for Excel</button>'); $('#modal-root #rvxl').onclick=()=>rvExcel(rep); };
 
 /* ================= Comment resolution (Build Next, Nov 2026) =================
    Every public comment gets a disposition (Accepted, Accepted with Changes, Not Accepted, or Duplicate or Out
