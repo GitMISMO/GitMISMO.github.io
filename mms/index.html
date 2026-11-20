@@ -2004,6 +2004,19 @@ p,.sub,.lede{text-wrap:pretty}
 .rv-fb{display:inline-flex;gap:4px;flex-wrap:wrap}
 .rv-fbb.rv-fb-unsure.on{background:#a86a00;border-color:#a86a00;color:#fff}
 .rv-fbb.rv-fb-pass.on{background:#5b6b7a;border-color:#5b6b7a;color:#fff}
+/* AI Review: pick from the work request's files (Nov 20) */
+.rv-src{margin:4px 0 6px}
+.rv-src-h{font-size:13px;font-weight:600;margin-bottom:6px}
+.rv-src-l{display:flex;flex-direction:column;gap:4px;max-height:220px;overflow:auto;border:1px solid var(--border);border-radius:6px;padding:6px;background:var(--surface)}
+.rv-src-f{display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:4px;cursor:pointer}
+.rv-src-f:hover{background:var(--surface-2)}
+.rv-src-f input{flex:none}
+.rv-src-n{display:flex;flex-direction:column;min-width:0;flex:1}
+.rv-src-n b{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-src-n em{font-style:normal;font-size:11.5px;color:var(--muted)}
+.rv-src-s{font-size:11.5px;color:var(--muted);flex:none}
+.rv-src-or{font-size:12px;margin:8px 0 2px;text-align:center}
+.rv-src-f .ss-i svg{width:18px;height:18px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2077,7 +2090,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T18:52:30Z',fp:'3363e5d0'};
+window.__mmsBuild={at:'2026-11-20T20:59:25Z',fp:'95536229'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7740,6 +7753,36 @@ async function rvExcel(rep){
 const _rvShowX=rvShow;
 rvShow=function(rep){ _rvShowX(rep); const dl=$('#modal-root #rvdl'); if(!dl||$('#modal-root #rvxl')) return;
   dl.insertAdjacentHTML('afterend','<button class="btn" id="rvxl" type="button">Download for Excel</button>'); $('#modal-root #rvxl').onclick=()=>rvExcel(rep); };
+/* ---------- AI Review / IM Pre-Review: pick files from the work request's Files (Nov 20, 2026) ----------
+   Instead of finding the file on your computer and dropping it in, tick it in the list of this work request's
+   files (its SharePoint folder, newest first). The MMS gets each ticked file from SharePoint through the
+   "MMS Documents - Upload" flow (mode "get") and adds it to the review, alongside any file chosen or dropped. */
+function rvSrcFiles(t,kind){ ssEnsure(); const D=ssFor(t); const ok=kind==='im'?/\.xls[xm]$/i:/\.(docx|xlsx|xlsm|pdf)$/i;
+  return ((D&&D.files)||[]).filter(f=>f.p&&!f.gone&&ok.test(f.n||f.p)).slice().sort((a,b)=>String(b.u||'').localeCompare(String(a.u||''))).slice(0,40); }
+function rvSrcPath(f){ let p=String(f.p||''); p=p.replace(/^\/?sites\/Facilitators\/Shared Documents\//i,''); if(!/^MMS Smartsheet Files\//i.test(p)) p='MMS Smartsheet Files/'+p.replace(/^\/+/,''); return p; }
+async function rvSrcGet(f){ const url=S.notify&&S.notify.docFlowUrl; if(!url) throw new Error('the SharePoint connection isn’t set up');
+  const r=await fetch(url,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({token:(window.ResourcesSession&&ResourcesSession.token())||'',project:'mms',mode:'get',path:rvSrcPath(f)})});
+  const j=await r.json().catch(()=>({})); if(!r.ok||!j.got||!j.content) throw new Error(j.error||'SharePoint didn’t send it'+(r.status!==200?' ('+r.status+')':''));
+  const bin=atob(j.content), u8=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u8[i]=bin.charCodeAt(i);
+  const name=String(f.p).split('/').pop()||f.n; return new File([u8],name,{type:/\.pdf$/i.test(name)?'application/pdf':'application/octet-stream'}); }
+const _rvRunSrc=rvRun;
+rvRun=function(t,kind){ _rvRunSrc(t,kind); const box=$('#modal-root .modal'), drop=box&&$('#rvdrop',box), inp=box&&$('#rvf',box); if(!drop||!inp) return;
+  const L=rvSrcFiles(t,kind); if(!L.length||!(S.notify&&S.notify.docFlowUrl)) return;
+  drop.insertAdjacentHTML('beforebegin','<div class="rv-src"><div class="rv-src-h">From this work request’s files<span class="muted"> · tick '+(kind==='im'?'the form':'the files to review')+'</span></div><div class="rv-src-l">'+
+    L.map((f,i)=>'<label class="rv-src-f"><input type="checkbox" data-rvsrc="'+i+'"><span class="ss-i ss-'+ssKind(f.n)+'">'+ssIc(ssKind(f.n))+'</span><span class="rv-src-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',ssTag(f.n)||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span><span class="rv-src-s" data-rvsrcs="'+i+'"></span></label>').join('')+
+    '</div><div class="rv-src-or muted">or from your computer</div></div>');
+  const got={}, local={files:[]}; let mine=false;
+  inp.addEventListener('change',()=>{ if(!mine) local.files=[...inp.files]; },true);
+  drop.addEventListener('drop',e=>{ if(e.dataTransfer) local.files=[...e.dataTransfer.files]; },true);
+  const apply=()=>{ const dt=new DataTransfer(); local.files.forEach(f=>dt.items.add(f)); L.forEach((f,i)=>{ const c=$('[data-rvsrc="'+i+'"]',box); if(c&&c.checked&&got[i]) dt.items.add(got[i]); });
+    if(kind==='im'&&dt.files.length>1){ const keep=dt.files[dt.files.length-1]; const d1=new DataTransfer(); d1.items.add(keep); mine=true; inp.files=d1.files; } else { mine=true; inp.files=dt.files; }
+    inp.dispatchEvent(new Event('change')); mine=false; };
+  $$('[data-rvsrc]',box).forEach(c=>c.onchange=async()=>{ const i=+c.dataset.rvsrc, st=$('[data-rvsrcs="'+i+'"]',box);
+    if(kind==='im'&&c.checked) $$('[data-rvsrc]',box).forEach(o=>{ if(o!==c) o.checked=false; });
+    if(c.checked&&!got[i]){ st.textContent='Getting it…'; c.disabled=true;
+      try{ got[i]=await rvSrcGet(L[i]); st.textContent='Added'; }catch(e){ st.textContent='Couldn’t get it: '+e.message; c.checked=false; } c.disabled=false; }
+    else st.textContent=c.checked?'Added':'';
+    apply(); }); };
 
 /* ================= Comment resolution (Build Next, Nov 2026) =================
    Every public comment gets a disposition (Accepted, Accepted with Changes, Not Accepted, or Duplicate or Out
