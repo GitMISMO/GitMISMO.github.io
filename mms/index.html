@@ -1996,6 +1996,9 @@ p,.sub,.lede{text-wrap:pretty}
 .lane .tk2 .t2-ft{margin-top:auto}
 .lane .tk2 .t2-acts{flex-wrap:nowrap}
 .lane .tk2 .t2-acts .btn{flex:1 1 0;width:100%;justify-content:center;white-space:normal}
+/* Nov 20: share link on the published work request */
+.wp-share-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.wp-share-u{flex:1 1 320px;min-width:0;background:var(--surface-2,var(--bg));border:1px solid var(--border);border-radius:5px;padding:7px 10px;font-size:12.5px;overflow-wrap:anywhere;user-select:all}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2069,7 +2072,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T14:54:09Z',fp:'f714b890'};
+window.__mmsBuild={at:'2026-11-20T16:12:10Z',fp:'ea602b7f'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -4437,8 +4440,8 @@ const feedWww=u=>String(u||'').trim().replace(/^https?:\/\/(collaborate\.mismo\.
 const feedFile=u=>{ try{ return decodeURIComponent(String(u).split(/[?#]/)[0].split('/').pop()||''); }catch(e){ return ''; } };
 function webRecent(){
   const mms=allTickets().filter(t=>t.stage==='published'&&!t.split&&t.dates&&t.dates.published).map(t=>{ const L=t.links||{};
-    const url=feedWww(L.resourceLibrary||L.crResourceLibrary); if(!/^https:\/\//.test(url)) return null;
-    const o={id:t.id,name:webName(String((t.cpCard&&t.cpCard.title)||'').trim()||cpPublic(t)),published:String(t.dates.published).slice(0,10),url};
+    const url=feedWww(L.resourceLibrary||L.crResourceLibrary||(t.wp&&t.wp.libraryUrl)); if(!/^https:\/\//.test(url)) return null;
+    const o={id:t.id,name:webName(String((t.wp&&!t.wp.off&&t.wp.title)||'').trim()||String((t.cpCard&&t.cpCard.title)||'').trim()||cpPublic(t)),published:String(t.dates.published).slice(0,10),url};
     if(/member/i.test((t.designation||{}).availableTo||'')) o.memberOnly=true;
     else if(L.nonMember){ o.licence=o.name; o.nonMemberAccess=L.nonMember; const f=feedFile(L.nonMember); if(/\.[a-z0-9]{2,5}$/i.test(f)) o.fileName=f; }
     return o; }).filter(Boolean);
@@ -6144,9 +6147,9 @@ function wpForm(t){ const W=t.wp||{}; const title=W.title||String((t.cpCard&&t.c
   const mo=W.membersOnly!=null?W.membersOnly:/member/i.test((t.designation||{}).availableTo||'');
   return '<div class="wp-sec"><h4 style="margin:16px 0 4px">Website: Find a Work Product</h4>'+
     '<label class="tog"><input type="checkbox" name="wpon"'+(W.off?'':' checked')+'> List it on the website, with its public files</label>'+
-    fld('Website Id',inp('wpid',W.id||wpSlug(title),'e.g. mortgage-compliance-dataset-mcd'),'An id already on the website updates that listing; a new id adds one. Ids never change once listed.')+
+    (W.queuedAt&&W.id?fld('Website Id','<input name="wpid" value="'+esc(W.id)+'" readonly>','Fixed once it’s on the website: every share link uses it. To rename it, change the Title; the old name is kept as a search name.'):fld('Website Id',inp('wpid',W.id||wpSlug(title),'e.g. mortgage-compliance-dataset-mcd'),'An id already on the website updates that listing; a new id adds one. Ids never change once listed.'))+
     fld('Title',inp('wptitle',title))+
-    fld('Summary',ta('wpsum',W.summary||(t.cpCard&&t.cpCard.text)||'','One or two plain sentences on what it is'))+
+    fld('Summary',ta('wpsum',W.summary||(t.cpCard&&t.cpCard.text)||'','One or two plain sentences on what it is'),'The public, final description: plain text, one or two sentences, no comment-period wording.')+
     fld('Category',inp('wpcat',W.category||'','e.g. Digital Mortgage, Credit, Closing'))+
     fld('Version',inp('wpver',W.version||String(t.wr||'').replace(/_/g,'-')))+
     fld('Status',sel('wpst',['Candidate Recommendation','Recommendation','Final'],W.status||(isStandard(t)?'Candidate Recommendation':'Final')))+
@@ -6160,6 +6163,7 @@ function wpWatch(){ let files=[]; const i=document.querySelector('#modal-root in
     dl.innerHTML=c.products.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.title)+'</option>').join(''); box.appendChild(dl); const w=box.querySelector('[name=wpid]'); if(w) w.setAttribute('list','wpids'); });
   return ()=>files; }
 function wpCheck(v,t){ if(!v.wpon) return ''; if(!wpSlug(v.wpid)) return 'Add a website id.'; if(!String(v.wptitle||'').trim()) return 'Add the title for the website.';
+  if(/\b(comment period|public comment|open for comment|proposed updates?|open through)\b/i.test(String(v.wpsum||''))) return 'The summary still talks about the comment period. Rewrite it as the final description.';
   if(t&&t.wp&&t.wp.needsFinalFile&&!v.wpmo){ const i=document.querySelector('#modal-root input[name=wpfiles]'); if(!i||!i.files||!i.files.length) return 'Add the final file. The website still lists the comment-period file for this work product, and it would stay there.'; }
   return ''; }
 function wpB64(u8){ let s=''; for(let i=0;i<u8.length;i+=32768) s+=String.fromCharCode.apply(null,u8.subarray(i,i+32768)); return btoa(s); }
@@ -6168,7 +6172,9 @@ async function wpPut(name,content){ const tok=window.ResourcesSession&&Resources
   for(let a=0;a<4;a++){ try{ const r=await fetch(RELAY()+'/mms/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content})}); if(r.ok) return; if(r.status===409) return; /* each piece has its own name, so a conflict means an earlier try already saved it */ if(r.status===401||r.status===403) throw new Error('no access'); }catch(e){ if(/no access|signed out/.test(e.message)) throw e; } await new Promise(z=>setTimeout(z,800*(a+1))); }
   throw new Error('the save service is busy'); }
 async function wpQueue(t,v,files){
-  files=(files||[]).filter(Boolean); const id=wpSlug(v.wpid); const mo=!!v.wpmo;
+  files=(files||[]).filter(Boolean); const W0=(S.tickets[t.id]||t).wp||{}; const id=(W0.queuedAt&&W0.id)?W0.id:wpSlug(v.wpid); const mo=!!v.wpmo;
+  v.wpsum=String(v.wpsum||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  if(W0.queuedAt&&W0.title&&String(v.wptitle).trim()&&W0.title.trim()!==String(v.wptitle).trim()){ const al=String(v.wpalias||'').split(',').map(x=>x.trim()).filter(Boolean); if(!al.some(x=>x.toLowerCase()===W0.title.trim().toLowerCase())) al.push(W0.title.trim()); v.wpalias=al.join(', '); }
   const big=files.filter(f=>f.size>WP_MAX); if(big.length) toast(big.map(f=>f.name).join(', ')+' is over 100 MB, so it wasn’t posted. Send it to Jonna.');
   files=mo?[]:files.filter(f=>f.size<=WP_MAX);
   const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6); /* short: the save service only takes short file names (wpup-<key>-<file>-<piece>) */ const out=[];
@@ -6181,9 +6187,10 @@ async function wpQueue(t,v,files){
     published:v.d||today(),license:+v.wplic||null,membersOnly:mo,libraryUrl:feedWww(v.rl)||null,aliases:String(v.wpalias||'').split(',').map(s=>s.trim()).filter(Boolean)};
   const doc={key,ticket:t.id,wr:t.wr,id,product,files:out,status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''};
   await write('wpqueue',key,doc);
-  const x=clone(S.tickets[t.id]||t); x.wp=Object.assign({},product,{id,key,queuedAt:doc.at});
-  hist(x,'Sent to the website’s Find a Work Product ('+(mo?'members only, no public files':out.length+' public file'+(out.length===1?'':'s'))+'); it’s posted within half an hour');
-  await saveTicket(x); wpSay('Sent to the website. It’s posted within half an hour.','ok'); return true; }
+  const x=clone(S.tickets[t.id]||t); x.wp=Object.assign({},product,{id,key,queuedAt:doc.at}); if(product.libraryUrl) x.links=Object.assign({},x.links,{resourceLibrary:product.libraryUrl});
+  hist(x,'Sent to the website’s Find a Work Product ('+(mo?'members only, no public files':out.length+' public file'+(out.length===1?'':'s'))+'); it’s posted within half an hour. Share link: '+wpShare(id));
+  await saveTicket(x); wpSay('Sent to the website. It’s posted within half an hour. Share link: '+wpShare(id),'ok'); return true; }
+function wpShare(id){ return 'https://www.mismo.org/standards-resources?get='+encodeURIComponent(id); }
 /* a published work request: list it, update its listing or send its files again */
 async function wpResend(t){ const p=modal({title:'Website: Find a Work Product',ok:'Send to the Website',validate:v=>wpCheck(Object.assign({wpon:true},v)),
     body:fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'),'Optional')+wpForm(t).replace(/<label class="tog"><input type="checkbox" name="wpon"[^>]*>[^<]*<\/label>/,'')});
@@ -6491,6 +6498,23 @@ async function wpPrefill(){
   hist(x,'Website listing set up for Mark Published: it updates the existing Find a Work Product entry (flood-risk-disclosure-guide) as the Homeowners Insurance Guide, Final, license 4 (Commercial Distributor), with “Flood Risk Disclosure Guide” kept as a search name. The final file is needed when it is marked published.');
   await saveTicket(x,'',clone(t));
 }
+/* ---------- Share link on the published work request (Nov 20) ----------
+   The website gives every product in work-products/catalog.json a share link,
+   https://www.mismo.org/standards-resources?get=<catalog id>, which opens its Download pop-up
+   (licence and form for visitors, Download for signed-in members, Resource Library for
+   members-only products). The published work request shows it with a Copy button. */
+function wpShareSec(t){ const W=t.wp||{}; if(!W.queuedAt||!W.id||W.off) return '';
+  const u=wpShare(W.id), lib=(t.links&&t.links.resourceLibrary)||W.libraryUrl||'';
+  return '<div class="psec full wp-share"><h4>On the Website<span class="sp muted" style="font-size:12px;font-weight:500">Use the share link in press releases and emails</span></h4>'+
+    '<div class="wp-share-row"><code class="wp-share-u">'+esc(u)+'</code><button type="button" class="btn sm pri" data-wpcopy="'+esc(u)+'">Copy Link</button><a class="btn sm" href="'+esc(u)+'" target="_blank" rel="noopener">Open</a></div>'+
+    '<p class="muted" style="font-size:12.5px;margin:8px 0 0">'+esc(W.title||t.name)+(W.status?' · '+esc(W.status):'')+(W.membersOnly?' · members only':'')+'. Visitors get the licence and form; signed-in members get Download'+(lib?'; members can also open it in the <a href="'+esc(lib)+'" target="_blank" rel="noopener">Resource Library</a>':'')+'.</p></div>'; }
+const _renderPanelSL=renderPanel;
+renderPanel=function(){ _renderPanelSL(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t||t.stage!=='published') return;
+  const pb=$('.pb',P); if(!pb||$('.wp-share',pb)) return; const h=wpShareSec(t); if(!h) return;
+  const host=$('[data-wtab="over"]',pb); if(!host) return; const w=document.createElement('div'); w.innerHTML=h; const sec=w.firstChild;
+  const first=host.firstElementChild; first&&first.nextSibling?host.insertBefore(sec,first.nextSibling):host.appendChild(sec); };
+document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-wpcopy]'); if(!b) return; e.preventDefault();
+  try{ await navigator.clipboard.writeText(b.dataset.wpcopy); toast('Share link copied'); }catch(err){ const r=document.createRange(); const c=b.parentElement.querySelector('.wp-share-u'); if(c){ r.selectNodeContents(c); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); } toast('Press Ctrl+C to copy the selected link'); } });
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
@@ -7287,7 +7311,7 @@ const RC2_STAGE_HOW={
   comment:['Post its Comment Period Card on mismo.org and announce it.','Moves to Post-Comment by itself when the period ends.'],
   post:['Report what came back from the comment period.','Comments from the website form land on the work request. If Governance already approved publishing when there are no material or significant changes, a report of none sends it straight to Release.'],
   'gc-publish':['Governance approves it to publish.','Staff record the vote; approved work goes to Release.'],
-  release:['Announce it, then Mark Published.','Mark Published also lists it on the website’s Find a Work Product with its public files (members-only products are listed without files); it is posted within half an hour. MISMO Media gets the release request, with the facts for the press release, on its own.']
+  release:['Announce it, then Mark Published.','Mark Published also lists it on the website’s Find a Work Product with its public files (members-only products are listed without files); it is posted within half an hour. MISMO Media gets the release request, with the facts for the press release, on its own. The published work request shows its share link (www.mismo.org/standards-resources?get=<website id>) with a Copy button, for press releases and emails; the website id never changes once listed.']
 };
 const GOV_DESC={'Business Executive Team (BET)':'Approves new work and sets priorities.','Residential Standards Governance Committee':'Governs residential standards.','Commercial Standards Governance Committee':'Governs commercial standards.','Council of Chairs':'Workgroup and community chairs.','Education Council':'Guides MISMO education.'};
 function rc2Tile(x,c){ const [n,d,u,ic]=x, int=/^go:/.test(u);
