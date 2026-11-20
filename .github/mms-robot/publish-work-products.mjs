@@ -52,7 +52,7 @@ export async function publishWorkProducts({ RW, GH = 'https://api.github.com', O
   if (Object.values(done).some(x => x.status === 'done')) await put('work-products', 'data/products.json', Buffer.from(JSON.stringify(Object.assign({}, pf.data, { products: list }), null, 2)), pf.sha, 'MMS: work products published');
   for (let a = 0; a < 4; a++) {   /* the MMS may be saving the queue too: read it again and only change these entries */
     const q2 = await get('mms-data', 'data/wpqueue.json'); const D = q2.data.docs || {};
-    for (const [k, v] of Object.entries(done)) if (D[k]) D[k] = Object.assign({}, D[k], v);
+    for (const [k, v] of Object.entries(done)) { const kk = D[k] ? k : (D['wpqueue/' + k] ? 'wpqueue/' + k : ''); if (kk) D[kk] = Object.assign({}, D[kk], v); }   /* the MMS saves them as wpqueue/<key> (Nov 20 fix: done and errors weren't being recorded) */
     try { await put('mms-data', 'data/wpqueue.json', Buffer.from(JSON.stringify(Object.assign({}, q2.data, { docs: D }), null, 2)), q2.sha, 'MMS Robot: work products queue'); break; }
     catch (e) { if (e.status !== 409 && e.status !== 422) throw e; await new Promise(r => setTimeout(r, 1500)); }
   }
