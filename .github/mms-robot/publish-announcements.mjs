@@ -10,7 +10,7 @@
    {"source":"MMS","updated":"<ISO>","announcements":[{"id","type":"cfp|comment|release","kind","status",
      "requested","done","link","wr","name","publicName","workgroup","groupType","classification","releaseStatus",
      "facilitator","summary","license","availableTo","memberUrl","nonMemberUrl","websiteId","version",
-     "commentOpens","commentCloses","mmsUrl","leaders":[{"name","position","company"}]}]} */
+     "commentOpens","commentCloses","mmsUrl","shareUrl","leaders":[{"name","position","company"}]}]} */
 import fs from 'fs';
 const TOKEN = process.env.MMS_DATA_TOKEN; if (!TOKEN) { console.log('No MMS_DATA_TOKEN; nothing published.'); process.exit(0); }
 const GH = process.env.GH_API || 'https://api.github.com', OUT = process.env.ANN_OUT || 'mms/announcements.json', KEEP_DAYS = 90;
@@ -45,6 +45,7 @@ for (const m of reqs) {
     license: W.license || D.license || '', availableTo: D.availableTo || '', memberUrl: L.resourceLibrary || '', nonMemberUrl: clean(t.cpCard && t.cpCard.nonMember),
     websiteId: W.off ? '' : (W.id || ''), version: W.version || '', commentOpens: d.commentStart || '', commentCloses: d.commentEnd || '',
     mmsUrl: 'https://resources.mismo.org/mms/#wr=' + encodeURIComponent(t.id),
+    shareUrl: (W.queuedAt && W.id && !W.off) ? 'https://www.mismo.org/standards-resources?get=' + encodeURIComponent(W.id) : '',
     leaders: k ? leaders.filter(l => l.groups.some(g => g && gnorm(g) === k)).sort((a, b) => rank(a.position) - rank(b.position) || a.name.localeCompare(b.name)).map(l => ({ name: l.name, position: l.position || '', company: l.company || '' })) : []
   });
 }
