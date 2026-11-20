@@ -1,7 +1,7 @@
 {
   "source": "MMS",
   "note": "Announcement requests from the MMS for MISMO Media, with the facts to draft from. Public information only.",
-  "updated": "2026-11-20T16:15:58.571Z",
+  "updated": "2026-11-20T22:16:03.538Z",
   "announcements": [
     {
       "id": "WR2025_24-Final-Release-Announcement",
@@ -22,8 +22,8 @@
       "summary": "The Homeowners Insurance Disclosure gives homeowners an at-a-glance overview of homeowners insurance: what their policy covers, where common gaps exist, and when additional coverage such as flood insurance may be needed. It replaces MISMO’s Flood Risk Disclosure Guide.",
       "license": 4,
       "availableTo": "Public",
-      "memberUrl": "",
-      "nonMemberUrl": "",
+      "memberUrl": "https://www.mismo.org/viewdocument/flood-risk-disclosure-guide-1",
+      "nonMemberUrl": "https://resources.mismo.org/work-products/files/flood-risk-disclosure-guide/mismo-homeowners-insurance-disclosure-final.pdf",
       "websiteId": "flood-risk-disclosure-guide",
       "version": "WR2025-24",
       "commentOpens": "2026-10-08",
