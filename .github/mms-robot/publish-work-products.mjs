@@ -40,8 +40,11 @@ export async function publishWorkProducts({ RW, GH = 'https://api.github.com', O
         out.push({ name: f.name, file: f.file, url: PUB + encodeURIComponent(d.id) + '/' + encodeURIComponent(f.file), bytes: buf.length });
       }
       const i = list.findIndex(p => p.id === d.id), old = i >= 0 ? list[i] : {};
-      const p = Object.assign({ id: d.id, title: '', summary: '', category: null, version: null, status: null, published: null, license: null, membersOnly: false, libraryUrl: null, externalUrl: null, purchaseUrl: null, files: [], aliases: [] }, old, d.product, { id: d.id, ticket: d.ticket });
-      p.files = p.membersOnly ? [] : (out.length ? out : (old.files || []));
+      if (d.replace && i < 0) throw new Error('no product ' + d.id + ' to fix');
+      const p = Object.assign({ id: d.id, title: '', summary: '', category: null, version: null, status: null, published: null, license: null, membersOnly: false, libraryUrl: null, externalUrl: null, purchaseUrl: null, files: [], aliases: [] }, old, d.product, { id: d.id }, d.ticket ? { ticket: d.ticket } : {});
+      /* "replace" (Settings › Website › Fix a Work Product File, Nov 20): swap just those files, same names; keep the rest */
+      if (d.replace) p.files = (old.files || []).map(f => out.find(o => o.file === f.file) || f);
+      else p.files = p.membersOnly ? [] : (out.length ? out : (old.files || []));
       if (i >= 0) list[i] = p; else list.push(p);
       done[d.key] = { status: 'done', doneAt: new Date().toISOString(), files: out.length };
     } catch (e) { failed++; done[d.key] = { status: 'error', error: String(e.message || e).slice(0, 200), triedAt: new Date().toISOString() }; }
