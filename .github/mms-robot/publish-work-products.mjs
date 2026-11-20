@@ -5,6 +5,7 @@
    data/products.json there (its own workflow then rebuilds catalog.json), marks the listing done and removes the pieces.
    Logs counts only. Needs MMS_ROBOT_TOKEN to include work-products. */
 import crypto from 'node:crypto'; import { checkBuf } from './filecheck.mjs';
+const BIG = 20 * 1048576, PART = 15 * 1048576;
 export async function publishWorkProducts({ RW, GH = 'https://api.github.com', ORG = 'GitMISMO' }) {
   const head = { Authorization: `Bearer ${RW}`, Accept: 'application/vnd.github+json', 'User-Agent': 'mms-robot', 'X-GitHub-Api-Version': '2022-11-28' };
   const url = (repo, p) => `${GH}/repos/${ORG}/${repo}/contents/${p.split('/').map(encodeURIComponent).join('/')}`;
@@ -22,7 +23,9 @@ export async function publishWorkProducts({ RW, GH = 'https://api.github.com', O
   async function del(repo, p, sha) { await fetch(url(repo, p), { method: 'DELETE', headers: Object.assign({ 'Content-Type': 'application/json' }, head), body: JSON.stringify({ message: 'MMS Robot: tidy ' + p, sha, committer: { name: 'MMS Robot', email: 'workrequests@mismo.org' } }) }).catch(() => {}); }
   const PUB = 'https://resources.mismo.org/work-products/files/';
   const q = await get('mms-data', 'data/wpqueue.json'); if (!q || !q.data) return { ready: 0 };
-  const docs = (q.data.docs || {}); const ready = Object.values(docs).filter(d => d && d.status === 'ready' && d.id);
+  const docs = (q.data.docs || {}); const ready = Object.values(docs).filter(d => d && d.id && (d.status === 'ready' ||
+    /* a save GitHub refused (too big, or busy) is tried again for two days while its pieces are still there */
+    (d.status === 'error' && /^GitHub (422|5\d\d)/.test(d.error || '') && Date.now() - Date.parse(d.at || 0) < 2 * 864e5)));
   if (!ready.length) return { ready: 0 };
   const pf = await get('work-products', 'data/products.json'); if (!pf) throw new Error('work-products/data/products.json not found');
   const list = pf.data.products || []; const done = {}, tidy = []; let files = 0, failed = 0;
@@ -33,10 +36,17 @@ export async function publishWorkProducts({ RW, GH = 'https://api.github.com', O
         const parts = [];
         for (let i = 0; i < f.chunks; i++) { const c = await get('mms-data', `data/wpup-${d.key}-${fi}-${i}.json`); if (!c) throw new Error('a piece of ' + f.file + ' is missing'); parts.push(Buffer.from(c.data.c || '', 'base64')); tidy.push([`data/wpup-${d.key}-${fi}-${i}.json`, c.sha]); }
         const buf = Buffer.concat(parts); const bad = checkBuf(buf, f.file, f.bytes); if (bad) throw new Error(f.file + ' ' + bad); /* size and, for zips, "PK" + whole directory (Nov 20) */
-        const path = `files/${d.id}/${f.file}`; const ex = await get('work-products', path, true).catch(() => null);
-        const saved = await put('work-products', path, buf, ex && ex.sha, `MMS: ${d.id} ${f.file}`); files++;
-        /* the saved copy must be exactly the file sent: GitHub's id for it is the hash of its bytes */
-        const want = crypto.createHash('sha1').update(`blob ${buf.length}\0`).update(buf).digest('hex'); if (saved !== want) throw new Error(f.file + ' was not saved whole');
+        const blobId = b => crypto.createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex');
+        if (buf.length > BIG) {   /* GitHub won't take a file this big in one save (Nov 20: 422 on a 42.7 MB zip): it goes to incoming/ in parts and the Work Products repair joins, checks and saves it */
+          for (let i = 0, n = 1; i < buf.length; i += PART, n++) { const part = buf.subarray(i, i + PART), pp = `incoming/${f.file}.part${String(n).padStart(3, '0')}`; const ex = await get('work-products', pp, true).catch(() => null);
+            const saved = await put('work-products', pp, part, ex && ex.sha, `MMS: ${d.id} ${f.file} part ${n}`); if (saved !== blobId(part)) throw new Error(f.file + ' part ' + n + ' was not saved whole'); }
+          files++;
+        } else {
+          const path = `files/${d.id}/${f.file}`; const ex = await get('work-products', path, true).catch(() => null);
+          const saved = await put('work-products', path, buf, ex && ex.sha, `MMS: ${d.id} ${f.file}`); files++;
+          /* the saved copy must be exactly the file sent: GitHub's id for it is the hash of its bytes */
+          if (saved !== blobId(buf)) throw new Error(f.file + ' was not saved whole');
+        }
         out.push({ name: f.name, file: f.file, url: PUB + encodeURIComponent(d.id) + '/' + encodeURIComponent(f.file), bytes: buf.length });
       }
       const i = list.findIndex(p => p.id === d.id), old = i >= 0 ? list[i] : {};
