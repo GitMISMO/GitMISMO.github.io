@@ -37,9 +37,12 @@ if (!FORCE) {
   if (!settings.on) { console.log('The digest is off in Settings.'); process.exit(0); }
   if (settings.sender !== 'action') { console.log('Settings say the MMS sends the digest, not this scheduled sender.'); process.exit(0); }
   if (!settings.days.includes(et.dow)) { console.log('Not a send day.'); process.exit(0); }
+  /* a day skipped in Settings (Skip Today's Email, Nov 20): nothing goes, and the day counts as done */
+  if ((settings.skipDates || []).includes(et.ymd)) { console.log(`Skipped in Settings for ${et.ymd}: nothing sent.`); if (process.env.GITHUB_OUTPUT) { const fs = await import('fs'); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'done=1\n'); fs.writeFileSync('.digest-done', new Date().toISOString()); } process.exit(0); }
   /* GitHub often runs scheduled jobs late or skips them, so send on the first run at or after the send hour.
      The workflow remembers a day once it is done, so later runs that day stop before reaching here. */
-  if (Math.floor(et.min / 60) < settings.hour) { console.log(`Not the send hour yet (now ${Math.floor(et.min / 60)}:00 ET, sending at ${settings.hour}:00).`); process.exit(0); }
+  const hm = h => `${Math.floor(h)}:${String(Math.round((h % 1) * 60)).padStart(2, '0')}`;
+  if (et.min < Math.round(settings.hour * 60)) { console.log(`Not the send time yet (now ${hm(et.min / 60)} ET, sending at ${hm(settings.hour)}).`); process.exit(0); }
 }
 
 /* the MMS */

@@ -2096,7 +2096,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T21:54:24Z',fp:'1c282c22'};
+window.__mmsBuild={at:'2026-11-20T23:31:58Z',fp:'42a86da7'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -4377,7 +4377,7 @@ function digestSettingsHtml(){
   const who=S.dgPrev.who&&F.some(p=>p.name===S.dgPrev.who)?S.dgPrev.who:(F[0]||{}).name||'';
   return '<div class="dg-top card"><div class="dg-on"><label class="dg-sw"><input type="checkbox" id="dgon"'+(c.on?' checked':'')+'><span></span></label><div><h3 style="margin:0">Daily Digest '+(c.on?'<span class="chip good">On</span>':'<span class="chip">Off</span>')+'</h3><div class="muted" style="font-size:12.5px">An end-of-day email to each facilitator with their queue and what needs them. Fridays turn into a weekly wrap-up; Mondays add hours still to log. '+esc(c.ccNames||'Perry Williams')+' is copied on each one.</div></div><button class="btn pri" id="dgsave" type="button">Save Digest Settings</button></div>'+
     '<div class="kv dg-kv"><div class="f"><label>Send On</label><div class="dg-days">'+days.map((d,i)=>'<label><input type="checkbox" data-dgday="'+i+'"'+(c.days.includes(i)?' checked':'')+'>'+d+'</label>').join('')+'</div></div>'+
-    '<div class="f"><label>Send At (Eastern)</label><select id="dghour">'+[14,15,16,17,18].map(h=>'<option value="'+h+'"'+(c.hour===h?' selected':'')+'>'+(h>12?h-12:h)+':00 PM</option>').join('')+'</select></div>'+
+    '<div class="f"><label>Send At (Eastern)</label><select id="dghour">'+[14,14.5,15,15.5,16,16.5,17,17.5,18].map(h=>'<option value="'+h+'"'+(+c.hour===h?' selected':'')+'>'+(Math.floor(h)>12?Math.floor(h)-12:Math.floor(h))+(h%1?':30':':00')+' PM</option>').join('')+'</select><div class="muted" style="font-size:12px;margin-top:4px">The daily digest and the Friday wrap-up both go at this time.'+((c.skipDates||[]).includes(MMSDigest.et(new Date()).ymd)?' <b>Today’s email is skipped.</b>':'')+'</div></div>'+
     '<div class="f wide"><label>Copy (CC) on Every Digest</label><input id="dgcc" value="'+esc((c.cc||[]).join(', '))+'"></div>'+
     '<div class="f"><label>Target Nudge (Days Ahead)</label><input id="dgtd" value="'+esc(c.targetSoonDays)+'"></div><div class="f"><label>Stalled After (Days)</label><input id="dgsd" value="'+esc(c.staleDays)+'"></div><div class="f"><label>Attendance Look-Back (Days)</label><input id="dgad" value="'+esc(c.attendanceDays)+'"></div>'+
     '<div class="f"><label>Sent By</label><select id="dgsender"><option value="mms"'+(c.sender!=='action'?' selected':'')+'>The MMS, when MISMO staff have it open</option><option value="action"'+(c.sender==='action'?' selected':'')+'>The scheduled sender on GitHub</option></select></div>'+
@@ -4386,7 +4386,7 @@ function digestSettingsHtml(){
     '<div class="dg-g"><div class="dg-gh">Who Gets It</div>'+F.map(p=>'<label class="dg-ck"><input type="checkbox" data-dgwho="'+esc(p.name)+'"'+(c.skip[p.name]?'':' checked')+'><span><b>'+esc(p.name)+'</b><em>'+(p.email?esc(p.email):'<span class="bad">No email on file: add it in People and Roles</span>')+'</em></span></label>').join('')+'</div></div>'+
     '<div class="card dg-prev"><h3>Preview<span class="sp"><select id="dgwho">'+F.map(p=>'<option'+(p.name===who?' selected':'')+'>'+esc(p.name)+'</option>').join('')+'</select><select id="dgas"><option value="today"'+(S.dgPrev.as==='today'?' selected':'')+'>As Today</option><option value="fri"'+(S.dgPrev.as==='fri'?' selected':'')+'>As a Friday Wrap-Up</option><option value="mon"'+(S.dgPrev.as==='mon'?' selected':'')+'>As a Monday</option></select></span></h3>'+
     '<div class="dg-meta" id="dgmeta">Building the preview…</div><iframe id="dgframe" title="Digest preview" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe>'+
-    '<div class="dg-acts"><button class="btn" id="dgtest" type="button">Send Me This Preview</button><button class="btn pri" id="dgnow" type="button">Send Today’s Digests Now</button></div></div></div>';
+    '<div class="dg-acts"><button class="btn" id="dgtest" type="button">Send Me This Preview</button><button class="btn" id="dgskiptoday" type="button">'+((c.skipDates||[]).includes(MMSDigest.et(new Date()).ymd)?'Don’t Skip Today':'Skip Today’s Email')+'</button><button class="btn pri" id="dgnow" type="button">Send Today’s Digests Now</button></div></div></div>';
 }
 function previewDate(as){ const d=new Date(); const want=as==='fri'?5:as==='mon'?1:null; if(want==null) return d; while(d.getDay()!==want) d.setDate(d.getDate()+1); d.setHours(17,30,0,0); return d; }
 async function paintPreview(m){
@@ -4402,6 +4402,8 @@ function wireDigest(m){
   const read=()=>{ const c=MMSDigest.settings(S.digestCfg); c.on=$('#dgon',m).checked; c.days=$$('[data-dgday]',m).filter(x=>x.checked).map(x=>+x.dataset.dgday); c.hour=+$('#dghour',m).value; c.cc=$('#dgcc',m).value.split(/[,;\s]+/).map(x=>x.trim()).filter(x=>/@/.test(x)); c.targetSoonDays=+$('#dgtd',m).value||14; c.staleDays=+$('#dgsd',m).value||45; c.attendanceDays=+$('#dgad',m).value||60; c.skipEmpty=$('#dgskip',m).checked; c.sender=$('#dgsender',m).value;
     $$('[data-dgs]',m).forEach(x=>c.sections[x.dataset.dgs]=x.checked); c.skip={}; $$('[data-dgwho]',m).forEach(x=>{ if(!x.checked) c.skip[x.dataset.dgwho]=true; }); c.hoursVendor=(digestSrc&&digestSrc.hoursVendor)||(S.digestCfg||{}).hoursVendor||{}; return c; };
   $$('[data-dgs],[data-dgwho],#dgskip,#dgtd,#dgsd,#dgad',m).forEach(x=>x.addEventListener('change',()=>{ S.digestCfg=read(); paintPreview(m); }));
+  /* skip one day's email (the daily digest or the Friday wrap-up) without turning the digest off (Nov 20) */
+  const sk=$('#dgskiptoday',m); if(sk) sk.onclick=async()=>{ const c=MMSDigest.settings(S.digestCfg), d=MMSDigest.et(new Date()).ymd; const L=(c.skipDates||[]).filter(x=>x>=d); c.skipDates=L.includes(d)?L.filter(x=>x!==d):L.concat(d); S.digestCfg=c; await write('config','digest',c); toast(c.skipDates.includes(d)?'Today’s email is skipped':'Today’s email will go'); renderAll(); };
   $('#dgsave',m).onclick=async()=>{ S.digestCfg=read(); await write('config','digest',S.digestCfg); toast('Digest settings saved'); renderAll(); };
   $('#dgon',m).onchange=async()=>{ S.digestCfg=read(); await write('config','digest',S.digestCfg); toast(S.digestCfg.on?'Daily digest is on':'Daily digest is off'); renderAll(); };
   $('#dgwho',m).onchange=e=>{ S.dgPrev.who=e.target.value; paintPreview(m); };
@@ -4413,7 +4415,7 @@ function wireDigest(m){
 /* sending on its own while staff have the MMS open */
 async function digestAuto(){
   const c=MMSDigest.settings(S.digestCfg), held=mailHeld(); if((!held&&(!c.on||c.sender==='action'))||!S.isStaff||!S.canWrite||S.mode!=='relay'||S.partial||!S.autoOn) return;
-  const n=MMSDigest.et(new Date()); if(!c.days.includes(n.dow)||n.min<c.hour*60) return;
+  const n=MMSDigest.et(new Date()); if(!c.days.includes(n.dow)||n.min<c.hour*60||(c.skipDates||[]).includes(n.ymd)) return;
   const log=S.digestLog||{}; if(log.date===n.ymd) return;
   S.digestLog={date:n.ymd,at:new Date().toISOString(),by:S.me.name||'',count:0,how:'automatic'}; await write('config','digestLog',S.digestLog);
   const src=await loadDigestSources(true); const k=await sendDigests(MMSDigest.build(digestInput(src)),'auto');
