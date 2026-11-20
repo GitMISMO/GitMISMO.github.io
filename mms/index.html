@@ -2069,7 +2069,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T14:49:36Z',fp:'3f6b085c'};
+window.__mmsBuild={at:'2026-11-20T14:54:09Z',fp:'f714b890'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -6171,7 +6171,7 @@ async function wpQueue(t,v,files){
   files=(files||[]).filter(Boolean); const id=wpSlug(v.wpid); const mo=!!v.wpmo;
   const big=files.filter(f=>f.size>WP_MAX); if(big.length) toast(big.map(f=>f.name).join(', ')+' is over 100 MB, so it wasn’t posted. Send it to Jonna.');
   files=mo?[]:files.filter(f=>f.size<=WP_MAX);
-  const key=(id.slice(0,60)+'-'+Date.now().toString(36)); const out=[];
+  const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6); /* short: the save service only takes short file names (wpup-<key>-<file>-<piece>) */ const out=[];
   try{
     for(const [fi,f] of files.entries()){ const u8=new Uint8Array(await f.arrayBuffer()); const n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
       for(let i=0;i<n;i++){ wpSay('Uploading '+f.name+' for the website: '+Math.round(i/n*100)+'% ('+(fi+1)+' of '+files.length+'). Keep this tab open.'); await wpPut('wpup-'+key+'-'+fi+'-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
