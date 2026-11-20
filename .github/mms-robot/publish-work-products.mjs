@@ -35,19 +35,23 @@ export async function publishWorkProducts({ RW, GH = 'https://api.github.com', O
       for (const [fi, f] of (d.files || []).entries()) {
         const parts = [];
         for (let i = 0; i < f.chunks; i++) { const c = await get('mms-data', `data/wpup-${d.key}-${fi}-${i}.json`); if (!c) throw new Error('a piece of ' + f.file + ' is missing'); parts.push(Buffer.from(c.data.c || '', 'base64')); tidy.push([`data/wpup-${d.key}-${fi}-${i}.json`, c.sha]); }
-        const buf = Buffer.concat(parts); const bad = checkBuf(buf, f.file, f.bytes); if (bad) throw new Error(f.file + ' ' + bad); /* size and, for zips, "PK" + whole directory (Nov 20) */
+        const buf = Buffer.concat(parts); const bad = checkBuf(buf, f.file, f.bytes); if (bad) throw new Error(f.file + ' ' + bad); if (d.fileOnly && buf.length > BIG) throw new Error(f.file + ' is over 20 MB'); /* size and, for zips, "PK" + whole directory (Nov 20) */
         const blobId = b => crypto.createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex');
-        if (buf.length > BIG) {   /* GitHub won't take a file this big in one save (Nov 20: 422 on a 42.7 MB zip): it goes to incoming/ in parts and the Work Products repair joins, checks and saves it */
+        if (buf.length > BIG && !d.fileOnly) {   /* GitHub won't take a file this big in one save (Nov 20: 422 on a 42.7 MB zip): it goes to incoming/ in parts and the Work Products repair joins, checks and saves it */
           for (let i = 0, n = 1; i < buf.length; i += PART, n++) { const part = buf.subarray(i, i + PART), pp = `incoming/${f.file}.part${String(n).padStart(3, '0')}`; const ex = await get('work-products', pp, true).catch(() => null);
             const saved = await put('work-products', pp, part, ex && ex.sha, `MMS: ${d.id} ${f.file} part ${n}`); if (saved !== blobId(part)) throw new Error(f.file + ' part ' + n + ' was not saved whole'); }
           files++;
         } else {
-          const path = `files/${d.id}/${f.file}`; const ex = await get('work-products', path, true).catch(() => null);
+          const path = d.fileOnly ? `${d.fileOnly}/${f.file}` : `files/${d.id}/${f.file}`; const ex = await get('work-products', path, true).catch(() => null);
           const saved = await put('work-products', path, buf, ex && ex.sha, `MMS: ${d.id} ${f.file}`); files++;
           /* the saved copy must be exactly the file sent: GitHub's id for it is the hash of its bytes */
           if (saved !== blobId(buf)) throw new Error(f.file + ' was not saved whole');
         }
         out.push({ name: f.name, file: f.file, url: PUB + encodeURIComponent(d.id) + '/' + encodeURIComponent(f.file), bytes: buf.length });
+      }
+      if (d.fileOnly) {   /* a comment-period file (Nov 20): saved at <fileOnly>/<file> for the card's non-member download; no listing changes */
+        if (!/^comment\/[A-Za-z0-9_.-]+$/.test(d.fileOnly)) throw new Error('not a comment-period folder');
+        done[d.key] = { status: 'done', doneAt: new Date().toISOString(), files: out.length }; continue;
       }
       const i = list.findIndex(p => p.id === d.id), old = i >= 0 ? list[i] : {};
       if (d.replace && i < 0) throw new Error('no product ' + d.id + ' to fix');
