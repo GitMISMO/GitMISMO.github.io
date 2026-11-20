@@ -2093,7 +2093,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T21:25:47Z',fp:'4c15c379'};
+window.__mmsBuild={at:'2026-11-20T21:45:27Z',fp:'02613935'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -5474,16 +5474,16 @@ async function rvAsk(prompt){
   const j=rvRepairJson(txt); if(!j) throw new Error('Claude’s answer couldn’t be read'); return j; }
 async function rvPool(items,n,fn){ const out=new Array(items.length); let k=0; await Promise.all(Array.from({length:Math.min(n,items.length)},async()=>{ while(k<items.length){ const i=k++; try{ out[i]=await fn(items[i],i); }catch(e){ out[i]={__err:(e&&e.message)||'failed'}; } } })); return out; }
 function rvChunks(text,max){ const out=[]; let cur=''; String(text).split(/\n/).forEach(l=>{ while(l.length>max){ out.push(l.slice(0,max)); l=l.slice(max); } if((cur+l).length>max&&cur){ out.push(cur); cur=''; } cur+=l+'\n'; }); if(cur.trim()) out.push(cur); return out; }
-async function rvAiEditor(files,ctx,progress){
+async function rvAiEditor(files,ctx,progress,start){ start=start||0;
   if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
   const all=files.map(f=>'# FILE: '+f.name+' ('+(f.kind==='excel'?'Excel workbook':f.kind==='pdf'?'PDF':'Word document')+')\n'+f.text).join('\n\n');
-  const parts=rvChunks(all,5000), use=parts.slice(0,30); let done=0;
+  const parts=rvChunks(all,5000), use=parts.slice(start,start+30); let done=0;   /* 30 parts per pass; Read the Rest carries on from where it stopped */
   const res={corrections:[],recommendations:[],questions:[],summaries:[],readiness:[]};
   const got=await rvPool(use,4,async(part,i)=>{
-    const prompt=RV_EDITOR_PERSONA+'\n\n'+RV_EDITOR_RULES+(typeof rvEditorExtra==='function'?rvEditorExtra():'')+(typeof rvFbAvoid==='function'&&rvFbAvoid('editor').length?'\n- MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('editor').join(' | '):'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nStage: '+stageDef(ctx.t.stage).name+'\nFacilitator note: '+(ctx.note||'none')+'\nThis is part '+(i+1)+' of '+use.length+'.\n'+
+    const prompt=RV_EDITOR_PERSONA+'\n\n'+RV_EDITOR_RULES+(typeof rvEditorExtra==='function'?rvEditorExtra():'')+(typeof rvFbAvoid==='function'&&rvFbAvoid('editor').length?'\n- MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('editor').join(' | '):'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nStage: '+stageDef(ctx.t.stage).name+'\nFacilitator note: '+(ctx.note||'none')+'\nThis is part '+(start+i+1)+' of '+parts.length+'.\n'+
       '\nAnswer in this compact JSON only (no other text): {"s":"one sentence on this part","r":"ready|minor|needs","c":[["exact short quote","what is wrong","the fix","category"]],"m":[["where","recommendation","suggestion"]],"q":["question for the facilitator"]}. At most 6 items in c, 2 in m, 1 in q; most important first; each string under 20 words. Answer right away.\n\nTEXT:\n'+part;
-    const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+done+' of '+use.length+' part'+(use.length===1?'':'s')+'…'); return r; });
-  let errs=0;
+    const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+(start+done)+' of '+parts.length+' part'+(parts.length===1?'':'s')+'…'); return r; });
+  let errs=0; res.parts={read:start+use.length,total:parts.length};
   got.forEach(r=>{ if(!r||r.__err){ errs++; return; }
     (r.c||[]).forEach(x=>Array.isArray(x)?res.corrections.push({where:x[0],issue:x[1],suggestion:x[2],category:x[3]}):res.corrections.push(x));
     (r.m||[]).forEach(x=>Array.isArray(x)?res.recommendations.push({where:x[0],issue:x[1],suggestion:x[2]}):res.recommendations.push(x));
@@ -5491,7 +5491,7 @@ async function rvAiEditor(files,ctx,progress){
   const seen=new Set(); res.corrections=res.corrections.filter(c=>{ const k=rvNorm(c.where)+'|'+rvNorm(c.issue).slice(0,30); if(seen.has(k)) return false; seen.add(k); return true; });
   res.summaries=res.summaries.slice(0,3);
   if(errs) res.error=errs+' of '+use.length+' parts didn’t come back from Claude; the rest are below.';
-  if(parts.length>use.length) res.note='Claude read the first '+use.length+' of '+parts.length+' parts; the software checks covered everything.';
+  if(parts.length>start+use.length) res.note='Claude read the first '+(start+use.length)+' of '+parts.length+' parts; the software checks covered everything.';
   return res;
 }
 async function rvAiIm(P,ctx,progress){
@@ -5521,7 +5521,7 @@ function rvTrim(s,n){ s=String(s==null?'':s); return s.length>n?s.slice(0,n-1)+'
 function rvBuildReport(kind,t,files,findings,ai,ctx){
   const [rk,rl]=kind==='im'?rvImReadiness(findings,ai):rvReadiness(findings,ai);
   const rep={id:kind+'-'+t.id+'-'+Date.now().toString(36),kind,ticket:t.id,wr:t.wr,name:t.name,at:new Date().toISOString(),by:S.me.name||'',files:files.map(f=>f.name),boiler:ctx.boiler,
-    readiness:rk,readinessLabel:rl,summary:((ai&&ai.summaries)||[]).join(' ')||'',aiNote:(ai&&(ai.skipped||ai.error||ai.note))||'',
+    aiParts:(ai&&ai.parts)||null,readiness:rk,readinessLabel:rl,summary:((ai&&ai.summaries)||[]).join(' ')||'',aiNote:(ai&&(ai.skipped||ai.error||ai.note))||'',
     findings:findings.slice(0,160).map(f=>({sev:f.sev,area:f.area,issue:rvTrim(f.issue,400),suggestion:rvTrim(f.suggestion,400),where:rvTrim(f.where,180),item:f.item||'',src:f.src,rule:f.rule||'',fb:f.fb||''}))};
   if(kind==='editor'){ rep.corrections=((ai&&ai.corrections)||[]).slice(0,80).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300),category:rvTrim(c.category,30)}));
     rep.recommendations=((ai&&ai.recommendations)||[]).slice(0,24).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300)}));
@@ -6020,7 +6020,7 @@ function ssNote(t,msg){ if(S.panel!==t.id) return; const box=$('#panel [data-wta
 const CP_TEXT_MAX=320;
 const CP_STAGES=['designation','gc-comment','comment','post'];
 function cpCardOf(t){ const c=t.cpCard||{}, L=t.links||{};
-  return {title:(c.title||'').trim()||(typeof cpPublic==='function'?cpPublic(t):cpName(t)), text:(c.text||'').trim(), member:L.resourceLibrary||'', nonMember:(c.nonMember||'').trim(), set:!!(c.text||'').trim()}; }
+  return {title:(c.title||'').trim()||(typeof cpPublic==='function'?cpPublic(t):cpName(t)), text:(c.text||'').trim(), member:L.resourceLibrary||(typeof cpAutoMember==='function'?cpAutoMember(t):''), nonMember:(c.nonMember||'').trim()||(typeof cpAutoNonMember==='function'?cpAutoNonMember(t):''),   /* links fill in on their own (Nov 20): the card, the website and MISMO Media use them without anyone opening the card */ set:!!(c.text||'').trim()}; }
 function cpCanEdit(t){ return S.canWrite&&!S.viewAs&&(S.isStaff||sameName(t.facilitator,S.me&&S.me.name)); }
 function cpPreview(c,t){ const d=t.dates||{};
   return '<div class="cpc"><div class="cpc-eb">Open for Comment'+(d.commentEnd?' · closes '+esc(fmtS(d.commentEnd)):'')+'</div><b class="cpc-t">'+esc(c.title)+'</b>'+
@@ -7114,7 +7114,7 @@ const HELP_TOPICS={
      'The review runs in a few minutes. You get a list of what to fix and what is only a suggestion.',
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
      'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.'],
-    ['Fixes are things IM will send back. Suggestions are up to you.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+    ['Fixes are things IM will send back. Suggestions are up to you.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
     [['Open the Review Desk','reviews']]],
   handoff:['IM, AWG and Designation: What Happens on Its Own','*',
     'Once a submission is sent to IM, nobody has to move it by hand.',
@@ -7825,6 +7825,54 @@ rvRun=function(t,kind){ _rvRunSrc(t,kind); const box=$('#modal-root .modal'), dr
       try{ got[i]=await rvSrcGet(L[i]); st.textContent='Added'; }catch(e){ st.textContent='Couldn’t get it: '+e.message; c.checked=false; } c.disabled=false; }
     else st.textContent=c.checked?'Added':'';
     apply(); }); };
+/* ---------- AI Review: Read the Rest (Nov 20, 2026) ----------
+   Claude's editorial read stops after 30 parts so a review finishes in a few minutes. For a big file the report
+   offers "Read the Rest": the MMS gets the same files again (from the work request's Files when they're there,
+   otherwise you choose them), carries on 30 parts at a time from where it stopped, and adds the new notes to the
+   same report, saving after every 30 so nothing is lost if the tab closes. */
+function rvParts(rep){ if(rep.aiParts&&rep.aiParts.total) return rep.aiParts; const m=String(rep.aiNote||'').match(/read the first (\d+) of (\d+) parts/i); return m?{read:+m[1],total:+m[2]}:null; }
+function rvRestLeft(rep){ const p=rvParts(rep); return rep.kind==='editor'&&p&&p.read<p.total?p.total-p.read:0; }
+const _rvShowRest=rvShow;
+rvShow=function(rep){ _rvShowRest(rep); const left=rvRestLeft(rep), dl=$('#modal-root #rvdl'); if(!left||!dl||$('#modal-root #rvrest')) return;
+  dl.insertAdjacentHTML('beforebegin','<button class="btn pri" id="rvrest" type="button" title="Claude reads the remaining parts and adds the notes to this report">Read the Rest ('+left+' part'+(left===1?'':'s')+' left)</button>');
+  $('#modal-root #rvrest').onclick=()=>rvReadRest(rep); };
+async function rvRestFiles(rep,t,say){ const out=[], missing=[]; const D=(typeof ssFor==='function'&&ssFor(t))||{files:[]};
+  for(const n of rep.files||[]){ const f=(D.files||[]).filter(x=>x.p&&!x.gone).find(x=>x.n===n||String(x.p).split('/').pop()===n);
+    if(f&&typeof rvSrcGet==='function'&&S.notify&&S.notify.docFlowUrl){ try{ say('Getting '+n+' from the work request’s files…'); out.push(await rvSrcGet(f)); continue; }catch(e){} }
+    missing.push(n); }
+  if(!missing.length) return out;
+  const picked=await new Promise(res=>{ const root=$('#modal-root'); const box=document.createElement('div'); box.className='modal'; box.style.zIndex=60;
+    box.innerHTML='<div class="box"><header><h3>Choose the Files Again</h3><p>To read the rest, the review needs the same file'+(missing.length===1?'':'s')+' it read before:</p></header><div class="bd"><ul>'+missing.map(n=>'<li>'+esc(n)+'</li>').join('')+'</ul><input type="file" id="rvrestf" multiple accept=".docx,.xlsx,.xlsm,.pdf"></div><footer><button class="btn" type="button" data-x>Cancel</button><button class="btn pri" type="button" data-go>Read the Rest</button></footer></div>';
+    root.appendChild(box); $('[data-x]',box).onclick=()=>{ box.remove(); res(null); }; $('[data-go]',box).onclick=()=>{ const L=[...$('#rvrestf',box).files]; box.remove(); res(L); }; });
+  if(!picked) return null;
+  for(const n of missing){ const f=picked.find(x=>x.name===n)||picked.find(x=>rvNorm(x.name)===rvNorm(n)); if(!f) throw new Error(n+' wasn’t chosen'); out.push(f); }
+  return (rep.files||[]).map(n=>out.find(f=>f.name===n||String(f.name)===String(n).split('/').pop())||out.find(f=>rvNorm(f.name)===rvNorm(n))).filter(Boolean); }
+async function rvReadRest(rep){
+  const t=S.tickets[rep.ticket]; if(!t) return toast('The work request isn’t loaded.'); if(!S.sample) return toast('Claude isn’t reachable from here.');
+  const btn=$('#modal-root #rvrest'), host=$('#modal-root .rv-rep'); const bar=document.createElement('div'); bar.className='banner info rv-restbar'; host&&host.prepend(bar);
+  const say=(m,cls)=>{ bar.className='banner '+(cls||'info')+' rv-restbar'; bar.innerHTML=(cls?'':'<span class="spin"></span> ')+esc(m); };
+  if(btn) btn.disabled=true;
+  try{
+    const files=await rvRestFiles(rep,t,say); if(!files){ bar.remove(); if(btn) btn.disabled=false; return; }
+    if(files.length!==(rep.files||[]).length) throw new Error('not all the files could be found');
+    say('Reading the files…'); const read=[]; for(const f of files) read.push(await rvReadFile(f));
+    let p=rvParts(rep), cur=clone(rep); const ctx={t,boiler:rep.boiler,note:''};
+    while(p&&p.read<p.total){
+      const ai=await rvAiEditor(read,ctx,m=>say(m+' Keep this tab open; notes are saved after every 30 parts.'),p.read);
+      if(!ai||ai.skipped) throw new Error((ai&&ai.skipped)||'Claude didn’t answer');
+      const seen=new Set((cur.corrections||[]).map(c=>rvNorm(c.where)+'|'+rvNorm(c.issue).slice(0,30)));
+      cur.corrections=[...(cur.corrections||[]),...(ai.corrections||[]).filter(c=>{ const k=rvNorm(c.where)+'|'+rvNorm(c.issue).slice(0,30); if(seen.has(k)) return false; seen.add(k); return true; }).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300),category:rvTrim(c.category||'',40)}))].slice(0,400);
+      cur.recommendations=[...(cur.recommendations||[]),...(ai.recommendations||[]).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300)}))].slice(0,120);
+      cur.questions=[...(cur.questions||[]),...(ai.questions||[]).map(q=>rvTrim(q,300))].slice(0,40);
+      p={read:ai.parts.read,total:ai.parts.total}; cur.aiParts=p;
+      cur.aiNote=String(cur.aiNote||'').replace(/Claude read the first \d+ of \d+ parts; the software checks covered everything\.\s*/i,'').trim();
+      cur.aiNote=((p.read<p.total?'Claude read the first '+p.read+' of '+p.total+' parts; the software checks covered everything. ':'Claude read all '+p.total+' parts. ')+cur.aiNote+(ai.error?' '+ai.error:'')).trim();
+      cur.restAt=new Date().toISOString(); cur.restBy=S.me.name||'';
+      await rvSave(t,cur); }
+    const x=clone(S.tickets[t.id]); hist(x,'AI Review: Claude read the rest of the files ('+p.total+' parts in all)'); await saveTicket(x,'Review saved');
+    rvShow(S.reviews[cur.id]||cur); toast('Claude read all '+p.total+' parts. The new notes are in the report.');
+  }catch(e){ say('Stopped: '+((e&&e.message)||'something went wrong')+'. What was read so far is saved; click Read the Rest to carry on.','bad'); if(btn) btn.disabled=false; }
+}
 /* ---------- Work request links that go nowhere (Nov 20, 2026) ----------
    About 250 links brought over from Smartsheet hold only a name ("Closing Instructions Development Workgroup (DWG)")
    instead of a web address, so clicking them did nothing. Each such link now opens: the same workgroup's address
