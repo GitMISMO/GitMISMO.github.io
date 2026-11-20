@@ -414,6 +414,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <button type="button" data-hq="home" aria-current="page" title="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Home</span><b class="nb" id="nb-todo" hidden></b></button>
     
     <button type="button" data-hq="pip" title="Payment in Process"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Payment in Process</span><b class="nb" id="nb-pip"></b></button>
+    <button type="button" data-hq="aptify" title="Aptify Updates"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6"/><path d="M15.5 11l2 2 4-4"/></svg><span>Aptify Updates</span><b class="nb" id="nb-apt" hidden></b></button>
     <button type="button" data-hq="cases" title="Case Management"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Case Management</span></button>
     <button type="button" data-hq="done" title="Completed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Completed</span></button>
     <button type="button" data-hq="help" title="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2v.1"/></svg><span>Help</span></button>
@@ -479,6 +480,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     </div>
     <div class="panel" style="margin-top:16px"><div class="ph"><h2>Paid in the Last 60 Days</h2><span class="hint">newest first</span></div><div class="rows" id="pip-paid"></div></div>
   </section>
+  <section class="view" id="v-aptify" hidden>
+    <div class="vhead"><div><h1>Aptify Updates</h1><div class="vsub">People the MISMO team marked in Member 360 as no longer with their company. Update each one in Aptify, then select Done in Aptify.</div></div></div>
+    <div class="panel"><div class="ph"><h2>To Update in Aptify</h2><span class="hint" id="apt-h"></span></div><div class="rows" id="apt-todo"></div></div>
+    <div class="panel" style="margin-top:16px"><div class="ph"><h2>Done in the Last 60 Days</h2><span class="hint">newest first</span></div><div class="rows" id="apt-done"></div></div>
+  </section>
 
   <section class="view" id="v-cases" hidden>
     <div class="vhead"><div><h1>Case Management</h1><div class="vsub" id="cases-sub"></div></div></div>
@@ -520,15 +526,17 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   window.__deskUndo=async f=>change(P=>{const it=P.items.find(x=>x.entry===f.entry);if(it){it.undone=true;it.undoneAt=new Date().toISOString();it.undoneBy=window.__deskMe().name;}});
   /* Payment in Process: the invoices the team adds, kept in desk/invoices (never deleted: Entered by Mistake only marks one) (Jonna, Nov 2, 2026) */
   window.__deskInv=async fn=>{for(let i=0;i<4;i++){const g=await get("invoices");const P=(g.data&&Array.isArray(g.data.items))?g.data:{items:[]};fn(P);P.writtenAt=new Date().toISOString();const r=await put("invoices",P,g.sha);if(r.ok)return P;if(r.status!==409)throw new Error("save "+r.status);}throw new Error("busy");};
-  async function load(){say("Opening the Membership Desk…","Loading what's waiting and what's been set up.");
-    const [T,S,C,Dn,I]=await Promise.all(["todos","square","cases","done","invoices"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
+  /* Aptify Updates: contacts Member 360 marks as no longer with their company come in on todos (aptify); Done in Aptify marks are kept in desk/aptify, never deleted (Undo only marks one undone) (Jonna, Nov 20, 2026) */
+window.__deskApt=async fn=>{for(let i=0;i<4;i++){const g=await get("aptify");const P=(g.data&&Array.isArray(g.data.items))?g.data:{items:[]};fn(P);P.writtenAt=new Date().toISOString();const r=await put("aptify",P,g.sha);if(r.ok)return P;if(r.status!==409)throw new Error("save "+r.status)}throw new Error("busy")};
+async function load(){say("Opening the Membership Desk…","Loading what's waiting and what's been set up.");
+    const [T,S,C,Dn,I,A]=await Promise.all(["todos","square","cases","done","invoices","aptify"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
     if(!T.data&&!S.data&&T.err&&S.err){say("The Membership Desk couldn't load","Please refresh. If it keeps happening, email Jonna.");return;}
     const t=T.data||{},s=S.data||{},items=((Dn.data&&Dn.data.items)||[]).filter(x=>!x.undone),doneIds=new Set(items.map(x=>x.id));
     /* a set-up marked done before it had an Aptify ID still counts once the ID arrives (Jonna, Nov 7, 2026) */
     const doneCid=new Set(items.filter(x=>x.cid).map(x=>String(x.id||"").split("-")[0]+"|"+x.cid));
     const keep=(k,L)=>(L||[]).map(x=>Object.assign({},x,{id:idOf(k,x)})).filter(x=>!doneIds.has(x.id)&&!(x.cid&&doneCid.has(PRE[k]+"|"+x.cid)));
     const tt=t.todo||{},td=t.done||{};
-    window.DESK={asOf:today(),inv:((I&&I.data&&I.data.items)||[]),pip:t.pip||[],invPaid:t.invPaid||{},
+    window.DESK={asOf:today(),inv:((I&&I.data&&I.data.items)||[]),pip:t.pip||[],apt:{list:t.aptify||[],done:((A&&A.data&&A.data.items)||[])},invPaid:t.invPaid||{},
       todo:{square:keep("square",s.pending),members:keep("members",tt.members),free:keep("free",tt.free),iif:keep("iif",tt.iif)},
       done:{square:s.done||[],squareWaitingPay:s.waitingPay||[],iif:td.iif||[],members:td.members||[],freeActive:td.freeActive||0},
       cases:C.data||{asOf:today(),total:0,months:{},topicsY:{},channelY:{},byY:{},sameDay:0,closed:0,list:{T:[],C:[],B:[],R:[]}},
@@ -954,6 +962,7 @@ const HELP=[
    ["Record the IDs","Enter the Aptify Company ID and select Mark Set Up."],
    ["What Happens Next","Member 360's IIF numbers and member counts pick them up on the next Aptify pull."]],
   notes:[]},
+  {id:"aptify",k:"#b79cff",name:"Aptify Updates",lead:"When someone on the MISMO team learns a person has left a company, they mark that contact in Member 360 and it comes here, so the person can be updated in Aptify too.",steps:[["Update Aptify","Open Aptify Updates. Each one shows the person, their title and email, and the company with its Aptify ID. Update the person in Aptify."],["Select Done in Aptify","Once Aptify is updated, select Done in Aptify. It moves to Done in the Last 60 Days."],["Undo","Marked one by mistake? Select Undo next to it under Done and it goes back on the list."]]},
   {id:"pip",k:"#f0b94a",name:"Payment in Process",lead:"Invoices that have been sent and not paid yet, with Lenders and Non-Lenders apart, so the membership team, Amy and Kelly all see what's still owed.",
   steps:[["Add an Invoice","On Payment in Process, or at the top of Home, select Add an Invoice and enter the company, Lender or Non-Lender, what it's for, the amount and the invoice date. The Aptify Company ID is optional, but with it the payment is tied for certain."],
    ["Renewals Come In on Their Own","Non-Lender renewals that Member 360 has at Invoiced or Payment in Process show on the Non-Lender list by themselves, marked from Member 360. Don't enter those."],
@@ -1076,13 +1085,34 @@ $("pip-add").addEventListener("click",()=>openInv(null));
 
 /* ---------- pages ---------- */
 function go(tab){if(tab==="todo"){if($("v-home").hidden)show("home");setTimeout(()=>{const w=$("work");if(w)w.scrollIntoView({behavior:RED()?"auto":"smooth",block:"start"});},80);return;}const b=document.querySelector('.hq nav button[data-hq="'+tab+'"]');if(b)b.click();}
+/* ---------- Aptify Updates (Jonna, Nov 20, 2026) ---------- */
+function aptRows(){const A=(window.DESK||{}).apt||{list:[],done:[]},dn=new Set((A.done||[]).filter(x=>!x.undone).map(x=>x.id));return (A.list||[]).filter(x=>!dn.has(x.id)).sort((a,b)=>String(a.at||"").localeCompare(String(b.at||"")))}
+function aptBadge(){const n=aptRows().length,nb=$("nb-apt");if(nb){nb.textContent=n||"";nb.hidden=!n}}
+function aptToast(m){$("toast-u").hidden=true;$("toast-t").textContent=m;$("toast").classList.add("on");setTimeout(()=>$("toast").classList.remove("on"),6000)}
+function aptRow(x,done){const who=[x.title,x.email].filter(Boolean).join(" · ");
+  const when=done?"done "+fmt(String(done.at).slice(0,10))+(done.byName?" by "+String(done.byName).split(" ")[0]:""):(x.at?"marked "+fmt(x.at):"")+(x.by?" by "+String(x.by).split(" ")[0]:"");
+  const sub=[(x.org||"")+(x.cid?" · Aptify ID "+x.cid:""),who,when].filter(Boolean).join(" · ");
+  const b=h("button",{type:"button",class:"btn"+(done?" ghost":""),style:"margin:0;padding:6px 12px;font-size:12.5px;white-space:nowrap",onclick:()=>aptMark(x,!done)},done?"Undo":"Done in Aptify");
+  return h("div",{class:"row r2",style:"--k:"+(done?"#5fd39a":"#b79cff")},h("span",{class:"dot"}),h("span",{class:"nm",title:x.name||""},x.name||x.email||"No name",h("small",null,sub)),b)}
+function renderApt(){const A=(window.DESK||{}).apt||{list:[],done:[]},L=aptRows(),td=$("apt-todo"),dd=$("apt-done");if(!td||!dd)return;td.textContent="";dd.textContent="";
+  $("apt-h").textContent=L.length?L.length+" waiting · oldest first":"";
+  if(L.length)L.forEach(x=>td.appendChild(aptRow(x)));else td.appendChild(h("div",{class:"hint",style:"padding:14px 16px"},"Nothing to update in Aptify right now."));
+  const cut=new Date(Date.now()-60*864e5).toISOString(),byId={};(A.list||[]).forEach(x=>{byId[x.id]=x});
+  const D2=(A.done||[]).filter(x=>!x.undone&&String(x.at)>=cut).sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+  if(D2.length)D2.forEach(d=>dd.appendChild(aptRow(byId[d.id]||{id:d.id,name:d.name,org:d.org,cid:d.cid,title:d.title,email:d.email},d)));else dd.appendChild(h("div",{class:"hint",style:"padding:14px 16px"},"None yet."));
+  aptBadge()}
+async function aptMark(x,on){const D=window.DESK;if(!D)return;D.apt=D.apt||{list:[],done:[]};const A=D.apt,me=(window.__deskMe&&window.__deskMe())||{};
+  if(on){const f={id:x.id,name:x.name||"",org:x.org||"",cid:x.cid||"",title:x.title||"",email:x.email||"",at:new Date().toISOString(),by:me.email||"",byName:me.name||""};A.done.push(f);renderApt();
+    try{await window.__deskApt(P=>{P.items.push(f)});aptToast((x.name||"Contact")+" marked done in Aptify")}catch(e){console.error("apt save",e);A.done.splice(A.done.indexOf(f),1);renderApt();aptToast("That didn't save. Please try again.")}}
+  else{const L=A.done.filter(d=>d.id===x.id&&!d.undone);if(!L.length)return;L.forEach(d=>{d.undone=true});renderApt();
+    try{await window.__deskApt(P=>{P.items.filter(d=>d.id===x.id&&!d.undone).forEach(d=>{d.undone=true;d.undoneAt=new Date().toISOString();d.undoneBy=me.name||""})});aptToast((x.name||"Contact")+" is back on the list")}catch(e){console.error("apt undo",e);L.forEach(d=>{d.undone=false});renderApt();aptToast("That didn't save. Please try again.")}}}
 function show(tab){document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>{if(b.dataset.hq===tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
  document.querySelectorAll("main .view").forEach(v=>v.hidden=v.id!=="v-"+tab);closePane();
- ({home:renderHome,todo:renderHome,pip:renderPip,done:renderDone,cases:renderCases,help:renderHelp})[tab]();window.scrollTo(0,0);}
+ ({home:renderHome,todo:renderHome,pip:renderPip,aptify:renderApt,done:renderDone,cases:renderCases,help:renderHelp})[tab]();window.scrollTo(0,0);}
 document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.hq)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 function renderAll(){const t=(document.querySelector(".hq nav button[aria-current]")||{dataset:{hq:"home"}}).dataset.hq;renderHome();if(t!=="home")show(t);}
-$("asof").textContent="As of "+fmt(TODAY);
+$("asof").textContent="As of "+fmt(TODAY);try{aptBadge()}catch(e){console.error("apt badge",e)}
 window.__desk={todo:()=>TODO,finished,open:openPane,go};
 renderHome();
 /* a link from an email opens the set-up straight away: #todo/<id> */
