@@ -2020,6 +2020,9 @@ p,.sub,.lede{text-wrap:pretty}
 
 /* Comment Period card: Draft with AI (Nov 20) */
 .cp-draft{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12.5px}
+
+/* Comment Period card: file for comment (Nov 20) */
+.cpf-row{margin-top:10px;font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2093,7 +2096,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T21:45:27Z',fp:'02613935'};
+window.__mmsBuild={at:'2026-11-20T21:54:24Z',fp:'1c282c22'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7135,7 +7138,7 @@ const HELP_TOPICS={
     []],
   comments:['Comment Periods and Comments','facilitator staff website gov',
     'Comment Periods shows what is open for public comment, what just closed and what is approved but not posted yet.',
-    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Draft with AI writes a first version of the one or two sentences from the work request, its reviews and its files; edit it or keep it. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
+    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Choose the File for Comment picks the file that goes out for comment from the work request’s Files; the MMS posts it as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a first version of the one or two sentences from the work request, its reviews and its files; edit it or keep it. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
      'Members click Member Access on the card and open the work product in the Resource Library. They do not use the MMS.',
      'Non-members click Non-Member Access, sign the Proposed (open for comment) license form, and then get the download.',
      'Still needed on the card lists anything missing: the card text, the Resource Library link or the non-member download.',
@@ -7873,6 +7876,60 @@ async function rvReadRest(rep){
     rvShow(S.reviews[cur.id]||cur); toast('Claude read all '+p.total+' parts. The new notes are in the report.');
   }catch(e){ say('Stopped: '+((e&&e.message)||'something went wrong')+'. What was read so far is saved; click Read the Rest to carry on.','bad'); if(btn) btn.disabled=false; }
 }
+/* ---------- The comment-period file, and the Resource Library notice (Nov 20, 2026) ----------
+   On the Comment Period Card, the facilitator (or staff) ticks the file that goes out for comment from the work
+   request's Files. The MMS posts it on resources.mismo.org (work-products/comment/<WR>/<file>, through the MMS Robot,
+   checked like every website file), and that address becomes the card's non-member download everywhere: the card,
+   the website's Open for Comment list and MISMO Media's announcement request.
+   Once the work is at Comment Period (Governance approved it for comment) and the file is chosen, the Website Admin
+   (Vanessa) gets one email, copying Jonna: make the Resource Library entry with that file, then put its link in
+   the MMS (Posted: Set Comment Dates, or the Links tab). It goes once; not again once the link is in. */
+const CPF_BASE='https://resources.mismo.org/work-products/comment/';
+const CPF_OK=/\.(docx|pdf|xlsx|xlsm|zip|pptx|xsd|json|txt)$/i;
+function cpfUrl(t,name){ return CPF_BASE+encodeURIComponent(String(t.wr||t.id).replace(/[^A-Za-z0-9_.-]/g,'_'))+'/'+encodeURIComponent(name); }
+function cpfFiles(t){ ssEnsure(); const D=ssFor(t); return ((D&&D.files)||[]).filter(f=>f.p&&!f.gone&&CPF_OK.test(f.n||f.p)).slice().sort((a,b)=>String(b.u||'').localeCompare(String(a.u||''))).slice(0,40); }
+/* the posted file is the card's non-member download unless someone typed one */
+const _cpAutoNonMemberF=cpAutoNonMember;
+cpAutoNonMember=function(t){ const F=t.cpFile; if(F&&F.url&&!F.off) return F.url; return _cpAutoNonMemberF(t); };
+const _cpSectionF=cpSection;
+cpSection=function(t){ const h=_cpSectionF(t), F=t.cpFile; const can=cpCanEdit(t);
+  const row='<div class="cpf-row"><b>File for Comment:</b> '+(F&&F.url?'<a href="'+esc(F.url)+'" target="_blank" rel="noopener">'+esc(F.name)+'</a> <span class="muted">· posted '+esc(fmtS(String(F.at||'').slice(0,10)))+(F.by?' by '+esc(F.by):'')+'; it’s the non-member download</span>':'<span class="muted">not chosen yet. Pick the file that goes out for comment; it becomes the non-member download and the Website Admin is asked to make the Resource Library entry.</span>')+
+    (can?' <button type="button" class="btn sm'+(F&&F.url?'':' pri')+'" data-cpfile="'+esc(t.id)+'">'+(F&&F.url?'Change the File':'Choose the File for Comment')+'</button>':'')+'</div>';
+  return h.replace(/<\/div>\s*$/,row+'</div>'); };
+async function cpfChoose(t){
+  const L=cpfFiles(t); if(!L.length) return toast('No files in this work request’s folder yet. Add the comment-period file on the Files tab first.');
+  const v=await modal({title:'File for Comment',text:esc(t.wr)+' · the file non-members download after they sign the Proposed (open for comment) license form',ok:'Post This File',
+    body:'<div class="rv-src-l">'+L.map((f,i)=>'<label class="rv-src-f"><input type="radio" name="cpf" value="'+i+'"'+(i===0?' checked':'')+'><span class="ss-i ss-'+ssKind(f.n)+'">'+ssIc(ssKind(f.n))+'</span><span class="rv-src-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',ssTag(f.n)||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span></label>').join('')+'</div>'});
+  if(!v) return; const f=L[+v.cpf]; if(!f) return;
+  wpSay('Getting '+f.n+' from the work request’s files…');
+  try{
+    const file=await rvSrcGet(f); const u8=new Uint8Array(await file.arrayBuffer()); if(u8.length>20*1048576) throw new Error('it’s over 20 MB; post it on the website by hand');
+    const zb=wpZipBad(file.name,u8); if(zb) throw new Error(file.name+' '+zb);
+    const name=wpFileName(file.name), key=Date.now().toString(36)+Math.random().toString(36).slice(2,6), n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
+    for(let i=0;i<n;i++){ wpSay('Posting '+f.n+': '+Math.round(i/n*100)+'%. Keep this tab open.'); await wpPut('wpup-'+key+'-0-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
+    await write('wpqueue',key,{key,ticket:t.id,id:'comment',fileOnly:'comment/'+String(t.wr||t.id).replace(/[^A-Za-z0-9_.-]/g,'_'),product:{},files:[{name:f.n,file:name,bytes:u8.length,chunks:n}],status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''});
+    const x=clone(S.tickets[t.id]||t), b=clone(x); x.cpFile={name:f.n,file:name,path:f.p,url:cpfUrl(t,name),bytes:u8.length,at:new Date().toISOString(),by:(S.me&&S.me.name)||''};
+    hist(x,'File for comment chosen: '+f.n+' (posted as the non-member download)'); await saveTicket(x,'File posted',b);
+    wpSay('Posted. It’s the non-member download within half an hour.','ok');
+    try{ await cpfNotice(S.tickets[t.id]||x); }catch(e){}
+    if(typeof publishFeed==='function') try{ publishFeed(); }catch(e){}
+  }catch(e){ wpSay('The file didn’t post ('+e.message+').','bad'); }
+}
+document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-cpfile]'); if(!b) return; e.preventDefault(); if(S.viewAs) return; const t=S.tickets[b.dataset.cpfile]; if(t) cpfChoose(t); });
+/* the Resource Library notice: once, when the work is at Comment Period and the file is chosen, until the link is in */
+function cpfNeedsNotice(t){ return t&&t.state==='active'&&t.stage==='comment'&&t.cpFile&&t.cpFile.url&&!(t.links&&t.links.resourceLibrary)&&!t.rlNoticeAt&&!t.rides; }
+async function cpfNotice(t){ if(!cpfNeedsNotice(t)||!S.canWrite||!S.isStaff&&!sameName(t.facilitator,S.me&&S.me.name)) return false;
+  const to=peopleFor('website',t).map(p=>p.email).filter(Boolean); if(!to.length) return false;
+  const me=personByName('Jonna Critchley'), cc=[(me&&me.email)||'jcritchley@mba.org'].filter(e=>!to.includes(e));
+  const c=cpCardOf(t), F=t.cpFile, d=t.dates||{}; const link='https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id);
+  const body='Governance approved '+c.title+' ('+t.wr+') for public comment, and the file for comment is ready. Please make its Resource Library entry and put the link in the MMS.\n\n'+
+    'Title: '+c.title+'\nFile: '+F.name+'\n  '+F.url+(F.path&&typeof ssUrl==='function'?'\n  In SharePoint: '+ssUrl({p:F.path}):'')+'\n'+(c.text?'Description (from the Comment Period card): '+c.text+'\n':'')+'Workgroup: '+(t.workgroup||'')+'\nFacilitator: '+(t.facilitator||'')+'\n'+(d.commentStart?'Comment period: '+fmt(d.commentStart)+' to '+fmt(d.commentEnd||'')+'\n':'')+
+    '\nThen open the work request and paste the entry’s link in Resource Library (Posted: Set Comment Dates, or the Links tab): '+link+'\n\nMembers open the comment-period file from that link on the website’s Open for Comment card.';
+  await queueMail({to,cc,subject:'Resource Library entry needed: '+t.wr+' '+c.title+' (open for comment)',body,ticket:t.id,kind:'stage',key:t.id+'-rlneeded'});
+  const x=clone(S.tickets[t.id]||t), b=clone(x); x.rlNoticeAt=new Date().toISOString(); hist(x,'Website Admin asked to make the Resource Library entry'); await saveTicket(x,'Notice sent',b); return true; }
+/* the automatic steps (staff tabs and the MMS Robot) pick up work that reached Comment Period after the file was chosen */
+const _runAutoCPF=runAutomations;
+runAutomations=async function(){ await _runAutoCPF(); try{ for(const t of allTickets()) if(cpfNeedsNotice(t)) await cpfNotice(t); }catch(e){} };
 /* ---------- Work request links that go nowhere (Nov 20, 2026) ----------
    About 250 links brought over from Smartsheet hold only a name ("Closing Instructions Development Workgroup (DWG)")
    instead of a web address, so clicking them did nothing. Each such link now opens: the same workgroup's address
