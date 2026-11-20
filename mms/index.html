@@ -2017,6 +2017,9 @@ p,.sub,.lede{text-wrap:pretty}
 .rv-src-s{font-size:11.5px;color:var(--muted);flex:none}
 .rv-src-or{font-size:12px;margin:8px 0 2px;text-align:center}
 .rv-src-f .ss-i svg{width:18px;height:18px}
+
+/* Comment Period card: Draft with AI (Nov 20) */
+.cp-draft{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12.5px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2090,7 +2093,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T21:08:57Z',fp:'4db9b37d'};
+window.__mmsBuild={at:'2026-11-20T21:25:47Z',fp:'4c15c379'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -6030,9 +6033,9 @@ function cpSection(t){ const c=cpCardOf(t);
 async function cpEdit(t){ const c=cpCardOf(t), raw=t.cpCard||{};
   const v=await modal({title:'Comment Period Card',text:esc(t.wr)+' · what the website’s Open for Comment card says',ok:'Save the Card',body:
     fld('Card Title',inp('title',raw.title||'',cpName(t)),'Leave blank to use '+esc(cpName(t))+'.')+
-    fld('What the Card Says','<textarea name="text" rows="4" maxlength="'+CP_TEXT_MAX+'" placeholder="One or two sentences: what it is, who it’s for, and what reviewers should look at.">'+esc(raw.text||'')+'</textarea>','Up to '+CP_TEXT_MAX+' characters. Plain sentences; no links.')+
-    fld('Member Access: Resource Library Link',inp('member',c.member,'https://collaborate.mismo.org/…'),'Members open the work product here.')+
-    fld('Non-Member Access: Download Link',inp('nonmember',raw.nonMember||'','https://…'),'The file non-members get after they sign the Proposed (open for comment) license form.'),
+    fld('What the Card Says','<textarea name="text" rows="4" maxlength="'+CP_TEXT_MAX+'" placeholder="One or two sentences: what it is, who it’s for, and what reviewers should look at.">'+esc(raw.text||'')+'</textarea>'+(S.sample?'<div class="cp-draft"><button type="button" class="btn sm" data-cpdraft="'+esc(t.id)+'">'+(raw.text?'Draft Again with AI':'Draft with AI')+'</button><span class="muted" data-cpdraftmsg></span></div>':''),'Up to '+CP_TEXT_MAX+' characters. Plain sentences; no links. AI drafts from the work request, its reviews and its files; edit it or keep it.')+
+    fld('Member Access: Resource Library Link',inp('member',c.member||cpAutoMember(t),'https://collaborate.mismo.org/…'),(c.member?'':cpAutoMember(t)?'Filled in from the work request. ':'')+'Members open the work product here.')+
+    fld('Non-Member Access: Download Link',inp('nonmember',raw.nonMember||cpAutoNonMember(t),'https://…'),(!raw.nonMember&&cpAutoNonMember(t)?'Filled in from the file posted on the website. ':'')+'The file non-members get after they sign the Proposed (open for comment) license form.'),
     validate:x=>{ for(const k of ['member','nonmember']){ const u=(x[k]||'').trim(); if(u&&!/^https:\/\//i.test(u)) return 'Links start with https://'; } return ''; }});
   if(!v) return; const x=clone(t), b=clone(t);
   x.cpCard={title:(v.title||'').trim(),text:(v.text||'').trim().slice(0,CP_TEXT_MAX),nonMember:(v.nonmember||'').trim(),by:S.me.name||'',at:today()};
@@ -6161,6 +6164,32 @@ renderPanel=function(){ const P=$('#panel'), id=S.panel, same=!!(P&&id&&P.datase
   if(id&&S.panel===id&&py>0){ const P2=$('#panel'); if(P2) P2.scrollTop=py; }
   if(id&&S.panel===id&&y>0){ const pb=$('.pb',$('#panel')); if(pb){ pb.scrollTop=y; requestAnimationFrame(()=>{ if(S.panel===id&&pb.isConnected&&pb.scrollTop<y) pb.scrollTop=y; }); } }
   if(window.scrollY!==wy) window.scrollTo(0,wy); };
+
+/* ---------- AI first draft and links filled in (Nov 20, 2026) ----------
+   "Draft with AI" writes the one or two sentences from what the MMS knows about the work request (name, workgroup,
+   summary, type, impact, the latest AI Review and the designation notes); the facilitator edits it or keeps it.
+   The two links fill in on their own when the MMS already has them: the Resource Library link from the work
+   request's links or its website listing, and the non-member download from the file posted on Find a Work Product. */
+function cpAutoMember(t){ const L=t.links||{}, W=t.wp||{}; const u=[L.resourceLibrary,L.crResourceLibrary,W.libraryUrl].find(x=>/^https:\/\//i.test(String(x||'')));
+  return u||''; }
+function cpAutoNonMember(t){ const W=t.wp||{}; if(W.off||W.membersOnly) return ''; const c=(typeof wpCat!=='undefined'&&wpCat&&wpCat.products)||[]; const p=W.id&&c.find(x=>x.id===W.id); const f=p&&(p.files||[])[0]; return (f&&f.url)||''; }
+if(typeof wpCatalog==='function') setTimeout(()=>{ try{ wpCatalog(); }catch(e){} },4000);   /* so the posted file is known when the card opens */
+function cpDraftFacts(t){ const rv=(typeof rvFor==='function'?rvFor(t):[]).find(r=>r.kind==='editor'); const ai=((t.ai&&t.ai.rounds)||[]).slice(-1)[0];
+  const f=(typeof ssFor==='function'&&ssFor(t)&&ssFor(t).files||[]).slice(-6).map(x=>x.n);
+  return ['Work request: '+t.wr+' '+t.name,'Public name: '+((typeof cpPublic==='function'?cpPublic(t):'')||t.productPageName||''),'Workgroup: '+(t.workgroup||''),'Classification: '+(t.classification||''),
+    'Type of work: '+[t.workType,t.reqType].filter(Boolean).join(', '),'Summary: '+(t.summary||(t.wp&&t.wp.summary)||''),'Impact: '+(Array.isArray(t.impact)?t.impact.join(', '):String(t.impact||'')),
+    'Designation notes: '+((t.designation&&t.designation.notes)||''),'Latest AI Review summary: '+((rv&&rv.summary)||(ai&&ai.summary)||''),'Files: '+f.join('; '),
+    'Comment period: '+((t.dates&&t.dates.commentStart)||'')+' to '+((t.dates&&t.dates.commentEnd)||'')].filter(x=>!/: *$/.test(x)).join('\n'); }
+async function cpDraft(t){ if(!S.sample) throw new Error('Claude isn’t reachable from here');
+  const prompt='Write the text for a MISMO website "Open for Comment" card. One or two plain sentences, at most '+(CP_TEXT_MAX-20)+' characters in all: what the work product is, who it is for, and what reviewers should look at. MISMO voice: clear, factual, no hype, no links, no dates, no "we", American spelling. Use only the facts below; do not invent features or numbers. Do not mention AI Review findings or edits.\n\n'+cpDraftFacts(t)+'\n\nAnswer in JSON only: {"text":"..."}';
+  const r=await S.sample.json(prompt,{modelTier:'complex'}); let x=(r&&(r.text||(r.content&&r.content.text)))||(typeof r==='string'?r:''); if(typeof x!=='string') x='';
+  x=x.replace(/\s+/g,' ').trim().replace(/(https?:\/\/|www\.)\S*[^\s.,;:!?)]/gi,'\u0001'); x=((x.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g)||[x]).filter(z=>!z.includes('\u0001')).join('').trim())||x.replace(/\u0001/g,'').trim();   /* a sentence with a web address is dropped */ if(x.length>CP_TEXT_MAX){ const cut=x.slice(0,CP_TEXT_MAX); x=cut.slice(0,Math.max(cut.lastIndexOf('. ')+1,cut.lastIndexOf(' '))).trim(); }
+  if(!x) throw new Error('no draft came back'); return x; }
+document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-cpdraft]'); if(!b) return; e.preventDefault(); const t=S.tickets[b.dataset.cpdraft]; if(!t) return;
+  const box=b.closest('.modal')||document, ta=box.querySelector('textarea[name=text]'), msg=box.querySelector('[data-cpdraftmsg]'); b.disabled=true; if(msg) msg.textContent=' Drafting…';
+  try{ const x=await cpDraft(t); if(ta){ ta.value=x; ta.dispatchEvent(new Event('input',{bubbles:true})); ta.focus(); } if(msg) msg.textContent=' Drafted. Edit it or keep it.'; b.textContent='Draft Again with AI'; }
+  catch(err){ if(msg) msg.textContent=' Couldn’t draft it ('+err.message+'). Write it yourself or try again.'; }
+  b.disabled=false; });
 
 /* ---------- Work products on the website (Nov 18, 2026) ----------
    The MMS is the one place work products come from. Mark Published also lists the work product on the website's
@@ -7106,7 +7135,7 @@ const HELP_TOPICS={
     []],
   comments:['Comment Periods and Comments','facilitator staff website gov',
     'Comment Periods shows what is open for public comment, what just closed and what is approved but not posted yet.',
-    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card.',
+    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Draft with AI writes a first version of the one or two sentences from the work request, its reviews and its files; edit it or keep it. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
      'Members click Member Access on the card and open the work product in the Resource Library. They do not use the MMS.',
      'Non-members click Non-Member Access, sign the Proposed (open for comment) license form, and then get the download.',
      'Still needed on the card lists anything missing: the card text, the Resource Library link or the non-member download.',
