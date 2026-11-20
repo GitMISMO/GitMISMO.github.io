@@ -28,6 +28,9 @@ const pub = t => clean(t.cpCard && t.cpCard.title) || clean(t.wp && t.wp.title) 
   clean(t.name).replace(/\s*\((existing|new)[^)]*\)/gi, '').replace(/\s*\([^)]*page\)/gi, '').trim();
 
 const media = await data('media'), cfg = await data('config');
+/* the file posted on Find a Work Product, for the non-member link when nobody typed one (Nov 20) */
+let catalog = []; try { const r = await fetch(process.env.WP_CATALOG || 'https://resources.mismo.org/work-products/catalog.json'); if (r.ok) catalog = (await r.json()).products || []; } catch (e) {}
+const postedFile = W => { if (!W || W.off || W.membersOnly || !W.id) return ''; const p = catalog.find(x => x.id === W.id); return (p && p.files && p.files[0] && p.files[0].url) || ''; };
 const leaders = ((cfg['config/leaders'] || {}).list || []).map(r => ({ name: r[0], position: r[1], company: r[2], groups: [r[3], r[4], ...String(r[7] || '').split('|')] }));
 const cutoff = new Date(Date.now() - KEEP_DAYS * 864e5).toISOString().slice(0, 10);
 const reqs = Object.values(media).filter(m => m && m.id && m.ticket && TYPE(m.kind) && m.status !== 'Canceled' && (m.status !== 'Done' || (m.done || m.requested || '') >= cutoff));
@@ -42,7 +45,7 @@ for (const m of reqs) {
     wr: t.wr || '', name: t.name || '', publicName: pub(t), workgroup: t.workgroup || '', groupType: t.groupType || '', classification: t.classification || '',
     releaseStatus: W.status || (TYPE(m.kind) === 'release' ? (isStd ? 'Candidate Recommendation' : 'Final') : ''),
     facilitator: t.facilitator || '', summary: clean(W.summary) || clean(t.cpCard && t.cpCard.text),
-    license: W.license || D.license || '', availableTo: D.availableTo || '', memberUrl: L.resourceLibrary || '', nonMemberUrl: clean(t.cpCard && t.cpCard.nonMember),
+    license: W.license || D.license || '', availableTo: D.availableTo || '', memberUrl: L.resourceLibrary || L.crResourceLibrary || (W.off ? '' : clean(W.libraryUrl)), nonMemberUrl: clean(t.cpCard && t.cpCard.nonMember) || postedFile(W),
     websiteId: W.off ? '' : (W.id || ''), version: W.version || '', commentOpens: d.commentStart || '', commentCloses: d.commentEnd || '',
     mmsUrl: 'https://resources.mismo.org/mms/#wr=' + encodeURIComponent(t.id),
     shareUrl: (W.queuedAt && W.id && !W.off) ? 'https://www.mismo.org/standards-resources?get=' + encodeURIComponent(W.id) : '',
