@@ -2090,7 +2090,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T21:00:26Z',fp:'8950b246'};
+window.__mmsBuild={at:'2026-11-20T21:08:57Z',fp:'4db9b37d'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7796,6 +7796,29 @@ rvRun=function(t,kind){ _rvRunSrc(t,kind); const box=$('#modal-root .modal'), dr
       try{ got[i]=await rvSrcGet(L[i]); st.textContent='Added'; }catch(e){ st.textContent='Couldn’t get it: '+e.message; c.checked=false; } c.disabled=false; }
     else st.textContent=c.checked?'Added':'';
     apply(); }); };
+/* ---------- Work request links that go nowhere (Nov 20, 2026) ----------
+   About 250 links brought over from Smartsheet hold only a name ("Closing Instructions Development Workgroup (DWG)")
+   instead of a web address, so clicking them did nothing. Each such link now opens: the same workgroup's address
+   from another work request that has it, or the work request's SharePoint folder for its file, or else a search
+   for that name (MISMO Connect for Connect sites, mismo.org for everything else). Nothing stored is changed.
+   Also: a #wr= link opens its work request even when the MMS is already open in that tab. */
+const WRL_OK=/^(https?:|mailto:|tel:|#)/i;
+function wrlNorm(s){ return String(s||'').toLowerCase().replace(/\(.*?\)/g,' ').replace(/\b(dwg|cop|development workgroup|community of practice|workgroup|work group)\b/g,' ').replace(/[^a-z0-9]/g,''); }
+let wrlMapAt=0, wrlMap={};
+function wrlKnown(){ if(Date.now()-wrlMapAt<60000) return wrlMap; const m={}; allTickets().forEach(t=>{ const L=t.links||{}; Object.keys(L).forEach(k=>{ const v=String(L[k]||'').trim(); if(!/^https?:\/\//i.test(v)) return; (m[k]=m[k]||{})[wrlNorm(t.workgroup)]=m[k][wrlNorm(t.workgroup)]||v; }); });
+  wrlMap=m; wrlMapAt=Date.now(); return m; }
+function wrlFix(t,k,v){ v=String(v||'').trim(); if(!v||WRL_OK.test(v)) return v; if(/^www\./i.test(v)) return 'https://'+v;
+  if(k==='workgroupPage'||k==='connect'){ const m=wrlKnown()[k]||{}; const hit=m[wrlNorm(v)]||m[wrlNorm(t.workgroup)]; if(hit) return hit; }   /* a workgroup has one page and one community; announcements are each their own */
+  if(k==='workFile'&&typeof ssFolderUrl==='function') try{ return ssFolderUrl(t); }catch(e){}
+  if(k==='connect') return 'https://collaborate.mismo.org/search?executeSearch=true&SearchTerm='+encodeURIComponent(v);
+  return 'https://www.mismo.org/search?executeSearch=true&SearchTerm='+encodeURIComponent(v); }
+function wrlPatch(root,t){ if(!root||!t) return; const L=t.links||{};
+  root.querySelectorAll('a[href]').forEach(a=>{ const h=a.getAttribute('href'); if(WRL_OK.test(h)) return; const k=Object.keys(L).find(x=>String(L[x]||'').trim()===String(h).trim());
+    a.setAttribute('href',wrlFix(t,k||'',h)); a.title=a.title||'Opens the closest match: this link was saved as a name, not a web address'; }); }
+const _renderPanelWRL=renderPanel;
+renderPanel=function(){ _renderPanelWRL(); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(t) wrlPatch(document.getElementById('panel'),t); };
+/* a #wr= link clicked while the MMS is already open */
+window.addEventListener('hashchange',()=>{ const m=(location.hash||'').match(/^#wr=([^&]+)/); if(!m||!S.ready) return; const id=decodeURIComponent(m[1]); const t=S.tickets[id]||allTickets().find(x=>x.wr===id||x.id===id); if(t) openPanel(t.id); });
 
 /* ================= Comment resolution (Build Next, Nov 2026) =================
    Every public comment gets a disposition (Accepted, Accepted with Changes, Not Accepted, or Duplicate or Out
