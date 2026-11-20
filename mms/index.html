@@ -2090,7 +2090,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T20:59:25Z',fp:'95536229'};
+window.__mmsBuild={at:'2026-11-20T21:00:26Z',fp:'8950b246'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -5215,11 +5215,17 @@ async function rvReadPdf(buf){
   const hfLines=pages.map(p=>p.bottom); const pageNums=pages.filter(p=>/^\s*(page\s*)?\d+(\s*of\s*\d+)?\s*$|\b\d+\s*$/i.test(p.bottom)).length;
   return {kind:'pdf',paras:body,pages:pages.length,pageNums,hf:[{kind:'header',t:pages.map(p=>p.top).join(' '),page:false},{kind:'footer',t:hfLines.join(' '),page:pageNums>=Math.max(1,pages.length-1)}],text:body.map(p=>p.t).join('\n')};
 }
+/* an IM/AWG Submission Form: keep only the tabs IM reads (Face Page, Reference Model Changes, Proposed Structure);
+   the vote tabulation, CLEAN copy, examples, instructions and internal tabs are ignored (Nov 20, per Erin) */
+const RV_SUB_TABS=/^(face page|reference model changes|proposed structure)$/i;
+function rvSubFormOnly(x){ if(!x||x.kind!=='excel') return x; const keep=x.sheets.filter(s=>RV_SUB_TABS.test(String(s.name).trim()));
+  if(keep.length<2||!keep.some(s=>/^face page$/i.test(String(s.name).trim()))) return x;
+  return Object.assign({},x,{subForm:true,allTabs:x.sheets.map(s=>s.name),sheets:keep,text:keep.map(s=>'## '+s.name+'\n'+s.rows.map(r=>Object.values(r.c).join(' | ')).join('\n')).join('\n\n')}); }
 async function rvReadFile(f){
   const buf=await f.arrayBuffer(), ext=(f.name.split('.').pop()||'').toLowerCase();
   if(ext==='pdf') return Object.assign(await rvReadPdf(buf),{name:f.name});
   if(ext==='docx') return Object.assign(await rvReadDocx(buf),{name:f.name});
-  if(ext==='xlsx'||ext==='xlsm') return Object.assign(await rvReadXlsx(buf),{name:f.name});
+  if(ext==='xlsx'||ext==='xlsm') return rvSubFormOnly(Object.assign(await rvReadXlsx(buf),{name:f.name}));
   if(ext==='txt'||ext==='md'||ext==='csv') return {kind:'text',name:f.name,text:await f.text()};
   throw new Error(f.name+': the review reads Word (.docx), Excel (.xlsx) and PDF files.');
 }
@@ -5326,7 +5332,13 @@ function rvEditorChecks(files,ctx){
       if(ph.length) add('fix','Readiness','Placeholders are still in the text: '+[...new Set(ph)].slice(0,6).join(', ')+'.','Fill in or remove every placeholder before submitting.',W,'placeholder');
       if(/ {2,}\S/.test(bodyT)) add('recommend','Formatting','Some sentences have double spaces.','Use single spaces between words and sentences.',W,'dbl-space');
     }
-    if(f.kind==='excel'){
+    if(f.kind==='excel'&&f.subForm){
+      /* the IM/AWG Submission Form (Nov 20, per Erin): only the Face Page, Reference Model Changes and Proposed Structure tabs are read;
+         it isn't a published work product, so the boilerplate, copyright and print-setup checks don't apply */
+      const S=f.sheets; const merged=S.filter(s=>s.merged>0); if(merged.length) add('recommend','Excel Setup','Merged cells on '+merged.map(s=>s.name+' ('+s.merged+')').join(', ')+'.','Avoid merged cells in the rows IM reads.',W,'xl-merged');
+      rvTermChecks(f.text,W,add);
+    }
+    else if(f.kind==='excel'){
       const S=f.sheets.filter(s=>s.state==='visible');
       const merged=S.filter(s=>s.merged>0); if(merged.length) add('fix','Excel Setup','Merged cells on '+merged.map(s=>s.name+' ('+s.merged+')').join(', ')+'.','Don’t use merged cells (they break sorting and filtering).',W,'xl-merged');
       const unnum=S.filter(s=>!/^\s*\d/.test(s.name)); if(unnum.length) add('recommend','Excel Setup','Tabs aren’t numbered: '+unnum.slice(0,6).map(s=>s.name).join(', ')+(unnum.length>6?'…':'')+'.','Number the tabs (for example “1. Overview”, “2. Mapping”).',W,'xl-tabnum');
@@ -5513,6 +5525,7 @@ function rvBuildReport(kind,t,files,findings,ai,ctx){
     rep.questions=[...findings.filter(f=>f.sev==='question').map(f=>f.issue+' '+f.suggestion),...((ai&&ai.questions)||[])].slice(0,20).map(q=>rvTrim(q,300)); }
   else { rep.rows=((ai&&ai.rows)||[]).slice(0,150).map(r=>({item:String(r.item||''),likely:rvTrim(r.likely,24),note:rvTrim(r.note,300),def:rvTrim(r.suggestedDefinition,400),name:rvTrim(r.suggestedName,120)}));
     rep.questions=findings.filter(f=>f.sev==='question').map(f=>rvTrim(f.issue+' '+f.suggestion,300)); rep.form=ctx.formStats||null; rep.rm=ctx.rm||''; if(!ctx.rm) rep.aiNote=[rep.aiNote,'The Reference Model couldn’t be loaded here, so “already exists” and XPATH checks didn’t run. Run the review on the live MMS at resources.mismo.org.'].filter(Boolean).join(' '); }
+  if(files.some(f=>f&&f.subForm)) rep.aiNote=[rep.aiNote,'IM Submission Form: only the Face Page, Reference Model Changes and Proposed Structure tabs were reviewed; the other tabs were left out.'].filter(Boolean).join(' ');
   return rep;
 }
 function rvReportHtml(rep,forWord){
