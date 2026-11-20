@@ -2072,7 +2072,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T16:42:36Z',fp:'50d05d91'};
+window.__mmsBuild={at:'2026-11-20T17:22:40Z',fp:'39cdf1e9'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -6520,6 +6520,45 @@ renderPanel=function(){ _renderPanelSL(); const P=$('#panel'); if(!S.panel||Stri
   const first=host.firstElementChild; first&&first.nextSibling?host.insertBefore(sec,first.nextSibling):host.appendChild(sec); };
 document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-wpcopy]'); if(!b) return; e.preventDefault();
   try{ await navigator.clipboard.writeText(b.dataset.wpcopy); toast('Share link copied'); }catch(err){ const r=document.createRange(); const c=b.parentElement.querySelector('.wp-share-u'); if(c){ r.selectNodeContents(c); const sel=getSelection(); sel.removeAllRanges(); sel.addRange(r); } toast('Press Ctrl+C to copy the selected link'); } });
+/* ---------- Website: Fix a Work Product File (Nov 20, 2026) ----------
+   After 16 zips on Find a Work Product were found missing their first 5 MB, staff can replace one public file of a
+   product with its original: same file name and link, any size up to 100 MB (files too big to attach to a chat go
+   through here). The file goes up in pieces like Mark Published's; the MMS Robot checks it (size, "PK", the zip's own
+   directory), swaps that one file in work-products and leaves the product's other files and details as they are. */
+const WFX_CHECKS='https://resources.mismo.org/work-products/checks.json';
+const _feedCardWfx=feedCard;
+feedCard=function(){ return _feedCardWfx()+wfxCard(); };
+function wfxCard(){
+  return '<div class="card" id="wfx"><h3>Website: Fix a Work Product File</h3><p style="font-size:13px;margin:0 0 8px">Replace a file on Find a Work Product with its original. It keeps the same name and link. The MMS Robot checks it and puts it up within half an hour. Files marked Damaged failed the website’s file check.</p>'+
+    '<div class="kv"><div class="f wide"><label for="wfxp">Work Product</label><select id="wfxp"><option value="">Loading…</option></select></div>'+
+    '<div class="f wide"><label for="wfxf">File to Replace</label><select id="wfxf"></select></div>'+
+    '<div class="f wide"><label for="wfxin">Original File</label><input type="file" id="wfxin"></div></div>'+
+    '<div style="margin-top:10px"><button class="btn" id="wfxgo" type="button">Replace the File</button></div></div>'; }
+async function wfxLoad(m){
+  const ps=$('#wfxp',m), fs=$('#wfxf',m); if(!ps||ps.dataset.on) return; ps.dataset.on='1';
+  let cat={}, bad=[]; try{ cat=await wpCatalog(); }catch(e){} try{ bad=(await fetch(WFX_CHECKS+'?t='+Date.now(),{cache:'no-store'}).then(r=>r.json())).badFiles||[]; }catch(e){}
+  const isBad=(id,f)=>bad.some(b=>b.id===id&&b.file===f);
+  const L=(cat.products||[]).filter(p=>(p.files||[]).length).sort((a,b)=>(+bad.some(x=>x.id===b.id))-(+bad.some(x=>x.id===a.id))||String(a.title).localeCompare(String(b.title)));
+  ps.innerHTML='<option value="">Choose a work product</option>'+L.map(p=>'<option value="'+esc(p.id)+'">'+esc(p.title)+(bad.some(x=>x.id===p.id)?' (Damaged)':'')+'</option>').join('');
+  const fill=()=>{ const p=L.find(x=>x.id===ps.value); const seen={}; fs.innerHTML=p?(p.files||[]).filter(f=>!seen[f.file]&&(seen[f.file]=1)).map(f=>'<option value="'+esc(f.file)+'">'+esc(f.name||f.file)+(isBad(p.id,f.file)?' (Damaged)':'')+'</option>').join(''):''; };
+  ps.onchange=fill; fill(); m._wfx=L; }
+async function wfxGo(m){
+  const L=m._wfx||[], id=$('#wfxp',m).value, fname=$('#wfxf',m).value, inp=$('#wfxin',m), f=inp&&inp.files&&inp.files[0];
+  const p=L.find(x=>x.id===id), cur=p&&(p.files||[]).find(x=>x.file===fname);
+  if(!p||!cur) return toast('Choose the work product and the file to replace.'); if(!f) return toast('Choose the original file.');
+  if(f.size>WP_MAX) return toast(f.name+' is over 100 MB, so it can’t go on the website this way.');
+  const ext=s=>(String(s).match(/\.([a-z0-9]+)$/i)||['',''])[1].toLowerCase(); if(ext(f.name)!==ext(fname)) return toast('The original is a .'+ext(f.name)+' file, but the website file is .'+ext(fname)+'.');
+  const go=$('#wfxgo',m); go.disabled=true;
+  try{
+    const u8=new Uint8Array(await f.arrayBuffer()); const zb=wpZipBad(fname,u8); if(zb) throw new Error(f.name+' '+zb);
+    const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6), n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
+    for(let i=0;i<n;i++){ wpSay('Uploading '+f.name+': '+Math.round(i/n*100)+'%. Keep this tab open.'); await wpPut('wpup-'+key+'-0-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
+    await write('wpqueue',key,{key,id,replace:true,product:{},files:[{name:cur.name,file:fname,bytes:u8.length,chunks:n}],status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''});
+    wpSay('Sent. The MMS Robot checks it and puts it on the website within half an hour.','ok'); inp.value='';
+  }catch(e){ wpSay('The file didn’t go up ('+e.message+').','bad'); }
+  go.disabled=false; }
+const _wireMainWfx=wireMain;
+wireMain=function(m){ _wireMainWfx(m); if(S.view==='settings'&&$('#wfx',m)){ wfxLoad(m); const g=$('#wfxgo',m); if(g) g.onclick=()=>wfxGo(m); } };
 /* MISMO holidays (no IM or AWG call): MLK Day, Presidents' Day, Memorial Day, Juneteenth, Independence Day, Labor Day,
    Veterans Day, Thanksgiving and the day after, and Winter Break (Christmas Day through New Year's Day).
    A call that lands on one is skipped; if it is moved, Meeting Trackers logs the new date and it shows up from there. */
