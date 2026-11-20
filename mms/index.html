@@ -2072,7 +2072,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T16:12:10Z',fp:'ea602b7f'};
+window.__mmsBuild={at:'2026-11-20T16:42:36Z',fp:'50d05d91'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -6179,7 +6179,7 @@ async function wpQueue(t,v,files){
   files=mo?[]:files.filter(f=>f.size<=WP_MAX);
   const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6); /* short: the save service only takes short file names (wpup-<key>-<file>-<piece>) */ const out=[];
   try{
-    for(const [fi,f] of files.entries()){ const u8=new Uint8Array(await f.arrayBuffer()); const n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
+    for(const [fi,f] of files.entries()){ const u8=new Uint8Array(await f.arrayBuffer()); const zb=wpZipBad(f.name,u8); if(zb) throw new Error(f.name+' '+zb+'; please use the original file'); const n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
       for(let i=0;i<n;i++){ wpSay('Uploading '+f.name+' for the website: '+Math.round(i/n*100)+'% ('+(fi+1)+' of '+files.length+'). Keep this tab open.'); await wpPut('wpup-'+key+'-'+fi+'-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
       out.push({name:wpDisplay(f.name),file:wpFileName(f.name),bytes:u8.length,chunks:n}); }
   }catch(e){ wpSay('The files didn’t upload ('+e.message+'). Open the work request and click Put on the Website to try again.','bad'); return false; }
@@ -6190,6 +6190,11 @@ async function wpQueue(t,v,files){
   const x=clone(S.tickets[t.id]||t); x.wp=Object.assign({},product,{id,key,queuedAt:doc.at}); if(product.libraryUrl) x.links=Object.assign({},x.links,{resourceLibrary:product.libraryUrl});
   hist(x,'Sent to the website’s Find a Work Product ('+(mo?'members only, no public files':out.length+' public file'+(out.length===1?'':'s'))+'); it’s posted within half an hour. Share link: '+wpShare(id));
   await saveTicket(x); wpSay('Sent to the website. It’s posted within half an hour. Share link: '+wpShare(id),'ok'); return true; }
+/* a damaged zip is never posted (Nov 20: 18 zips on the website were missing their first 5 MB) */
+function wpZipBad(name,u8){ if(!/\.zip$/i.test(name||'')) return ''; if(u8.length<22) return 'is too small to be a zip'; if(u8[0]!==0x50||u8[1]!==0x4b) return 'is damaged (it doesn’t start like a zip)';
+  const dv=new DataView(u8.buffer,u8.byteOffset,u8.byteLength); let e=-1; for(let i=u8.length-22;i>=Math.max(0,u8.length-65557);i--) if(dv.getUint32(i,true)===0x06054b50){ e=i; break; }
+  if(e<0) return 'is damaged (no zip directory)'; const sz=dv.getUint32(e+12,true), off=dv.getUint32(e+16,true); if(sz===0xffffffff||off===0xffffffff) return '';
+  return off+sz>e ? 'is missing part of itself' : ''; }
 function wpShare(id){ return 'https://www.mismo.org/standards-resources?get='+encodeURIComponent(id); }
 /* a published work request: list it, update its listing or send its files again */
 async function wpResend(t){ const p=modal({title:'Website: Find a Work Product',ok:'Send to the Website',validate:v=>wpCheck(Object.assign({wpon:true},v)),
