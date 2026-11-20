@@ -2069,7 +2069,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-19T15:35:48Z',fp:'6d832782'};
+window.__mmsBuild={at:'2026-11-20T14:49:36Z',fp:'3f6b085c'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2701,7 +2701,7 @@ function stageActions(t){
   const A=[], g=govName(), sub=t.sub||'';
   const add=(label,fn,cls)=>A.push({label,fn,cls:cls||''});
   if(t.state==='hold'){ add('Resume Work',()=>resume(t),'pri'); return A; }
-  if(t.state!=='active'){ add('Reopen',()=>reopen(t),'pri'); return A; }
+  if(t.state!=='active'){ add('Reopen',()=>reopen(t),'pri'); if(t.stage==='published'&&S.canWrite&&S.isStaff&&typeof wpResend==='function') A.push({label:(t.wp&&t.wp.queuedAt)?'Update on the Website':'Put on the Website',fn:()=>wpResend(t),cls:'ghost'}); return A; }
   if(t.split){ add('+ Add a Deliverable',()=>splitT(t),'pri'); return A; }
   if(t.rides){ const b=S.tickets[t.rides]; if(t.stage==='designation') add('Approve Recommended Designation',()=>approveRec(t),'pri'); add('Open '+(b?b.wr:'the Release'),()=>openPanel(t.rides)); add('Stop Riding: Move on Its Own',()=>unride(t)); return A; }
   switch(t.stage){
@@ -6165,7 +6165,7 @@ function wpCheck(v,t){ if(!v.wpon) return ''; if(!wpSlug(v.wpid)) return 'Add a 
 function wpB64(u8){ let s=''; for(let i=0;i<u8.length;i+=32768) s+=String.fromCharCode.apply(null,u8.subarray(i,i+32768)); return btoa(s); }
 function wpSay(m,cls){ let b=document.getElementById('wpprog'); if(!b){ b=document.createElement('div'); b.id='wpprog'; b.className='wp-prog'; document.body.appendChild(b); } b.className='wp-prog '+(cls||''); b.textContent=m; b.hidden=!m; if(cls==='ok'||cls==='bad') setTimeout(()=>{ if(b.textContent===m) b.hidden=true; },9000); }
 async function wpPut(name,content){ const tok=window.ResourcesSession&&ResourcesSession.token(); if(!RELAY()||!tok) throw new Error('signed out');
-  for(let a=0;a<4;a++){ try{ const r=await fetch(RELAY()+'/mms/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content})}); if(r.ok) return; if(r.status===401||r.status===403) throw new Error('no access'); }catch(e){ if(/no access|signed out/.test(e.message)) throw e; } await new Promise(z=>setTimeout(z,800*(a+1))); }
+  for(let a=0;a<4;a++){ try{ const r=await fetch(RELAY()+'/mms/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content})}); if(r.ok) return; if(r.status===409) return; /* each piece has its own name, so a conflict means an earlier try already saved it */ if(r.status===401||r.status===403) throw new Error('no access'); }catch(e){ if(/no access|signed out/.test(e.message)) throw e; } await new Promise(z=>setTimeout(z,800*(a+1))); }
   throw new Error('the save service is busy'); }
 async function wpQueue(t,v,files){
   files=(files||[]).filter(Boolean); const id=wpSlug(v.wpid); const mo=!!v.wpmo;
@@ -6176,7 +6176,7 @@ async function wpQueue(t,v,files){
     for(const [fi,f] of files.entries()){ const u8=new Uint8Array(await f.arrayBuffer()); const n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
       for(let i=0;i<n;i++){ wpSay('Uploading '+f.name+' for the website: '+Math.round(i/n*100)+'% ('+(fi+1)+' of '+files.length+'). Keep this tab open.'); await wpPut('wpup-'+key+'-'+fi+'-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
       out.push({name:wpDisplay(f.name),file:wpFileName(f.name),bytes:u8.length,chunks:n}); }
-  }catch(e){ wpSay('The files didn’t upload ('+e.message+'). Open the work request and use Website › Send Again.','bad'); return false; }
+  }catch(e){ wpSay('The files didn’t upload ('+e.message+'). Open the work request and click Put on the Website to try again.','bad'); return false; }
   const product={title:String(v.wptitle).trim(),summary:String(v.wpsum||'').trim(),category:String(v.wpcat||'').trim()||null,version:String(v.wpver||'').trim()||null,status:v.wpst||null,
     published:v.d||today(),license:+v.wplic||null,membersOnly:mo,libraryUrl:feedWww(v.rl)||null,aliases:String(v.wpalias||'').split(',').map(s=>s.trim()).filter(Boolean)};
   const doc={key,ticket:t.id,wr:t.wr,id,product,files:out,status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''};
