@@ -1607,6 +1607,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
      submission is one request, and a 60 MB one will not land. */
   var ATT_MAX_FILE  = 10 * 1024 * 1024;
   var ATT_MAX_TOTAL = 25 * 1024 * 1024;
+  var ATT_MAX_COUNT = 15;   /* the flow turns away a submission with more files than this */
 
   function attList(){ var a = get("attachments", []); return Array.isArray(a) ? a : []; }
   function attBytes(){ return attList().reduce(function(n, f){ return n + (f.size || 0); }, 0); }
@@ -1618,11 +1619,13 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
   function attAdd(files){
     var have = attList().slice();
-    var total = attBytes(), rejected = [];
+    var total = attBytes(), count = have.length, rejected = [];
     Array.prototype.forEach.call(files, function(f){
       if(f.size > ATT_MAX_FILE){ rejected.push(f.name + " is " + attSize(f.size)); return; }
       if(total + f.size > ATT_MAX_TOTAL){ rejected.push(f.name + " would go over the limit"); return; }
       if(have.some(function(x){ return x.name === f.name && x.size === f.size; })) return;
+      if(count >= ATT_MAX_COUNT){ rejected.push(f.name + " would be more than " + ATT_MAX_COUNT + " files"); return; }
+      count++;
       total += f.size;
       var r = new FileReader();
       r.onload = function(){
@@ -1634,7 +1637,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       r.readAsDataURL(f);
     });
     if(rejected.length){
-      toast("Too large to send through the form: " + rejected.join("; ") +
+      toast("Could not add to the form: " + rejected.join("; ") +
             ". Email those to certifications@mismo.org instead.");
     }
   }
@@ -1953,7 +1956,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     stage = s;
     applyStage();
     paintProgress(); paintSubmit(); persist();
-    window.scrollTo(0, 0);
+    /* To the top of the form, not the top of the page (21 Nov 2026: choosing Questionnaire jumped back
+       to the page header). */
+    var top = document.getElementById("stages") || document.getElementById("form");
+    if(top) window.scrollTo(0, Math.max(0, top.getBoundingClientRect().top + window.pageYOffset - 90));
+    else window.scrollTo(0, 0);
   }
 
   /* ================= events =================
