@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-21T00:12:44.163Z",
+ "updated": "2026-11-21T00:37:56.765Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-21T00:11:25.209Z",
+ "sourceUpdated": "2026-11-21T00:36:33.708Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -41,7 +41,7 @@
     ]
    },
    "grid": {
-    "updated": "2026-11-21T00:11:25.209Z",
+    "updated": "2026-11-21T00:36:33.708Z",
     "sessions": [
      {
       "id": "breakfast@mon",
@@ -444,7 +444,7 @@
       "room": "Pelican II",
       "desc": "",
       "sponsor": "",
-      "status": "tentative"
+      "status": "confirmed"
      },
      {
       "id": "secondary@wed",
