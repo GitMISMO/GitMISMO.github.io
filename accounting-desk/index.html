@@ -818,21 +818,23 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       tiles.push(['ar', "Still Owed to MISMO", usd(a.owedTotal, 1), open.length ? open.length + " open" : "nothing owed"]);
     }
 
-    /* invoices: the newest service month that is over, and what is still moving */
+    /* invoices: the newest service month that is over, and what is waiting for approval */
     var inv = (D.invoices && D.invoices.rows) || [];
     if (inv.length) {
       var ms = Object.keys(inv.reduce(function (o, r) { if (r.serviceMonth && r.serviceMonth < thisM) o[r.serviceMonth] = 1; return o; }, {})).sort();
       var lm = ms[ms.length - 1] || "", inLm = inv.filter(function (r) { return r.serviceMonth === lm; });
-      var recent = lastMonths(4)[0];
-      var moving = inv.filter(function (r) { return r.serviceMonth >= recent && r.serviceMonth <= thisM && r.status && r.status !== "Approved" && r.status !== "Received" && r.status !== "Paid"; });
-      var stages = ["Sent to AP", "In NetSuite"].map(function (st) { var l = moving.filter(function (r) { return r.status === st; }); return { st: st, n: l.length, amt: sum(l, function (r) { return r.amount; }) }; });
-      var maxAmt = Math.max.apply(null, stages.map(function (x) { return x.amt; }).concat([1]));
+      /* Jonna, 21 Nov 2026: "31 of what is not approved?" An invoice is waiting for approval only while it
+         has no Approved date and is not paid. "In NetSuite" comes after approval, so it is not waiting. */
+      var since = lastMonths(4)[0];
+      var waiting = inv.filter(function (r) { return r.serviceMonth >= since && r.serviceMonth <= thisM && r.sentToAp && !r.approved && !r.paid; })
+        .sort(function (x, y) { return (y.amount || 0) - (x.amount || 0); });
+      var wAmt = sum(waiting, function (r) { return r.amount; });
       var body2 = '<div class="big"><b>' + usd(sum(inLm, function (r) { return r.amount; }), 1) + "</b><span>" + inLm.length + " invoices for " + esc(monthName(lm)) + "</span></div>" +
-        '<p class="say">Not yet approved, for work done since ' + esc(monthName(recent)) + ':</p><div class="flow">' + stages.map(function (x) {
-          return '<div class="fr' + (x.st === "Sent to AP" ? " mine" : "") + '"><i>' + esc(x.st) + '</i><div class="trk"><u style="width:' + (100 * x.amt / maxAmt).toFixed(1) + '%"></u></div><em>' + x.n + " · " + usd(x.amt, 1) + "</em></div>";
-        }).join("") + "</div>";
+        (waiting.length ? '<p class="say">' + waiting.length + (waiting.length === 1 ? " invoice is" : " invoices are") + " sent to AP and waiting for approval (work done since " + esc(monthName(since)) + "):</p>" +
+          '<ul class="toplist">' + waiting.slice(0, 5).map(function (r) { return '<li data-ovinv="' + esc(r.id) + '"><b>' + esc(r.vendor) + "</b><span>" + esc(monthName(r.serviceMonth)) + "</span><em>" + usd(r.amount) + "</em></li>"; }).join("") + "</ul>"
+          : '<p class="say ok">Every invoice sent to AP for work done since ' + esc(monthName(since)) + " is approved.</p>");
       cards.push(ovCard("invoices", "Invoices", body2));
-      tiles.push(['invoices', "Not Yet Approved", String(moving.length), usd(sum(moving, function (r) { return r.amount; }), 1) + " since " + monthName(recent)]);
+      tiles.push(['invoices', "Invoices to Approve", String(waiting.length), waiting.length ? usd(wAmt, 1) + " sent to AP" : "all approved since " + monthName(since)]);
     }
 
     /* members */
@@ -873,18 +875,20 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var dateSay = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
     $("v-overview").innerHTML =
       '<div class="hero ov-hero"><div class="eyebrow">For Accounting</div><h1>' + esc(hello + (first ? ", " + first : "")) + '</h1><div class="when">' + esc(dateSay) + "</div>" +
-      "<p>Where MISMO&rsquo;s books stand today: the close, what is still owed, invoices on their way through AP, members, certifications and the IIF. Click anything to see the detail.</p>" +
+      "<p>Where MISMO&rsquo;s books stand today: the close, what is still owed, invoices waiting for approval, members, certifications and the IIF. Click anything to see the detail.</p>" +
       '<div class="tiles">' + tiles.map(function (t) { return '<button type="button" class="tile ovtile" data-ovgo="' + t[0] + '"><span>' + esc(t[1]) + "</span><b>" + esc(t[2]) + "</b><i>" + esc(t[3]) + "</i></button>"; }).join("") + "</div></div>" +
       '<div class="ovgrid">' + cards.join("") + "</div>" +
       '<p class="stamp">' + esc(stamp(D.ar && D.ar.writtenAt)) + "</p>";
     document.querySelectorAll("#v-overview [data-ovgo]").forEach(function (b) { b.addEventListener("click", function () { show(b.getAttribute("data-ovgo")); }); });
+    document.querySelectorAll("#v-overview [data-ovinv]").forEach(function (li) { li.addEventListener("click", function () {
+      var k = li.getAttribute("data-ovinv"); show("invoices").then(function () { var r = D.invoices.rows.filter(function (x) { return x.id === k; })[0]; if (r) invOpen(r); }); }); });
     document.querySelectorAll("#v-overview [data-ovar]").forEach(function (li) { li.addEventListener("click", function () {
       var k = li.getAttribute("data-ovar"); show("ar").then(function () { var r = D.ar.items.filter(function (x) { return x.key === k; })[0]; if (r) arOpen(r); }); }); });
   }
 
   function drawHelp() {
     $("v-help").innerHTML = '<section class="hero"><div class="eyebrow">For Accounting</div><h1>Help</h1><p>This desk is view only. Nothing here can be changed, and nothing you do here changes MISMO&rsquo;s records.</p></section>' +
-      "<h2>Overview</h2><p>The desk opens here. The tiles across the top are today&rsquo;s headline numbers, and each card below shows one part: the month being closed and which of its six steps is next, what is still owed to MISMO, invoices still on their way through AP, new and renewing members, certifications and IIF payments. Click a tile, a card&rsquo;s Open button or a receivable to go to its page.</p>" +
+      "<h2>Overview</h2><p>The desk opens here. The tiles across the top are today&rsquo;s headline numbers, and each card below shows one part: the month being closed and which of its six steps is next, what is still owed to MISMO, invoices sent to AP that are still waiting for approval, new and renewing members, certifications and IIF payments. Click a tile, a card&rsquo;s Open button or a receivable to go to its page.</p>" +
       "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
       "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid.</p>" +
       "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
