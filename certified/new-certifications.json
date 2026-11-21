@@ -1,0 +1,357 @@
+{
+ "note": "Company and product certifications completed in the last 180 days, newest first, for MISMO Media and MISMO Matters. Written by the Website listings job in cms-data from the CMS; not edited by hand. first = the company's first certification in that program.",
+ "updated": "2026-11-21",
+ "certifications": [
+  {
+   "org": "Docutech",
+   "slug": "docutech",
+   "program": "eVault",
+   "product": "Solex eVault",
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-11-20"
+  },
+  {
+   "org": "Aven",
+   "slug": "aven",
+   "program": "RON",
+   "product": "Aven Remote Online Notarization Software",
+   "first": false,
+   "type": "Renewal 6",
+   "certifiedOn": "2026-11-19"
+  },
+  {
+   "org": "NotaryHub",
+   "slug": "notaryhub",
+   "program": "RON",
+   "product": "NotaryHub.com by Everything Legal",
+   "first": false,
+   "type": "Renewal 3",
+   "certifiedOn": "2026-11-19"
+  },
+  {
+   "org": "Rocket Close",
+   "slug": "rocket-close",
+   "program": "RON",
+   "product": "Clear Sign",
+   "first": false,
+   "type": "Renewal 6",
+   "certifiedOn": "2026-10-26"
+  },
+  {
+   "org": "Signix",
+   "slug": "signix",
+   "program": "RON",
+   "product": "eNotaryDoX",
+   "first": false,
+   "type": "Renewal 6",
+   "certifiedOn": "2026-10-26"
+  },
+  {
+   "org": "Simply Secure Sign",
+   "slug": "simply-secure-sign",
+   "program": "RON",
+   "product": "SimplySecureSign",
+   "first": false,
+   "type": "Renewal 5",
+   "certifiedOn": "2026-10-26"
+  },
+  {
+   "org": "Actualize Consulting",
+   "slug": "actualize-consulting",
+   "program": "FRAME",
+   "product": null,
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-10-12"
+  },
+  {
+   "org": "Crittora",
+   "slug": "crittora",
+   "program": "FRAME",
+   "product": null,
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-10-12"
+  },
+  {
+   "org": "Falcon Capital Advisors LLC",
+   "slug": "falcon-capital-advisors-llc",
+   "program": "FRAME",
+   "product": null,
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-10-12"
+  },
+  {
+   "org": "Teraverde Financial",
+   "slug": "teraverde-financial",
+   "program": "FRAME",
+   "product": null,
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-10-12"
+  },
+  {
+   "org": "TReX (Tidgewell Results Experience)",
+   "slug": "trex-tidgewell-results-experience",
+   "program": "FRAME",
+   "product": null,
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-10-12"
+  },
+  {
+   "org": "Viant Eye",
+   "slug": "viant-eye",
+   "program": "FRAME",
+   "product": null,
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-10-12"
+  },
+  {
+   "org": "Docutech",
+   "slug": "docutech",
+   "program": "eClosing",
+   "product": "Solex eClosing",
+   "first": false,
+   "type": "Renewal 2",
+   "certifiedOn": "2026-10-05"
+  },
+  {
+   "org": "Simplifile",
+   "slug": "simplifile",
+   "program": "RON",
+   "product": "eSign Events",
+   "first": false,
+   "type": "Renewal 5",
+   "certifiedOn": "2026-10-05"
+  },
+  {
+   "org": "Take Three Technologies",
+   "slug": "take-three-technologies",
+   "program": "Product",
+   "product": null,
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-10-05"
+  },
+  {
+   "org": "BlueNotary",
+   "slug": "bluenotary",
+   "program": "RON",
+   "product": "BlueNotary",
+   "first": false,
+   "type": "Renewal 4",
+   "certifiedOn": "2026-09-25"
+  },
+  {
+   "org": "Docutech",
+   "slug": "docutech",
+   "program": "RON",
+   "product": "RON - Proof Integration",
+   "first": false,
+   "type": "Renewal 4",
+   "certifiedOn": "2026-09-25"
+  },
+  {
+   "org": "FundingShield",
+   "slug": "fundingshield",
+   "program": "Product",
+   "product": "The Guardian Service",
+   "first": false,
+   "type": "Renewal 3",
+   "certifiedOn": "2026-09-25"
+  },
+  {
+   "org": "Stellar Innovative Solutions Corp",
+   "slug": "stellar-innovative-solutions-corp",
+   "program": "Product",
+   "product": "Universal Loan Review System Unidex",
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-09-25"
+  },
+  {
+   "org": "Black Knight",
+   "slug": "black-knight",
+   "program": "RON",
+   "product": "Expedite",
+   "first": false,
+   "type": "Renewal 5",
+   "certifiedOn": "2026-09-09"
+  },
+  {
+   "org": "Eltropy",
+   "slug": "eltropy",
+   "program": "RON",
+   "product": "Eltropy's Video Notary",
+   "first": false,
+   "type": "Renewal 2",
+   "certifiedOn": "2026-09-09"
+  },
+  {
+   "org": "NotaryLive",
+   "slug": "notarylive",
+   "program": "RON",
+   "product": "NotaryLive",
+   "first": false,
+   "type": "Renewal 5",
+   "certifiedOn": "2026-09-09"
+  },
+  {
+   "org": "Online Notary Center",
+   "slug": "online-notary-center",
+   "program": "RON",
+   "product": "Online Notary Center",
+   "first": false,
+   "type": "Renewal 2",
+   "certifiedOn": "2026-09-09"
+  },
+  {
+   "org": "USA Notary Services LLC",
+   "slug": "usa-notary-services-llc",
+   "program": "RON",
+   "product": "SharpNote Digital Notarization Platform",
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-09-09"
+  },
+  {
+   "org": "Secured Signing",
+   "slug": "secured-signing",
+   "program": "RON",
+   "product": "Secured Signing",
+   "first": false,
+   "type": "Renewal 5",
+   "certifiedOn": "2026-08-17"
+  },
+  {
+   "org": "Guidehouse",
+   "slug": "guidehouse",
+   "program": "Consultant",
+   "product": "Consultant",
+   "first": false,
+   "type": "Renewal 1",
+   "certifiedOn": "2026-08-07"
+  },
+  {
+   "org": "Viant Eye",
+   "slug": "viant-eye",
+   "program": "Consultant",
+   "product": "Viant Eye",
+   "first": false,
+   "type": "Renewal",
+   "certifiedOn": "2026-08-07"
+  },
+  {
+   "org": "Docusign",
+   "slug": "docusign",
+   "program": "RON",
+   "product": "Docusign Notary",
+   "first": false,
+   "type": "Renewal 4",
+   "certifiedOn": "2026-08-04"
+  },
+  {
+   "org": "Qualia Labs, Inc.",
+   "slug": "qualia-labs-inc",
+   "program": "RON",
+   "product": "Qualia RON",
+   "first": false,
+   "type": "Renewal 4",
+   "certifiedOn": "2026-08-04"
+  },
+  {
+   "org": "Stavvy",
+   "slug": "stavvy",
+   "program": "RON",
+   "product": "Stavvy",
+   "first": false,
+   "type": "Renewal 5",
+   "certifiedOn": "2026-08-04"
+  },
+  {
+   "org": "TReX (Tidgewell Results Experience)",
+   "slug": "trex-tidgewell-results-experience",
+   "program": "Consultant",
+   "product": "Consultant",
+   "first": false,
+   "type": "Renewal 2",
+   "certifiedOn": "2026-07-27"
+  },
+  {
+   "org": "PhoenixTeam",
+   "slug": "phoenixteam",
+   "program": "Consultant",
+   "product": "Consultant",
+   "first": false,
+   "type": "Renewal 2",
+   "certifiedOn": "2026-07-17"
+  },
+  {
+   "org": "OneNotary",
+   "slug": "onenotary",
+   "program": "RON",
+   "product": "OneNotary",
+   "first": false,
+   "type": "Renewal 5",
+   "certifiedOn": "2026-07-06"
+  },
+  {
+   "org": "ProNotary",
+   "slug": "pronotary",
+   "program": "RON",
+   "product": "ProNotary",
+   "first": false,
+   "type": "Renewal 5",
+   "certifiedOn": "2026-07-06"
+  },
+  {
+   "org": "Falcon Capital Advisors LLC",
+   "slug": "falcon-capital-advisors-llc",
+   "program": "Consultant",
+   "product": "Consultant",
+   "first": false,
+   "type": "Renewal 2",
+   "certifiedOn": "2026-06-29"
+  },
+  {
+   "org": "Rocket Close",
+   "slug": "rocket-close",
+   "program": "eClosing",
+   "product": "Clear Sign",
+   "first": false,
+   "type": "Renewal 4",
+   "certifiedOn": "2026-06-12"
+  },
+  {
+   "org": "DocMagic",
+   "slug": "docmagic",
+   "program": "RON",
+   "product": "DocMagic Total eClose",
+   "first": false,
+   "type": "Renewal 4",
+   "certifiedOn": "2026-06-09"
+  },
+  {
+   "org": "Snapdocs",
+   "slug": "snapdocs",
+   "program": "RON",
+   "product": "Pactima RON Platform",
+   "first": true,
+   "type": "First certification",
+   "certifiedOn": "2026-06-09"
+  },
+  {
+   "org": "Snapdocs",
+   "slug": "snapdocs",
+   "program": "eVault",
+   "product": "Snapdocs eVault",
+   "first": false,
+   "type": "Renewal 1",
+   "certifiedOn": "2026-05-28"
+  }
+ ]
+}
