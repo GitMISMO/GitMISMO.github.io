@@ -1,8 +1,138 @@
 {
   "source": "MMS",
   "note": "Announcement requests from the MMS for MISMO Media, with the facts to draft from. Public information only.",
-  "updated": "2026-11-20T22:16:03.538Z",
+  "updated": "2026-11-21T01:46:04.150Z",
   "announcements": [
+    {
+      "id": "WR2026_01-LinkedIn-Post",
+      "type": "comment",
+      "kind": "LinkedIn Post",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2026_01",
+      "name": "Minor Reference Model Release v3.6.4",
+      "publicName": "Minor Reference Model Release v3.6.4",
+      "workgroup": "Architecture Workgroup",
+      "groupType": "",
+      "classification": "Standard",
+      "releaseStatus": "",
+      "facilitator": "Erin Bittenbender",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "",
+      "commentCloses": "",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_01",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Chris Trujillo",
+          "position": "Co-Chair",
+          "company": "Viant Eye"
+        },
+        {
+          "name": "Mark Kleingers",
+          "position": "Co-Chair",
+          "company": "Actualize Consulting"
+        }
+      ]
+    },
+    {
+      "id": "WR2026_10-LinkedIn-Post",
+      "type": "comment",
+      "kind": "LinkedIn Post",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2026_10",
+      "name": "Business Glossary Maintenance 2026.02",
+      "publicName": "Business Glossary Maintenance 2026.02",
+      "workgroup": "Business Glossary CoP",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "",
+      "facilitator": "Kellie Stoll",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "",
+      "commentCloses": "",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_10",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Rusty Emory",
+          "position": "Chair",
+          "company": "PrimeLending"
+        },
+        {
+          "name": "Richard Collins",
+          "position": "Vice-Chair",
+          "company": "United Wholesale Mortgage"
+        },
+        {
+          "name": "Kristie Flores",
+          "position": "IM Rep",
+          "company": "Ranieri Solutions LLC"
+        },
+        {
+          "name": "Lauren Scott",
+          "position": "Education Rep",
+          "company": "LodeStar Software Solutions"
+        }
+      ]
+    },
+    {
+      "id": "WR2026_11-LinkedIn-Post",
+      "type": "comment",
+      "kind": "LinkedIn Post",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2026_11",
+      "name": "ALTA Settlement Statement Dataset Revisions",
+      "publicName": "Title and Closing Dataset Specifications (existing page)",
+      "workgroup": "Title and Closing Docs to Data DWG",
+      "groupType": "",
+      "classification": "Standard",
+      "releaseStatus": "",
+      "facilitator": "Kellie Stoll",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "",
+      "commentCloses": "",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_11",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Bryan Bedard",
+          "position": "Vice-Chair",
+          "company": "Rocket Close"
+        },
+        {
+          "name": "Ruth Dillingham",
+          "position": "Education Rep",
+          "company": "Dillingham Consulting, LLC"
+        }
+      ]
+    },
     {
       "id": "WR2025_24-Final-Release-Announcement",
       "type": "release",
