@@ -231,7 +231,7 @@
   };
 
   /* ---------- one person's digest ---------- */
-  D.forPerson = function (input, person) {
+  D.forPerson = function (input, person, extra) {
     var cfg = D.settings(input.settings), on = cfg.sections, P = proc(input.process), gov = P.gov || 'GC';
     var now = input.now || new Date(), n = et(now), today = n.ymd, dow = n.dow;
     var friday = dow === 5 && on.wkOn, monday = dow === 1;
@@ -334,6 +334,9 @@
       if (hw && hw.length) S.push({ key: 'hours', title: 'Hours Still to Log', tone: 'bad', note: 'In the Service Orders portal', button: { href: HOURS_URL, label: 'Log My Hours' },
         rows: hw.map(function (w) { return { lead: 'Week ending', main: fl(w.ending), sub: w.back ? 'Sent back to you to correct' : 'Not submitted yet', badge: w.back ? 'Sent back' : 'Not submitted', tone: w.back ? 'warn' : 'bad', href: HOURS_URL }; }) });
     }
+    /* staff who get the digest instead of emails also get a summary of each facilitator's digest (Nov 20) */
+    var team = (extra || []).filter(function (x) { return x && x.rows && x.rows.length; });
+    team.forEach(function (x) { S.push(x); });
     var first = String(person.name || '').split(' ')[0];
     var kind = friday ? 'weekly' : (monday ? 'monday' : 'daily');
     var subject = friday ? 'Your MMS Week in Review, ' + f(add(today, -4)) + ' to ' + f(today)
@@ -344,8 +347,8 @@
     /* a daily (or Monday) digest goes out only when there is something for them to do; the Friday wrap-up always goes */
     var ACT = { yourMove: 1, overdue: 1, targetUpdate: 1, attendance: 1, comments: 1, hours: 1 };
     var acts = S.filter(function (x) { return ACT[x.key]; }).length;
-    var empty = friday ? !S.length : (cfg.actionOnly === false ? !S.length : !acts);
-    return { name: person.name, email: person.email || '', kind: kind, subject: subject, html: html, text: D.text(first, intro, S), sections: S.length, actions: acts, counts: count, empty: empty };
+    var empty = friday ? !S.length : (cfg.actionOnly === false ? !S.length : (!acts && !team.length));
+    return { name: person.name, email: person.email || '', kind: kind, subject: subject, html: html, text: D.text(first, intro, S), sections: S.length, actions: acts, counts: count, empty: empty, secs: S };
   };
 
   D.build = function (input) {
@@ -358,9 +361,32 @@
       var fac = (P.facilitators || []).indexOf(p) >= 0; if (!fac && !listed(cfg.digestOnly, p)) return false; seen[k] = 1; return true; });
     /* access only: no MMS emails at all, not even a copy */
     var noEm = pool.filter(function (p) { return p && listed(cfg.noMail, p); }).map(function (p) { return String(p.email || '').toLowerCase(); });
-    return people.filter(function (p) { return !cfg.skip[p.name] && !listed(cfg.noMail, p); }).map(function (p) {
-      var m = D.forPerson(input, p); m.to = p.email ? [p.email] : []; m.cc = (cfg.cc || []).filter(function (e) { return e && noEm.indexOf(String(e).toLowerCase()) < 0; }); return m;
+    var go = people.filter(function (p) { return !cfg.skip[p.name] && !listed(cfg.noMail, p); });
+    var isFac = function (p) { return (P.facilitators || []).some(function (x) { return x && same(x.name, p.name); }); };
+    var cc = (cfg.cc || []).filter(function (e) { return e && noEm.indexOf(String(e).toLowerCase()) < 0; });
+    var facOut = (P.facilitators || []).filter(function (p) { return p && p.name; }).map(function (p) { return D.forPerson(input, p); });
+    var team = D.teamSummary(input, facOut);
+    return go.map(function (p) {
+      var m = isFac(p) ? facOut.filter(function (x) { return same(x.name, p.name); })[0] || D.forPerson(input, p) : D.forPerson(input, p, team);
+      m = Object.assign({}, m); m.to = p.email ? [p.email] : []; m.cc = cc.slice(); return m;
     });
+  };
+  /* one section per digest: each facilitator's to-do count, what's past target or sitting too long, and their top items */
+  D.teamSummary = function (input, facOut) {
+    var n = et(input.now || new Date()), friday = n.dow === 5 && D.settings(input.settings).sections.wkOn;
+    var pick = function (secs, k) { var x = (secs || []).filter(function (s) { return s.key === k; })[0]; return x ? x.rows || [] : []; };
+    var rows = [];
+    (facOut || []).forEach(function (m) {
+      var ym = pick(m.secs, 'yourMove'), late = pick(m.secs, 'overdue'), stale = pick(m.secs, 'stalled'), moved = pick(m.secs, friday ? 'wkMoved' : 'moved');
+      var bits = [ym.length + ' to do'];
+      if (late.length) bits.push(late.length + ' past target');
+      if (stale.length) bits.push(stale.length + ' sitting too long');
+      if (moved.length) bits.push(moved.length + (friday ? ' moved this week' : ' moved today'));
+      rows.push({ lead: m.name, main: bits.join(' · '), badge: late.length ? 'Past Target' : '', tone: late.length ? 'bad' : '', href: APP + '#board' });
+      ym.slice(0, 3).forEach(function (r) { rows.push({ lead: '', main: (r.lead ? r.lead + ' ' : '') + r.main, sub: r.sub, badge: r.badge, tone: r.tone, href: r.href }); });
+      if (ym.length > 3) rows.push({ lead: '', main: '+ ' + (ym.length - 3) + ' more for ' + String(m.name).split(' ')[0], href: APP + '#board' });
+    });
+    return rows.length ? [{ key: 'team', title: friday ? 'The Facilitators’ Week' : 'The Facilitators’ Digests', tone: 'info', noCount: true, max: 80, note: 'What each facilitator’s digest says today, in one place.', rows: rows }] : [];
   };
   D.isSendDay = function (settings, now) { var cfg = D.settings(settings), n = et(now || new Date()); return (cfg.days || []).indexOf(n.dow) >= 0; };
 
@@ -378,7 +404,7 @@
     var F = "font-family:'IBM Plex Sans',Arial,Helvetica,sans-serif;";
     var all = o.sections || [], act = all.filter(function (s) { return ACT_KEYS[s.key]; }), info = all.filter(function (s) { return !ACT_KEYS[s.key]; });
     var block = function (s, max) {
-      var c = TONE[s.tone || ''] || TONE[''], rows = s.rows || [], shown = rows.slice(0, max), more = rows.length - shown.length;
+      var c = TONE[s.tone || ''] || TONE[''], rows = s.rows || [], shown = rows.slice(0, s.max || max), more = rows.length - shown.length;
       return '<tr><td style="padding:0 28px 12px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-left:4px solid ' + c[0] + ';border-radius:6px;border-collapse:separate">' +
         '<tr><td style="' + F + 'padding:8px 14px 4px"><span style="font-size:14px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (rows.length && !s.noCount ? '<span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;&nbsp;' + rows.length + '</span>' : '') + (s.note ? '<span style="font-size:12px;color:#7794aa">&nbsp;&nbsp;' + esc(s.note) + '</span>' : '') + '</td></tr>' +
         shown.map(function (r) {
