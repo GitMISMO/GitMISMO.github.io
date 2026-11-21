@@ -1,5 +1,10 @@
-/* MISMO certification portal, sample edition (Jonna, 21 Nov 2026: "one each of the certifications so i can show them").
-   One engine for every company certification's example portal. Each page under /portal/<program>/ carries its own
+/* MISMO company certification portal (Jonna, 21 Nov 2026: "one each of the certifications so i can show them", then
+   "update the other certifications to this new portal, so new companies will apply, then pay, then be sent to the portal").
+   One engine for every company certification's portal. Opened plainly it is the SAMPLE (a made-up company, nothing sent).
+   Opened from a company's own link (?p=<32-character code>) it is LIVE: it loads that company's record and saved work through
+   the "MISMO Company Portal - Serve" flow (address in endpoint.js), saves to MISMO as they go (several people can work on it:
+   a save made elsewhere meanwhile is merged, not overwritten), sends files to their SharePoint folder, books the
+   demonstration through the booking flow, and Send to MISMO stamps it sent. Sign-in by emailed code comes next. Each page under /portal/<program>/ carries its own
    settings in <script id="cfg" type="application/json">: the journey, the steps, a made-up sample company, and the
    application and questionnaire questions copied from the live forms on resources.mismo.org/forms/.
    Nothing is sent or uploaded: everything stays in this browser (localStorage), and Restore the Sample puts it back.
@@ -9,6 +14,11 @@
 var CFG = JSON.parse(document.getElementById("cfg").textContent);
 var KEY = "resources:" + CFG.key + "-portal:draft", SKEY = "resources:" + CFG.key + "-portal:signedin";
 var CO = CFG.sample;
+var QS = new URLSearchParams(location.search), TOKEN = (QS.get("p") || "").trim().toLowerCase();
+var LIVE = /^[0-9a-f]{32}$/.test(TOKEN);
+var FLOW = window.MISMO_PORTAL_FLOW || "", BOOK_FLOW = window.MISMO_BOOKING_FLOW || "";
+var PAGE = null, SRV = { savedAt: null, submittedAt: null, submittedBy: null }, LAST = null, saveTimer = null, saving = false, again = false, saveSay = "";
+if (LIVE) { KEY = "resources:" + CFG.key + "-portal:" + TOKEN; }
 
 /* ---------- helpers ---------- */
 function $(id) { return document.getElementById(id); }
@@ -29,9 +39,13 @@ function sample() {
   (CFG.steps || []).forEach(function (st) { if (st.type === "booking") s.booking[st.id] = { chosen: null, slots: [addDays(st.offset || 9) + "|10:00 AM ET", addDays((st.offset || 9) + 1) + "|1:30 PM ET", addDays((st.offset || 9) + 3) + "|11:00 AM ET"] }; });
   return s;
 }
-function load() { try { var t = localStorage.getItem(KEY); if (t) { var x = JSON.parse(t); if (x && x.v === 1) return x; } } catch (e) {} return sample(); }
+function load() { if (LIVE) return { v: 1, step: 1, qsec: 0, values: {}, reps: {}, answers: {}, docs: [], booking: {}, attest: false, signer: "", submitted: false }; try { var t = localStorage.getItem(KEY); if (t) { var x = JSON.parse(t); if (x && x.v === 1) return x; } } catch (e) {} return sample(); }
 var S = load(), savedAt = null;
-function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} savedAt = new Date(); var el = $("savedline"); if (el) el.textContent = "Saved " + savedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+function paintSaved() { var el = $("savedline"); if (!el) return; if (LIVE) { el.textContent = saveSay; return; } if (savedAt) el.textContent = "Saved " + savedAt.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }); }
+function save() {
+  if (LIVE) { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} clearTimeout(saveTimer); saveTimer = setTimeout(serverSave, 4000); say("Saving\u2026"); return; }
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} savedAt = new Date(); paintSaved();
+}
 
 /* ---------- counting what is done ---------- */
 function visible(f, vals) { if (!f.showIf) return true; return String(vals[f.showIf.key] || "") === String(f.showIf.equals); }
@@ -51,21 +65,24 @@ function ansFilled(a) { if (a == null) return false; if (typeof a === "object" &
 function qStats(st, si) { var ids = qItems(st).filter(function (id) { return si == null || id.split("-")[0] === String(si); }); return { done: ids.filter(function (id) { return ansFilled(S.answers[id]); }).length, tot: ids.length }; }
 function docStats(st) { var areas = st.areas.filter(function (a) { return !a.optional; }); return { done: areas.filter(function (a) { return S.docs.some(function (d) { return d.area === a.code; }); }).length, tot: areas.length, files: S.docs.filter(function (d) { return st.areas.some(function (a) { return a.code === d.area; }); }).length }; }
 function stepStats(st) {
-  if (st.type === "fields") return fieldStats(st);
+  if (st.type === "fields") return (LIVE && st.confirm) ? { done: S.confirmed ? 1 : 0, tot: 1 } : fieldStats(st);
   if (st.type === "questionnaire") return qStats(st);
   if (st.type === "docs") return docStats(st);
-  if (st.type === "booking") return { done: S.booking[st.id] && S.booking[st.id].chosen ? 1 : 0, tot: 1 };
+  if (st.type === "booking") return LIVE ? { done: liveBooked() ? 1 : 0, tot: 1 } : { done: S.booking[st.id] && S.booking[st.id].chosen ? 1 : 0, tot: 1 };
+  if (st.type === "invoice") return { done: invPaid() ? 1 : 0, tot: 1 };
   if (st.type === "exercise") return { done: S.docs.some(function (d) { return d.area === "exercise"; }) ? 1 : 0, tot: 1 };
   return { done: S.submitted ? 1 : 0, tot: 1 };
 }
-function overall() { var d = 0, t = 0; CFG.steps.forEach(function (st) { if (st.type === "review") return; var x = stepStats(st); d += x.done; t += x.tot; }); d += S.attest ? 1 : 0; t += 1; return t ? d / t : 0; }
+function hasReview() { return CFG.steps.some(function (s) { return s.type === "review"; }); }
+function overall() { var d = 0, t = 0; CFG.steps.forEach(function (st) { if (st.type === "review") return; var x = stepStats(st); d += x.done; t += x.tot; }); if (hasReview()) { d += S.attest ? 1 : 0; t += 1; } return t ? d / t : 0; }
 function stepOk(st) { var x = stepStats(st); return x.tot > 0 && x.done >= x.tot; }
 function stepSub(st) {
   var x = stepStats(st);
-  if (st.type === "fields") return x.done + " of " + x.tot + " done";
+  if (st.type === "fields") return (LIVE && st.confirm) ? (S.confirmed ? "Confirmed" : "Check and confirm") : x.done + " of " + x.tot + " done";
   if (st.type === "questionnaire") return x.done + " of " + x.tot + " answered";
   if (st.type === "docs") return x.files + " uploaded · " + x.done + " of " + x.tot + " areas";
-  if (st.type === "booking") { var b = S.booking[st.id] || {}; return b.chosen ? "Booked " + fmtDay(b.chosen.split("|")[0]).replace(/^\w+, /, "") : "Pick a time"; }
+  if (st.type === "booking") { if (LIVE) return liveBookingSub(); var b = S.booking[st.id] || {}; return b.chosen ? "Booked " + fmtDay(b.chosen.split("|")[0]).replace(/^\w+, /, "") : "Pick a time"; }
+  if (st.type === "invoice") { var iv = invoiceOf(); return !iv ? "On its way" : invPaid() ? "Paid" : "Ready to pay"; }
   if (st.type === "exercise") return x.done ? "Response uploaded" : "Brief and scenario";
   return S.submitted ? "Sent to MISMO" : "Check, sign and send";
 }
@@ -73,11 +90,12 @@ function stepSub(st) {
 /* ---------- hero and steps ---------- */
 function paintHero() {
   var p = overall(), now = S.submitted ? CFG.now + 1 : CFG.now;
-  var h = '<div class="wrap"><div style="min-width:0"><div class="kicker">' + esc(CFG.kicker) + "</div>" +
-    "<h1>Welcome, " + esc(first(CO.contactName)) + ". Let's get <span>" + esc(CO.subject) + "</span> certified.</h1>" +
+  if (LIVE && PAGE && CFG.stops && CFG.stops[PAGE.state] != null) now = Math.max(CFG.stops[PAGE.state], S.submitted ? CFG.now + 1 : 0);
+  var h = '<div class="wrap"><div style="min-width:0"><div class="kicker">' + esc(LIVE ? CFG.kicker.replace(/ · Sample$/, "") : CFG.kicker) + "</div>" +
+    "<h1>Welcome" + (CO.contactName ? ", " + esc(first(CO.contactName)) : "") + ". Let's get <span>" + esc(CO.subject) + "</span> certified.</h1>" +
     '<p class="sub">' + esc(CFG.heroSub) + "</p>" +
-    '<div class="meta">' + (CFG.meta || []).map(function (m) { return "<span>" + esc(m[0]) + " <b>" + esc(m[1]) + "</b></span>"; }).join("") + "</div></div>" +
-    '<div class="ring" aria-label="' + Math.round(p * 100) + ' percent complete">' + ringSvg(p) + '<div class="lbl"><span class="pct">' + Math.round(p * 100) + '%</span><span class="cap">' + (S.submitted ? "Submitted" : "Complete") + "</span></div></div>" +
+    '<div class="meta">' + (LIVE ? liveMeta() : (CFG.meta || [])).map(function (m) { return "<span>" + esc(m[0]) + " <b>" + esc(m[1]) + "</b></span>"; }).join("") + "</div></div>" +
+    '<div class="ring" aria-label="' + Math.round(p * 100) + ' percent complete">' + ringSvg(p) + '<div class="lbl"><span class="pct">' + Math.round(p * 100) + '%</span><span class="cap">' + (S.submitted ? "Submitted" : hasReview() ? "Complete" : "Done") + "</span></div></div>" +
     '<div class="journey" style="--j:' + CFG.journey.length + '">' + CFG.journey.map(function (j, i) { var c = i < now ? "done" : i === now ? "now" : ""; return '<div class="jstop ' + c + '"><span class="dot"></span>' + esc(j[0]) + '<span class="who">' + esc(i === now ? (S.submitted ? "With MISMO now" : "You are here") : j[1]) + "</span></div>"; }).join("") + "</div></div>";
   $("hero").innerHTML = h;
 }
@@ -114,6 +132,7 @@ function stepFields(st) {
       }).join("") + (items.length < (b.max || 20) ? '<button type="button" class="btn ghost sm" data-repadd="' + esc(b.key) + '" style="margin:4px 0 18px">Add ' + esc(b.itemLabel) + "</button>" : "");
     });
   });
+  if (LIVE && st.confirm) h += '<div class="callout' + (S.confirmed ? "" : " next") + '"><div class="grow"><h4>' + (S.confirmed ? "Confirmed" : "Is this right?") + "</h4><p>" + (S.confirmed ? "Thank you. You can still change anything here; it saves as you type." : "Add anything missing, correct anything that has changed, then confirm.") + "</p></div>" + (S.confirmed ? "" : '<button type="button" class="btn" id="confirmdetails">These Details Are Right</button>') + "</div>";
   return h + foot() + "</div></div>";
 }
 
@@ -187,9 +206,9 @@ function stepDocs(st) {
   var rows = S.docs.filter(function (d) { return st.areas.some(function (a) { return a.code === d.area; }); });
   var opts = function (cur) { return st.areas.map(function (a) { return '<option value="' + a.code + '"' + (a.code === cur ? " selected" : "") + ">" + esc(a.name) + "</option>"; }).join(""); };
   return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div><div class="tools"><span class="muted" id="savedline" style="font-size:12.5px"></span></div></div><div class="pb">' +
-    '<label class="drop" id="drop" data-area="' + st.areas[0].code + '"><input type="file" id="filein" multiple hidden><div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg></div><div class="big">Drop files here, or choose them</div><p>Sample only: the file names are kept to show how it works, nothing is uploaded. Pick what each file is in the list below.</p></label>' +
+    '<label class="drop" id="drop" data-area="' + st.areas[0].code + '"><input type="file" id="filein" multiple hidden><div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg></div><div class="big">Drop files here, or choose them</div><p>' + (LIVE ? "Each file goes straight to MISMO. After it is added, pick what it is in the list below." : "Sample only: the file names are kept to show how it works, nothing is uploaded. Pick what each file is in the list below.") + '</p></label>' +
     '<div class="areas docareas">' + areaBtns + "</div>" +
-    (rows.length ? '<div class="tblwrap"><table class="docs"><thead><tr><th>File</th><th>What It Is</th><th>Size</th><th></th></tr></thead><tbody>' + rows.map(function (d) { return '<tr><td class="fname">' + ftype(d.name) + " " + esc(d.name) + '</td><td><select class="in" data-docarea="' + d.id + '">' + opts(d.area) + '</select></td><td class="fsz">' + fsize(d.size) + '</td><td><button type="button" class="linkbtn" data-docdel="' + d.id + '">Remove</button></td></tr>'; }).join("") + "</tbody></table></div>" : '<p class="muted">Nothing uploaded yet.</p>') +
+    (rows.length ? '<div class="tblwrap"><table class="docs"><thead><tr><th>File</th><th>What It Is</th><th>Size</th><th></th></tr></thead><tbody>' + rows.map(function (d) { return '<tr><td class="fname">' + ftype(d.name) + " " + (LIVE ? '<button type="button" class="linkbtn" data-docopen="' + esc(d.name) + '">' + esc(d.name) + "</button>" : esc(d.name)) + '</td><td><select class="in" data-docarea="' + d.id + '">' + opts(d.area) + '</select></td><td class="fsz">' + fsize(d.size) + '</td><td><button type="button" class="linkbtn" data-docdel="' + d.id + '">Remove</button></td></tr>'; }).join("") + "</tbody></table></div>" : '<p class="muted">Nothing uploaded yet.</p>') +
     foot() + "</div></div>";
 }
 
@@ -199,17 +218,19 @@ function stepBooking(st) {
   var slots = b.slots.map(function (s) { var p = s.split("|"), on = b.chosen === s; return '<button type="button" class="slot" data-slot="' + esc(st.id + "~" + s) + '" aria-pressed="' + on + '"><b>' + esc(fmtDay(p[0])) + "</b><span>" + esc(p[1]) + " · " + esc(st.length) + "</span></button>"; }).join("");
   return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div></div><div class="pb">' +
     '<div class="sectlabel">Times ' + esc(st.from) + " Offered</div><div class=\"slots\">" + slots + "</div>" +
-    (b.chosen ? '<div class="callout"><div class="grow"><h4>Booked for ' + esc(fmtDay(b.chosen.split("|")[0])) + " at " + esc(b.chosen.split("|")[1]) + "</h4><p>" + esc(st.confirm) + '</p></div><button type="button" class="btn ghost sm" data-unbook="' + st.id + '">Change It</button></div>' : '<div class="callout next"><div class="grow"><h4>None of these work?</h4><p>Email certifications@mismo.org and we will offer more times. In the real portal this is a button.</p></div></div>') +
+    (b.slots.length < 12 && !b.chosen ? '<div style="margin-top:10px"><button type="button" class="btn ghost sm" data-moresample="' + st.id + '">Show More Times</button></div>' : "") +
+    (b.chosen ? '<div class="callout"><div class="grow"><h4>Booked for ' + esc(fmtDay(b.chosen.split("|")[0])) + " at " + esc(b.chosen.split("|")[1]) + "</h4><p>" + esc(st.confirm) + '</p></div><button type="button" class="btn ghost sm" data-unbook="' + st.id + '">Change It</button></div>' : "") +
     (st.prep && st.prep.length ? '<div class="sectlabel" style="margin-top:20px">How to Get Ready</div><ol class="prep">' + st.prep.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>" : "") +
     foot() + "</div></div>";
 }
 
 /* ---------- practical exercise (FRAME) ---------- */
 function stepExercise(st) {
+  if (LIVE && st.live) st = Object.assign({}, st, st.live);
   var mine = S.docs.filter(function (d) { return d.area === "exercise"; });
   return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div></div><div class="pb"><div class="grid2">' +
     '<div class="rcard"><div class="sectlabel">The Brief</div>' + st.brief.map(function (x) { return "<p>" + esc(x) + "</p>"; }).join("") + '</div><div class="rcard"><div class="sectlabel">Your Scenario</div><h3 style="font-size:17px">' + esc(st.scenario.title) + "</h3>" + st.scenario.body.map(function (x) { return "<p>" + esc(x) + "</p>"; }).join("") + "</div></div>" +
-    '<div class="sectlabel" style="margin-top:20px">Your Response</div><label class="drop" id="drop" data-area="exercise"><input type="file" id="filein" multiple hidden><div class="big">Drop your write-up here</div><p>Sample only: nothing is uploaded.</p></label>' +
+    '<div class="sectlabel" style="margin-top:20px">Your Response</div><label class="drop" id="drop" data-area="exercise"><input type="file" id="filein" multiple hidden><div class="big">Drop your write-up here</div><p>' + (LIVE ? "It goes straight to MISMO." : "Sample only: nothing is uploaded.") + '</p></label>' +
     (mine.length ? '<div class="tblwrap"><table class="docs"><tbody>' + mine.map(function (d) { return '<tr><td class="fname">' + ftype(d.name) + " " + esc(d.name) + '</td><td class="fsz">' + fsize(d.size) + '</td><td><button type="button" class="linkbtn" data-docdel="' + d.id + '">Remove</button></td></tr>'; }).join("") + "</tbody></table></div>" : "") +
     foot() + "</div></div>";
 }
@@ -240,11 +261,11 @@ function foot() {
 function render() {
   paintHero(); paintSteps();
   var st = CFG.steps[S.step - 1], m = $("main");
-  m.innerHTML = st.type === "fields" ? stepFields(st) : st.type === "questionnaire" ? stepQuestionnaire(st) : st.type === "docs" ? stepDocs(st) : st.type === "booking" ? stepBooking(st) : st.type === "exercise" ? stepExercise(st) : stepReview();
-  if (savedAt) save();
+  m.innerHTML = st.type === "fields" ? stepFields(st) : st.type === "questionnaire" ? stepQuestionnaire(st) : st.type === "docs" ? stepDocs(st) : st.type === "booking" ? (LIVE ? liveBooking(st) : stepBooking(st)) : st.type === "invoice" ? stepInvoice(st) : st.type === "exercise" ? stepExercise(st) : stepReview();
+  paintSaved();
 }
 function rerender() { var y = window.scrollY; render(); window.scrollTo(0, y); }
-function go(n) { S.step = n; save(); render(); window.scrollTo({ top: $("steps").getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" }); }
+function go(n) { S.step = n; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} render(); window.scrollTo({ top: $("steps").getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" }); }
 
 /* ---------- typing ---------- */
 document.addEventListener("input", function (e) {
@@ -267,6 +288,7 @@ document.addEventListener("change", function (e) { var t = e.target; if ((t.type
 
 /* ---------- clicks ---------- */
 function addFiles(list, area) {
+  if (LIVE) { liveUpload(list, area); return; }
   var n = 0;
   Array.prototype.forEach.call(list || [], function (f) { if (S.docs.some(function (d) { return d.name === f.name && d.size === f.size; })) return; S.docs.push({ id: "d" + Date.now().toString(36) + n, name: f.name, size: f.size, area: area }); n++; });
   if (n) { save(); rerender(); toast(n + " file" + (n === 1 ? "" : "s") + " added (sample: not uploaded)"); }
@@ -275,19 +297,279 @@ document.addEventListener("click", function (e) {
   var t = e.target.closest("button"); if (!t) return;
   var d = t.dataset;
   if (d.step) { go(+d.step); return; }
-  if (d.qsec != null) { S.qsec = +d.qsec; save(); render(); var p = document.querySelector(".qlayout"); if (p) window.scrollTo({ top: p.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" }); return; }
+  if (d.qsec != null) { S.qsec = +d.qsec; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} render(); var p = document.querySelector(".qlayout"); if (p) window.scrollTo({ top: p.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" }); return; }
   if (d.yn) { var y = d.yn.split("|"), cur = S.answers[y[0]], o = cur && typeof cur === "object" ? cur : {}; o.yn = o.yn === y[1] ? "" : y[1]; S.answers[y[0]] = o; save(); rerender(); return; }
   if (d.repadd) { S.reps[d.repadd] = S.reps[d.repadd] || []; S.reps[d.repadd].push({}); save(); rerender(); return; }
   if (d.repdel) { var r = d.repdel.split("|"); S.reps[r[0]].splice(+r[1], 1); save(); rerender(); return; }
   if (d.docdel) { S.docs = S.docs.filter(function (x) { return x.id !== d.docdel; }); save(); rerender(); toast("File removed"); return; }
   if (d.slot) { var s = d.slot.split("~"); S.booking[s[0]].chosen = S.booking[s[0]].chosen === s[1] ? null : s[1]; save(); rerender(); if (S.booking[s[0]].chosen) toast("Booked (sample: nobody is told)"); return; }
   if (d.unbook) { S.booking[d.unbook].chosen = null; save(); rerender(); return; }
-  if (t.id === "submit") { S.submitted = true; save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); toast("Sent (sample: nothing was sent)"); return; }
-  if (t.id === "reopen") { S.submitted = false; S.step = 1; save(); render(); return; }
+  if (d.moresample) { var bb = S.booking[d.moresample], last = bb.slots.length, base0 = (CFG.steps.filter(function (x) { return x.id === d.moresample; })[0] || {}).offset || 9, times = ["9:30 AM ET", "2:00 PM ET", "11:00 AM ET"]; for (var k = 0; k < 3; k++) bb.slots.push(addDays(base0 + 4 + last + k * 2) + "|" + times[k]); save(); rerender(); return; }
+  if (t.id === "submit") { if (LIVE) { liveSubmit(t); return; } S.submitted = true; save(); render(); window.scrollTo({ top: 0, behavior: "smooth" }); toast("Sent (sample: nothing was sent)"); return; }
+  if (d.docopen) { liveOpen(d.docopen); return; }
+  if (d.more) { S.more = (S.more || 3) + 3; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (x) {} rerender(); return; }
+  if (d.lslot) { BK.picked = BK.picked === d.lslot ? null : d.lslot; rerender(); return; }
+  if (t.id === "bookit") { liveBook(); return; }
+  if (t.id === "getinvoice") { liveInvoice(t); return; }
+  if (t.id === "confirmdetails") { S.confirmed = true; save(); rerender(); toast("Thank you"); return; }
+  if (t.id === "liveretry") { start(); return; }
+  if (t.id === "reopen") { if (LIVE) { S.step = 1; S.viewAnswers = true; render(); return; } S.submitted = false; S.step = 1; save(); render(); return; }
 });
 document.addEventListener("dragover", function (e) { var z = e.target.closest && e.target.closest("#drop"); if (z) { e.preventDefault(); z.classList.add("over"); } });
 document.addEventListener("dragleave", function (e) { var z = e.target.closest && e.target.closest("#drop"); if (z) z.classList.remove("over"); });
 document.addEventListener("drop", function (e) { var z = e.target.closest && e.target.closest("#drop"); if (z) { e.preventDefault(); z.classList.remove("over"); if (e.dataTransfer) addFiles(e.dataTransfer.files, z.dataset.area); } });
+
+/* ---------- LIVE: talking to MISMO ---------- */
+function say(t) { saveSay = t; paintSaved(); }
+function call(body) {
+  if (!FLOW) return Promise.reject(new Error("This portal is not connected yet."));
+  body.formKey = "mismo-company-portal"; body.token = TOKEN;
+  return fetch(FLOW, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(body) })
+    .then(function (r) { var ct = r.headers.get("Content-Type") || ""; if (/json/.test(ct)) return r.json().then(function (j) { j.__status = r.status; return j; }); return r.blob().then(function (b) { return { __status: r.status, blob: b, type: ct }; }); });
+}
+function who() { try { return localStorage.getItem("resources:company-portal:me") || ""; } catch (e) { return ""; } }
+function draftOf(x) { var d = clone(x); delete d.step; delete d.qsec; delete d.more; delete d.viewAnswers; return d; }
+/* Merge: what I changed since my last sync wins; everything else comes from the newer copy someone else saved. */
+function merged(base, mine, theirs) {
+  var out = clone(theirs || {});
+  ["values", "answers", "reps"].forEach(function (sec) {
+    var b = (base && base[sec]) || {}, m = mine[sec] || {}, o = out[sec] = out[sec] || {};
+    Object.keys(Object.assign({}, b, m)).forEach(function (k) { if (JSON.stringify(m[k]) !== JSON.stringify(b[k])) { if (m[k] === undefined) delete o[k]; else o[k] = m[k]; } });
+  });
+  var bd = ((base && base.docs) || []).map(function (d) { return d.id; }), md = (mine.docs || []).map(function (d) { return d.id; });
+  var docs = (out.docs || []).filter(function (d) { return !(bd.indexOf(d.id) >= 0 && md.indexOf(d.id) < 0); });
+  (mine.docs || []).forEach(function (d) { var i = docs.map(function (x) { return x.id; }).indexOf(d.id); if (i < 0) docs.push(d); else if (bd.indexOf(d.id) >= 0 && JSON.stringify(d) !== JSON.stringify(((base.docs || []).filter(function (x) { return x.id === d.id; })[0]))) docs[i] = d; });
+  out.docs = docs;
+  ["attest", "signer"].forEach(function (k) { if (JSON.stringify(mine[k]) !== JSON.stringify(base && base[k])) out[k] = mine[k]; });
+  out.v = 1;
+  return out;
+}
+function serverSave(submit) {
+  if (saving) { again = true; return Promise.resolve(false); }
+  saving = true; say(submit ? "Sending…" : "Saving…");
+  var mine = draftOf(S);
+  return call({ mode: submit ? "submit" : "save", draft: mine, base: SRV.savedAt || "", by: who() || (PAGE && PAGE.contact && PAGE.contact.name) || "the company" }).then(function (r) {
+    saving = false;
+    if (r.__status === 409 && r.conflict) {
+      var theirs = (r.draft && r.draft.draft) || {};
+      var m = merged(LAST || {}, mine, theirs);
+      ["step", "qsec", "more"].forEach(function (k) { m[k] = S[k]; });
+      S = m; SRV.savedAt = r.draft.savedAt || null; LAST = draftOf(S);
+      toast("Someone on your team saved changes too. Theirs and yours are both kept.");
+      rerender(); return serverSave(submit);
+    }
+    if (!r.saved) { say("Not saved yet. Check your connection; it will try again."); clearTimeout(saveTimer); saveTimer = setTimeout(serverSave, 15000); return false; }
+    SRV.savedAt = r.savedAt; LAST = mine;
+    if (submit) { SRV.submittedAt = r.submittedAt; S.submitted = true; }
+    say("Saved to MISMO " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }));
+    if (again) { again = false; serverSave(); }
+    return true;
+  }, function () { saving = false; say("Not saved yet. Check your connection; it will try again."); clearTimeout(saveTimer); saveTimer = setTimeout(serverSave, 15000); return false; });
+}
+function liveFresh(pg) {
+  var s = { v: 1, step: 1, qsec: 0, values: {}, reps: {}, answers: {}, docs: [], booking: {}, attest: false, signer: "", submitted: false };
+  var c = pg.company || {}, k = pg.contact || {}, g = pg.signer || {};
+  var v = { org: pg.org, website: c.website, street: c.street, city: c.city, state: c.state, zip: c.zip, contact: k.name, contactEmail: k.email, signer: g.name, signerTitle: g.title, signerEmail: g.email };
+  Object.keys(v).forEach(function (x) { if (v[x]) s.values[x] = v[x]; });
+  if (pg.product) s.reps.products = [{ name: pg.product }];
+  /* the questionnaire's own "about the provider" box, from the record */
+  CFG.steps.forEach(function (st) {
+    if (st.type !== "questionnaire") return;
+    (st.form.sections || []).forEach(function (sec, si) { (sec.tables || []).forEach(function (tb, ti) {
+      if (tb.kind !== "field_block" || si !== 0) return;
+      var o = {}; (tb.fields || []).forEach(function (f, i) { o[f] = i === 0 ? (pg.product || pg.org) : /Name/.test(f) ? (k.name || "") : /Email/.test(f) ? (k.email || "") : ""; });
+      s.answers[si + "-t" + ti] = o;
+    }); });
+  });
+  return s;
+}
+function liveMeta() {
+  var m = [["Company", PAGE.org]];
+  if (PAGE.product) m.push(["Product", PAGE.product]);
+  m.push(["Certification", CFG.programName.replace(/ Certification$/, "")]);
+  return m;
+}
+function liveScreen(title, html, retry) {
+  $("hero").innerHTML = '<div class="wrap"><div style="min-width:0"><div class="kicker">' + esc(CFG.programName) + "</div><h1>" + esc(title) + '</h1><p class="sub">' + html + "</p>" + (retry ? '<p style="margin-top:14px"><button type="button" class="btn" id="liveretry">Try Again</button></p>' : "") + "</div></div>";
+  $("hero").hidden = false; $("steps").parentNode.hidden = true; $("main").hidden = true;
+}
+function start() {
+  $("gate").hidden = true;
+  var band = document.querySelector(".band .wrap");
+  band.innerHTML = '<div class="draftnote"><b class="live">Private</b><span>Your company’s own link. Share it only with your team; everyone’s work is saved to MISMO.</span></div><span style="margin-left:auto"></span>'
+    + '<label class="whoami">Working as <input class="in" id="whoami" placeholder="Your name" value="' + esc(who()) + '"></label>';
+  liveScreen("Opening your portal…", "One moment while we load your certification.");
+  if (!FLOW) { liveScreen("This portal opens shortly", "It is being connected. Please use the link in your email again later today, or write to certifications@mismo.org."); return; }
+  call({ mode: "load" }).then(function (r) {
+    if (r.__status === 404 || r.error === "no-token" || !r.page) { liveScreen("We could not find this portal", "Please open the link exactly as it appears in your email from MISMO, or write to certifications@mismo.org."); return; }
+    PAGE = r.page;
+    if (PAGE.closed) { liveScreen("This portal is closed", "This certification is complete, so its portal is closed. Questions: certifications@mismo.org."); return; }
+    CO = { org: PAGE.org, subject: PAGE.product || PAGE.org, contactName: PAGE.contact && PAGE.contact.name, contactEmail: PAGE.contact && PAGE.contact.email, signerName: PAGE.signer && PAGE.signer.name };
+    var local = null; try { local = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
+    if (r.draft && r.draft.draft) {
+      S = Object.assign(liveFresh(PAGE), r.draft.draft);
+      SRV = { savedAt: r.draft.savedAt || null, submittedAt: r.draft.submittedAt || null, submittedBy: r.draft.submittedBy || null };
+      S.submitted = !!SRV.submittedAt;
+      LAST = draftOf(S);
+      say("Saved to MISMO " + new Date(SRV.savedAt).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }));
+    } else {
+      S = liveFresh(PAGE); LAST = null;
+      if (local && local.v === 1 && local.values) S = Object.assign(S, local);   /* typed here before a save reached MISMO */
+      say("Nothing saved yet");
+    }
+    if (local) { S.step = local.step || 1; S.qsec = local.qsec || 0; }
+    if (S.step > CFG.steps.length) S.step = 1;
+    $("hero").hidden = false; $("steps").parentNode.hidden = false; $("main").hidden = false;
+    render();
+  }, function () { liveScreen("We could not open your portal just now", "Please check your connection and try again. If it keeps happening, write to certifications@mismo.org.", true); });
+}
+/* leaving the page, or switching tabs: save now rather than wait */
+document.addEventListener("visibilitychange", function () { if (LIVE && PAGE && document.visibilityState === "hidden" && saveTimer) { clearTimeout(saveTimer); saveTimer = null; serverSave(); } });
+document.addEventListener("change", function (e) { if (e.target && e.target.id === "whoami") { try { localStorage.setItem("resources:company-portal:me", e.target.value.trim()); } catch (x) {} } });
+
+/* ---------- LIVE: files ---------- */
+var SMALL = 20 * 1024 * 1024, BIG_MAX = 2 * 1024 * 1024 * 1024;
+function b64(file) { return new Promise(function (ok, no) { var r = new FileReader(); r.onload = function () { ok(String(r.result).split(",")[1] || ""); }; r.onerror = function () { no(r.error); }; r.readAsDataURL(file); }); }
+function sendParts(url, file, onp) {
+  var PART = 10 * 1024 * 1024, at = 0;
+  function next(tries) {
+    if (at >= file.size) return Promise.resolve(true);
+    var end = Math.min(at + PART, file.size);
+    return fetch(url, { method: "PUT", headers: { "Content-Range": "bytes " + at + "-" + (end - 1) + "/" + file.size }, body: file.slice(at, end) }).then(function (r) {
+      if (r.status === 200 || r.status === 201 || r.status === 202) { at = end; onp(at / file.size); return next(0); }
+      if ((r.status >= 500 || r.status === 429) && tries < 4) return new Promise(function (w) { setTimeout(w, 2000 * (tries + 1)); }).then(function () { return next(tries + 1); });
+      throw new Error("The upload stopped (" + r.status + ").");
+    }, function (e) { if (tries < 4) return new Promise(function (w) { setTimeout(w, 2000 * (tries + 1)); }).then(function () { return next(tries + 1); }); throw e; });
+  }
+  return next(0);
+}
+function liveUpload(list, area) {
+  var files = Array.prototype.slice.call(list || []);
+  if (!files.length) return;
+  var chain = Promise.resolve(), n = 0;
+  files.forEach(function (f) {
+    chain = chain.then(function () {
+      if (f.size > BIG_MAX) { toast(f.name + " is too big to upload here. Write to certifications@mismo.org."); return; }
+      say("Uploading " + f.name + "…");
+      var p = f.size <= SMALL
+        ? b64(f).then(function (c) { return call({ mode: "upload", name: f.name, content: c }); })
+        : call({ mode: "big", name: f.name, size: f.size }).then(function (r) { if (!r.uploadUrl) return r; return sendParts(r.uploadUrl, f, function (x) { say("Uploading " + f.name + " … " + Math.round(x * 100) + "%"); }).then(function () { return { saved: true, name: r.name }; }); });
+      return p.then(function (r) {
+        if (!r || !r.saved) { toast((r && r.error) || ("We could not upload " + f.name + ".")); return; }
+        S.docs.push({ id: "d" + Date.now().toString(36) + n, name: r.name || f.name, size: f.size, area: area, at: new Date().toISOString(), by: who() || null }); n++;
+      }, function (e) { toast("We could not upload " + f.name + ": " + (e && e.message || "no connection")); });
+    });
+  });
+  chain.then(function () { if (n) { save(); rerender(); toast(n + " file" + (n === 1 ? "" : "s") + " added"); } else paintSaved(); });
+}
+function openBlob(r, name) {
+  if (!r || !r.blob || r.__status !== 200) { toast("That file could not be opened just now."); return; }
+  var u = URL.createObjectURL(r.blob);
+  if (/pdf|image/.test(r.type || "")) window.open(u, "_blank", "noopener"); else { var a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+  setTimeout(function () { URL.revokeObjectURL(u); }, 60000);
+}
+function liveOpen(name) { toast("Opening " + name + "…"); call({ mode: "open", name: name }).then(function (r) { openBlob(r, name); }, function () { toast("That file could not be opened just now."); }); }
+
+/* ---------- invoice (Product) ---------- */
+function invoiceOf() { return LIVE ? (PAGE && PAGE.invoice) || null : (CO.invoice || null); }
+function invPaid() { var i = invoiceOf(); return !!(i && i.paid); }
+function money(n) { return n == null ? "" : "$" + Number(n).toLocaleString("en-US", { minimumFractionDigits: n % 1 ? 2 : 0 }); }
+function longDay(iso) { return iso ? new Date(String(iso).slice(0, 10) + "T12:00:00").toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : ""; }
+function stepInvoice(st) {
+  var i = invoiceOf(), paid = invPaid();
+  var body = !i ? '<div class="callout next"><div class="grow"><h4>Your invoice is on its way</h4><p>MISMO raises it once your application agreement is signed, and it appears here as soon as it is sent. Questions: certifications@mismo.org.</p></div></div>'
+    : '<div class="invcard' + (paid ? " paid" : "") + '"><div class="invtop"><span class="tag' + (paid ? " ok" : "") + '">' + (paid ? "Paid" : "Open") + '</span><b>' + esc(money(i.amount)) + "</b></div>"
+      + '<div class="invrows"><div><span>Aptify Order</span><b>' + esc(i.order || "") + '</b></div><div><span>Invoiced</span><b>' + esc(longDay(i.invoicedOn)) + "</b></div>"
+      + (paid ? '<div><span>Paid</span><b>' + esc(longDay(i.paidOn) || "Received") + "</b></div>" : "") + "</div>"
+      + (paid ? '<p class="muted" style="margin:10px 0 0">Thank you, your payment has been received. You can now book your demonstration.</p>'
+             : '<p class="muted" style="margin:10px 0 0">Pay by the instructions on the invoice. If your organization needs a purchase order number or a change, reply to the invoice email or write to certifications@mismo.org. This page shows it paid within a day of MISMO receiving payment.</p>'
+               + ((LIVE ? PAGE.hasInvoicePdf : true) ? '<p style="margin:12px 0 0"><button type="button" class="btn" id="getinvoice">Download Your Invoice</button></p>' : ""))
+      + "</div>";
+  return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div></div><div class="pb">' + body + foot() + "</div></div>";
+}
+function liveInvoice(btn) {
+  if (!LIVE) { toast("Sample: the invoice PDF opens here in the real portal."); return; }
+  btn.disabled = true; call({ mode: "invoice" }).then(function (r) { btn.disabled = false; openBlob(r, "MISMO invoice.pdf"); }, function () { btn.disabled = false; toast("The invoice could not be opened just now."); });
+}
+
+/* ---------- LIVE: booking the demonstration (the same booking flow as the booking page) ---------- */
+var BK = { picked: null, rid: null, until: 0, timer: null, said: "" };
+function liveBooked() { var b = PAGE && PAGE.booking; return !!(b && (b.status === "booked" || b.status === "proposed")); }
+function liveBookingSub() { var b = PAGE && PAGE.booking; if (!b) return "Opens after payment"; if (b.status === "booked") return "Booked"; if (b.status === "proposed") return "Times offered"; if (CFG.key === "product" && !invPaid()) return "Once paid"; return b.status === "open" ? "Pick a time" : "Not open"; }
+function bookCall(body) {
+  if (!BOOK_FLOW) return Promise.reject(new Error("Booking is not connected yet."));
+  body.formKey = "mismo-demo-booking"; body.token = PAGE.booking.token;
+  return fetch(BOOK_FLOW, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(body) }).then(function (r) { return r.json(); });
+}
+function liveBooking(st) {
+  var b = PAGE.booking, h = "";
+  var lockedProduct = CFG.key === "product" && !invPaid();
+  if (lockedProduct) h = '<div class="callout next"><div class="grow"><h4>Booking opens once your invoice is paid</h4><p>As soon as payment is received, the times your assessor has open appear here. Nothing else to do until then.</p></div></div>';
+  else if (!b) h = '<div class="callout next"><div class="grow"><h4>Your booking opens shortly</h4><p>MISMO is assigning your assessor. Their open times appear here as soon as that is done, and you will get an email too.</p></div></div>';
+  else if (b.status === "booked") h = '<div class="callout"><div class="grow"><h4>Booked' + (b.booked && b.booked.label ? ": " + esc(b.booked.label) : "") + "</h4><p>" + esc(st.confirm) + " If you need a different time, write to certifications@mismo.org.</p></div></div>";
+  else if (b.status === "proposed") h = '<div class="callout"><div class="grow"><h4>Your times are with ' + esc(b.assessor || "the assessor") + "</h4><p>They will confirm one by email, and it shows here once they do.</p></div></div>";
+  else if (b.status === "hold") h = '<div class="callout next"><div class="grow"><h4>Booking is paused</h4><p>MISMO has paused this certification for now. Questions: certifications@mismo.org.</p></div></div>';
+  else if (b.status !== "open") h = '<div class="callout next"><div class="grow"><h4>Booking is not open right now</h4><p>Questions: certifications@mismo.org.</p></div></div>';
+  else {
+    var me = who(), c = PAGE.contact || {};
+    var form = '<div class="fgrid" style="--cols:2;margin-top:16px"><div class="fld"><label for="bk-name">Your Name</label><input class="in" id="bk-name" value="' + esc(me || c.name || "") + '"></div><div class="fld"><label for="bk-email">Your Email</label><input class="in" id="bk-email" type="email" value="' + esc(c.email || "") + '"></div>'
+      + '<div class="fld wide"><label for="bk-others">Everyone Else Who Should Get the Invitation</label><span class="help">Email addresses, separated by commas.</span><input class="in" id="bk-others"></div>'
+      + '<div class="fld wide"><label for="bk-note">Anything the Assessor Should Know (Optional)</label><textarea class="in" id="bk-note" rows="2"></textarea></div></div>';
+    if (b.mode === "slots") {
+      var all = b.slots || [], n = Math.min(all.length, S.more || 3);
+      h = (all.length ? '<div class="sectlabel">Times ' + esc(b.assessor || "Your Assessor") + ' Has Open</div><div class="slots">' + all.slice(0, n).map(function (x) { return '<button type="button" class="slot" data-lslot="' + esc(x.start) + '" aria-pressed="' + (BK.picked === x.start) + '"><b>' + esc(String(x.label).split(",").slice(0, 2).join(",")) + "</b><span>" + esc(String(x.label).split(",").slice(2).join(",").trim() || ((b.minutes || "") + " minutes")) + "</span></button>"; }).join("") + "</div>"
+        + (n < all.length ? '<div style="margin-top:10px"><button type="button" class="btn ghost sm" data-more="1">Show More Times</button></div>' : '<p class="muted" style="font-size:13px;margin:10px 0 0">Those are all the times open right now. If none of them work, write to certifications@mismo.org and we will find more.</p>')
+        : '<div class="callout next"><div class="grow"><h4>No open times just now</h4><p>Your assessor will publish more shortly. Write to certifications@mismo.org if you would like us to chase it.</p></div></div>')
+        + (BK.picked ? form + '<div class="foot-actions"><span id="bk-say" class="muted">' + esc(BK.said) + '</span><button type="button" class="btn good" id="bookit">Book This Time</button></div>' : "");
+    } else {
+      h = '<p class="muted" style="margin:0 0 10px">' + (b.calendarLink ? 'See when ' + esc(b.assessor || "the assessor") + ' is free on <a href="' + esc(b.calendarLink) + '" target="_blank" rel="noopener">their calendar</a> (please don’t book there), then offer up to three times here and they will confirm one.' : "Offer up to three times that suit you, and the assessor will confirm one.") + "</p>"
+        + '<div class="fgrid" style="--cols:3">' + [1, 2, 3].map(function (i) { return '<div class="fld"><label for="bk-o' + i + '">Time ' + i + '</label><input class="in" id="bk-o' + i + '" placeholder="e.g. Tue Dec 8, 2 PM ET"></div>'; }).join("") + "</div>"
+        + form + '<div class="foot-actions"><span id="bk-say" class="muted">' + esc(BK.said) + '</span><button type="button" class="btn good" id="bookit">Send These Times</button></div>';
+    }
+  }
+  return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div></div><div class="pb">' + h
+    + (b && b.prepDoc ? '<p style="margin:16px 0 0"><a href="' + esc(b.prepDoc) + '" target="_blank" rel="noopener">Read the demonstration overview</a> to prepare.</p>' : "")
+    + (st.prep && st.prep.length ? '<div class="sectlabel" style="margin-top:20px">How to Get Ready</div><ol class="prep">' + st.prep.map(function (x) { return "<li>" + esc(x) + "</li>"; }).join("") + "</ol>" : "")
+    + foot() + "</div></div>";
+}
+function liveBook() {
+  var b = PAGE.booking, EM = /^[^\s@,;<>]+@[^\s@,;<>]+\.[^\s@,;<>]+$/;
+  var name = ($("bk-name") || {}).value || "", email = ($("bk-email") || {}).value || "", others = (($("bk-others") || {}).value || "").split(/[\s,;]+/).filter(Boolean);
+  var body = { mode: "book", name: name.trim(), email: email.trim(), attendees: others.join(", "), note: (($("bk-note") || {}).value || "").trim() };
+  function no(t) { BK.said = t; var e = $("bk-say"); if (e) e.textContent = t; }
+  if (b.mode === "slots") { body.kind = "book"; body.slot = BK.picked; if (!BK.picked) return no("Choose a time first."); }
+  else { body.kind = "propose"; body.options = [1, 2, 3].map(function (i) { return (($("bk-o" + i) || {}).value || "").trim(); }).filter(Boolean); if (!body.options.length) return no("Offer at least one time."); }
+  if (!body.name) return no("Please give your name.");
+  if (!EM.test(body.email)) return no("Please give a valid email address.");
+  if (others.some(function (x) { return !EM.test(x); })) return no("One of the other addresses doesn't look right.");
+  BK.rid = "r" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7); body.rid = BK.rid;
+  $("bookit").disabled = true; no(b.mode === "slots" ? "Booking your time… this takes about a minute." : "Sending your times…");
+  bookCall(body).then(function (r) {
+    if (!r || r.saved !== true) { $("bookit").disabled = false; return no(r && r.error === "not-open" ? "These times have just changed. Please look again." : "That did not go through. Please try again."); }
+    BK.until = Date.now() + 4 * 60 * 1000; poll();
+  }, function (e) { $("bookit").disabled = false; no((e && e.message) || "That did not go through. Please try again."); });
+}
+function poll() {
+  bookCall({ mode: "load" }).then(function (p) {
+    var q = p && p.requests && p.requests[BK.rid];
+    if ((q && /booked|proposed/.test(q.status)) || (p && (p.status === "booked" || p.status === "proposed"))) {
+      PAGE.booking = Object.assign({}, PAGE.booking, { status: p.status, booked: p.booked || null, slots: p.slots || [] });
+      BK.picked = null; BK.said = ""; rerender(); toast(p.status === "booked" ? "Booked. The calendar invitation follows from the assessor." : "Sent. The assessor will confirm a time."); return;
+    }
+    if (q && q.status === "failed") { BK.said = q.why || "That time has just gone. Please choose another."; PAGE.booking.slots = p.slots || PAGE.booking.slots; BK.picked = null; rerender(); return; }
+    if (Date.now() < BK.until) { BK.timer = setTimeout(poll, 8000); return; }
+    BK.said = "Still confirming. You will get an email as soon as it is booked."; rerender();
+  }, function () { if (Date.now() < BK.until) BK.timer = setTimeout(poll, 8000); });
+}
+
+/* ---------- LIVE: Send to MISMO ---------- */
+function liveSubmit(btn) {
+  btn.disabled = true; clearTimeout(saveTimer);
+  serverSave(true).then(function (ok) {
+    if (!ok) { btn.disabled = false; toast("It did not send. Check your connection and try again."); return; }
+    render(); window.scrollTo({ top: 0, behavior: "smooth" }); toast("Sent to MISMO. Thank you.");
+  });
+}
 
 /* ---------- how sign-in works (shown, never sent) ---------- */
 var G = { s: 0, code: CFG.code || "615204", err: "" };
@@ -336,8 +618,10 @@ document.addEventListener("click", function (e) {
   try { var saved = localStorage.getItem("mismo.portal.theme"); if (saved) document.documentElement.setAttribute("data-theme", saved); } catch (e) {}
   paint();
 })();
-$("reset").addEventListener("click", function () { S = sample(); save(); render(); window.scrollTo(0, 0); toast("The sample is back as it started"); });
-$("seesign").addEventListener("click", function () { setSigned(false); G.s = 0; G.err = ""; showGate(true); window.scrollTo(0, 0); });
-if (/[?&]in=1/.test(location.search)) setSigned(true);
-render(); showGate(!signedIn());
+if (!LIVE) {
+  $("reset").addEventListener("click", function () { S = sample(); save(); render(); window.scrollTo(0, 0); toast("The sample is back as it started"); });
+  $("seesign").addEventListener("click", function () { setSigned(false); G.s = 0; G.err = ""; showGate(true); window.scrollTo(0, 0); });
+  if (/[?&]in=1/.test(location.search)) setSigned(true);
+  render(); showGate(!signedIn());
+} else start();
 })();
