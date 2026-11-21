@@ -26,7 +26,7 @@ function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function
 function filled(v) { if (Array.isArray(v)) return v.length > 0; return v != null && v !== false && String(v).trim() !== ""; }
 function clone(x) { return JSON.parse(JSON.stringify(x)); }
 function toast(msg) { var t = $("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast._t); toast._t = setTimeout(function () { t.hidden = true; }, 2600); }
-function fsize(n) { return n >= 1e6 ? (n / 1e6).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1e3)) + " KB"; }
+function fsize(n) { n = Number(n) || 0; return n >= 1e6 ? (n / 1e6).toFixed(1) + " MB" : Math.max(1, Math.round(n / 1e3)) + " KB"; }
 function ftype(n) { var e = (String(n).split(".").pop() || "").toLowerCase(); var c = { pdf: "#b3372c", doc: "#2477b8", docx: "#2477b8", xls: "#0f7b5c", xlsx: "#0f7b5c", csv: "#0f7b5c", ppt: "#c25a1d", pptx: "#c25a1d", png: "#6b5bb5", jpg: "#6b5bb5", jpeg: "#6b5bb5", mp4: "#6b5bb5", zip: "#55687a", xml: "#0f7b5c" }[e] || "#55687a"; return '<span class="ftype" style="background:' + c + '">' + esc(e.slice(0, 4).toUpperCase() || "FILE") + "</span>"; }
 function ringSvg(p) { var size = 132, stroke = 10, r = (size - stroke) / 2, c = 2 * Math.PI * r; return '<svg viewBox="0 0 132 132" aria-hidden="true"><circle cx="66" cy="66" r="' + r + '" fill="none" stroke="rgba(255,255,255,.15)" stroke-width="10"/><circle cx="66" cy="66" r="' + r + '" fill="none" stroke="#74bfeb" stroke-width="10" stroke-linecap="round" stroke-dasharray="' + (c * p).toFixed(1) + " " + c.toFixed(1) + '"/></svg>'; }
 function fmtDay(iso) { var d = new Date(iso + "T12:00:00"); return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" }); }
@@ -208,7 +208,7 @@ function stepDocs(st) {
   return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div><div class="tools"><span class="muted" id="savedline" style="font-size:12.5px"></span></div></div><div class="pb">' +
     '<label class="drop" id="drop" data-area="' + st.areas[0].code + '"><input type="file" id="filein" multiple hidden><div class="icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16V4M6 10l6-6 6 6M4 20h16"/></svg></div><div class="big">Drop files here, or choose them</div><p>' + (LIVE ? "Each file goes straight to MISMO. After it is added, pick what it is in the list below." : "Sample only: the file names are kept to show how it works, nothing is uploaded. Pick what each file is in the list below.") + '</p></label>' +
     '<div class="areas docareas">' + areaBtns + "</div>" +
-    (rows.length ? '<div class="tblwrap"><table class="docs"><thead><tr><th>File</th><th>What It Is</th><th>Size</th><th></th></tr></thead><tbody>' + rows.map(function (d) { return '<tr><td class="fname">' + ftype(d.name) + " " + (LIVE ? '<button type="button" class="linkbtn" data-docopen="' + esc(d.name) + '">' + esc(d.name) + "</button>" : esc(d.name)) + '</td><td><select class="in" data-docarea="' + d.id + '">' + opts(d.area) + '</select></td><td class="fsz">' + fsize(d.size) + '</td><td><button type="button" class="linkbtn" data-docdel="' + d.id + '">Remove</button></td></tr>'; }).join("") + "</tbody></table></div>" : '<p class="muted">Nothing uploaded yet.</p>') +
+    (rows.length ? '<div class="tblwrap"><table class="docs"><thead><tr><th>File</th><th>What It Is</th><th>Size</th><th></th></tr></thead><tbody>' + rows.map(function (d) { return '<tr><td class="fname">' + ftype(d.name) + " " + (LIVE ? '<button type="button" class="linkbtn" data-docopen="' + esc(d.name) + '">' + esc(d.name) + "</button>" : esc(d.name)) + '</td><td><select class="in" data-docarea="' + esc(d.id) + '">' + opts(d.area) + '</select></td><td class="fsz">' + fsize(d.size) + '</td><td><button type="button" class="linkbtn" data-docdel="' + esc(d.id) + '">Remove</button></td></tr>'; }).join("") + "</tbody></table></div>" : '<p class="muted">Nothing uploaded yet.</p>') +
     foot() + "</div></div>";
 }
 
@@ -231,7 +231,7 @@ function stepExercise(st) {
   return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div></div><div class="pb"><div class="grid2">' +
     '<div class="rcard"><div class="sectlabel">The Brief</div>' + st.brief.map(function (x) { return "<p>" + esc(x) + "</p>"; }).join("") + '</div><div class="rcard"><div class="sectlabel">Your Scenario</div><h3 style="font-size:17px">' + esc(st.scenario.title) + "</h3>" + st.scenario.body.map(function (x) { return "<p>" + esc(x) + "</p>"; }).join("") + "</div></div>" +
     '<div class="sectlabel" style="margin-top:20px">Your Response</div><label class="drop" id="drop" data-area="exercise"><input type="file" id="filein" multiple hidden><div class="big">Drop your write-up here</div><p>' + (LIVE ? "It goes straight to MISMO." : "Sample only: nothing is uploaded.") + '</p></label>' +
-    (mine.length ? '<div class="tblwrap"><table class="docs"><tbody>' + mine.map(function (d) { return '<tr><td class="fname">' + ftype(d.name) + " " + esc(d.name) + '</td><td class="fsz">' + fsize(d.size) + '</td><td><button type="button" class="linkbtn" data-docdel="' + d.id + '">Remove</button></td></tr>'; }).join("") + "</tbody></table></div>" : "") +
+    (mine.length ? '<div class="tblwrap"><table class="docs"><tbody>' + mine.map(function (d) { return '<tr><td class="fname">' + ftype(d.name) + " " + esc(d.name) + '</td><td class="fsz">' + fsize(d.size) + '</td><td><button type="button" class="linkbtn" data-docdel="' + esc(d.id) + '">Remove</button></td></tr>'; }).join("") + "</tbody></table></div>" : "") +
     foot() + "</div></div>";
 }
 
@@ -464,8 +464,12 @@ function liveUpload(list, area) {
 }
 function openBlob(r, name) {
   if (!r || !r.blob || r.__status !== 200) { toast("That file could not be opened just now."); return; }
-  var u = URL.createObjectURL(r.blob);
-  if (/pdf|image/.test(r.type || "")) window.open(u, "_blank", "noopener"); else { var a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
+  /* Only a PDF or a plain picture opens in a tab, and its type comes from the file's own extension, never from what
+     came back: anything else (an SVG or a web page included) downloads, so a file can never run on this site. */
+  var ext = (String(name).split(".").pop() || "").toLowerCase();
+  var safe = { pdf: "application/pdf", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", gif: "image/gif", webp: "image/webp" }[ext];
+  var u = URL.createObjectURL(safe ? new Blob([r.blob], { type: safe }) : new Blob([r.blob], { type: "application/octet-stream" }));
+  if (safe) window.open(u, "_blank", "noopener"); else { var a = document.createElement("a"); a.href = u; a.download = name; document.body.appendChild(a); a.click(); a.remove(); }
   setTimeout(function () { URL.revokeObjectURL(u); }, 60000);
 }
 function liveOpen(name) { toast("Opening " + name + "…"); call({ mode: "open", name: name }).then(function (r) { openBlob(r, name); }, function () { toast("That file could not be opened just now."); }); }
