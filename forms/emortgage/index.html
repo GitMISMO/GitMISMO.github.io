@@ -637,7 +637,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 <div style="flex: 1 1 440px; min-width: 0; max-width: 620px; margin-right: auto;">
 <p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: #74bfeb; font-family: inherit; line-height: 1.5;">MISMO eMortgage Technology Certification</p>
 <h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Apply for eMortgage<span style="display: block; color: #74bfeb;">Technology Certification</span></h1>
-<p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">One application for RON, eClosing and eVault. Tick the ones you want and only those questionnaires appear.</p>
+<p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">One application for RON, eClosing and eVault. Tick the ones you want; the questionnaires follow in your own certification portal.</p>
 <p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3; max-width: 52ch;">Your answers save as you type, so you can close this page and come back whenever you like.</p>
 <div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#form" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Start the Application&nbsp;&rarr;</a></div>
 </div>
@@ -658,11 +658,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <div class="sect-head">
     <p class="mm-eyebrow">Application</p>
     <h2>Complete Your Application</h2>
-    <p>Start with the application. Tick RON, eClosing or eVault and only those questionnaires appear — you do not fill the application out three times. Everything is kept as you type.</p>
+    <p>Tick RON, eClosing or eVault: one application covers them all. Once your application agreement is signed and your fee is paid, MISMO emails you a link to your own certification portal, where you answer the questionnaire, add your documents and book your demonstration. Everything here is kept as you type.</p>
   </div>
 
   <h1 class="doc">Apply for MISMO eMortgage Technology Certification</h1>
-  <p class="docsub">Two parts: the application, then the questionnaire. Your answers save as you type &mdash; close this page and come back whenever you like.</p>
+  <p class="docsub">The application only: the questionnaire comes in your certification portal once your fee is paid. Your answers save as you type &mdash; close this page and come back whenever you like.</p>
 
   <div class="stages" id="stages" role="tablist" aria-label="The parts of this application"></div>
 
@@ -746,7 +746,12 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
      Appendix A carries the scoring weights, the certification gates and the
      reviewer recommendation. It is MISMO's, and it is in the same file as the
      questions, so it is filtered out here by name rather than by position. */
-  function liveForms(){
+  /* Application only (Jonna, 21 Nov 2026: "new companies will apply, then pay, then be sent to the portal"). The
+     questionnaires are answered in the company's own certification portal once the fee is paid. The ticks still say
+     which programs are applied for (chosenForms -> the payload's questionnaires list, which the intake splits on). */
+  var APP_ONLY = true;
+  function liveForms(){ return APP_ONLY ? [] : chosenForms(); }
+  function chosenForms(){
     return (FORMS || []).filter(function(f){
       return !f.gate || filled(get(f.gate));
     });
@@ -1373,7 +1378,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       attachments: attList(),
       form: "MISMO eMortgage Technology Certification",
       programCode: "EMORTGAGE",
-      questionnaires: liveForms().map(function(f){
+      questionnaires: chosenForms().map(function(f){
         return {code: f.code, label: f.label,
                 version: f.source_title || f.source_file || f.code};
       }),
@@ -1410,7 +1415,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     if(submitted){
       box.className = "done";
       box.innerHTML = '<h3>Sent to MISMO</h3><p>Your application has been submitted. ' +
-        'MISMO will be in touch about the next step. Your answers stay on this page ' +
+        'Once your application agreement is signed and your fee is paid, MISMO emails you a link to your own certification portal for the questionnaire, documents and booking. Your answers stay on this page ' +
         'if you need to look back at them.</p>';
       return;
     }
@@ -1898,7 +1903,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
          type the applicant ticks. Until one is ticked the tab bar was simply
          hidden, so there was nothing on the page to say a questionnaire exists
          at all. Say so instead. */
-      if((FORMS || []).length){
+      if((FORMS || []).length && !APP_ONLY){
         bar.hidden = false;
         bar.innerHTML = '<div class="stage-note">' +
           'The questionnaire appears here, as a second step, once you tick what you are ' +
