@@ -2096,7 +2096,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T23:31:58Z',fp:'42a86da7'};
+window.__mmsBuild={at:'2026-11-20T23:43:23Z',fp:'4cd38d47'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7955,6 +7955,21 @@ const _renderPanelWRL=renderPanel;
 renderPanel=function(){ _renderPanelWRL(); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(t) wrlPatch(document.getElementById('panel'),t); };
 /* a #wr= link clicked while the MMS is already open */
 window.addEventListener('hashchange',()=>{ const m=(location.hash||'').match(/^#wr=([^&]+)/); if(!m||!S.ready) return; const id=decodeURIComponent(m[1]); const t=S.tickets[id]||allTickets().find(x=>x.wr===id||x.id===id); if(t) openPanel(t.id); });
+/* ---------- Settings: MISMO Staff only (Nov 20, 2026) ----------
+   Settings shows only for the people in Settings › People and Roles › MISMO Staff (and the site's platform admins,
+   who manage everyone's access). Before, an "admin" on the MMS in the site's sign-in access also saw it.
+   Facilitators, architects and everyone else keep My Email Choices, which isn't in Settings.
+   While staff preview someone else (View As), Settings follows that person. */
+function setgateMine(){ const L=(S.people&&S.people.roles&&S.people.roles.staff)||[], nm=(S.me&&S.me.name)||'', em=String((S.me&&S.me.email)||'').toLowerCase();
+  return L.some(p=>sameName(p.name,nm)||(em&&String(p.email||'').toLowerCase()===em)); }
+function canSettings(){ if(S.mode==='memory') return true; if(S.viewAs) return typeof personIsStaff==='function'&&personIsStaff(S.viewAs);
+  if(setgateMine()) return true; try{ return !!(window.ResourcesSession&&ResourcesSession.isPlatformAdmin&&ResourcesSession.isPlatformAdmin()); }catch(e){ return false; } }
+const _renderAllSG=renderAll;
+renderAll=function(){
+  if(S.view==='settings'&&S.ready&&!canSettings()){ S.view='home'; try{ history.replaceState(null,'','#home'); }catch(e){} setTimeout(()=>toast('Settings are for MISMO staff.'),0); }
+  _renderAllSG();
+  const ok=canSettings(), n=document.getElementById('nav-settings'); if(n&&!ok) n.hidden=true;
+  if(!ok) document.querySelectorAll('[data-go="settings"],[data-hq="settings"]').forEach(b=>{ if(b.id!=='nav-settings') b.remove(); }); };
 
 /* ================= Comment resolution (Build Next, Nov 2026) =================
    Every public comment gets a disposition (Accepted, Accepted with Changes, Not Accepted, or Duplicate or Out
