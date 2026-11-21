@@ -321,12 +321,70 @@ document.addEventListener("drop", function (e) { var z = e.target.closest && e.t
 
 /* ---------- LIVE: talking to MISMO ---------- */
 function say(t) { saveSay = t; paintSaved(); }
+/* Sign-in (21 Nov 2026): the link alone never opens the portal. A six-digit code is emailed to an address MISMO has for
+   the company (or a colleague at the same company email domain); a right code gives this device a 30-day session. */
+var SESS_KEY = "resources:company-portal:session:" + TOKEN, PRE = null, SIGNIN_UP = false, SI = { step: "email", email: "", err: "", note: "", busy: false };
+function sess() { try { var o = JSON.parse(localStorage.getItem(SESS_KEY) || "null"); return o && o.session && o.until && new Date(o.until) > new Date() ? o : null; } catch (e) { return null; } }
+function setSess(o) { try { if (o) localStorage.setItem(SESS_KEY, JSON.stringify(o)); else localStorage.removeItem(SESS_KEY); } catch (e) {} }
 function call(body) {
   if (!FLOW) return Promise.reject(new Error("This portal is not connected yet."));
-  body.formKey = "mismo-company-portal"; body.token = TOKEN;
+  body.formKey = "mismo-company-portal"; body.token = TOKEN; body.session = (sess() || {}).session || "";
   return fetch(FLOW, { method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" }, body: JSON.stringify(body) })
-    .then(function (r) { var ct = r.headers.get("Content-Type") || ""; if (/json/.test(ct)) return r.json().then(function (j) { j.__status = r.status; return j; }); return r.blob().then(function (b) { return { __status: r.status, blob: b, type: ct }; }); });
+    .then(function (r) {
+      var ct = r.headers.get("Content-Type") || "";
+      if (r.status === 401 && PAGE && !SIGNIN_UP) { setSess(null); SIGNIN_UP = true; setTimeout(function () { SI.step = "email"; liveSignIn("Please sign in again to keep working. Anything you typed is kept on this device."); }, 0); }
+      if (/json/.test(ct)) return r.json().then(function (j) { j.__status = r.status; return j; });
+      return r.blob().then(function (b) { return { __status: r.status, blob: b, type: ct }; });
+    });
 }
+function liveSignIn(msg) {
+  SIGNIN_UP = true; clearTimeout(saveTimer);
+  var org = (PRE && PRE.org) || (PAGE && PAGE.org) || "";
+  if (msg) SI.err = msg;
+  $("hero").innerHTML = '<div class="wrap"><div style="min-width:0"><div class="kicker">' + esc(CFG.programName) + '</div><h1>Sign in to your <span>certification portal</span></h1><p class="sub">' + (org ? esc(org) + ". " : "") + "For your security the link alone never opens the portal: we email you a six-digit code first.</p></div></div>";
+  $("hero").hidden = false; $("steps").parentNode.hidden = true; $("main").hidden = false;
+  var h = '<div class="panel" style="max-width:660px;margin:0 auto"><div class="pb signbox">';
+  if (SI.step === "email") h += '<h3>Your work email</h3><p class="muted" style="margin:0 0 10px">Use the email MISMO has for your company, or your own work email at the same company. We send the code there.</p>'
+    + '<label class="sr" for="si-email">Your work email</label><input class="in" id="si-email" type="email" autocomplete="email" placeholder="you@yourcompany.com" value="' + esc(SI.email) + '">'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn" type="button" id="si-send"' + (SI.busy ? " disabled" : "") + ">" + (SI.busy ? "Sending…" : "Email Me a Code") + "</button></div>";
+  else h += '<h3>Enter your code</h3><p class="muted" style="margin:0 0 10px">We sent a six-digit code to <b>' + esc(SI.email) + "</b>. It works once and lasts 10 minutes.</p>"
+    + '<label class="sr" for="si-code">Six-digit code</label><input class="in codein" id="si-code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000 000">'
+    + '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"><button class="btn" type="button" id="si-go"' + (SI.busy ? " disabled" : "") + ">" + (SI.busy ? "Checking…" : "Sign In") + '</button><button class="btn ghost" type="button" id="si-again">Send a New Code</button><button class="btn ghost" type="button" id="si-other">Use a Different Email</button></div>';
+  h += (SI.err ? '<p role="alert" style="margin:12px 0 0;color:var(--bad);font-weight:600">' + esc(SI.err) + "</p>" : "")
+    + (SI.note ? '<p class="muted" style="margin:12px 0 0">' + esc(SI.note) + "</p>" : "")
+    + '<p class="muted" style="margin:16px 0 0;font-size:13px">You stay signed in on this device for 30 days. Trouble signing in? Email certifications@mismo.org.</p></div></div>';
+  $("main").innerHTML = h;
+  var f = $(SI.step === "email" ? "si-email" : "si-code"); if (f && !SI.busy) f.focus();
+}
+function siSend() {
+  var e = SI.step === "email" ? (($("si-email") || {}).value || "").trim() : SI.email;
+  if (!/^[^@\s,;<>"]+@[^@\s,;<>"]+\.[^@\s,;<>"]+$/.test(e)) { SI.err = "Enter your work email address."; liveSignIn(); return; }
+  SI.email = e; SI.busy = true; SI.err = ""; SI.note = ""; liveSignIn();
+  call({ mode: "code", email: e }).then(function (r) {
+    SI.busy = false;
+    if (r.sent) { SI.step = "code"; SI.note = "Can't find it? Check your junk folder; it comes from certifications@mismo.org."; }
+    else SI.err = r.error === "not-on-file" ? "We can't send a code to that address. Use the email MISMO has for your company, or a work email at the same company. Need a hand? Email certifications@mismo.org."
+      : r.error === "too-soon" ? "We just sent a code. Please wait a minute before asking for another." : "We couldn't send a code just now. Please try again in a minute.";
+    liveSignIn();
+  }, function () { SI.busy = false; SI.err = "We couldn't reach MISMO just now. Check your connection and try again."; liveSignIn(); });
+}
+function siGo() {
+  var c = (($("si-code") || {}).value || "").replace(/\D/g, "");
+  if (c.length !== 6) { SI.err = "Enter the six-digit code from the email."; liveSignIn(); return; }
+  SI.busy = true; SI.err = ""; liveSignIn();
+  call({ mode: "verify", code: c }).then(function (r) {
+    SI.busy = false;
+    if (r.session) { setSess({ session: r.session, until: r.until, by: r.by }); SI = { step: "email", email: "", err: "", note: "", busy: false }; start(); toast("Signed in"); return; }
+    SI.err = r.error === "expired" ? "That code has run out. Press Send a New Code." : r.error === "too-many" ? "Too many tries. Press Send a New Code for a fresh one."
+      : r.error === "no-code" ? "Press Send a New Code first." : r.error === "bad-code" ? "That code doesn't match. Check the email and try again." : "We couldn't sign you in just now. Please try again.";
+    liveSignIn();
+  }, function () { SI.busy = false; SI.err = "We couldn't reach MISMO just now. Check your connection and try again."; liveSignIn(); });
+}
+document.addEventListener("click", function (e) {
+  var t = e.target.closest && e.target.closest("#si-send,#si-go,#si-again,#si-other"); if (!t || SI.busy) return;
+  if (t.id === "si-send" || t.id === "si-again") siSend(); else if (t.id === "si-go") siGo(); else { SI.step = "email"; SI.err = ""; SI.note = ""; liveSignIn(); }
+});
+document.addEventListener("keydown", function (e) { if (e.key !== "Enter" || SI.busy) return; if (e.target.id === "si-email") { e.preventDefault(); siSend(); } else if (e.target.id === "si-code") { e.preventDefault(); siGo(); } });
 function who() { try { return localStorage.getItem("resources:company-portal:me") || ""; } catch (e) { return ""; } }
 function draftOf(x) { var d = clone(x); delete d.step; delete d.qsec; delete d.more; delete d.viewAnswers; return d; }
 /* Merge: what I changed since my last sync wins; everything else comes from the newer copy someone else saved. */
@@ -358,6 +416,7 @@ function serverSave(submit) {
       toast("Someone on your team saved changes too. Theirs and yours are both kept.");
       rerender(); return serverSave(submit);
     }
+    if (r.__status === 401) return false;
     if (r.__status === 429) { clearTimeout(saveTimer); saveTimer = setTimeout(serverSave, 3000); return false; }
     if (r.__status === 413) { say("This is more than the portal can save in one go. Email certifications@mismo.org and we will help."); return false; }
     if (!r.saved) { say("Not saved yet. Check your connection; it will try again."); clearTimeout(saveTimer); saveTimer = setTimeout(serverSave, 15000); return false; }
@@ -403,6 +462,8 @@ function start() {
   liveScreen("Opening your portal…", "One moment while we load your certification.");
   if (!FLOW) { liveScreen("This portal opens shortly", "It is being connected. Please use the link in your email again later today, or write to certifications@mismo.org."); return; }
   call({ mode: "load" }).then(function (r) {
+    if (r.signin) { PRE = r; PAGE = null; liveSignIn(); return; }
+    SIGNIN_UP = false;
     if (r.__status === 404 || r.error === "no-token" || !r.page) { liveScreen("We could not find this portal", "Please open the link exactly as it appears in your email from MISMO, or write to certifications@mismo.org."); return; }
     PAGE = r.page;
     if (PAGE.closed) { liveScreen("This portal is closed", "This certification is complete, so its portal is closed. Questions: certifications@mismo.org."); return; }
@@ -598,7 +659,7 @@ function paintGate() {
       '<div class="panel how"><div class="pb"><div class="sectlabel">What Happens</div><ol><li><b>' + esc(CFG.inviteStep) + "</b> The CMS opens the portal and this email goes out (only once MISMO approves it).</li><li><b>They click Open My Portal.</b> The portal knows which company it is, but asks for a code first.</li><li><b>A six-digit code is emailed</b> to the address on file. Good for 10 minutes.</li><li><b>Signed in.</b> On their own device they stay signed in for 30 days.</li><li><b>MISMO can open any company's portal</b> from the CMS.</li></ol></div></div></div>";
   } else if (G.s === 1) {
     h += '<div class="gcols"><div class="panel"><div class="pb signbox"><h3>Sign in to your certification portal</h3><div class="who"><span class="mono">' + esc(fn.charAt(0)) + "</span><div><b>" + esc(CO.org) + '</b><br><span class="muted" style="font-size:13px">' + esc(CO.subject) + " · " + esc(CFG.programName) + "</span></div></div><p style=\"margin:0\">We'll email a six-digit sign-in code to <b>" + esc(mask(CO.contactEmail)) + '</b>.</p><div><button class="btn" type="button" data-g="2">Email Me a Code</button></div><p class="muted" style="margin:0;font-size:13px">Not you, or need a different address? Email certifications@mismo.org.</p></div></div>' +
-      '<div class="panel how"><div class="pb"><div class="sectlabel">Why a Code</div><ol><li>No password for the company to create or forget.</li><li>A forwarded or leaked link is useless without the inbox.</li><li>Only addresses MISMO has on file, plus teammates they add, can get a code.</li></ol></div></div></div>';
+      '<div class="panel how"><div class="pb"><div class="sectlabel">Why a Code</div><ol><li>No password for the company to create or forget.</li><li>A forwarded or leaked link is useless without the inbox.</li><li>Only addresses MISMO has on file, and colleagues at the same company email domain, can get a code.</li></ol></div></div></div>';
   } else {
     h += '<div class="gcols">' + mailFrame("Your MISMO sign-in code", '<div class="ctx">Sign-In Code · ' + esc(CFG.programName) + "</div><p>Hello " + esc(fn) + ",</p><p>Here is your code to sign in to the " + esc(CO.subject) + ' certification portal:</p><div class="code">' + G.code.slice(0, 3) + " " + G.code.slice(3) + '</div><p>It works once and expires in 10 minutes.</p><div class="note">If you didn\'t ask for this code, you can ignore this email. Nobody can sign in without it.</div>', "Sign-in code email") +
       '<div class="panel"><div class="pb signbox"><h3>Enter your code</h3><p class="muted" style="margin:0">We sent it to ' + esc(mask(CO.contactEmail)) + '.</p><label class="sr" for="codein">Six-digit code</label><input class="in codein" id="codein" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="000000">' + (G.err ? '<div class="err" role="alert">' + esc(G.err) + "</div>" : "") +
