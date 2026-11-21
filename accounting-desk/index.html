@@ -640,18 +640,27 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     drawWith("ar", listOnly, function () {
       var received = items.filter(function (r) { return r.status === "Paid" || r.status === "Complete"; });
       var bad = items.filter(function (r) { return r.status === "Bad Debt"; });
-      $("v-ar").innerHTML = hero("For Accounting", "Receivables", "Your AR aging as MISMO reads it. Every morning MISMO checks each item against the Aptify payments, so an item paid since your report shows as Paid. You no longer need to add items to a shared sheet.", "",
+      /* Jonna, 21 Nov 2026: receivables come from Aptify's Monday workbook once it carries Order Status and Balance */
+      var wk = a.source === "weekly", yr = String(a.asOf || a.reportDate || "").slice(0, 4);
+      $("v-ar").innerHTML = hero("For Accounting", "Receivables", wk
+        ? "What is still owed on Aptify's orders: every order Shipped with a balance over $0, from the Monday Aptify workbook. Every morning MISMO checks each one against the Aptify payments, so an order paid since the workbook shows as Paid."
+        : "Your AR aging as MISMO reads it. Every morning MISMO checks each item against the Aptify payments, so an item paid since your report shows as Paid. You no longer need to add items to a shared sheet.", "",
         tile("Still Owed to MISMO", usd(a.owedTotal, 1), items.filter(function (r) { return r.status === "Open"; }).length + " open") +
         tile("Over 90 Days", usd(a.owedOver90 && a.owedOver90.amount, 1), (a.owedOver90 && a.owedOver90.count || 0) + " of what is owed") +
         tile("Received", usd(sum(received, function (r) { return r.amount; }), 1), received.length + " paid or complete") +
         tile("Bad Debt", usd(sum(bad, function (r) { return r.amount; }), 1), bad.length + " kept out of what is owed") +
-        tile("Newest AR Aging", day(a.reportDate), a.count + " items on file")) +
+        (wk ? tile("Aptify Workbook", day(a.asOf || a.reportDate), a.count + " orders owed" + (a.taken && a.taken.count ? ", " + a.taken.count + " Taken left out" : ""))
+            : tile("Newest AR Aging", day(a.reportDate), a.count + " items on file"))) +
         (items.some(function (r) { return r.status === "Open"; }) ? "" :
-          '<div class="nowed">Nothing is owed to MISMO on the AR aging dated ' + esc(day(a.reportDate)) + ": every item on it is paid, complete, canceled or bad debt.</div>") +
+          '<div class="nowed">' + (wk ? "Nothing is owed to MISMO on Aptify's orders as of " + esc(day(a.asOf || a.reportDate)) + "."
+            : "Nothing is owed to MISMO on the AR aging dated " + esc(day(a.reportDate)) + ": every item on it is paid, complete, canceled or bad debt.") + "</div>") +
         '<div class="bar"><h2>Every Receivable</h2>' +
         select("ar-status", "Status", [["", "Every Status"], ["Open", "Open"], ["Paid", "Paid"], ["Complete", "Complete"], ["Canceled", "Canceled"], ["Bad Debt", "Bad Debt"]], AS.status) +
         findBox("ar-q", "Company, order or note", AS.q) + '<button class="btn" type="button" id="ar-dl">Download for Excel</button></div>' +
-        '<div class="card" id="ar-list"></div><p class="note">The newest AR aging on file is dated ' + esc(day(a.reportDate)) + ". A newer aging sent to Jonna is loaded into MISMO Money and shows here the next morning.</p>" +
+        '<div class="card" id="ar-list"></div><p class="note">' + (wk
+          ? "From Aptify's Monday workbook dated " + esc(day(a.asOf || a.reportDate)) + ". It only holds orders dated January 1, " + esc(yr) + " or later, so an unpaid order from before then does not appear here." +
+            (a.taken && a.taken.count ? " " + a.taken.count + " Taken orders (" + usd(a.taken.amount, 1) + ") are left out: they are not money owed." : "")
+          : "The newest AR aging on file is dated " + esc(day(a.reportDate)) + ". A newer aging sent to Jonna is loaded into MISMO Money and shows here the next morning.") + "</p>" +
         '<p class="stamp">' + esc(stamp(a.writtenAt)) + "</p>";
       $("ar-status").addEventListener("change", function () { AS.status = this.value; resetPage("ar"); drawAr(); });
       wireFind("ar-q", AS, "ar", drawAr);
@@ -907,7 +916,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
       "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid.</p>" +
       "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
-      "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. You no longer need to add items to a shared sheet; just keep sending the monthly AR aging.</p>" +
+      "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. Once Aptify's Monday workbook carries each order's status and balance, this becomes what is still owed on Aptify's own orders (every order Shipped with a balance over $0), and the AR aging is no longer needed.</p>" +
       "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each and its membership term (when it starts and ends, and whether it is a dues deal). Pick a month or a year, or choose All Time and search.</p>" +
       "<h2>IIF Payments</h2><p>Every Innovation Investment Fee payment, by fiscal year or month, with Member 360&rsquo;s count of lenders paid in full and partly paid.</p>" +
       "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
