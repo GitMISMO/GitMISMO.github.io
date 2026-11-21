@@ -638,7 +638,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 <p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: #74bfeb; font-family: inherit; line-height: 1.5;">MISMO FRAME Certification</p>
 <h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Become a FRAME<span style="display: block; color: #74bfeb;">Certified Advisory Partner</span></h1>
 <p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff;">Apply for the certification that recognizes advisors who can guide mortgage organizations through AI governance using MISMO FRAME.</p>
-<p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3;">Two parts: the application, then the questionnaire. Your answers save as you type, so you can close this page and come back whenever you like.</p>
+<p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3;">Apply here. Once your fee is paid, MISMO emails you your own link to the questionnaire. Your answers save as you type, so you can close this page and come back whenever you like.</p>
 <div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#form" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Start the Application&nbsp;&rarr;</a></div>
 </div>
 <div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
@@ -662,7 +662,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   </div>
 
   <h1 class="doc">Apply to Become a MISMO FRAME Certified Advisory Partner</h1>
-  <p class="docsub">Two parts: the application, then the questionnaire. Your answers save as you type &mdash; close this page and come back whenever you like.</p>
+  <p class="docsub">Apply here. Once your fee is paid, MISMO emails you your own link to the questionnaire. Your answers save as you type &mdash; close this page and come back whenever you like.</p>
 
   <div class="stages" id="stages" role="tablist" aria-label="The parts of this application"></div>
 
@@ -724,6 +724,18 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
      Put the same word here and in the flow's condition. It keeps the mailbox
      clean; it is not a password and protects nothing else. */
   var FORM_KEY = "mismo-fmpi-m8on08";
+
+  /* Two pages in one (Jonna, 21 Nov 2026: "complete the application, pay the fee, then they get the same portal
+     invitation to complete the questionnaire"). Opened plainly it is the application only. Opened from the link
+     MISMO emails once the fee is paid (?p=<code>) it is that company's questionnaire: the code finds their record
+     through the renewal-page flow, and the answers go back as programCode FRAMEQ, carrying the code, so the CMS
+     files them against the right certification. */
+  var PORTAL = (function(){ var m = /[?&]p=([0-9a-f]{32})(?:&|$)/.exec(location.search); return m ? m[1] : null; })();
+  var PORTAL_REC = null, PORTAL_BAD = false;
+  var PAGE_FLOW = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/30/workflows/b7c43e642a114351bea85f898ce0cf65/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GjeuqRbTNg00VzD2nKHSTcXJXRHlVLVtbeTYbNX6H5Q";
+  var QFORMS = FORMS;
+  if(!PORTAL) FORMS = [];
+  else KEY = KEY + ".q." + PORTAL;
 
   var data    = {};      /* every answer, by key */
   var openSet = {};      /* which sections are open */
@@ -1307,6 +1319,12 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* ================= progress, and what is still missing ================= */
   function appRequired(){
     var miss = [];
+    if(PORTAL){
+      if(PORTAL_BAD) miss.push("This link is not one MISMO sent. Use the link in your email from MISMO, or write to certifications@mismo.org.");
+      if(!filled(get("pName"))) miss.push("Your name - Who Is Sending This");
+      if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(get("pEmail") || "").trim())) miss.push("Your email - Who Is Sending This");
+      return miss;
+    }
     (APP.sections || []).forEach(function(sec){
       (sec.fields || []).forEach(function(f){
         if(f.required && shows(f) && !filled(get(f.key))) miss.push(f.label + " - " + sec.heading);
@@ -1384,16 +1402,20 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     return {
       formKey: FORM_KEY,
       attachments: attList(),
-      form: "MISMO FRAME Certified Advisory Partner",
-      programCode: "FRAME",
+      form: PORTAL ? "MISMO FRAME Questionnaire" : "MISMO FRAME Certified Advisory Partner",
+      programCode: PORTAL ? "FRAMEQ" : "FRAME",
       questionnaires: liveForms().map(function(f){
-        return {code: f.code, label: f.label,
+        var q = {code: f.code, label: f.label,
                 version: f.source_title || f.source_file || f.code};
+        if(PORTAL) q.portal = PORTAL;
+        return q;
       }),
       submittedAt: new Date().toISOString(),
-      organization: get("org"),
+      organization: PORTAL ? ((PORTAL_REC && PORTAL_REC.org) || get("pName")) : get("org"),
       application: (function(){
         var o = {};
+        if(PORTAL) return {company: (PORTAL_REC && PORTAL_REC.org) || null, contact: get("pName"),
+          contactEmail: String(get("pEmail") || "").trim(), kind: "Questionnaire", portal: PORTAL};
         (APP.sections || []).forEach(function(s){
           (s.fields || []).forEach(function(f){ if(filled(get(f.key))) o[f.key] = get(f.key); });
           if(s.repeating && filled(get(s.repeating.key))) o[s.repeating.key] = get(s.repeating.key);
@@ -1423,7 +1445,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     if(submitted){
       box.className = "done";
       box.innerHTML = '<h3>Sent to MISMO</h3><p>Your application has been submitted. ' +
-        'MISMO will be in touch about the next step. Your answers stay on this page ' +
+        'MISMO will be in touch about the next step: once your fee is paid, MISMO emails you your own link to the questionnaire. Your answers stay on this page ' +
         'if you need to look back at them.</p>';
       return;
     }
@@ -1772,7 +1794,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       '<div style="height:18px"></div>' +
       (APP.sections || []).map(appSectionHTML).join("") +
       /* The files support the questionnaire answers, so they sit in its section 11 (Erin, 7 Nov 2026). */
-      (APP.attachments && !liveForms().length ? attSectionHTML() : "") +
+      (APP.attachments && !liveForms().length && !(QFORMS || []).length ? attSectionHTML() : "") +
       '<div id="submitbox"></div>';
     paintSubmit();
   }
@@ -1795,6 +1817,15 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         }).join("") + '</div>';
     });
     FORM = was;
+    if(PORTAL){
+      out = '<div class="intro-card"><p><b>' + esc(PORTAL_REC && PORTAL_REC.org ? PORTAL_REC.org + "'s questionnaire" : "Your questionnaire") + '</b>' +
+        (PORTAL_REC && PORTAL_REC.received && PORTAL_REC.received.at ? ' &mdash; MISMO received it on ' + esc(new Date(PORTAL_REC.received.at).toLocaleDateString("en-US", {month: "long", day: "numeric", year: "numeric"})) + '. Sending it again replaces it.' : '') +
+        '</p><p>Your answers save as you type on this computer, so you can come back to this link and carry on. Attach supporting documents in section 11.</p></div>' +
+        '<div class="sect"><div class="sect-body on" style="display:block"><p class="sect-intro"><b>Who Is Sending This</b></p>' +
+        appFieldHTML({key: "pName", label: "Your Name", type: "text", required: true}) +
+        appFieldHTML({key: "pEmail", label: "Your Email", type: "email", required: true, help: "MISMO confirms receipt to this address."}) +
+        '</div></div>' + out;
+    }
     host.innerHTML = out + '<div id="qsubmitbox" class="qfoot"></div>';
     paintQSubmit();
   }
@@ -1849,16 +1880,16 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var miss = appRequired();
     if(submitted){
       box.className = "done qfoot";
-      box.innerHTML = '<h3>Sent to MISMO</h3><p>Your application and questionnaire have been ' +
-        'submitted. Your answers stay on this page if you need to look back at them.</p>';
+      box.innerHTML = '<h3>Sent to MISMO</h3><p>' + (PORTAL ? 'Your questionnaire has been sent.' : 'Your application and questionnaire have been submitted.') +
+        ' Your answers stay on this page if you need to look back at them.</p>';
       return;
     }
     if(miss.length){
       box.className = "done miss qfoot";
-      box.innerHTML = '<h3>The application still needs a few things</h3>' +
+      box.innerHTML = '<h3>' + (PORTAL ? 'A few details first' : 'The application still needs a few things') + '</h3>' +
         '<p>These are needed before anything can go to MISMO:</p>' +
         '<ul class="miss-list">' + miss.map(function(m){ return '<li>' + esc(m) + '</li>'; }).join("") +
-        '</ul><button class="btn ghost" type="button" id="backapp">Back to the Application</button>';
+        '</ul>' + (PORTAL ? '' : '<button class="btn ghost" type="button" id="backapp">Back to the Application</button>');
       var ba = $("backapp");
       if(ba) ba.addEventListener("click", function(){ showStage("application"); });
       return;
@@ -1888,7 +1919,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     }
     box.className = "done qfoot";
     box.innerHTML = '<h3>Everything answered</h3>' +
-      '<p>The application and the questionnaire are both complete.</p>' +
+      '<p>' + (PORTAL ? 'Your questionnaire is complete.' : 'The application and the questionnaire are both complete.') + '</p>' +
       '<button class="btn" type="button" id="qsubmit">Send to MISMO</button>';
     var qb = $("qsubmit");
     if(qb) qb.addEventListener("click", doSubmit);
@@ -1909,6 +1940,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
   function renderStages(){
     var bar = $("stages"); if(!bar) return;
+    if(PORTAL){ bar.innerHTML = ""; bar.hidden = true; return; }
     var live = liveForms();
     if(!live.length){
       /* eMortgage carries three questionnaires, each unlocked by the product
@@ -1988,6 +2020,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     if(t.dataset.k != null){
       set(t.dataset.k, t.value);
       if(tallied(t.dataset.k)) repaintTally();
+      if(PORTAL && (t.dataset.k === "pName" || t.dataset.k === "pEmail")) paintQSubmitSoon();
       return;
     }
     if(t.dataset.grow != null){
@@ -2203,6 +2236,18 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   restore();
+  if(PORTAL){
+    stage = (QFORMS[0] || {}).code || "Q";
+    var h1 = document.querySelector("h1.doc"); if(h1) h1.textContent = "Your MISMO FRAME Questionnaire";
+    var sub = document.querySelector(".docsub"); if(sub) sub.textContent = "Your answers save as you type, so you can close this page and come back to this link whenever you like.";
+    try{
+      fetch(PAGE_FLOW, { method: "POST", headers: {"Content-Type": "text/plain;charset=UTF-8"},
+        body: JSON.stringify({ formKey: "mismo-renewal-response", mode: "load", token: PORTAL }) })
+        .then(function(r){ if(r.status === 404) { PORTAL_BAD = true; return null; } return r.ok ? r.json() : null; })
+        .then(function(rec){ if(rec && rec.org && rec.kind === "portal") PORTAL_REC = rec; else if(rec) PORTAL_BAD = true; renderQuestionnaires(); paintProgress(); })
+        .catch(function(){});
+    }catch(e){}
+  }
   initTheme();
   renderAll();
   showStage(stage);
