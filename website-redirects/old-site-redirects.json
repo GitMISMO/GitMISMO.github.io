@@ -1032,6 +1032,8 @@
   "/standards-resources/license-form/framework-dtds": "/standards-resources?get=mismo-version-2",
   "/standards-resources/mismo-product/bwic-data-standard": "/standards-resources?get=bwic-template-mapping-specification",
   "/standards-resources/mismo-product/the-respa-application-decision-date": "/viewdocument/the-respa-application-decision-date",
-  "/standards-resources/mismo-product/title---settlement-pricing-dataset": "/standards-resources?get=title-settlement-pricing-dataset"
+  "/standards-resources/mismo-product/title---settlement-pricing-dataset": "/standards-resources?get=title-settlement-pricing-dataset",
+  "/get-involved/eheloc": "/get-involved/workgroups",
+  "/get-involved/title-pricing-api": "/get-involved/workgroups"
  }
 }
