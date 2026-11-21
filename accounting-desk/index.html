@@ -553,7 +553,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var a = D.ar || { items: [] };
     var items = a.items || [];
     if (AS.status === null) AS.status = items.some(function (r) { return r.status === "Open"; }) ? "Open" : "";
-    var shown = items.filter(function (r) { return (!AS.status || r.status === AS.status) && has(r, AS.q, ["company", "order", "description", "accountingNote", "mismoNote", "mismoNoteOnFile"]); })
+    var shown = items.filter(function (r) { return (!AS.status || r.status === AS.status) && has(r, AS.q, ["company", "order", "description", "mismoNote", "mismoNoteOnFile"]); })
       .sort(function (x, y) { return String(y.invoicedOn).localeCompare(String(x.invoicedOn)); });
     var tone = function (s) { return s === "Paid" || s === "Complete" ? " good" : s === "Open" ? " warn" : s === "Bad Debt" ? " bad" : ""; };
     var cols = [
@@ -562,9 +562,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       { h: "Amount", num: 1, cell: function (r) { return usd(r.amount); } },
       { h: "Invoiced", cls: "nw", cell: function (r) { return esc(day(r.invoicedOn) || r.reportedRaw); } },
       { h: "Status", cls: "nw", cell: function (r) { return '<span class="tag' + tone(r.status) + '">' + esc(r.status || "No Status") + "</span>" + (r.paidInAptify ? '<span class="sub">paid ' + esc(usd(r.paidInAptify.amount)) + " in Aptify, last " + esc(day(r.paidInAptify.last)) + "</span>" : ""); } },
-      { h: "Accounting's Note", cls: "clip", cell: function (r) { return esc(r.accountingNote); } },
       { h: "MISMO's Latest Note", cls: "clip", cell: function (r) { return esc(lastNote(r)); } }];
-    var foot = function (l) { return '<tr><td colspan="2">' + l.length + (l.length === 1 ? " receivable" : " receivables") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + '</td><td colspan="4"></td></tr>'; };
+    var foot = function (l) { return '<tr><td colspan="2">' + l.length + (l.length === 1 ? " receivable" : " receivables") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + '</td><td colspan="3"></td></tr>'; };
     var paint = function () { list($("ar-list"), { key: "ar", rows: shown, cols: cols, foot: foot, none: "No receivable matches that.", open: arOpen }); };
     drawWith("ar", listOnly, function () {
       var received = items.filter(function (r) { return r.status === "Paid" || r.status === "Complete"; });
@@ -585,8 +584,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       $("ar-status").addEventListener("change", function () { AS.status = this.value; resetPage("ar"); drawAr(); });
       wireFind("ar-q", AS, "ar", drawAr);
       $("ar-dl").addEventListener("click", function () {
-        download("Receivables", ["Company", "Order", "Description", "Amount", "Invoiced", "On the Aging Dated", "Status", "Status on Your File", "Paid in Aptify Since", "Accounting's Note", "MISMO's Notes"],
-          shown.map(function (r) { return [r.company, r.order, r.description, r.amount, r.invoicedOn, r.reportedOn || r.reportedRaw, r.status, r.statusOnFile, r.paidInAptify ? r.paidInAptify.amount : "", r.accountingNote, [r.mismoNote, r.mismoNoteOnFile].filter(Boolean).join(" | ")]; }));
+        download("Receivables", ["Company", "Order", "Description", "Amount", "Invoiced", "On the Aging Dated", "Status", "Status on Your File", "Paid in Aptify Since", "MISMO's Notes"],
+          shown.map(function (r) { return [r.company, r.order, r.description, r.amount, r.invoicedOn, r.reportedOn || r.reportedRaw, r.status, r.statusOnFile, r.paidInAptify ? r.paidInAptify.amount : "", [r.mismoNote, r.mismoNoteOnFile].filter(Boolean).join(" | ")]; }));
       });
       paint();
     }, paint);
@@ -595,8 +594,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     pane(r.company, "Order " + r.order + " · " + usd(r.amount),
       sect("Receivable", kv([["Company", r.company], ["Order", r.order], ["Description", r.description], ["Amount", usd(r.amount)], ["Invoiced", day(r.invoicedOn)], ["On the Aging Dated", day(r.reportedOn) || r.reportedRaw], ["Age", r.age != null ? r.age + " days · " + r.bucket : ""]])) +
       sect("Status", kv([["Status", r.status], ["Status on Your File", r.statusOnFile], ["Status MISMO Set", r.statusSetByMismo], ["Paid in Aptify Since the Aging", r.paidInAptify ? usd(r.paidInAptify.amount) + ", last on " + day(r.paidInAptify.last) : ""], ["Payment MISMO Holds for the Order", r.paymentHeld ? usd(r.paymentHeld.amount) + " on " + day(r.paymentHeld.on) : "None"]])) +
-      sect("Notes", (r.accountingNote ? '<div class="txt"><b>Accounting&rsquo;s Note</b>' + esc(r.accountingNote) + "</div>" : "") + (r.mismoNote ? '<div class="txt"><b>MISMO&rsquo;s Note</b>' + esc(r.mismoNote) + "</div>" : "") +
-        (r.mismoNoteOnFile ? '<div class="txt"><b>MISMO&rsquo;s Follow-Up Notes on the Aging</b>' + esc(r.mismoNoteOnFile) + "</div>" : "") + (!r.accountingNote && !r.mismoNote && !r.mismoNoteOnFile ? '<div class="txt">No notes.</div>' : "")));
+      sect("Notes", (r.mismoNote ? '<div class="txt"><b>MISMO&rsquo;s Note</b>' + esc(r.mismoNote) + "</div>" : "") +
+        (r.mismoNoteOnFile ? '<div class="txt"><b>MISMO&rsquo;s Follow-Up Notes on the Aging</b>' + esc(r.mismoNoteOnFile) + "</div>" : "") + (!r.mismoNote && !r.mismoNoteOnFile ? '<div class="txt">No notes.</div>' : "")));
   }
 
   /* ================= New and Renewing Members ================= */
