@@ -789,11 +789,48 @@ function boot(){
   });
 }
 
+/* ---------- Certified Consultant points scorecard (21 Nov 2026) ----------
+   The CMS works it out from MISMO's records and saves it; the page record carries it as "scorecard". */
+var SC_CATS = ["membership", "leadership", "participation", "mismoEd", "otherEd", "ancillary"];
+function scoreHTML(sc) {
+  var M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var dt = function (d) { if (!d) return ""; var p = String(d).slice(0, 10).split("-"); return M[+p[1] - 1] + " " + (+p[2]) + ", " + p[0]; };
+  var cats = SC_CATS.filter(function (k) { return sc.categories && sc.categories[k]; });
+  var miss = cats.filter(function (k) { return !sc.categories[k].met; }).map(function (k) { return sc.categories[k].label; });
+  var h = '<div class="scc"><div class="scc-head"><div><div class="kicker">Your Points Scorecard</div><h2>' + esc(sc.total) + ' points</h2>' +
+    '<p>' + (sc.kind === "renewal" ? "Renewal" : "Initial certification") + " scorecard as of " + esc(dt(sc.asOf)) + ". Participation and ancillary points count from " + esc(dt(sc.from)) +
+    ". Minimums for " + (sc.size === "small" ? "10 employees and under" : "11 employees and over") + ".</p></div>" +
+    '<span class="scc-verdict ' + (sc.meetsAll ? "yes" : "no") + '">' + (sc.meetsAll ? "Meets Every Minimum" : "Not Yet: " + esc(miss.join(", "))) + "</span></div>" +
+    '<div class="scc-cats">' + cats.map(function (k) { var c = sc.categories[k], w = c.min ? Math.min(100, Math.round(c.points / c.min * 100)) : 100;
+      return '<div class="scc-cat' + (c.met ? " met" : "") + '"><span>' + esc(c.label) + "</span><b>" + esc(c.points) + "</b><i>" + (c.min ? "Minimum " + esc(c.min) : "No minimum") + '</i><div class="m"><em style="width:' + w + '%"></em></div></div>'; }).join("") + "</div>";
+  var rows = cats.map(function (k) { var its = (sc.items || []).filter(function (i) { return i.cat === k; }); if (!its.length) return "";
+    return '<tr class="scc-cr"><td colspan="3">' + esc(sc.categories[k].label) + "</td></tr>" + its.map(function (i) {
+      return "<tr><td>" + esc(i.name) + (i.detail ? '<span class="d">' + esc(i.detail) + "</span>" : "") + "</td><td>" + esc(i.person || "Your company") + '</td><td class="n">' + esc(i.pts) + "</td></tr>"; }).join(""); }).join("");
+  if (rows) h += '<details class="scc-more"><summary>Where your points come from</summary><table>' + rows + "</table></details>";
+  h += '<p class="scc-note">Points come from MISMO\u2019s own records (membership, leadership roles, meeting and Summit attendance, certifications and designations). Something missing? Email <a href="mailto:certifications@mismo.org">certifications@mismo.org</a> and MISMO will add it.</p></div>';
+  return h;
+}
+/* the made-up company's scorecard, for the Consultant example (?demo=consultant) */
+var SAMPLE_SC = { kind: "renewal", asOf: "2026-11-21", from: "2025-11-21", size: "large", total: 64, meetsAll: false,
+  categories: { membership: { label: "Membership", points: 4, min: 1, met: true }, leadership: { label: "Leadership", points: 15, min: 10, met: true },
+    participation: { label: "Participation", points: 24, min: 20, met: true }, mismoEd: { label: "MISMO Education / Certification", points: 13, min: 9, met: true },
+    otherEd: { label: "Other Education / Certification", points: 5, min: 7, met: false }, ancillary: { label: "Ancillary Points", points: 3, min: 7, met: false } },
+  items: [ { cat: "membership", name: "MISMO Member", pts: 1, person: null, detail: "Member (Associate)" }, { cat: "membership", name: "Associate Level Champion", pts: 3, person: null, detail: "" },
+    { cat: "leadership", name: "Chair or Vice Chair - Development Workgroup", pts: 10, person: "Sam Rivera", detail: "Co-Chair" }, { cat: "leadership", name: "Workgroup IM Representative", pts: 5, person: "Lee Park", detail: "IM Rep" },
+    { cat: "participation", name: "MISMO Summit Attendance", pts: 4, person: "Sam Rivera", detail: "Fall Summit" }, { cat: "participation", name: "Workgroup Attendance (66% of meetings)", pts: 4, person: "Lee Park", detail: "9 of 11 meetings" },
+    { cat: "mismoEd", name: "CMSP", pts: 10, person: "Sam Rivera", detail: "" }, { cat: "mismoEd", name: "AMSP", pts: 3, person: "Lee Park", detail: "" },
+    { cat: "otherEd", name: "CMB", pts: 5, person: "Jordan Sample", detail: "" }, { cat: "ancillary", name: "Developed / Participated in a MISMO Webinar", pts: 3, person: "Sam Rivera", detail: "" } ] };
+function renderScore(){
+  var sc = R.scorecard || (R.program === "Consultant" && /[?&]demo=/.test(location.search) ? SAMPLE_SC : null), host = el("score-wrap");
+  if (!sc) { if (host) host.hidden = true; return; }
+  if (!host) { host = document.createElement("div"); host.className = "wrap"; host.id = "score-wrap"; var sw = el("steps-wrap"); sw.parentNode.insertBefore(host, sw.nextSibling); }
+  host.hidden = false; host.innerHTML = '<section class="panel scc-panel">' + scoreHTML(sc) + "</section>";
+}
 function start(renewal){
   R = renewal;
   load();
   numberSteps();
-  renderHeader(); renderFacts(); renderInvoice(); renderDocs(); renderScript(); renderSigner(); renderAttest(); renderWebsite();
+  renderHeader(); renderFacts(); renderInvoice(); renderDocs(); renderScript(); renderSigner(); renderAttest(); renderWebsite(); renderScore();
   wireAll(); paintReady();
   el("steps-wrap").hidden = false;
   var saved = null; try { saved = localStorage.getItem(KEY + ":step"); } catch(e){}
