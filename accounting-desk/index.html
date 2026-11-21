@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en" data-rs-gate>
 <head>
-<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws; frame-src 'none'; object-src 'none'; base-uri 'self'"><!-- Page safety list: the only places this page may load code from or send data to. -->
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws; frame-src blob:; object-src 'none'; base-uri 'self'"><!-- Page safety list: the only places this page may load code from or send data to. -->
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MBA Accounting Desk</title>
 <meta name="description" content="What MBA Accounting sees: invoices, monthly close, receivables, members and IIF.">
@@ -285,6 +285,10 @@ tfoot td{font-weight:700;background:var(--surface-2);border-top:2px solid var(--
 .ovcol{display:flex;flex-direction:column;gap:14px;min-width:0}
 @media(max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.hqtop{padding:0 12px}.hqtop .mastrule{margin-inline:10px}.hqtop .hqname{overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}.hero{padding:18px 16px}.find{width:100%}.bar .fld{flex:1 1 100%}}
+/* an invoice's PDF, inside the panel */
+.btn.ghost{background:var(--surface);color:var(--navy);border-color:var(--border-strong,#adc4d6)}
+.pdfbar{display:flex;gap:12px;flex-wrap:wrap;padding:10px 14px 14px}
+.pdfview{display:block;width:100%;height:72vh;border:0;border-top:1px solid var(--line, var(--rule))}
 </style>
 </head>
 <body>
@@ -399,6 +403,17 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         var bin = atob(String(j.content || "").replace(/\s/g, "")), bytes = new Uint8Array(bin.length);
         for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
         return JSON.parse(new TextDecoder("utf-8").decode(bytes));
+      });
+  }
+  /* a file as it is (an invoice's PDF), for viewing only */
+  function readBytes(project, path) {
+    var tok = ""; try { tok = window.ResourcesSession.token() || ""; } catch (e) {}
+    return fetch(RELAY + "/" + project + "/file/" + path, { headers: { Authorization: "Bearer " + tok }, cache: "no-store" })
+      .then(function (r) { if (!r.ok) { var e = new Error("status " + r.status); e.status = r.status; throw e; } return r.json(); })
+      .then(function (j) {
+        var bin = atob(String(j.content || "").replace(/\s/g, "")), bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return bytes;
       });
   }
   var FILES = { ask: "ask", invoices: "invoices", close: "close", ar: "receivables", members: "members", iif: "iif" };
@@ -554,7 +569,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var label = IS.month ? monthName(IS.month) : "Every Month";
     var cols = [
       { h: "Invoice #", cls: "nw", cell: function (r) { return esc(r.invoiceNo); } },
-      { h: "Vendor", cell: function (r) { return "<b>" + esc(r.vendor) + "</b>"; } },
+      { h: "Vendor", cell: function (r) { return "<b>" + esc(r.vendor) + "</b>" + (r.file && r.file.path ? '<span class="sub">Invoice PDF to view</span>' : ""); } },
       { h: "Period", cls: "nw", cell: function (r) { return esc(r.period); } },
       { h: "Service Month", cls: "nw", cell: function (r) { return esc(monthName(r.serviceMonth)); } },
       { h: "Category", cell: function (r) { return esc(r.category + (r.summit ? " · " + r.summit : "")); } },
@@ -591,7 +606,29 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     pane(r.vendor || "Invoice", (r.invoiceNo ? "Invoice " + r.invoiceNo + " · " : "") + usd(r.amount),
       sect("Invoice", kv([["Invoice #", r.invoiceNo], ["Vendor", r.vendor], ["Period", r.period], ["Service Month", monthName(r.serviceMonth)], ["Category", r.category], ["Summit", r.summit], ["Amount", usd(r.amount)]])) +
       sect("Where It Is", kv([["Sent to AP", day(r.sentToAp)], ["Reviewed and Coded", day(r.reviewed)], ["NetSuite #", r.netsuite], ["Approved", day(r.approved)], ["Paid", day(r.paid)], ["Status", r.status]])) +
-      sect("Coding", kv([["GL Account", r.gl], ["Expense Line", r.line]])));
+      sect("Coding", kv([["GL Account", r.gl], ["Expense Line", r.line]])) +
+      sect("The Invoice", r.file && r.file.path ? '<div class="txt">' + esc(r.file.name) + '</div><div class="pdfbar"><button class="btn" type="button" id="pdf-view">View the Invoice</button><button class="btn ghost" type="button" id="pdf-save">Save a Copy</button></div><div id="pdf-box"></div>'
+        : '<div class="txt">' + (r.file ? "The invoice " + esc(r.file.name) + " is " + esc(r.file.why) + "." : "MISMO has no PDF of this invoice. Only invoices logged on MISMO&rsquo;s Invoice Log since October 2026 carry their PDF.") + "</div>"));
+    if (r.file && r.file.path) wirePdf(r.file);
+  }
+  /* Jonna, 21 Nov 2026: "can you also let her see the actual invoice if she wanted to?" The PDF opens
+     inside the panel; Save a Copy keeps it. Nothing here can change it. */
+  var PDF = {};
+  function pdfUrl(f) {
+    if (PDF[f.path]) return Promise.resolve(PDF[f.path]);
+    return readBytes(PROJECT, f.path).then(function (b) { return (PDF[f.path] = URL.createObjectURL(new Blob([b], { type: "application/pdf" }))); });
+  }
+  function wirePdf(f) {
+    var say = function (t) { $("pdf-box").innerHTML = '<div class="txt">' + esc(t) + "</div>"; };
+    $("pdf-view").addEventListener("click", function () {
+      say("Opening the invoice…");
+      pdfUrl(f).then(function (u) { $("pdf-box").innerHTML = '<iframe class="pdfview" title="' + esc(f.name) + '" src="' + u + '"></iframe>'; },
+        function () { say("The invoice could not be opened just now. Try again in a minute."); });
+    });
+    $("pdf-save").addEventListener("click", function () {
+      pdfUrl(f).then(function (u) { var a = document.createElement("a"); a.href = u; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); },
+        function () { say("The invoice could not be saved just now. Try again in a minute."); });
+    });
   }
 
   /* ================= Monthly Close ================= */
@@ -960,7 +997,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       "<h2>Overview</h2><p>The desk opens here. The tiles across the top are today&rsquo;s headline numbers, and each card below shows one part: the month being closed and which of its six steps is next, what is still owed to MISMO, invoices sent to AP that are still waiting for approval, new and renewing members, certifications and IIF payments. Click a tile, a card&rsquo;s Open button or a receivable to go to its page.</p>" +
       "<h2>Ask Accounting</h2><p>The questions MISMO has for Accounting, the same ones MISMO Money&rsquo;s Reconcile page lists under Ask Accounting. Click one to read it in full. A question comes off the list once MISMO marks it answered.</p>" +
       "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
-      "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid.</p>" +
+      "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid. Where MISMO has the invoice itself, its panel has View the Invoice, which opens the PDF right there, and Save a Copy. Invoices logged on MISMO&rsquo;s Invoice Log since October 2026 carry their PDF; older ones came from a spreadsheet and have none.</p>" +
       "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
       "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. Once Aptify's Monday workbook carries each order's status and balance, this becomes what is still owed on Aptify's own orders (every order Shipped with a balance over $0), and the AR aging is no longer needed.</p>" +
       "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each and its membership term (when it starts and ends, and whether it is a dues deal). Pick a month or a year, or choose All Time and search.</p>" +
