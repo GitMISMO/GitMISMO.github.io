@@ -742,7 +742,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         tile("Collected", usd(sum(inP, function (r) { return r.amount; }), 1), label) + tile("Payments", String(inP.length), Object.keys(cos).length + " companies") +
         (m3.iif_year ? tile("Lenders Paid in Full", m3.iif_paid_in_full || "—", "IIF year " + m3.iif_year + ", per Member 360") + tile("Partly Paid", m3.iif_partly_paid || "—", "per Member 360") + tile("Lender Members", m3.iif_lender_members || "—", "paid at least the member amount") : "")) +
         '<div class="bar"><h2>IIF Payments, ' + esc(label) + "</h2>" + findBox("iif-q", "Company or order", FS.q) + '<button class="btn" type="button" id="iif-dl">Download for Excel</button></div>' +
-        '<div class="card" id="iif-list"></div><p class="note">Amounts are MISMO&rsquo;s share as MISMO Money&rsquo;s Gross Cash counts them, for the current and previous fiscal years.</p><p class="stamp">' + esc(stamp(D.iif.writtenAt)) + "</p>";
+        '<div class="card" id="iif-list"></div><p class="note">Amounts are MISMO&rsquo;s share as MISMO Money&rsquo;s Gross Cash counts them, for the current and previous fiscal years. Credit memos are left out: they move money already paid from one order to another, so no new money came in.</p><p class="stamp">' + esc(stamp(D.iif.writtenAt)) + "</p>";
       wirePeriod("iif", FS, keys, drawIif); wireFind("iif-q", FS, "iif", drawIif);
       $("iif-dl").addEventListener("click", function () { download("IIF Payments - " + label, ["Paid On", "Fiscal Year", "Company", "Company Type", "Aptify Order", "Product", "How Paid", "Amount"], shown.map(function (r) { return [r.on, r.fy, r.company, r.companyType, r.order, r.product, r.how, r.amount]; })); });
       paint();
