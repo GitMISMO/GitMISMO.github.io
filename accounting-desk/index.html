@@ -685,7 +685,9 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function termText(t) { return t && t.start && t.end ? shortMonYear(t.start) + " \u2013 " + shortMonYear(t.end) : ""; }
   function shortMonYear(d) { return MON[+d.slice(5, 7) - 1].slice(0, 3) + " " + d.slice(0, 4); }
   /* Jonna, 21 Nov 2026: "why does it still show none found for stoner and sitzler?" Their membership
-     orders are $0 in Aptify, so there is nothing to pay; say so with the order number. */
+     orders are $0 in Aptify; say so with the order number. Then: "didn't they pay to be a member?"
+     A $0 membership says Comped only when a record says so (tools/desk-member-lookups.json "comped");
+     otherwise it says no reason is on record and carries a Check. */
   function zeroOrder(r) {
     var o = ((r.aptify && r.aptify.orders) || []).filter(function (x) { return x.order === r.order && Number(x.amount) === 0 && /membership/i.test(x.product || ""); })[0];
     return o ? o.order : "";
@@ -706,7 +708,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       { h: "Level", cls: "nw", cell: function (r) { return esc(r.level); } },
       { h: "Membership Term", cls: "nw", cell: function (r) { return r.term ? esc(termText(r.term)) + (r.term.deal ? '<span class="sub">' + esc(r.term.deal) + "</span>" : "") + (r.term.from === "Aptify" ? '<span class="sub">from Aptify</span>' : "") : '<span class="sub">not known</span>'; } },
       { h: "Aptify Order", cls: "nw", cell: function (r) { return esc(r.order || (r.payments || []).map(function (p) { return p.order; }).filter(function (v, i, s) { return s.indexOf(v) === i; }).join(", ")); } },
-      { h: "Paid", num: 1, cell: function (r) { var z = zeroOrder(r); return r.paid != null ? usd(r.paid) : z ? usd(0) + '<span class="sub">$0 order ' + esc(z) + ", nothing to pay</span>" : '<span class="sub">none found</span>'; } }];
+      { h: "Paid", num: 1, cell: function (r) { var z = zeroOrder(r), cp = r.aptify && r.aptify.comped; return r.paid != null ? usd(r.paid) : z ? usd(0) + '<span class="sub">' + (cp ? "Comped (free), order " + esc(z) : "$0 order " + esc(z) + ", no reason on record") + "</span>" : '<span class="sub">none found</span>'; } }];
     var foot = function (l) { return '<tr><td colspan="7">' + l.length + (l.length === 1 ? " member" : " members") + '</td><td class="num">' + usd(sum(l, function (r) { return r.paid; })) + "</td></tr>"; };
     var paint = function () { list($("members-list"), { key: "members", rows: shown, cols: cols, foot: foot, none: "No new member or renewal" + (MS.q ? " matches that search." : " in " + label + "."), open: memOpen }); };
     drawWith("members", listOnly, function () {
@@ -730,7 +732,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
   function memOpen(r) {
     var pays = (r.payments || []).length ? '<div class="tablewrap"><table><thead><tr><th>Paid On</th><th>Order</th><th>Product</th><th>How Paid</th><th class="num">Amount</th></tr></thead><tbody>' +
-      r.payments.map(function (p) { return "<tr><td>" + esc(day(p.on)) + "</td><td>" + esc(p.order) + "</td><td>" + esc(p.product) + "</td><td>" + esc(p.how) + '</td><td class="num">' + usd(p.amount) + "</td></tr>"; }).join("") + "</tbody></table></div>" : '<div class="txt">' + (zeroOrder(r) ? "No payment needed: Aptify order " + esc(zeroOrder(r)) + " is $0." : "No payment found in MISMO Money for this one.") + "</div>";
+      r.payments.map(function (p) { return "<tr><td>" + esc(day(p.on)) + "</td><td>" + esc(p.order) + "</td><td>" + esc(p.product) + "</td><td>" + esc(p.how) + '</td><td class="num">' + usd(p.amount) + "</td></tr>"; }).join("") + "</tbody></table></div>" : '<div class="txt">' + (zeroOrder(r) ? (r.aptify.comped ? "No payment: the membership is comped (free). Aptify order " + esc(zeroOrder(r)) + " is $0. " + esc(r.aptify.comped) : "No payment: Aptify order " + esc(zeroOrder(r)) + " is $0, and nothing on record says why.") : "No payment found in MISMO Money for this one.") + "</div>";
     var ap = r.aptify;
     var apHtml = ap ? sect("What Aptify Shows" + (ap.checkedOn ? ", Checked " + day(ap.checkedOn) : ""),
       (ap.flag ? '<div class="txt"><span class="tag warn">Check</span> ' + esc(ap.flag) + "</div>" : "") +
