@@ -1,8 +1,78 @@
 {
   "source": "MMS",
   "note": "Announcement requests from the MMS for MISMO Media, with the facts to draft from. Public information only.",
-  "updated": "2026-11-21T01:46:04.150Z",
+  "updated": "2026-11-21T02:16:08.877Z",
   "announcements": [
+    {
+      "id": "WR2025_23-LinkedIn-Post",
+      "type": "comment",
+      "kind": "LinkedIn Post",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2025_23",
+      "name": "Artificial Intelligence (AI) Glossary Update",
+      "publicName": "Artificial Intelligence (AI) Glossary Update",
+      "workgroup": "Artificial Intelligence (AI) CoP",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "",
+      "facilitator": "Meghan Tidgewell",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "",
+      "commentCloses": "",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_23",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Brian Stucky",
+          "position": "Co-Chair",
+          "company": "Decision-X"
+        },
+        {
+          "name": "Praveen Chandramohan",
+          "position": "Co-Chair",
+          "company": "Cotality"
+        },
+        {
+          "name": "Devin Caster",
+          "position": "Co-Vice-Chair",
+          "company": "Cotality"
+        },
+        {
+          "name": "Timothy Marlowe",
+          "position": "Co-Vice-Chair",
+          "company": ""
+        },
+        {
+          "name": "Angela Sella",
+          "position": "IM Rep",
+          "company": "Mortgage Guaranty Insurance Corporation (MGIC)"
+        },
+        {
+          "name": "Daniel Rocklein",
+          "position": "Education Rep",
+          "company": "Ernst & Young LLP"
+        },
+        {
+          "name": "Eric Litwin",
+          "position": "AWG Rep",
+          "company": "Pennymac"
+        },
+        {
+          "name": "Tammy Butler, Master CMB",
+          "position": "Education Rep",
+          "company": "Mortgage Guidelines"
+        }
+      ]
+    },
     {
       "id": "WR2026_01-LinkedIn-Post",
       "type": "comment",
