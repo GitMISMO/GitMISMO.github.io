@@ -484,6 +484,15 @@
       "data/"
     ]
   },
+  "accounting-desk": {
+    "repo": "GitMISMO/financials-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "readable": [
+      "accounting-desk/"
+    ],
+    "writable": []
+  },
   "cert-completions": {
     "repo": "GitMISMO/cms-data",
     "branch": "main",

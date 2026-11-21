@@ -1,0 +1,906 @@
+<!doctype html>
+<html lang="en" data-rs-gate>
+<head>
+<meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws; frame-src 'none'; object-src 'none'; base-uri 'self'"><!-- Page safety list: the only places this page may load code from or send data to. -->
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MBA Accounting Desk</title>
+<meta name="description" content="What MBA Accounting sees: invoices, monthly close, receivables, members and IIF.">
+<meta name="theme-color" content="#16A34A">
+<!-- The MBA Accounting Desk (Jonna, 21 November 2026): Accounting's own view-only desk, like the Membership
+     Desk for Member 360. It reads only accounting-desk/ in MISMO Money's store (relay key accounting-desk,
+     written every morning by MISMO Money's scheduled check) and the CMS's Certification Completions file
+     (relay key cert-completions). Nothing on it saves. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<script src="/assets/session.js"></script>
+<style>
+:root{--navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
+  --ground:#f1f6fa;--surface:#fff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;--border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
+  --ink:#0d314c;--ink-2:#456179;--ink-3:#7794aa;--good:#0f7b5c;--bad:#b3372c;--warn:#a2701a;--accent-soft:#e4f2fb;--btn:#0d314c;--btn-ink:#fff;
+  --display:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--ui:var(--display);--mono:var(--display);
+  --hq-h:64px;--rail-w:240px;--rail-mini:62px;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#123143;--border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;--ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;--good:#4fc79b;--bad:#f08579;--warn:#e0a83c;--accent-soft:#173c52;--btn:#74bfeb;--btn-ink:#06202f;color-scheme:dark}}
+:root[data-theme="dark"]{--ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#123143;--border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;--ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;--good:#4fc79b;--bad:#f08579;--warn:#e0a83c;--accent-soft:#173c52;--btn:#74bfeb;--btn-ink:#06202f;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--ground);color:var(--ink);font-family:var(--display);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit}
+
+/* ===== the masthead and rail, copied from Summit HQ (mismo-left-nav) ===== */
+.hqtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:97;height:var(--hq-h);background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;padding:0 22px;box-shadow:0 1px 0 rgba(80,164,219,.28);margin-left:calc(0px - var(--rail-w));width:calc(100% + var(--rail-w));transition:margin-left .2s cubic-bezier(.4,0,.2,1),width .2s cubic-bezier(.4,0,.2,1)}
+body.railmini .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}
+.hqtop .mastrule{display:block;width:2px;height:34px;flex:0 0 auto;margin-inline:20px;border-radius:1px;background:var(--sky)}
+.hqtop .hqname{font-family:var(--display);font-size:15.5px;font-weight:700;letter-spacing:-.005em;color:var(--sky);white-space:nowrap}
+.hqtop-r{margin-left:auto;display:flex;align-items:center;gap:13px}
+.hqtop .eyebrow-m{font-family:var(--display);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
+@media(max-width:700px){.hqtop .eyebrow-m{display:none}}
+.logoplate{background:#fff;border-radius:7px;padding:8px 14px;display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative}
+.logoplate .wordmark{height:24px;width:auto;display:block}
+.santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
+html[data-season="december"] .santa{display:block}
+#rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
+#rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
+/* stand-in for the shared sign-in chip in this preview only (session.js draws the real one) */
+.pv-who{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--navy);border-radius:4px;padding:4px 10px 4px 4px;font-size:13px;font-weight:600;white-space:nowrap}
+.pv-who i{font-style:normal;width:26px;height:26px;border-radius:50%;background:var(--sky-wash);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.pv-who em{font-style:normal;font-size:10px;opacity:.7}
+
+.hq.rail{position:fixed;left:0;top:calc(var(--hq-h) + env(safe-area-inset-top,0px));bottom:0;width:var(--rail-w);z-index:95;background:var(--navy);color:#fff;display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden auto;overscroll-behavior:contain;box-shadow:1px 0 0 rgba(80,164,219,.22),4px 0 18px rgba(6,32,47,.14);transition:width .2s cubic-bezier(.4,0,.2,1)}
+body{padding-left:var(--rail-w);transition:padding-left .2s cubic-bezier(.4,0,.2,1)}
+@media (prefers-reduced-motion:reduce){.hq.rail,body,.hqtop{transition:none}}
+body.railmini{padding-left:var(--rail-mini)}
+body.railmini .hq.rail{width:var(--rail-mini)}
+body.railmini .rail-top{justify-content:center;padding:10px 0 9px}
+body.railmini .rail-lbl{display:none}
+body.railmini .railhide{margin:0}
+body.railmini .railhide svg{transform:scaleX(-1)}
+body.railmini .railfind{padding:9px 0 2px;display:flex;justify-content:center}
+body.railmini .railfind .fi,body.railmini .railfind input,body.railmini .railq-x,body.railmini .railhits{display:none}
+body.railmini .railfind-b{display:flex}
+body.railmini .hq nav{padding:6px 0 4px;align-items:center;gap:4px}
+body.railmini .hq nav button{width:42px;padding:10px 0;justify-content:center;border-radius:9px;box-shadow:none}
+body.railmini .hq nav button span{display:none}
+body.railmini .hq nav button svg{width:19px;height:19px}
+body.railmini .hq nav button[aria-current]{background:var(--sky);color:var(--navy-deep)}
+body.railmini .hq nav button[aria-current] svg{stroke:var(--navy-deep);opacity:1}
+body.railmini .hq .mast-right{gap:3px;padding:8px 0 11px;align-items:center}
+body.railmini .hq .mast-right .theme-btn{width:42px;padding:9px 0;font-size:0;justify-content:center;border-radius:9px}
+body.railmini .hq .mast-right .theme-btn .ti{width:19px;height:19px}
+body.railmini .hq .mast-right .theme-btn span{display:none}
+body.railmini .hq .mast-right #theme-btn{margin-top:4px;padding-top:10px;border-radius:9px}
+body.railmini .nb{display:none}
+.railfind-b{display:none;width:34px;height:30px;border:1px solid rgba(255,255,255,.18);border-radius:7px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.8);align-items:center;justify-content:center;padding:0}
+.railfind-b svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
+.railfind-b:hover{background:rgba(255,255,255,.18);color:#fff}
+.rail-top{display:flex;align-items:center;gap:8px;padding:11px 10px 9px;border-bottom:1px solid rgba(80,164,219,.2);flex:0 0 auto}
+.rail-lbl{font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.55);padding-left:3px}
+.railhide{margin-left:auto;background:transparent;border:1px solid rgba(255,255,255,.18);border-radius:5px;color:rgba(255,255,255,.75);width:24px;height:24px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.railhide svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.railhide:hover{background:rgba(255,255,255,.14);color:#fff}
+.railfind{position:relative;padding:11px 12px 3px;flex:0 0 auto}
+.railfind .fi{position:absolute;left:21px;top:20px;width:14px;height:14px;fill:none;stroke:rgba(255,255,255,.5);stroke-width:2;stroke-linecap:round;pointer-events:none}
+.railfind input{width:100%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);border-radius:6px;color:#fff;font:inherit;font-size:12.5px;padding:6px 26px 6px 30px}
+.railfind input::placeholder{color:rgba(255,255,255,.5)}
+.railfind input:focus{outline:2px solid var(--sky);outline-offset:-1px;background:rgba(255,255,255,.16)}
+.railfind input::-webkit-search-cancel-button{display:none}
+.railq-x{position:absolute;right:17px;top:16px;width:20px;height:20px;border:0;border-radius:4px;background:transparent;color:rgba(255,255,255,.6);font-size:15px;line-height:1;padding:0;cursor:pointer}
+.railq-x:hover{background:rgba(255,255,255,.16);color:#fff}
+.railhits{margin-top:7px;background:var(--surface);border:1px solid var(--border-strong);border-radius:6px;box-shadow:0 10px 26px rgba(6,32,47,.3);overflow:hidden auto;max-height:min(52vh,420px)}
+.railhits .rh-g{font-family:var(--mono);font-size:9px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:var(--ink-3);background:var(--sunk);padding:4px 10px;border-bottom:1px solid var(--line);position:sticky;top:0}
+.railhits .rh{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);padding:6px 10px;color:var(--ink);font-family:var(--ui);cursor:pointer}
+.railhits .rh:last-child{border-bottom:0}
+.railhits .rh:hover,.railhits .rh.on{background:var(--accent-soft)}
+.railhits .rh b{display:block;font-size:12.5px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+.railhits .rh i{display:block;font-style:normal;font-family:var(--mono);font-size:9.5px;letter-spacing:.03em;color:var(--ink-3);margin-top:1px;overflow-wrap:anywhere}
+.railhits .rh-none{padding:10px;font-size:12px;color:var(--ink-3)}
+.hq nav{display:flex;flex-direction:column;gap:1px;padding:8px 8px 4px;flex:0 0 auto}
+.hq nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;color:rgba(255,255,255,.76);padding:8px 10px;font:inherit;font-family:var(--display);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;position:relative}
+.hq nav button svg{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.hq nav button:hover{color:#fff;background:rgba(255,255,255,.09)}
+.hq nav button[aria-current]{color:#fff;font-weight:600;background:var(--navy-mid);box-shadow:inset 3px 0 0 var(--sky)}
+.hq nav button[aria-current] svg{opacity:1;stroke:var(--sky)}
+.hq nav button:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
+/* the count on a nav item, squared like Elections HQ's */
+.nb{margin-left:auto;font-size:11px;font-weight:700;min-width:20px;padding:1px 6px;border-radius:4px;background:#c94a3b;color:#fff;text-align:center}
+.nb.quiet{background:rgba(255,255,255,.14);color:rgba(255,255,255,.85)}
+.hq .mast-right{margin-top:auto;display:flex;flex-direction:column;align-items:stretch;gap:1px;padding:8px 8px 10px;border-top:1px solid rgba(80,164,219,.2);flex:0 0 auto}
+.theme-btn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;color:rgba(255,255,255,.76);padding:8px 10px;font:inherit;font-family:var(--display);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.theme-btn .ti{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
+.theme-btn .ti-sun{display:none}
+:root[data-theme="dark"] .theme-btn .ti-moon{display:none}
+:root[data-theme="dark"] .theme-btn .ti-sun{display:block}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .theme-btn .ti-moon{display:none}:root:not([data-theme="light"]) .theme-btn .ti-sun{display:block}}
+.theme-btn:hover:not(:disabled){color:#fff;background:rgba(255,255,255,.09)}
+.theme-btn:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
+.hq .mast-right #theme-btn{margin-top:5px;padding-top:11px;border-top:1px solid rgba(80,164,219,.18);border-radius:0 0 6px 6px}
+.railscrim{position:fixed;inset:0;z-index:94;background:rgba(6,32,47,.42);border:0;padding:0;display:none}
+@media(max-width:900px){body:not(.railmini){padding-left:var(--rail-mini)}body:not(.railmini) .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}body:not(.railmini) .hq.rail{box-shadow:4px 0 26px rgba(6,32,47,.4)}body:not(.railmini) .railscrim{display:block}}
+
+
+/* sign-in, access and connection notices (resources.mismo.org) */
+/* account button: squared corners, same as Team HQ */
+#rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
+#rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
+
+/* ===== the pages ===== */
+main{max-width:1360px;margin:0 auto;padding:22px 26px 48px}
+@media(max-width:700px){main{padding:16px 16px 40px}}
+.view[hidden]{display:none}
+.hero{position:relative;overflow:hidden;border-radius:12px;background:linear-gradient(135deg,var(--navy-deep),var(--navy) 55%,var(--navy-mid));color:#fff;padding:20px 24px 22px;box-shadow:0 10px 30px rgba(6,32,47,.18)}
+.hero:before{content:"";position:absolute;inset:0;background-image:linear-gradient(rgba(116,191,235,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(116,191,235,.08) 1px,transparent 1px);background-size:28px 28px;pointer-events:none}
+.hero>*{position:relative}
+.hero .eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--sky);font-weight:700}
+.hero h1{margin:4px 0 6px;font-size:25px;letter-spacing:-.01em}
+.hero p{margin:0;color:rgba(255,255,255,.8);font-size:14px;max-width:820px;line-height:1.5}
+.picker{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:16px}
+.seg{display:inline-flex;border:1px solid rgba(255,255,255,.28);border-radius:4px;overflow:hidden}
+.seg button{background:transparent;color:#fff;border:0;padding:8px 13px;font-size:13px;font-weight:600;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--sky);color:var(--navy-deep)}
+.navbtn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.28);color:#fff;border-radius:4px;width:36px;height:36px;font-size:16px;cursor:pointer}
+.navbtn:disabled{opacity:.35;cursor:default}
+.hero select{background:#fff;color:var(--navy);border:0;border-radius:4px;padding:8px 10px;font-size:14px;font-weight:600;min-width:170px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin-top:18px}
+.tile{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.16);border-radius:8px;padding:12px 14px;min-width:0}
+.tile b{display:block;font-size:22px;letter-spacing:-.01em;white-space:nowrap}
+.tile span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.66);font-weight:600}
+.tile i{display:block;font-style:normal;font-size:12px;color:rgba(255,255,255,.72);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin:22px 0 10px}
+.bar h2{margin:0;font-size:17px;flex:1 1 auto}
+.fld{display:flex;flex-direction:column;gap:4px}
+.fld label{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+.find,.fld select{border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:4px;padding:8px 10px;font-size:13.5px;max-width:100%}
+.find{width:250px}
+.btn{background:var(--navy);color:#fff;border:1px solid var(--navy);border-radius:4px;padding:8px 14px;font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+:root[data-theme="dark"] .btn{background:var(--sky);color:var(--navy-deep);border-color:var(--sky)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn{background:var(--sky);color:var(--navy-deep);border-color:var(--sky)}}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.card+.card{margin-top:16px}
+.cardh{display:flex;align-items:center;gap:10px;padding:13px 16px 11px;border-bottom:1px solid var(--rule)}
+.cardh h3{margin:0;font-size:15px}
+.cardh .hint{margin-left:auto;font-size:12.5px;color:var(--ink-3)}
+.cardp{padding:12px 16px;font-size:13.5px;color:var(--ink-2);line-height:1.55;border-bottom:1px solid var(--rule)}
+.tablewrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);font-weight:700;background:var(--surface-2);padding:10px 12px;border-bottom:1px solid var(--border);white-space:nowrap}
+th.num,td.num{text-align:right}
+td{padding:10px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+td.nw{white-space:nowrap}
+td:has(>b){min-width:170px}
+tbody tr.go{cursor:pointer}
+tbody tr.go:hover td{background:var(--surface-2)}
+tbody tr.go:focus-visible{outline:2px solid var(--sky);outline-offset:-2px}
+td .sub{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+td.clip{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.04em;padding:2px 7px;border-radius:4px;background:var(--accent-soft);color:var(--ink-2);white-space:nowrap}
+.tag.good{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
+.tag.warn{background:color-mix(in srgb,var(--warn) 16%,transparent);color:var(--warn)}
+.tag.bad{background:color-mix(in srgb,var(--bad) 14%,transparent);color:var(--bad)}
+.monthrow td{background:var(--surface-3);font-weight:700;font-size:12.5px;color:var(--ink-2)}
+tfoot td{font-weight:700;background:var(--surface-2);border-top:2px solid var(--border);border-bottom:0}
+.empty{padding:30px 20px;text-align:center;color:var(--ink-3)}
+.note{margin:12px 2px 0;color:var(--ink-3);font-size:12.5px;line-height:1.55}
+.pager{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}
+.pager button{border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:4px;padding:4px 10px;font-size:12.5px;font-weight:600;cursor:pointer}
+.pager button:disabled{opacity:.4;cursor:default}
+.pager select{border:1px solid var(--border);background:var(--surface);color:var(--ink);border-radius:4px;padding:3px 6px;font-size:12.5px}
+.pager .sp{margin-left:auto}
+.steps td.wait{color:var(--warn);font-weight:600}
+.steps td.late{color:var(--bad);font-weight:600}
+.steps td.done{color:var(--good);font-weight:600}
+.steps td .sub{font-weight:400}
+/* the right-hand panel */
+.pane{position:fixed;top:calc(var(--hq-h) + env(safe-area-inset-top,0px));right:0;bottom:0;width:min(980px,72vw);background:var(--surface);border-left:1px solid var(--border);box-shadow:-10px 0 30px rgba(6,32,47,.18);z-index:96;transform:translateX(102%);transition:transform .22s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column}
+@media(max-width:1100px){.pane{width:100vw}}
+@media (prefers-reduced-motion:reduce){.pane{transition:none}}
+.pane.on{transform:none}
+.pane-h{display:flex;align-items:flex-start;gap:12px;padding:18px 22px 14px;border-bottom:1px solid var(--rule)}
+.pane-h h2{margin:0;font-size:20px}
+.pane-h .ps{font-size:13px;color:var(--ink-2);margin-top:3px}
+.pane-x{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:4px;width:30px;height:30px;font-size:17px;cursor:pointer;flex:none}
+.pane-b{padding:18px 22px 30px;overflow:auto;display:flex;flex-direction:column;gap:16px}
+.sect{border:1px solid var(--border);border-radius:8px;overflow:hidden;flex-shrink:0}
+.sect h3{margin:0;padding:9px 14px;font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-2);background:var(--surface-2);border-bottom:2px solid var(--sky)}
+.kv{display:grid;grid-template-columns:190px minmax(0,1fr)}
+.kv div{padding:8px 14px;border-bottom:1px solid var(--rule);font-size:13px;white-space:pre-wrap;overflow-wrap:anywhere}
+.kv div:nth-child(odd){color:var(--ink-3)}
+.kv div:nth-child(even){font-weight:600}
+.kv div:nth-last-child(-n+2){border-bottom:0}
+.txt{padding:10px 14px;font-size:13px;white-space:pre-wrap;line-height:1.5;border-bottom:1px solid var(--rule)}
+.txt:last-child{border-bottom:0}
+.txt b{display:block;font-size:12px;color:var(--ink-3);margin-bottom:3px}
+.help h2{font-size:17px;margin:22px 0 6px}
+.help p,.help li{font-size:14px;line-height:1.6;color:var(--ink-2);max-width:860px}
+.stamp{color:var(--ink-3);font-size:12px;margin-top:10px}
+.loading{padding:40px 20px;text-align:center;color:var(--ink-3)}
+@media(max-width:700px){.hqtop{padding:0 12px}.hqtop .mastrule{margin-inline:10px}.hqtop .hqname{overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}.hero{padding:18px 16px}.find{width:100%}.bar .fld{flex:1 1 100%}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
+0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58
+355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320
+c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
+-297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243
+-4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198
+0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3
+-104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245
+-337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17
+246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49
+203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12
+26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57
+187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44
+-204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288
+-20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92
+-51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12
+-24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297
+3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146
+-106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0
+-356 -14z"/></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263
+13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19
+-16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20
+-222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0
+46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62
+-220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6
+355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
+52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
+
+<symbol id="mismo-hat" viewBox="0 0 100 100"><path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41 C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/><path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z" fill="#0d314c" opacity=".17"/><rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/><rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/><circle cx="86" cy="45" r="11.5" fill="#ffffff"/></symbol>
+</defs></svg>
+
+<header class="hqtop">
+  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg><svg class="santa" viewBox="0 0 100 100" aria-hidden="true"><use href="#mismo-hat"/></svg></span>
+  <span class="mastrule"></span>
+  <span class="hqname">MBA Accounting Desk</span>
+  <span class="hqtop-r"><span class="eyebrow-m">Programs &amp; Operations</span>
+    <!-- The shared account bubble every tool shows in this spot (session.js fills it). -->
+    <div id="rs-account"></div></span>
+</header>
+<aside class="hq rail" id="rail">
+  <div class="rail-top"><span class="rail-lbl">Sections</span>
+    <button class="railhide" id="rail-hide" type="button" aria-label="Narrow the menu" title="Narrow the menu (backslash)"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></div>
+  <div class="railfind">
+    <button class="railfind-b" id="rail-qb" type="button" aria-label="Search" title="Search" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
+    <svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+    <input type="search" id="rail-q" autocomplete="off" spellcheck="false" placeholder="Search" aria-label="Search companies, orders, vendors and invoices">
+    <button class="railq-x" id="rail-qx" type="button" aria-label="Clear the search" hidden>×</button>
+    <div class="railhits" id="rail-hits" hidden></div>
+  </div>
+  <nav aria-label="MBA Accounting Desk">
+    <button type="button" data-hq="certs" aria-current="page" title="Certification Complete"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/></svg><span>Certification Complete</span></button>
+    <button type="button" data-hq="invoices" title="Invoices"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Invoices</span></button>
+    <button type="button" data-hq="close" title="Monthly Close"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2.5 2.5L16 13"/></svg><span>Monthly Close</span></button>
+    <button type="button" data-hq="ar" title="Receivables"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12H4z"/><path d="M4 11h16M8 15h3"/></svg><span>Receivables</span></button>
+    <button type="button" data-hq="members" title="New and Renewing Members"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M19 8v6M16 11h6"/></svg><span>New and Renewing Members</span></button>
+    <button type="button" data-hq="iif" title="IIF Payments"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>IIF Payments</span></button>
+    <button type="button" data-hq="help" title="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2v.1"/></svg><span>Help</span></button>
+  </nav>
+  <div class="mast-right">
+    <button class="theme-btn" id="theme-btn" type="button"><svg class="ti ti-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6.4 6.4 0 009 9 9 9 0 11-9-9z"/></svg><svg class="ti ti-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg><span id="theme-lab">Dark Mode</span></button>
+  </div>
+</aside>
+<div class="railscrim" id="rail-scrim"></div>
+
+<main>
+  <section class="view" id="v-certs"><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-invoices" hidden><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-close" hidden><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-ar" hidden><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-members" hidden><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-iif" hidden><div class="loading">Loading&hellip;</div></section>
+  <section class="view help" id="v-help" hidden></section>
+</main>
+
+<aside class="pane" id="pane" aria-hidden="true" aria-label="Details">
+  <div class="pane-h"><div><h2 id="pane-t"></h2><div class="ps" id="pane-s"></div></div>
+    <button class="pane-x" id="pane-x" type="button" aria-label="Close the details">&times;</button></div>
+  <div class="pane-b" id="pane-b"></div>
+</aside>
+
+<script>
+(function () {
+  "use strict";
+  var RELAY = "https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws";
+  var PROJECT = "accounting-desk", CERTS = "cert-completions";
+  var K = "tools:accounting-desk:";
+  var D = {}, LOADED = {}, FAILED = {};
+  var $ = function (id) { return document.getElementById(id); };
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function usd(n, whole) { if (n == null || n === "" || isNaN(n)) return ""; var v = Number(n), s = Math.abs(v).toLocaleString("en-US", { minimumFractionDigits: whole ? 0 : 2, maximumFractionDigits: whole ? 0 : 2 }); return (v < 0 ? "−$" : "$") + s; }
+  var MON = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+  function monthName(k) { if (!k) return ""; var p = String(k).split("-"); return MON[+p[1] - 1] + " " + p[0]; }
+  function day(d) { if (!d || !/^\d{4}-\d{2}-\d{2}/.test(d)) return d || ""; var p = d.slice(0, 10).split("-"); return MON[+p[1] - 1].slice(0, 3) + " " + (+p[2]) + ", " + p[0]; }
+  function sum(list, f) { return Math.round(list.reduce(function (t, r) { var v = f(r); return t + (Number(v) || 0); }, 0) * 100) / 100; }
+  function keep(k, v) { try { if (v === undefined) return JSON.parse(localStorage.getItem(K + k) || "null"); localStorage.setItem(K + k, JSON.stringify(v)); } catch (e) { return null; } }
+  function stamp(at) { return at ? "Brought up to date " + new Date(at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" }) + "." : ""; }
+
+  /* ---- reading the files (view only: the relay key can read, never write) ---- */
+  function readFile(project, path) {
+    var tok = ""; try { tok = window.ResourcesSession.token() || ""; } catch (e) {}
+    return fetch(RELAY + "/" + project + "/file/" + path, { headers: { Authorization: "Bearer " + tok }, cache: "no-store" })
+      .then(function (r) { if (!r.ok) { var e = new Error("status " + r.status); e.status = r.status; throw e; } return r.json(); })
+      .then(function (j) {
+        var bin = atob(String(j.content || "").replace(/\s/g, "")), bytes = new Uint8Array(bin.length);
+        for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return JSON.parse(new TextDecoder("utf-8").decode(bytes));
+      });
+  }
+  var FILES = { invoices: "invoices", close: "close", ar: "receivables", members: "members", iif: "iif" };
+  function load(tab) {
+    if (LOADED[tab]) return LOADED[tab];
+    var p = tab === "certs" ? readFile(CERTS, "data/accounting/completions.json") : readFile(PROJECT, "accounting-desk/" + FILES[tab] + ".json");
+    LOADED[tab] = p.then(function (j) { D[tab] = j; return j; }, function (e) { FAILED[tab] = e; LOADED[tab] = null; throw e; });
+    return LOADED[tab];
+  }
+  function failSay(tab, e) {
+    var who = tab === "certs" && e && e.status === 403 ? "Your account does not have access to Certification Completions yet. Ask Jonna Critchley to add it."
+      : "This could not be loaded just now. Reload the page in a minute; if it keeps happening, tell Jonna Critchley.";
+    $("v-" + tab).innerHTML = '<div class="card"><div class="empty">' + esc(who) + "</div></div>";
+  }
+
+  /* ---- one list: paged (10 a page; 5, 10, 15 or 20), totals always the whole list ---- */
+  var PAGE = {};
+  function list(host, o) {
+    var st = PAGE[o.key] || (PAGE[o.key] = { page: 0, per: keep("per") || 10 });
+    var rows = o.rows, pages = Math.max(1, Math.ceil(rows.length / st.per));
+    if (st.page >= pages) st.page = pages - 1;
+    var show = rows.slice(st.page * st.per, st.page * st.per + st.per);
+    var h = '<div class="tablewrap"><table><thead><tr>' + o.cols.map(function (c) { return "<th" + (c.num ? ' class="num"' : "") + ">" + esc(c.h) + "</th>"; }).join("") + "</tr></thead><tbody>";
+    if (!rows.length) h += '<tr><td colspan="' + o.cols.length + '" class="empty">' + esc(o.none || "Nothing to show.") + "</td></tr>";
+    show.forEach(function (r, i) {
+      h += "<tr" + (o.open ? ' class="go" tabindex="0" data-i="' + (st.page * st.per + i) + '"' : "") + ">" + o.cols.map(function (c) {
+        return "<td" + (c.cls ? ' class="' + c.cls + '"' : c.num ? ' class="num nw"' : "") + ">" + c.cell(r) + "</td>"; }).join("") + "</tr>";
+    });
+    h += "</tbody>" + (rows.length && o.foot ? "<tfoot>" + o.foot(rows) + "</tfoot>" : "") + "</table></div>";
+    if (rows.length > 5) h += '<div class="pager"><button type="button" data-pg="-1"' + (st.page ? "" : " disabled") + ">&lsaquo; Previous</button>" +
+      "<span>Page " + (st.page + 1) + " of " + pages + " &middot; " + rows.length + " in all</span>" +
+      '<button type="button" data-pg="1"' + (st.page < pages - 1 ? "" : " disabled") + ">Next &rsaquo;</button>" +
+      '<span class="sp">Per Page</span><select aria-label="Per page">' + [5, 10, 15, 20].map(function (n) { return "<option" + (n === st.per ? " selected" : "") + ">" + n + "</option>"; }).join("") + "</select></div>";
+    host.innerHTML = h;
+    host.querySelectorAll("[data-pg]").forEach(function (b) { b.addEventListener("click", function () { st.page += +b.getAttribute("data-pg"); list(host, o); }); });
+    var sel = host.querySelector(".pager select");
+    if (sel) sel.addEventListener("change", function () { st.per = +sel.value; st.page = 0; keep("per", st.per); list(host, o); });
+    if (o.open) host.querySelectorAll("tr.go").forEach(function (tr) {
+      var go = function () { o.open(rows[+tr.getAttribute("data-i")]); };
+      tr.addEventListener("click", go);
+      tr.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+    });
+  }
+  function resetPage(key) { if (PAGE[key]) PAGE[key].page = 0; }
+
+  /* ---- Download for Excel (CSV) ---- */
+  function csvCell(v) { var s = v == null ? "" : String(v); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; }
+  function download(name, head, rows) {
+    var lines = [head.map(csvCell).join(",")].concat(rows.map(function (r) { return r.map(csvCell).join(","); }));
+    var blob = new Blob(["﻿" + lines.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = name + ".csv";
+    document.body.appendChild(a); a.click(); setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  /* ---- the right-hand panel ---- */
+  function pane(title, sub, html) {
+    $("pane-t").textContent = title; $("pane-s").textContent = sub || ""; $("pane-b").innerHTML = html;
+    $("pane").classList.add("on"); $("pane").setAttribute("aria-hidden", "false"); $("pane-x").focus();
+  }
+  function closePane() { $("pane").classList.remove("on"); $("pane").setAttribute("aria-hidden", "true"); }
+  function kv(pairs) { return '<div class="kv">' + pairs.filter(function (p) { return p[1] !== "" && p[1] != null; }).map(function (p) { return "<div>" + esc(p[0]) + "</div><div>" + esc(p[1]) + "</div>"; }).join("") + "</div>"; }
+  function sect(t, inner) { return '<div class="sect"><h3>' + esc(t) + "</h3>" + inner + "</div>"; }
+
+  /* the hero with its period picker: months, years, all time */
+  function hero(eyebrow, title, lede, picker, tiles) {
+    return '<section class="hero"><div class="eyebrow">' + esc(eyebrow) + "</div><h1>" + esc(title) + "</h1><p>" + lede + "</p>" + (picker || "") + '<div class="tiles">' + tiles + "</div></section>";
+  }
+  function tile(label, big, small) { return '<div class="tile"><span>' + esc(label) + "</span><b>" + esc(big) + "</b><i>" + esc(small || "") + "</i></div>"; }
+  function periodPicker(id, st, keys, periods) {
+    var labels = { month: "Month", year: "Year", fy: "Fiscal Year", all: "All Time" };
+    var h = '<div class="picker"><div class="seg" role="group" aria-label="Period">' + periods.map(function (p) {
+      return '<button type="button" data-' + id + '-period="' + p + '" aria-pressed="' + (st.period === p) + '">' + labels[p] + "</button>"; }).join("") + "</div>";
+    if (st.period !== "all") {
+      var i = keys.indexOf(st.key);
+      h += '<button class="navbtn" type="button" id="' + id + '-prev" aria-label="Earlier"' + (i >= keys.length - 1 ? " disabled" : "") + ">&#8249;</button>" +
+        '<select id="' + id + '-pick" aria-label="Which period">' + keys.map(function (k) { return '<option value="' + esc(k) + '"' + (k === st.key ? " selected" : "") + ">" + esc(st.period === "month" ? monthName(k) : k) + "</option>"; }).join("") + "</select>" +
+        '<button class="navbtn" type="button" id="' + id + '-next" aria-label="Later"' + (i <= 0 ? " disabled" : "") + ">&#8250;</button>";
+    }
+    return h + "</div>";
+  }
+  function wirePeriod(id, st, keysFor, redraw) {
+    document.querySelectorAll("[data-" + id + "-period]").forEach(function (b) { b.addEventListener("click", function () { st.period = b.getAttribute("data-" + id + "-period"); st.key = null; resetPage(id); keep(id + "-period", st.period); redraw(); }); });
+    var pk = $(id + "-pick"); if (pk) pk.addEventListener("change", function () { st.key = pk.value; resetPage(id); redraw(); });
+    var pv = $(id + "-prev"), nx = $(id + "-next");
+    if (pv) pv.addEventListener("click", function () { var k = keysFor(), i = k.indexOf(st.key); if (i < k.length - 1) { st.key = k[i + 1]; resetPage(id); redraw(); } });
+    if (nx) nx.addEventListener("click", function () { var k = keysFor(), i = k.indexOf(st.key); if (i > 0) { st.key = k[i - 1]; resetPage(id); redraw(); } });
+  }
+  function keysOf(rows, period, f) { var s = {}; rows.forEach(function (r) { var m = f(r); if (!m) return; s[period === "month" ? m.slice(0, 7) : m.slice(0, 4)] = 1; }); return Object.keys(s).sort().reverse(); }
+  function findBox(id, ph, val) { return '<div class="fld"><label for="' + id + '">Find</label><input class="find" type="search" id="' + id + '" placeholder="' + esc(ph) + '" value="' + esc(val || "") + '"></div>'; }
+  function wireFind(id, st, key, redraw) { var f = $(id); if (!f) return; f.addEventListener("input", function () { st.q = f.value; resetPage(key); redraw(true); }); }
+  function has(r, q, fields) { if (!q) return true; q = q.trim().toLowerCase(); return fields.map(function (f) { return r[f]; }).join(" ").toLowerCase().indexOf(q) >= 0; }
+  function select(id, label, opts, val) { return '<div class="fld"><label for="' + id + '">' + esc(label) + '</label><select id="' + id + '">' + opts.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (o[0] === val ? " selected" : "") + ">" + esc(o[1]) + "</option>"; }).join("") + "</select></div>"; }
+  /* redraw only the list when typing, so the search box keeps its place */
+  function drawWith(viewId, listOnly, full, partial) { if (listOnly && $(viewId + "-list")) partial(); else full(); }
+
+  /* ================= Certification Complete (the CMS's file, as its own desk shows it) ================= */
+  var CS = { period: keep("certs-period") || "month", key: null, q: "" };
+  function certPaid(r) { if (r.paidAmount == null) return r.balance === 0 ? r.fee : null; return r.fee != null ? Math.min(r.paidAmount, r.fee) : r.paidAmount; }
+  function drawCerts(listOnly) {
+    var rows = (D.certs && D.certs.rows) || [];
+    var keys = function () { return keysOf(rows, CS.period, function (r) { return r.month; }); };
+    if (CS.period !== "all" && (!CS.key || keys().indexOf(CS.key) < 0)) CS.key = keys()[0] || null;
+    var inP = rows.filter(function (r) { return CS.period === "all" || (CS.period === "year" ? r.month.slice(0, 4) === CS.key : r.month === CS.key); });
+    var shown = inP.filter(function (r) { return has(r, CS.q, ["org", "program", "product", "order", "assessor", "type", "aptifyCompanyId", "assessorInvoice"]); })
+      .sort(function (a, b) { return String(b.completedOn).localeCompare(String(a.completedOn)); });
+    var label = CS.period === "all" ? "All Time" : CS.period === "year" ? CS.key : monthName(CS.key);
+    var cols = [
+      { h: "Completed", cls: "nw", cell: function (r) { return esc(day(r.completedOn)) + (r.source === "MACTS" ? '<span class="sub">MACTS</span>' : ""); } },
+      { h: "Company", cell: function (r) { return "<b>" + esc(r.org) + "</b>" + (r.aptifyCompanyId ? '<span class="sub">Aptify ' + esc(r.aptifyCompanyId) + "</span>" : ""); } },
+      { h: "Certification", cell: function (r) { return esc(r.program) + (r.product ? '<span class="sub">' + esc(r.product) + "</span>" : ""); } },
+      { h: "Type", cls: "nw", cell: function (r) { return esc(r.type); } },
+      { h: "Aptify Order", cls: "nw", cell: function (r) { return esc(r.order || ""); } },
+      { h: "Fee", num: 1, cell: function (r) { return usd(r.fee); } },
+      { h: "Paid", cls: "nw", cell: function (r) { return r.paidOn ? '<span class="tag good">Paid</span><span class="sub">' + esc(day(r.paidOn)) + "</span>" : r.balance === 0 ? '<span class="tag good">Paid</span>' : r.order ? '<span class="tag warn">Not Shown as Paid</span>' : '<span class="sub">No Aptify order on file</span>'; } },
+      { h: "Assessor", cell: function (r) { return esc(r.assessor || ""); } },
+      { h: "Assessor's Fee", num: 1, cell: function (r) { return usd(r.assessorFee); } },
+      { h: "Assessor Invoice", cls: "nw", cell: function (r) { return esc(r.assessorInvoice || "") + (r.assessorInvoiceDate ? '<span class="sub">' + esc(r.assessorInvoiceDate) + "</span>" : ""); } },
+      { h: "MISMO's Share", num: 1, cell: function (r) { return usd(r.mismoNet); } }];
+    var foot = function (l) { return '<tr><td colspan="5">' + l.length + (l.length === 1 ? " certification" : " certifications") + '</td><td class="num">' + usd(sum(l, function (r) { return r.fee; })) + "</td><td>" + usd(sum(l, certPaid)) + '</td><td></td><td class="num">' + usd(sum(l, function (r) { return r.assessorFee; })) + '</td><td></td><td class="num">' + usd(sum(l, function (r) { return r.mismoNet; })) + "</td></tr>"; };
+    var paint = function () { list($("certs-list"), { key: "certs", rows: shown, cols: cols, foot: foot, none: "Nothing completed" + (CS.q ? " matches that search." : " in " + label + "."), open: certOpen }); };
+    drawWith("certs", listOnly, function () {
+      var unpaid = inP.filter(function (r) { return r.order && !r.paidOn && r.balance !== 0; }).length;
+      $("v-certs").innerHTML = hero("For Accounting", "Certification Complete", "Every company and product certification completed, with the Aptify order, the fee, what has been paid and the assessor&rsquo;s fee. From the CMS.",
+        periodPicker("certs", CS, keys(), ["month", "year", "all"]),
+        tile("Completed", String(inP.length), label) + tile("Fees", usd(sum(inP, function (r) { return r.fee; }), 1), inP.filter(function (r) { return r.fee != null; }).length + " with a fee") +
+        tile("Paid", usd(sum(inP, certPaid), 1), unpaid ? unpaid + " not shown as paid" : "all shown as paid") + tile("Assessor's Fees", usd(sum(inP, function (r) { return r.assessorFee; }), 1), "to outside assessors") +
+        tile("MISMO's Share", usd(sum(inP, function (r) { return r.mismoNet; }), 1), "fee less assessor's fee")) +
+        '<div class="bar"><h2>Completed, ' + esc(label) + "</h2>" + findBox("certs-q", "Company, order or program", CS.q) + '<button class="btn" type="button" id="certs-dl">Download for Excel</button></div>' +
+        '<div class="card" id="certs-list"></div>' + (D.certs.note ? '<p class="note">' + esc(D.certs.note) + "</p>" : "") + '<p class="stamp">' + esc(stamp(D.certs.writtenAt)) + "</p>";
+      wirePeriod("certs", CS, keys, drawCerts); wireFind("certs-q", CS, "certs", drawCerts);
+      $("certs-dl").addEventListener("click", function () {
+        download("Certification Complete - " + label, ["Completed On", "Company", "Aptify Company ID", "Program", "Product", "Type", "Aptify Order", "Fee", "Order Payment", "Paid On", "Assessor", "Assessor's Fee", "Assessor Invoice", "MISMO's Share"],
+          shown.map(function (r) { return [r.completedOn, r.org, r.aptifyCompanyId, r.program, r.product, r.type, r.order, r.fee, r.paidAmount, r.paidOn, r.assessor, r.assessorFee, r.assessorInvoice, r.mismoNet]; }));
+      });
+      paint();
+    }, paint);
+  }
+  function certOpen(r) {
+    pane(r.org, r.program + (r.completedOn ? " · completed " + day(r.completedOn) : ""), sect("Certification", kv([["Company", r.org], ["Aptify Company ID", r.aptifyCompanyId], ["Certification", r.program], ["Product", r.product], ["Type", r.type], ["Completed", day(r.completedOn)], ["Recorded In", r.source]])) +
+      sect("Money", kv([["Aptify Order", r.order], ["Fee", usd(r.fee)], ["Order Payment", usd(r.paidAmount)], ["Paid On", day(r.paidOn)], ["Paid By", r.paidHow], ["Assessor", r.assessor], ["Assessor's Fee", usd(r.assessorFee)], ["Assessor Invoice", r.assessorInvoice], ["MISMO's Share", usd(r.mismoNet)]])));
+  }
+
+  /* ================= Invoices ================= */
+  var IS = { month: null, status: "", cat: "", q: "" };
+  function drawInvoices(listOnly) {
+    var rows = (D.invoices && D.invoices.rows) || [];
+    var months = Object.keys(rows.reduce(function (s, r) { if (r.serviceMonth) s[r.serviceMonth] = 1; return s; }, {})).sort().reverse();
+    if (IS.month === null) { var now = new Date().toISOString().slice(0, 7); IS.month = months.filter(function (m) { return m < now; })[0] || months[0] || ""; }
+    var inM = rows.filter(function (r) { return !IS.month || r.serviceMonth === IS.month; });
+    var shown = inM.filter(function (r) { return (!IS.status || r.status === IS.status) && (!IS.cat || r.category === IS.cat) && has(r, IS.q, ["vendor", "invoiceNo", "netsuite", "period", "line"]); })
+      .sort(function (a, b) { return (b.serviceMonth || "").localeCompare(a.serviceMonth || "") || String(b.sentToAp || "").localeCompare(String(a.sentToAp || "")); });
+    var statuses = Object.keys(rows.reduce(function (s, r) { if (r.status) s[r.status] = 1; return s; }, {})).sort();
+    var label = IS.month ? monthName(IS.month) : "Every Month";
+    var cols = [
+      { h: "Invoice #", cls: "nw", cell: function (r) { return esc(r.invoiceNo); } },
+      { h: "Vendor", cell: function (r) { return "<b>" + esc(r.vendor) + "</b>"; } },
+      { h: "Period", cls: "nw", cell: function (r) { return esc(r.period); } },
+      { h: "Service Month", cls: "nw", cell: function (r) { return esc(monthName(r.serviceMonth)); } },
+      { h: "Category", cell: function (r) { return esc(r.category + (r.summit ? " · " + r.summit : "")); } },
+      { h: "Amount", num: 1, cell: function (r) { return usd(r.amount); } },
+      { h: "Sent to AP", cls: "nw", cell: function (r) { return esc(day(r.sentToAp)); } },
+      { h: "NetSuite #", cls: "nw", cell: function (r) { return esc(r.netsuite); } },
+      { h: "Approved", cls: "nw", cell: function (r) { return esc(day(r.approved)); } },
+      { h: "Paid", cls: "nw", cell: function (r) { return esc(day(r.paid)); } },
+      { h: "Status", cls: "nw", cell: function (r) { return '<span class="tag' + (r.status === "Paid" ? " good" : "") + '">' + esc(r.status) + "</span>"; } },
+      { h: "Expense Line", cls: "clip", cell: function (r) { return esc(r.line); } }];
+    var foot = function (l) { return '<tr><td colspan="5">' + l.length + (l.length === 1 ? " invoice" : " invoices") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + '</td><td colspan="6"></td></tr>'; };
+    var paint = function () { list($("invoices-list"), { key: "invoices", rows: shown, cols: cols, foot: foot, none: "No invoice matches that.", open: invOpen }); };
+    drawWith("invoices", listOnly, function () {
+      var byStatus = {}; inM.forEach(function (r) { byStatus[r.status] = (byStatus[r.status] || 0) + 1; });
+      $("v-invoices").innerHTML = hero("For Accounting", "Invoices", "Every contractor and expense invoice MISMO sends to AP, with where it is: sent to AP, in NetSuite, approved and paid. The service month is the month the work was done.", "",
+        tile("Invoices", String(inM.length), label) + tile("Amount", usd(sum(inM, function (r) { return r.amount; }), 1), label) +
+        statuses.filter(function (s) { return byStatus[s]; }).slice(0, 3).map(function (s) { return tile(s, String(byStatus[s]), "invoices"); }).join("")) +
+        '<div class="bar"><h2>Invoices, ' + esc(label) + "</h2>" +
+        select("inv-month", "Service Month", [["", "Every Month"]].concat(months.map(function (m) { return [m, monthName(m)]; })), IS.month) +
+        select("inv-status", "Status", [["", "Every Status"]].concat(statuses.map(function (s) { return [s, s]; })), IS.status) +
+        select("inv-cat", "Category", [["", "Every Category"], ["Contractor", "Contractor"], ["Summit", "Summit"], ["Marketing", "Marketing"], ["Other", "Other"]], IS.cat) +
+        findBox("inv-q", "Vendor, invoice or NetSuite number", IS.q) + '<button class="btn" type="button" id="inv-dl">Download for Excel</button></div>' +
+        '<div class="card" id="invoices-list"></div><p class="stamp">' + esc(stamp(D.invoices.writtenAt)) + "</p>";
+      [["inv-month", "month"], ["inv-status", "status"], ["inv-cat", "cat"]].forEach(function (p) { $(p[0]).addEventListener("change", function () { IS[p[1]] = this.value; resetPage("invoices"); drawInvoices(); }); });
+      wireFind("inv-q", IS, "invoices", drawInvoices);
+      $("inv-dl").addEventListener("click", function () {
+        download("Invoices - " + label, ["Invoice #", "Vendor", "Period", "Service Month", "Category", "Summit", "Amount", "Sent to AP", "Reviewed", "NetSuite #", "Approved", "Paid", "Status", "GL", "Expense Line"],
+          shown.map(function (r) { return [r.invoiceNo, r.vendor, r.period, r.serviceMonth, r.category, r.summit, r.amount, r.sentToAp, r.reviewed, r.netsuite, r.approved, r.paid, r.status, r.gl, r.line]; }));
+      });
+      paint();
+    }, paint);
+  }
+  function invOpen(r) {
+    pane(r.vendor || "Invoice", (r.invoiceNo ? "Invoice " + r.invoiceNo + " · " : "") + usd(r.amount),
+      sect("Invoice", kv([["Invoice #", r.invoiceNo], ["Vendor", r.vendor], ["Period", r.period], ["Service Month", monthName(r.serviceMonth)], ["Category", r.category], ["Summit", r.summit], ["Amount", usd(r.amount)]])) +
+      sect("Where It Is", kv([["Sent to AP", day(r.sentToAp)], ["Reviewed and Coded", day(r.reviewed)], ["NetSuite #", r.netsuite], ["Approved", day(r.approved)], ["Paid", day(r.paid)], ["Status", r.status]])) +
+      sect("Coding", kv([["GL Account", r.gl], ["Expense Line", r.line]])));
+  }
+
+  /* ================= Monthly Close ================= */
+  function stepCell(s) {
+    var cls = s.state === "waiting" ? (/^Was due/.test(s.due) ? "late" : "wait") : s.state === "done" || s.state === "inferred" ? "done" : "";
+    return { cls: cls, html: esc(s.say) + (s.due ? '<span class="sub">' + esc(s.due) + "</span>" : s.by ? '<span class="sub">' + esc(s.by) + "</span>" : "") };
+  }
+  function drawClose() {
+    var months = (D.close && D.close.months) || [];
+    var latest = months.filter(function (m) { return m.ended; })[0];
+    var closed = months.filter(function (m) { return m.complete; }).length;
+    var stepsHead = months.length ? months[0].steps.map(function (s) { return s.label; }) : [];
+    $("v-close").innerHTML = hero("For Accounting", "Monthly Close", "Each month&rsquo;s six close steps, in order: MISMO sends the Monthly Summary, Accounting sends the admin expense, MISMO approves it, Accounting sends the draft statement, MISMO reviews it, and Accounting issues the final. Open a month for its steps and the Monthly Summary as it was sent.", "",
+      tile("Newest Month Over", latest ? latest.label : "—", latest ? latest.line.replace(/^[^:]*: /, "") : "") +
+      tile("Months Closed", String(closed), "of " + months.filter(function (m) { return m.ended; }).length + " shown") +
+      tile("Next Step", latest && !latest.complete ? (latest.steps.filter(function (s) { return s.state === "waiting"; })[0] || {}).label || "—" : "—", latest && !latest.complete ? "waiting on " + ((latest.steps.filter(function (s) { return s.state === "waiting"; })[0] || {}).who || "") : "nothing waiting")) +
+      '<div class="bar"><h2>Every Month, Newest First</h2></div><div class="card steps" id="close-list"></div><p class="stamp">' + esc(stamp(D.close.writtenAt)) + "</p>";
+    var cols = [{ h: "Month", cls: "nw", cell: function (m) { return "<b>" + esc(m.label) + "</b>"; } }, { h: "Status", cell: function (m) { var t = m.ended ? (m.complete ? "Closed" : m.line.replace(/^[^:]*: /, "").replace(/\.$/, "")) : "Month not over"; return esc(t.charAt(0).toUpperCase() + t.slice(1)); } }]
+      .concat(stepsHead.map(function (h, i) { return { h: h, cls: "nw", cell: function (m) { var c = stepCell(m.steps[i]); return '<span class="' + c.cls + '">' + c.html + "</span>"; } }; }));
+    list($("close-list"), { key: "close", rows: months, cols: cols, none: "No month yet.", open: closeOpen });
+    $("close-list").querySelectorAll("span.wait,span.late,span.done").forEach(function (s) { s.parentNode.classList.add(s.className); });
+  }
+  function closeOpen(m) {
+    var steps = '<div class="tablewrap"><table><thead><tr><th>Step</th><th>Whose Step</th><th>Status</th><th>By</th><th>Note</th></tr></thead><tbody>' +
+      m.steps.map(function (s) { var c = stepCell(s); return "<tr><td>" + esc(s.label) + "</td><td>" + esc(s.who) + '</td><td class="' + c.cls + '">' + esc(s.say) + (s.due ? '<span class="sub">' + esc(s.due) + "</span>" : "") + "</td><td>" + esc(s.by) + "</td><td>" + esc(s.note) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+    var summ = m.summary ? m.summary.rows.filter(function (r) { return r.figure != null || (r.text && r.text.trim()); }).map(function (r) {
+      return '<div class="txt"><b>' + esc(r.name) + "</b>" + (r.figure != null ? esc(usd(r.figure)) + (r.text ? "\n" : "") : "") + esc(r.text || "") + "</div>"; }).join("") : "";
+    pane(m.label, m.line, sect("The Six Steps", steps) + sect("Monthly Summary" + (m.summary ? " (" + m.summary.from + ")" : ""), summ || '<div class="txt">Not sent for this month yet.</div>'));
+  }
+
+  /* ================= Receivables ================= */
+  var AS = { status: null, q: "" };
+  function lastNote(r) { var t = (r.mismoNote || r.mismoNoteOnFile || "").split(/\n+/).filter(Boolean); return t[0] || ""; }
+  function followUp(a) {
+    var none = {}; (a.noPayment || []).forEach(function (k) { none[k] = 1; });
+    return a.items.filter(function (r) { return r.status === "Open" || r.status === "Bad Debt" || none[r.key]; }).map(function (r) {
+      var why = r.status === "Bad Debt" ? "Bad debt, kept out of what is still owed" : none[r.key] ? "The aging calls it " + r.status + ", but no Aptify payment carries the order (often MBA ACH or a credit memo)" :
+        r.age != null && r.age > 60 ? "Still open " + r.age + " days on, with no payment" : "Still open";
+      return Object.assign({ why: why }, r);
+    });
+  }
+  function drawAr(listOnly) {
+    var a = D.ar || { items: [] };
+    var items = a.items || [];
+    if (AS.status === null) AS.status = items.some(function (r) { return r.status === "Open"; }) ? "Open" : "";
+    var fu = followUp(a);
+    var shown = items.filter(function (r) { return (!AS.status || r.status === AS.status) && has(r, AS.q, ["company", "order", "description", "accountingNote", "mismoNote", "mismoNoteOnFile"]); })
+      .sort(function (x, y) { return String(y.invoicedOn).localeCompare(String(x.invoicedOn)); });
+    var tone = function (s) { return s === "Paid" || s === "Complete" ? " good" : s === "Open" ? " warn" : s === "Bad Debt" ? " bad" : ""; };
+    var cols = [
+      { h: "Company", cell: function (r) { return "<b>" + esc(r.company) + "</b>" + '<span class="sub">' + esc(r.description) + "</span>"; } },
+      { h: "Order", cls: "nw", cell: function (r) { return esc(r.order); } },
+      { h: "Amount", num: 1, cell: function (r) { return usd(r.amount); } },
+      { h: "Invoiced", cls: "nw", cell: function (r) { return esc(day(r.invoicedOn) || r.reportedRaw); } },
+      { h: "Status", cls: "nw", cell: function (r) { return '<span class="tag' + tone(r.status) + '">' + esc(r.status || "No Status") + "</span>" + (r.paidInAptify ? '<span class="sub">paid ' + esc(usd(r.paidInAptify.amount)) + " in Aptify, last " + esc(day(r.paidInAptify.last)) + "</span>" : ""); } },
+      { h: "Accounting's Note", cls: "clip", cell: function (r) { return esc(r.accountingNote); } },
+      { h: "MISMO's Latest Note", cls: "clip", cell: function (r) { return esc(lastNote(r)); } }];
+    var foot = function (l) { return '<tr><td colspan="2">' + l.length + (l.length === 1 ? " receivable" : " receivables") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + '</td><td colspan="4"></td></tr>'; };
+    var paint = function () { list($("ar-list"), { key: "ar", rows: shown, cols: cols, foot: foot, none: "No receivable matches that.", open: arOpen }); };
+    drawWith("ar", listOnly, function () {
+      var received = items.filter(function (r) { return r.status === "Paid" || r.status === "Complete"; });
+      var bad = items.filter(function (r) { return r.status === "Bad Debt"; });
+      $("v-ar").innerHTML = hero("For Accounting", "Receivables", "Your AR aging as MISMO reads it. Every morning MISMO checks each item against the Aptify payments: an item paid since your report shows as Paid, and anything still open, unpaid after 60 days or settled with no payment behind it goes to MISMO to follow up. You no longer need to add items to a shared sheet.", "",
+        tile("Still Owed to MISMO", usd(a.owedTotal, 1), items.filter(function (r) { return r.status === "Open"; }).length + " open") +
+        tile("Over 90 Days", usd(a.owedOver90 && a.owedOver90.amount, 1), (a.owedOver90 && a.owedOver90.count || 0) + " of what is owed") +
+        tile("Received", usd(sum(received, function (r) { return r.amount; }), 1), received.length + " paid or complete") +
+        tile("Bad Debt", usd(sum(bad, function (r) { return r.amount; }), 1), bad.length + " kept out of what is owed") +
+        tile("Newest AR Aging", day(a.reportDate), a.count + " items on file")) +
+        '<div class="bar"><h2>Being Followed Up by MISMO</h2></div><div class="card" id="ar-fu"></div>' +
+        '<div class="bar"><h2>Every Receivable</h2>' +
+        select("ar-status", "Status", [["", "Every Status"], ["Open", "Open"], ["Paid", "Paid"], ["Complete", "Complete"], ["Canceled", "Canceled"], ["Bad Debt", "Bad Debt"]], AS.status) +
+        findBox("ar-q", "Company, order or note", AS.q) + '<button class="btn" type="button" id="ar-dl">Download for Excel</button></div>' +
+        '<div class="card" id="ar-list"></div><p class="note">The newest AR aging on file is dated ' + esc(day(a.reportDate)) + ". A newer aging sent to Jonna is loaded into MISMO Money and shows here the next morning.</p>" +
+        '<p class="stamp">' + esc(stamp(a.writtenAt)) + "</p>";
+      list($("ar-fu"), { key: "arfu", rows: fu, open: arOpen, none: "Nothing is being followed up right now: every receivable on file is paid, complete or canceled.",
+        cols: [{ h: "Company", cell: function (r) { return "<b>" + esc(r.company) + "</b>"; } }, { h: "Order", cls: "nw", cell: function (r) { return esc(r.order); } },
+          { h: "Amount", num: 1, cell: function (r) { return usd(r.amount); } }, { h: "Why", cell: function (r) { return esc(r.why); } },
+          { h: "MISMO's Latest Note", cls: "clip", cell: function (r) { return esc(lastNote(r)); } }] });
+      $("ar-status").addEventListener("change", function () { AS.status = this.value; resetPage("ar"); drawAr(); });
+      wireFind("ar-q", AS, "ar", drawAr);
+      $("ar-dl").addEventListener("click", function () {
+        download("Receivables", ["Company", "Order", "Description", "Amount", "Invoiced", "On the Aging Dated", "Status", "Status on Your File", "Paid in Aptify Since", "Accounting's Note", "MISMO's Notes"],
+          shown.map(function (r) { return [r.company, r.order, r.description, r.amount, r.invoicedOn, r.reportedOn || r.reportedRaw, r.status, r.statusOnFile, r.paidInAptify ? r.paidInAptify.amount : "", r.accountingNote, [r.mismoNote, r.mismoNoteOnFile].filter(Boolean).join(" | ")]; }));
+      });
+      paint();
+    }, paint);
+  }
+  function arOpen(r) {
+    pane(r.company, "Order " + r.order + " · " + usd(r.amount),
+      sect("Receivable", kv([["Company", r.company], ["Order", r.order], ["Description", r.description], ["Amount", usd(r.amount)], ["Invoiced", day(r.invoicedOn)], ["On the Aging Dated", day(r.reportedOn) || r.reportedRaw], ["Age", r.age != null ? r.age + " days · " + r.bucket : ""]])) +
+      sect("Status", kv([["Status", r.status], ["Status on Your File", r.statusOnFile], ["Status MISMO Set", r.statusSetByMismo], ["Paid in Aptify Since the Aging", r.paidInAptify ? usd(r.paidInAptify.amount) + ", last on " + day(r.paidInAptify.last) : ""], ["Payment MISMO Holds for the Order", r.paymentHeld ? usd(r.paymentHeld.amount) + " on " + day(r.paymentHeld.on) : "None"]])) +
+      sect("Notes", (r.accountingNote ? '<div class="txt"><b>Accounting&rsquo;s Note</b>' + esc(r.accountingNote) + "</div>" : "") + (r.mismoNote ? '<div class="txt"><b>MISMO&rsquo;s Note</b>' + esc(r.mismoNote) + "</div>" : "") +
+        (r.mismoNoteOnFile ? '<div class="txt"><b>MISMO&rsquo;s Follow-Up Notes on the Aging</b>' + esc(r.mismoNoteOnFile) + "</div>" : "") + (!r.accountingNote && !r.mismoNote && !r.mismoNoteOnFile ? '<div class="txt">No notes.</div>' : "")));
+  }
+
+  /* ================= New and Renewing Members ================= */
+  var MS = { period: keep("members-period") || "month", key: null, kind: "", q: "" };
+  function drawMembers(listOnly) {
+    var rows = (D.members && D.members.rows) || [];
+    var keys = function () { return keysOf(rows, MS.period, function (r) { return r.month; }); };
+    if (MS.period !== "all" && (!MS.key || keys().indexOf(MS.key) < 0)) { var now = new Date().toISOString().slice(0, 7); MS.key = keys().filter(function (k) { return k <= (MS.period === "month" ? now : now.slice(0, 4)); })[0] || keys()[0] || null; }
+    var inP = rows.filter(function (r) { return MS.period === "all" || (MS.period === "year" ? r.month.slice(0, 4) === MS.key : r.month === MS.key); });
+    var shown = inP.filter(function (r) { return (!MS.kind || r.kind === MS.kind) && has(r, MS.q, ["company", "companyId", "order", "level", "type"]); });
+    var label = MS.period === "all" ? "All Time" : MS.period === "year" ? MS.key : monthName(MS.key);
+    var nNew = inP.filter(function (r) { return r.kind === "New Member"; }), nRen = inP.filter(function (r) { return r.kind === "Renewal"; });
+    var cols = [
+      { h: "Date", cls: "nw", cell: function (r) { return esc(day(r.date)); } },
+      { h: "Company", cell: function (r) { return "<b>" + esc(r.company) + "</b>" + (r.companyId ? '<span class="sub">Aptify ' + esc(r.companyId) + "</span>" : ""); } },
+      { h: "New or Renewal", cls: "nw", cell: function (r) { return '<span class="tag' + (r.kind === "Renewal" ? "" : " good") + '">' + esc(r.kind) + "</span>"; } },
+      { h: "Member Type", cls: "nw", cell: function (r) { return esc(r.type); } },
+      { h: "Level", cls: "nw", cell: function (r) { return esc(r.level); } },
+      { h: "Aptify Order", cls: "nw", cell: function (r) { return esc(r.order || (r.payments || []).map(function (p) { return p.order; }).filter(function (v, i, s) { return s.indexOf(v) === i; }).join(", ")); } },
+      { h: "Paid", num: 1, cell: function (r) { return r.paid == null ? '<span class="sub">none found</span>' : usd(r.paid); } }];
+    var foot = function (l) { return '<tr><td colspan="6">' + l.length + (l.length === 1 ? " member" : " members") + '</td><td class="num">' + usd(sum(l, function (r) { return r.paid; })) + "</td></tr>"; };
+    var paint = function () { list($("members-list"), { key: "members", rows: shown, cols: cols, foot: foot, none: "No new member or renewal" + (MS.q ? " matches that search." : " in " + label + "."), open: memOpen }); };
+    drawWith("members", listOnly, function () {
+      $("v-members").innerHTML = hero("For Accounting", "New and Renewing Members", "New members and 2027 renewals by month, from Member 360, with the payments MISMO holds for each. A new member is dated from the start of its membership; a renewal from the day it was paid. Pick a month, or a year, or search them all.",
+        periodPicker("members", MS, keys(), ["month", "year", "all"]),
+        tile("New Members", String(nNew.length), label) + tile("Renewals", String(nRen.length), label) +
+        tile("Paid, New Members", usd(sum(nNew, function (r) { return r.paid; }), 1), nNew.filter(function (r) { return r.paid != null; }).length + " with a payment found") +
+        tile("Paid, Renewals", usd(sum(nRen, function (r) { return r.paid; }), 1), nRen.filter(function (r) { return r.paid != null; }).length + " with a payment found")) +
+        '<div class="bar"><h2>' + esc(label) + "</h2>" + select("mem-kind", "Show", [["", "New and Renewals"], ["New Member", "New Members"], ["Renewal", "Renewals"]], MS.kind) +
+        findBox("mem-q", "Company, Aptify ID or order", MS.q) + '<button class="btn" type="button" id="mem-dl">Download for Excel</button></div>' +
+        '<div class="card" id="members-list"></div><p class="note">Payments are MISMO&rsquo;s share as MISMO Money counts them: a renewal by its Aptify order, a new member by its membership or IIF payments within 60 days of its start.</p><p class="stamp">' + esc(stamp(D.members.writtenAt)) + "</p>";
+      wirePeriod("members", MS, keys, drawMembers);
+      $("mem-kind").addEventListener("change", function () { MS.kind = this.value; resetPage("members"); drawMembers(); });
+      wireFind("mem-q", MS, "members", drawMembers);
+      $("mem-dl").addEventListener("click", function () {
+        download("New and Renewing Members - " + label, ["Date", "Month", "Company", "Aptify Company ID", "New or Renewal", "Member Type", "Level", "How Known", "Aptify Order", "Paid"],
+          shown.map(function (r) { return [r.date, r.month, r.company, r.companyId, r.kind, r.type, r.level, r.how, r.order || (r.payments || []).map(function (p) { return p.order; }).join(" "), r.paid]; }));
+      });
+      paint();
+    }, paint);
+  }
+  function memOpen(r) {
+    var pays = (r.payments || []).length ? '<div class="tablewrap"><table><thead><tr><th>Paid On</th><th>Order</th><th>Product</th><th>How Paid</th><th class="num">Amount</th></tr></thead><tbody>' +
+      r.payments.map(function (p) { return "<tr><td>" + esc(day(p.on)) + "</td><td>" + esc(p.order) + "</td><td>" + esc(p.product) + "</td><td>" + esc(p.how) + '</td><td class="num">' + usd(p.amount) + "</td></tr>"; }).join("") + "</tbody></table></div>" : '<div class="txt">No payment found in MISMO Money for this one.</div>';
+    pane(r.company, r.kind + " · " + day(r.date), sect("Membership", kv([["Company", r.company], ["Aptify Company ID", r.companyId], ["New or Renewal", r.kind], ["Date", day(r.date)], ["Member Type", r.type], ["Level", r.level], ["How Member 360 Knows", r.how]])) + sect("Payments", pays));
+  }
+
+  /* ================= IIF Payments ================= */
+  var FS = { period: keep("iif-period") || "fy", key: null, q: "" };
+  function drawIif(listOnly) {
+    var rows = (D.iif && D.iif.rows) || [], m3 = (D.iif && D.iif.member360) || {};
+    var keyOf = function (r) { return FS.period === "fy" ? r.fy : r.month; };
+    var keys = function () { var s = {}; rows.forEach(function (r) { s[keyOf(r)] = 1; }); return Object.keys(s).sort().reverse(); };
+    if (FS.period !== "all" && (!FS.key || keys().indexOf(FS.key) < 0)) FS.key = keys()[0] || null;
+    var inP = rows.filter(function (r) { return FS.period === "all" || keyOf(r) === FS.key; });
+    var shown = inP.filter(function (r) { return has(r, FS.q, ["company", "order", "companyType", "how"]); });
+    var label = FS.period === "all" ? "All Time" : FS.period === "fy" ? FS.key : monthName(FS.key);
+    var cos = {}; inP.forEach(function (r) { cos[r.company] = 1; });
+    var cols = [
+      { h: "Paid On", cls: "nw", cell: function (r) { return esc(day(r.on)); } },
+      { h: "Company", cell: function (r) { return "<b>" + esc(r.company) + "</b>" + '<span class="sub">' + esc(r.companyType) + "</span>"; } },
+      { h: "Aptify Order", cls: "nw", cell: function (r) { return esc(r.order); } },
+      { h: "How Paid", cls: "nw", cell: function (r) { return esc(r.how); } },
+      { h: "Amount", num: 1, cell: function (r) { return usd(r.amount); } }];
+    var foot = function (l) { return '<tr><td colspan="4">' + l.length + (l.length === 1 ? " payment" : " payments") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + "</td></tr>"; };
+    var paint = function () { list($("iif-list"), { key: "iif", rows: shown, cols: cols, foot: foot, none: "No IIF payment" + (FS.q ? " matches that search." : " in " + label + ".") }); };
+    drawWith("iif", listOnly, function () {
+      var labelsP = { fy: "Fiscal Year", month: "Month", all: "All Time" };
+      var pick = '<div class="picker"><div class="seg" role="group" aria-label="Period">' + ["fy", "month", "all"].map(function (p) { return '<button type="button" data-iif-period="' + p + '" aria-pressed="' + (FS.period === p) + '">' + labelsP[p] + "</button>"; }).join("") + "</div>" +
+        (FS.period !== "all" ? '<button class="navbtn" type="button" id="iif-prev" aria-label="Earlier">&#8249;</button><select id="iif-pick" aria-label="Which period">' + keys().map(function (k) { return '<option value="' + esc(k) + '"' + (k === FS.key ? " selected" : "") + ">" + esc(FS.period === "month" ? monthName(k) : k) + "</option>"; }).join("") + '</select><button class="navbtn" type="button" id="iif-next" aria-label="Later">&#8250;</button>' : "") + "</div>";
+      $("v-iif").innerHTML = hero("For Accounting", "IIF Payments", "Every Innovation Investment Fee payment MISMO Money holds, by fiscal year (October to September) or month, with the lender counts Member 360 shows on its IIF Cycle page.", pick,
+        tile("Collected", usd(sum(inP, function (r) { return r.amount; }), 1), label) + tile("Payments", String(inP.length), Object.keys(cos).length + " companies") +
+        (m3.iif_year ? tile("Lenders Paid in Full", m3.iif_paid_in_full || "—", "IIF year " + m3.iif_year + ", per Member 360") + tile("Partly Paid", m3.iif_partly_paid || "—", "per Member 360") + tile("Lender Members", m3.iif_lender_members || "—", "paid at least the member amount") : "")) +
+        '<div class="bar"><h2>IIF Payments, ' + esc(label) + "</h2>" + findBox("iif-q", "Company or order", FS.q) + '<button class="btn" type="button" id="iif-dl">Download for Excel</button></div>' +
+        '<div class="card" id="iif-list"></div><p class="note">Amounts are MISMO&rsquo;s share as MISMO Money&rsquo;s Gross Cash counts them, for the current and previous fiscal years.</p><p class="stamp">' + esc(stamp(D.iif.writtenAt)) + "</p>";
+      wirePeriod("iif", FS, keys, drawIif); wireFind("iif-q", FS, "iif", drawIif);
+      $("iif-dl").addEventListener("click", function () { download("IIF Payments - " + label, ["Paid On", "Fiscal Year", "Company", "Company Type", "Aptify Order", "Product", "How Paid", "Amount"], shown.map(function (r) { return [r.on, r.fy, r.company, r.companyType, r.order, r.product, r.how, r.amount]; })); });
+      paint();
+    }, paint);
+  }
+
+  /* ================= Help ================= */
+  function drawHelp() {
+    $("v-help").innerHTML = '<section class="hero"><div class="eyebrow">For Accounting</div><h1>Help</h1><p>This desk is view only. Nothing here can be changed, and nothing you do here changes MISMO&rsquo;s records.</p></section>' +
+      "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
+      "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid.</p>" +
+      "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
+      "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. Anything still open, unpaid after 60 days, or called paid with no Aptify payment behind it goes to MISMO&rsquo;s own follow-up list, and shows here under Being Followed Up by MISMO with MISMO&rsquo;s notes. You no longer need to add items to a shared sheet; just keep sending the monthly AR aging.</p>" +
+      "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each. Pick a month or a year, or choose All Time and search.</p>" +
+      "<h2>IIF Payments</h2><p>Every Innovation Investment Fee payment, by fiscal year or month, with Member 360&rsquo;s count of lenders paid in full and partly paid.</p>" +
+      "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
+  }
+
+  /* ---- tabs ---- */
+  var DRAW = { certs: drawCerts, invoices: drawInvoices, close: drawClose, ar: drawAr, members: drawMembers, iif: drawIif, help: drawHelp };
+  var CUR = "certs";
+  function show(tab) {
+    if (!DRAW[tab]) tab = "certs";
+    CUR = tab; closePane();
+    document.querySelectorAll(".hq nav button[data-hq]").forEach(function (b) { if (b.dataset.hq === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
+    document.querySelectorAll("main .view").forEach(function (v) { v.hidden = v.id !== "v-" + tab; });
+    try { history.replaceState(null, "", "#" + tab); } catch (e) {}
+    keep("tab", tab);
+    if (tab === "help") { drawHelp(); return Promise.resolve(); }
+    return load(tab).then(function () { if (CUR === tab) DRAW[tab](); }, function (e) { console.error("desk", tab, e); if (CUR === tab) failSay(tab, e); });
+  }
+  window.__desk = { show: show, data: D, load: load, open: function (tab, test) {
+    return show(tab).then(function () { var rows = []; if (tab === "ar") rows = D.ar.items; else if (tab === "invoices") rows = D.invoices.rows; else if (tab === "members") rows = D.members.rows; else if (tab === "certs") rows = D.certs.rows;
+      var r = rows.filter(test)[0]; if (r) ({ ar: arOpen, invoices: invOpen, members: memOpen, certs: certOpen })[tab](r); return !!r; }); } };
+
+  function start() {
+    var rs = window.ResourcesSession; if (!rs) { setTimeout(start, 100); return; }
+    rs.requireAccess(PROJECT, { toolName: "MBA Accounting Desk", eyebrow: "Programs & Operations" }).then(function () {
+      document.querySelectorAll(".hq nav button[data-hq]").forEach(function (b) { b.addEventListener("click", function () { show(b.dataset.hq); }); });
+      $("pane-x").addEventListener("click", closePane);
+      document.addEventListener("keydown", function (e) { if (e.key === "Escape" && $("pane").classList.contains("on")) closePane(); });
+      var h = String(location.hash || "").replace("#", "");
+      show(DRAW[h] ? h : keep("tab") || "certs");
+      /* load the other tabs quietly so the search can find things on them */
+      setTimeout(function () { Object.keys(FILES).concat(["certs"]).forEach(function (t) { load(t)["catch"](function () {}); }); }, 1200);
+    })["catch"](function (e) { console.error("desk", e); });
+  }
+  if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
+  if (new Date().getMonth() === 11) document.documentElement.setAttribute("data-season", "december");
+
+  /* the rail search's sources (see gather below) */
+  window.__deskFind = function (t, push, go) {
+    var open = function (tab, test) { return function () { window.__desk.open(tab, test); }; };
+    ((D.ar && D.ar.items) || []).forEach(function (r) { if ((r.company + " " + r.order).toLowerCase().indexOf(t) >= 0) push("Receivables", r.company, "Order " + r.order + " · " + r.status + " · " + usd(r.amount), open("ar", function (x) { return x.key === r.key; })); });
+    ((D.invoices && D.invoices.rows) || []).forEach(function (r) { if ((r.vendor + " " + r.invoiceNo + " " + r.netsuite).toLowerCase().indexOf(t) >= 0) push("Invoices", r.vendor, (r.invoiceNo || "") + " · " + monthName(r.serviceMonth) + " · " + usd(r.amount), open("invoices", function (x) { return x.id === r.id; })); });
+    ((D.members && D.members.rows) || []).forEach(function (r) { if ((r.company + " " + r.companyId).toLowerCase().indexOf(t) >= 0) push("New and Renewing Members", r.company, r.kind + " · " + day(r.date), open("members", function (x) { return x === r; })); });
+    ((D.certs && D.certs.rows) || []).forEach(function (r) { if ((r.org + " " + (r.order || "")).toLowerCase().indexOf(t) >= 0) push("Certification Complete", r.org, r.program + " · " + day(r.completedOn), open("certs", function (x) { return x === r; })); });
+    ((D.iif && D.iif.rows) || []).forEach(function (r) { if ((r.company + " " + r.order).toLowerCase().indexOf(t) >= 0) push("IIF Payments", r.company, day(r.on) + " · " + usd(r.amount), function () { FS.period = "all"; FS.q = r.company; go("iif"); setTimeout(function () { drawIif(); }, 50); }); });
+  };
+})();
+</script>
+<script>
+/* the rail: collapse, remember, search (Summit HQ's, as-is apart from gather) */
+(function(){
+  "use strict";
+  const KEY='hq.rail.off';
+  const rail=()=>document.getElementById('rail');
+
+  function set(off, remember){
+    document.body.classList.toggle('railmini', !!off);
+    const h=document.getElementById('rail-hide');
+    if(h){ h.setAttribute('aria-expanded', off?'false':'true');
+      h.setAttribute('aria-label', off?'Open the menu':'Narrow the menu');
+      h.title = (off?'Open the menu':'Narrow the menu')+' (backslash)'; }
+    if(off) close();
+    if(remember!==false){ try{ localStorage.setItem(KEY, off?'1':'0'); }catch(e){} }
+    setTimeout(()=>{ window.dispatchEvent(new Event('resize')); }, 230);
+  }
+  function toggle(){ set(!document.body.classList.contains('railmini')); }
+
+  function start(){
+    let off=null;
+    try{ const v=localStorage.getItem(KEY); if(v!==null) off=(v==='1'); }catch(e){}
+    if(off===null) off = window.matchMedia('(max-width:900px)').matches;
+    set(off, false);
+    const h=document.getElementById('rail-hide'); if(h) h.addEventListener('click',toggle);
+    const sc=document.getElementById('rail-scrim'); if(sc) sc.addEventListener('click',()=>set(true));
+    const qb=document.getElementById('rail-qb');
+    if(qb) qb.addEventListener('click',()=>{ set(false);
+      setTimeout(()=>{ const q=document.getElementById('rail-q'); if(q) q.focus(); },230); });
+    document.querySelectorAll('.hq nav button[data-hq]').forEach(b=>{
+      b.addEventListener('click',()=>{
+        if(window.matchMedia('(max-width:900px)').matches) set(true);
+      });
+    });
+    wireFind();
+  }
+
+  document.addEventListener('keydown',e=>{
+    const t=e.target;
+    const typing = t && (t.tagName==='INPUT'||t.tagName==='TEXTAREA'||t.isContentEditable);
+    if(e.key==='\\' && !typing && !e.metaKey && !e.ctrlKey && !e.altKey){ e.preventDefault(); toggle(); }
+    if((e.metaKey||e.ctrlKey) && e.key.toLowerCase()==='k'){
+      e.preventDefault(); set(false);
+      setTimeout(()=>{ const q=document.getElementById('rail-q');
+        if(q){ q.focus(); q.select(); } }, 230);
+    }
+  });
+
+  const HITS=()=>document.getElementById('rail-hits');
+  let picked=-1, rows=[];
+  function norm(x){ return String(x||'').replace(/\s+/g,' ').trim().toLowerCase(); }
+
+  function gather(q){
+    const t=norm(q); if(t.length<2) return [];
+    const out=[];
+    const score=(name)=>{ const n=norm(name);
+      return n===t ? 3 : n.indexOf(t)===0 ? 2 : n.indexOf(t)>=0 ? 1 : 0; };
+    const push=(group,name,where,go)=>{
+      if(out.length<60) out.push({group,name,where,go,s:score(name)});
+    };
+
+    try{ if(window.__deskFind) window.__deskFind(t, push, go); }catch(e){}
+
+    const best={};
+    out.forEach(h=>{ best[h.group]=Math.max(best[h.group]||0, h.s); });
+    const ORDER=['Receivables','Invoices','Certification Complete','New and Renewing Members','IIF Payments'];
+    out.sort((a,b)=>
+      (best[b.group]-best[a.group])
+      || (ORDER.indexOf(a.group)-ORDER.indexOf(b.group))
+      || (b.s-a.s)
+      || String(a.name).localeCompare(String(b.name)));
+    return out;
+  }
+  function go(tab){
+    const b=document.querySelector('.hq nav button[data-hq="'+tab+'"]');
+    if(b && !b.hasAttribute('aria-current')) b.click();
+  }
+
+  function draw(list){
+    const box=HITS(); if(!box) return;
+    box.textContent=''; rows=[]; picked=-1;
+    if(!list.length){
+      const n=document.createElement('div'); n.className='rh-none';
+      n.textContent='Nothing matches.'; box.appendChild(n); box.hidden=false; return;
+    }
+    let g=null;
+    list.slice(0,24).forEach(h=>{
+      if(h.group!==g){ g=h.group;
+        const hd=document.createElement('div'); hd.className='rh-g'; hd.textContent=g; box.appendChild(hd); }
+      const b=document.createElement('button'); b.type='button'; b.className='rh';
+      const nm=document.createElement('b'); nm.textContent=h.name; b.appendChild(nm);
+      if(h.where){ const w=document.createElement('i'); w.textContent=h.where; b.appendChild(w); }
+      b.addEventListener('click',()=>{ close(); h.go(); });
+      rows.push(b); box.appendChild(b);
+    });
+    box.hidden=false;
+  }
+  function close(){ const b=HITS(); if(b){ b.hidden=true; b.textContent=''; } rows=[]; picked=-1; }
+  function mark(){ rows.forEach((r,i)=>r.classList.toggle('on', i===picked));
+    if(rows[picked]) try{ rows[picked].scrollIntoView({block:'nearest'}); }catch(e){} }
+
+  function wireFind(){
+    const q=document.getElementById('rail-q'), x=document.getElementById('rail-qx');
+    if(!q) return;
+    let tmr=null;
+    const run=()=>{ const v=q.value;
+      if(x) x.hidden = !v;
+      if(norm(v).length<2){ close(); return; }
+      draw(gather(v)); };
+    q.addEventListener('input',()=>{ clearTimeout(tmr); tmr=setTimeout(run,150); });
+    q.addEventListener('focus',()=>{ if(norm(q.value).length>=2) run(); });
+    q.addEventListener('keydown',e=>{
+      if(e.key==='Escape'){ close(); q.blur(); return; }
+      if(!rows.length) return;
+      if(e.key==='ArrowDown'){ e.preventDefault(); picked=(picked+1)%rows.length; mark(); }
+      else if(e.key==='ArrowUp'){ e.preventDefault(); picked=(picked-1+rows.length)%rows.length; mark(); }
+      else if(e.key==='Enter'){ e.preventDefault(); (rows[picked]||rows[0]).click(); }
+    });
+    if(x) x.addEventListener('click',()=>{ q.value=''; x.hidden=true; close(); q.focus(); });
+    document.addEventListener('click',e=>{
+      if(!e.target.closest('.railfind')) close();
+    });
+  }
+
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start);
+  else start();
+  window.__rail={ show:()=>set(false), hide:()=>set(true), toggle,
+    mini:()=>document.body.classList.contains('railmini') };
+})();
+
+(function theme(){
+  var btn = document.getElementById("theme-btn");
+  if(!btn) return;
+  function cur(){
+    var t = document.documentElement.getAttribute("data-theme");
+    if(t) return t;
+    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  function paint(){
+    const dark = cur() === "dark";
+    const lab = document.getElementById("theme-lab");
+    if(lab) lab.textContent = dark ? "Light Mode" : "Dark Mode";
+    else btn.textContent = dark ? "Light Mode" : "Dark Mode";
+    btn.title = "Switch to " + (dark ? "light" : "dark") + " mode";
+  }
+  btn.addEventListener("click", function(){
+    document.documentElement.setAttribute("data-theme", cur() === "dark" ? "light" : "dark");
+    paint();
+    try{ localStorage.setItem("mismo.portal.theme", cur()); }catch(e){}
+    window.dispatchEvent(new Event("resize"));
+  });
+  try{
+    var saved = localStorage.getItem("mismo.portal.theme");
+    if(saved) document.documentElement.setAttribute("data-theme", saved);
+  }catch(e){}
+  paint();
+})();
+</script>
+</body>
+</html>
