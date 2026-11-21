@@ -114,8 +114,9 @@ function renderScript(){
 }
 
 /* ---------- drawing ---------- */
+function progName(p){ return { Consultant: "Certified Consultant", FRAME: "FRAME Certified Advisory Partner" }[p] || p + " Certification"; }
 function renderHeader(){
-  el("pname").textContent = R.program + " Certification Renewal";
+  el("pname").textContent = progName(R.program) + " Renewal";
   document.title = R.program + " Renewal · " + R.org + (DEMO ? " · Example" : "");
   paintHero();
 }
@@ -158,7 +159,7 @@ function paintHero(){
   var sent = !!(submitted || R.received), i = R.invoice || {}, p = progress();
   var now = !sent ? 1 : i.paid ? 3 : 2;
   var who = firstName((R.contact && (R.contact.first || R.contact.name)) || (R.website && R.website.contact));
-  h.innerHTML = '<div class="wrap"><div style="min-width:0"><div class="kicker">' + esc(R.program) + " Certification · Renewal" + (DEMO ? " · Example" : "") + "</div>"
+  h.innerHTML = '<div class="wrap"><div style="min-width:0"><div class="kicker">' + esc(progName(R.program)) + " · Renewal" + (DEMO ? " · Example" : "") + "</div>"
     + "<h1>Welcome" + (who ? ", " + esc(who) : "") + ". Let's renew <span>" + esc(R.org) + "</span>.</h1>"
     + '<p class="sub">' + (sent ? "We have your renewal. Nothing else is needed from you today; your invoice is on this page."
         : "Confirm what we hold, sign the attestation and send it back. " + STEP_WORDS[stepCount()].replace(/^./, function(c){ return c.toUpperCase(); }) + " short steps.") + "</p>"
@@ -412,7 +413,18 @@ function saveBlob(blob, name){
   }
 }
 
+/* The documents step is named for what this certification renews on: the application and questionnaire (eMortgage,
+   FRAME), the application alone (Product), or the firm's own documents (Certified Consultant). */
+function docsTitle(){
+  var ds = R.documents || [];
+  if (ds.some(function(d){ return d.id === "questionnaire"; })) return ["Application and Questionnaire", "Your Application and Questionnaire", "Open what you sent us last time and tell us whether it still holds. If anything has changed, send the corrected document back."];
+  if (ds.length <= 1) return ["Your Application", "Your Application", "Open what you sent us last time and tell us whether it still holds. If anything has changed, send the corrected version back."];
+  return ["Your Documents", "Your Documents", "For each one, open what you sent us last time and tell us whether it still holds: your application, key employee bios, project examples and client references. If anything has changed, send the updated document back."];
+}
 function renderDocs(){
+  var tt = docsTitle(), sec = document.querySelector('.rn-step[data-key="docs"]');
+  STEP_TITLE.docs = tt[0];
+  if (sec) { sec.querySelector("h2").textContent = tt[1]; sec.querySelector(".ph p").textContent = tt[2]; }
   el("docs").innerHTML = (R.documents || []).map(function(d){
     var v = (A.documents[d.id] || {}).response || "";
     var files = A.files[d.id] || [];
@@ -799,7 +811,9 @@ function example(p){
   if (!P) return null;
   var y = new Date().getFullYear(), ann = (y + 1) + "-01-15", last = (y - 1) + "-01-20";
   var docs = [{ id: "application", name: "Certification Application", lastSent: last, available: true }];
-  if (p !== "product" && p !== "consultant") docs.push({ id: "questionnaire", name: P[0] + " Questionnaire", lastSent: last, available: true });
+  if (p === "consultant") docs.push({ id: "bio", name: "Key Employee Bios", lastSent: last, available: true },
+    { id: "example", name: "Project Examples and Write-Ups", lastSent: last, available: true }, { id: "references", name: "Client References", lastSent: last, available: true });
+  else if (p !== "product") docs.push({ id: "questionnaire", name: (P[0] === "FRAME" ? "FRAME" : P[0]) + " Questionnaire", lastSent: last, available: true });
   return {
     org: "Northbeam Financial (Example)", program: P[0], product: P[1], anniversary: ann, fee: P[2],
     contact: { name: "Jordan Sample" },
