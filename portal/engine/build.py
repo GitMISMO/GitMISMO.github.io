@@ -313,6 +313,12 @@ cfgs["frame"] = {
         {"type": "review", "title": "Review and Submit"}]}
 
 
+# A stamp from the engine files themselves, added to their links, so a browser never keeps showing an older copy after
+# a change (21 Nov 2026: the tidied step tiles did not show until the cached stylesheet expired).
+import hashlib
+STAMP = hashlib.sha1(b"".join(open(os.path.join(ROOT, "portal", "engine", f), "rb").read() for f in ("portal.css", "portal.js", "endpoint.js"))).hexdigest()[:8]
+
+
 def page(slug, cfg):
     title = cfg["programName"] + " Portal"
     return """<!doctype html>
@@ -326,7 +332,7 @@ def page(slug, cfg):
 <title>%(title)s · Sample</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
-<link rel="stylesheet" href="../engine/portal.css">
+<link rel="stylesheet" href="../engine/portal.css?v=%(v)s">
 <style>[hidden]{display:none!important}body{margin:0}</style>
 </head>
 <body>
@@ -349,11 +355,11 @@ def page(slug, cfg):
 <main class="wrap" id="main" style="padding-block:18px 60px"></main>
 <div class="toast" id="toast" role="status" hidden></div>
 <script id="cfg" type="application/json">%(cfg)s</script>
-<script src="../engine/endpoint.js"></script>
-<script src="../engine/portal.js"></script>
+<script src="../engine/endpoint.js?v=%(v)s"></script>
+<script src="../engine/portal.js?v=%(v)s"></script>
 </body>
 </html>
-""" % {"title": title, "name": cfg["programName"], "logo": LOGO, "cfg": json.dumps(cfg, ensure_ascii=False).replace("</", "<\\/")}
+""" % {"title": title, "name": cfg["programName"], "logo": LOGO, "v": STAMP, "cfg": json.dumps(cfg, ensure_ascii=False).replace("</", "<\\/")}
 
 
 for slug, cfg in cfgs.items():
