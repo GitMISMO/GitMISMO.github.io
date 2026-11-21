@@ -350,6 +350,25 @@ td select.in{padding:5px 8px;font-size:13px}
 /* ===== additions for the sample portals of every certification (21 Nov 2026) ===== */
 .steps{grid-template-columns:repeat(var(--n,4),minmax(0,1fr))}
 @media (max-width:900px){.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.steps .stepbtn:last-child:nth-child(odd){grid-column:1/-1}}
+/* Step tiles, tidied (21 Nov 2026, Jonna: "the font is crowded next to the side ... clean it up"): the title is its own
+   block with a tight line height, the subtitle may take two lines instead of being cut off, and there is room inside the
+   edge. With six or more steps (the renewal page) the number sits above the words, so each title gets the full width. */
+.stepbtn{padding:14px 16px;gap:12px}
+.stepbtn .t{display:block;font-size:14px;line-height:1.3;overflow-wrap:break-word;text-wrap:balance}
+.stepbtn .s{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.35;margin-top:4px}
+@media all{
+  .steps:has(> .stepbtn:nth-child(6)){gap:12px}
+  .steps:has(> .stepbtn:nth-child(6)) .stepbtn{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:10px;padding:14px 16px 16px}
+  .steps:has(> .stepbtn:nth-child(6)) .stepbtn .n{width:30px;height:30px;font-size:13px}
+  .steps:has(> .stepbtn:nth-child(6)) .stepbtn>span:last-child{width:100%}
+}
+/* not wide enough for six or seven side by side: two rows of four, so no word is ever split */
+@media (min-width:901px) and (max-width:1279px){
+  .steps:has(> .stepbtn:nth-child(6)){grid-template-columns:repeat(3,minmax(0,1fr))}
+  .steps:has(> .stepbtn:nth-child(7)){grid-template-columns:repeat(4,minmax(0,1fr))}
+  .steps:has(> .stepbtn:nth-child(7):last-child) .stepbtn:last-child{grid-column:span 2}
+}
+@media (max-width:900px){.steps:has(> .stepbtn:nth-child(6)) .stepbtn{padding:12px 14px 14px}}
 .journey{grid-template-columns:repeat(var(--j,7),minmax(0,1fr))}
 @media (max-width:760px){.journey{grid-template-columns:repeat(var(--j,7),minmax(84px,1fr))}}
 .anav button{white-space:normal;align-items:flex-start}
