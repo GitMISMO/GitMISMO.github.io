@@ -1,6 +1,6 @@
 {
  "note": "Old mismo.org addresses and where they go now. Read by the website footer script (Nav Behavior, old-site redirects) on Page Not Found pages. Keys are lower-case paths without a trailing slash. Source: GitMISMO/website-migration-data mismo-redirect-list-2026-11-17.csv. To add or change one, edit this file.",
- "updated": "2026-11-17",
+ "updated": "2026-11-21",
  "map": {
   "/": "/home",
   "/2018-mismo-intellectual-property-rights-policy": "/policies-and-procedures",
@@ -518,8 +518,8 @@
   "/home/certifications/certification-list/wolters-kluwer": "/standards-resources/certification/wolters-kluwer",
   "/home/certifications/certification-pricing": "/standards-resources/certification/certification-pricing",
   "/home/certifications/professional-certification": "/standards-resources/certification/individual-certifications",
-  "/home/certifications/professional-certification/mismo-frame-advisory-partner-certification": "/standards-resources/certification/organization-certifications/frame",
-  "/home/certifications/professional-certification/mismo-frame-advisory-partner-certification/mismo-frame-advisory-partners": "/standards-resources/certification/organization-certifications/frame/frame-advisory-partners",
+  "/home/certifications/professional-certification/mismo-frame-advisory-partner-certification": "/standards-resources/certification/organization-certifications/frame-advisory-partner",
+  "/home/certifications/professional-certification/mismo-frame-advisory-partner-certification/mismo-frame-advisory-partners": "/standards-resources/certification/organization-certifications/frame-advisory-partner/frame-advisory-partners",
   "/home/certifications/technology-certifications": "/standards-resources/certification/organization-certifications",
   "/home/certifications/technology-certifications/ai-governance-certification": "/standards-resources/certification/organization-certifications/ai-governance",
   "/home/certifications/technology-certifications/ai-governance-certification/ai-governance-certified-companies": "/standards-resources/certification/organization-certifications/ai-governance/ai-governance-certified-providers",
