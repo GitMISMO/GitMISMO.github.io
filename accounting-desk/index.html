@@ -212,6 +212,76 @@ tfoot td{font-weight:700;background:var(--surface-2);border-top:2px solid var(--
 .help p,.help li{font-size:14px;line-height:1.6;color:var(--ink-2);max-width:860px}
 .stamp{color:var(--ink-3);font-size:12px;margin-top:10px}
 .loading{padding:40px 20px;text-align:center;color:var(--ink-3)}
+/* the Overview (Jonna, 21 Nov 2026: "visually awesome, but make sure it's useful") */
+.ov-hero h1{font-size:28px}
+.ov-hero .when{font-size:13px;color:var(--sky-soft);margin-top:2px}
+.ovtile{cursor:pointer;text-align:left;font:inherit;color:inherit;transition:background .15s,border-color .15s}
+.ovtile:hover,.ovtile:focus-visible{background:rgba(255,255,255,.13);border-color:rgba(116,191,235,.55);outline:none}
+.ovtile b{font-size:26px}
+.ovgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;margin-top:16px}
+@media(max-width:900px){.ovgrid{grid-template-columns:minmax(0,1fr)}}
+.ovcard{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;min-width:0}
+.ovcard.wide{grid-column:1/-1}
+.ovh{display:flex;align-items:center;gap:10px;padding:14px 18px 12px;border-bottom:1px solid var(--rule)}
+.ovh .ic{width:30px;height:30px;border-radius:4px;background:var(--sky-wash);color:var(--navy);display:flex;align-items:center;justify-content:center;flex:none}
+:root[data-theme="dark"] .ovh .ic{background:var(--surface-3);color:var(--sky)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ovh .ic{background:var(--surface-3);color:var(--sky)}}
+.ovh .ic svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ovh h3{margin:0;font-size:15px}
+.ovh .go{margin-left:auto;border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:4px;padding:5px 10px;font-size:12.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.ovh .go:hover{border-color:var(--sky);color:var(--ink)}
+@media(max-width:700px){.ovh .go .gon{display:none}}
+.ovb{padding:16px 18px 18px;display:flex;flex-direction:column;gap:14px;flex:1}
+.big{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.big b{font-size:30px;letter-spacing:-.015em;line-height:1}
+.big span{font-size:13px;color:var(--ink-3)}
+.say{font-size:13.5px;color:var(--ink-2);line-height:1.5;margin:0}
+.say.ok{padding:10px 12px;border-radius:4px;border-left:3px solid var(--good);background:color-mix(in srgb,var(--good) 9%,transparent);color:var(--ink);font-weight:600}
+.minis{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.mini{border:1px solid var(--rule);border-radius:6px;padding:9px 11px;background:var(--surface-2)}
+.mini b{display:block;font-size:17px}
+.mini span{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:700}
+/* the close, as six steps across */
+.stepper{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:0;position:relative}
+.stepper .st{position:relative;padding:0 6px;text-align:center}
+.stepper .st:before{content:"";position:absolute;top:15px;left:0;right:0;height:3px;background:var(--rule)}
+.stepper .st:first-child:before{left:50%}.stepper .st:last-child:before{right:50%}
+.stepper .st.done:before{background:var(--good)}
+.stepper .dot{position:relative;z-index:1;margin:0 auto 8px;width:32px;height:32px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;background:var(--surface);border:2px solid var(--border-strong);color:var(--ink-3)}
+.stepper .done .dot{background:var(--good);border-color:var(--good);color:#fff}
+.stepper .wait .dot{border-color:var(--sky);color:var(--navy);background:var(--sky-wash);box-shadow:0 0 0 4px color-mix(in srgb,var(--sky) 25%,transparent)}
+.stepper .late .dot{border-color:var(--bad);color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,var(--surface))}
+.stepper .lbl{font-size:12.5px;font-weight:700;line-height:1.3}
+.stepper .who{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+.stepper .due{font-size:11.5px;margin-top:3px;font-weight:600;color:var(--ink-2)}
+.stepper .late .due{color:var(--bad)}
+@media(max-width:700px){.stepper{grid-template-columns:minmax(0,1fr)}.stepper .st{display:grid;grid-template-columns:40px minmax(0,1fr);text-align:left;align-items:center;padding:4px 0}.stepper .st:before{display:none}.stepper .dot{margin:0}}
+/* a stage-by-stage strip: one bar, labelled in place */
+.flow{display:flex;flex-direction:column;gap:8px}
+.flow .fr{display:grid;grid-template-columns:110px minmax(0,1fr) 92px;gap:10px;align-items:center;font-size:13px}
+.flow .fr i{font-style:normal;color:var(--ink-2)}
+.flow .fr em{font-style:normal;text-align:right;font-weight:700;white-space:nowrap}
+.flow .trk{height:10px;border-radius:2px;background:var(--surface-3);overflow:hidden}
+.flow .trk u{display:block;height:100%;background:var(--sky);border-radius:2px}
+.flow .fr.mine .trk u{background:var(--warn)}
+/* column charts, values on top, months below */
+.cols{width:100%;height:auto;display:block}
+.cols text{font-family:inherit;fill:var(--ink-3);font-size:11px}
+.cols text.v{fill:var(--ink-2);font-weight:700}
+.cols rect{fill:var(--sky)}
+.cols rect.now{fill:var(--navy)}
+:root[data-theme="dark"] .cols rect.now{fill:#e9f4fb}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cols rect.now{fill:#e9f4fb}}
+.toplist{list-style:none;margin:0;padding:0;border-top:1px solid var(--rule)}
+.toplist li{display:flex;gap:10px;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--rule);font-size:13px;cursor:pointer}
+.toplist li:hover b{text-decoration:underline}
+.toplist li b{font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toplist li span{color:var(--ink-3);white-space:nowrap;font-size:12px}
+.toplist li em{font-style:normal;font-weight:700;white-space:nowrap}
+.ovnote{font-size:12px;color:var(--ink-3);margin:0}
+.split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:24px;align-items:start}
+.ovcol{display:flex;flex-direction:column;gap:14px;min-width:0}
+@media(max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:700px){.hqtop{padding:0 12px}.hqtop .mastrule{margin-inline:10px}.hqtop .hqname{overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}.hero{padding:18px 16px}.find{width:100%}.bar .fld{flex:1 1 100%}}
 </style>
 </head>
@@ -267,7 +337,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <div class="railhits" id="rail-hits" hidden></div>
   </div>
   <nav aria-label="MBA Accounting Desk">
-    <button type="button" data-hq="certs" aria-current="page" title="Certification Complete"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/></svg><span>Certification Complete</span></button>
+    <button type="button" data-hq="overview" aria-current="page" title="Overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Overview</span></button>
+    <button type="button" data-hq="certs" title="Certification Complete"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/></svg><span>Certification Complete</span></button>
     <button type="button" data-hq="iif" title="IIF Payments"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>IIF Payments</span></button>
     <button type="button" data-hq="invoices" title="Invoices"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Invoices</span></button>
     <button type="button" data-hq="close" title="Monthly Close"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2.5 2.5L16 13"/></svg><span>Monthly Close</span></button>
@@ -282,7 +353,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 <div class="railscrim" id="rail-scrim"></div>
 
 <main>
-  <section class="view" id="v-certs"><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-overview"><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-certs" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view" id="v-invoices" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view" id="v-close" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view" id="v-ar" hidden><div class="loading">Loading&hellip;</div></section>
@@ -678,8 +750,141 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ================= Help ================= */
+  /* ================= Overview ================= */
+  var ICON = {
+    close: '<path d="M3 5h18v16H3z"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2.5 2.5L16 13"/>',
+    ar: '<path d="M4 7h16v12H4z"/><path d="M4 11h16M8 15h3"/>',
+    invoices: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
+    members: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M19 8v6M16 11h6"/>',
+    certs: '<circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/>',
+    iif: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>' };
+  function ovCard(tab, title, body, wide) {
+    return '<section class="ovcard' + (wide ? " wide" : "") + '"><div class="ovh"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[tab] + '</svg></span><h3>' + esc(title) +
+      '</h3><button class="go" type="button" data-ovgo="' + tab + '">Open<span class="gon"> ' + esc(title) + '</span> &rsaquo;</button></div><div class="ovb">' + body + "</div></section>";
+  }
+  function mini(label, big) { return '<div class="mini"><span>' + esc(label) + "</span><b>" + esc(big) + "</b></div>"; }
+  /* column chart: [{k, label, v}], the last one darker; money or counts */
+  function columns(pts, money) {
+    if (!pts.length) return "";
+    var W = 560, H = 150, top = 22, bot = 22, gap = 8, n = pts.length, bw = (W - gap * (n - 1)) / n;
+    var max = Math.max.apply(null, pts.map(function (p) { return p.v; }).concat([1]));
+    var short = function (v) { return money ? (v >= 1000 ? "$" + (Math.round(v / 100) / 10) + "k" : "$" + Math.round(v)) : String(v); };
+    var h = '<svg class="cols" viewBox="0 0 ' + W + " " + H + '" role="img" aria-label="' + esc(pts.map(function (p) { return p.label + " " + short(p.v); }).join(", ")) + '">';
+    pts.forEach(function (p, i) {
+      var x = i * (bw + gap), bh = Math.max(p.v ? 3 : 0, (H - top - bot) * p.v / max), y = H - bot - bh;
+      h += '<rect x="' + x.toFixed(1) + '" y="' + y.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + bh.toFixed(1) + '" rx="2"' + (i === n - 1 ? ' class="now"' : "") + "/>";
+      h += '<text class="v" x="' + (x + bw / 2).toFixed(1) + '" y="' + (y - 6).toFixed(1) + '" text-anchor="middle">' + esc(p.v ? short(p.v) : "") + "</text>";
+      h += '<text x="' + (x + bw / 2).toFixed(1) + '" y="' + (H - 6) + '" text-anchor="middle">' + esc(p.label) + "</text>";
+    });
+    return h + "</svg>";
+  }
+  function lastMonths(n) {
+    var out = [], d = new Date(); d.setDate(1);
+    for (var i = 0; i < n; i++) { out.unshift(d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0")); d.setMonth(d.getMonth() - 1); }
+    return out;
+  }
+  function shortMon(k) { return MON[+k.slice(5, 7) - 1].slice(0, 3); }
+  function drawOverview() {
+    var now = new Date(), thisM = lastMonths(1)[0], six = lastMonths(6);
+    var hour = now.getHours(), hello = hour < 12 ? "Good Morning" : hour < 17 ? "Good Afternoon" : "Good Evening";
+    var who = ((window.ResourcesSession && ResourcesSession.current && ResourcesSession.current()) || {}).name || "";
+    var first = String(who).split(/\s+/)[0];
+    var cards = [], tiles = [];
+
+    /* the close */
+    var months = (D.close && D.close.months) || [], cm = months.filter(function (m) { return m.ended && !m.complete; }).pop() || months.filter(function (m) { return m.ended; })[0];
+    if (cm) {
+      var next = cm.steps.filter(function (s) { return s.state === "waiting"; })[0];
+      var stepper = '<div class="stepper">' + cm.steps.map(function (s, i) {
+        var c = stepCell(s).cls;
+        return '<div class="st ' + c + '"><div class="dot">' + (c === "done" ? "&#10003;" : i + 1) + '</div><div><div class="lbl">' + esc(s.label) + '</div><div class="who">' + esc(s.who) + "</div>" +
+          (s.due ? '<div class="due">' + esc(s.due) + "</div>" : "") + "</div></div>";
+      }).join("") + "</div>";
+      var others = months.filter(function (m) { return m.ended && !m.complete && m !== cm; });
+      cards.push(ovCard("close", "Monthly Close", '<div class="big"><b>' + esc(cm.label) + "</b><span>" + (cm.complete ? "closed" : next ? "next: " + esc(next.label) + ", waiting on " + esc(next.who) : "") + "</span></div>" + stepper +
+        (others.length ? '<p class="ovnote">Also not closed yet: ' + others.map(function (m) { return esc(m.label) + " (" + esc(m.line.replace(/^[^:]*: /, "").replace(/\.$/, "")) + ")"; }).join(", ") + ".</p>" : ""), true));
+      tiles.push(['close', "Close in Progress", cm.label, cm.complete ? "closed" : next ? "waiting on " + next.who : ""]);
+    }
+
+    /* receivables */
+    var a = D.ar;
+    if (a) {
+      var open = (a.items || []).filter(function (r) { return r.status === "Open"; }).sort(function (x, y) { return (y.amount || 0) - (x.amount || 0); });
+      var body = '<div class="big"><b>' + usd(a.owedTotal, 1) + "</b><span>still owed to MISMO" + (open.length ? ", " + open.length + (open.length === 1 ? " order" : " orders") : "") + "</span></div>";
+      if (!open.length) body += '<p class="say ok">Nothing is owed to MISMO right now.</p>';
+      else body += '<ul class="toplist">' + open.slice(0, 5).map(function (r) { return '<li data-ovar="' + esc(r.key) + '"><b>' + esc(r.company) + "</b><span>" + esc(day(r.invoicedOn)) + "</span><em>" + usd(r.amount) + "</em></li>"; }).join("") + "</ul>";
+      if (a.owedOver90 && a.owedOver90.count) body += '<p class="say">' + usd(a.owedOver90.amount, 1) + " of it is over 90 days old.</p>";
+      cards.push(ovCard("ar", "Receivables", body));
+      tiles.push(['ar', "Still Owed to MISMO", usd(a.owedTotal, 1), open.length ? open.length + " open" : "nothing owed"]);
+    }
+
+    /* invoices: the newest service month that is over, and what is still moving */
+    var inv = (D.invoices && D.invoices.rows) || [];
+    if (inv.length) {
+      var ms = Object.keys(inv.reduce(function (o, r) { if (r.serviceMonth && r.serviceMonth < thisM) o[r.serviceMonth] = 1; return o; }, {})).sort();
+      var lm = ms[ms.length - 1] || "", inLm = inv.filter(function (r) { return r.serviceMonth === lm; });
+      var recent = lastMonths(4)[0];
+      var moving = inv.filter(function (r) { return r.serviceMonth >= recent && r.serviceMonth <= thisM && r.status && r.status !== "Approved" && r.status !== "Received" && r.status !== "Paid"; });
+      var stages = ["Sent to AP", "In NetSuite"].map(function (st) { var l = moving.filter(function (r) { return r.status === st; }); return { st: st, n: l.length, amt: sum(l, function (r) { return r.amount; }) }; });
+      var maxAmt = Math.max.apply(null, stages.map(function (x) { return x.amt; }).concat([1]));
+      var body2 = '<div class="big"><b>' + usd(sum(inLm, function (r) { return r.amount; }), 1) + "</b><span>" + inLm.length + " invoices for " + esc(monthName(lm)) + "</span></div>" +
+        '<p class="say">Not yet approved, for work done since ' + esc(monthName(recent)) + ':</p><div class="flow">' + stages.map(function (x) {
+          return '<div class="fr' + (x.st === "Sent to AP" ? " mine" : "") + '"><i>' + esc(x.st) + '</i><div class="trk"><u style="width:' + (100 * x.amt / maxAmt).toFixed(1) + '%"></u></div><em>' + x.n + " · " + usd(x.amt, 1) + "</em></div>";
+        }).join("") + "</div>";
+      cards.push(ovCard("invoices", "Invoices", body2));
+      tiles.push(['invoices', "Not Yet Approved", String(moving.length), usd(sum(moving, function (r) { return r.amount; }), 1) + " since " + monthName(recent)]);
+    }
+
+    /* members */
+    var mem = (D.members && D.members.rows) || [];
+    if (mem.length) {
+      var inThis = mem.filter(function (r) { return r.month === thisM; });
+      var nN = inThis.filter(function (r) { return r.kind === "New Member"; }).length, nR = inThis.length - nN;
+      var pts = six.map(function (k) { return { k: k, label: shortMon(k), v: mem.filter(function (r) { return r.month === k; }).length }; });
+      cards.push(ovCard("members", "New and Renewing Members", '<div class="minis">' + mini("New This Month", String(nN)) + mini("Renewals This Month", String(nR)) +
+        mini("Paid This Month", usd(sum(inThis, function (r) { return r.paid; }), 1)) + '</div><p class="ovnote">New members and renewals together, the last six months</p>' + columns(pts, false)));
+      tiles.push(['members', "Members This Month", String(inThis.length), nN + " new, " + nR + " renewing"]);
+    }
+
+    /* certifications */
+    var cr = (D.certs && D.certs.rows) || [];
+    if (cr.length) {
+      var cThis = cr.filter(function (r) { return r.month === thisM; });
+      var unpaid = cr.filter(function (r) { return r.order && !r.paidOn && r.balance !== 0; });
+      var cpts = six.map(function (k) { return { k: k, label: shortMon(k), v: cr.filter(function (r) { return r.month === k; }).length }; });
+      cards.push(ovCard("certs", "Certification Complete", '<div class="minis">' + mini("Completed This Month", String(cThis.length)) + mini("Fees This Month", usd(sum(cThis, function (r) { return r.fee; }), 1)) +
+        mini("Not Shown as Paid", String(unpaid.length)) + '</div><p class="ovnote">Certifications completed, the last six months</p>' + columns(cpts, false)));
+    }
+
+    /* IIF */
+    var iif = (D.iif && D.iif.rows) || [];
+    if (iif.length) {
+      var fy = iif.map(function (r) { return r.fy; }).sort().pop();
+      var inFy = iif.filter(function (r) { return r.fy === fy; });
+      var ipts = six.map(function (k) { return { k: k, label: shortMon(k), v: sum(iif.filter(function (r) { return r.month === k; }), function (r) { return r.amount; }) }; });
+      var m3 = D.iif.member360 || {};
+      cards.push(ovCard("iif", "IIF Payments", '<div class="split"><div class="ovcol"><div class="big"><b>' + usd(sum(inFy, function (r) { return r.amount; }), 1) + "</b><span>collected in " + esc(fy) + "</span></div>" +
+        '<div class="minis">' + mini("Payments", String(inFy.length)) + mini("Companies", String(Object.keys(inFy.reduce(function (o, r) { o[r.company] = 1; return o; }, {})).length)) + "</div>" +
+        (m3.iif_lender_members ? '<p class="ovnote">Member 360&rsquo;s IIF cycle ' + esc(m3.iif_year) + ": " + esc(m3.iif_paid_in_full) + " paid in full, " + esc(m3.iif_partly_paid) + " partly paid.</p>" : "") +
+        '</div><div class="ovcol"><p class="ovnote">Collected by month, the last six months</p>' + columns(ipts, true) + "</div></div>", true));
+      tiles.push(['iif', "IIF Collected", usd(sum(inFy, function (r) { return r.amount; }), 1), fy + " to date"]);
+    }
+
+    var dateSay = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    $("v-overview").innerHTML =
+      '<div class="hero ov-hero"><div class="eyebrow">For Accounting</div><h1>' + esc(hello + (first ? ", " + first : "")) + '</h1><div class="when">' + esc(dateSay) + "</div>" +
+      "<p>Where MISMO&rsquo;s books stand today: the close, what is still owed, invoices on their way through AP, members, certifications and the IIF. Click anything to see the detail.</p>" +
+      '<div class="tiles">' + tiles.map(function (t) { return '<button type="button" class="tile ovtile" data-ovgo="' + t[0] + '"><span>' + esc(t[1]) + "</span><b>" + esc(t[2]) + "</b><i>" + esc(t[3]) + "</i></button>"; }).join("") + "</div></div>" +
+      '<div class="ovgrid">' + cards.join("") + "</div>" +
+      '<p class="stamp">' + esc(stamp(D.ar && D.ar.writtenAt)) + "</p>";
+    document.querySelectorAll("#v-overview [data-ovgo]").forEach(function (b) { b.addEventListener("click", function () { show(b.getAttribute("data-ovgo")); }); });
+    document.querySelectorAll("#v-overview [data-ovar]").forEach(function (li) { li.addEventListener("click", function () {
+      var k = li.getAttribute("data-ovar"); show("ar").then(function () { var r = D.ar.items.filter(function (x) { return x.key === k; })[0]; if (r) arOpen(r); }); }); });
+  }
+
   function drawHelp() {
     $("v-help").innerHTML = '<section class="hero"><div class="eyebrow">For Accounting</div><h1>Help</h1><p>This desk is view only. Nothing here can be changed, and nothing you do here changes MISMO&rsquo;s records.</p></section>' +
+      "<h2>Overview</h2><p>The desk opens here. The tiles across the top are today&rsquo;s headline numbers, and each card below shows one part: the month being closed and which of its six steps is next, what is still owed to MISMO, invoices still on their way through AP, new and renewing members, certifications and IIF payments. Click a tile, a card&rsquo;s Open button or a receivable to go to its page.</p>" +
       "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
       "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid.</p>" +
       "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
@@ -690,16 +895,20 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ---- tabs ---- */
-  var DRAW = { certs: drawCerts, invoices: drawInvoices, close: drawClose, ar: drawAr, members: drawMembers, iif: drawIif, help: drawHelp };
-  var CUR = "certs";
+  var DRAW = { overview: drawOverview, certs: drawCerts, invoices: drawInvoices, close: drawClose, ar: drawAr, members: drawMembers, iif: drawIif, help: drawHelp };
+  var CUR = "overview";
   function show(tab) {
-    if (!DRAW[tab]) tab = "certs";
+    if (!DRAW[tab]) tab = "overview";
     CUR = tab; closePane();
     document.querySelectorAll(".hq nav button[data-hq]").forEach(function (b) { if (b.dataset.hq === tab) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current"); });
     document.querySelectorAll("main .view").forEach(function (v) { v.hidden = v.id !== "v-" + tab; });
     try { history.replaceState(null, "", "#" + tab); } catch (e) {}
     keep("tab", tab);
     if (tab === "help") { drawHelp(); return Promise.resolve(); }
+    if (tab === "overview") {
+      var all = Object.keys(FILES).concat(["certs"]).map(function (t) { return load(t)["catch"](function () { return null; }); });
+      return Promise.all(all).then(function () { if (CUR === "overview") drawOverview(); });
+    }
     return load(tab).then(function () { if (CUR === tab) DRAW[tab](); }, function (e) { console.error("desk", tab, e); if (CUR === tab) failSay(tab, e); });
   }
   window.__desk = { show: show, data: D, load: load, open: function (tab, test) {
@@ -713,7 +922,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       $("pane-x").addEventListener("click", closePane);
       document.addEventListener("keydown", function (e) { if (e.key === "Escape" && $("pane").classList.contains("on")) closePane(); });
       var h = String(location.hash || "").replace("#", "");
-      show(DRAW[h] ? h : keep("tab") || "certs");
+      show(DRAW[h] ? h : "overview");
       /* load the other tabs quietly so the search can find things on them */
       setTimeout(function () { Object.keys(FILES).concat(["certs"]).forEach(function (t) { load(t)["catch"](function () {}); }); }, 1200);
     })["catch"](function (e) { console.error("desk", e); });
