@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-19T23:35:58.940Z",
+ "updated": "2026-11-21T00:12:44.163Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-19T23:34:39.589Z",
+ "sourceUpdated": "2026-11-21T00:11:25.209Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -41,7 +41,7 @@
     ]
    },
    "grid": {
-    "updated": "2026-11-18T03:35:51.258Z",
+    "updated": "2026-11-21T00:11:25.209Z",
     "sessions": [
      {
       "id": "breakfast@mon",
@@ -223,7 +223,7 @@
       "room": "Algiers C",
       "desc": "",
       "sponsor": "",
-      "status": "tentative"
+      "status": "confirmed"
      },
      {
       "id": "general-sessions@tue",
@@ -301,7 +301,7 @@
       "room": "Acadian I/II",
       "desc": "",
       "sponsor": "",
-      "status": "tentative"
+      "status": "confirmed"
      },
      {
       "id": "credit@wed",
@@ -379,7 +379,7 @@
       "room": "Acadian I/II",
       "desc": "",
       "sponsor": "",
-      "status": "tentative"
+      "status": "confirmed"
      },
      {
       "id": "triparty@wed",
@@ -392,7 +392,7 @@
       "room": "La Salle A",
       "desc": "",
       "sponsor": "",
-      "status": "tentative"
+      "status": "confirmed"
      },
      {
       "id": "mtg-compliance@wed",
