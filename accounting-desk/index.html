@@ -214,6 +214,8 @@ tfoot td{font-weight:700;background:var(--surface-2);border-top:2px solid var(--
 .loading{padding:40px 20px;text-align:center;color:var(--ink-3)}
 /* the Overview (Jonna, 21 Nov 2026: "visually awesome, but make sure it's useful") */
 .ov-hero h1{font-size:28px}
+/* six tiles: two rows of three, so the close's month never runs into the next tile */
+.ov-hero .tiles{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
 .ov-hero .when{font-size:13px;color:var(--sky-soft);margin-top:2px}
 .ovtile{cursor:pointer;text-align:left;font:inherit;color:inherit;transition:background .15s,border-color .15s}
 .ovtile:hover,.ovtile:focus-visible{background:rgba(255,255,255,.13);border-color:rgba(116,191,235,.55);outline:none}
@@ -338,6 +340,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   </div>
   <nav aria-label="MBA Accounting Desk">
     <button type="button" data-hq="overview" aria-current="page" title="Overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Overview</span></button>
+    <button type="button" data-hq="ask" title="Ask Accounting"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4z"/><path d="M12 8.2v3.6M12 13.8v.1"/></svg><span>Ask Accounting</span></button>
     <button type="button" data-hq="certs" title="Certification Complete"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/></svg><span>Certification Complete</span></button>
     <button type="button" data-hq="iif" title="IIF Payments"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>IIF Payments</span></button>
     <button type="button" data-hq="invoices" title="Invoices"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Invoices</span></button>
@@ -354,6 +357,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
 <main>
   <section class="view" id="v-overview"><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-ask" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view" id="v-certs" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view" id="v-invoices" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view" id="v-close" hidden><div class="loading">Loading&hellip;</div></section>
@@ -397,7 +401,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         return JSON.parse(new TextDecoder("utf-8").decode(bytes));
       });
   }
-  var FILES = { invoices: "invoices", close: "close", ar: "receivables", members: "members", iif: "iif" };
+  var FILES = { ask: "ask", invoices: "invoices", close: "close", ar: "receivables", members: "members", iif: "iif" };
   function load(tab) {
     if (LOADED[tab]) return LOADED[tab];
     var p = tab === "certs" ? readFile(CERTS, "data/accounting/completions.json") : readFile(PROJECT, "accounting-desk/" + FILES[tab] + ".json");
@@ -779,6 +783,36 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     }, paint);
   }
 
+  /* ================= Ask Accounting ================= */
+  /* Jonna, 21 Nov 2026: "can you add the ask accounting ones from reconcile as a tab on the mba
+     accounting desk?" The questions MISMO Money's Reconcile page holds for Accounting, as it says them. */
+  var QS = { q: "" };
+  function askOpen(r) {
+    pane(r.title, r.type + (r.raised ? " · raised " + day(r.raised) : ""),
+      sect("The Question", kv([["Raised", day(r.raised)], ["Kind", r.area || r.type], ["Aptify Order", r.order], ["Amount", usd(r.amount)], ["Status", r.status]])) +
+      sect("What MISMO Needs to Know", '<div class="txt">' + esc(r.detail) + "</div>"));
+  }
+  function drawAsk(listOnly) {
+    var rows = (D.ask && D.ask.rows) || [];
+    var shown = rows.filter(function (r) { return has(r, QS.q, ["title", "area", "order", "detail"]); });
+    var cols = [
+      { h: "Raised", cls: "nw", cell: function (r) { return esc(day(r.raised)); } },
+      { h: "Question", cell: function (r) { return "<b>" + esc(r.title) + '</b><span class="sub">' + esc(r.area || r.type) + "</span>"; } },
+      { h: "Amount", num: 1, cell: function (r) { return usd(r.amount); } }];
+    var foot = function (l) { return '<tr><td colspan="3">' + l.length + (l.length === 1 ? " question" : " questions") + "</td></tr>"; };
+    var paint = function () { list($("ask-list"), { key: "ask", rows: shown, cols: cols, foot: foot, open: askOpen, none: QS.q ? "No question matches that search." : "Nothing to ask Accounting right now." }); };
+    drawWith("ask", listOnly, function () {
+      var oldest = rows.map(function (r) { return r.raised; }).filter(Boolean).sort()[0];
+      $("v-ask").innerHTML = hero("For Accounting", "Ask Accounting", "The questions MISMO has for Accounting, as MISMO Money&rsquo;s Reconcile page holds them. Click one to read it in full.", "",
+        tile("Open Questions", String(rows.length), rows.length ? "waiting on Accounting" : "nothing to ask") + (oldest ? tile("Oldest", day(oldest), "raised") : "")) +
+        '<div class="bar"><h2>Questions for Accounting</h2>' + findBox("ask-q", "Company, order or words", QS.q) + '<button class="btn" type="button" id="ask-dl">Download for Excel</button></div>' +
+        '<div class="card" id="ask-list"></div><p class="stamp">' + esc(stamp(D.ask.writtenAt)) + "</p>";
+      wireFind("ask-q", QS, "ask", drawAsk);
+      $("ask-dl").addEventListener("click", function () { download("Ask Accounting", ["Raised", "Question", "Kind", "Aptify Order", "Amount", "What MISMO Needs to Know"], shown.map(function (r) { return [r.raised, r.title, r.area || r.type, r.order, r.amount, r.detail]; })); });
+      paint();
+    }, paint);
+  }
+
   /* ================= Help ================= */
   /* ================= Overview ================= */
   var ICON = {
@@ -787,7 +821,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     invoices: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
     members: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M19 8v6M16 11h6"/>',
     certs: '<circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/>',
-    iif: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>' };
+    iif: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    ask: '<path d="M4 5h16v11H9l-5 4z"/><path d="M12 8.2v3.6M12 13.8v.1"/>' };
   function ovCard(tab, title, body, wide) {
     return '<section class="ovcard' + (wide ? " wide" : "") + '"><div class="ovh"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[tab] + '</svg></span><h3>' + esc(title) +
       '</h3><button class="go" type="button" data-ovgo="' + tab + '">Open<span class="gon"> ' + esc(title) + '</span> &rsaquo;</button></div><div class="ovb">' + body + "</div></section>";
@@ -902,10 +937,14 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       tiles.push(['iif', "IIF Collected", usd(sum(inFy, function (r) { return r.amount; }), 1), fy + " to date"]);
     }
 
+    /* questions MISMO has for Accounting (Reconcile's Ask Accounting) */
+    var aq = (D.ask && D.ask.rows) || [];
+    if (D.ask) tiles.push(['ask', "Questions for You", String(aq.length), aq.length ? "from MISMO, waiting on you" : "nothing to ask"]);
+
     var dateSay = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
     $("v-overview").innerHTML =
       '<div class="hero ov-hero"><div class="eyebrow">For Accounting</div><h1>' + esc(hello + (first ? ", " + first : "")) + '</h1><div class="when">' + esc(dateSay) + "</div>" +
-      "<p>Where MISMO&rsquo;s books stand today: the close, what is still owed, invoices waiting for approval, members, certifications and the IIF. Click anything to see the detail.</p>" +
+      "<p>Where MISMO&rsquo;s books stand today: the close, what is still owed, invoices waiting for approval, MISMO&rsquo;s questions for you, members, certifications and the IIF. Click anything to see the detail.</p>" +
       '<div class="tiles">' + tiles.map(function (t) { return '<button type="button" class="tile ovtile" data-ovgo="' + t[0] + '"><span>' + esc(t[1]) + "</span><b>" + esc(t[2]) + "</b><i>" + esc(t[3]) + "</i></button>"; }).join("") + "</div></div>" +
       '<div class="ovgrid">' + cards.join("") + "</div>" +
       '<p class="stamp">' + esc(stamp(D.ar && D.ar.writtenAt)) + "</p>";
@@ -919,6 +958,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function drawHelp() {
     $("v-help").innerHTML = '<section class="hero"><div class="eyebrow">For Accounting</div><h1>Help</h1><p>This desk is view only. Nothing here can be changed, and nothing you do here changes MISMO&rsquo;s records.</p></section>' +
       "<h2>Overview</h2><p>The desk opens here. The tiles across the top are today&rsquo;s headline numbers, and each card below shows one part: the month being closed and which of its six steps is next, what is still owed to MISMO, invoices sent to AP that are still waiting for approval, new and renewing members, certifications and IIF payments. Click a tile, a card&rsquo;s Open button or a receivable to go to its page.</p>" +
+      "<h2>Ask Accounting</h2><p>The questions MISMO has for Accounting, the same ones MISMO Money&rsquo;s Reconcile page lists under Ask Accounting. Click one to read it in full. A question comes off the list once MISMO marks it answered.</p>" +
       "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
       "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid.</p>" +
       "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
@@ -929,7 +969,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ---- tabs ---- */
-  var DRAW = { overview: drawOverview, certs: drawCerts, invoices: drawInvoices, close: drawClose, ar: drawAr, members: drawMembers, iif: drawIif, help: drawHelp };
+  var DRAW = { overview: drawOverview, ask: drawAsk, certs: drawCerts, invoices: drawInvoices, close: drawClose, ar: drawAr, members: drawMembers, iif: drawIif, help: drawHelp };
   var CUR = "overview";
   function show(tab) {
     if (!DRAW[tab]) tab = "overview";
@@ -946,8 +986,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     return load(tab).then(function () { if (CUR === tab) DRAW[tab](); }, function (e) { console.error("desk", tab, e); if (CUR === tab) failSay(tab, e); });
   }
   window.__desk = { show: show, data: D, load: load, open: function (tab, test) {
-    return show(tab).then(function () { var rows = []; if (tab === "ar") rows = D.ar.items; else if (tab === "invoices") rows = D.invoices.rows; else if (tab === "members") rows = D.members.rows; else if (tab === "certs") rows = D.certs.rows;
-      var r = rows.filter(test)[0]; if (r) ({ ar: arOpen, invoices: invOpen, members: memOpen, certs: certOpen })[tab](r); return !!r; }); } };
+    return show(tab).then(function () { var rows = []; if (tab === "ar") rows = D.ar.items; else if (tab === "invoices") rows = D.invoices.rows; else if (tab === "members") rows = D.members.rows; else if (tab === "certs") rows = D.certs.rows; else if (tab === "ask") rows = D.ask.rows;
+      var r = rows.filter(test)[0]; if (r) ({ ar: arOpen, invoices: invOpen, members: memOpen, certs: certOpen, ask: askOpen })[tab](r); return !!r; }); } };
 
   function start() {
     var rs = window.ResourcesSession; if (!rs) { setTimeout(start, 100); return; }
@@ -967,6 +1007,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* the rail search's sources (see gather below) */
   window.__deskFind = function (t, push, go) {
     var open = function (tab, test) { return function () { window.__desk.open(tab, test); }; };
+    ((D.ask && D.ask.rows) || []).forEach(function (r) { if ((r.title + " " + r.order + " " + r.area).toLowerCase().indexOf(t) >= 0) push("Ask Accounting", r.title, (r.area || r.type) + (r.amount != null ? " · " + usd(r.amount) : ""), open("ask", function (x) { return x === r; })); });
     ((D.ar && D.ar.items) || []).forEach(function (r) { if ((r.company + " " + r.order).toLowerCase().indexOf(t) >= 0) push("Receivables", r.company, "Order " + r.order + " · " + r.status + " · " + usd(r.amount), open("ar", function (x) { return x.key === r.key; })); });
     ((D.invoices && D.invoices.rows) || []).forEach(function (r) { if ((r.vendor + " " + r.invoiceNo + " " + r.netsuite).toLowerCase().indexOf(t) >= 0) push("Invoices", r.vendor, (r.invoiceNo || "") + " · " + monthName(r.serviceMonth) + " · " + usd(r.amount), open("invoices", function (x) { return x.id === r.id; })); });
     ((D.members && D.members.rows) || []).forEach(function (r) { if ((r.company + " " + r.companyId).toLowerCase().indexOf(t) >= 0) push("New and Renewing Members", r.company, r.kind + " · " + day(r.date), open("members", function (x) { return x === r; })); });
