@@ -1,5 +1,29 @@
 {
  "note": "MISMO-certified providers: the About Us and website link each company's listing shows on www.mismo.org, as published from the Certification Management System. Written by the Website listings job in cms-data; not edited by hand.",
- "updated": "2026-11-19",
- "providers": []
+ "updated": "2026-11-20",
+ "providers": [
+  {
+   "org": "Snapdocs",
+   "slug": "snapdocs",
+   "aboutUs": "Snapdocs is digital infrastructure for the most impactful transactions. The company began in mortgage, one of the most highly regulated and operationally complex industries, and now powers 1 in 5 home lending transactions, providing transparency, efficiency and quality to lenders, title companies, notaries, and borrowers. Drawing on this expertise, Snapdocs has extended its capabilities into adjacent financial markets, including consumer lending, brokerage, estate planning, auto, and asset-backed securities. Supported by a highly-trained customer service team and nationwide settlement and notary networks, Snapdocs helps organizations complete high-volume transactions with speed, accuracy, and confidence in the records that support them. For more information, visit www.snapdocs.com.",
+   "website": "https://www.snapdocs.com/",
+   "programs": [
+    "RON",
+    "eClosing",
+    "eVault"
+   ],
+   "publishedOn": "2026-11-21"
+  },
+  {
+   "org": "Viant Eye",
+   "slug": "viant-eye",
+   "aboutUs": "Viant Eye built LINK, the platform MISMO uses to build and manage its standards. LINK is now available to the industry, so lenders, servicers, and vendors can explore, implement, and connect to the MISMO standards from the source.",
+   "website": "https://www.vianteye.com/solutions",
+   "programs": [
+    "Product",
+    "Consultant"
+   ],
+   "publishedOn": "2026-11-21"
+  }
+ ]
 }
