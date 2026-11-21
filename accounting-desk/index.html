@@ -178,6 +178,7 @@ td.clip{max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowra
 tfoot td{font-weight:700;background:var(--surface-2);border-top:2px solid var(--border);border-bottom:0}
 .empty{padding:30px 20px;text-align:center;color:var(--ink-3)}
 .note{margin:12px 2px 0;color:var(--ink-3);font-size:12.5px;line-height:1.55}
+.nowed{margin:18px 0 0;padding:12px 14px;border:1px solid var(--border);border-left:3px solid var(--sky);border-radius:4px;background:var(--surface);font-weight:600;font-size:14px}
 .pager{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 16px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3)}
 .pager button{border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:4px;padding:4px 10px;font-size:12.5px;font-weight:600;cursor:pointer}
 .pager button:disabled{opacity:.4;cursor:default}
@@ -574,6 +575,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         tile("Received", usd(sum(received, function (r) { return r.amount; }), 1), received.length + " paid or complete") +
         tile("Bad Debt", usd(sum(bad, function (r) { return r.amount; }), 1), bad.length + " kept out of what is owed") +
         tile("Newest AR Aging", day(a.reportDate), a.count + " items on file")) +
+        (items.some(function (r) { return r.status === "Open"; }) ? "" :
+          '<div class="nowed">Nothing is owed to MISMO on the AR aging dated ' + esc(day(a.reportDate)) + ": every item on it is paid, complete, canceled or bad debt.</div>") +
         '<div class="bar"><h2>Every Receivable</h2>' +
         select("ar-status", "Status", [["", "Every Status"], ["Open", "Open"], ["Paid", "Paid"], ["Complete", "Complete"], ["Canceled", "Canceled"], ["Bad Debt", "Bad Debt"]], AS.status) +
         findBox("ar-q", "Company, order or note", AS.q) + '<button class="btn" type="button" id="ar-dl">Download for Excel</button></div>' +
