@@ -1,403 +1,84 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Certification Renewal | MISMO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src https://*.environment.api.powerplatform.com; frame-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+<title>Certification Renewal | MISMO</title>
+<!-- The renewal page, in the company portal's look (21 Nov 2026). The link's code lives in the address:
+     no-referrer keeps the browser from handing the address to any site the company clicks through to,
+     noindex keeps the page out of search results, and the page links nowhere that would carry it. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="/portal/engine/portal.css">
 <style>
-/* Layout: a narrow single column the provider works straight down, the way the eight
-   application forms read. Each section is a panel; nothing is hidden behind a toggle,
-   because every part of this has to be answered. */
-:root{
-  --navy:#0d314c; --sky:#74bfeb; --navy-deep:#06202f; --navy-mid:#14486e;
-  --sky-soft:#a9d8f3; --sky-wash:#e4f2fb;
-  --ground:#f1f6fa; --surface:#ffffff; --surface-2:#f6fafd; --surface-3:#e9f1f8;
-  --border:#d5e2ed; --border-strong:#adc4d6; --rule:#e5eef5;
-  --ink:#0d314c; --ink-2:#456179; --ink-3:#7794aa;
-  --good:#0f7b5c; --bad:#b3372c; --warn:#a2701a;
-  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  color-scheme:light;
-}
-@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
-  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
-  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
-  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#7a9db4;
-  --good:#4fc79b; --bad:#f08579; --warn:#e0a83c; --sky-wash:#102f41;
-  color-scheme:dark;
-}}
-:root[data-theme="dark"]{
-  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52;
-  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
-  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#7a9db4;
-  --good:#4fc79b; --bad:#f08579; --warn:#e0a83c; --sky-wash:#102f41;
-  color-scheme:dark;
-}
-*{box-sizing:border-box}
-body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:15px;line-height:1.6}
-body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--navy)}
-.masthead{background:var(--navy);color:#fff}
-.masthead-in{display:flex;align-items:center;gap:14px;padding-block:11px;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  max-width:880px;margin:0 auto}
-.logoplate{position:relative;background:#fff;border-radius:5px;padding:9px 13px;display:flex;align-items:center;line-height:0;flex:none}
-.logoplate .wordmark{height:24px;width:auto}
-.santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
-html[data-season="december"] .logoplate .santa{display:block}
-html[data-season="december"] .masthead-in{padding-top:20px}
-.vrule{width:1px;align-self:stretch;background:rgba(116,191,235,.4);flex:none}
-.pagename{color:var(--sky-soft);font-weight:500;font-size:14.5px}
-.rightgrp{margin-left:auto;display:flex;align-items:center;gap:12px}
-.eyebrow{text-transform:uppercase;letter-spacing:.11em;font-size:10.5px;color:rgba(255,255,255,.62)}
-@media (max-width:560px){ .eyebrow{display:none} }
-.theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;
-  padding:5px 10px;font-size:11.5px;cursor:pointer;font-family:inherit;white-space:nowrap;min-width:max-content}
-.theme-btn:hover{background:rgba(255,255,255,.18)}
-.wrap{max-width:880px;margin:0 auto;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
-  padding-block:26px 64px;display:flex;flex-direction:column;gap:22px}
-h1{font-size:26px;margin:0 0 6px;letter-spacing:-.012em;text-wrap:balance}
-.lede{color:var(--ink-2);margin:0}
-.lede b{color:var(--ink)}
-.saveline{font-size:13px;color:var(--ink-3);margin:10px 0 0}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:20px 20px 22px}
-.panel h2{font-size:16px;margin:0 0 4px;letter-spacing:-.012em}
-.psub{margin:0 0 16px;color:var(--ink-3);font-size:13px}
-.step{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--sky);letter-spacing:.09em;margin:0 0 6px}
-.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:7px;overflow:hidden}
+/* Only what the renewal steps need beyond the portal stylesheet. */
+[hidden]{display:none!important}
+.rn-step.off{display:none}
+.rn .panel{margin-top:4px}
+.stepno{display:block;font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.09em;margin:0 0 4px}
+:root[data-theme="dark"] .stepno{color:var(--sky)}
+.rn input[type=text],.rn input[type=email],.rn input[type=url],.rn textarea{width:100%;font:inherit;font-size:14px;color:var(--ink);background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:9px 11px;min-width:0}
+.rn input:focus,.rn textarea:focus{background:var(--surface);border-color:var(--focus);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 22%,transparent)}
+.rn input:disabled{color:var(--ink-3)}
+.rn textarea{resize:vertical;min-height:96px;line-height:1.55}
+.hint{font-size:12.5px;color:var(--ink-3)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--border);border:1px solid var(--border);border-radius:6px;overflow:hidden;margin:0}
 .fact{background:var(--surface-2);padding:11px 13px}
 .fact dt{font-size:10.5px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600;margin:0 0 3px}
 .fact dd{margin:0;font-size:14.5px;font-weight:600}
 .fact dd.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
-/* The invoice is a thing to take away, not a question to answer, so it sits under the
-   facts in step one rather than becoming a step of its own. */
-.inv{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:16px 0 0;padding:15px 16px;
-  border:1px solid var(--border);border-radius:7px;background:var(--surface-2)}
-.inv-i{flex:none;width:38px;height:46px;border:1px solid var(--border-strong);border-radius:4px;
-  background:var(--surface);display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;
-  font-family:var(--mono);font-size:9px;font-weight:600;color:var(--ink-3);letter-spacing:.06em}
+.inv{display:flex;flex-wrap:wrap;gap:14px;align-items:center;margin:16px 0 0;padding:15px 16px;border:1px solid var(--border);border-left:4px solid var(--warn);border-radius:6px;background:var(--surface-2)}
+.inv-i{flex:none;width:38px;height:46px;border:1px solid var(--border-strong);border-radius:4px;background:var(--surface);display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font-family:var(--mono);font-size:9px;font-weight:600;color:var(--ink-3);letter-spacing:.06em}
 .inv-b{min-width:0;flex:1 1 220px}
 .inv-n{font-weight:600;font-size:14.5px;margin:0 0 2px}
 .inv-m{font-size:12.5px;color:var(--ink-3);margin:0}
 .inv-m .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .inv-a{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-/* The code step. A link that has been forwarded still opens the page, so the invoice
-   itself asks for a code sent to the contact MISMO already holds. It takes the invoice
-   row's place rather than sitting beside it, so there is only one thing to do at a time. */
-.inv-code{margin:16px 0 0;padding:15px 16px;border:1px solid var(--border);border-radius:7px;
-  background:var(--surface-2)}
-.inv-code p{margin:0 0 10px;font-size:13px;color:var(--ink-2);line-height:1.5}
+.inv-code{margin:16px 0 0;padding:15px 16px;border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:6px;background:var(--surface-2)}
+.inv-code p{margin:0 0 10px;font-size:13.5px;color:var(--ink-2);line-height:1.5}
 .inv-code .to{font-family:var(--mono);font-weight:600;color:var(--ink)}
 .inv-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.inv-row input[type=text]{font-family:var(--mono);font-size:18px;font-weight:600;letter-spacing:.28em;
-  width:7.4em;flex:0 0 auto;text-align:center;padding:9px 6px 9px 14px}
-.inv-again{background:none;border:0;padding:0;font:inherit;font-size:12.5px;color:var(--sky);
-  cursor:pointer;text-decoration:underline}
+.rn .inv-row input[type=text]{font-family:var(--mono);font-size:18px;font-weight:600;letter-spacing:.28em;width:7.4em;flex:0 0 auto;text-align:center;padding:8px 6px 8px 14px}
+.inv-again{background:none;border:0;padding:0;font:inherit;font-size:12.5px;color:var(--accent);cursor:pointer;text-decoration:underline}
 .inv-again:disabled{color:var(--ink-3);cursor:default;text-decoration:none}
 .inv-bad{font-size:12.5px;color:var(--bad);margin:9px 0 0}
-.paid{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
-  padding:3px 9px;border-radius:4px;background:rgba(15,123,92,.14);color:var(--good)}
-:root[data-theme="dark"] .paid, :root:not([data-theme="light"]) .paid{background:rgba(79,199,155,.16)}
-.doc{border:1px solid var(--border);border-radius:7px;padding:15px 16px;margin:0 0 14px;background:var(--surface-2)}
-.doc:last-of-type{margin-bottom:0}
+.paid{display:inline-block;font-size:10.5px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:2px 8px;border-radius:3px;background:var(--good-wash);color:var(--good)}
+.doc{border:1px solid var(--border);border-radius:6px;padding:15px 16px;margin:0 0 12px;background:var(--surface-2)}
+.doc:last-child{margin-bottom:0}
 .doc-h{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;margin:0 0 4px}
 .doc-n{font-weight:600;font-size:14.5px}
 .doc-s{font-size:12.5px;color:var(--ink-3)}
-.doc-link{font-size:13px;color:var(--navy-mid);font-weight:600;white-space:nowrap;min-width:max-content}
+.doc-link{font-size:13px;color:var(--accent);font-weight:600;white-space:nowrap}
+:root[data-theme="dark"] .doc-link{color:var(--sky)}
 button.doc-open{background:none;border:0;padding:0;font-family:inherit;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
-:root[data-theme="dark"] .doc-link, :root:not([data-theme="light"]) .doc-link{color:var(--sky)}
 .choices{display:flex;flex-wrap:wrap;gap:9px;margin:12px 0 0}
-.choice{display:flex;align-items:center;gap:8px;border:1px solid var(--border-strong);border-radius:6px;
-  padding:9px 13px;cursor:pointer;background:var(--surface);font-size:14px;white-space:nowrap;min-width:max-content}
-.choice:hover{border-color:var(--navy-mid)}
-.choice input{margin:0;accent-color:var(--navy-mid)}
-.choice.on{border-color:var(--navy-mid);background:var(--sky-wash);font-weight:600}
-.drop{margin:13px 0 0;border:1px dashed var(--border-strong);border-radius:7px;padding:16px;text-align:center;background:var(--surface)}
-.drop p{margin:0 0 10px;font-size:13px;color:var(--ink-3)}
+.choice{display:flex;align-items:center;gap:8px;border:1px solid var(--border-strong);border-radius:5px;padding:9px 13px;cursor:pointer;background:var(--surface);font-size:14px;white-space:nowrap}
+.choice:hover{border-color:var(--accent)}
+.choice input{margin:0;accent-color:var(--accent)}
+.choice.on{border-color:var(--accent);background:var(--sky-wash);font-weight:600}
+.rn .drop{margin:13px 0 0;padding:16px;cursor:default}
 .filelist{list-style:none;margin:11px 0 0;padding:0;display:flex;flex-direction:column;gap:7px}
 .filelist li{display:flex;align-items:center;gap:10px;font-size:13px;background:var(--surface-3);border-radius:5px;padding:7px 11px}
 .filelist .nm{font-weight:600;min-width:0;overflow-wrap:anywhere}
 .filelist .sz{color:var(--ink-3);font-family:var(--mono);margin-left:auto;white-space:nowrap}
-.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
-.fld{display:flex;flex-direction:column;gap:5px;min-width:0}
-.fld label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);font-weight:600}
-/* The choice labels are read as sentences, not as field captions, so they keep their own case. */
-input[type=text],input[type=email],input[type=url],textarea{font-family:inherit;font-size:14px;padding:9px 11px;
-  border:1px solid var(--border-strong);border-radius:6px;background:var(--surface-2);color:var(--ink);width:100%}
-textarea{resize:vertical;min-height:88px;line-height:1.55}
-.hint{font-size:12px;color:var(--ink-3)}
-.btn{font-family:inherit;font-size:14.5px;font-weight:600;padding:11px 22px;border-radius:6px;cursor:pointer;
-  background:var(--navy);color:#fff;border:1px solid var(--navy);white-space:nowrap;min-width:max-content}
-.btn:hover{background:var(--navy-mid)}
-.btn:disabled{opacity:.55;cursor:default}
-.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--border-strong)}
-.btn.ghost:hover{background:var(--surface-3)}
-.btn:focus-visible,input:focus-visible,textarea:focus-visible,.choice:focus-within{outline:2px solid var(--sky);outline-offset:2px}
-.acts{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:4px 0 0}
-.next{border-left:3px solid var(--sky);background:var(--sky-wash);border-radius:0 7px 7px 0;padding:14px 16px;margin:18px 0 0}
-.next h3{margin:0 0 7px;font-size:13.5px}
-.next ol{margin:0;padding-left:19px;font-size:13.5px;color:var(--ink-2)}
-.next li{margin:0 0 5px}
-.warn{border:1px solid var(--warn);background:rgba(162,112,26,.1);border-radius:7px;padding:13px 15px;font-size:13.5px;color:var(--ink)}
-.done{text-align:center;padding:40px 20px}
-.done .tick{width:46px;height:46px;border-radius:50%;background:var(--good);color:#fff;display:flex;align-items:center;
-  justify-content:center;font-size:24px;margin:0 auto 16px}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom,0px));
-  background:var(--navy);color:#fff;padding:10px 20px;border-radius:6px;font-size:14px;z-index:60;
-  box-shadow:0 4px 18px rgba(6,32,47,.32);max-width:92vw}
-[hidden]{display:none!important}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
-</style>
-<style>
-/* ===================================================================
-   MISMO website skin, applied over an application form.
-   Values from MISMO-Website-Style-Guide.md, measured from the live
-   Home page on 21 October 2026. Appended last so it wins on source
-   order; the dark-mode selectors are repeated here at their own
-   specificity so a stored "dark" preference cannot reach the page.
-   No web font is imported - the site names IBM Plex Sans and does not
-   load it, so importing it would make these forms look unlike the site.
-   =================================================================== */
-:root,
-:root:not([data-theme="light"]),
-:root[data-theme="dark"]{
-  --mm-font:"IBM Plex Sans","Segoe UI",-apple-system,BlinkMacSystemFont,Helvetica,Arial,sans-serif;
-  --mm-hero:#071d2e; --mm-pill:#0f314c; --mm-blue:#1a8fe3; --mm-blue-top:#2e9dee;
-  --mm-sky:#74bfeb; --mm-sky-2:#56b4f2; --mm-sub:#a9d8f3;
-  --mm-text:#44607a; --mm-line:#cfdeeb; --mm-tag-bg:#e3f1fc; --mm-tag-ink:#1a74b8;
-
-  /* the form's own tokens, remapped to the website palette */
-  --navy:#071d2e; --navy-deep:#0d314c; --navy-mid:#1a8fe3;
-  --sky:#1a8fe3; --sky-soft:#74bfeb; --sky-wash:#e3f1fc;
-  --ground:#ffffff; --surface:#ffffff; --surface-2:#ffffff; --surface-3:#f4f8fc;
-  --border:#cfdeeb; --border-strong:#cfdeeb; --rule:#e5eef5;
-  --ink:#0d314c; --ink-2:#44607a; --ink-3:#44607a;
-  --good:#0f7b5c; --bad:#b3372c; --warn:#a2701a;
-  --chip:#e3f1fc; --track:#e3f1fc; --tab-active:#ffffff;
-  /* --soft and --line are used by the form but were never declared, so the
-     notes and the attestation box drew with no background and no border. */
-  --soft:#f4f8fc; --line:#cfdeeb;
-}
-body{font-family:var(--mm-font); font-size:16px; line-height:1.6;
-  background:#ffffff; color:var(--mm-ink,#0d314c);}
-a{color:var(--mm-blue);}
-
-/* ---------- Header bar (70px, dark navy, logo left, nav, Log in pill right) ---------- */
-.mm-header{position:relative;z-index:5;height:70px;background:var(--mm-hero);box-shadow:0 2px 4px 0 rgba(0,0,0,.1),0 0 2px 0 rgba(153,153,153,.25);display:flex;align-items:center;padding:0 50px;gap:56px}
-.mm-logo img{display:block;width:194px;height:36px;max-width:100%;object-fit:contain;object-position:left center} /* the logo file is 684x108; "contain" keeps its shape, as the live site does (it shows about 194x31). Never let it stretch to fill 194x36. */
-.mm-logo{flex:0 1 194px;min-width:0}
-.mm-nav{display:flex;align-items:stretch;height:70px;margin:0;padding:0;list-style:none;flex:1 1 auto}
-.mm-nav>li{position:relative;display:flex;align-items:center;list-style:none}
-.mm-nav-link{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:21px;color:#ffffff;text-decoration:none;white-space:nowrap}
-.mm-nav>li:hover>.mm-nav-link,.mm-nav-link:focus-visible{color:var(--mm-sky)}
-.mm-chev{display:none}
-/* Dropdown menus: measured from the live site (opens on hover or keyboard focus) */
-.mm-dd{display:none;position:absolute;left:0;top:100%;z-index:20;min-width:250px;margin:0;padding:8px 0;list-style:none;background:#0b2740;border-top:2px solid var(--mm-blue);border-radius:0 0 8px 8px;box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
-.mm-nav>li:hover>.mm-dd,.mm-nav>li:focus-within>.mm-dd{display:block}
-.mm-dd a{display:block;padding:10px 18px 10px 16px;border-left:2px solid transparent;font-family:var(--mm-font);font-size:15px;font-weight:500;line-height:19.5px;color:#e6eef5;text-decoration:none;white-space:nowrap;transition:background .15s,color .15s,border-color .15s}
-.mm-dd a:hover,.mm-dd a:focus-visible{outline:none;background:rgba(116,191,235,.1);border-left-color:var(--mm-sky);color:var(--mm-sky)}
-.mm-login{margin-left:auto;display:inline-block;padding:10px 20px;border-radius:50px;background:var(--mm-pill);color:#ffffff;font-family:var(--mm-font);font-size:16px;font-weight:600;line-height:16px;text-decoration:none;white-space:nowrap;min-width:max-content}
-.mm-burger{display:none;width:40px;height:40px;margin-left:auto;padding:9px 8px;border:0;border-radius:6px;background:transparent;cursor:pointer}
-.mm-burger span{display:block;height:2px;margin:4px 0;border-radius:2px;background:#ffffff;transition:transform .2s,opacity .2s}
-/* Phones and tablets: hamburger shows the same menu as a panel under the bar, sub-pages listed under each heading */
-@media (max-width:1100px){
-  .mm-header{padding:0 20px;gap:12px}
-  .mm-burger{display:block}
-  .mm-nav{display:none}
-  .mm-header.is-open .mm-nav{display:block;position:absolute;top:70px;left:0;right:0;height:auto;max-height:calc(100vh - 70px);overflow-y:auto;padding:8px 0 16px;background:#0b2740;border-top:2px solid var(--mm-blue);box-shadow:0 18px 40px -14px rgba(0,0,0,.6)}
-  .mm-header.is-open .mm-nav>li{display:block}
-  .mm-header.is-open .mm-nav-link{display:flex;padding:12px 20px 6px;font-weight:600}
-  .mm-header.is-open .mm-chev{display:none}
-  .mm-header.is-open .mm-dd{display:block;position:static;min-width:0;padding:0 0 6px;background:transparent;border:0;border-radius:0;box-shadow:none}
-  .mm-header.is-open .mm-dd a{padding:9px 20px 9px 34px;white-space:normal}
-  .mm-header.is-open .mm-burger span:nth-child(1){transform:translateY(6px) rotate(45deg)}
-  .mm-header.is-open .mm-burger span:nth-child(2){opacity:0}
-  .mm-header.is-open .mm-burger span:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
-}
-
-/* ---------- footer: the live site's, measured 21 Oct 2026 at 1440px ----------
-   One 68px bar in #f4f7f9 - light, not dark - logo left, address in the middle,
-   policy links then the two social circles on the right. */
-.mm-footer{background:#f4f7f9;}
-.mm-footer-bar{background:#f4f7f9; display:flex; flex-wrap:wrap; align-items:center;
-  justify-content:space-between; gap:10px 28px; padding:18px 50px;
-  font-family:var(--mm-font);}
-.mm-f-logo{flex:0 0 auto; line-height:0;
-  /* the two colors the shared MISMO symbol reads */
-  --logo-body:#0d314c; --logo-s:#50a4db;}
-.mm-f-mark{display:block; width:197px; height:30px;}
-.mm-f-addr{flex:1 1 300px; text-align:center; font-size:12.5px; line-height:20px;
-  color:#5b7183;}
-.mm-f-addr a{color:#0d314c; text-decoration:none;}
-.mm-f-addr a:hover{text-decoration:underline;}
-.mm-f-env{width:15px; height:12px; margin:0 7px 0 14px; color:#5b7183;
-  vertical-align:-1px;}
-.mm-f-links{flex:0 0 auto; display:flex; gap:16px;}
-.mm-f-links a, .mm-f-links span{font-size:13px; font-weight:600; color:#0d314c; text-decoration:none;
-  white-space:nowrap;}
-.mm-f-links a:hover{text-decoration:underline;}
-.mm-f-social{flex:0 0 auto; display:flex; gap:13px;}
-.mm-f-soc{width:32px; height:32px; border-radius:50px; background:#50a4db;
-  color:#0d314c; display:flex; align-items:center; justify-content:center;}
-.mm-f-soc svg{width:17px; height:17px; display:block;}
-.mm-f-soc:hover{background:#74bfeb;}
-
-/* ---------- the page column ---------- */
-.wrap{max-width:960px; margin:0 auto; padding:46px clamp(20px,5vw,48px) 110px;}
-/* The hero carries the title and the lede now, so the page does not say it twice. */
-h1.doc, .docsub{display:none;}
-.sect-head{margin:0 0 22px;}
-.sect-head .mm-eyebrow{margin:0 0 10px; font-size:12px; font-weight:600;
-  text-transform:uppercase; letter-spacing:.14em; color:var(--mm-blue);}
-.sect-head h2{margin:0 0 12px; font-size:38px; font-weight:700; line-height:1.2;
-  color:var(--mm-ink,#0d314c);}
-.sect-head p{margin:0; font-size:16px; line-height:1.6; color:var(--mm-text);}
-@media (max-width:600px){ .sect-head h2{font-size:30px;} }
-
-/* ---------- stage tabs ---------- */
-.stages{border-radius:10px;}
-.stage{font-size:14px;}
-.stage.on{box-shadow:0 1px 2px rgba(7,29,46,.12);}
-
-/* ---------- the sticky progress bar ---------- */
-/* The website header does not stick, so this sits at the top of the viewport
-   rather than under a masthead that is no longer there. */
-.bar{top:0; border-radius:12px; border:1px solid var(--mm-line); background:#ffffff;
-  box-shadow:0 8px 22px -18px rgba(7,29,46,.45); padding:12px 16px;}
-.ptrack{background:#e3f1fc;}
-.pfill{background:var(--mm-blue);}
-.bar .pct{color:var(--mm-blue);}
-
-/* ---------- buttons: never wrap ---------- */
-.btn{border-radius:8px; font-family:var(--mm-font); font-size:15px; font-weight:600;
-  line-height:1.2; white-space:nowrap; min-width:max-content; padding:14px 22px;
-  border:1.5px solid var(--mm-blue); color:#ffffff;
-  background:linear-gradient(180deg,var(--mm-blue-top) 0%, var(--mm-blue) 100%);
-  box-shadow:0 5px 16px -4px rgba(26,143,227,.55);}
-.btn:hover{background:linear-gradient(180deg,var(--mm-blue) 0%, #1580cc 100%);}
-.btn.ghost{background:#ffffff; color:var(--mm-blue); border:1.5px solid var(--mm-blue);
-  box-shadow:none;}
-.btn.ghost:hover{background:#f2f9fe; color:var(--mm-blue);}
-.btn:focus-visible{outline:3px solid rgba(26,143,227,.35); outline-offset:2px;}
-/* The bar sits above the form and holds three of them, so they take the smaller size. */
-.bar-acts .btn{padding:9px 16px; font-size:14px;}
-.rep-add{border-radius:8px; border:1.5px dashed var(--mm-line); color:var(--mm-text);
-  font-size:14px; padding:11px 16px;}
-.rep-add:hover{border-color:var(--mm-blue); color:var(--mm-blue);}
-
-/* ---------- a section is a form card: white, 1px #cfdeeb, 12px corners ---------- */
-.sect{border:1px solid var(--mm-line); border-radius:12px; background:#ffffff;
-  margin-bottom:14px; box-shadow:0 14px 34px -26px rgba(7,29,46,.35);}
-.sect-btn{padding:17px 24px; gap:14px;}
-.sect-btn .st{font-size:17px; font-weight:600; color:var(--mm-ink,#0d314c);}
-.sect-btn .sc{font-size:12px; padding:3px 11px; border-radius:4px; font-weight:600;
-  letter-spacing:.04em; background:var(--mm-tag-bg); color:var(--mm-tag-ink);}
-.sect-btn .sc.done{background:rgba(15,123,92,.13); color:var(--good);}
-.sect-btn[aria-expanded="true"]{background:#f4f8fc;}
-.sect-body{padding:6px 24px 24px;}
-@media (max-width:600px){ .sect-btn{padding:15px 20px} .sect-body{padding:4px 20px 20px} }
-
-/* ---------- questions ---------- */
-.q-txt{font-size:15px; font-weight:600; color:var(--mm-ink,#0d314c);}
-.q-no{font-size:12px; color:var(--mm-text);}
-.q-guide, .sect-intro{font-size:13px; color:var(--mm-text);}
-
-/* ---------- fields: 44px tall, 8px corners, the site's search box ---------- */
-.fld label{font-size:14px; font-weight:600; color:var(--mm-ink,#0d314c);
-  text-transform:none; letter-spacing:0; margin-bottom:6px;}
-.in{border:1px solid var(--mm-line); border-radius:8px; background:#ffffff;
-  color:var(--mm-ink,#0d314c); font-family:var(--mm-font); font-size:15px;}
-input.in, select.in{height:44px; padding:0 14px;}
-select.in{padding-right:34px;}
-textarea.in{min-height:120px; padding:12px 14px; line-height:1.5;}
-.flds .na-wide textarea.in{min-height:150px;}
-.in:focus{outline:none; border-color:var(--mm-blue);
-  box-shadow:0 0 0 3px rgba(26,143,227,.18);}
-.opt{font-size:15px; color:var(--mm-ink,#0d314c);}
-.fld .opt, .fld label.opt{font-size:15px;}
-.opt input{accent-color:var(--mm-blue);}
-.mx input{accent-color:var(--mm-blue);}
-.mx th{color:var(--mm-text);}
-
-/* ---------- notes, attestation, totals, attachments ---------- */
-.note, .stage-note, .intro-card{border-radius:8px; border-left:3px solid var(--mm-blue);
-  font-size:15px; color:var(--mm-text);}
-.intro-card p{font-size:15px; color:var(--mm-text);}
-.attest{border-left:3px solid var(--mm-blue); border-radius:0 8px 8px 0; font-size:15px;}
-.attest-tick{border-radius:8px; font-size:15px;}
-/* The renewal attestation. One box: the tick sits with the statement it belongs to,
-   the way the membership application does it, not a bolded line of its own. */
-.att-box{display:flex; align-items:flex-start; gap:12px; padding:16px 18px;
-  border:1px solid var(--border); border-radius:8px; background:var(--surface-2);
-  cursor:pointer; font-weight:400; font-size:15px; line-height:1.7; color:var(--ink);
-  background:#f8fbfe;}  /* the soft tint the membership application uses; --surface-2 is
-                            pinned to white by the shared skin on this page */
-.att-box input{margin-top:5px; width:18px; height:18px; flex:0 0 auto; cursor:pointer;}
-.att-box.on{border-color:var(--sky); background:var(--sky-wash);}
-.att-stamp{margin:12px 2px 0; font-size:13px; color:var(--ink-3);}
-.att{border:1.5px dashed var(--mm-line); border-radius:12px; background:#f8fbfe;}
-.att-list li{border-radius:8px; border-color:var(--mm-line);}
-.tally{border-radius:12px; background:#f8fbfe;}
-.done{border-radius:12px; border:1px solid var(--mm-line); border-left:3px solid var(--good);}
-.done h3{font-size:19px;}
-.done p{font-size:15px; color:var(--mm-text);}
-.rep{border-radius:10px; border-color:var(--mm-line); background:#f8fbfe;}
-.toast{border-radius:8px; font-size:15px;}
-.foot{font-size:13px; color:var(--mm-text); margin-top:34px;}
-
-/* ---------- phones ---------- */
-@media (max-width:600px){
-  .two-acts .btn{flex:1 1 100%}
-  .mm-footer-bar{padding:18px 20px; justify-content:center; gap:14px 20px}
-  .mm-f-addr{flex:1 1 100%}
-  .mm-f-mark{width:170px; height:26px}
-}
-
-/* ---------- the hero rules the live site applies, lifted from the template ---------- */
-/* Desktop rules the live site applies to every hero (from the shared stylesheet):
-   the hero is 502px tall with 40px top and bottom padding, and hero buttons are only as wide as their text. */
-div[style*="min-height: clamp(380px"]{min-height:502px !important;padding-top:40px !important;padding-bottom:40px !important}
-div[style*="max-width: 560px"] > a{flex:0 0 auto !important}
-/* Phone rules the live site applies to every hero (from the shared stylesheet) */
-@media (max-width:600px){
-  div[style*="min-height: clamp(380px"]{min-height:0 !important;padding:30px 20px !important}
-  div[style*="flex: 0 1 200px"]{display:flex !important;flex-wrap:wrap;gap:4px 16px;border-left:0 !important;padding-left:0 !important;min-width:0 !important}
-  div[style*="flex: 0 1 200px"] > div:nth-child(n+5){display:none !important}
-  div[style*="max-width: 560px"] > a{flex:0 0 100% !important}
-}
-</style>
-
-<!-- MISMO site chrome v2 (October 25, 2026): loads IBM Plex Sans and matches the website header -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400;1,600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
-<style id="mm-chrome-v2">
-.mm-actions{margin-left:auto;display:flex;align-items:center;gap:10px;flex:0 0 auto}
-.mm-actions .mm-login{margin-left:0}
-.mm-login{display:inline-block;padding:10px 20px;border-radius:50px;background:var(--mm-pill,#0f314c);color:#ffffff;font-family:var(--mm-font,inherit);font-size:16px;font-weight:600;line-height:16px;text-decoration:none;white-space:nowrap;min-width:max-content}
-.mm-login:hover{background:#17476d;color:#ffffff}
-.mm-login:focus-visible,.mm-search-btn:focus-visible,.mm-search-in:focus-visible{outline:2px solid var(--mm-sky,#74bfeb);outline-offset:2px}
-.mm-search{display:flex;align-items:center;margin:0}
-.mm-search-in{box-sizing:border-box;width:0;height:34px;padding:0;border:0;border-radius:6px;opacity:0;background:#ffffff;color:#0d314c;font-family:var(--mm-font,inherit);font-size:15px;transition:width .2s ease,opacity .2s ease,padding .2s ease}
-.mm-search.is-open .mm-search-in{width:200px;padding:0 10px;opacity:1}
-.mm-search-btn{display:flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;border:0;background:transparent;color:#ffffff;cursor:pointer}
-@media (max-width:1100px){.mm-search{display:none}}
-@media (max-width:720px){.mm-login{padding:9px 16px;font-size:15px}}
+.acts{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:14px 0 0}
+.whatnext{border:1px solid var(--border);border-left:4px solid var(--accent);background:var(--surface-2);border-radius:6px;padding:14px 16px;margin:18px 0 0}
+.whatnext h3{margin:0 0 7px;font-size:14px}
+.whatnext ol{margin:0;padding-left:19px;font-size:13.5px;color:var(--ink-2)}
+.whatnext li{margin:0 0 5px}
+.warn{border:1px solid var(--warn);border-left-width:4px;background:var(--warn-wash);border-radius:6px;padding:13px 15px;font-size:13.5px;color:var(--ink)}
+.att-box{display:flex;align-items:flex-start;gap:12px;padding:16px 18px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);cursor:pointer;font-size:14.5px;line-height:1.7;color:var(--ink)}
+.att-box input{margin-top:5px;width:18px;height:18px;flex:0 0 auto;cursor:pointer;accent-color:var(--accent)}
+.att-box.on{border-color:var(--accent);background:var(--sky-wash)}
+.att-stamp{margin:12px 2px 0;font-size:13px;color:var(--ink-3)}
+.rn .grid2{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.rn .fld label{text-transform:none;letter-spacing:0}
 </style>
 </head>
 <body>
-
-
-<!-- The link's code lives in the address. Two rules keep it from travelling anywhere it
-     should not: no-referrer stops the browser handing the address to any site the provider
-     clicks through to, and noindex keeps the page out of search results. -->
-
-
-
-
-
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0d314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58
 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320
@@ -425,132 +106,101 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6
 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
-<symbol id="mismo-hat" viewBox="0 0 100 100">
-  <path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41
-           C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/>
-  <path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z"
-        fill="#0d314c" opacity=".17"/>
-  <rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/>
-  <rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/>
-  <circle cx="86" cy="45" r="11.5" fill="#ffffff"/>
-</symbol></defs></svg>
+</defs></svg>
+<header class="mast"><div class="wrap">
+  <div class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></div>
+  <div class="vr"></div>
+  <div class="pname" id="pname">Certification Renewal</div>
+  <div class="right"><span class="eyebrow">MISMO Certifications</span><button class="theme-btn" id="theme-btn" type="button">Dark</button></div>
+</div></header>
+<div class="band"><div class="wrap">
+  <div class="draftnote" id="bandnote"><b class="live">Private</b><span>Your company's own renewal link. Share it only with your team. Your answers save in this browser as you type.</span></div>
+  <span style="margin-left:auto"></span>
+  <button type="button" id="demo-reset" class="btn ghost sm" hidden>Restore the Example</button>
+</div></div>
+<section class="hero" id="hero"></section>
+<div class="wrap" id="steps-wrap" hidden><nav class="steps" id="steps" aria-label="Steps"></nav></div>
 
-<header class="mm-header">
-  <a class="mm-logo" href="https://www.mismo.org/"><img src="https://higherlogicdownload.s3.amazonaws.com/MISMO/LogoImages/6e07790a-6fc9-43dc-b9d6-9178e00c3342_mismo-reverse-nav-logo.png" alt="MISMO logo. This will take you to the homepage"></a>
-  
-  <a class="mm-login" href="https://www.mismo.org/HigherLogic/Security/OAUTH/SignIn.aspx?ReturnUrl=https%3A%2F%2Fwww.mismo.org%2Fsigned-in%3Fto%3Dhttps%253A%252F%252Fresources.mismo.org%252Fforms%252Frenewal%252F" style="margin-left:auto">Log In</a>
-</header>
-<div style="position: relative; overflow: hidden; background: #071d2e; min-height: clamp(380px,37vw,520px); display: flex; align-items: center; padding: clamp(34px,3.8vw,50px) clamp(20px,5vw,48px);"><!-- built-in Pathway artwork (shows until a photo is added) --> <svg viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true" style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; width: 100%; height: 100%;"> <defs> <linearGradient id="skyhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0d314c" stop-opacity="0"></stop> </linearGradient> <linearGradient id="gndhm" x1="0" y1="0" x2="0" y2="1"> <stop offset="0%" stop-color="#0e3a5c"></stop><stop offset="100%" stop-color="#071d2e"></stop> </linearGradient> <radialGradient id="glowhm" cx="50%" cy="50%" r="50%"> <stop offset="0%" stop-color="#74bfeb" stop-opacity=".42"></stop> <stop offset="100%" stop-color="#74bfeb" stop-opacity="0"></stop> </radialGradient> <linearGradient id="trailhm" x1="0" y1="0" x2="1" y2="0"> <stop offset="0%" stop-color="#74bfeb" stop-opacity="0"></stop> <stop offset="45%" stop-color="#9ad4f4" stop-opacity=".95"></stop> <stop offset="100%" stop-color="#ffffff" stop-opacity=".55"></stop> </linearGradient> </defs> <rect x="0" y="0" width="1200" height="560" fill="url(#gndhm)"></rect> <ellipse cx="930" cy="360" rx="420" ry="250" fill="url(#glowhm)"></ellipse> <g fill="#0a2740" opacity="1"> <rect x="640" y="300" width="52" height="260"></rect><rect x="698" y="236" width="40" height="324"></rect> <rect x="744" y="318" width="60" height="242"></rect><rect x="810" y="186" width="48" height="374"></rect> <rect x="864" y="268" width="68" height="292"></rect><rect x="938" y="214" width="42" height="346"></rect> <rect x="986" y="296" width="56" height="264"></rect><rect x="1048" y="238" width="50" height="322"></rect> <rect x="1104" y="310" width="64" height="250"></rect><rect x="1174" y="258" width="44" height="302"></rect> </g> <rect x="560" y="548" width="660" height="12" fill="#0a2740"></rect> <g fill="#74bfeb" opacity=".30"> <rect x="684" y="222" width="5" height="7"></rect><rect x="696" y="246" width="5" height="7"></rect> <rect x="800" y="184" width="5" height="7"></rect><rect x="814" y="216" width="5" height="7"></rect> <rect x="860" y="258" width="5" height="7"></rect><rect x="884" y="290" width="5" height="7"></rect> <rect x="932" y="214" width="5" height="7"></rect><rect x="988" y="292" width="5" height="7"></rect> <rect x="1050" y="240" width="5" height="7"></rect><rect x="1108" y="312" width="5" height="7"></rect> </g> <g fill="none" stroke="url(#trailhm)" stroke-linecap="round"> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="13" opacity=".15"></path> <path d="M470,620 C690,540 880,470 1250,398" stroke-width="3"></path> <path d="M450,654 C680,572 890,500 1258,428" stroke-width="1.4" opacity=".7"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="7" opacity=".2"></path> <path d="M520,684 C740,604 940,534 1264,464" stroke-width="2" opacity=".85"></path> <path d="M580,712 C800,636 990,570 1272,500" stroke-width="1.2" opacity=".55"></path> </g> </svg> <!-- PHOTO LAYER -->
-<div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background-image: none; background-size: cover; background-position: center right; background-repeat: no-repeat;"></div><div style="position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: linear-gradient(90deg,#071d2e 0%,rgba(7,29,46,.96) 30%,rgba(7,29,46,.80) 50%,rgba(7,29,46,.42) 72%,rgba(7,29,46,.22) 100%);"></div>
-<div style="position: relative; z-index: 2; width: 100%; max-width: 1120px; margin: 0 auto; display: flex; flex-wrap: wrap; gap: 30px; align-items: center;">
-<div style="flex: 1 1 440px; min-width: 0; max-width: 620px; margin-right: auto;">
-<p style="margin: 0 0 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; color: #74bfeb; font-family: inherit; line-height: 1.5;">MISMO Certifications</p>
-<h1 style="margin: 0 0 18px; font-family: inherit; font-size: clamp(33px,5.3vw,53px); font-weight: bold; line-height: 1.04; letter-spacing: -.027em; color: #ffffff; text-shadow: 0 2px 18px rgba(7,29,46,.6);">Renew Your MISMO<span style="display: block; color: #74bfeb;">Certification</span></h1>
-<p style="margin: 0 0 12px; font-family: inherit; font-size: clamp(16.5px,1.8vw,19px); font-weight: 500; line-height: 1.5; color: #ffffff; max-width: 40ch;">Confirm what we hold, sign the attestation and send it back. Everything here is about your own certification.</p>
-<p style="margin: 0; font-family: inherit; font-size: 15px; line-height: 1.6; color: #a9d8f3; max-width: 52ch;">Your answers save as you type, so you can close this page and come back whenever you like.</p>
-<div style="margin-top: 24px; display: flex; flex-wrap: wrap; gap: 12px; max-width: 560px;"><a href="#renewal" style="flex: 1 1 190px; min-width: max-content; box-sizing: border-box; display: block; text-align: center; white-space: nowrap; padding: 14px 22px; border-radius: 8px; background: linear-gradient(180deg,#2e9dee 0%,#1a8fe3 100%); box-shadow: 0 5px 16px -4px rgba(26,143,227,.55); color: #ffffff; font-family: inherit; font-size: 15px; font-weight: 600; line-height: 1.2; text-decoration: none; border: 1.5px solid #1a8fe3;">Go to Your Renewal&nbsp;&rarr;</a></div>
-</div>
-<div style="flex: 0 1 200px; box-sizing: border-box; min-width: 170px; border-left: 1px solid rgba(116,191,235,.35); padding-left: 26px;">
-<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">People</div>
-<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Systems</div>
-<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Standards</div>
-<div style="font-family: inherit; font-size: 13px; font-weight: 600; letter-spacing: .17em; text-transform: uppercase; color: #56b4f2; line-height: 2.15; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Progress</div>
-<div style="width: 44px; height: 1px; background: rgba(255,255,255,.4); margin: 18px 0;"></div>
-<div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">A More Efficient</div>
-<div style="font-family: inherit; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.85); line-height: 1.75; text-shadow: 0 1px 10px rgba(7,29,46,.9);">Mortgage Industry</div>
-</div>
-</div>
-</div>
-
-
-<main class="wrap" id="form-wrap"><span id="renewal"></span>
-  <div>
-    <h1 id="hd">Renew your MISMO certification</h1>
-    <p class="lede" id="lede"></p>
-    <p class="saveline">Your answers are saved as you type. You may close this page and come back to it.</p>
-  </div>
-
-  <section class="panel">
-    <span class="step" data-step="facts">STEP 1</span>
-    <h2>What Is Being Renewed</h2>
-    <p class="psub">If anything here is wrong, tell us before you go on &mdash; reply to the email that brought you here.</p>
-    <dl class="facts" id="facts"></dl>
-    <div id="invoice"></div>
+<main class="wrap rn" id="form-wrap" hidden style="padding-block:18px 60px">
+  <section class="panel rn-step" data-key="facts">
+    <div class="ph"><div><span class="stepno" data-step="facts">STEP 1</span><h2>What Is Being Renewed</h2>
+      <p>If anything here is wrong, tell us before you go on: reply to the email that brought you here.</p></div></div>
+    <div class="pb"><dl class="facts" id="facts"></dl><div id="invoice"></div><div class="foot-actions"></div></div>
   </section>
 
-  <section class="panel">
-    <span class="step" data-step="docs">STEP 2</span>
-    <h2>Your Application and Questionnaire</h2>
-    <p class="psub">Open what you sent us last year and tell us whether it still holds. If anything has changed, send the corrected document back.</p>
-    <div id="docs"></div>
+  <section class="panel rn-step" data-key="docs">
+    <div class="ph"><div><span class="stepno" data-step="docs">STEP 2</span><h2>Your Application and Questionnaire</h2>
+      <p>Open what you sent us last time and tell us whether it still holds. If anything has changed, send the corrected document back.</p></div></div>
+    <div class="pb"><div id="docs"></div><div class="foot-actions"></div></div>
   </section>
 
-  <section class="panel" id="script-panel" hidden>
-    <span class="step" data-step="script">STEP 3</span>
-    <h2>Your Answers for the Certification Script</h2>
-    <p class="psub">Your assessor works from these at your demonstration. We have filled in what you told us last time &mdash; correct anything that has changed, and answer anything left blank.</p>
-    <div id="script"></div>
+  <section class="panel rn-step" data-key="script" id="script-panel" hidden>
+    <div class="ph"><div><span class="stepno" data-step="script">STEP 3</span><h2>Your Answers for the Certification Script</h2>
+      <p>Your assessor works from these at your demonstration. We have filled in what you told us last time: correct anything that has changed, and answer anything left blank.</p></div></div>
+    <div class="pb"><div id="script"></div><div class="foot-actions"></div></div>
   </section>
 
-  <section class="panel">
-    <span class="step" data-step="signer">STEP 3</span>
-    <h2>Who Signs for Your Company</h2>
-    <p class="psub">Who MISMO has on file as authorised to act for your company.</p>
-    <div id="signer"></div>
+  <section class="panel rn-step" data-key="signer">
+    <div class="ph"><div><span class="stepno" data-step="signer">STEP 3</span><h2>Who Signs for Your Company</h2>
+      <p>Who MISMO has on file as authorized to act for your company.</p></div></div>
+    <div class="pb"><div id="signer"></div><div class="foot-actions"></div></div>
   </section>
 
-  <section class="panel">
-    <span class="step" data-step="website">STEP 4</span>
-    <h2>How You Appear on mismo.org</h2>
-    <p class="psub">Your page on mismo.org shows your About Us and a link to your website. Correct anything that has moved on.</p>
-    <!-- No contact name or email (Jonna, 19 Nov 2026): the website no longer lists provider contacts, so the page stays current. -->
-    <div class="grid2">
-      <div class="fld"><label for="w-page">Your Website</label>
-        <input type="url" id="w-page" data-f="website.page" placeholder="https://" autocomplete="off"></div>
-      <div class="fld"><label for="w-lastcheck">Last Confirmed</label>
-        <input type="text" id="w-lastcheck" disabled></div>
-    </div>
-    <div class="fld" style="margin-top:14px">
-      <label for="w-about">About Us</label>
-      <textarea id="w-about" data-f="website.aboutUs" maxlength="900"></textarea>
-      <span class="hint"><span id="w-count">0</span> of 900 characters. A short paragraph reads best on the register.</span>
+  <section class="panel rn-step" data-key="website">
+    <div class="ph"><div><span class="stepno" data-step="website">STEP 4</span><h2>How You Appear on mismo.org</h2>
+      <p>Your page on mismo.org shows your About Us and a link to your website. Correct anything that has moved on.</p></div></div>
+    <!-- No contact name or email (Jonna, 19 Nov 2026): the website no longer lists provider contacts. -->
+    <div class="pb">
+      <div class="grid2">
+        <div class="fld"><label for="w-page">Your Website</label>
+          <input type="url" id="w-page" data-f="website.page" placeholder="https://" autocomplete="off"></div>
+        <div class="fld"><label for="w-lastcheck">Last Confirmed</label>
+          <input type="text" id="w-lastcheck" disabled></div>
+      </div>
+      <div class="fld" style="margin-top:14px">
+        <label for="w-about">About Us</label>
+        <textarea id="w-about" data-f="website.aboutUs" maxlength="900"></textarea>
+        <span class="hint"><span id="w-count">0</span> of 900 characters. A short paragraph reads best on the register.</span>
+      </div>
+      <div class="foot-actions"></div>
     </div>
   </section>
 
-  <section class="panel">
-    <span class="step" data-step="attest">STEP 5</span>
-    <h2>Attestation</h2>
-    <p class="psub">The same attestation you gave on your Application and Questionnaire.</p>
-    <div id="attest"></div>
+  <section class="panel rn-step" data-key="attest">
+    <div class="ph"><div><span class="stepno" data-step="attest">STEP 5</span><h2>Attestation</h2>
+      <p>The same attestation you gave on your Application and Questionnaire.</p></div></div>
+    <div class="pb"><div id="attest"></div><div class="foot-actions"></div></div>
   </section>
 
-  <section class="panel">
-    <span class="step" data-step="send">STEP 6</span>
-    <h2>Send It Back</h2>
-    <p class="psub" id="ready-sub">Everything above is answered. Send it and we will take it from there.</p>
-    <div id="blockers"></div>
-    <div class="acts">
-      <button class="btn" id="send" type="button">Send to MISMO</button>
-      <button class="btn ghost" id="save" type="button">Save a Copy</button>
-    </div>
-    <div class="next">
-      <h3>What Happens Next</h3>
-      <ol>
-        <li>Your attestation is recorded against your certification.</li>
-        <li>Your renewal invoice is raised and sent to you.</li>
-        <li>Once the fee is paid, we write to arrange your assessment.</li>
-      </ol>
+  <section class="panel rn-step" data-key="send">
+    <div class="ph"><div><span class="stepno" data-step="send">STEP 6</span><h2>Send It Back</h2>
+      <p id="ready-sub">Everything above is answered. Send it and we will take it from there.</p></div></div>
+    <div class="pb">
+      <div id="blockers"></div>
+      <div class="acts">
+        <button class="btn" id="send" type="button">Send to MISMO</button>
+        <button class="btn ghost" id="save" type="button">Save a Copy</button>
+      </div>
+      <div class="whatnext">
+        <h3>What Happens Next</h3>
+        <ol>
+          <li>Your attestation is recorded against your certification.</li>
+          <li>Your renewal invoice is raised and sent to you.</li>
+          <li>Once the fee is paid, we write to arrange your assessment.</li>
+        </ol>
+      </div>
+      <div class="foot-actions"></div>
     </div>
   </section>
 </main>
 
-<main class="wrap" id="done-wrap" hidden>
-  <section class="panel done">
-    <div class="tick" aria-hidden="true">&check;</div>
-    <h1 style="font-size:22px">Thank you &mdash; we have it</h1>
-    <p class="lede" id="done-line"></p>
-    <div id="done-invoice" style="text-align:left;max-width:560px;margin:22px auto 0"></div>
-    <div class="next" style="text-align:left;max-width:460px;margin:22px auto 0">
+<main class="wrap rn" id="done-wrap" hidden style="padding-block:18px 60px">
+  <section class="panel"><div class="pb done-screen">
+    <div class="ok" aria-hidden="true">&check;</div>
+    <h2 style="font-size:22px">Thank you, we have it</h2>
+    <p class="muted" id="done-line" style="max-width:60ch;margin:8px auto 0"></p>
+    <div id="done-invoice" style="text-align:left;max-width:600px;margin:22px auto 0"></div>
+    <div class="whatnext" style="text-align:left;max-width:600px;margin:22px auto 0">
       <h3>What Happens Next</h3>
       <ol>
         <li>Your attestation is recorded against your certification.</li>
@@ -559,726 +209,26 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       </ol>
     </div>
     <p style="margin:18px 0 0"><button class="btn ghost" type="button" id="done-fix">Send a Correction</button></p>
-  </section>
+  </div></section>
 </main>
 
-<!-- Shown while the renewal is being fetched, and in place of the form when the link
-     cannot be opened. The page carries no renewal of its own: without a working link
-     there is nothing here to see. -->
-<main class="wrap" id="wait-wrap" hidden>
-  <section class="panel">
-    <h1 style="font-size:22px" id="wait-h">Opening your renewal&hellip;</h1>
-    <p class="lede" id="wait-line">One moment.</p>
-    <div class="next" id="wait-help" hidden style="text-align:left;max-width:520px;margin:22px 0 0">
+<!-- Shown while the renewal is being fetched, and in place of the form when the link cannot be opened.
+     The page carries no renewal of its own: without a working link there is nothing here to see. -->
+<main class="wrap rn" id="wait-wrap" style="padding-block:18px 60px">
+  <section class="panel"><div class="pb">
+    <h2 style="font-size:20px" id="wait-h">Opening your renewal&hellip;</h2>
+    <p class="muted" id="wait-line" style="margin:6px 0 0">One moment.</p>
+    <div class="whatnext" id="wait-help" hidden style="max-width:560px">
       <h3>What to Do</h3>
       <ol>
-        <li>Open the link straight from the renewal email rather than typing it in &mdash; the address carries a code at the end that has to come across whole.</li>
+        <li>Open the link straight from the renewal email rather than typing it in: the address carries a code at the end that has to come across whole.</li>
         <li>If the link was forwarded to you, ask the person who sent it to reply to the email instead, so we can send one to you directly.</li>
-        <li>Still stuck? Reply to the renewal email and we will sort it out.</li>
+        <li>Still stuck? Email certifications@mismo.org and we will sort it out.</li>
       </ol>
     </div>
-  </section>
+  </div></section>
 </main>
 
-<script>
-/* The renewal response page.
-
-   The provider arrives from the renewal notice with a token in the link. The token is
-   all the page is given: it asks MISMO for the renewal behind it, and posts the answers
-   back the same way. Nothing about a company is ever baked into this page, which is what
-   lets it sit on the public website.
-
-   Answers are kept in this browser as they are typed, under the token, so closing the
-   page loses nothing. */
-
-var FLOW_ENDPOINT = "https://default867e5d11bde4499fb45e61572f9f33.7c.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/30/workflows/b7c43e642a114351bea85f898ce0cf65/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=GjeuqRbTNg00VzD2nKHSTcXJXRHlVLVtbeTYbNX6H5Q";   /* filled in when the flow is built */
-var token = (new URLSearchParams(location.search)).get("r") || "";
-var KEY = "mismo.renewal." + (token || "preview");
-var R = null;             /* the renewal, as MISMO describes it */
-var A = { documents: {}, signer: {}, attest: {}, website: {}, files: {}, script: {} };
-var submitted = false;
-
-(function season(){ if (new Date().getMonth() === 11) document.documentElement.setAttribute("data-season","december"); })();
-(function theme(){
-  /* The website build drops the tool masthead, and the toggle with it - the site has
-     no dark mode. Without this guard the page would die here and never start. */
-  var btn = document.getElementById("theme-btn");
-  if (!btn) return;
-  function cur(){ var t = document.documentElement.getAttribute("data-theme"); if (t) return t;
-    return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"; }
-  function paint(){ btn.textContent = cur() === "dark" ? "Light" : "Dark"; }
-  btn.addEventListener("click", function(){
-    document.documentElement.setAttribute("data-theme", cur() === "dark" ? "light" : "dark"); paint();
-    try { localStorage.setItem("mismo.portal.theme", cur()); } catch(e){}
-  });
-  try { var s = localStorage.getItem("mismo.portal.theme"); if (s) document.documentElement.setAttribute("data-theme", s); } catch(e){}
-  paint();
-})();
-
-var MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-function longDate(iso){ if(!iso) return "—"; var p = String(iso).slice(0,10).split("-");
-  return MONTHS[parseInt(p[1],10)-1] + " " + parseInt(p[2],10) + ", " + p[0]; }  /* US style, November 9, 2026 (27 Oct 2026) */
-function money(n){ return n == null ? "—" : "$" + String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ","); }
-function esc(s){ return String(s == null ? "" : s).replace(/[&<>"']/g, function(c){
-  return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]; }); }
-function el(id){ return document.getElementById(id); }
-function bytes(n){ return n < 1024 ? n + " B" : n < 1048576 ? (n/1024).toFixed(0) + " KB" : (n/1048576).toFixed(1) + " MB"; }
-
-function toast(msg){
-  var t = document.createElement("div"); t.className = "toast"; t.textContent = msg;
-  document.body.appendChild(t); setTimeout(function(){ t.remove(); }, 3600);
-}
-
-/* ---------- keeping the answers ---------- */
-function load(){
-  try { var raw = localStorage.getItem(KEY); if (raw) { var o = JSON.parse(raw);
-    if (o && o.answers) A = o.answers; submitted = !!(o && o.submitted); } } catch(e){}
-}
-function persist(){
-  try { localStorage.setItem(KEY, JSON.stringify({ answers: A, submitted: submitted, at: new Date().toISOString() })); return; } catch(e){}
-  /* A large attachment can be more than this browser will keep. The typed answers are still kept
-     then, without the files, so nothing else is lost; a file is attached again after a reload. */
-  try {
-    var lite = JSON.parse(JSON.stringify(A));
-    Object.keys(lite.files || {}).forEach(function(k){ lite.files[k] = []; });
-    localStorage.setItem(KEY, JSON.stringify({ answers: lite, submitted: submitted, at: new Date().toISOString() }));
-  } catch(e){}
-}
-function setPath(path, value){
-  var parts = path.split("."), o = A;
-  for (var i = 0; i < parts.length - 1; i++) o = (o[parts[i]] = o[parts[i]] || {});
-  o[parts[parts.length - 1]] = value;
-  persist();
-}
-function getPath(path){
-  var parts = path.split("."), o = A;
-  for (var i = 0; i < parts.length; i++) { if (o == null) return undefined; o = o[parts[i]]; }
-  return o;
-}
-
-/* ---------- step numbers ----------
-   The certification script step only appears for the programs that have a script (RON,
-   eClosing, eVault), so the steps are numbered from what is on the page, not typed in. */
-var STEP_WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine"];
-function hasScript(){ return !!(R && R.script && R.script.questions && R.script.questions.length); }
-function stepKeys(){
-  return ["facts", "docs"].concat(hasScript() ? ["script"] : []).concat(["signer", "website", "attest", "send"]);
-}
-function stepOf(key){ return stepKeys().indexOf(key) + 1; }
-function stepCount(){ return stepKeys().length; }
-function numberSteps(){
-  el("script-panel").hidden = !hasScript();
-  Array.prototype.forEach.call(document.querySelectorAll("[data-step]"), function(s){
-    s.textContent = "STEP " + stepOf(s.getAttribute("data-step"));
-  });
-}
-
-/* ---------- the certification script's questions ---------- */
-function renderScript(){
-  if (!hasScript()) { el("script").innerHTML = ""; return; }
-  A.script = A.script || {};
-  el("script").innerHTML = R.script.questions.map(function(q, i){
-    if (A.script[q.id] === undefined) A.script[q.id] = q.answer || "";
-    return '<div class="doc">'
-      + '<div class="fld"><label for="sq-' + esc(q.id) + '" style="text-transform:none;letter-spacing:0;font-size:14px;font-weight:600;line-height:1.45">'
-      + (q.number ? esc(q.number) + ". " : "") + esc(q.text) + "</label>"
-      + '<textarea id="sq-' + esc(q.id) + '" data-f="script.' + esc(q.id) + '" style="min-height:70px"></textarea>'
-      + (q.answer ? '<span class="hint">Filled in from what you told us last time.</span>' : "")
-      + "</div></div>";
-  }).join("");
-  wireFields(el("script"));
-}
-
-/* ---------- drawing ---------- */
-function renderHeader(){
-  el("hd").textContent = R.program + " Certification Renewal";
-  el("lede").innerHTML = "<b>" + esc(R.org) + "</b>" + (R.product ? " · " + esc(R.product) : "")
-    + " — your certification renews on <b>" + esc(longDate(R.anniversary))
-    + "</b>. There are " + STEP_WORDS[stepCount()] + " short steps below.";
-  document.title = R.program + " Renewal · " + R.org;
-}
-function renderFacts(){
-  var rows = [
-    ["Company", esc(R.org), false],
-    ["Certification", esc(R.program) + (R.product ? " · " + esc(R.product) : ""), false],
-    ["Renews On", esc(longDate(R.anniversary)), true],
-    ["Renewal Fee", esc(money(R.fee)), true]
-  ];
-  el("facts").innerHTML = rows.map(function(r){
-    return '<div class="fact"><dt>' + r[0] + '</dt><dd' + (r[2] ? ' class="num"' : "") + '>' + r[1] + "</dd></div>";
-  }).join("");
-}
-/* The invoice itself is never part of the page. MISMO holds it, and the page asks for it
-   by token only when the provider presses Download, so the bytes are never sitting on a
-   public web server waiting to be found. */
-function renderInvoice(){
-  var i = R.invoice;
-  var host = el("invoice");
-  if (!i || !i.available){
-    host.innerHTML = '<div class="inv"><div class="inv-b"><p class="inv-n">Your renewal invoice</p>'
-      + '<p class="inv-m">' + esc((i && i.note) || "Not raised yet. It will be sent to you, and will appear here once it is ready.") + "</p></div></div>";
-    return;
-  }
-  host.innerHTML = '<div class="inv">'
-    + '<div class="inv-i" aria-hidden="true">PDF</div>'
-    + '<div class="inv-b"><p class="inv-n">Renewal Fee Invoice'
-      + (i.paid ? ' <span class="paid">Paid</span>' : "") + "</p>"
-    + '<p class="inv-m">' + (i.number ? 'Order <span class="num">' + esc(i.number) + "</span> \u00b7 " : "")
-      + '<span class="num">' + esc(money(i.amount)) + "</span>"
-      + (i.date ? " \u00b7 raised " + esc(longDate(i.date)) : "")
-      + (i.paid ? "" : " \u00b7 payable on receipt") + "</p></div>"
-    + '<div class="inv-a"><button class="btn ghost" type="button" id="inv-dl">Download the Invoice</button></div>'
-    + "</div>"
-    + (i.paid ? "" : '<p class="hint" style="margin:9px 2px 0">How to pay is printed on the invoice. Once the fee reaches us we will write to arrange your assessment.</p>');
-  el("inv-dl").addEventListener("click", downloadInvoice);
-}
-
-/* A link that has been forwarded still opens this page, so the invoice is the one thing
-   behind a second door: MISMO emails a short code to the contact it already holds for this
-   company, and the file only comes back once that code is typed in. The address is never
-   asked for here - whoever is holding the link cannot redirect the code to themselves. */
-var codeState = null;   /* {hint: the masked address MISMO sent to, tries: 0} while the code step is open */
-
-function post(mode, extra){
-  var body = { formKey: "mismo-renewal-response", mode: mode, token: token };
-  if (extra) for (var k in extra) body[k] = extra[k];
-  return fetch(FLOW_ENDPOINT, {
-    method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" },
-    body: JSON.stringify(body)
-  }).then(function(r){
-    if (!r.ok) throw new Error("status " + r.status);
-    return r.json();
-  });
-}
-
-/* Step one: ask MISMO to send the code. */
-function downloadInvoice(){
-  var b = el("inv-dl");
-  b.disabled = true; b.textContent = "Sending a code\u2026";
-  function done(){ b.disabled = false; b.textContent = "Download the Invoice"; }
-  if (!FLOW_ENDPOINT){ done(); toast("This is a preview \u2014 the invoice is not wired up yet."); return; }
-  post("invoice-code").then(function(d){
-    if (!d || !d.sent) throw new Error(d && d.error || "not sent");
-    codeState = { hint: d.hint || "the contact we hold for you", tries: 0 };
-    renderCodeStep();
-  }).catch(function(e){
-    done();
-    if (String(e.message) === "no-contact")
-      toast("We do not have an email address on file for this company, so we cannot send a code. Reply to the email that brought you here and we will send the invoice.");
-    else
-      toast("We could not send the code just now. Reply to the email that brought you here and we will send the invoice.");
-  });
-}
-
-function renderCodeStep(bad){
-  var host = el("invoice");
-  host.innerHTML = '<div class="inv-code">'
-    + "<p>For your security the invoice is not handed out on the link alone. We have emailed a "
-    + 'six-digit code to <span class="to">' + esc(codeState.hint) + "</span>. Enter it here and the "
-    + "invoice will download. The code lasts fifteen minutes.</p>"
-    + '<div class="inv-row">'
-    + '<input type="text" id="inv-code" inputmode="numeric" autocomplete="one-time-code" '
-    + 'maxlength="6" placeholder="000000" aria-label="Six-digit code">'
-    + '<button class="btn" type="button" id="inv-go">Get the Invoice</button>'
-    + '<button class="inv-again" type="button" id="inv-again">Send it again</button>'
-    + "</div>"
-    + (bad ? '<p class="inv-bad">' + esc(bad) + "</p>" : "")
-    + "</div>";
-  var f = el("inv-code");
-  f.addEventListener("input", function(){ f.value = f.value.replace(/\D/g, "").slice(0, 6); });
-  f.addEventListener("keydown", function(e){ if (e.key === "Enter") { e.preventDefault(); sendCode(); } });
-  el("inv-go").addEventListener("click", sendCode);
-  el("inv-again").addEventListener("click", againCode);
-  f.focus();
-}
-
-function againCode(){
-  var a = el("inv-again");
-  a.disabled = true; a.textContent = "Sending\u2026";
-  post("invoice-code").then(function(d){
-    a.textContent = d && d.sent ? "Sent again" : "Send it again";
-    setTimeout(function(){ if (el("inv-again")) { el("inv-again").disabled = false; el("inv-again").textContent = "Send it again"; } }, 20000);
-  }).catch(function(){
-    a.disabled = false; a.textContent = "Send it again";
-    toast("We could not send the code just now.");
-  });
-}
-
-/* Step two: hand the code back, and the file comes with it. */
-function sendCode(){
-  var f = el("inv-code"), g = el("inv-go");
-  var code = (f.value || "").replace(/\D/g, "");
-  if (code.length !== 6){ renderCodeStep("That code is six digits."); return; }
-  g.disabled = true; g.textContent = "Checking\u2026";
-  post("invoice", { code: code }).then(function(d){
-    if (d && d.error) throw new Error(d.error);
-    if (!d || !d.data) throw new Error("no file came back");
-    var bin = atob(d.data), n = bin.length, arr = new Uint8Array(n);
-    for (var k = 0; k < n; k++) arr[k] = bin.charCodeAt(k);
-    saveBlob(new Blob([arr], { type: d.type || "application/pdf" }), d.name || "MISMO renewal invoice.pdf");
-    codeState = null;
-    renderInvoice();
-    toast("The invoice is downloading.");
-  }).catch(function(e){
-    var m = String(e.message);
-    codeState.tries++;
-    if (m === "expired") renderCodeStep("That code has run out. Press \u201cSend it again\u201d for a fresh one.");
-    else if (m === "too-many") renderCodeStep("Too many tries. Press \u201cSend it again\u201d for a fresh code.");
-    else if (m === "bad-code") renderCodeStep("That code does not match. Check the email and try again.");
-    else {
-      codeState = null;
-      renderInvoice();
-      toast("The invoice would not come through. Reply to the email that brought you here and we will send it.");
-    }
-  });
-}
-
-/* ---------- the documents the company sent last time (26 Oct 2026) ----------
-   Behind the same emailed code as the invoice, since they carry the company's own contacts and
-   answers. A code that worked is remembered for this visit only (never stored), so both
-   documents open with one code; the invoice still spends it. */
-var docCode = null;      /* a code that opened a document in this visit */
-var docAsk = null;       /* {id, hint, bad} while a document's code box is open */
-function docName(id){ var d = (R.documents || []).filter(function(x){ return x.id === id; })[0]; return d ? d.name : "document"; }
-function docCodeBox(d){
-  return '<div class="inv-code" style="margin-top:12px">'
-    + "<p>For your security this is not handed out on the link alone. We have emailed a six-digit code to "
-    + '<span class="to">' + esc(docAsk.hint) + "</span>. Enter it and your " + esc(d.name) + " will download.</p>"
-    + '<div class="inv-row">'
-    + '<input type="text" id="doc-code" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="000000" aria-label="Six-digit code">'
-    + '<button class="btn" type="button" data-docgo="' + esc(d.id) + '">Open It</button>'
-    + "</div>"
-    + (docAsk.bad ? '<p class="inv-bad">' + esc(docAsk.bad) + "</p>" : "")
-    + "</div>";
-}
-function redrawDocs(){ renderDocs(); wireAll(); paintReady(); var f = el("doc-code"); if (f) f.focus(); }
-function openDoc(id, btn){
-  if (!FLOW_ENDPOINT){ toast("This is a preview \u2014 documents are not wired up here."); return; }
-  if (docCode) { fetchDoc(id, docCode); return; }
-  if (btn) { btn.disabled = true; btn.textContent = "Sending a code\u2026"; }
-  post("invoice-code").then(function(d){
-    if (!d || !d.sent) throw new Error(d && d.error || "not sent");
-    docAsk = { id: id, hint: d.hint || "the contact we hold for you" };
-    redrawDocs();
-  }).catch(function(){
-    redrawDocs();
-    toast("We could not send the code just now. Reply to the email that brought you here and we will send your " + docName(id) + ".");
-  });
-}
-function fetchDoc(id, code){
-  post("invoice", { code: code, doc: id }).then(function(d){
-    if (d && d.error) throw new Error(d.error);
-    if (!d || !d.data) throw new Error("no file came back");
-    var bin = atob(d.data), n = bin.length, arr = new Uint8Array(n);
-    for (var k = 0; k < n; k++) arr[k] = bin.charCodeAt(k);
-    saveBlob(new Blob([arr], { type: d.type || "application/pdf" }), d.name || (docName(id) + ".pdf"));
-    docCode = code; docAsk = null; redrawDocs();
-    toast("Your " + docName(id) + " is downloading.");
-  }).catch(function(e){
-    var m = String(e.message);
-    if (m === "bad-code" || m === "too-many" || m === "expired") {
-      docCode = null;
-      docAsk = docAsk || { id: id, hint: "the contact we hold for you" };
-      docAsk.bad = m === "bad-code" ? "That code does not match. Check the email and try again."
-        : "That code can no longer be used. Press \u201cOpen what you sent\u201d again for a fresh one.";
-      if (m !== "bad-code") docAsk = null;
-      redrawDocs();
-      if (m !== "bad-code") toast("That code can no longer be used. Press \u201cOpen what you sent\u201d again for a fresh one.");
-    } else {
-      docAsk = null; redrawDocs();
-      toast("That document would not come through. Reply to the email that brought you here and we will send it.");
-    }
-  });
-}
-
-/* Some viewers refuse to let a page hand over a file at all - the artifact preview is one.
-   Saying so is better than a button that silently does nothing. */
-function saveBlob(blob, name){
-  try {
-    var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = name;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 4000);
-  } catch(e){
-    toast("This preview will not let the page hand over a file. It works on the live page.");
-  }
-}
-
-function renderDocs(){
-  el("docs").innerHTML = (R.documents || []).map(function(d){
-    var v = (A.documents[d.id] || {}).response || "";
-    var files = A.files[d.id] || [];
-    return '<div class="doc" data-doc="' + esc(d.id) + '">'
-      + '<div class="doc-h"><span class="doc-n">' + esc(d.name) + "</span>"
-      + (d.lastSent ? '<span class="doc-s">you last sent this on ' + esc(longDate(d.lastSent)) + "</span>" : "")
-      + (d.url ? '<a class="doc-link" href="' + esc(d.url) + '" target="_blank" rel="noopener noreferrer">Open what you sent&nbsp;&rarr;</a>'
-         : d.available ? '<button class="doc-link doc-open" type="button" data-docopen="' + esc(d.id) + '">Open what you sent&nbsp;&rarr;</button>' : "")
-      + "</div>"
-      + (docAsk && docAsk.id === d.id ? docCodeBox(d) : "")
-      + '<div class="choices">'
-      + choice(d.id, "no-changes", "Nothing has changed", v)
-      + choice(d.id, "updates", "I have changes to send", v)
-      + "</div>"
-      + (v === "updates" ? uploadBlock(d, files) : "")
-      + "</div>";
-  }).join("") || '<div class="warn">No documents are listed for this renewal. Reply to the email that brought you here and we will sort it out.</div>';
-}
-function choice(docId, val, label, current){
-  var on = current === val;
-  return '<label class="choice' + (on ? " on" : "") + '">'
-    + '<input type="radio" name="doc-' + esc(docId) + '" value="' + val + '"' + (on ? " checked" : "") + ">"
-    + "<span>" + esc(label) + "</span></label>";
-}
-function uploadBlock(d, files){
-  return '<div class="drop"><p>Send us the corrected ' + esc(d.name) + ".</p>"
-    + '<button class="btn ghost" type="button" data-pick="' + esc(d.id) + '">Choose a File</button>'
-    + '<input type="file" hidden data-file="' + esc(d.id) + '" multiple></div>'
-    + (files.length ? '<ul class="filelist">' + files.map(function(f, i){
-        return "<li><span class=\"nm\">" + esc(f.name) + '</span><span class="sz">' + bytes(f.size) + "</span>"
-          + '<button class="btn ghost" type="button" style="padding:3px 10px;font-size:12px" data-drop="'
-          + esc(d.id) + "|" + i + '">Remove</button></li>';
-      }).join("") + "</ul>" : "");
-}
-function renderSigner(){
-  var keep = A.signer.keep;
-  el("signer").innerHTML = '<div class="facts" style="grid-template-columns:1fr">'
-      + '<div class="fact"><dt>On File</dt><dd>' + esc(R.signer && R.signer.name || "Nobody recorded")
-      + (R.signer && R.signer.email ? ' <span style="font-weight:400;color:var(--ink-3)">· ' + esc(R.signer.email) + "</span>" : "")
-      + "</dd></div></div>"
-    + '<div class="choices">'
-      + '<label class="choice' + (keep === true ? " on" : "") + '"><input type="radio" name="signer" value="keep"'
-        + (keep === true ? " checked" : "") + "><span>That is still right</span></label>"
-      + '<label class="choice' + (keep === false ? " on" : "") + '"><input type="radio" name="signer" value="change"'
-        + (keep === false ? " checked" : "") + "><span>Someone else signs now</span></label>"
-    + "</div>"
-    + (keep === false ? '<div class="grid2" style="margin-top:14px">'
-        + '<div class="fld"><label for="s-name">Signer’s Name</label>'
-        + '<input type="text" id="s-name" data-f="signer.name" autocomplete="off"></div>'
-        + '<div class="fld"><label for="s-email">Signer’s Email</label>'
-        + '<input type="email" id="s-email" data-f="signer.email" autocomplete="off"></div></div>' : "");
-  wireFields(el("signer"));
-}
-var ATTEST_TEXT = "I hereby attest that I am authorized by the Applicant to sign and submit "
-  + "this Application on its behalf. The information provided in this Application is all "
-  + "accurate to the best of my knowledge and based on my diligent review. Should any "
-  + "information cease to be accurate after the time of submission of this Application, the "
-  + "Applicant will notify MISMO of such and provide updated information.";
-
-function renderAttest(){
-  if (A.attest.company === undefined) A.attest.company = R.org || "";
-  var on = A.attest.agreed === true;
-  el("attest").innerHTML =
-      '<label class="att-box' + (on ? " on" : "") + '">'
-        + '<input type="checkbox" id="att-ok"' + (on ? " checked" : "") + ">"
-        + "<span>" + esc(ATTEST_TEXT) + "</span>"
-      + "</label>"
-    + '<div class="grid2" style="margin-top:14px">'
-      + '<div class="fld"><label for="att-name">Printed Name</label>'
-        + '<input type="text" id="att-name" data-f="attest.name" autocomplete="off"></div>'
-      + '<div class="fld"><label for="att-title">Title</label>'
-        + '<input type="text" id="att-title" data-f="attest.title" autocomplete="off"></div>'
-    + "</div>"
-    + '<div class="fld" style="margin-top:12px"><label for="att-co">Company</label>'
-      + '<input type="text" id="att-co" data-f="attest.company" autocomplete="off"></div>'
-    + '<p class="att-stamp">The date and time are recorded automatically when you send this.</p>';
-  el("att-ok").addEventListener("change", function(){
-    A.attest.agreed = this.checked; persist(); renderAttest(); wireFields(el("attest")); paintReady();
-  });
-}
-
-function renderWebsite(){
-  var w = R.website || {};
-  if (A.website.page === undefined) A.website.page = w.page || "";
-  if (A.website.aboutUs === undefined) A.website.aboutUs = w.aboutUs || "";
-  el("w-page").value = A.website.page;
-  el("w-about").value = A.website.aboutUs;
-  el("w-lastcheck").value = w.lastUpdated ? longDate(w.lastUpdated) : "Not recorded";
-  countAbout();
-}
-function countAbout(){ el("w-count").textContent = (el("w-about").value || "").length; }
-
-/* ---------- what is still missing ---------- */
-function blockers(){
-  var out = [];
-  (R.documents || []).forEach(function(d){
-    var a = A.documents[d.id] || {};
-    if (!a.response) out.push("Step " + stepOf("docs") + ": say whether your " + d.name + " has changed.");
-    else if (a.response === "updates" && !(A.files[d.id] || []).length)
-      out.push("Step " + stepOf("docs") + ": attach your corrected " + d.name + ".");
-  });
-  if (hasScript()) {
-    var open = R.script.questions.filter(function(q){ return !String((A.script || {})[q.id] || "").trim(); }).length;
-    if (open) out.push("Step " + stepOf("script") + ": answer " + (open === 1 ? "the last certification script question." : "the " + open + " certification script questions still blank."));
-  }
-  if (A.signer.keep === undefined) out.push("Step " + stepOf("signer") + ": confirm who signs for your company.");
-  /* With no email on file for the signer, "That is still right" would leave MISMO nobody to send the
-     signing request to (stress test, 1 Nov 2026). */
-  if (A.signer.keep === true && !(R.signer && R.signer.email)) out.push("Step " + stepOf("signer") + ": we have no email address for your signer, so choose \u201cSomeone else signs now\u201d and give the signer\u2019s name and email, even if it is the same person.");
-  if (A.signer.keep === false) {
-    if (!(A.signer.name || "").trim()) out.push("Step " + stepOf("signer") + ": give the new signer’s name.");
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test((A.signer.email || "").trim())) out.push("Step " + stepOf("signer") + ": give the new signer’s email.");
-  }
-  if (A.attest.agreed !== true) out.push("Step " + stepOf("attest") + ": tick the attestation.");
-  if (!(A.attest.name || "").trim()) out.push("Step " + stepOf("attest") + ": type your printed name.");
-  if (!(A.attest.title || "").trim()) out.push("Step " + stepOf("attest") + ": give your title.");
-  if (!(A.attest.company || "").trim()) out.push("Step " + stepOf("attest") + ": give your company.");
-  return out;
-}
-function paintReady(){
-  var b = blockers();
-  el("blockers").innerHTML = b.length
-    ? '<div class="warn"><b>Not quite ready.</b><ul style="margin:7px 0 0;padding-left:19px">'
-      + b.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>"
-    : "";
-  el("ready-sub").textContent = b.length
-    ? "A few things are still open. They are listed below."
-    : "Everything above is answered. Send it and we will take it from there.";
-  el("send").disabled = b.length > 0;
-}
-
-/* ---------- wiring ---------- */
-function wireFields(scope){
-  Array.prototype.forEach.call(scope.querySelectorAll("[data-f]"), function(i){
-    if (i.__w) return; i.__w = 1;
-    var p = i.dataset.f;
-    var v = getPath(p);
-    if (v !== undefined && i.value !== v) i.value = v;
-    i.addEventListener("input", function(){ setPath(p, i.value); paintReady(); if (p === "website.aboutUs") countAbout(); });
-  });
-}
-function wireAll(){
-  wireFields(document);
-  /* The page-wide listeners go on once. wireAll runs again after every redraw, and each run
-     used to add another set, so one click could act several times. */
-  if (wireAll.done) return;
-  wireAll.done = true;
-  document.addEventListener("change", function(e){
-    var t = e.target;
-    if (t.name && t.name.indexOf("doc-") === 0){
-      var id = t.name.slice(4);
-      A.documents[id] = A.documents[id] || {};
-      A.documents[id].response = t.value;
-      persist(); renderDocs(); wireAll(); paintReady();
-    }
-    if (t.name === "signer"){
-      A.signer.keep = t.value === "keep";
-      if (A.signer.keep) { delete A.signer.name; delete A.signer.email; }
-      persist(); renderSigner(); paintReady();
-    }
-    if (t.dataset && t.dataset.file){
-      var did = t.dataset.file;
-      var list = A.files[did] = A.files[did] || [];
-      Array.prototype.forEach.call(t.files, function(f){
-        if (f.size > 12 * 1024 * 1024) { toast(f.name + " is too large — 12 MB is the limit."); return; }
-        var fr = new FileReader();
-        fr.onload = function(){
-          list.push({ name: f.name, size: f.size, type: f.type || "application/octet-stream",
-                      data: String(fr.result).split(",")[1] || "" });
-          persist(); renderDocs(); wireAll(); paintReady();
-        };
-        fr.readAsDataURL(f);
-      });
-      t.value = "";
-    }
-  });
-  document.addEventListener("click", function(e){
-    var op = e.target.closest && e.target.closest("[data-docopen]");
-    if (op){ openDoc(op.dataset.docopen, op); return; }
-    var go = e.target.closest && e.target.closest("[data-docgo]");
-    if (go){
-      var c = ((el("doc-code") || {}).value || "").replace(/\D/g, "");
-      if (c.length !== 6){ docAsk.bad = "That code is six digits."; redrawDocs(); return; }
-      go.disabled = true; go.textContent = "Checking\u2026";
-      fetchDoc(go.dataset.docgo, c);
-      return;
-    }
-    var pick = e.target.closest && e.target.closest("[data-pick]");
-    if (pick){ var inp = document.querySelector('[data-file="' + pick.dataset.pick + '"]'); if (inp) inp.click(); return; }
-    var drop = e.target.closest && e.target.closest("[data-drop]");
-    if (drop){
-      var parts = drop.dataset.drop.split("|");
-      (A.files[parts[0]] || []).splice(Number(parts[1]), 1);
-      persist(); renderDocs(); wireAll(); paintReady();
-    }
-  });
-  el("w-about").addEventListener("input", countAbout);
-  el("save").addEventListener("click", saveCopy);
-  el("send").addEventListener("click", send);
-}
-
-function payload(){
-  return {
-    formKey: "mismo-renewal-response",
-    /* The flow switches on this. Without it the switch fell through to its default,
-       which answered 200, and the page below took that for success. */
-    mode: "submit",
-    token: token,
-    org: R.org, program: R.program, product: R.product || null,
-    anniversary: R.anniversary,
-    documents: (R.documents || []).map(function(d){
-      return { id: d.id, name: d.name,
-               response: (A.documents[d.id] || {}).response || null,
-               files: (A.files[d.id] || []).map(function(f){
-                 return { name: f.name, size: f.size, type: f.type, data: f.data }; }) };
-    }),
-    signer: A.signer.keep ? { unchanged: true, name: R.signer && R.signer.name || null,
-                              email: R.signer && R.signer.email || null }
-                          : { unchanged: false, name: A.signer.name || null, email: A.signer.email || null },
-    /* The company's answers for the certification script, keyed the way the questionnaire
-       answers are, so they drop straight into the cycle and fill the assessor's workbook. */
-    scriptAnswers: hasScript() ? R.script.questions.map(function(q){
-      return { Section: q.section, Question: q.question, Answer: String((A.script || {})[q.id] || "").trim() || null,
-               number: q.number || null, text: q.text };
-    }) : [],
-    website: { contact: null, contactEmail: null,   /* no longer asked (19 Nov 2026); keys kept for the readers */
-               page: A.website.page || null, aboutUs: A.website.aboutUs || null },
-    attestation: {
-      agreed: A.attest.agreed === true,
-      name: (A.attest.name || "").trim(),
-      title: (A.attest.title || "").trim(),
-      company: (A.attest.company || "").trim(),
-      text: ATTEST_TEXT,
-      at: new Date().toISOString()
-    },
-    submittedAt: new Date().toISOString()
-  };
-}
-function saveCopy(){
-  var body = payload();
-  var copy = JSON.parse(JSON.stringify(body));
-  copy.documents.forEach(function(d){ d.files.forEach(function(f){ delete f.data; }); });
-  saveBlob(new Blob([JSON.stringify(copy, null, 2)], { type: "application/json" }),
-           "MISMO renewal - " + (R.org || "response") + ".json");
-  toast("Saved to your computer.");
-}
-function send(){
-  var b = el("send");
-  b.disabled = true; b.textContent = "Sending…";
-  var body = payload();
-  if (!FLOW_ENDPOINT){
-    b.disabled = false; b.textContent = "Send to MISMO";
-    toast("This is a preview — nothing was sent.");
-    return;
-  }
-  fetch(FLOW_ENDPOINT, {
-    method: "POST", headers: { "Content-Type": "text/plain;charset=UTF-8" },
-    body: JSON.stringify(body)
-  }).then(function(r){
-    if (!r.ok) throw new Error("status " + r.status);
-    return r.json();
-  }).then(function(d){
-    /* A 200 only means the flow answered. It says whether it kept the answers. */
-    if (!d || d.saved !== true) throw new Error((d && d.error) || "not saved");
-    submitted = true; persist(); showDone();
-  }).catch(function(){
-    b.disabled = false; b.textContent = "Send to MISMO";
-    saveCopy();
-    toast("That did not go through — your answers have been saved to your computer instead.");
-  });
-}
-/* Sent already - on this browser, or on any other (R.received, from MISMO's records): the thank-you
-   screen, with the invoice moved onto it so it can still be downloaded, and a way to send a
-   correction (5 Nov 2026: Proof came back for the invoice and found the form empty). */
-var invHome = null, invNext = null;
-function fmtSent(iso){
-  var d = iso ? new Date(iso) : null;
-  return d && !isNaN(d) ? d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }) : "";
-}
-function showDone(){
-  el("form-wrap").hidden = true;
-  el("done-wrap").hidden = false;
-  var rc = R.received || null, when = rc && rc.at ? fmtSent(rc.at) : "";
-  el("done-line").textContent = "We have your renewal for " + R.org
-    + (R.product ? " · " + R.product : "") + "."
-    + (when ? " It was sent on " + when + (rc.by ? " by " + rc.by : "") + "." : "")
-    + " Nothing else is needed from you today.";
-  var inv = el("invoice"), box = el("done-invoice");
-  if (inv && box && inv.parentNode !== box){ invHome = inv.parentNode; invNext = inv.nextSibling; box.appendChild(inv); }
-  var i = R.invoice || {};
-  el("done-inv-step").textContent = i.paid ? "Your renewal fee is paid. Thank you."
-    : i.available ? "Your renewal invoice is above. Download it here at any time."
-    : "Your renewal invoice is raised and sent to you. It will also appear on this page.";
-  window.scrollTo(0, 0);
-}
-function showForm(){
-  var inv = el("invoice");
-  if (inv && invHome && inv.parentNode !== invHome) invHome.insertBefore(inv, invNext);
-  el("done-wrap").hidden = true;
-  el("form-wrap").hidden = false;
-  window.scrollTo(0, 0);
-}
-
-/* The live page holds no renewal of its own. It arrives with a code in the link, asks
-   MISMO for that one renewal, and shows nothing at all if the answer does not come back.
-   The preview in the artifact calls start() with a worked example instead. */
-function showWaiting(title, line, help){
-  var f = el("form-wrap"), d = el("done-wrap"), w = el("wait-wrap");
-  if (f) f.hidden = true;
-  if (d) d.hidden = true;
-  if (!w) return;
-  w.hidden = false;
-  el("wait-h").textContent = title;
-  el("wait-line").textContent = line;
-  el("wait-help").hidden = !help;
-}
-
-function boot(){
-  if (!token){
-    showWaiting("This link is not complete",
-      "The address is missing the code that identifies your renewal, so there is nothing to open.", true);
-    return;
-  }
-  if (!FLOW_ENDPOINT){
-    showWaiting("This renewal cannot be opened yet",
-      "The renewal pages are not switched on here. Reply to the email that brought you here and we will help.", false);
-    return;
-  }
-  showWaiting("Opening your renewal\u2026", "One moment.", false);
-  post("load").then(function(d){
-    /* A renewal page is open only while its renewal is going on (7 Nov 2026). A closed one carries
-       nothing about the company, so there is nothing to show but that. */
-    if (d && d.closed){
-      showWaiting("This renewal page is closed",
-        "It opens again when your next renewal comes round, and we will email you a new link then. If you need anything from a past renewal, email certifications@mismo.org.", false);
-      return;
-    }
-    if (!d || d.error || !d.org) throw new Error(d && d.error || "no record");
-    el("wait-wrap").hidden = true;
-    el("form-wrap").hidden = false;
-    start(d);
-  }).catch(function(){
-    showWaiting("We could not open this renewal",
-      "The link may have been replaced by a newer one, or it may have been typed in rather than clicked.", true);
-  });
-}
-
-function start(renewal){
-  R = renewal;
-  load();
-  numberSteps();
-  renderHeader(); renderFacts(); renderInvoice(); renderDocs(); renderScript(); renderSigner(); renderAttest(); renderWebsite();
-  wireAll(); paintReady();
-  var fix = el("done-fix");
-  if (fix) fix.onclick = function(){ submitted = false; persist(); R.received = null; showForm(); };
-  if (submitted || R.received) showDone();
-}
-
-boot();
-</script>
-<script>
-/* Phone and tablet menu: the hamburger opens the same menu as a panel under the header bar. */
-(function(){var h=document.querySelector(".mm-header"),b=h&&h.querySelector(".mm-burger");if(!b)return;b.addEventListener("click",function(){var o=h.classList.toggle("is-open");b.setAttribute("aria-expanded",o?"true":"false");b.setAttribute("aria-label",o?"Close menu":"Open menu");});document.addEventListener("keydown",function(e){if(e.key==="Escape"&&h.classList.contains("is-open")){h.classList.remove("is-open");b.setAttribute("aria-expanded","false");b.focus();}});})();
-</script>
-<footer class="mm-footer">
-  <div class="mm-footer-bar">
-    <a class="mm-f-logo" href="https://www.mismo.org/home"><svg class="mm-f-mark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></a>
-    <div class="mm-f-addr">1919 M Street NW, 5th Floor, Washington, DC 20036<svg class="mm-f-env" viewBox="0 0 20 16" aria-hidden="true"><rect x="1" y="1.5" width="18" height="13" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M1.8 3l8.2 6 8.2-6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><a href="mailto:info@mismo.org">info@mismo.org</a></div>
-    <div class="mm-f-links"><span>Privacy Policy</span><span>Terms of Use</span></div>
-    <div class="mm-f-social"><a class="mm-f-soc" href="https://www.linkedin.com/company/mismo-mortgage-industry-standards-maintenance-organization" aria-label="MISMO on LinkedIn"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="9.5" width="3" height="11" rx="1" fill="currentColor"/><circle cx="5" cy="5.6" r="1.9" fill="currentColor"/><path d="M10 20.5v-11h3v1.5a3.7 3.7 0 0 1 3.2-1.7c2.4 0 3.8 1.6 3.8 4.4v6.8h-3v-6.3c0-1.6-.6-2.5-2-2.5s-2 .9-2 2.5v6.3z" fill="currentColor"/></svg></a><a class="mm-f-soc" href="https://www.youtube.com/channel/UCuKIkeqACTIU7j0eL_igPHA" aria-label="MISMO on YouTube"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="3.6" fill="currentColor"/><path d="M10.2 9.4l5.4 2.6-5.4 2.6z" fill="#f4f7f9"/></svg></a></div>
-  </div>
-</footer>
-
-<script>/* Log In returns to this exact page (keeps any code in the address) */(function(){var a=document.querySelectorAll('a.mm-login');if(!a.length)return;var u='https://www.mismo.org/signed-in?to='+encodeURIComponent(location.href.split('#')[0]);var h='https://www.mismo.org/HigherLogic/Security/OAUTH/SignIn.aspx?ReturnUrl='+encodeURIComponent(u);for(var i=0;i<a.length;i++)a[i].setAttribute('href',h);})();</script>
+<script src="renewal.js"></script>
 </body>
 </html>
