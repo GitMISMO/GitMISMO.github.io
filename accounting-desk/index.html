@@ -548,19 +548,10 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* ================= Receivables ================= */
   var AS = { status: null, q: "" };
   function lastNote(r) { var t = (r.mismoNote || r.mismoNoteOnFile || "").split(/\n+/).filter(Boolean); return t[0] || ""; }
-  function followUp(a) {
-    var none = {}; (a.noPayment || []).forEach(function (k) { none[k] = 1; });
-    return a.items.filter(function (r) { return r.status === "Open" || r.status === "Bad Debt" || none[r.key]; }).map(function (r) {
-      var why = r.status === "Bad Debt" ? "Bad debt, kept out of what is still owed" : none[r.key] ? "The aging calls it " + r.status + ", but no Aptify payment carries the order (often MBA ACH or a credit memo)" :
-        r.age != null && r.age > 60 ? "Still open " + r.age + " days on, with no payment" : "Still open";
-      return Object.assign({ why: why }, r);
-    });
-  }
   function drawAr(listOnly) {
     var a = D.ar || { items: [] };
     var items = a.items || [];
     if (AS.status === null) AS.status = items.some(function (r) { return r.status === "Open"; }) ? "Open" : "";
-    var fu = followUp(a);
     var shown = items.filter(function (r) { return (!AS.status || r.status === AS.status) && has(r, AS.q, ["company", "order", "description", "accountingNote", "mismoNote", "mismoNoteOnFile"]); })
       .sort(function (x, y) { return String(y.invoicedOn).localeCompare(String(x.invoicedOn)); });
     var tone = function (s) { return s === "Paid" || s === "Complete" ? " good" : s === "Open" ? " warn" : s === "Bad Debt" ? " bad" : ""; };
@@ -577,22 +568,17 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     drawWith("ar", listOnly, function () {
       var received = items.filter(function (r) { return r.status === "Paid" || r.status === "Complete"; });
       var bad = items.filter(function (r) { return r.status === "Bad Debt"; });
-      $("v-ar").innerHTML = hero("For Accounting", "Receivables", "Your AR aging as MISMO reads it. Every morning MISMO checks each item against the Aptify payments: an item paid since your report shows as Paid, and anything still open, unpaid after 60 days or settled with no payment behind it goes to MISMO to follow up. You no longer need to add items to a shared sheet.", "",
+      $("v-ar").innerHTML = hero("For Accounting", "Receivables", "Your AR aging as MISMO reads it. Every morning MISMO checks each item against the Aptify payments, so an item paid since your report shows as Paid. You no longer need to add items to a shared sheet.", "",
         tile("Still Owed to MISMO", usd(a.owedTotal, 1), items.filter(function (r) { return r.status === "Open"; }).length + " open") +
         tile("Over 90 Days", usd(a.owedOver90 && a.owedOver90.amount, 1), (a.owedOver90 && a.owedOver90.count || 0) + " of what is owed") +
         tile("Received", usd(sum(received, function (r) { return r.amount; }), 1), received.length + " paid or complete") +
         tile("Bad Debt", usd(sum(bad, function (r) { return r.amount; }), 1), bad.length + " kept out of what is owed") +
         tile("Newest AR Aging", day(a.reportDate), a.count + " items on file")) +
-        '<div class="bar"><h2>Being Followed Up by MISMO</h2></div><div class="card" id="ar-fu"></div>' +
         '<div class="bar"><h2>Every Receivable</h2>' +
         select("ar-status", "Status", [["", "Every Status"], ["Open", "Open"], ["Paid", "Paid"], ["Complete", "Complete"], ["Canceled", "Canceled"], ["Bad Debt", "Bad Debt"]], AS.status) +
         findBox("ar-q", "Company, order or note", AS.q) + '<button class="btn" type="button" id="ar-dl">Download for Excel</button></div>' +
         '<div class="card" id="ar-list"></div><p class="note">The newest AR aging on file is dated ' + esc(day(a.reportDate)) + ". A newer aging sent to Jonna is loaded into MISMO Money and shows here the next morning.</p>" +
         '<p class="stamp">' + esc(stamp(a.writtenAt)) + "</p>";
-      list($("ar-fu"), { key: "arfu", rows: fu, open: arOpen, none: "Nothing is being followed up right now: every receivable on file is paid, complete or canceled.",
-        cols: [{ h: "Company", cell: function (r) { return "<b>" + esc(r.company) + "</b>"; } }, { h: "Order", cls: "nw", cell: function (r) { return esc(r.order); } },
-          { h: "Amount", num: 1, cell: function (r) { return usd(r.amount); } }, { h: "Why", cell: function (r) { return esc(r.why); } },
-          { h: "MISMO's Latest Note", cls: "clip", cell: function (r) { return esc(lastNote(r)); } }] });
       $("ar-status").addEventListener("change", function () { AS.status = this.value; resetPage("ar"); drawAr(); });
       wireFind("ar-q", AS, "ar", drawAr);
       $("ar-dl").addEventListener("click", function () {
@@ -695,7 +681,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
       "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid.</p>" +
       "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
-      "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. Anything still open, unpaid after 60 days, or called paid with no Aptify payment behind it goes to MISMO&rsquo;s own follow-up list, and shows here under Being Followed Up by MISMO with MISMO&rsquo;s notes. You no longer need to add items to a shared sheet; just keep sending the monthly AR aging.</p>" +
+      "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. You no longer need to add items to a shared sheet; just keep sending the monthly AR aging.</p>" +
       "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each. Pick a month or a year, or choose All Time and search.</p>" +
       "<h2>IIF Payments</h2><p>Every Innovation Investment Fee payment, by fiscal year or month, with Member 360&rsquo;s count of lenders paid in full and partly paid.</p>" +
       "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
