@@ -138,10 +138,7 @@
         if (pq) return { role: 'imawg', text: pq.status === 'carried' ? 'Carried to the next AWG call' : (t.stage === 'awg' ? 'On the AWG agenda' : 'With the IM reviewers' + (pq.rows && pq.done ? ': ' + pq.done + ' of ' + pq.rows + ' rows decided' : '')) };
         return { role: 'imawg', text: sub === 'in-review' ? nm + ' is reviewing' : t.stage === 'im' ? 'Run the IM Pre-Review and send it to IM Review' : 'Waiting for ' + nm + ' Review' };
       }
-      case 'designation':
-        if (sub === 'vps') return { role: 'vps', text: t.designation && t.designation.auto ? 'Approve the recommended designation' : 'Approve the Director’s designation' };
-        if (sub === 'director' || sub === 'discuss') return { role: 'director', text: sub === 'discuss' ? 'Talk it over and update the designation' : 'Recommend the designation' };
-        return { role: 'vps', text: 'Approve the recommended designation' };
+      case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
       case 'comment': return sub === 'setup' ? { role: 'website', text: 'Post to the standards page and set the dates' } : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
       case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
@@ -255,6 +252,14 @@
       if (ym.length) S.push({ key: 'yourMove', title: 'Your Move', note: ym.length + ' waiting on you', tone: 'warn',
         rows: ym.map(function (x) { var a = stageAge(x[0], today); return row(x[0], stageName(P, x[0].stage) + ': ' + x[1], a != null ? ageTxt(a) + ' at this stage' : '', pastTarget(x[0], today) ? 'bad' : (a != null && a > cfg.staleDays ? 'warn' : '')); }) });
     }
+    /* the Website Admin: Resource Library entries to make for files posted for comment (instead of an email each, Nov 20) */
+    var webP = ((input.people && input.people.roles && input.people.roles.website) || []).some(function (p) { return p && same(p.name, person.name); });
+    if (webP) {
+      var rl = T.filter(function (t) { return t.state === 'active' && !t.rides && ['comment', 'post'].indexOf(t.stage) >= 0 && t.cpFile && t.cpFile.url && !(t.links && t.links.resourceLibrary); });
+      count.todo += rl.length;
+      if (rl.length) S.unshift({ key: 'rlEntry', title: 'Resource Library Entries to Make', tone: 'warn', note: 'Make the entry with the file for comment, then put its link in the MMS (Links tab).',
+        rows: rl.map(function (t) { return row(t, 'File for comment: ' + (t.cpFile.name || 'chosen'), t.dates && t.dates.commentEnd ? 'Ends ' + f(t.dates.commentEnd) : '', 'warn'); }) });
+    }
     var late = act.filter(function (t) { return pastTarget(t, today); });
     count.late = late.length;
     if (on.overdue && late.length) S.push({ key: 'overdue', title: 'Past Target', tone: 'bad', note: 'Past the Target to Submit to IM date. Submit it, or open it and choose Change Target Date.',
@@ -344,22 +349,31 @@
   };
 
   D.build = function (input) {
-    var cfg = D.settings(input.settings), people = (input.people && input.people.facilitators) || [];
-    return people.filter(function (p) { return p && p.name && !cfg.skip[p.name]; }).map(function (p) {
-      var m = D.forPerson(input, p); m.to = p.email ? [p.email] : []; m.cc = (cfg.cc || []).filter(Boolean); return m;
+    var cfg = D.settings(input.settings), P = input.people || {}, R = P.roles || {};
+    /* facilitators, plus anyone Settings › Daily Digest gives the digest instead of individual emails (Nov 20) */
+    var pool = (P.facilitators || []).concat(R.staff || []); Object.keys(R).forEach(function (k) { if (k !== 'staff') pool = pool.concat(R[k] || []); });
+    var listed = function (L, p) { return (L || []).some(function (n) { return same(n, p.name); }); };
+    var seen = {}, people = pool.filter(function (p) {
+      if (!p || !p.name) return false; var k = String(p.name).toLowerCase(); if (seen[k]) return false;
+      var fac = (P.facilitators || []).indexOf(p) >= 0; if (!fac && !listed(cfg.digestOnly, p)) return false; seen[k] = 1; return true; });
+    /* access only: no MMS emails at all, not even a copy */
+    var noEm = pool.filter(function (p) { return p && listed(cfg.noMail, p); }).map(function (p) { return String(p.email || '').toLowerCase(); });
+    return people.filter(function (p) { return !cfg.skip[p.name] && !listed(cfg.noMail, p); }).map(function (p) {
+      var m = D.forPerson(input, p); m.to = p.email ? [p.email] : []; m.cc = (cfg.cc || []).filter(function (e) { return e && noEm.indexOf(String(e).toLowerCase()) < 0; }); return m;
     });
   };
   D.isSendDay = function (settings, now) { var cfg = D.settings(settings), n = et(now || new Date()); return (cfg.days || []).indexOf(n.dow) >= 0; };
 
   /* ---------- the email itself: email-safe tables, MISMO navy and sky ---------- */
   var TONE = { bad: ['#b3372c', '#fbe9e7'], warn: ['#8a5d0f', '#fbf1dc'], info: ['#1f5f93', '#e4f2fb'], good: ['#0f7b5c', '#e3f4ed'], '': ['#456179', '#eef3f7'] };
+  /* a plain, squared button that looks the same in Outlook (padding on the cell, not the link) */
   function btn(href, label, big) {
-    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:' + (big ? '22px 0 6px' : '10px 0 2px') + '"><tr><td bgcolor="#0d314c" style="border-radius:6px;background:#0d314c">' +
-      '<a href="' + esc(href) + '" target="_blank" style="display:inline-block;padding:' + (big ? '13px 26px' : '8px 16px') + ';font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '15px' : '13px') + ';font-weight:700;color:#ffffff;text-decoration:none;border-radius:6px;border-bottom:3px solid #74bfeb">' + esc(label) + ' &rarr;</a></td></tr></table>';
+    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:' + (big ? '20px 0 6px' : '10px 0 2px') + '"><tr><td bgcolor="#eef6fc" style="background:#eef6fc;border:1px solid #9fc9e6;border-radius:4px;padding:' + (big ? '8px 16px' : '6px 12px') + '">' +
+      '<a href="' + esc(href) + '" target="_blank" style="display:block;font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '14px' : '13px') + ';line-height:20px;font-weight:600;color:#0d314c;text-decoration:none">' + esc(label) + '&nbsp;&nbsp;&rsaquo;</a></td></tr></table>';
   }
   /* The email: what needs them first, then what is good to know. Short rows, a few per section,
      and a link to the rest in the MMS, so it reads in under a minute. */
-  var ACT_KEYS = { yourMove: 1, overdue: 1, targetUpdate: 1, attendance: 1, comments: 1, hours: 1, wkOverdue: 1 };
+  var ACT_KEYS = { rlEntry: 1, yourMove: 1, overdue: 1, targetUpdate: 1, attendance: 1, comments: 1, hours: 1, wkOverdue: 1 };
   D.html = function (o) {
     var F = "font-family:'IBM Plex Sans',Arial,Helvetica,sans-serif;";
     var all = o.sections || [], act = all.filter(function (s) { return ACT_KEYS[s.key]; }), info = all.filter(function (s) { return !ACT_KEYS[s.key]; });

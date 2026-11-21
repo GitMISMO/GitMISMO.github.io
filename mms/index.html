@@ -2096,7 +2096,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-20T23:43:23Z',fp:'4cd38d47'};
+window.__mmsBuild={at:'2026-11-21T01:45:17Z',fp:'96bf174b'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2174,7 +2174,7 @@ const atDay=iso=>{ if(!iso) return ''; if(/^\d{4}-\d{2}-\d{2}$/.test(iso)) retur
 const ago=s=>{ const n=daysBetween(s,today()); if(n==null) return ''; if(n<=0) return 'today'; if(n===1) return '1 day'; return n+' days'; };
 
 /* ---------- people & roles ---------- */
-const ROLE_LABEL={facilitator:'Facilitator',staff:'MISMO Staff',media:'MISMO Media',imawg:'IM and AWG Chairs',director:'Director',vps:'Designation Approver',gov:'Governance',website:'Website Admin',pm:'Program Manager',architect:'Architect',workgroup:'Workgroup',bet:'BET'};
+const ROLE_LABEL={facilitator:'Facilitator',staff:'MISMO Staff',media:'MISMO Media',imawg:'IM and AWG Chairs',director:'Director',vps:'License Designator',gov:'Governance',website:'Website Admin',pm:'Program Manager',architect:'Architect',workgroup:'Workgroup',bet:'BET'};
 const DEFAULT_PEOPLE={
   facilitators:[
     {name:'Erin Bittenbender',email:'ebittenbender@mismo.org'},
@@ -2206,7 +2206,7 @@ function baseStages(gov){ return [
   {key:'aireview',name:'AI Review',owner:'facilitator',color:'#1baf7a',on:true,desc:'Editor and readiness review in one: Claude checks the submission and lists anything to fix before IM.'},
   {key:'im',name:'IM Review',owner:'imawg',color:'#14486e',on:true,desc:'Information Management reviews the submission.'},
   {key:'awg',name:'AWG Review',owner:'imawg',color:'#2f6688',on:true,desc:'Architecture Workgroup reviews the submission.'},
-  {key:'designation',name:'License Designation',owner:'director',color:'#eda100',on:true,desc:'The MMS recommends the comment type, classification and license from past designations; the Designation Approver approves.'},
+  {key:'designation',name:'License Designation',owner:'director',color:'#eda100',on:true,desc:'The MMS recommends the comment type, classification and license from past designations; the License Designator designates it, and it goes straight to Governance.'},
   {key:'gc-comment',name:'Governance Approval to Comment',owner:'gov',color:'#d55181',on:true,desc:gov+' approves the work product to go out for public comment.'},
   {key:'comment',name:'Comment Period',owner:'website',color:'#008300',on:true,desc:'Posted to the website standards page and announced. Moves on by itself when the period ends.'},
   {key:'post',name:'Post-Comment',owner:'facilitator',color:'#456179',on:true,desc:'The facilitator reports what came back from the comment period.'},
@@ -2330,10 +2330,9 @@ function whoseMove(t){
       const pq=typeof portalItemFor==='function'?portalItemFor(t,t.stage):null; if(pq) return {role:'imawg',label:nm+' Review',text:pq.status==='carried'?'Carried to the next AWG call':(t.stage==='awg'?'On the AWG agenda':'With the IM reviewers'+(pq.rows&&pq.done?': '+pq.done+' of '+pq.rows+' rows decided':''))};
       return {role:'imawg',label:'IM and AWG',text:sub==='in-review'?nm+' is reviewing':t.stage==='im'?'Run the IM Pre-Review and send it to IM Review':'Waiting for '+nm+' Review'};
     }
-    case 'designation':
-      if(sub==='vps'){ const ap=peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'Designation Approval'; return {role:'vps',label:ap,text:t.designation&&t.designation.auto?'Approve the recommended designation':'Approve the Director’s designation'}; }
-      if(sub==='director'||sub==='discuss') return {role:'director',label:'Director',text:sub==='discuss'?'Talk it over and update the designation':'Recommend the designation'};
-      return {role:'vps',label:peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'Designation Approver',text:'Approve the recommended designation'};
+    case 'designation': { /* the License Designator designates; nothing waits for a second approval (Jonna, Nov 20) */
+      const ld=peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'License Designator';
+      return {role:'vps',label:ld,text:t.designation&&(t.designation.auto||t.designation.recommended)?'Designate the license (the MMS has a recommendation)':'Designate the license'}; }
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
     case 'comment': return sub==='setup'?{role:'website',label:'Website Admin',text:'Post to the standards page and set the dates'}:(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
     case 'post': return {role:'facilitator',label:'Facilitator',text:'Report what came back from comment'};
@@ -2437,7 +2436,7 @@ function onEnter(t,to){
   if(to==='aireview'){ t.dates.aiSubmitted=today(); }
   if(to==='im'){ t.dates.imSubmitted=t.dates.imSubmitted||today(); t.im=t.im||{}; if(!t.sub) t.sub='new'; }
   if(to==='awg'){ t.dates.awgSubmitted=t.dates.awgSubmitted||today(); t.awg=t.awg||{}; if(!t.sub) t.sub='new'; }
-  /* AWG approved: the designation is recommended automatically and goes to the Designation Approver */
+  /* AWG approved: the designation is recommended automatically and goes to the License Designator */
   if(to==='designation' && (!t.sub||t.sub==='prep')){ if(typeof withAutoDesignation==='function'&&!(t.designation&&t.designation.auto)) withAutoDesignation(t); t.sub='vps'; }
   if(to==='cfp'){ mediaRequest(t,'Call for Participation','Draft and publish the Call for Participation for '+t.name+'.'); }
   if(to==='comment'){
@@ -2615,8 +2614,8 @@ function stateChip(t){
 function keepLast(n){ return esc(n).replace(/ (\S{1,3})$/,'&nbsp;$1'); }
 function stageChip(t){ const s=stageDef(t.stage); return '<span class="chip stg" style="background:color-mix(in srgb,'+s.color+' 16%,transparent);color:var(--ink)"><span class="dot" style="background:'+s.color+'"></span>'+esc(s.name)+'</span>'; }
 function subChip(t){
-  const m={updates:['Updates Needed','warn'],resubmitted:['Resubmitted','info'],'in-review':['In Review','info'],new:['Waiting','info'],reviewed:['Reviewed','good'],setup:['Being Set Up','warn'],prep:['For Approval','info'],vps:['For Approval','info'],director:['With Director','info'],discuss:['Needs Discussion','warn'],published:['Published','good']};
-  const x=m[t.sub]; return x?'<span class="chip '+x[1]+'">'+x[0]+'</span>':'';
+  const m={updates:['Updates Needed','warn'],resubmitted:['Resubmitted','info'],'in-review':['In Review','info'],new:['Waiting','info'],reviewed:['Reviewed','good'],setup:['Being Set Up','warn'],prep:['For Approval','info'],vps:['To Designate','info'],director:['With Director','info'],discuss:['Needs Discussion','warn'],published:['Published','good']};
+  const x=t.stage==='designation'&&t.state==='active'?['To Designate','info']:m[t.sub]; return x?'<span class="chip '+x[1]+'">'+x[0]+'</span>':'';
 }
 const sizeTag=t=>t.size?'<span class="size" title="Size: '+esc(typeof sizeLabel==='function'?sizeLabel(t):t.size)+'">'+esc(t.size)+'</span>':'';
 function miniTrack(t){ const list=stages(); const i=list.findIndex(s=>s.key===t.stage); return '<div class="mini-track">'+list.map((s,j)=>'<i class="'+(t.state==='published'||j<i?'done':(j===i?'cur':''))+'" title="'+esc(s.name)+'"></i>').join('')+'</div>'; }
@@ -2730,7 +2729,7 @@ function stageActions(t){
   if(t.state==='hold'){ add('Resume Work',()=>resume(t),'pri'); return A; }
   if(t.state!=='active'){ add('Reopen',()=>reopen(t),'pri'); if(t.stage==='published'&&S.canWrite&&S.isStaff&&typeof wpResend==='function') A.push({label:(t.wp&&t.wp.queuedAt)?'Update on the Website':'Put on the Website',fn:()=>wpResend(t),cls:'ghost'}); return A; }
   if(t.split){ add('+ Add a Deliverable',()=>splitT(t),'pri'); return A; }
-  if(t.rides){ const b=S.tickets[t.rides]; if(t.stage==='designation') add('Approve Recommended Designation',()=>approveRec(t),'pri'); add('Open '+(b?b.wr:'the Release'),()=>openPanel(t.rides)); add('Stop Riding: Move on Its Own',()=>unride(t)); return A; }
+  if(t.rides){ const b=S.tickets[t.rides]; if(t.stage==='designation') add('Designate as Recommended',()=>approveRec(t),'pri'); add('Open '+(b?b.wr:'the Release'),()=>openPanel(t.rides)); add('Stop Riding: Move on Its Own',()=>unride(t)); return A; }
   switch(t.stage){
     case 'approved': add('Start Work →',()=>startWork(t),'pri'); break;
     case 'cfp': add('Call for Participation Published →',()=>cfpDone(t),'pri'); break;
@@ -2755,8 +2754,7 @@ function stageActions(t){
       add('Not Required: Skip',()=>move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)'})},text:nm+' review not required; skipped'}),'ghost');
       break; }
     case 'designation':
-      if(sub==='director'||sub==='discuss'||sub==='prep'||!sub){ add('Approve Recommended Designation →',()=>approveRec(t),'pri'); add('Change the Designation',()=>directorRec(t)); }
-      if(sub==='vps'){ add('Approve the Designation',()=>vpAgree(t),'pri'); if(S.isStaff||isRole('director',S.me)) add('Change the Designation',()=>directorRec(t)); }
+      if(S.isStaff||isRole('vps',S.me)||isRole('director',S.me)){ add('Designate as Recommended →',()=>approveRec(t),'pri'); add('Change the Designation',()=>directorRec(t)); }
       break;
     case 'gc-comment': add('Record '+g+' Decision',()=>decide(t),'pri'); break;
     case 'comment':
@@ -2899,16 +2897,19 @@ async function toDesignation(t){
 }
 async function directorRec(t){
   const ds=t.designation||{};
-  const v=await modal({title:'Recommend Designation',ok:'Send for Approval',body:
+  const v=await modal({title:'License Designation',ok:'Designate',body:
     fld('Comment Type',radios('type',['Public','Member'],ds.type||'Public'))+fld('Product Classification',radios('cls',['Standard','Collateral'],t.classification||'Standard'))+
     fld('License Usage',radios('lic',['Commercial Distributor','Non Commercial Distributor','Internal Use Only','Copyright'],ds.license||''),typeof licHint==='function'?licHint():'')+
     fld('Royalty Status',sel('roy',['','Public for Free','Available to PUBLIC for FREE with COMMERCIAL USAGE LICENSE','Members Only for Free','Public for a Fee','Royalty Temp Waived'],ds.royalty))+
     fld('Available To',radios('avail',['Public','Members Only'],ds.availableTo||'Public'))+fld('Notes',ta('note',ds.notes||''))});
   if(!v) return; const x=clone(t); x.classification=v.cls; x.designation=Object.assign({},ds,{type:v.type,license:v.lic,royalty:v.roy,availableTo:v.avail,notes:v.note,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
-  await setSub(x,'vps','Director recommended: '+[v.type,v.cls,v.lic,v.avail].filter(Boolean).join(', '));
-  queueMail({to:peopleFor('vps').map(p=>p.email),subject:t.wr+' '+t.name+': designation ready for your approval',body:'Recommended designation: '+[v.type,v.cls,v.lic,v.roy,v.avail].filter(Boolean).join(' · ')+'.\n\nApprove it or ask to discuss it in the MMS.',ticket:t.id,kind:'stage',key:t.id+'-vps-'+today()});
+  /* the License Designator's designation is the decision: no second approval; it goes straight to Governance */
+  x.designation.status='3. Approved'; x.designation.by=S.me.name||''; x.designation.at=today();
+  if(t.stage!=='designation'||t.rides){ hist(x,'Designation changed: '+[v.type,v.cls,v.lic,v.roy,v.avail].filter(Boolean).join(', ')); await saveTicket(x,'Designation saved',clone(t)); return; }
+  await move(x,nextStage(x),{text:'Designated by '+(S.me.name||'the License Designator')+': '+[v.type,v.cls,v.lic,v.roy,v.avail].filter(Boolean).join(', ')+'; added to the '+govName()+' agenda'});
 }
-async function vpAgree(t){
+async function vpAgree(t){ return directorRec(t); }
+async function vpAgreeOld(t){
   const vps=peopleFor('vps'); const cur=(t.designation&&t.designation.vps)||{};
   const body=vps.map((p,i)=>fld(p.name,radios('v'+i,['Approve','Needs Discussion','Not Yet'],((cur[p.name]&&cur[p.name].vote)==='Agree'?'Approve':(cur[p.name]&&cur[p.name].vote))||(sameName(p.name,S.me.name)?'Approve':'Not Yet'))+'<input name="n'+i+'" placeholder="Note (optional)" style="margin-top:6px" value="'+esc((cur[p.name]&&cur[p.name].note)||'')+'">')).join('');
   const v=await modal({title:'Approve the Designation',ok:'Save',body:(t.designation&&t.designation.auto?'<p class="muted">Recommended automatically: '+esc([t.designation.type,t.classification,t.designation.license,t.designation.royalty,t.designation.availableTo].filter(Boolean).join(' · '))+(t.designation.basis?' (from '+esc(t.designation.basis)+')':'')+'.</p>':'')+(body||'<p>Add the designation approver in Settings, People and Roles.</p>')});
@@ -3086,8 +3087,9 @@ async function approveRec(t){
   x.dates=Object.assign({},x.dates,{designation:today()});
   if(t.rides){ hist(x,'Approved the recommended designation: '+[r.classification,r.type,r.license,r.availableTo].join(', ')); await saveTicket(x,'Designation approved',clone(t)); return; }
   /* when the approver is the person approving it here, one click does it: no second approval of their own designation */
-  const ap=peopleFor('vps'); if(ap.length&&ap.every(p=>sameName(p.name,S.me.name))){ x.designation.vps={[ap[0].name]:{vote:'Approve',note:'',at:today()}}; x.designation.status='3. Approved';
-    await move(x,nextStage(x),{text:'Designation approved by '+ap[0].name+': '+[r.classification,r.type,r.license,r.availableTo].join(', ')+'; added to the '+govName()+' agenda'}); return; }
+  /* the License Designator's designation is the decision: one click, straight to Governance (Jonna, Nov 20) */
+  { x.designation.status='3. Approved'; x.designation.by=S.me.name||''; x.designation.at=today();
+    await move(x,nextStage(x),{text:'Designated by '+(S.me.name||'the License Designator')+' as recommended: '+[r.classification,r.type,r.license,r.royalty,r.availableTo].filter(Boolean).join(', ')+'; added to the '+govName()+' agenda'}); return; }
   await setSub(x,'vps','Director approved the recommended designation: '+[r.classification,r.type,r.license,r.availableTo].join(', '));
   queueMail({to:peopleFor('vps').map(p=>p.email),subject:t.wr+' '+t.name+': designation ready for your agreement',body:'The Director approved: '+[r.classification,r.type,r.license,r.royalty,r.availableTo].join(' · ')+'.\n\nAgree or ask to discuss in the MMS.',ticket:t.id,kind:'stage',key:t.id+'-vps-'+today()});
 }
@@ -3530,10 +3532,7 @@ function wireArch(m){
         if (pq) return { role: 'imawg', text: pq.status === 'carried' ? 'Carried to the next AWG call' : (t.stage === 'awg' ? 'On the AWG agenda' : 'With the IM reviewers' + (pq.rows && pq.done ? ': ' + pq.done + ' of ' + pq.rows + ' rows decided' : '')) };
         return { role: 'imawg', text: sub === 'in-review' ? nm + ' is reviewing' : t.stage === 'im' ? 'Run the IM Pre-Review and send it to IM Review' : 'Waiting for ' + nm + ' Review' };
       }
-      case 'designation':
-        if (sub === 'vps') return { role: 'vps', text: t.designation && t.designation.auto ? 'Approve the recommended designation' : 'Approve the Director’s designation' };
-        if (sub === 'director' || sub === 'discuss') return { role: 'director', text: sub === 'discuss' ? 'Talk it over and update the designation' : 'Recommend the designation' };
-        return { role: 'vps', text: 'Approve the recommended designation' };
+      case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
       case 'comment': return sub === 'setup' ? { role: 'website', text: 'Post to the standards page and set the dates' } : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
       case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
@@ -3647,6 +3646,14 @@ function wireArch(m){
       if (ym.length) S.push({ key: 'yourMove', title: 'Your Move', note: ym.length + ' waiting on you', tone: 'warn',
         rows: ym.map(function (x) { var a = stageAge(x[0], today); return row(x[0], stageName(P, x[0].stage) + ': ' + x[1], a != null ? ageTxt(a) + ' at this stage' : '', pastTarget(x[0], today) ? 'bad' : (a != null && a > cfg.staleDays ? 'warn' : '')); }) });
     }
+    /* the Website Admin: Resource Library entries to make for files posted for comment (instead of an email each, Nov 20) */
+    var webP = ((input.people && input.people.roles && input.people.roles.website) || []).some(function (p) { return p && same(p.name, person.name); });
+    if (webP) {
+      var rl = T.filter(function (t) { return t.state === 'active' && !t.rides && ['comment', 'post'].indexOf(t.stage) >= 0 && t.cpFile && t.cpFile.url && !(t.links && t.links.resourceLibrary); });
+      count.todo += rl.length;
+      if (rl.length) S.unshift({ key: 'rlEntry', title: 'Resource Library Entries to Make', tone: 'warn', note: 'Make the entry with the file for comment, then put its link in the MMS (Links tab).',
+        rows: rl.map(function (t) { return row(t, 'File for comment: ' + (t.cpFile.name || 'chosen'), t.dates && t.dates.commentEnd ? 'Ends ' + f(t.dates.commentEnd) : '', 'warn'); }) });
+    }
     var late = act.filter(function (t) { return pastTarget(t, today); });
     count.late = late.length;
     if (on.overdue && late.length) S.push({ key: 'overdue', title: 'Past Target', tone: 'bad', note: 'Past the Target to Submit to IM date. Submit it, or open it and choose Change Target Date.',
@@ -3736,22 +3743,31 @@ function wireArch(m){
   };
 
   D.build = function (input) {
-    var cfg = D.settings(input.settings), people = (input.people && input.people.facilitators) || [];
-    return people.filter(function (p) { return p && p.name && !cfg.skip[p.name]; }).map(function (p) {
-      var m = D.forPerson(input, p); m.to = p.email ? [p.email] : []; m.cc = (cfg.cc || []).filter(Boolean); return m;
+    var cfg = D.settings(input.settings), P = input.people || {}, R = P.roles || {};
+    /* facilitators, plus anyone Settings › Daily Digest gives the digest instead of individual emails (Nov 20) */
+    var pool = (P.facilitators || []).concat(R.staff || []); Object.keys(R).forEach(function (k) { if (k !== 'staff') pool = pool.concat(R[k] || []); });
+    var listed = function (L, p) { return (L || []).some(function (n) { return same(n, p.name); }); };
+    var seen = {}, people = pool.filter(function (p) {
+      if (!p || !p.name) return false; var k = String(p.name).toLowerCase(); if (seen[k]) return false;
+      var fac = (P.facilitators || []).indexOf(p) >= 0; if (!fac && !listed(cfg.digestOnly, p)) return false; seen[k] = 1; return true; });
+    /* access only: no MMS emails at all, not even a copy */
+    var noEm = pool.filter(function (p) { return p && listed(cfg.noMail, p); }).map(function (p) { return String(p.email || '').toLowerCase(); });
+    return people.filter(function (p) { return !cfg.skip[p.name] && !listed(cfg.noMail, p); }).map(function (p) {
+      var m = D.forPerson(input, p); m.to = p.email ? [p.email] : []; m.cc = (cfg.cc || []).filter(function (e) { return e && noEm.indexOf(String(e).toLowerCase()) < 0; }); return m;
     });
   };
   D.isSendDay = function (settings, now) { var cfg = D.settings(settings), n = et(now || new Date()); return (cfg.days || []).indexOf(n.dow) >= 0; };
 
   /* ---------- the email itself: email-safe tables, MISMO navy and sky ---------- */
   var TONE = { bad: ['#b3372c', '#fbe9e7'], warn: ['#8a5d0f', '#fbf1dc'], info: ['#1f5f93', '#e4f2fb'], good: ['#0f7b5c', '#e3f4ed'], '': ['#456179', '#eef3f7'] };
+  /* a plain, squared button that looks the same in Outlook (padding on the cell, not the link) */
   function btn(href, label, big) {
-    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:' + (big ? '22px 0 6px' : '10px 0 2px') + '"><tr><td bgcolor="#0d314c" style="border-radius:6px;background:#0d314c">' +
-      '<a href="' + esc(href) + '" target="_blank" style="display:inline-block;padding:' + (big ? '13px 26px' : '8px 16px') + ';font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '15px' : '13px') + ';font-weight:700;color:#ffffff;text-decoration:none;border-radius:6px;border-bottom:3px solid #74bfeb">' + esc(label) + ' &rarr;</a></td></tr></table>';
+    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:' + (big ? '20px 0 6px' : '10px 0 2px') + '"><tr><td bgcolor="#eef6fc" style="background:#eef6fc;border:1px solid #9fc9e6;border-radius:4px;padding:' + (big ? '8px 16px' : '6px 12px') + '">' +
+      '<a href="' + esc(href) + '" target="_blank" style="display:block;font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '14px' : '13px') + ';line-height:20px;font-weight:600;color:#0d314c;text-decoration:none">' + esc(label) + '&nbsp;&nbsp;&rsaquo;</a></td></tr></table>';
   }
   /* The email: what needs them first, then what is good to know. Short rows, a few per section,
      and a link to the rest in the MMS, so it reads in under a minute. */
-  var ACT_KEYS = { yourMove: 1, overdue: 1, targetUpdate: 1, attendance: 1, comments: 1, hours: 1, wkOverdue: 1 };
+  var ACT_KEYS = { rlEntry: 1, yourMove: 1, overdue: 1, targetUpdate: 1, attendance: 1, comments: 1, hours: 1, wkOverdue: 1 };
   D.html = function (o) {
     var F = "font-family:'IBM Plex Sans',Arial,Helvetica,sans-serif;";
     var all = o.sections || [], act = all.filter(function (s) { return ACT_KEYS[s.key]; }), info = all.filter(function (s) { return !ACT_KEYS[s.key]; });
@@ -4391,7 +4407,7 @@ function digestSettingsHtml(){
 function previewDate(as){ const d=new Date(); const want=as==='fri'?5:as==='mon'?1:null; if(want==null) return d; while(d.getDay()!==want) d.setDate(d.getDate()+1); d.setHours(17,30,0,0); return d; }
 async function paintPreview(m){
   const fr=$('#dgframe',m), meta=$('#dgmeta',m); if(!fr) return;
-  const src=await loadDigestSources(); const who=($('#dgwho',m)||{}).value; const p=(S.people.facilitators||[]).find(x=>x.name===who); if(!p){ meta.textContent='Add facilitators in People and Roles to preview the digest.'; return; }
+  const src=await loadDigestSources(); const who=($('#dgwho',m)||{}).value; const p=(S.people.facilitators||[]).find(x=>x.name===who)||(typeof dgoAll==='function'?dgoAll().find(x=>x.name===who):null); if(!p){ meta.textContent='Add facilitators in People and Roles to preview the digest.'; return; }
   const one=MMSDigest.forPerson(digestInput(src,previewDate(S.dgPrev.as)),p);
   fr.srcdoc=one.html; meta.innerHTML='<b>To</b> '+esc(p.email||'(no email on file)')+' · <b>CC</b> '+esc((MMSDigest.settings(S.digestCfg).cc||[]).join(', '))+'<br><b>Subject</b> '+esc(one.subject)+(one.empty&&MMSDigest.settings(S.digestCfg).skipEmpty?'<div class="muted" style="margin-top:4px">Nothing needs '+esc(p.name.split(' ')[0])+' on this day, so this email is not sent.</div>':'')+(src.note.length?'<div class="muted" style="margin-top:4px">'+esc(src.note.join(' '))+'</div>':'');
   fr.onload=()=>{ try{ fr.style.height=Math.min(1400,fr.contentDocument.body.scrollHeight+10)+'px'; }catch(e){} };
@@ -6124,7 +6140,7 @@ function desigSetBy(t){ const H=(t.history||[]).filter(h=>/Director recommended|
   return d.auto?'Recommended automatically'+(d.basis?' from '+d.basis:''):''; }
 function desigSection(t){ const d=t.designation||{}, rows=desigRows(t), sub=t.sub||'';
   const vps=peopleFor('vps'), votes=d.vps||{}, approved=/Approved/.test(d.status||'');
-  const state=approved?['good','Approved']:sub==='vps'?['info','Waiting for approval']:sub==='discuss'?['warn','Needs discussion']:d.auto?['info','Recommended automatically']:['', 'Not set yet'];
+  const state=approved?['good','Approved']:sub==='vps'?['info','Ready to designate']:sub==='discuss'?['warn','Needs discussion']:d.auto?['info','Recommended automatically']:['', 'Not set yet'];
   const canChange=S.canWrite&&!S.viewAs&&(S.isStaff||isRole('director',S.me))&&t.stage==='designation';
   return '<div class="psec full desig-sec"><h4>License Designation<span class="chip '+state[0]+'" style="margin-left:6px">'+esc(state[1])+'</span><span class="sp muted" style="font-size:12px;font-weight:500">'+esc(desigSetBy(t))+'</span>'+'</h4>'+
     '<div class="desig-grid">'+rows.map(([k,v])=>'<div class="dg-f'+(v?'':' miss')+'"><label>'+esc(k)+'</label><b>'+esc(v||'Not set')+'</b></div>').join('')+'</div>'+
@@ -6364,7 +6380,7 @@ stagePanel=function(t){ const rows=[], sub=t.sub||'', d=t.dates||{};
   rv('im','IM Review'); rv('awg','AWG Review');
   const ds=t.designation||{}, approved=/Approved/i.test(ds.status||'');
   if(t.stage==='designation'||ds.type||ds.license){
-    const chip=approved?'<span class="chip good">Designated</span>':t.stage==='designation'?(subChip(t)||'<span class="chip info">For Approval</span>'):'<span class="chip">Set</span>';
+    const chip=approved?'<span class="chip good">Designated</span>':t.stage==='designation'?(subChip(t)||'<span class="chip info">To Designate</span>'):'<span class="chip">Set</span>';
     let tiles='<div class="rd-tiles">'+[['Comment Type',ds.type],['Classification',t.classification],['License Usage',ds.license],['Royalty Status',ds.royalty],['Available To',ds.availableTo],['Comment Length',t.commentDays?t.commentDays+' days':'']].map(([l,v])=>'<div class="dg-f'+(v?'':' miss')+'"><label>'+esc(l)+'</label><b>'+esc(v||'Not set')+'</b></div>').join('')+'</div>';
     const deciding=t.stage==='designation'&&!approved; if(typeof hasParts==='function'&&hasParts(t)&&!deciding) tiles=partsTable(t); rows.push(rdRow('License Designation',chip,deciding?'Being decided: see License Designation above':d.designation&&approved?'Designated '+esc(fmtS(d.designation)):'',deciding?'':tiles)); }
   else if(rdPast(t,'designation')) rows.push(rdRow('License Designation',RD_BEFORE,''));
@@ -6974,7 +6990,7 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
   }catch(e){ console.warn('awg sync',e); } finally{ awgSyncing=false; } }
 const _imEnsureQ1=imEnsureQ; imEnsureQ=function(){ _imEnsureQ1(); setTimeout(awgSync,2500); };
 
-/* ---------- after approval: the designation is recommended automatically and goes to the Designation Approver ---------- */
+/* ---------- after approval: the designation is recommended automatically and goes to the License Designator ---------- */
 /* ONE rule for the designation: the same recommend() the recommendation panel and the parts use (by name, kind and
    workgroup); the most common past designation is only the fallback when recommend() isn't there */
 function autoDesignation(t){ if(typeof recommend==='function'){ const r=recommend(t); return {ds:{type:r.type,license:r.license,royalty:r.royalty,availableTo:r.availableTo},cls:r.classification,basis:r.why.replace(/\.$/,'')}; }
@@ -6986,7 +7002,7 @@ function autoDesignation(t){ if(typeof recommend==='function'){ const r=recommen
   return {ds,basis:base.length?base.length+' earlier '+(same.length>=2?(t.workgroup||'')+' ':'')+'work product'+(base.length===1?'':'s'):'MISMO’s usual designation'}; }
 function withAutoDesignation(x){ const a=autoDesignation(x), days=(proc().commentDays||[30]); x.classification=x.classification||a.cls||'Standard'; x.commentDays=x.commentDays||days[0]; x.releasePriority=x.releasePriority||'Medium'; x.productPageName=x.productPageName||x.name;
   x.designation=Object.assign({},x.designation||{},a.ds,{auto:true,basis:a.basis,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
-  return {x,text:'Designation recommended automatically ('+a.basis+'): '+[a.ds.type,x.classification,a.ds.license,a.ds.royalty,a.ds.availableTo].filter(Boolean).join(', ')+'. Sent to '+(((typeof peopleFor==='function'?peopleFor('vps'):[])||[]).map(p=>p.name).filter(Boolean).join(' and ')||'the Designation Approver')+' for approval.'}; }
+  return {x,text:'Designation recommended automatically ('+a.basis+'): '+[a.ds.type,x.classification,a.ds.license,a.ds.royalty,a.ds.availableTo].filter(Boolean).join(', ')+'. Sent to '+(((typeof peopleFor==='function'?peopleFor('vps'):[])||[]).map(p=>p.name).filter(Boolean).join(' and ')||'the License Designator')+' to designate.'}; }
 
 /* ---------- Meeting Trackers → IM Review and AWG Review: the voting roster, the call dates and who was there ----------
    Erin keeps these in Meeting Trackers; the portals only record what was decided. */
@@ -7041,14 +7057,14 @@ const HELP_ROLES=[
   ['staff','MISMO Staff','You set up approved work, keep things moving and run Settings.'],
   ['imawg','IM and AWG Chairs','You chair or facilitate the IM and AWG calls and record what they decided.'],
   ['member','IM and AWG Members','You read submissions before the call and vote on it.'],
-  ['approver','Designation Approver','You approve the license designation after AWG.'],
+  ['approver','License Designator','You set the license designation after AWG; it goes straight to Governance.'],
   ['gov','Governance','Your committee approves kickoff, comment and publishing.'],
   ['media','MISMO Media','You write the Calls for Participation, posts and announcements.'],
   ['pm','Program Manager and Architect','You approve and work Architecture Help requests.'],
   ['website','Website Admin','You post comment periods and releases on mismo.org.']
 ];
 /* the role as it reads after "For" or "Help for" */
-function helpFor(R){ return ({facilitator:'Facilitators',member:'IM and AWG Members',imawg:'IM and AWG Chairs',approver:'the Designation Approver',pm:'the Program Manager and Architect',website:'the Website Admin'})[R[0]]||R[1]; }
+function helpFor(R){ return ({facilitator:'Facilitators',member:'IM and AWG Members',imawg:'IM and AWG Chairs',approver:'the License Designator',pm:'the Program Manager and Architect',website:'the Website Admin'})[R[0]]||R[1]; }
 /* topic: [title, roles ('*' = everyone), lead, steps, tips, links [[label, view or url]]] */
 const HELP_TOPICS={
   start:['The MMS in Two Minutes','*',
@@ -7127,7 +7143,7 @@ const HELP_TOPICS={
      'IM returns it: it goes back to the facilitator as Updates Needed, with IM’s notes.',
      'AWG approves: the MMS recommends a comment type, classification and license from past designations of the same kind, and sends it to Jonna. If the work request has parts, each part gets its own recommendation.',
      'AWG returns it: it goes back to the facilitator, or back to IM if AWG asks for that.',
-     'Jonna approves the designation: it moves on to Governance for approval to comment. The recommendation goes away, and the License Designation section shows what was chosen.'],
+     'Jonna designates it (Designate as Recommended, or Change the Designation): it goes straight to Governance for approval to comment, with no second approval. The recommendation goes away, and the License Designation section shows what was chosen.'],
     ['The facilitator hears about each of these in the daily digest.','The Review Desk shows all four review steps side by side.'],
     [['Open the Review Desk','reviews']]],
   asks:['Dates, Holds and Closing','facilitator staff',
@@ -7263,7 +7279,7 @@ const HELP_TOPICS={
      'The section also shows the Boilerplate at Publication: which of the six versions in the Boilerplate Guidance the work product must carry, from its license usage and whether it is a Standard or Collateral. Change the Designation explains what each license usage means.',
      'Click Approve the Designation and choose Approve, Needs Discussion or Not Yet.',
      'Waiting on approval and need to fix it? Click Change the Designation.',
-     'Approved designations move on to Governance for approval to comment. The recommendation goes away, and Reviews and Decisions shows the designation that was chosen.'],
+     'Designations move straight on to Governance for approval to comment. The recommendation goes away, and Reviews and Decisions shows the designation that was chosen.'],
     ['A work request with parts gets one designation per part, all approved together. See Parts in this Help.'],
     [['Open My Queue','mine']]],
   govmem:['What Governance Sees','gov',
@@ -8473,6 +8489,40 @@ VIEWS.outbox=function(){ trEnsure(); const h=_vOutboxTr(); if(!S.isStaff) return
 const _wireTr=wireMain;
 wireMain=function(m){ _wireTr(m); const b=$('#tropen',m); if(b) b.onclick=()=>trOpen(); };
 (function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); setTimeout(()=>{ if(S.isStaff){ trEnsure(); setTimeout(trTidy,30000); } },15000); },1000); })();
+/* ---------- Digest instead of individual emails; access without emails (Nov 20, 2026) ----------
+   Settings › Daily Digest › Who Gets It has two more lists:
+   - Digest Instead of Individual Emails (Jonna, Perry, Vanessa): they get the daily digest and the Friday wrap-up,
+     and no single emails from the MMS; what used to come as an email is in their digest's Needs You.
+   - Access Only, No MMS Emails (Jonathan): they can open and use the MMS but get no MMS emails, not even a copy.
+   Every email the MMS files is checked here; the GitHub digest sender reads the same lists. */
+function dgoCfg(){ return (typeof MMSDigest!=='undefined'&&MMSDigest.settings)?MMSDigest.settings(S.digestCfg):(S.digestCfg||{}); }
+function dgoAll(){ const P=S.people||{}, R=P.roles||{}; let out=(P.facilitators||[]).concat(R.staff||[]); Object.keys(R).forEach(k=>{ if(k!=='staff') out=out.concat(R[k]||[]); });
+  const seen={}; return out.filter(p=>{ if(!p||!p.name) return false; const k=String(p.name).toLowerCase(); if(seen[k]) return false; seen[k]=1; return true; }); }
+function dgoNamesFor(email){ const e=String(email||'').trim().toLowerCase(); if(!e) return []; const P=S.people||{}, R=P.roles||{}; let all=(P.facilitators||[]).slice(); Object.values(R).forEach(L=>all=all.concat(L||[]));
+  return all.filter(p=>p&&String(p.email||'').toLowerCase()===e).map(p=>p.name); }
+function dgoListed(L,email){ return dgoNamesFor(email).some(n=>(L||[]).some(x=>sameName(x,n))); }
+const DGO_KEEP={digest:1,health:1};
+function dgoDrop(email,kind){ if(!email) return false; const c=dgoCfg(); return dgoListed(c.noMail,email)||(!DGO_KEEP[kind]&&dgoListed(c.digestOnly,email)); }
+const _queueMailDGO=queueMail;
+queueMail=async function(m){
+  const to0=(m.to||[]).filter(Boolean), to=(m.to||[]).filter(e=>!dgoDrop(e,m.kind)), cc=(m.cc||[]).filter(e=>!dgoDrop(e,m.kind));
+  if(to0.length&&!to.filter(Boolean).length){ if(!cc.filter(Boolean).length) return false; return _queueMailDGO(Object.assign({},m,{to:cc,cc:[]})); }
+  return _queueMailDGO(Object.assign({},m,{to,cc})); };
+
+/* Settings › Daily Digest: the two lists, under Who Gets It */
+const _digestSettingsHtmlDGO=digestSettingsHtml;
+digestSettingsHtml=function(){ const h=_digestSettingsHtmlDGO(), c=dgoCfg(), fac=(S.people.facilitators||[]).map(p=>String(p.name).toLowerCase());
+  const others=dgoAll().filter(p=>!fac.includes(String(p.name).toLowerCase())).sort((a,b)=>a.name.localeCompare(b.name)), everyone=dgoAll().slice().sort((a,b)=>a.name.localeCompare(b.name));
+  const ck=(attr,L,p)=>'<label class="dg-ck"><input type="checkbox" '+attr+'="'+esc(p.name)+'"'+((L||[]).some(x=>sameName(x,p.name))?' checked':'')+'><span><b>'+esc(p.name)+'</b><em>'+esc(p.email||'No email on file')+'</em></span></label>';
+  const add='<div class="dg-g"><div class="dg-gh">Digest Instead of Individual Emails</div><div class="muted" style="font-size:12px;margin:0 0 6px">They get the daily digest and the Friday wrap-up, and no single emails from the MMS.</div>'+others.map(p=>ck('data-dgonly',c.digestOnly,p)).join('')+'</div>'+
+    '<div class="dg-g"><div class="dg-gh">Access Only, No MMS Emails</div><div class="muted" style="font-size:12px;margin:0 0 6px">They can open and use the MMS but get no MMS emails, not even a copy.</div>'+everyone.map(p=>ck('data-dgnomail',c.noMail,p)).join('')+'</div>';
+  const i=h.indexOf('<div class="card dg-prev">'); if(i<0) return h; const j=h.lastIndexOf('</div>',i); return h.slice(0,j)+add+h.slice(j); };
+const _wireDigestDGO=wireDigest;
+wireDigest=function(m){ _wireDigestDGO(m); if(!$('#dgframe',m)) return;
+  const upd=()=>{ const c=dgoCfg(); c.digestOnly=$$('[data-dgonly]',m).filter(x=>x.checked).map(x=>x.dataset.dgonly); c.noMail=$$('[data-dgnomail]',m).filter(x=>x.checked).map(x=>x.dataset.dgnomail); S.digestCfg=c; };
+  $$('[data-dgonly],[data-dgnomail]',m).forEach(x=>x.addEventListener('change',()=>{ upd(); if(x.checked&&x.dataset.dgnomail){ const o=$('[data-dgonly="'+CSS.escape(x.dataset.dgnomail)+'"]',m); if(o&&o.checked){ o.checked=false; upd(); } } }));
+  /* the preview can show a digest-only person's email too */
+  const sel=$('#dgwho',m); if(sel){ const have=[...sel.options].map(o=>o.value); dgoAll().filter(p=>(dgoCfg().digestOnly||[]).some(n=>sameName(n,p.name))&&!have.includes(p.name)).forEach(p=>{ const o=document.createElement('option'); o.textContent=p.name; o.value=p.name; if(S.dgPrev.who===p.name) o.selected=true; sel.appendChild(o); }); } };
 
 /* ---------- settings ---------- */
 let setTab='process';
@@ -8490,7 +8540,7 @@ VIEWS.settings=function(){
   }
   if(setTab==='people'){
     const P=S.people; const block=(title,key,list,desc)=>'<div class="card" data-plist="'+key+'"><h3>'+esc(title)+'<span class="sp"><button class="btn sm" data-padd="'+key+'" type="button">+ Add</button></span></h3>'+(desc?'<div class="muted" style="font-size:12px;margin:-4px 0 8px">'+desc+'</div>':'')+(list||[]).slice().sort((a,b)=>a.name.localeCompare(b.name)).map(p=>'<div class="vote"><span class="nm"><b>'+esc(p.name)+'</b> <span class="muted">'+esc(p.email||'')+'</span></span><button class="btn sm ghost" data-pedit="'+key+'|'+esc(p.name)+'" type="button">Edit</button> <button class="btn sm ghost" data-pdel="'+key+'|'+esc(p.name)+'" type="button">Remove</button></div>').join('')+'</div>';
-    body='<div class="banner info">Who can open and save the MMS on resources.mismo.org is set in People and Access, same as Meeting Trackers. These lists decide whose queue a work request lands in and who gets emailed.</div><div class="peoplegrid">'+block('Facilitators','facilitators',P.facilitators)+Object.keys(ROLE_LABEL).filter(k=>!['facilitator','workgroup','bet'].includes(k)).map(k=>block(k==='gov'?govName()+' Members':ROLE_LABEL[k],'roles.'+k,P.roles[k],{staff:'MISMO staff who set up approved work and see Settings.',gov:'Listed here, each member’s vote is logged with every decision.',vps:'The Designation Approver approves each license designation before it goes to Governance.',imreview:'Leave empty to let anyone with IM Review access decide rows.',imawg:'The IM chair and AWG chair and facilitator, who finish IM’s and AWG’s decisions.'}[k]||'')).join('')+'</div>';
+    body='<div class="banner info">Who can open and save the MMS on resources.mismo.org is set in People and Access, same as Meeting Trackers. These lists decide whose queue a work request lands in and who gets emailed.</div><div class="peoplegrid">'+block('Facilitators','facilitators',P.facilitators)+Object.keys(ROLE_LABEL).filter(k=>!['facilitator','workgroup','bet'].includes(k)).map(k=>block(k==='gov'?govName()+' Members':ROLE_LABEL[k],'roles.'+k,P.roles[k],{staff:'MISMO staff who set up approved work and see Settings.',gov:'Listed here, each member’s vote is logged with every decision.',vps:'The License Designator sets each work product’s license designation; it then goes straight to Governance.',imreview:'Leave empty to let anyone with IM Review access decide rows.',imawg:'The IM chair and AWG chair and facilitator, who finish IM’s and AWG’s decisions.'}[k]||'')).join('')+'</div>';
   }
   if(setTab==='notify'){
     const N=S.notify;
