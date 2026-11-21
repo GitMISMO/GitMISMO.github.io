@@ -4,7 +4,7 @@
 <meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws https://*.environment.api.powerplatform.com https://*.logic.azure.com; frame-src blob:; object-src 'none'; base-uri 'self'"><!-- Page safety list: the only places this page may load code from or send data to. -->
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MBA Accounting Desk</title>
-<meta name="description" content="What MBA Accounting sees: invoices, monthly close, receivables, members and IIF.">
+<meta name="description" content="What MBA Accounting sees: invoices, close, receivables, members, IIF and sponsorships.">
 <meta name="theme-color" content="#16A34A">
 <!-- The MBA Accounting Desk (Jonna, 21 November 2026): Accounting's own view-only desk, like the Membership
      Desk for Member 360. It reads only accounting-desk/ in MISMO Money's store (relay key accounting-desk,
@@ -353,6 +353,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <button type="button" data-hq="close" title="Monthly Close"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2.5 2.5L16 13"/></svg><span>Monthly Close</span></button>
     <button type="button" data-hq="members" title="New and Renewing Members"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M19 8v6M16 11h6"/></svg><span>New and Renewing Members</span></button>
     <button type="button" data-hq="ar" title="Receivables"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12H4z"/><path d="M4 11h16M8 15h3"/></svg><span>Receivables</span></button>
+    <button type="button" data-hq="wg" title="Workgroup Sponsorships"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20v-1.5c0-2.4 2-4 4.5-4s4.5 1.6 4.5 4V20"/><circle cx="7.5" cy="9" r="3"/><path d="M14 4h7v7l-3.5-2-3.5 2z"/><path d="M13.5 15.5c2.6-.4 6.5.6 7.5 4.5"/></svg><span>Workgroup Sponsorships</span></button>
     <button type="button" data-hq="help" title="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2v.1"/></svg><span>Help</span></button>
   </nav>
   <div class="mast-right">
@@ -369,6 +370,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <section class="view" id="v-ar" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view" id="v-members" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view" id="v-iif" hidden><div class="loading">Loading&hellip;</div></section>
+  <section class="view" id="v-wg" hidden><div class="loading">Loading&hellip;</div></section>
   <section class="view help" id="v-help" hidden></section>
 </main>
 
@@ -417,7 +419,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         return bytes;
       });
   }
-  var FILES = { invoices: "invoices", close: "close", ar: "receivables", members: "members", iif: "iif" };
+  var FILES = { invoices: "invoices", close: "close", ar: "receivables", members: "members", iif: "iif", wg: "sponsorships" };
   function load(tab) {
     if (LOADED[tab]) return LOADED[tab];
     var p = tab === "certs" ? readFile(CERTS, "data/accounting/completions.json") : readFile(PROJECT, "accounting-desk/" + FILES[tab] + ".json");
@@ -870,6 +872,63 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     }, paint);
   }
 
+  /* ================= Workgroup Sponsorships (Jonna, 21 Nov 2026: for accrual, when each starts and ends and what was paid) ================= */
+  var WS = { show: keep("wg-show") || "", q: "" };
+  function fyOf(m) { return "FY" + (+m.slice(5, 7) >= 10 ? +m.slice(0, 4) + 1 : +m.slice(0, 4)); }
+  function wgState(r, thru) { if (!r.start) return "Dates Not Known"; var s = r.start.slice(0, 7), e = r.end.slice(0, 7); return e <= thru ? "Finished" : s > thru ? "Not Started" : "Being Earned"; }
+  function drawWg(listOnly) {
+    var d = D.wg || {}, rows = d.rows || [], thru = d.earnedThrough || "", thruSay = monthName(thru);
+    var shown = rows.filter(function (r) { return (!WS.show || wgState(r, thru) === WS.show || (WS.show === "open" && wgState(r, thru) !== "Finished")) && has(r, WS.q, ["company", "group", "order"]); });
+    var cols = [
+      { h: "Sponsor", cell: function (r) { return "<b>" + esc(r.company) + "</b>" + '<span class="sub">' + esc(r.group) + "</span>"; } },
+      { h: "Aptify Order", cls: "nw", cell: function (r) { return esc(r.order); } },
+      { h: "Starts", cls: "nw", cell: function (r) { return r.start ? esc(day(r.start)) : '<span class="tag warn">Not Known</span>'; } },
+      { h: "Ends", cls: "nw", cell: function (r) { return r.end ? esc(day(r.end)) : '<span class="tag warn">Not Known</span>'; } },
+      { h: "Paid", num: 1, cell: function (r) { return usd(r.amount) + '<span class="sub">' + esc(day(r.paidOn)) + "</span>"; } },
+      { h: "A Month", num: 1, cell: function (r) { return r.monthly != null ? usd(r.monthly) + '<span class="sub">' + r.months.length + " months</span>" : ""; } },
+      { h: "Earned Through " + shortMon(thru || "2000-01") + " " + thru.slice(0, 4), num: 1, cell: function (r) { return usd(r.earned); } },
+      { h: "Still to Earn", num: 1, cell: function (r) { return usd(r.toEarn); } },
+      { h: "Where It Stands", cls: "nw", cell: function (r) { var st = wgState(r, thru); return '<span class="tag' + (st === "Finished" ? "" : st === "Dates Not Known" ? " warn" : " good") + '">' + esc(st) + "</span>"; } }];
+    var foot = function (l) { return '<tr><td colspan="4">' + l.length + (l.length === 1 ? " sponsorship" : " sponsorships") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + '</td><td></td><td class="num">' + usd(sum(l, function (r) { return r.earned; })) + '</td><td class="num">' + usd(sum(l, function (r) { return r.toEarn; })) + "</td><td></td></tr>"; };
+    var paint = function () { list($("wg-list"), { key: "wg", rows: shown, cols: cols, foot: foot, none: "No workgroup sponsorship matches that.", open: wgOpen }); };
+    drawWith("wg", listOnly, function () {
+      var open = rows.filter(function (r) { return wgState(r, thru) !== "Finished"; }), np = d.notPaid || [];
+      var nowM = lastMonths(1)[0], perMonth = sum(rows.filter(function (r) { return r.months.some(function (x) { return x[0] === nowM; }); }), function (r) { return r.months.filter(function (x) { return x[0] === nowM; })[0][1]; });
+      $("v-wg").innerHTML = hero("For Accounting", "Workgroup Sponsorships", "Every workgroup and community of practice sponsorship MISMO has been paid for: who paid, how much, and when it starts and ends. Each one is earned evenly over the months it runs, and what is still to earn is as of the end of " + esc(thruSay) + ".", "",
+        tile("Still to Earn", usd(sum(rows, function (r) { return r.toEarn; }), 1), "at the end of " + thruSay) + tile("Earned This Month", usd(perMonth, 1), monthName(nowM)) +
+        tile("Running or Not Started", String(open.length), open.length === 1 ? "sponsorship" : "sponsorships") + tile("Paid", usd(sum(rows, function (r) { return r.amount; }), 1), rows.length + (rows.length === 1 ? " sponsorship" : " sponsorships"))) +
+        '<div class="bar"><h2>Sponsorships</h2>' + select("wg-show", "Show", [["", "Every Sponsorship"], ["open", "Being Earned or Not Started"], ["Finished", "Finished"]], WS.show) +
+        findBox("wg-q", "Sponsor, workgroup or order", WS.q) + '<button class="btn" type="button" id="wg-dl">Download for Excel</button></div>' +
+        '<div class="card" id="wg-list"></div>' +
+        (np.length ? '<div class="bar"><h2>Ordered in Aptify, Not Yet Paid</h2></div><div class="card"><div class="tablewrap"><table><thead><tr><th>Sponsor</th><th>Aptify Order</th><th>Kind</th><th>Ordered On</th><th class="num">Amount</th></tr></thead><tbody>' +
+          np.map(function (o) { return "<tr><td><b>" + esc(o.company) + '</b><span class="sub">' + esc(o.product) + "</span></td><td>" + esc(o.order) + "</td><td>" + esc(o.kind) + '</td><td class="nw">' + esc(day(o.orderedOn)) + '</td><td class="num nw">' + usd(o.amount) + "</td></tr>"; }).join("") +
+          '</tbody></table></div></div><p class="note">These are not counted above. Each one is added, with its dates, once it is paid.</p>' : "") +
+        '<p class="note">From the payments MISMO Money holds, which start in October 2025. The start and end dates are the ones Aptify puts on each payment. Each month gets an even share, and the last month takes any leftover cents, so the months add up exactly to what was paid.</p><p class="stamp">' + esc(stamp(d.writtenAt)) + "</p>";
+      $("wg-show").addEventListener("change", function () { WS.show = this.value; keep("wg-show", WS.show); resetPage("wg"); drawWg(); });
+      wireFind("wg-q", WS, "wg", drawWg);
+      $("wg-dl").addEventListener("click", function () {
+        download("Workgroup Sponsorships", ["Sponsor", "Workgroup", "Aptify Order", "Paid On", "Starts", "Ends", "Months", "Paid", "A Month", "Earned Through " + thruSay, "Still to Earn", "Where It Stands"],
+          shown.map(function (r) { return [r.company, r.group, r.order, r.paidOn, r.start, r.end, r.months.length || "", r.amount, r.monthly, r.earned, r.toEarn, wgState(r, thru)]; }));
+      });
+      paint();
+    }, paint);
+  }
+  function wgOpen(r) {
+    var thru = D.wg.earnedThrough, fys = {};
+    r.months.forEach(function (x) { fys[fyOf(x[0])] = (fys[fyOf(x[0])] || 0) + x[1]; });
+    var months = r.months.length ? '<div class="tablewrap"><table><thead><tr><th>Month</th><th>Fiscal Year</th><th class="num">Earned</th><th>By the End of ' + esc(monthName(thru)) + "</th></tr></thead><tbody>" +
+      r.months.map(function (x) { return "<tr><td>" + esc(monthName(x[0])) + "</td><td>" + esc(fyOf(x[0])) + '</td><td class="num">' + usd(x[1]) + "</td><td>" + (x[0] <= thru ? "Earned" : "Still to earn") + "</td></tr>"; }).join("") +
+      '</tbody><tfoot><tr><td colspan="2">' + r.months.length + ' months</td><td class="num">' + usd(sum(r.months, function (x) { return x[1]; })) + "</td><td></td></tr></tfoot></table></div>"
+      : '<div class="txt">' + esc(r.missing.join("; ") || "Not known") + ".</div>";
+    var pays = '<div class="tablewrap"><table><thead><tr><th>Paid On</th><th>Payment</th><th>How Paid</th><th class="num">Amount</th></tr></thead><tbody>' +
+      r.payments.map(function (p) { return "<tr><td>" + esc(day(p.on)) + "</td><td>" + esc(p.id) + "</td><td>" + esc(p.how) + '</td><td class="num">' + usd(p.amount) + "</td></tr>"; }).join("") + "</tbody></table></div>";
+    pane(r.company, r.group, sect("Sponsorship", kv([["Sponsor", r.company], ["Workgroup", r.group], ["Aptify Product", r.product], ["Aptify Order", r.order], ["Paid", usd(r.amount)],
+      ["Starts", r.start ? day(r.start) : "Not known"], ["Ends", r.end ? day(r.end) : "Not known"], ["A Month", r.monthly != null ? usd(r.monthly) + " for " + r.months.length + " months" : ""],
+      ["Earned Through " + monthName(thru), usd(r.earned)], ["Still to Earn", usd(r.toEarn)], ["Where It Stands", wgState(r, thru)]])) +
+      (Object.keys(fys).length ? sect("By Fiscal Year", kv(Object.keys(fys).sort().map(function (k) { return [k + " (October to September)", usd(Math.round(fys[k] * 100) / 100)]; }))) : "") +
+      sect("Month by Month", months) + sect("Payments", pays));
+  }
+
   /* ================= Help ================= */
   /* ================= Overview ================= */
   var ICON = {
@@ -878,7 +937,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     invoices: '<path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/>',
     members: '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.2-5.6 6.5-5.6s5.9 2 6.5 5.6"/><path d="M19 8v6M16 11h6"/>',
     certs: '<circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/>',
-    iif: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>' };
+    iif: '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+    wg: '<path d="M3 20v-1.5c0-2.4 2-4 4.5-4s4.5 1.6 4.5 4V20"/><circle cx="7.5" cy="9" r="3"/><path d="M14 4h7v7l-3.5-2-3.5 2z"/><path d="M13.5 15.5c2.6-.4 6.5.6 7.5 4.5"/>' };
   function ovCard(tab, title, body, wide) {
     return '<section class="ovcard' + (wide ? " wide" : "") + '"><div class="ovh"><span class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">' + ICON[tab] + '</svg></span><h3>' + esc(title) +
       '</h3><button class="go" type="button" data-ovgo="' + tab + '">Open<span class="gon"> ' + esc(title) + '</span> &rsaquo;</button></div><div class="ovb">' + body + "</div></section>";
@@ -993,10 +1053,20 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       tiles.push(['iif', "IIF Collected", usd(sum(inFy, function (r) { return r.amount; }), 1), fy + " to date"]);
     }
 
+    /* workgroup sponsorships */
+    var wgr = (D.wg && D.wg.rows) || [];
+    if (wgr.length) {
+      var wthru = D.wg.earnedThrough, wopen = wgr.filter(function (r) { return wgState(r, wthru) !== "Finished"; });
+      var wleft = sum(wgr, function (r) { return r.toEarn; });
+      cards.push(ovCard("wg", "Workgroup Sponsorships", '<div class="big"><b>' + usd(wleft, 1) + "</b><span>still to earn at the end of " + esc(monthName(wthru)) + "</span></div>" +
+        (wopen.length ? '<ul class="toplist">' + wopen.map(function (r) { return '<li data-ovwg="' + esc(r.order) + '"><b>' + esc(r.company) + "</b><span>" + esc(day(r.start)) + " to " + esc(day(r.end)) + "</span><em>" + usd(r.amount) + "</em></li>"; }).join("") + "</ul>"
+          : '<p class="say ok">Every sponsorship paid so far has been fully earned.</p>')));
+    }
+
     var dateSay = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
     $("v-overview").innerHTML =
       '<div class="hero ov-hero"><div class="eyebrow">For Accounting</div><h1>' + esc(hello + (first ? ", " + first : "")) + '</h1><div class="when">' + esc(dateSay) + "</div>" +
-      "<p>Where MISMO&rsquo;s books stand today: the close, what is still owed, invoices waiting for approval, members, certifications and the IIF. Click anything to see the detail.</p>" +
+      "<p>Where MISMO&rsquo;s books stand today: the close, what is still owed, invoices waiting for approval, members, certifications, the IIF and workgroup sponsorships. Click anything to see the detail.</p>" +
       '<div class="tiles">' + tiles.map(function (t) { return '<button type="button" class="tile ovtile" data-ovgo="' + t[0] + '"><span>' + esc(t[1]) + "</span><b>" + esc(t[2]) + "</b><i>" + esc(t[3]) + "</i></button>"; }).join("") + "</div></div>" +
       '<div class="ovgrid">' + cards.join("") + "</div>" +
       '<p class="stamp">' + esc(stamp(D.ar && D.ar.writtenAt)) + "</p>";
@@ -1005,22 +1075,25 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       var k = li.getAttribute("data-ovinv"); show("invoices").then(function () { var r = D.invoices.rows.filter(function (x) { return x.id === k; })[0]; if (r) invOpen(r); }); }); });
     document.querySelectorAll("#v-overview [data-ovar]").forEach(function (li) { li.addEventListener("click", function () {
       var k = li.getAttribute("data-ovar"); show("ar").then(function () { var r = D.ar.items.filter(function (x) { return x.key === k; })[0]; if (r) arOpen(r); }); }); });
+    document.querySelectorAll("#v-overview [data-ovwg]").forEach(function (li) { li.addEventListener("click", function () {
+      var k = li.getAttribute("data-ovwg"); show("wg").then(function () { var r = D.wg.rows.filter(function (x) { return x.order === k; })[0]; if (r) wgOpen(r); }); }); });
   }
 
   function drawHelp() {
     $("v-help").innerHTML = '<section class="hero"><div class="eyebrow">For Accounting</div><h1>Help</h1><p>This desk is view only. Nothing here can be changed, and nothing you do here changes MISMO&rsquo;s records.</p></section>' +
-      "<h2>Overview</h2><p>The desk opens here. The tiles across the top are today&rsquo;s headline numbers, and each card below shows one part: the month being closed and which of its six steps is next, what is still owed to MISMO, invoices sent to AP that are still waiting for approval, new and renewing members, certifications and IIF payments. Click a tile, a card&rsquo;s Open button or a receivable to go to its page.</p>" +
+      "<h2>Overview</h2><p>The desk opens here. The tiles across the top are today&rsquo;s headline numbers, and each card below shows one part: the month being closed and which of its six steps is next, what is still owed to MISMO, invoices sent to AP that are still waiting for approval, new and renewing members, certifications, IIF payments and workgroup sponsorships. Click a tile, a card&rsquo;s Open button or a receivable to go to its page.</p>" +
       "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
       "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid. Where MISMO has the invoice itself, its panel has View the Invoice, which opens the PDF right there, and Save a Copy. Invoices logged on MISMO&rsquo;s Invoice Log since October 2026 carry their PDF. Older invoices show the files that were attached to them on the old Invoice Tracking sheet (the invoice, and often the approval and payment emails): View opens a PDF or picture in the panel, and Save a Copy saves any of them. An email file (.msg) opens in Outlook once saved.</p>" +
       "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
       "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. Once Aptify's Monday workbook carries each order's status and balance, this becomes what is still owed on Aptify's own orders (every order Shipped with a balance over $0), and the AR aging is no longer needed.</p>" +
       "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each and its membership term (when it starts and ends, and whether it is a dues deal). Pick a month or a year, or choose All Time and search.</p>" +
       "<h2>IIF Payments</h2><p>Every Innovation Investment Fee payment, by fiscal year or month, with Member 360&rsquo;s count of lenders paid in full and partly paid.</p>" +
+      "<h2>Workgroup Sponsorships</h2><p>Every workgroup and community of practice sponsorship MISMO has been paid for, for accrual: the sponsor, the Aptify order, when it was paid and how much, and when it starts and ends. Each one is earned evenly over the months it runs (the last month takes any leftover cents). The list shows what is earned through the last month that has ended and what is still to earn. Open one to see it month by month and by fiscal year. Sponsorships ordered in Aptify but not paid yet are listed below, apart; they are not counted until they are paid.</p>" +
       "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
   }
 
   /* ---- tabs ---- */
-  var DRAW = { overview: drawOverview, certs: drawCerts, invoices: drawInvoices, close: drawClose, ar: drawAr, members: drawMembers, iif: drawIif, help: drawHelp };
+  var DRAW = { overview: drawOverview, certs: drawCerts, invoices: drawInvoices, close: drawClose, ar: drawAr, members: drawMembers, iif: drawIif, wg: drawWg, help: drawHelp };
   var CUR = "overview";
   function show(tab) {
     if (!DRAW[tab]) tab = "overview";
@@ -1037,8 +1110,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     return load(tab).then(function () { if (CUR === tab) DRAW[tab](); }, function (e) { console.error("desk", tab, e); if (CUR === tab) failSay(tab, e); });
   }
   window.__desk = { show: show, data: D, load: load, open: function (tab, test) {
-    return show(tab).then(function () { var rows = []; if (tab === "ar") rows = D.ar.items; else if (tab === "invoices") rows = D.invoices.rows; else if (tab === "members") rows = D.members.rows; else if (tab === "certs") rows = D.certs.rows;
-      var r = rows.filter(test)[0]; if (r) ({ ar: arOpen, invoices: invOpen, members: memOpen, certs: certOpen })[tab](r); return !!r; }); } };
+    return show(tab).then(function () { var rows = []; if (tab === "ar") rows = D.ar.items; else if (tab === "invoices") rows = D.invoices.rows; else if (tab === "members") rows = D.members.rows; else if (tab === "certs") rows = D.certs.rows; else if (tab === "wg") rows = D.wg.rows;
+      var r = rows.filter(test)[0]; if (r) ({ ar: arOpen, invoices: invOpen, members: memOpen, certs: certOpen, wg: wgOpen })[tab](r); return !!r; }); } };
 
   function start() {
     var rs = window.ResourcesSession; if (!rs) { setTimeout(start, 100); return; }
@@ -1062,6 +1135,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     ((D.invoices && D.invoices.rows) || []).forEach(function (r) { if ((r.vendor + " " + r.invoiceNo + " " + r.netsuite).toLowerCase().indexOf(t) >= 0) push("Invoices", r.vendor, (r.invoiceNo || "") + " · " + monthName(r.serviceMonth) + " · " + usd(r.amount), open("invoices", function (x) { return x.id === r.id; })); });
     ((D.members && D.members.rows) || []).forEach(function (r) { if ((r.company + " " + r.companyId).toLowerCase().indexOf(t) >= 0) push("New and Renewing Members", r.company, r.kind + " · " + day(r.date), open("members", function (x) { return x === r; })); });
     ((D.certs && D.certs.rows) || []).forEach(function (r) { if ((r.org + " " + (r.order || "")).toLowerCase().indexOf(t) >= 0) push("Certification Complete", r.org, r.program + " · " + day(r.completedOn), open("certs", function (x) { return x === r; })); });
+    ((D.wg && D.wg.rows) || []).forEach(function (r) { if ((r.company + " " + r.group + " " + r.order).toLowerCase().indexOf(t) >= 0) push("Workgroup Sponsorships", r.company, r.group + " · " + day(r.start) + " to " + day(r.end), open("wg", function (x) { return x === r; })); });
     ((D.iif && D.iif.rows) || []).forEach(function (r) { if ((r.company + " " + r.order).toLowerCase().indexOf(t) >= 0) push("IIF Payments", r.company, day(r.on) + " · " + usd(r.amount), function () { FS.period = "all"; FS.q = r.company; go("iif"); setTimeout(function () { drawIif(); }, 50); }); });
   };
 })();
@@ -1131,7 +1205,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
     const best={};
     out.forEach(h=>{ best[h.group]=Math.max(best[h.group]||0, h.s); });
-    const ORDER=['Receivables','Invoices','Certification Complete','New and Renewing Members','IIF Payments'];
+    const ORDER=['Receivables','Invoices','Certification Complete','New and Renewing Members','IIF Payments','Workgroup Sponsorships'];
     out.sort((a,b)=>
       (best[b.group]-best[a.group])
       || (ORDER.indexOf(a.group)-ORDER.indexOf(b.group))
