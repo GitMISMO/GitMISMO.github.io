@@ -1,8 +1,188 @@
 {
   "source": "MMS",
   "note": "Announcement requests from the MMS for MISMO Media, with the facts to draft from. Public information only.",
-  "updated": "2026-11-21T02:16:08.877Z",
+  "updated": "2026-11-21T02:46:14.036Z",
   "announcements": [
+    {
+      "id": "WR2024_19-Final-Release-Announcement",
+      "type": "release",
+      "kind": "Final Release Announcement",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2024_19",
+      "name": "eHELOC Adoption Support",
+      "publicName": "https://www.mismo.org/standards-resources/mismo-product/smart-doc--v3-eheloc-faq",
+      "workgroup": "eHELOC DWG",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "Final",
+      "facilitator": "Meghan Tidgewell",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "https://collaborate.mismo.org/viewdocument/eheloc-faq",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-09-29",
+      "commentCloses": "2026-10-29",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2024_19",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Charles Epperson",
+          "position": "Chair",
+          "company": ""
+        }
+      ]
+    },
+    {
+      "id": "WR2024_22-Final-Release-Announcement",
+      "type": "release",
+      "kind": "Final Release Announcement",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2024_22",
+      "name": "Creation of Wrapper Guidance",
+      "publicName": "Version 3 XML General Implementation Guide",
+      "workgroup": "Architecture Workgroup",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "Final",
+      "facilitator": "Erin Bittenbender",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-10-08",
+      "commentCloses": "2026-11-07",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2024_22",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Chris Trujillo",
+          "position": "Co-Chair",
+          "company": "Viant Eye"
+        },
+        {
+          "name": "Mark Kleingers",
+          "position": "Co-Chair",
+          "company": "Actualize Consulting"
+        }
+      ]
+    },
+    {
+      "id": "WR2025_03-Candidate-Recommendation-Announcement",
+      "type": "release",
+      "kind": "Candidate Recommendation Announcement",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2025_03",
+      "name": "MI Estimated Rate Quote JSON API Annual Maintenance-2025",
+      "publicName": "MI Estimated Rate Quote JSON API Annual Maintenance-2025",
+      "workgroup": "Mortgage Insurance CoP",
+      "groupType": "",
+      "classification": "Standard",
+      "releaseStatus": "Candidate Recommendation",
+      "facilitator": "Erin Bittenbender",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "https://collaborate.mismo.org/viewdocument/mi-rate-quote-api-comment-period-ve",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-09-29",
+      "commentCloses": "2026-10-29",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_03",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Leslie Bensen",
+          "position": "Chair",
+          "company": "Mortgage Guaranty Insurance Corporation (MGIC)"
+        },
+        {
+          "name": "Candy Hepfner",
+          "position": "Co-Vice-Chair",
+          "company": "Mortgage Guaranty Insurance Corporation (MGIC)"
+        },
+        {
+          "name": "Nayanika Sanyal",
+          "position": "Co-Vice-Chair",
+          "company": "Arch Mortgage Insurance Company"
+        },
+        {
+          "name": "Amy Ketterling",
+          "position": "AWG Rep",
+          "company": "Mortgage Guaranty Insurance Corporation (MGIC)"
+        },
+        {
+          "name": "Sherry Gajeski",
+          "position": "IM Rep",
+          "company": "Radian Guaranty Inc."
+        },
+        {
+          "name": "Will Vickers",
+          "position": "Education Rep",
+          "company": "Arch Mortgage Insurance Company"
+        }
+      ]
+    },
+    {
+      "id": "WR2025_05-Final-Release-Announcement",
+      "type": "release",
+      "kind": "Final Release Announcement",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2025_05",
+      "name": "Commercial eNotes Data Glossary",
+      "publicName": "https://www.mismo.org/standards-resources/mismo-product/commercialeNoteGlossary",
+      "workgroup": "Commercial and Other Real Estate Digital Notes",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "Final",
+      "facilitator": "Meghan Tidgewell",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-10-08",
+      "commentCloses": "2026-11-07",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_05",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Vonda Renfrow",
+          "position": "Chair",
+          "company": "Federal Home Loan Bank of Des Moines"
+        },
+        {
+          "name": "Stephen Bradley",
+          "position": "Vice-Chair",
+          "company": "Wolters Kluwer"
+        },
+        {
+          "name": "Jake Daniels",
+          "position": "Education Rep",
+          "company": "Federal Home Loan Bank of Des Moines"
+        }
+      ]
+    },
     {
       "id": "WR2025_23-LinkedIn-Post",
       "type": "comment",
@@ -110,6 +290,51 @@
           "name": "Mark Kleingers",
           "position": "Co-Chair",
           "company": "Actualize Consulting"
+        }
+      ]
+    },
+    {
+      "id": "WR2026_04-Final-Release-Announcement",
+      "type": "release",
+      "kind": "Final Release Announcement",
+      "status": "Requested",
+      "requested": "2026-11-20",
+      "done": "",
+      "link": "",
+      "wr": "WR2026_04",
+      "name": "SMART Doc V3 iGuide Updates",
+      "publicName": "https://www.mismo.org/standards-resources/mismo-product/smart-doc-version-3",
+      "workgroup": "Verifiable Profile SMARTDoc® DWG",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "Final",
+      "facilitator": "Meghan Tidgewell",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "https://collaborate.mismo.org/viewdocument/smart-doc-version-3",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-09-29",
+      "commentCloses": "2026-10-29",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_04",
+      "shareUrl": "",
+      "leaders": [
+        {
+          "name": "Charles Epperson",
+          "position": "Chair",
+          "company": ""
+        },
+        {
+          "name": "Harry Gardner",
+          "position": "Vice-Chair",
+          "company": "ICE Mortgage Technology"
+        },
+        {
+          "name": "Jay Arneja",
+          "position": "Education Rep",
+          "company": "nCino"
         }
       ]
     },
