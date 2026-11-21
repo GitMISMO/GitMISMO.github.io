@@ -16,6 +16,7 @@ const CONTEXT = {
   'qr:See how codes are scanned': 'scans scanned scanning qr analytics statistics stats traffic usage count',
   'cms:Certification Management System': 'certification certifications certified cms macts assessor assessors invoices pricing renewals ron eclosing evault frame consultant smartdoc programs lifecycle action queue',
   'member-360:Member 360': 'member members membership 360 renewals renew renewal outreach dues prospects organizations orgs levels specials stats contacts relationship',
+  'mms:Work through my queue': 'mms manufacturing system production produce standards standard work request requests queue pipeline board review desk comment period periods governance due process record publish publishing release facilitator resource center architecture metrics',
   'iif-hq:IIF Planning HQ': 'iif innovation investment fee fees invoicing invoice invoices collections billing cycle plan tasks key dates decisions risks raid last cycle',
   'summit-hq:Plan the summit': 'summit event conference meeting rooms room session sessions agenda schedule venue placement conflicts',
   'website-migration:Check the migration': 'website site web page pages migration move sitefinity higher logic launch cutover redirects',
@@ -145,7 +146,9 @@ const P = {
   key:'M8 15a4 4 0 1 0 0 .01 M10.8 12.2L20 3M16 7l3 3',
   /* Elections HQ, MISMO Media and the Scheduler (Perry, 30 Oct 2026): a ballot box, a megaphone, a calendar with a clock */
   ballot:'M4 13h16v8H4z M8 13V3.5h8V13 M10 8.2l1.5 1.5 2.8-3', media:'M3.5 10h3.5l8-4.5v13L7 14H3.5z M18.5 9a4 4 0 0 1 0 6 M7 14l1.5 5.5h2.5L10 14.6',
-  schedule:'M8 3v3 M16 3v3 M4 9h16 M11.5 20H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4.5 M17 13.5a3.75 3.75 0 1 0 0 7.5a3.75 3.75 0 1 0 0-7.5 M17 15.6v1.6l1.1 .9' };
+  schedule:'M8 3v3 M16 3v3 M4 9h16 M11.5 20H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v4.5 M17 13.5a3.75 3.75 0 1 0 0 7.5a3.75 3.75 0 1 0 0-7.5 M17 15.6v1.6l1.1 .9',
+  /* MMS, the MISMO Manufacturing System (Perry, 21 Nov 2026): a factory, since it is where standards are produced */
+  mms:'M3 21h18 M4 21V11l5 3v-3l5 3v-3l5 3V4h2v17 M8 18h2 M13 18h2' };
 /* The sections and tools, in the admin panel's order (assets/tools.json, 5 Oct 2026). */
 const SECTIONS = ['Standards & Tools', 'Planning', 'Certification', 'Sponsorship'];   /* Service Orders sits in Certification on the home page (Perry, 9 Oct 2026) */
 const TOOLS = [
@@ -153,6 +156,7 @@ const TOOLS = [
   { key:'glossary', name:'Business Glossary', c:'#0F9D77', icon:'glossary', sec:'Standards & Tools' },
   { key:'qr', name:'QR Code Manager', c:'#2477B8', icon:'qr', sec:'Standards & Tools' },
   { key:'mismo-link', name:'MISMO Link', c:'#1E3A8A', icon:'link', sec:'Standards & Tools' },
+  { key:'mms', name:'MISMO Manufacturing System', c:'#0D314C', icon:'mms', sec:'Standards & Tools' },   /* on the home page for everyone with MMS access (Perry, 21 Nov 2026) */
   { key:'summit-hq', name:'Summit HQ', c:'#B45309', icon:'summit', sec:'Planning' },
   { key:'website-migration', name:'Website Migration HQ', c:'#475569', icon:'website', sec:'Planning' },
   { key:'team-hq', name:'Team HQ', c:'#0D314C', icon:'team', sec:'Planning' },
@@ -183,6 +187,7 @@ const ENTRIES = {
   'elections-hq': [['Run the elections', 'Elections HQ', 'ballot', '/elections-hq/']],   /* Perry, 30 Oct 2026 */
   'marketing-hq': [['Check the schedule', 'MISMO Media', 'media', '/marketing-hq/']],   /* it opens on the Schedule (Perry, 30 Oct 2026) */
   'scheduler': [['Follow up on meeting requests', 'Scheduler', 'schedule', '/scheduler/'], ['Schedule a meeting', 'New Request', 'plus', '/scheduler/#tab=new']],   /* it opens on Follow Up (Perry, 30 Oct 2026) */
+  'mms': [['Work through my queue', 'MISMO Manufacturing System', 'mms', '/mms/']],   /* MMS opens on My Queue (Perry, 21 Nov 2026) */
   'member-360': [['Member 360', 'Member 360', 'member', '/member-360/']],   /* no sub-pages identified: the main page only, named after the tool (Perry, 9 Oct 2026) */
   'cms': [['Certification Management System', 'Certification Management System', 'cert', '/cms/']],   /* one button, named after the tool (Perry, 9 Oct 2026) */
   'sponsorship': [['Track a sponsor', 'Sponsorship Portal', 'sponsorship', '/sponsorship/'], ['Send the prospectus', '2027 Summit Sponsorship Prospectus', 'send', '/sponsorship-prospectus/']],
@@ -193,7 +198,7 @@ const ENTRIES = {
    have their own address. */
 const TOOL_PATH = { hub:'/initiative-hub/', glossary:'/glossary/console/', qr:'/qr/', 'summit-hq':'/summit-hq/', 'website-migration':'/website-migration/', 'team-hq':'/team-hq/',
   'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/service-orders/',
-  'mismo-link':'/mismo-link/', financials:'/financials/', 'elections-hq':'/elections-hq/', 'marketing-hq':'/marketing-hq/', scheduler:'/scheduler/' };
+  'mismo-link':'/mismo-link/', mms:'/mms/', financials:'/financials/', 'elections-hq':'/elections-hq/', 'marketing-hq':'/marketing-hq/', scheduler:'/scheduler/' };
 const MORE_PAGES = {
   hub: [['Meeting Calendar', 'Page', 'hub', '/initiative-hub/calendar.html'],
     ['Mortgage Compliance Dataset (MCD)', 'Overview', 'hub', '/initiative-hub/mcd-dashboard.html'], ['Common Confidence Score (CCS)', 'Overview', 'hub', '/initiative-hub/ccs-dashboard.html'],
