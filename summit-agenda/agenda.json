@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-21T16:21:05.835Z",
+ "updated": "2026-11-21T16:52:38.769Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-21T16:19:45.109Z",
+ "sourceUpdated": "2026-11-21T16:51:20.612Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -27,14 +27,14 @@
         "title": "VP, Strategic Growth",
         "company": "MISMO",
         "role": "Host",
-        "photo": ""
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-amy-moses-064e4236.webp"
        },
        {
         "name": "Brian Vieaux",
         "title": "President",
         "company": "MISMO",
         "role": "Speaker",
-        "photo": ""
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-brian-vieaux-1cdae0d6.webp"
        }
       ]
      }
