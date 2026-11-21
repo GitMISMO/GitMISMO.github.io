@@ -358,6 +358,8 @@ function serverSave(submit) {
       toast("Someone on your team saved changes too. Theirs and yours are both kept.");
       rerender(); return serverSave(submit);
     }
+    if (r.__status === 429) { clearTimeout(saveTimer); saveTimer = setTimeout(serverSave, 3000); return false; }
+    if (r.__status === 413) { say("This is more than the portal can save in one go. Email certifications@mismo.org and we will help."); return false; }
     if (!r.saved) { say("Not saved yet. Check your connection; it will try again."); clearTimeout(saveTimer); saveTimer = setTimeout(serverSave, 15000); return false; }
     SRV.savedAt = r.savedAt; LAST = mine;
     if (submit) { SRV.submittedAt = r.submittedAt; S.submitted = true; }
@@ -455,7 +457,7 @@ function liveUpload(list, area) {
         ? b64(f).then(function (c) { return call({ mode: "upload", name: f.name, content: c }); })
         : call({ mode: "big", name: f.name, size: f.size }).then(function (r) { if (!r.uploadUrl) return r; return sendParts(r.uploadUrl, f, function (x) { say("Uploading " + f.name + " … " + Math.round(x * 100) + "%"); }).then(function () { return { saved: true, name: r.name }; }); });
       return p.then(function (r) {
-        if (!r || !r.saved) { toast((r && r.error) || ("We could not upload " + f.name + ".")); return; }
+        if (!r || !r.saved) { toast(r && r.error === "too-big" ? f.name + " is too large to upload here. Email certifications@mismo.org and we will help." : (r && r.error) || ("We could not upload " + f.name + ".")); return; }
         S.docs.push({ id: "d" + Date.now().toString(36) + n, name: r.name || f.name, size: f.size, area: area, at: new Date().toISOString(), by: who() || null }); n++;
       }, function (e) { toast("We could not upload " + f.name + ": " + (e && e.message || "no connection")); });
     });
