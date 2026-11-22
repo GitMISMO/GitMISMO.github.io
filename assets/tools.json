@@ -177,10 +177,10 @@
     {
       "key": "so-phoenix",
       "label": "Phoenix Oversight Group LLC",
-      "sum": "Service Orders (Phoenix Oversight Group LLC)",
+      "sum": "Contractor HQ (Phoenix Oversight Group LLC)",
       "colour": "#E11D48",
-      "group": "Service Orders and Agreements",
-      "path": "/service-orders/",
+      "group": "Contractor HQ",
+      "path": "/contractor-hq/",
       "family": true
     },
     {
@@ -189,16 +189,16 @@
       "sum": "Hours Only, No Rates (Phoenix Oversight Group LLC)",
       "menu": "Phoenix Oversight Group LLC (Hours Only)",
       "colour": "#0F9D77",
-      "group": "Service Orders — Hours Only (No Rates)",
-      "path": "/service-orders/"
+      "group": "Contractor HQ — Hours Only (No Rates)",
+      "path": "/contractor-hq/"
     },
     {
       "key": "so-actualize",
       "label": "Actualize Consulting LLC",
-      "sum": "Service Orders (Actualize Consulting LLC)",
+      "sum": "Contractor HQ (Actualize Consulting LLC)",
       "colour": "#E11D48",
-      "group": "Service Orders and Agreements",
-      "path": "/service-orders/",
+      "group": "Contractor HQ",
+      "path": "/contractor-hq/",
       "family": true
     },
     {
@@ -207,16 +207,16 @@
       "sum": "Hours Only, No Rates (Actualize Consulting LLC)",
       "menu": "Actualize Consulting LLC (Hours Only)",
       "colour": "#0F9D77",
-      "group": "Service Orders — Hours Only (No Rates)",
-      "path": "/service-orders/"
+      "group": "Contractor HQ — Hours Only (No Rates)",
+      "path": "/contractor-hq/"
     },
     {
       "key": "so-trex",
       "label": "Tidgewell Results eXperience LLC",
-      "sum": "Service Orders (Tidgewell Results eXperience LLC)",
+      "sum": "Contractor HQ (Tidgewell Results eXperience LLC)",
       "colour": "#E11D48",
-      "group": "Service Orders and Agreements",
-      "path": "/service-orders/",
+      "group": "Contractor HQ",
+      "path": "/contractor-hq/",
       "family": true
     },
     {
@@ -225,16 +225,16 @@
       "sum": "Hours Only, No Rates (Tidgewell Results eXperience LLC)",
       "menu": "Tidgewell Results eXperience LLC (Hours Only)",
       "colour": "#0F9D77",
-      "group": "Service Orders — Hours Only (No Rates)",
-      "path": "/service-orders/"
+      "group": "Contractor HQ — Hours Only (No Rates)",
+      "path": "/contractor-hq/"
     },
     {
       "key": "so-falcon",
       "label": "Falcon Capital Advisors LLC",
-      "sum": "Service Orders (Falcon Capital Advisors LLC)",
+      "sum": "Contractor HQ (Falcon Capital Advisors LLC)",
       "colour": "#E11D48",
-      "group": "Service Orders and Agreements",
-      "path": "/service-orders/",
+      "group": "Contractor HQ",
+      "path": "/contractor-hq/",
       "family": true
     },
     {
@@ -243,16 +243,16 @@
       "sum": "Hours Only, No Rates (Falcon Capital Advisors LLC)",
       "menu": "Falcon Capital Advisors LLC (Hours Only)",
       "colour": "#0F9D77",
-      "group": "Service Orders — Hours Only (No Rates)",
-      "path": "/service-orders/"
+      "group": "Contractor HQ — Hours Only (No Rates)",
+      "path": "/contractor-hq/"
     },
     {
       "key": "so-trudigital",
       "label": "TruDigital Mortgage Solutions LLC",
-      "sum": "Service Orders (TruDigital Mortgage Solutions LLC)",
+      "sum": "Contractor HQ (TruDigital Mortgage Solutions LLC)",
       "colour": "#E11D48",
-      "group": "Service Orders and Agreements",
-      "path": "/service-orders/",
+      "group": "Contractor HQ",
+      "path": "/contractor-hq/",
       "family": true
     },
     {
@@ -261,16 +261,16 @@
       "sum": "Hours Only, No Rates (TruDigital Mortgage Solutions LLC)",
       "menu": "TruDigital Mortgage Solutions LLC (Hours Only)",
       "colour": "#0F9D77",
-      "group": "Service Orders — Hours Only (No Rates)",
-      "path": "/service-orders/"
+      "group": "Contractor HQ — Hours Only (No Rates)",
+      "path": "/contractor-hq/"
     },
     {
       "key": "so-vianteye",
       "label": "Viant Eye LLC",
-      "sum": "Service Orders (Viant Eye LLC)",
+      "sum": "Contractor HQ (Viant Eye LLC)",
       "colour": "#E11D48",
-      "group": "Service Orders and Agreements",
-      "path": "/service-orders/",
+      "group": "Contractor HQ",
+      "path": "/contractor-hq/",
       "family": true
     },
     {
@@ -279,8 +279,8 @@
       "sum": "Hours Only, No Rates (Viant Eye LLC)",
       "menu": "Viant Eye LLC (Hours Only)",
       "colour": "#0F9D77",
-      "group": "Service Orders — Hours Only (No Rates)",
-      "path": "/service-orders/"
+      "group": "Contractor HQ — Hours Only (No Rates)",
+      "path": "/contractor-hq/"
     },
     {
       "key": "cms",

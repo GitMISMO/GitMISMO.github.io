@@ -169,7 +169,7 @@ const TOOLS = [
   { key:'scheduler', name:'Scheduler', c:'#2477B8', icon:'schedule', sec:'Planning' },
   { key:'cms', name:'Certification Management System', c:'#BE123C', icon:'cert', sec:'Certification' },
   { key:'sponsorship', name:'Sponsorship', c:'#0EA5E9', icon:'sponsorship', sec:'Sponsorship' },
-  { key:'so', name:'Service Orders and Agreements', c:'#E11D48', icon:'so', sec:'Certification' },
+  { key:'so', name:'Contractor HQ', c:'#E11D48', icon:'so', sec:'Certification' },
 ];
 TOOLS.sort((a, b) => a.name.localeCompare(b.name, 'en', { sensitivity:'base' }));   /* A to Z within each section, left to right, top to bottom (Perry, 23 Oct 2026) */
 /* Every page the old home page offered, once each, worded as what people come to do. */
@@ -191,13 +191,13 @@ const ENTRIES = {
   'member-360': [['Member 360', 'Member 360', 'member', '/member-360/']],   /* no sub-pages identified: the main page only, named after the tool (Perry, 9 Oct 2026) */
   'cms': [['Certification Management System', 'Certification Management System', 'cert', '/cms/']],   /* one button, named after the tool (Perry, 9 Oct 2026) */
   'sponsorship': [['Track a sponsor', 'Sponsorship Portal', 'sponsorship', '/sponsorship/'], ['Send the prospectus', '2027 Summit Sponsorship Prospectus', 'send', '/sponsorship-prospectus/']],
-  'so': [['Log hours on a service order', 'Service Orders and Agreements', 'clock', '/service-orders/'], ['Review and accept an order', 'Service Orders and Agreements', 'check', '/service-orders/']],
+  'so': [['Log hours on a service order', 'Contractor HQ', 'clock', '/contractor-hq/'], ['Review and accept an order', 'Contractor HQ', 'check', '/contractor-hq/']],
 };
 /* Home page D with pins (Perry, 13 Oct 2026): each tool is a tile; its pin opens a menu to pin the whole tool or any
    page in it. A tool's pages are its own entries that lead somewhere other than its main page, plus these pages that
    have their own address. */
 const TOOL_PATH = { hub:'/initiative-hub/', glossary:'/glossary/console/', qr:'/qr/', 'summit-hq':'/summit-hq/', 'website-migration':'/website-migration/', 'team-hq':'/team-hq/',
-  'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/service-orders/',
+  'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/contractor-hq/',
   'mismo-link':'/mismo-link/', mms:'/mms/', financials:'/financials/', 'elections-hq':'/elections-hq/', 'marketing-hq':'/marketing-hq/', scheduler:'/scheduler/' };
 const MORE_PAGES = {
   hub: [['Meeting Calendar', 'Page', 'hub', '/initiative-hub/calendar.html'],

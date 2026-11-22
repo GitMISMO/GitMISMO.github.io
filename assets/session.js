@@ -111,12 +111,12 @@
     { key: "member-360", name: "Member 360", path: "/member-360/", group: "Planning" },
     { key: "cms", name: "Certification Management System", path: "/cms/", group: "Certification" },
     { key: "sponsorship", name: "Sponsorship Portal", path: "/sponsorship/", group: "Sponsorship" },
-    { key: "so-phoenix", name: "Phoenix Oversight Group LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
-    { key: "so-actualize", name: "Actualize Consulting LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
-    { key: "so-trex", name: "Tidgewell Results eXperience LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
-    { key: "so-falcon", name: "Falcon Capital Advisors LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
-    { key: "so-trudigital", name: "TruDigital Mortgage Solutions LLC", path: "/service-orders/", group: "Service Orders and Agreements" },
-    { key: "so-vianteye", name: "Viant Eye LLC", path: "/service-orders/", group: "Service Orders and Agreements" }
+    { key: "so-phoenix", name: "Phoenix Oversight Group LLC", path: "/contractor-hq/", group: "Contractor HQ" },
+    { key: "so-actualize", name: "Actualize Consulting LLC", path: "/contractor-hq/", group: "Contractor HQ" },
+    { key: "so-trex", name: "Tidgewell Results eXperience LLC", path: "/contractor-hq/", group: "Contractor HQ" },
+    { key: "so-falcon", name: "Falcon Capital Advisors LLC", path: "/contractor-hq/", group: "Contractor HQ" },
+    { key: "so-trudigital", name: "TruDigital Mortgage Solutions LLC", path: "/contractor-hq/", group: "Contractor HQ" },
+    { key: "so-vianteye", name: "Viant Eye LLC", path: "/contractor-hq/", group: "Contractor HQ" }
   ];
   function useToolList(list) {
     var ok = (list || []).filter(function (t) { return t && /^[a-z0-9-]{1,40}$/.test(t.key) && t.label && t.group; });
@@ -349,7 +349,7 @@
         return Promise.reject(e);
       });
     },
-    /* For a tool spanning several keys (Service Orders has one per contracting company):
+    /* For a tool spanning several keys (Contractor HQ has one per contracting company):
        ask the relay about each and correct the browser's copy for any it says this person
        holds. Shows nothing; resolves with the corrected session, or null if signed out.
        A page calls this before deciding someone has no access, never after refusing. */
