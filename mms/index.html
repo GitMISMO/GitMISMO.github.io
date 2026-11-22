@@ -2130,7 +2130,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-22T18:00:02Z',fp:'d744d92b'};
+window.__mmsBuild={at:'2026-11-22T18:41:44Z',fp:'11b85273'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -3245,11 +3245,11 @@ function homeLive(m){
   if(!counted){ counted=true; $$('[data-count]',m).forEach(el=>{ const to=+el.dataset.count; if(!to) return; const t0=performance.now(); const step=n=>{ const k=Math.min(1,(n-t0)/650); el.textContent=Math.round(to*(1-Math.pow(1-k,3))); if(k<1) requestAnimationFrame(step); }; el.textContent='0'; requestAnimationFrame(step); }); }
 }
 
-/* ---------- current leadership for each group, brought in from Elections HQ ---------- */
+/* ---------- current leadership for each group, brought in from Leadership HQ (formerly Elections HQ; same relay path /elections-hq/data/) ---------- */
 const ELECTIONS_ROSTER='https://resources.mismo.org/elections-hq/';
 const gnorm=s=>String(s||'').toLowerCase().replace(/\(.*?\)/g,' ').replace(/\b(cop|dwg|community of practice|development workgroup|workgroup|task force|area of focus|docs)\b/g,' ').replace(/[^a-z0-9]/g,'');
-/* Elections HQ is read by whoever can open it (staff); a copy lands in the MMS records so every
-   facilitator sees the same leaders, whether or not they have Elections HQ themselves. */
+/* Leadership HQ is read by whoever can open it (staff); a copy lands in the MMS records so every
+   facilitator sees the same leaders, whether or not they have Leadership HQ themselves. */
 async function electionsSync(){
   if(S.mode!=='relay') return;
   const rs=window.ResourcesSession, tok=rs&&rs.token(); if(!tok) return;
@@ -7407,7 +7407,7 @@ const HELP_TOPICS={
   health:['System Health','*',
     'One page that says whether every part the MMS depends on is working, in plain words, with who fixes it. Staff only.',
     ['Click System Health in the left rail, under Settings. A number on it means something is red or yellow.',
-     'Each line is green (working), gray (nothing to check yet), yellow (watch it) or red (needs fixing): saving, loading, storage, email, the Daily Digest, the Initiative Hub, public comments, the website feed, SharePoint files, the IM and AWG portals, Elections HQ, Meeting Trackers and AI review.',
+     'Each line is green (working), gray (nothing to check yet), yellow (watch it) or red (needs fixing): saving, loading, storage, email, the Daily Digest, the Initiative Hub, public comments, the website feed, SharePoint files, the IM and AWG portals, Leadership HQ, Meeting Trackers and AI review.',
      'Errors on This Page lists anything that went wrong since you opened the MMS; the Team Error Log shows everyone’s errors for the last 7 days.',
      'It checks again every 5 minutes while the MMS is open. Check Again runs it now; Copy Report copies it to paste into an email or a chat with Claude.',
      'The MMS Robot runs the same checks, and the MMS’s automatic steps (reminders, retrying emails, bringing in approved Hub requests, IM and AWG hand-offs), every 30 minutes even when nobody has the MMS open. It signs its changes “MMS Robot”.',
@@ -8428,7 +8428,7 @@ function hRows(){
   [['im','IM Review Portal',S.imPortalQ],['awg','AWG Review Portal',S.awgPortalQ]].forEach(([k,label,q])=>{ const e=NET[k]||{}, waiting=Object.values(q||{}).filter(x=>x&&x.status!=='decided'&&!x.test).length;
     if(e.failAt&&(!e.okAt||e.failAt>e.okAt)) row(k,label,'bad','Couldn’t reach the portal'+(e.status?' (answered '+e.status+')':'')+'. Hand-offs and decisions wait until it answers.','Perry');
     else row(k,label,e.okAt?'ok':'info',e.okAt?'Reachable. '+waiting+' waiting there.':'Not checked from this page yet.'); });
-  [['elections','Elections HQ','workgroup leaders',S.leaderSnap&&S.leaderSnap.at],['mt','Meeting Trackers','meeting schedules',null]].forEach(([k,label,what,at])=>{ const e=NET[k]||{};
+  [['elections','Leadership HQ','workgroup leaders',S.leaderSnap&&S.leaderSnap.at],['mt','Meeting Trackers','meeting schedules',null]].forEach(([k,label,what,at])=>{ const e=NET[k]||{};
     if(e.failAt&&(!e.okAt||e.failAt>e.okAt)) row(k,label,'bad','Couldn’t read '+what+(e.status?' (answered '+e.status+')':'')+'. The MMS keeps the last copy it had.','Perry, or '+label+'’s Claude');
     else row(k,label,e.okAt?'ok':'info',e.okAt?'Read '+what+' '+hWhen(e.okAt)+'.':(at?'Last read '+hWhen(at)+'.':'Not read from this page yet.')); });
   const ai=NET.ai||{};
