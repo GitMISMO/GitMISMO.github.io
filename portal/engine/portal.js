@@ -235,11 +235,28 @@ function stepBooking(st) {
 }
 
 /* ---------- practical exercise (FRAME) ---------- */
+/* The exercise MISMO assigned this applicant (22 Nov 2026: one of the four product scenarios is assigned automatically
+   and shown here with the questionnaire): the same brief for everyone, and their own vendor product. */
+function liveExercise(x) {
+  var b = x.brief || {}, p = x.product || {};
+  function ps(a) { return (a || []).map(function (s) { return "<p>" + esc(s) + "</p>"; }).join(""); }
+  return '<div class="grid2"><div class="rcard"><div class="sectlabel">' + esc(b.heading || "The Brief") + "</div>" + ps(b.intro) +
+    (b.tasks && b.tasks.length ? "<p><b>" + esc(b.taskLead || "Your task:") + '</b></p><ol class="prep">' + b.tasks.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ol>" : "") +
+    (b.caveat ? '<p class="muted">' + esc(b.caveat) + "</p>" : "") + "</div>" +
+    '<div class="rcard"><div class="sectlabel">Your Product</div><h3 style="font-size:17px">' + esc(p.name || "") + "</h3>" +
+    '<p class="muted">' + [p.vendor ? "Vendor: " + p.vendor : "", p.boughtBy ? "Bought by: " + p.boughtBy : "", p.runsIn ? "Runs in: " + p.runsIn : ""].filter(Boolean).map(esc).join("<br>") + "</p>" +
+    (p.pitch ? "<p>" + esc(p.pitch) + "</p>" : "") +
+    (p.features && p.features.length ? '<div class="sectlabel" style="margin-top:12px">Features, As the Vendor Describes Them</div>' + p.features.map(function (f) { return "<p><b>" + esc(f.feature || "") + ".</b> " + esc(f.description || "") + "</p>"; }).join("") : "") +
+    (p.known && p.known.length ? "<p><b>" + esc(p.knownLead || "What else Riverstone knows:") + '</b></p><ul class="prep">' + p.known.map(function (s) { return "<li>" + esc(s) + "</li>"; }).join("") + "</ul>" : "") +
+    "</div></div>";
+}
 function stepExercise(st) {
+  var X = LIVE && PAGE && PAGE.exercise && PAGE.exercise.product ? PAGE.exercise : null;
   if (LIVE && st.live) st = Object.assign({}, st, st.live);
+  if (X) st = Object.assign({}, st, { intro: "Every FRAME applicant gets the same brief and one vendor product. Work it as you would for a client, then upload your write-up here. There is no template and no page limit." });
   var mine = S.docs.filter(function (d) { return d.area === "exercise"; });
-  return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div></div><div class="pb"><div class="grid2">' +
-    '<div class="rcard"><div class="sectlabel">The Brief</div>' + st.brief.map(function (x) { return "<p>" + esc(x) + "</p>"; }).join("") + '</div><div class="rcard"><div class="sectlabel">Your Scenario</div><h3 style="font-size:17px">' + esc(st.scenario.title) + "</h3>" + st.scenario.body.map(function (x) { return "<p>" + esc(x) + "</p>"; }).join("") + "</div></div>" +
+  return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div></div><div class="pb">' + (X ? liveExercise(X) : '<div class="grid2">' +
+    '<div class="rcard"><div class="sectlabel">The Brief</div>' + st.brief.map(function (x) { return "<p>" + esc(x) + "</p>"; }).join("") + '</div><div class="rcard"><div class="sectlabel">Your Scenario</div><h3 style="font-size:17px">' + esc(st.scenario.title) + "</h3>" + st.scenario.body.map(function (x) { return "<p>" + esc(x) + "</p>"; }).join("") + "</div></div>") +
     '<div class="sectlabel" style="margin-top:20px">Your Response</div><label class="drop" id="drop" data-area="exercise"><input type="file" id="filein" multiple hidden><div class="big">Drop your write-up here</div><p>' + (LIVE ? "It goes straight to MISMO." : "Sample only: nothing is uploaded.") + '</p></label>' +
     (mine.length ? '<div class="tblwrap"><table class="docs"><tbody>' + mine.map(function (d) { return '<tr><td class="fname">' + ftype(d.name) + " " + esc(d.name) + '</td><td class="fsz">' + fsize(d.size) + '</td><td><button type="button" class="linkbtn" data-docdel="' + esc(d.id) + '">Remove</button></td></tr>'; }).join("") + "</tbody></table></div>" : "") +
     foot() + "</div></div>";
