@@ -2111,7 +2111,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-22T01:28:51Z',fp:'95893841'};
+window.__mmsBuild={at:'2026-11-22T01:45:05Z',fp:'14f86ce4'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -8567,6 +8567,26 @@ wireDigest=function(m){ _wireDigestDGO(m); if(!$('#dgframe',m)) return;
   $$('[data-dgonly],[data-dgnomail]',m).forEach(x=>x.addEventListener('change',()=>{ upd(); if(x.checked&&x.dataset.dgnomail){ const o=$('[data-dgonly="'+CSS.escape(x.dataset.dgnomail)+'"]',m); if(o&&o.checked){ o.checked=false; upd(); } } }));
   /* the preview can show a digest-only person's email too */
   const sel=$('#dgwho',m); if(sel){ const have=[...sel.options].map(o=>o.value); dgoAll().filter(p=>(dgoCfg().digestOnly||[]).some(n=>sameName(n,p.name))&&!have.includes(p.name)).forEach(p=>{ const o=document.createElement('option'); o.textContent=p.name; o.value=p.name; if(S.dgPrev.who===p.name) o.selected=true; sel.appendChild(o); }); } };
+/* ---------- Out-of-date tabs can't save (Nov 21, 2026) ----------
+   When a newer version of the MMS is published, an older open tab stops saving: it lets the person finish what they
+   are typing (unsaved work-request changes or an open window), then goes read-only and asks them to reload. Any save
+   it still tries is refused with a Reload button, so an old copy of the MMS never writes over newer work. */
+S._staleLocked=false;
+function sgBusy(){ return (typeof pnlDirty==='function'&&pnlDirty())||!!document.querySelector('#modal-root .modal'); }
+function sgLock(){ if(S._staleLocked) return; S._staleLocked=true; S.canWrite=false; S.autoOn=false;
+  const b=document.getElementById('stalebar'); if(b){ const s=b.querySelector('span'); if(s) s.textContent='A newer version of the MMS is out. Reload to keep working: this tab can’t save until you do.'; }
+  try{ renderAll(); }catch(e){} }
+function sgWatch(){ if(!S.stale||S._staleLocked) return; if(!sgBusy()) return sgLock();
+  const b=document.getElementById('stalebar'), s=b&&b.querySelector('span'); if(s) s.textContent='A newer version of the MMS is out. Finish and save what you’re doing, then reload: this tab stops saving after that.';
+  setTimeout(sgWatch,2000); }
+const _hStaleBarSG=hStaleBar;
+hStaleBar=function(){ _hStaleBarSG(); setTimeout(sgWatch,0); };
+/* the lowest level too (emails' status, Recently Deleted): only the tab's own health report still goes through */
+try{ if(typeof Store!=='undefined'&&Store&&typeof Store.set==='function'){ const _setSG=Store.set; Store.set=function(coll){ if(S._staleLocked&&!/^(health|errlog)$/.test(String(coll))) return Promise.reject(new Error('This tab is an older version of the MMS; reload to save')); return _setSG.apply(this,arguments); }; } }catch(e){}
+const _writeSG=write;
+write=async function(coll,id,data,base){
+  if(S._staleLocked){ if(typeof toast==='function') toast('This tab is an older version of the MMS and can’t save. Reload to keep working.'); return false; }
+  return _writeSG(coll,id,data,base); };
 
 /* ---------- settings ---------- */
 let setTab='process';
