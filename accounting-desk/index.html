@@ -910,8 +910,9 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       var open = rows.filter(function (r) { return wgState(r, thru) !== "Finished"; }), np = d.notPaid || [];
       var nowM = lastMonths(1)[0], perMonth = sum(rows.filter(function (r) { return r.months.some(function (x) { return x[0] === nowM; }); }), function (r) { return r.months.filter(function (x) { return x[0] === nowM; })[0][1]; });
       $("v-wg").innerHTML = hero("For Accounting", "Workgroup Sponsorships", "Every workgroup and community of practice sponsorship MISMO has been paid for: who paid, how much, and when it starts and ends. Each one is earned evenly over the months it runs, and what is still to earn is as of the end of " + esc(thruSay) + ".", "",
-        tile("Still to Earn", usd(sum(rows, function (r) { return r.toEarn; }), 1), "at the end of " + thruSay) + tile("Earned This Month", usd(perMonth, 1), monthName(nowM)) +
-        tile("Running or Not Started", String(open.length), open.length === 1 ? "sponsorship" : "sponsorships") + tile("Paid", usd(sum(rows, function (r) { return r.amount; }), 1), rows.length + (rows.length === 1 ? " sponsorship" : " sponsorships"))) +
+        tile("Left on Running Ones", usd(sum(rows.filter(function (r) { return wgState(r, thru) === "Being Earned"; }), function (r) { return r.toEarn; }), 1), "at the end of " + thruSay) +
+        tile("Paid Ahead, Not Started", usd(sum(rows.filter(function (r) { return wgState(r, thru) === "Not Started"; }), function (r) { return r.amount; }), 1), "earned once each starts") + tile("Earned This Month", usd(perMonth, 1), monthName(nowM)) +
+        tile("Paid", usd(sum(rows, function (r) { return r.amount; }), 1), rows.length + (rows.length === 1 ? " sponsorship" : " sponsorships"))) +
         '<div class="bar"><h2>Sponsorships</h2>' + select("wg-show", "Show", [["", "Every Sponsorship"], ["open", "Being Earned or Not Started"], ["Finished", "Finished"]], WS.show) +
         findBox("wg-q", "Sponsor, workgroup or order", WS.q) + '<button class="btn" type="button" id="wg-dl">Download for Excel</button></div>' +
         '<div class="card" id="wg-list"></div>' +
@@ -1125,10 +1126,15 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     /* workgroup sponsorships */
     var wgr = (D.wg && D.wg.rows) || [];
     if (wgr.length) {
-      var wthru = D.wg.earnedThrough, wopen = wgr.filter(function (r) { return wgState(r, wthru) !== "Finished"; });
-      var wleft = sum(wgr, function (r) { return r.toEarn; });
-      cards.push(ovCard("wg", "Workgroup Sponsorships", '<div class="big"><b>' + usd(wleft, 1) + "</b><span>still to earn at the end of " + esc(monthName(wthru)) + "</span></div>" +
-        (wopen.length ? '<ul class="toplist">' + wopen.map(function (r) { return '<li data-ovwg="' + esc(r.order) + '"><b>' + esc(r.company) + "</b><span>" + esc(day(r.start)) + " to " + esc(day(r.end)) + "</span><em>" + usd(r.amount) + "</em></li>"; }).join("") + "</ul>"
+      /* Jonna, 22 Nov 2026: "we're almost done with one of them so we've earned everything". What is
+         left on a sponsorship that is running is apart from one paid ahead that has not started. */
+      var wthru = D.wg.earnedThrough;
+      var wrun = wgr.filter(function (r) { return wgState(r, wthru) === "Being Earned"; }), wahead = wgr.filter(function (r) { return wgState(r, wthru) === "Not Started"; });
+      var wleft = sum(wrun, function (r) { return r.toEarn; }), wpre = sum(wahead, function (r) { return r.amount; });
+      var wli = function (r) { return '<li data-ovwg="' + esc(r.order) + '"><b>' + esc(r.company) + "</b><span>" + (wgState(r, wthru) === "Not Started"
+        ? "paid " + esc(day(r.paidOn)) + ", starts " + esc(day(r.start)) : "earned " + usd(r.earned) + " of " + usd(r.amount) + ", ends " + esc(day(r.end))) + "</span><em>" + usd(r.toEarn) + " left</em></li>"; };
+      cards.push(ovCard("wg", "Workgroup Sponsorships", '<div class="minis">' + mini("Left on Running Ones", usd(wleft, 1)) + mini("Paid Ahead, Not Started", usd(wpre, 1)) + mini("Earned Through " + shortMon(wthru) + " " + wthru.slice(0, 4), usd(sum(wgr, function (r) { return r.earned; }), 1)) + "</div>" +
+        (wrun.length || wahead.length ? '<ul class="toplist">' + wrun.concat(wahead).map(wli).join("") + "</ul>"
           : '<p class="say ok">Every sponsorship paid so far has been fully earned.</p>')));
     }
 
@@ -1158,7 +1164,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each and its membership term (when it starts and ends, and whether it is a dues deal). Pick a month or a year, or choose All Time and search.</p>" +
       "<h2>Approved Budget</h2><p>MISMO&rsquo;s Board-approved budget for each fiscal year, newest first. Pick the year at the top; each new year&rsquo;s budget is added once the Board approves it. It is laid out like the Statement of Activities: Revenue, Expenses and Net, with Year to Date (the months that have ended) and the Full Year first, then every month from October to September. Lines start folded to their main lines; click a line with an arrow to see the lines under it, or Expand All. It is view only, exactly as MISMO Money shows it. Download for Excel saves every line.</p>" +
       "<h2>IIF Payments</h2><p>Every Innovation Investment Fee payment, by fiscal year or month, with Member 360&rsquo;s count of lenders paid in full and partly paid.</p>" +
-      "<h2>Workgroup Sponsorships</h2><p>Every workgroup and community of practice sponsorship MISMO has been paid for, for accrual: the sponsor, the Aptify order, when it was paid and how much, and when it starts and ends. Each one is earned evenly over the months it runs (the last month takes any leftover cents). The list shows what is earned through the last month that has ended and what is still to earn. Open one to see it month by month and by fiscal year. Sponsorships ordered in Aptify but not paid yet are listed below, apart; they are not counted until they are paid.</p>" +
+      "<h2>Workgroup Sponsorships</h2><p>Every workgroup and community of practice sponsorship MISMO has been paid for, for accrual: the sponsor, the Aptify order, when it was paid and how much, and when it starts and ends. Each one is earned evenly over the months it runs (the last month takes any leftover cents). The list shows what is earned through the last month that has ended and what is still to earn. What is left is split in two: what is left on sponsorships that are running, and sponsorships paid ahead that have not started yet (earned only once each one starts). Open one to see it month by month and by fiscal year. Sponsorships ordered in Aptify but not paid yet are listed below, apart; they are not counted until they are paid.</p>" +
       "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
   }
 
