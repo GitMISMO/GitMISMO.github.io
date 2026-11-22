@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   MISMO Ballot: resources.mismo.org/forms/elections/ballot/?e=<election>
-  The public ballot for Elections HQ, in the website's look. No sign-in. Each ballot goes to the
+  The public ballot for Leadership HQ, in the website's look. No sign-in. Each ballot goes to the
   "Elections Ballots" Power Automate flow (FLOW_ENDPOINT below). Nothing is stored in this file.
 -->
 <html lang="en" data-theme="light">
@@ -300,7 +300,7 @@ input.t[aria-invalid="true"]{border-color:var(--f-bad);background:var(--f-bad-so
 </style>
 
 <style>
-/* Elections forms: the shared EF form (Elections HQ) in the website look */
+/* Elections forms: the shared EF form (Leadership HQ) in the website look */
 :root{--surface:#ffffff;--surface-2:#f4f8fc;--accent-soft:#e3f1fc;--good:#0f7b5c;--good-soft:#e3f3ed;--bad:#b3372c;--ink:#0d314c;--ink-2:#44607a;--ink-3:#5b7790;--border:#cfdeeb;--border-strong:#adc4d6;--rule:#e5eef5;--navy-mid:#1a74b8}
 .el-wrap{max-width:1120px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-left,0px)) 60px max(16px,env(safe-area-inset-right,0px))}
 .ef .ef-hero{display:none}
@@ -429,7 +429,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 </footer>
 <script>
 
-/* ================= the public forms (shared by Elections HQ and the website copies) =================
+/* ================= the public forms (shared by Leadership HQ and the website copies) =================
    EF.nominate(el, {elections, submit, onDone})   elections: [{cycle, type, name, open, closes, groups:[{name, positions:[{seat, position}]}], seats:[{seat, position}], boardSeats}]
    EF.ballot(el, {slate, code, submit})            slate: what slateOf() returns
    submit(record) returns a promise; the record is what gets filed (nomsubs or votes). */
@@ -562,15 +562,15 @@ var EF = (function(){
 (function(){
   "use strict";
   /* Where ballots go: the "Elections Ballots" Power Automate flow, which files each one, exactly as
-     cast, in GitMISMO/elections-hq-data (data/votes.json). Elections HQ checks one company, one vote
+     cast, in GitMISMO/elections-hq-data (data/votes.json). Leadership HQ checks one company, one vote
      and counts them. Empty until the flow is switched on. The ballot itself (confirmed nominees only)
-     comes from /elections-hq/slates/<election>.json, which Elections HQ publishes.
+     comes from /elections-hq/slates/<election>.json, which Leadership HQ publishes.
      Links: ?e=2027-cop (the election), &c=ABC123 (a voter's personal code), &g=API%20CoP (preselect a CoP). */
   var FLOW_ENDPOINT = "";
 
   function todayIso(){ var d=new Date(); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
   function isOpen(mode,from,until){ if(mode==="open") return true; if(mode==="closed") return false; var t=todayIso(); return !!(from && t>=from && (!until || t<=until)); }
-  /* the "Elections Forms" flow's address is published by Elections HQ in slates/forms.json */
+  /* the "Elections Forms" flow's address is published by Leadership HQ in slates/forms.json */
   var endpointP=null;
   function endpoint(){ if(FLOW_ENDPOINT) return Promise.resolve(FLOW_ENDPOINT); if(!endpointP) endpointP=fetch("/elections-hq/slates/forms.json",{cache:"no-store"}).then(function(r){ return r.ok?r.json():{}; }).then(function(j){ return (j&&j.endpoint)||""; },function(){ return ""; }); return endpointP; }
   function send(kind, rec){
