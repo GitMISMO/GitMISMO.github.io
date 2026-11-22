@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-21T17:57:12.427Z",
+ "updated": "2026-11-22T03:26:15.751Z",
  "summit": "2027 Winter Summit",
  "source": "Sponsorship Portal",
  "sponsors": [
@@ -51,7 +51,7 @@
    "name": "Guidehouse",
    "tier": "Gold",
    "url": "https://www.guidehouse.com",
-   "logo": "",
+   "logo": "https://resources.mismo.org/sponsors/logos/guidehouse.png",
    "placements": [
     {
      "title": "AI Governance in Practice Workshop",
