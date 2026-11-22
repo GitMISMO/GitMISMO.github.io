@@ -299,7 +299,7 @@ input.t[aria-invalid="true"]{border-color:var(--f-bad);background:var(--f-bad-so
 </style>
 
 <style>
-/* Elections forms: the shared EF form (Elections HQ) in the website look */
+/* Elections forms: the shared EF form (Leadership HQ) in the website look */
 :root{--surface:#ffffff;--surface-2:#f4f8fc;--accent-soft:#e3f1fc;--good:#0f7b5c;--good-soft:#e3f3ed;--bad:#b3372c;--ink:#0d314c;--ink-2:#44607a;--ink-3:#5b7790;--border:#cfdeeb;--border-strong:#adc4d6;--rule:#e5eef5;--navy-mid:#1a74b8}
 .el-wrap{max-width:1120px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-left,0px)) 60px max(16px,env(safe-area-inset-right,0px))}
 .ef .ef-hero{display:none}
@@ -430,7 +430,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 (function(){
   "use strict";
   /* Where answers go: the same "Elections Nominations" flow, which files confirmations in
-     GitMISMO/elections-hq-data (data/responses.json). Elections HQ matches the answer to the
+     GitMISMO/elections-hq-data (data/responses.json). Leadership HQ matches the answer to the
      nomination by its private token and moves the nominee along. */
   var FLOW_ENDPOINT = "";
   var q=new URLSearchParams(location.search), n=(q.get("n")||"").replace(/[^A-Za-z0-9_-]/g,""), t=(q.get("t")||"").replace(/[^A-Za-z0-9]/g,""), pre=(q.get("a")||"").toLowerCase();
