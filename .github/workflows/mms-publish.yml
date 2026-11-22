@@ -1,0 +1,75 @@
+# MMS Publish: GitHub builds the MMS from its source and publishes it to mms/ here, the same way every time,
+# and only after the MMS Checks pass. The source lives in the private repo mms-data (source/files/mms, unpacked
+# from source/mms-source.zip by its "Unpack MMS Source" job).
+# Start it by uploading .github/mms-publish/request.json (a short note saying what changed), or with Run workflow.
+# It will not publish over newer work: it stops if the live page was changed by hand since the last publish, or if
+# the source is older than what is live (Run workflow with "force" only when MISMO staff say so).
+name: MMS Publish
+on:
+  push:
+    paths: ['.github/mms-publish/request.json']
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Publish even if the live page was changed by hand or the source is older'
+        type: boolean
+        default: false
+permissions:
+  contents: write
+concurrency:
+  group: mms-publish
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      sha: ${{ steps.src.outputs.sha }}
+      date: ${{ steps.src.outputs.date }}
+    steps:
+      - name: Get the MMS source (private repo mms-data)
+        id: src
+        env:
+          TOKEN: ${{ secrets.MMS_DATA_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "The MMS_DATA_TOKEN secret is missing."; exit 1; fi
+          # the last change to the source files (the data in that repo changes all the time; only the source counts)
+          curl -sf -H "Authorization: Bearer $TOKEN" -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/GitMISMO/mms-data/commits?path=source/files/mms&per_page=1" > last.json
+          echo "sha=$(node -e "console.log(require('./last.json')[0].sha)")" >> "$GITHUB_OUTPUT"
+          echo "date=$(node -e "console.log(require('./last.json')[0].commit.committer.date)")" >> "$GITHUB_OUTPUT"
+          git clone -q --filter=blob:none --sparse "https://x-access-token:${TOKEN}@github.com/GitMISMO/mms-data.git" src
+          cd src && git sparse-checkout set source/files/mms
+      - name: Build
+        run: |
+          cd src/source/files/mms && python3 build.py
+          mkdir -p "$GITHUB_WORKSPACE/out" && cp dist/index.html dist/mms-door.js dist/digest.js "$GITHUB_WORKSPACE/out/"
+          if [ -f digest-run.mjs ]; then cp digest-run.mjs "$GITHUB_WORKSPACE/out/"; fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mms-build
+          path: out/
+          retention-days: 7
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.48.2-noble
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: mms-build
+          path: /tmp/build
+      - name: Get Playwright (the browser is already in the container)
+        run: |
+          npm init -y >/dev/null
+          for i in 1 2 3; do npm install --no-save playwright@1.48.2 && break; sleep 10; done
+      - name: Check, then publish
+        env:
+          SRC_SHA: ${{ needs.build.outputs.sha }}
+          SRC_DATE: ${{ needs.build.outputs.date }}
+          FORCE: ${{ inputs.force && '1' || '' }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          node .github/mms-publish/publish.mjs /tmp/build
