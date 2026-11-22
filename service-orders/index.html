@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Contractor HQ has moved</title>
+<!-- Service Orders and Agreements was renamed Contractor HQ on 22 November 2026 and moved from
+     /service-orders/ to /contractor-hq/. This page only forwards old links (emails already sent,
+     bookmarks, the Expenses app on a phone) to the same page at the new address, keeping anything
+     after the ? or #. It is inert while a repository named service-orders exists, because a project
+     site wins its path over a folder in this site; it starts working when that repository is renamed. -->
+<script>
+(function () {
+  var rest = location.pathname.replace(/^\/service-orders\/?/, '');
+  location.replace('/contractor-hq/' + rest + location.search + location.hash);
+})();
+</script>
+<noscript><meta http-equiv="refresh" content="0; url=/contractor-hq/"></noscript>
+<style>
+  body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#f4f7fa;color:#0d314c;display:flex;min-height:100vh;align-items:center;justify-content:center}
+  .card{background:#fff;border:1px solid #dbe4ec;border-radius:8px;padding:28px 32px;max-width:420px;text-align:center}
+  a{color:#0d314c;font-weight:600}
+</style>
+</head>
+<body>
+<div class="card">
+  <p><b>Service Orders and Agreements is now Contractor HQ.</b></p>
+  <p>Taking you there now. If nothing happens, go to <a href="/contractor-hq/">resources.mismo.org/contractor-hq/</a>.</p>
+</div>
+</body>
+</html>
