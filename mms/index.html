@@ -2111,7 +2111,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-22T01:45:05Z',fp:'14f86ce4'};
+window.__mmsBuild={at:'2026-11-22T02:04:18Z',fp:'fb351676'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -6526,7 +6526,7 @@ recPanel=function(t){ if(t.stage!=='designation'||t.state!=='active') return '';
 /* the License Designation section while deciding */
 const _desigSectionPT=desigSection;
 desigSection=function(t){ const h=_desigSectionPT(t); if(!h||!hasParts(t)) return h;
-  const set=t.parts.some(p=>p.ds&&p.ds.license); return h.replace(/<div class="desig-grid">[\s\S]*?<\/div><\/div>/,'').replace('</h4>','</h4>'+(set?partsTable(t):'<p class="muted" style="margin:0;font-size:12.5px">Not chosen yet for its '+t.parts.length+' parts. Approve the recommendation part by part below, or change it.</p>')); };
+  const set=t.parts.some(p=>p.ds&&p.ds.license); return h.replace(/<div class="desig-grid">[\s\S]*?<\/div><\/div>/,'').replace('</h4>','</h4>'+(set?partsTable(t):'<p class="muted" style="margin:0;font-size:12.5px">Not chosen yet for its '+t.parts.length+' parts. Designate as recommended, part by part below, or change it.</p>')); };
 
 /* approving the recommendation sets every part */
 const _approveRecPT=approveRec;
@@ -6535,10 +6535,9 @@ approveRec=async function(t){ if(!hasParts(t)||t.rides) return _approveRecPT(t);
   x.classification=f.classification; x.commentDays=x.commentDays||recommend(t).commentDays;
   x.designation=Object.assign({},x.designation,{type:f.type,license:f.license,royalty:f.royalty,availableTo:f.availableTo,recommended:true,parts:true,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
   const sum=x.parts.map(p=>p.name+': '+dsLine(p.ds)).join('\n');
-  const ap=peopleFor('vps'); if(ap.length&&ap.every(p=>sameName(p.name,S.me.name))){ x.designation.vps={[ap[0].name]:{vote:'Approve',note:'',at:today()}}; x.designation.status='3. Approved';
-    await move(x,nextStage(x),{text:'Designation approved by '+ap[0].name+' for '+x.parts.length+' parts; added to the '+govName()+' agenda',note:sum}); return; }
-  await setSub(x,'vps','Director approved the recommended designation for '+x.parts.length+' parts');
-  queueMail({to:ap.map(p=>p.email),subject:t.wr+' '+t.name+': designation ready for your approval ('+x.parts.length+' parts)',body:'Recommended designation, part by part:\n\n'+sum+'\n\nApprove it or ask to discuss it in the MMS.',ticket:t.id,kind:'stage',key:t.id+'-vps-'+today()}); };
+  /* the License Designator's designation is the decision: straight to Governance (Jonna, Nov 20) */
+  x.designation.status='3. Approved'; x.designation.by=S.me.name||''; x.designation.at=today();
+  await move(x,nextStage(x),{text:'Designated by '+(S.me.name||'the License Designator')+' as recommended for '+x.parts.length+' parts; added to the '+govName()+' agenda',note:sum}); };
 
 /* changing the designation: one block per part */
 const _directorRecPT=directorRec;
@@ -6546,13 +6545,14 @@ directorRec=async function(t){ if(!hasParts(t)) return _directorRecPT(t);
   const sl=(n,opts,v)=>'<select name="'+n+'">'+['',...opts].map(o=>'<option value="'+esc(o)+'"'+(o===(v||'')?' selected':'')+'>'+esc(o||'—')+'</option>').join('')+'</select>';
   const body=t.parts.map((p,i)=>{ const d=partDs(t,p); return '<div class="pt-blk"><b>'+esc(p.name)+'</b>'+(p.kind?' <span class="muted">'+esc(p.kind)+'</span>':'')+'<div class="pt-grid">'+
     fld('Classification',sl('c'+i,DS_CLS,d.classification))+fld('Comment Type',sl('t'+i,DS_TYPES,d.type))+fld('License Usage',sl('l'+i,DS_LIC,d.license))+fld('Royalty Status',sl('r'+i,DS_ROY,d.royalty))+fld('Available To',sl('a'+i,DS_AV,d.availableTo))+'</div></div>'; }).join('')+fld('Notes',ta('note',(t.designation&&t.designation.notes)||''));
-  const v=await modal({title:'Designation, Part by Part',text:esc(t.wr+' '+t.name),ok:'Send for Approval',body}); if(!v) return;
+  const v=await modal({title:'Designation, Part by Part',text:esc(t.wr+' '+t.name),ok:'Designate',body}); if(!v) return;
   const x=clone(t); x.parts=x.parts.map((p,i)=>Object.assign({},p,{ds:{classification:v['c'+i],type:v['t'+i],license:v['l'+i],royalty:v['r'+i],availableTo:v['a'+i]}})); const f=x.parts[0].ds;
   x.classification=f.classification; x.designation=Object.assign({},t.designation,{type:f.type,license:f.license,royalty:f.royalty,availableTo:f.availableTo,notes:v.note,parts:true,auto:false,vps:{}}); x.dates=Object.assign({},x.dates,{designation:today()});
   const sum=x.parts.map(p=>p.name+': '+dsLine(p.ds)).join('\n');
-  await setSub(x,'vps','Director recommended a designation for each of '+x.parts.length+' parts');
-  queueMail({to:peopleFor('vps').map(p=>p.email),subject:t.wr+' '+t.name+': designation ready for your approval ('+x.parts.length+' parts)',body:'Part by part:\n\n'+sum+'\n\nApprove it or ask to discuss it in the MMS.',ticket:t.id,kind:'stage',key:t.id+'-vps-'+today()});
-  toast('Designation saved for '+x.parts.length+' parts'); };
+  x.designation.status='3. Approved'; x.designation.by=S.me.name||''; x.designation.at=today();
+  if(t.stage!=='designation'||t.rides){ hist(x,'Designation changed for '+x.parts.length+' parts',{note:sum}); await saveTicket(x,'Designation saved',clone(t)); return; }
+  await move(x,nextStage(x),{text:'Designated by '+(S.me.name||'the License Designator')+' for each of '+x.parts.length+' parts; added to the '+govName()+' agenda',note:sum});
+  toast('Designated for '+x.parts.length+' parts'); };
 
 /* the approver sees every part in the approval window */
 const _vpAgreePT=vpAgree;
@@ -7141,7 +7141,7 @@ const HELP_TOPICS={
   queue:['My Queue: What’s Waiting on You','facilitator staff approver media pm website',
     'My Queue lists every work request where it is your turn, oldest and most overdue first.',
     ['Open My Queue from the left rail. The number on it is how many are waiting on you.',
-     'Each card says what to do next, such as Submit for AI Review or Approve the recommended designation.',
+     'Each card says what to do next, such as Submit for AI Review or Designate the license.',
      'Click the button on the card to do it, or click the card to see everything about that work request first.',
      'Drag a card up or down to put your work in the order you want, or pick an order: Most Urgent, My Order, A–Z, WR Number or Workgroup.',
      'Drag a card onto another column, or onto the strip that shows under the columns, to do its next step.'],
@@ -7234,7 +7234,10 @@ const HELP_TOPICS={
      'Good to Know comes second: comment periods opening or ending, work sitting too long, requests waiting on staff, Architecture Help and MISMO Media requests, and what moved today.',
      'Each list shows the top few, with a link to the rest in the MMS.',
      'On days with nothing in Needs You, you get no email. The Friday wrap-up always comes, with the week’s moves, what was published, comment periods and what is coming up.'],
-    ['MISMO staff choose who gets it, which days, and who is copied in Settings › Daily Digest.'],
+    ['It goes at 4:30 PM Eastern on weekdays (Settings › Daily Digest sets the time, and Skip Today’s Email skips one day).',
+     'MISMO staff on the Digest Instead of Individual Emails list get their own digest with every facilitator’s digest summarized in it (The Facilitators’ Digests; on Fridays, The Facilitators’ Week), and no single MMS emails. The Website Admin’s digest also lists the Resource Library entries to make.',
+     'Anyone on the Access Only list can use the MMS but gets no MMS emails, not even a copy.',
+     'MISMO staff choose who gets it, which days, and who is copied in Settings › Daily Digest.'],
     []],
   notif:['Notifications','staff',
     'Notifications is the MMS outbox: every email it creates, such as stage-change notices, reminders and digests.',
@@ -7268,13 +7271,13 @@ const HELP_TOPICS={
     ['The Governance number on the left rail is what is waiting on the committee.'],
     [['Open Governance','governance']]],
   settings:['Settings','staff',
-    'Settings changes how the MMS works without changing the page. Only MISMO staff see it.',
+    'Settings changes how the MMS works without changing the page. Only the people on the MISMO Staff list in People and Roles see it.',
     ['Process: the steps, their owners and descriptions, and comment period lengths.',
      'People and Roles: facilitators and who fills each role, which decides whose queue a work request lands in and who is emailed. Click + Add on a list to add someone with their name and email. Click Edit next to a person to fix their name or email, or Remove to take them off.',
      'Workgroups and Their Facilitators (under People and Roles): to give a workgroup a new facilitator, pick the person under Hand Over to and click Hand Over. Every work request in that workgroup, live and closed, moves to them and keeps who facilitated it before.',
      'To move a single work request, change Facilitator on its Details tab and click Save Changes.',
      'Notifications: the email flow link, the sender, Hold All Email Until, reminder timing, and who hears when work arrives at each step.',
-     'Daily Digest: who gets it, which days, who is copied, and which sections are on.',
+     'Daily Digest: who gets it, which days and time, who is copied, which sections are on, who gets the digest instead of individual emails, and who has access with no MMS emails.',
      'Website: the feed of open comment periods to mismo.org. Work products and their public files are listed on the website from Mark Published (resources.mismo.org/work-products/catalog.json); a published work request can be updated there with Update on the Website.',
      'Import and Backup: bring in or save a copy of the records.',
      'The facilitator list here is also published, names only, for other MISMO systems such as Summit HQ (resources.mismo.org/mms/facilitators.json). It updates within half an hour of a change.'],
@@ -7313,17 +7316,16 @@ const HELP_TOPICS={
      'Bring questions to the call. The vote and attendance are recorded there.'],
     ['Attendance is taken in Meeting Trackers.'],
     [['IM Review','https://resources.mismo.org/im-review/'],['AWG Review','https://resources.mismo.org/awg-review/']]],
-  approve:['Approving the Designation','approver staff',
-    'When AWG approves, the MMS recommends the comment type, classification, license usage, royalty status and who it is available to from past designations of the same kind, and sends it to you.',
-    ['Open My Queue. Look for Approve the recommended designation.',
-     'Open the work request. The License Designation section on the Overview shows the recommendation, who set it and where it stands.',
-     'If the recommendation is not right, change it first. A message confirms it: Designation saved.',
+  approve:['Designating the License','approver staff',
+    'When AWG approves, the MMS recommends the comment type, classification, license usage, royalty status and who it is available to from past designations of the same kind, and sends it to you, the License Designator.',
+    ['Open My Queue. Look for Designate the license.',
+     'Open the work request. The License Designation section on the Overview shows the recommendation and where it came from.',
+     'If the recommendation is right, click Designate as Recommended. That is the decision: it goes straight to Governance for approval to comment, with no approval step after it.',
+     'If it is not right, click Change the Designation, set the fields, and click Designate. It also goes straight to Governance.',
      'Comment type is Public unless you change it. Change the Designation if a work product should go to member comment.',
      'The section also shows the Boilerplate at Publication: which of the six versions in the Boilerplate Guidance the work product must carry, from its license usage and whether it is a Standard or Collateral. Change the Designation explains what each license usage means.',
-     'Click Approve the Designation and choose Approve, Needs Discussion or Not Yet.',
-     'Waiting on approval and need to fix it? Click Change the Designation.',
-     'Designations move straight on to Governance for approval to comment. The recommendation goes away, and Reviews and Decisions shows the designation that was chosen.'],
-    ['A work request with parts gets one designation per part, all approved together. See Parts in this Help.'],
+     'Reviews and Decisions shows the designation that was chosen and who designated it.'],
+    ['A work request with parts gets one designation per part, all designated together. See Parts in this Help.'],
     [['Open My Queue','mine']]],
   govmem:['What Governance Sees','gov',
     'You can look at any work request in the MMS, but you do not have to do anything in it.',
@@ -7338,7 +7340,8 @@ const HELP_TOPICS={
      'Post it on mismo.org using its Comment Period Card: the title, what the card says, Member Access (Resource Library) and Non-Member Access (license form, then the download).',
      'Post it on mismo.org, then the period runs on its own.',
      'When the period ends, the MMS moves it to Post-Comment.',
-     'The website feed in Settings › Website can post and remove open comment periods on the new mismo.org on its own once it is switched on.'],
+     'The website feed in Settings › Website can post and remove open comment periods on the new mismo.org on its own once it is switched on.',
+     'When the facilitator chooses the file for comment, your daily digest lists the Resource Library entry to make (Resource Library Entries to Make). Make the entry with that file, then put its link on the work request’s Links tab.'],
     [],
     [['Open Comment Periods','comment']]],
   parts:['Parts: More Than One License Designation','facilitator staff approver',
@@ -7376,7 +7379,7 @@ const HELP_TOPICS={
      'Errors on This Page lists anything that went wrong since you opened the MMS; the Team Error Log shows everyone’s errors for the last 7 days.',
      'It checks again every 5 minutes while the MMS is open. Check Again runs it now; Copy Report copies it to paste into an email or a chat with Claude.',
      'The MMS Robot runs the same checks, and the MMS’s automatic steps (reminders, retrying emails, bringing in approved Hub requests, IM and AWG hand-offs), every 30 minutes even when nobody has the MMS open. It signs its changes “MMS Robot”.',
-     'If a tab is left open on an older version of the MMS, it says so, asks you to reload, and stops its automatic steps until you do.',
+     'If a tab is left open on an older version of the MMS, it says so and asks you to reload. It lets you finish and save what you are doing, then stops saving (and its automatic steps) until you reload.',
      'On weekdays the GitHub digest run reads the last check, adds what it can see itself, and emails Jonna if anything is red or yellow, even when nobody has the MMS open.'],
     ['Settings › Notifications holds the email flow and Files flow links the checks read.'],
     [['Open System Health','health']]],
@@ -7385,7 +7388,8 @@ const HELP_TOPICS={
     ['Click My Email Choices in the left rail, above Settings.',
      'Untick anything you don’t want: work arriving at a step, reminders, answers to your asks, IM and AWG decisions, IM reviews ready, Architecture Help, your daily digest, or copies of other people’s digests.',
      'Click Save. Tick it again any time to start getting it again.'],
-    ['Email the MMS sends is only ever to @mismo.org and @mba.org addresses, and only for someone signed in to the MMS.'],
+    ['Email the MMS sends is only ever to @mismo.org and @mba.org addresses, and only for someone signed in to the MMS.',
+     'If Settings gives you the digest instead of individual emails, everything that would have come as a single email is in your digest.'],
     []],
   dprec:['Due-Process Record','facilitator staff approver gov',
     'One printable page per work request shows how it was decided: every review, vote and designation, the public comment period with each comment’s disposition, the key dates and the full history.',
