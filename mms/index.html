@@ -2036,6 +2036,8 @@ p,.sub,.lede{text-wrap:pretty}
 .dg-prev h3 .sp{flex-wrap:wrap}
 .srow .grip{min-width:28px;overflow:visible}
 @media(max-width:600px){.wkd .wn{letter-spacing:.04em;font-size:10px}.wkd{min-width:0}}
+/* Architecture Help cards hold buttons: no lift on hover, so a button never slides out from under the pointer (Nov 21) */
+.arc[data-archopen]:hover,.arc[data-archopen]:focus-visible{transform:none}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2109,7 +2111,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-22T01:15:55Z',fp:'fa16d0ba'};
+window.__mmsBuild={at:'2026-11-22T01:28:51Z',fp:'95893841'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
