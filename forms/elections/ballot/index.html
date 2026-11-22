@@ -570,7 +570,7 @@ var EF = (function(){
 
   function todayIso(){ var d=new Date(); return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2); }
   function isOpen(mode,from,until){ if(mode==="open") return true; if(mode==="closed") return false; var t=todayIso(); return !!(from && t>=from && (!until || t<=until)); }
-  /* the "Elections Forms" flow's address is published by Leadership HQ in slates/forms.json */
+  /* the "Leadership HQ - Forms" flow's address is published by Leadership HQ in slates/forms.json */
   var endpointP=null;
   function endpoint(){ if(FLOW_ENDPOINT) return Promise.resolve(FLOW_ENDPOINT); if(!endpointP) endpointP=fetch("/elections-hq/slates/forms.json",{cache:"no-store"}).then(function(r){ return r.ok?r.json():{}; }).then(function(j){ return (j&&j.endpoint)||""; },function(){ return ""; }); return endpointP; }
   function send(kind, rec){
