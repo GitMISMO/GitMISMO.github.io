@@ -2130,7 +2130,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-22T17:55:59Z',fp:'8bcdf4aa'};
+window.__mmsBuild={at:'2026-11-22T18:00:02Z',fp:'d744d92b'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -8822,7 +8822,7 @@ rvCard=function(rep){ const h=_rvCardRL(rep); if(rep.kind!=='im'||!rep.link) ret
 const RL_MASTER_HEAD=['Item #','Approval Body','Review Decision\n(IM AWG Only)','Review Comments\n(IM AWG Only) ','Submitter Comments','Change Type ','Change Target Type','Original/Old Value\n(If Applicable)','Reference Model Location of Target  (XPATH) ','Parent CONTAINER Name','CONTAINER Name','Alias CONTAINER Name \n(if applicable)','Choice Group Location\n (if applicable)','Data Point Name','Attribute Name','Enumeration Name','Attribute Association Type','Definition Type ',' Definition Type Template','Definition','Acronym Name','RELATIONSHIP: Verb Phrase','RELATIONSHIP: From ','RELATIONSHIP: To ','WR #','WR Name','Originating Work Group'];
 function rlIsRelease(t){ return !!t&&/reference model release|reference model v?\d+\.\d+(\.\d+)? release/i.test(t.name||''); }
 function rlRelOf(t){ const m=String(t.rmRelease||'').match(/\d+\.\d+(\.\d+)?/)||String(t.name||'').match(/\d+\.\d+\.\d+/); return m?'v'+m[0]:''; }
-function rlReleases(){ return [...new Set(allTickets().map(x=>rlRelOf(x)).filter(Boolean))].sort((a,b)=>b.localeCompare(a,undefined,{numeric:true})); }
+function rlReleases(){ return [...new Set(allTickets().filter(rlIsRelease).map(x=>rlRelOf(x)).filter(Boolean))].sort((a,b)=>b.localeCompare(a,undefined,{numeric:true})); }
 function rlInRelease(rel){ return allTickets().filter(x=>!x.archived&&rlRelOf(x)===rel&&!rlIsRelease(x)); }
 function rlLatestDoc(tid){ return Object.values(S.imr||{}).filter(d=>d&&d.ticket===tid&&d.status==='decided').sort((a,b)=>String(b.decidedAt||b.at).localeCompare(String(a.decidedAt||a.at)))[0]||null; }
 async function rlMasterRows(rel){ const T=rlInRelease(rel); T.forEach(t=>imEnsureR(t.id)); for(let i=0;i<12&&T.some(t=>!Object.values(S.imr||{}).some(d=>d&&d.ticket===t.id));i++) await new Promise(r=>setTimeout(r,250));
