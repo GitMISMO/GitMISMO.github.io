@@ -168,6 +168,14 @@
       "path": "/industry-license/"
     },
     {
+      "key": "huddle",
+      "label": "Huddle",
+      "colour": "#1BAF7A",
+      "group": "Planning",
+      "path": "/huddle/",
+      "menu": "Huddle (Meeting Polls)"
+    },
+    {
       "key": "sponsorship",
       "label": "Sponsorship Portal",
       "colour": "#0EA5E9",
