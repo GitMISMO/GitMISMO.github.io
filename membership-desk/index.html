@@ -520,7 +520,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* a set-up built from the application alone, the same shape Member 360 sends (Jonna, Nov 22, 2026) */
   function deskAppItem(a){const A=a.addr||{},B=a.billAddr||{},line=o=>[o.street,o.suite].filter(Boolean).join(", ");
     const from=String(a.submittedAt||"").slice(0,10)||today(),[y,m,d]=from.split("-").map(Number);
-    const start=new Date(Date.UTC(y,m-1+(d<=15?0:1),1)).toISOString().slice(0,10),end=start.slice(0,4)+"-12-31";
+    const start=new Date(Date.UTC(y,m-1+(d<=15?0:1),1)).toISOString().slice(0,10),end=(Number(start.slice(0,4))+(Number(start.slice(5,7))>=10?1:0))+"-12-31";/* starting Oct 1 or later runs through the next year (Jonna, Nov 22, 2026) */
     const contacts=[],seen={},C=a.contacts||{};
     const add=(role,p)=>{if(!p)return;const name=p.name||[p.first,p.last].filter(Boolean).join(" ");if(!(name||p.email))return;const k=String(p.email||name).toLowerCase()+"|"+role;if(seen[k])return;seen[k]=1;contacts.push({role,name,title:p.title||"",email:p.email||"",phone:p.phone||""});};
     [["primary","Primary"],["alternate","Alternate"],["billing","Billing"],["marketing","Marketing"]].forEach(r=>{const p=C[r[0]];add(r[1],p&&p.sameAsPrimary?C.primary:p);});add("Signed the Application",a.signer);
@@ -558,7 +558,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
        version (with Member 360's details) is the one shown; one Member 360 has already left off (set up, or already in Aptify) stays off. */
     const appItems=[];try{const nz=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,""),docs=((AP&&AP.data)||{}).docs||{},since=String(t.writtenAt||"");
       const have=new Set();(tt.members||[]).forEach(x=>{if(x.app)have.add(x.app);have.add(nz(x.name));});
-      Object.values(docs).forEach(a=>{if(!a||!a.id||!a.company||a.test||a.withdrawn||(a.action||"apply")!=="apply")return;
+      Object.values(docs).forEach(a=>{if(!a||!a.id||!a.company||a.test||a.withdrawn||a.oldForm||(a.action||"apply")!=="apply")return;
         if(a.setupAt||a.setup||a.aptifyId||a.orderNo||a.setUpAt||have.has(a.id)||have.has(nz(a.company)))return;
         if(since&&String(a.submittedAt||"")<since)return;
         appItems.push(deskAppItem(a));have.add(a.id);});}catch(e){console.error("desk applications",e);}
@@ -746,7 +746,7 @@ function deskSetup(x,left,kv){
  const ad=a=>{if(!a)return "";const l2=[a.city,[a.state,a.zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");return [a.street,l2,a.country&&!/^(us|usa|united states)$/i.test(a.country)?a.country:""].filter(Boolean).join("\n");};
  /* the membership application itself, as a PDF (Jonna, Nov 22, 2026): Member 360 makes one for every application */
  if(x.app){const ab=h("button",{type:"button",class:"btn",onclick:()=>deskAppPdf(x.app,ab)},"Open the Application (PDF)");
-  left.appendChild(h("div",{class:"sect"},h("h3",null,"Membership Application"),h("p",{class:"muted",style:"margin:0 0 8px"},"Reference "+x.app+": everything the applicant entered, with their logo."),ab));}
+  left.appendChild(h("div",{class:"sect"},h("h3",null,"Membership Application"),h("p",{class:"muted",style:"margin:10px 0 14px;line-height:1.5"},"Reference "+x.app+": everything the applicant entered, with their logo."),ab));}
  if((s.missing||[]).length)left.appendChild(dsiForm(x,s));
  const site=s.website||x.website||"";
  const addr=ad(s.address),bill=ad(s.billing);

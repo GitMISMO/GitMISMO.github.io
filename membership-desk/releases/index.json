@@ -27,6 +27,13 @@
       "by": "jycritchley",
       "note": "New applications show on their own; PDFs from the Desk's own copy",
       "sha256": "6a4ef0d94904db44153ae9635884515f4be565b88471f0e82338a93ab495d697"
+    },
+    {
+      "version": "20261122-2216",
+      "at": "2026-11-22T22:16:03.531Z",
+      "by": "jycritchley",
+      "note": "Oct-Dec joiners run through next year; roomier application note",
+      "sha256": "dc1ce38bf6408d713c5fc57055dac2e9f5a4ef7090538a43f669f7948d5e0c8e"
     }
   ]
 }
