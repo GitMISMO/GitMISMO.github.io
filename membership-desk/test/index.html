@@ -517,6 +517,23 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   const put=async(p,content,sha)=>fetch(URL(p),{method:"PUT",headers:{"Content-Type":"application/json",Authorization:"Bearer "+tok()},body:JSON.stringify({content,sha:sha||undefined})});
   const slug=v=>String(v||"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
   const PRE={members:"m",square:"sq",free:"free",iif:"iif"},idOf=(k,x)=>x.id||PRE[k]+"-"+(x.cid||slug(x.name));
+  /* a set-up built from the application alone, the same shape Member 360 sends (Jonna, Nov 22, 2026) */
+  function deskAppItem(a){const A=a.addr||{},B=a.billAddr||{},line=o=>[o.street,o.suite].filter(Boolean).join(", ");
+    const from=String(a.submittedAt||"").slice(0,10)||today(),[y,m,d]=from.split("-").map(Number);
+    const start=new Date(Date.UTC(y,m-1+(d<=15?0:1),1)).toISOString().slice(0,10),end=start.slice(0,4)+"-12-31";
+    const contacts=[],seen={},C=a.contacts||{};
+    const add=(role,p)=>{if(!p)return;const name=p.name||[p.first,p.last].filter(Boolean).join(" ");if(!(name||p.email))return;const k=String(p.email||name).toLowerCase()+"|"+role;if(seen[k])return;seen[k]=1;contacts.push({role,name,title:p.title||"",email:p.email||"",phone:p.phone||""});};
+    [["primary","Primary"],["alternate","Alternate"],["billing","Billing"],["marketing","Marketing"]].forEach(r=>{const p=C[r[0]];add(r[1],p&&p.sameAsPrimary?C.primary:p);});add("Signed the Application",a.signer);
+    const sector=a.sector==="Other"?(a.sectorOther||"Other"):(a.sector||""),website=a.website||"",phone=a.mainPhone||"";
+    const address=(A.street||A.city)?{street:line(A),city:A.city||"",state:A.state||"",zip:A.zip||"",country:A.country||""}:{street:"",city:"",state:"",zip:"",country:""};
+    const billing=!B.sameAsCompany&&(B.street||B.city)?{street:line(B),city:B.city||"",state:B.state||"",zip:B.zip||"",country:B.country||"",attn:B.attn||""}:null;
+    const missing=[];if(!address.street)missing.push("street address and ZIP");if(!phone)missing.push("main phone");if(!website)missing.push("website");
+    if(!contacts.some(c=>/primary/i.test(c.role)&&c.email))missing.push("a primary contact with an email");if(!contacts.some(c=>/billing/i.test(c.role)&&c.email))missing.push("a billing contact");
+    missing.push("Lender or Non-Lender");if(!sector)missing.push("industry sector");
+    const setup={key:"",legal:a.company,dba:a.dba||"",aptifyId:"",parent:null,memberType:"",sector,market:"",creditUnion:false,address,billing,phone,website,contacts,parentContacts:[],
+      payment:{how:"Not paid yet: applied on the website; the invoice goes to the Billing Contact once the membership is set up",amount:0,date:"",order:"",notes:""},start,end,
+      application:{id:a.id,submitted:from,notes:a.notes||"",po:a.po||"",focus:a.focus||"",subsidiaries:(a.subsidiaries||[]).map(s=>typeof s==="string"?s:(s.name||s.company||"")).filter(Boolean)},missing};
+    return {name:a.company,cid:"",level:String(a.levelLabel||a.level||"").replace(/\s*\(.*$/,""),price:+a.levelPrice||0,sold:from,paid:"",start,end,special:"Applied on the website",website,app:a.id,setup};}
   const today=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
   let card=null;const say=(t,sub)=>{if(!card){card=document.createElement("div");card.className="panel";card.style.cssText="padding:22px 24px;max-width:640px";const m=document.querySelector("main");m.prepend(card);}
     card.innerHTML="";const h=document.createElement("h2");h.style.cssText="margin:0 0 6px;font-size:18px";h.textContent=t;card.appendChild(h);if(sub){const p=document.createElement("div");p.className="vsub";p.style.whiteSpace="normal";p.textContent=sub;card.appendChild(p);}};
@@ -529,15 +546,24 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   /* Payment in Process: the invoices the team adds, kept in desk/invoices (never deleted: Entered by Mistake only marks one) (Jonna, Nov 2, 2026) */
   window.__deskInv=async fn=>{for(let i=0;i<4;i++){const g=await get("invoices");const P=(g.data&&Array.isArray(g.data.items))?g.data:{items:[]};fn(P);P.writtenAt=new Date().toISOString();const r=await put("invoices",P,g.sha);if(r.ok)return P;if(r.status!==409)throw new Error("save "+r.status);}throw new Error("busy");};
   async function load(){say("Opening the Membership Desk…","Loading what's waiting and what's been set up.");
-    const [T,S,C,Dn,I]=await Promise.all(["todos","square","cases","done","invoices"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
+    const [T,S,C,Dn,I,AP]=await Promise.all(["todos","square","cases","done","invoices","applications"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
     if(!T.data&&!S.data&&T.err&&S.err){say("The Membership Desk couldn't load","Please refresh. If it keeps happening, email Jonna.");return;}
     const t=T.data||{},s=S.data||{},items=((Dn.data&&Dn.data.items)||[]).filter(x=>!x.undone),doneIds=new Set(items.map(x=>x.id));
     /* a set-up marked done before it had an Aptify ID still counts once the ID arrives (Jonna, Nov 7, 2026) */
     const doneCid=new Set(items.filter(x=>x.cid).map(x=>String(x.id||"").split("-")[0]+"|"+x.cid));
     const keep=(k,L)=>(L||[]).map(x=>Object.assign({},x,{id:idOf(k,x)})).filter(x=>!doneIds.has(x.id)&&!(x.cid&&doneCid.has(PRE[k]+"|"+x.cid)));
     const tt=t.todo||{},td=t.done||{};
+    /* new website applications show here straight from the application (Jonna, Nov 22, 2026): Member 360 copies every application to
+       the desk's own data, so one shows the moment it arrives, without anyone opening Member 360. Once Member 360 has listed it, its
+       version (with Member 360's details) is the one shown; one Member 360 has already left off (set up, or already in Aptify) stays off. */
+    const appItems=[];try{const nz=s=>String(s||"").toLowerCase().replace(/[^a-z0-9]+/g,""),docs=((AP&&AP.data)||{}).docs||{},since=String(t.writtenAt||"");
+      const have=new Set();(tt.members||[]).forEach(x=>{if(x.app)have.add(x.app);have.add(nz(x.name));});
+      Object.values(docs).forEach(a=>{if(!a||!a.id||!a.company||a.test||a.withdrawn||(a.action||"apply")!=="apply")return;
+        if(a.setupAt||a.setup||a.aptifyId||a.orderNo||a.setUpAt||have.has(a.id)||have.has(nz(a.company)))return;
+        if(since&&String(a.submittedAt||"")<since)return;
+        appItems.push(deskAppItem(a));have.add(a.id);});}catch(e){console.error("desk applications",e);}
     window.DESK={asOf:today(),inv:((I&&I.data&&I.data.items)||[]),pip:t.pip||[],invPaid:t.invPaid||{},
-      todo:{square:keep("square",s.pending),members:keep("members",tt.members),free:keep("free",tt.free),iif:keep("iif",tt.iif)},
+      todo:{square:keep("square",s.pending),members:keep("members",(tt.members||[]).concat(appItems)),free:keep("free",tt.free),iif:keep("iif",tt.iif)},
       done:{square:s.done||[],squareWaitingPay:s.waitingPay||[],iif:td.iif||[],members:td.members||[],freeActive:td.freeActive||0},
       cases:C.data||{asOf:today(),total:0,months:{},topicsY:{},channelY:{},byY:{},sameDay:0,closed:0,list:{T:[],C:[],B:[],R:[]}},
       mine:items.slice().sort((a,b)=>String(b.at).localeCompare(String(a.at))).map(x=>({x:{kind:x.kind,name:x.name,id:x.id,level:x.level,special:x.special,price:x.price},cid:x.cid,order:x.order,person:x.person,note:x.note,at:x.at,by:x.by,byName:x.byName,entry:x.entry}))};
@@ -870,7 +896,7 @@ function cdLib(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((ok
 /* Opens a membership application's PDF (data/application-pdfs/<id>.pdf in Member 360's data) in a new tab. */
 async function deskAppPdf(id,btn){const t=btn.textContent;btn.disabled=true;btn.textContent="Opening…";
   try{const tk=window.ResourcesSession&&ResourcesSession.token?ResourcesSession.token():"";
-    const r=await fetch("https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/member-360/file/data/application-pdfs/"+encodeURIComponent(id)+".pdf",{headers:{Authorization:"Bearer "+tk},cache:"no-store"});
+    const R="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/",P="/file/data/application-pdfs/"+encodeURIComponent(id)+".pdf";/* the desk's own copy first, so the membership team needs Desk access only (Jonna, Nov 22, 2026) */let r=await fetch(R+"membership-desk"+P,{headers:{Authorization:"Bearer "+tk},cache:"no-store"});if(!r.ok)r=await fetch(R+"member-360"+P,{headers:{Authorization:"Bearer "+tk},cache:"no-store"});
     if(!r.ok)throw new Error(String(r.status));const b=String(((await r.json())||{}).content||"").replace(/\s/g,"");if(!b)throw new Error("empty");
     const bin=atob(b),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
     const url=URL.createObjectURL(new Blob([u8],{type:"application/pdf"}));const w=window.open(url,"_blank");
