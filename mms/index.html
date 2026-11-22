@@ -1451,7 +1451,7 @@ body.railmini .panel{width:calc(100vw - var(--rail-mini))}
 /* review feedback, terms list */
 .rvt .rv-fbh,.rvt .rv-fbc{width:86px;text-align:center;white-space:nowrap}
 .rv-fb{display:inline-flex;gap:4px}
-.rv-fbb{font:inherit;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;border:1px solid var(--line,#c9d6e2);background:transparent;color:inherit;cursor:pointer}
+.rv-fbb{font:inherit;font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:4px;border:1px solid var(--line,#c9d6e2);background:transparent;color:inherit;cursor:pointer}
 .rv-fbb:hover{border-color:var(--sky,#74bfeb)}
 .rv-fbb.on{background:#0f7b5c;border-color:#0f7b5c;color:#fff}
 .rv-fbb.no.on{background:#b4232c;border-color:#b4232c;color:#fff}
@@ -2038,6 +2038,25 @@ p,.sub,.lede{text-wrap:pretty}
 @media(max-width:600px){.wkd .wn{letter-spacing:.04em;font-size:10px}.wkd{min-width:0}}
 /* Architecture Help cards hold buttons: no lift on hover, so a button never slides out from under the pointer (Nov 21) */
 .arc[data-archopen]:hover,.arc[data-archopen]:focus-visible{transform:none}
+/* MISMO Link format check (rmlink.js) */
+.rl-sec{margin:14px 0 6px}
+.rl-sec h3{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px}
+.rl-cnt{font-size:12.5px;font-weight:500;color:var(--ink-3)}
+.rl-bar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0}
+.rl-t{table-layout:fixed}
+.rl-t td{vertical-align:top;overflow-wrap:anywhere;word-break:break-word}
+.rl-t th:nth-child(1){width:52px}.rl-t th:nth-child(2){width:19%}.rl-t th:nth-child(4){width:30%}.rl-t th:nth-child(5){width:170px}
+.rl-t s{color:var(--ink-3)}
+.rl-act{white-space:normal}
+.rl-act .btn{margin:0 4px 4px 0}
+.rl-d{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;margin-right:6px}
+.rl-accept{background:rgba(31,138,76,.12);color:#1f6e43}
+.rl-decline{background:rgba(180,83,9,.12);color:#92400e}
+.rl-by{font-size:12px;margin-right:6px}
+.rl-j{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:4px;font-size:11.5px;font-weight:600;background:rgba(116,191,235,.18);color:#14486e}
+.rl-mrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rl-mrow select{min-width:110px}
+@media (max-width:700px){.rl-act{white-space:normal}}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2111,7 +2130,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-22T02:04:18Z',fp:'fb351676'};
+window.__mmsBuild={at:'2026-11-22T17:55:59Z',fp:'8bcdf4aa'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -3420,7 +3439,7 @@ function wireArch(m){
   var D = {};
   var APP = 'https://resources.mismo.org/mms/';
   var LOGO = 'https://resources.mismo.org/mismo-signature-logo.png';
-  var HOURS_URL = 'https://resources.mismo.org/service-orders/';
+  var HOURS_URL = 'https://resources.mismo.org/contractor-hq/';
   var MT_URL = 'https://resources.mismo.org/meeting-trackers/';
 
   /* Every switch the digest has. Settings shows them as tick boxes. */
@@ -3451,7 +3470,7 @@ function wireArch(m){
       ['wkOverdue', 'Still past target', '']
     ] },
     { group: 'Monday', items: [
-      ['hours', 'Hours still to log in the Service Orders portal', 'Weeks the facilitator has not submitted yet. Only for people who log time.']
+      ['hours', 'Hours still to log in Contractor HQ', 'Weeks the facilitator has not submitted yet. Only for people who log time.']
     ] }
   ];
   D.DEFAULTS = {
@@ -3616,7 +3635,7 @@ function wireArch(m){
     return out.sort(function (a, b) { return a.name.localeCompare(b.name); });
   };
 
-  /* ---------- Service Orders: weeks of hours not submitted (Fridays end a week) ---------- */
+  /* ---------- Contractor HQ (formerly Service Orders): weeks of hours not submitted (Fridays end a week) ---------- */
   function weMDY(ymd) { var d = U(ymd); return String(d.getUTCMonth() + 1).padStart(2, '0') + '/' + String(d.getUTCDate()).padStart(2, '0') + '/' + String(d.getUTCFullYear()).slice(2); }
   function mdyToYmd(s) { var m = String(s || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if (!m) return String(s || '').slice(0, 10); var y = m[3].length === 2 ? '20' + m[3] : m[3]; return y + '-' + String(m[1]).padStart(2, '0') + '-' + String(m[2]).padStart(2, '0'); }
   D.hoursOwed = function (file, now) {
@@ -3740,7 +3759,7 @@ function wireArch(m){
     /* Monday hours */
     if (monday && on.hours && input.hours) {
       var hw = D.hoursOwed(input.hours[person.name], now);
-      if (hw && hw.length) S.push({ key: 'hours', title: 'Hours Still to Log', tone: 'bad', note: 'In the Service Orders portal', button: { href: HOURS_URL, label: 'Log My Hours' },
+      if (hw && hw.length) S.push({ key: 'hours', title: 'Hours Still to Log', tone: 'bad', note: 'In Contractor HQ', button: { href: HOURS_URL, label: 'Log My Hours' },
         rows: hw.map(function (w) { return { lead: 'Week ending', main: fl(w.ending), sub: w.back ? 'Sent back to you to correct' : 'Not submitted yet', badge: w.back ? 'Sent back' : 'Not submitted', tone: w.back ? 'warn' : 'bad', href: HOURS_URL }; }) });
     }
     /* staff who get the digest instead of emails also get a summary of each facilitator's digest (Nov 20) */
@@ -4415,7 +4434,7 @@ async function loadDigestSources(force){
       const order=known[p.name]?[known[p.name]].concat(V.filter(v=>v!==known[p.name])):V;
       for(const v of order){ for(const fy of fys){ const f=await rFile('so-'+v,'hours/'+slug+'-'+fy+'.json'); if(f&&f.weeks){ out.hours[p.name]=f; known[p.name]=v; return; } } } }));
     out.hoursVendor=known;
-  }catch(e){ out.note.push('Service Orders hours could not be read just now.'); }
+  }catch(e){ out.note.push('Contractor HQ hours could not be read just now.'); }
   digestSrc=out; digestSrcAt=Date.now(); return out;
 }
 function digestInput(src,now){ return {now:now||new Date(),tickets:S.tickets,process:S.process,people:S.people,arch:S.arch,media:S.media,comments:((src&&src.comments)||S.comments||[]).filter(c=>!cmIsTest(c)),mt:src&&src.mt,hours:src&&src.hours,settings:S.digestCfg,moveFor:(t,p)=>waitingOn(t,p)?(whoseMove(t).text||'Your move'):null}; }
@@ -5434,7 +5453,7 @@ const RV_FACE=[['wr','Work Request ID'],['name','Submission Name'],['cop','Prima
 // which fields each Change Type + Change Target Type needs (from the form's own instructions tab)
 const RV_NEED={'add and define':{acronym:['dt','def','ac'],attribute:['at','dt','def'],container:['xp','pc','cn','dt','def'],'data point':['pc','dp','dt','def'],enumeration:['dp','en','dt','def'],relationship:['dt','def']},
   'deprecate':{acronym:['ac'],attribute:['at'],container:['pc','cn'],'data point':['pc','dp'],enumeration:['dp','en']},
-  'modify definition':{acronym:['old','dt','def','ac'],attribute:['old','dt','def'],container:['old','cn','dt','def'],'data point':['old','dp','dt','def'],enumeration:['old','en','dt','def']},
+  'modify definition':{acronym:['old','dt','def','ac'],attribute:['old','dt','def'],container:['old','cn','dt','def'],'data point':['old','dp','dt','def'],enumeration:['old','dp','en','dt','def']},
   'move':{container:['old','pc','cn'],'data point':['old','pc','cn','dp']},'rename':{acronym:['old','ac'],attribute:['old','at'],container:['old','cn'],'data point':['old','dp'],enumeration:['old','dp','en']},
   'reuse':{container:['pc','cn'],'data point':['pc','dp']}};
 const RV_FIELD={item:'Item #',xp:'XPATH',pc:'Parent CONTAINER Name',cn:'CONTAINER Name',dp:'Data Point Name',at:'Attribute Name',en:'Enumeration Name',dt:'Definition Type',def:'Definition',ac:'Acronym Name',old:'Original/Old Value',ct:'Change Type',tt:'Change Target Type'};
@@ -5486,8 +5505,9 @@ function rvImChecks(file,ctx){
     if(tt==='enumeration'&&r.en&&/add/.test(ct)&&/^other$/i.test(r.en.trim())&&!P.rows.some(x=>/other description$/i.test(x.dp||''))) add('fix','Enumerations','“Other” is added, but no matching Type Other Description data point is added or reused.','Add or reuse the [Data Point] Other Description that goes with this Type.',where,'other-desc',it);
     // duplicates inside the submission
     const key=(tt+'|'+(r.pc||'')+'|'+nm).toLowerCase(), key2=('def|'+tt+'|'+nm).toLowerCase(); if(nm&&/add/.test(ct)){ if(seen[key]) add('recommend','Reference Model Changes','Added twice in this submission ('+seen[key]+' and '+it+').','Add and define it once, then reuse it at other XPaths.',where,'dup',it); else if(/define/.test(ct)&&seen[key2]) add('recommend','Reference Model Changes','Added and defined again under '+(r.pc||'another parent')+' (it is already defined at item '+seen[key2].it+(seen[key2].pc?' under '+seen[key2].pc:'')+').','IM’s rule is define once, reuse: keep the definition at item '+seen[key2].it+' and change this row to Add (reuse) at the new XPATH.',where,'dup',it); if(!seen[key]) seen[key]=it; if(/define/.test(ct)&&!seen[key2]) seen[key2]={it,pc:r.pc||''}; }
-    // container names are UPPER_CASE with underscores
-    if(tt==='container'&&r.cn&&!/^[A-Z][A-Z0-9_]*$/.test(String(r.cn).trim())) add('fix','Names','Container name '+rvQ(r.cn)+' isn’t in UPPER_CASE.','Container names use capital letters with underscores between words (for example '+String(r.cn).trim().toUpperCase().replace(/[^A-Z0-9]+/g,'_')+').',where,'normal-english',it);
+    // container names: normal English (Nov 22: was UPPER_CASE, which the form and MISMO Link don’t use)
+    /* container names are normal English too (the form's instructions, and what MISMO Link reads); only the XPATH uses capitals and underscores */
+    [['cn','CONTAINER Name'],['pc','Parent CONTAINER Name']].forEach(([k,l])=>{ const v=String(r[k]||'').trim(); if(v&&(/_/.test(v)||(!/[a-z]/.test(v)&&v.length>4))) add('fix','Names',l+' '+rvQ(v)+' isn’t in normal English.','Use words with spaces (for example '+v.toLowerCase().split(/_+/).map(w=>w?w[0].toUpperCase()+w.slice(1):'').join(' ')+'); only the XPATH uses capitals and underscores.',where,'normal-english',it); });
     // XPATH
     if(r.xp&&!/^\/{0,2}[A-Z][A-Z0-9_]*(\/[A-Z][A-Z0-9_]*)*(\/(@[A-Za-z][A-Za-z0-9]*|[A-Z][a-z][A-Za-z0-9]*))?\/?$/.test(r.xp.replace(/\s+/g,''))) add('fix','XPATH','The XPATH isn’t a path of container names.','Use the container names in capitals, separated by slashes (for example /DOCUMENT/DEAL_SETS/DEAL_SET/…). It may end at the data point or @attribute.',where,'xpath',it);
   });
@@ -7177,8 +7197,18 @@ const HELP_TOPICS={
      'When the work product is ready, click Submit for AI Review on the work request.',
      'The review runs in a few minutes. You get a list of what to fix and what is only a suggestion.',
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
-     'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.'],
+     'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.',
+     'On the IM Pre-Review report, go through MISMO Link Format: accept or decline each fix before you click Send to IM.'],
     ['Fixes are things IM will send back. Suggestions are up to you.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+    [['Open the Review Desk','reviews']]],
+  mislink:['MISMO Link Format: Fixes Before IM','*',
+    'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The IM Pre-Review lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
+    ['Run the IM Pre-Review on the work request. The report opens with MISMO Link Format.',
+     'Each row shows the change (old value crossed out, new value in bold) and why. Click Accept or Decline. Accept All Remaining takes the rest.',
+     '“Check this one” means the fix is a best guess (a parent container name, spelling, a second XPATH): look before you accept.',
+     'Download the Corrected Form, or Save It to This Work Request’s Files. It is your form with the accepted fixes written into the Reference Model Changes tab.',
+     'Click Send to IM. Accepted fixes are in the rows IM sees; declined ones go with a note, so IM knows you kept the original.'],
+    ['The rules come from the vendor’s corrections to the v3.6.3 and v3.6.4 lists and from the form’s own instructions: data point containers in Parent CONTAINER Name, names in plain words, the full XPATH from MESSAGE ending at the container, only the container inside a plural container repeats, alias containers, Reuse when something is already defined, and leaving blank the columns a change doesn’t use.','Spelling of new names is checked too: a misspelled name is published as is.','Once the form has gone to IM, the decisions are final.'],
     [['Open the Review Desk','reviews']]],
   handoff:['IM, AWG and Designation: What Happens on Its Own','*',
     'Once a submission is sent to IM, nobody has to move it by hand.',
@@ -7297,7 +7327,9 @@ const HELP_TOPICS={
      'Each submission comes with a draft decision for every row. Agree, or correct what the draft got wrong.',
      'Click a document to open it. Resubmissions link to the earlier decision.',
      'After the call, record the vote. Attendance and quorum come from Meeting Trackers.',
-     'Click Finish IM Review. Approved work goes to AWG on its own; returned work goes back to the facilitator.'],
+     'Click Finish IM Review. Approved work goes to AWG on its own; returned work goes back to the facilitator.',
+     'A row note that starts “MISMO Link format (facilitator kept as is)” is a MISMO Link fix the facilitator declined.',
+     'For the release: open the Reference Model release work request (for example Minor Reference Model Release v3.6.4) and click Download the Master Change List. It has every row IM approved, in the vendor’s layout, with a second tab of anything MISMO Link may still not read.'],
     ['Every correction teaches the next draft.'],
     [['Open IM Review','https://resources.mismo.org/im-review/']]],
   awgrun:['Running an AWG Review','imawg',
@@ -7420,9 +7452,9 @@ const HELP_TOPICS={
     [['Open MISMO Terms','rc:terms']]]
 };
 const HELP_ORDER={
-  facilitator:['start','hub','queue','panel','docs','arch','aireview','drafts','handoff','parts','asks','comments','dprec','invites','digest','mymail','mediareq','metrics','path','find','words'],
-  staff:['start','hub','queue','board','metrics','approvals','handoff','parts','govrec','dprec','settings','health','mt','notif','digest','mymail','panel','docs','drafts','arch','comments','invites','path','find'],
-  imawg:['start','imrun','awgrun','invites','mt','handoff','docs','drafts','digest','mymail','path','find'],
+  facilitator:['start','hub','queue','panel','docs','arch','aireview','mislink','drafts','handoff','parts','asks','comments','dprec','invites','digest','mymail','mediareq','metrics','path','find','words'],
+  staff:['start','hub','queue','board','metrics','approvals','mislink','handoff','parts','govrec','dprec','settings','health','mt','notif','digest','mymail','panel','docs','drafts','arch','comments','invites','path','find'],
+  imawg:['start','imrun','mislink','awgrun','invites','mt','handoff','docs','drafts','digest','mymail','path','find'],
   member:['start','member','invites','docs','path','find'],
   approver:['start','approve','parts','queue','handoff','dprec','metrics','digest','mymail','path','find'],
   gov:['start','govmem','comments','dprec','metrics','path','digest','mymail','find'],
@@ -8571,6 +8603,256 @@ wireDigest=function(m){ _wireDigestDGO(m); if(!$('#dgframe',m)) return;
   $$('[data-dgonly],[data-dgnomail]',m).forEach(x=>x.addEventListener('change',()=>{ upd(); if(x.checked&&x.dataset.dgnomail){ const o=$('[data-dgonly="'+CSS.escape(x.dataset.dgnomail)+'"]',m); if(o&&o.checked){ o.checked=false; upd(); } } }));
   /* the preview can show a digest-only person's email too */
   const sel=$('#dgwho',m); if(sel){ const have=[...sel.options].map(o=>o.value); dgoAll().filter(p=>(dgoCfg().digestOnly||[]).some(n=>sameName(n,p.name))&&!have.includes(p.name)).forEach(p=>{ const o=document.createElement('option'); o.textContent=p.name; o.value=p.name; if(S.dgPrev.who===p.name) o.selected=true; sel.appendChild(o); }); } };
+/* =====================================================================
+   MISMO Link format check (Nov 22, 2026)
+   MISMO Link (the vendor's tool that builds each Reference Model release) reads
+   the Reference Model Changes tab exactly as typed. The vendor corrects what it
+   can't read and sends the list back. These rules come from those corrections
+   (v3.6.4 master list vs. the vendor's Corrected Draft v5, reproducing all of its
+   corrections; v3.6.3 list vs. the published v3.6.3 dictionary) and from the
+   form's own "What Columns When" table.
+   The IM Pre-Review suggests each fix; the facilitator accepts or declines it.
+   Accepted fixes go to IM in the rows; declined ones go with a note, so IM sees
+   them. The corrected form can be downloaded or saved to the work request.
+   Release work requests get the Master Change List for the vendor.
+   ===================================================================== */
+const RL_ROOT=['MESSAGE','DEAL_SETS','DEAL_SET','DEALS','DEAL'];
+const RL_ACR=new Set(['AAPP','ADU','AMI','API','APR','ARM','AUS','AVM','CD','CFPB','CHOICE','COVID','CPL','DTI','DU','FDIC','FHA','FHFA','FICO','FNM','FRE','FRS','GFE','GNMA','GSE','HAMP','HELOC','HMDA','HOA','HUD','ID','IRS','LDD','LE','LLC','LLPA','LP','LTV','MERS','MI','MIN','MISMO','PITI','PMI','QM','REO','RESPA','SCRA','SSN','TIL','TILA','TRID','UAD','UCD','ULAD','UPB','URLA','US','USDA','VA','VOE','XML']);
+const RL_CHOICE=['Inside the Choice Group','Outside the Choice Group'];
+const RL_FIELD={ct:'Change Type',tt:'Change Target Type',old:'Original/Old Value',xp:'XPATH',pc:'Parent CONTAINER Name',cn:'CONTAINER Name',alias:'Alias CONTAINER Name',cg:'Choice Group Location',dp:'Data Point Name',at:'Attribute Name',en:'Enumeration Name',dt:'Definition Type',def:'Definition',ac:'Acronym Name',vp:'RELATIONSHIP: Verb Phrase',rf:'RELATIONSHIP: From',rt:'RELATIONSHIP: To'};
+/* the form's "What Columns When" table (RefM Prop Strt Tab Instructions), by Change Type and Change Target Type */
+const RL_COLS={'add and define':{acronym:['dt','def','ac'],attribute:['at','dt','def'],container:['xp','pc','cn','alias','cg','dt','def'],'data point':['pc','dp','cg','dt','def'],enumeration:['dp','en','dt','def'],relationship:['dt','def','vp','rf','rt']},
+  'deprecate':{acronym:['ac'],attribute:['at'],container:['xp','pc','cn'],'data point':['pc','dp'],enumeration:['dp','en'],relationship:['vp']},
+  'modify definition':{acronym:['old','dt','def','ac'],attribute:['old','xp','at','dt','def'],container:['old','cn','dt','def'],'data point':['old','dp','dt','def'],enumeration:['old','dp','en','dt','def'],relationship:['old','vp','rf','rt']},
+  'move':{container:['old','xp','pc','cn'],'data point':['old','pc','cn','dp']},
+  'rename':{acronym:['old','ac'],attribute:['old','at'],container:['old','cn'],'data point':['old','dp'],enumeration:['old','dp','en'],relationship:['old','vp','rf','rt']},
+  'reuse':{container:['xp','pc','cn','cg'],'data point':['pc','dp','cg']}};
+const RL_CARD={ind:'Container: Individual (cardinality zero to many)',sing:'Container: Singular (cardinality zero to one)'};
+const rlCt=r=>String(r.ct||'').toLowerCase().replace(/&/g,'and').replace(/\s+/g,' ').trim();
+const rlTt=r=>String(r.tt||'').toLowerCase().replace(/^data point.*/,'data point').replace(/\s+/g,' ').trim();
+const rlK=s=>String(s==null?'':s).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]/g,'');
+function rlIsAcr(w){ return RL_ACR.has(w)||!!(typeof RM!=='undefined'&&RM&&RM.ac&&RM.ac.has(w)); }
+/* plain English: UPPER_SNAKE or UpperCamel becomes words with spaces (acronyms stay capitals) */
+function rlPlain(s){ if(s==null) return s; let v=String(s).replace(/ /g,' ').replace(/\s+/g,' ').trim(); if(!v) return v;
+  if(!/[a-z]/.test(v)&&/[A-Z]/.test(v)&&(/_/.test(v)||!rlIsAcr(v))&&!/\s/.test(v.replace(/_/g,'')))
+    return v.split(/_+/).filter(Boolean).map(w=>rlIsAcr(w)||/\d/.test(w)?w:w[0]+w.slice(1).toLowerCase()).join(' ');
+  if(!/\s/.test(v)&&/^[A-Z][a-z0-9]+[A-Z]/.test(v)) return v.replace(/([a-z0-9])([A-Z])/g,'$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g,'$1 $2');
+  return v; }
+const rlSnake=s=>String(rlPlain(s)||'').trim().replace(/[^A-Za-z0-9]+/g,'_').replace(/^_|_$/g,'').toUpperCase();
+function rlPluralOf(p,c){ const a=rlK(p), b=rlK(c); return !!a&&!!b&&(a===b+'s'||a===b+'es'||(/y$/.test(b)&&a===b.slice(0,-1)+'ies')); }
+function rlSim(a,b){ a=rlK(a); b=rlK(b); if(!a||!b) return 0; const g=s=>{ const o=new Set(); for(let i=0;i<s.length-1;i++) o.add(s.slice(i,i+2)); return o; }; const A=g(a), B=g(b); let n=0; A.forEach(x=>{ if(B.has(x)) n++; }); return 2*n/((A.size+B.size)||1); }
+
+/* ---------- the check: one suggestion per fix, each with the cells it changes ---------- */
+function rlCheck(rows){
+  const out=[]; let n=0; const W=rows.map(r=>Object.assign({},r));
+  const sug=(r,rule,why,ch,judge)=>{ ch=ch.filter(c=>String(c.from==null?'':c.from)!==String(c.to==null?'':c.to)); if(!ch.length) return;
+    ch.forEach(c=>{ r[c.f]=c.to; }); out.push({id:'s'+(++n),item:String(r.item||''),row:r._row,name:r.en||r.dp||r.at||r.alias||r.cn||r.ac||'',rule,why,ch,judge:!!judge}); };
+  const set=(r,f,to)=>({f,from:r[f]==null?'':r[f],to});
+  // 1) names in plain English, single spaces
+  W.forEach(r=>{ ['pc','cn','alias','dp','at'].forEach(f=>{ if(!r[f]) return; const p=rlPlain(r[f]), raw=r._sp&&r._sp[f];
+      const onlySp=p!==r[f]&&p.replace(/\s/g,'')===String(r[f]).replace(/\s/g,'');
+      if(onlySp) sug(r,'lk-name','Extra spaces in the name: MISMO Link reads them as part of the name.',[{f,from:raw||r[f],to:p}]);
+      else if(p!==r[f]) sug(r,'lk-name','Names are plain words with spaces (only the XPATH uses capitals and underscores), so MISMO Link and spell-check can read them.',[{f,from:raw||r[f],to:p}]);
+      else if(raw) sug(r,'lk-name','Extra spaces in the name: MISMO Link reads “Report ” and “Report” as two different names.',[{f,from:raw,to:p}]); });
+    ['en'].forEach(f=>{ const raw=r._sp&&r._sp[f]; if(r[f]&&raw&&!/\[/.test(raw)) sug(r,'lk-name','Extra spaces in the name: MISMO Link reads them as part of the name.',[{f,from:raw,to:String(r[f]).replace(/\s+/g,' ').trim()}]); }); });
+  // 2) a data point's container goes in Parent CONTAINER Name; enumerations carry no container
+  W.forEach(r=>{ const tt=rlTt(r);
+    if((tt==='data point'||tt==='attribute')&&r.cn&&!r.pc) sug(r,'lk-dp-parent','For a data point, the container it sits in goes in Parent CONTAINER Name; CONTAINER Name stays blank.',[set(r,'pc',r.cn),set(r,'cn','')]);
+    if(tt==='enumeration'&&(r.pc||r.cn)) sug(r,'lk-enum-cont','Enumeration rows name only the data point and the value; no container.',[set(r,'pc',''),set(r,'cn','')]); });
+  // 3) alias containers: the base container in CONTAINER Name, the specific name in Alias, and it is Add and Define
+  W.forEach(r=>{ if(rlTt(r)!=='container'||!r.alias||!r.cn) return; const c=rlK(r.cn), a=rlK(r.alias);
+    if(c!==a&&c.endsWith(a)) sug(r,'lk-alias','CONTAINER Name is the existing container being reused (for example Address); Alias CONTAINER Name is the specific name (for example Property Address).',[set(r,'cn',r.alias),set(r,'alias',r.cn)]);
+    if(/reuse/.test(rlCt(r))) sug(r,'lk-alias','An alias container is added with its own name and definition, so the Change Type is Add and Define.',[set(r,'ct','Add and Define')]); });
+  // container names this submission defines (after the fixes above)
+  const defined=new Map(); W.forEach(r=>{ if(rlTt(r)==='container'&&/add|reuse/.test(rlCt(r))){ [r.alias,r.cn].filter(Boolean).forEach(x=>defined.set(rlK(x),rlPlain(x))); } });
+  const inModel=k=>!!(typeof RM!=='undefined'&&RM&&RM.cn&&RM.cn.has(k));
+  // 4) a parent container that isn't defined anywhere: most often the plural of the row's own container
+  W.forEach(r=>{ if(!r.pc||!/container|data point/.test(rlTt(r))||!/add|reuse|move/.test(rlCt(r))) return; const k=rlK(r.pc); if(defined.has(k)||inModel(k)) return;
+    const own=r.alias||r.cn; let best=''; if(rlTt(r)==='container'&&own){ const pl=[...defined.values()].find(d=>rlPluralOf(d,own)); if(pl) best=pl; }
+    if(!best&&!(typeof RM!=='undefined'&&RM)) return;   /* without the Reference Model it can't tell an existing container from a typo */
+    if(!best){ let sc=0; defined.forEach(v=>{ const s=rlSim(v,r.pc); if(s>sc&&s>=0.6){ sc=s; best=v; } }); }
+    if(best) r._oldpc=r.pc;
+    sug(r,'lk-parent','The parent container '+rvQ(r.pc)+' isn’t defined in this submission or the Reference Model'+(best?'; this looks like the one meant':'')+'.',best?[set(r,'pc',best)]:[],true);
+    if(!best) out.push({id:'s'+(++n),item:String(r.item||''),row:r._row,name:r.pc,rule:'lk-parent',why:'The parent container '+rvQ(r.pc)+' isn’t defined in this submission or the Reference Model. Check the name.',ch:[],judge:true}); });
+  // 5) repeating containers: only the container right inside a plural container repeats (zero to many)
+  const plural=new Set(); W.forEach(r=>{ if(rlTt(r)==='container'&&/plural/i.test(r.dt||'')) [r.alias,r.cn].filter(Boolean).forEach(x=>plural.add(rlK(x))); });
+  W.forEach(r=>{ if(rlTt(r)!=='container'||!/add/.test(rlCt(r))) return; const dt=String(r.dt||''); if(dt&&!/individual|singular/i.test(dt)) return;
+    const own=r.alias||r.cn; const pl=plural.has(rlK(r.pc))||rlPluralOf(r.pc,r.cn)||rlPluralOf(r.pc,own); const want=pl?RL_CARD.ind:RL_CARD.sing;
+    if(dt!==want) sug(r,'lk-card',pl?'It sits right inside the plural container '+rvQ(r.pc)+', so it repeats (zero to many).':'Only a container right inside a plural (“…s”) container repeats; this one is zero to one.',[set(r,'dt',want)]); });
+  // 6) a second Add and Define of the same thing is a Reuse
+  const seen={}; W.forEach(r=>{ const tt=rlTt(r); if(!/container|data point/.test(tt)||rlCt(r)!=='add and define'||(tt==='container'&&r.alias)) return; const nm=tt==='container'?r.cn:r.dp; if(!nm) return; const k=tt+'|'+rlK(nm);
+    if(seen[k]) sug(r,'lk-reuse','Already added and defined at item '+seen[k]+'; here it is reused, so the Change Type is Reuse with no new definition.',[set(r,'ct','Reuse'),set(r,'dt',''),set(r,'def','')]);
+    else if(tt==='data point'&&typeof RM!=='undefined'&&RM&&RM.dp&&RM.dp.has(rmKey(r.dp))&&!RM.depDp.has(rmKey(r.dp))) sug(r,'lk-reuse','Already in the '+RM.label+'; reuse it, with no new definition.',[set(r,'ct','Reuse'),set(r,'dt',''),set(r,'def','')],true);
+    else seen[k]=r.item||('row '+r._row); });
+  // 7) XPATH: the full path from MESSAGE, one path per row, ending at the container itself
+  W.forEach(r=>{ if(!r.xp) return; const tt=rlTt(r); let x=String(r.xp);
+    const paths=x.split(/\n+|\s{2,}|;/).map(s=>s.trim()).filter(Boolean); if(paths.length>1){ sug(r,'lk-xpath','One XPATH per row. Keep the first; add a Reuse row for the other location.',[set(r,'xp',paths[0])],true); x=paths[0]; }
+    let y=x.replace(/\s+/g,''); if(/^\/\//.test(y)){ const seg=y.replace(/^\/+/,'').split('/'); const i=RL_ROOT.indexOf(seg[0]); if(i>=0) y=RL_ROOT.slice(0,i).concat(seg).join('/'); }
+    y=y.replace(/^\/(?!\/)/,'').replace(/\/+$/,'');
+    if(tt==='container'&&/add|reuse|move/.test(rlCt(r))&&(r.alias||r.cn)&&!/^\/\//.test(y)){ const own=rlSnake(r.alias||r.cn); const seg=y.split('/');
+      if(r._oldpc&&seg[seg.length-1]===rlSnake(r._oldpc)) seg[seg.length-1]=rlSnake(r.pc); else if(r._oldpc&&seg[seg.length-1]===own&&seg[seg.length-2]===rlSnake(r._oldpc)) seg[seg.length-2]=rlSnake(r.pc);
+      y=seg.join('/'); if(own&&seg[seg.length-1]!==own) y=y+'/'+own; }
+    if(y!==x) sug(r,'lk-xpath',/^\/\//.test(x)?'MISMO Link needs the full XPATH from MESSAGE, not the // shortcut'+(tt==='container'?', ending with this container.':'.'):tt==='container'?'For a container, the XPATH is the path to the container itself, so it ends with '+rlSnake(r.alias||r.cn)+'.':'The XPATH starts at MESSAGE, with no slash in front.',[set(r,'xp',y)]); });
+  // 8) Choice Group Location is “Inside the Choice Group” or “Outside the Choice Group”
+  W.forEach(r=>{ if(r.cg&&!RL_CHOICE.some(c=>rlK(c)===rlK(r.cg))) sug(r,'lk-choice','Choice Group Location takes “Inside the Choice Group” or “Outside the Choice Group” from the dropdown (or blank).',[set(r,'cg','')],true); });
+  // 9) template wording copied into the wrong column
+  W.forEach(r=>{ ['pc','cn','alias','dp','at','en','old','ac','vp'].forEach(f=>{ if(r[f]&&/\[(name|description|qualifier|noun|thing|length|LDD|FROM|TO|verb)[^\]]*\]/i.test(r[f])) sug(r,'lk-template','Definition template wording ended up in '+RL_FIELD[f]+'.',[set(r,f,'')]); });
+    if(r.def&&/\[(name of|description of|qualifier|noun|thing|LDD term|verb phrase)[^\]]*\]/i.test(r.def)) out.push({id:'s'+(++n),item:String(r.item||''),row:r._row,name:r.dp||r.en||r.cn||'',rule:'lk-template',why:'The definition still has template placeholders in [brackets]. Write the definition out.',ch:[],judge:true}); });
+  // 10) columns this change doesn't use (people add extra information, then something in it is wrong)
+  W.forEach(r=>{ const use=(RL_COLS[rlCt(r)]||{})[rlTt(r)]; if(!use) return; const ex=Object.keys(RL_FIELD).filter(f=>!['ct','tt','ac'].includes(f)&&r[f]&&!use.includes(f));  /* an acronym noted on any row is harmless: MISMO Link ignores it */
+    if(ex.length) sug(r,'lk-extra','A '+r.ct+' · '+String(r.tt).trim()+' row doesn’t use '+ex.map(f=>RL_FIELD[f]).join(', ')+' (the form’s What Columns When table). Leave '+(ex.length>1?'them':'it')+' blank.',ex.map(f=>set(r,f,''))); });
+  Object.defineProperty(out,'rows',{value:W,enumerable:false});   /* the rows with every fix applied, for the spelling check */
+  return out;
+}
+
+/* ---------- spelling of the new names (Claude): a misspelled name is published as is ---------- */
+async function rlSpell(rows,list){
+  if(!S.sample||typeof rvAsk!=='function') return [];
+  const words=new Map(); rows.forEach(r=>{ const ct=rlCt(r); if(!/add|rename/.test(ct)) return; ['cn','alias','dp','at','en'].forEach(f=>{ String(r[f]||'').split(/[^A-Za-z]+/).filter(w=>w.length>3&&!/^[A-Z]+$/.test(w)).forEach(w=>words.set(w.toLowerCase(),w)); }); });
+  if(!words.size) return [];
+  const ws=[...words.values()].slice(0,400);
+  let res; try{ res=await rvAsk('These words are used in the names of new data points, containers and enumerations for the MISMO mortgage-industry Reference Model. List only the words that are clearly misspelled English words, with the correct spelling. Industry terms, abbreviations, product and agency names are fine. Answer in this JSON only: {"m":[["misspelled","correct"]]}. If none, {"m":[]}.\n\nWORDS: '+ws.join(', ')); }catch(e){ return []; }
+  const M=new Map(); ((res&&res.m)||[]).forEach(x=>{ if(Array.isArray(x)&&x[0]&&x[1]&&rlK(x[0])!==rlK(x[1])&&words.has(String(x[0]).toLowerCase())) M.set(String(x[0]).toLowerCase(),String(x[1])); });
+  if(!M.size) return [];
+  const out=[]; let n=(list||[]).length;
+  /* the same word is fixed wherever it appears: the name itself, parent containers and XPATHs that point to it */
+  rows.forEach(r=>{ const ch=[]; ['pc','cn','alias','dp','at','en','xp'].forEach(f=>{ const v=String(r[f]||''); if(!v) return; let to=v;
+      M.forEach((c,w)=>{ if(f==='xp') to=to.replace(new RegExp('(^|[/_])'+w.toUpperCase()+'(?=$|[/_])','g'),(m,a)=>a+c.toUpperCase()); else to=to.replace(new RegExp('\\b'+w+'\\b','gi'),m=>m[0]===m[0].toUpperCase()?c[0].toUpperCase()+c.slice(1):c.toLowerCase()); });
+      if(to!==v) ch.push({f,from:v,to}); });
+    if(ch.length) out.push({id:'s'+(++n),item:String(r.item||''),row:r._row,name:r.en||r.dp||r.at||r.alias||r.cn||'',rule:'lk-spell',why:'Spelling: '+ch.map(c=>rvQ(c.from)+' → '+rvQ(c.to)).join('; ')+'. A misspelled name goes into the published standard as is.',ch,judge:true}); });
+  return out;
+}
+
+/* ---------- hooked into the IM Pre-Review ---------- */
+const rlFiles={}; let rlLast=null;
+const _rvReadFileRL=rvReadFile;
+rvReadFile=async function(f){ const x=await _rvReadFileRL(f); if(x&&x.kind==='excel') rlLast={name:f.name,file:f}; return x; };
+const _rvImChecksRL=rvImChecks;
+function rlRawSpaces(file,rows){ const rm=(file.sheets||[]).find(s=>/^reference model changes$/i.test(String(s.name).trim())); if(!rm) return rows; const h=rm.rows.find(r=>Object.values(r.c).some(v=>/change type/i.test(v))); if(!h) return rows; const m=rvColMap(h.c);
+  return rows.map(r=>{ const raw=rm.rows.find(x=>x.n===r._row); if(!raw) return r; const sp={}; ['pc','cn','alias','dp','at','en'].forEach(f=>{ const v=m[f]&&raw.c[m[f]]; if(v!=null&&/^\s|\s$|\s{2,}|\u00a0/.test(String(v))&&String(v).trim()) sp[f]=String(v); }); return Object.keys(sp).length?Object.assign({},r,{_sp:sp}):r; }); }
+rvImChecks=function(file,ctx){ const r=_rvImChecksRL(file,ctx); try{ if(ctx&&r&&r.P&&r.P.rows) ctx.link=rlCheck(rlRawSpaces(file,r.P.rows)); }catch(e){ console.warn('MISMO Link check',e); } return r; };
+const _rvAiImRL=rvAiIm;
+rvAiIm=async function(P,ctx,progress){ const r=await _rvAiImRL(P,ctx,progress); try{ if(ctx&&ctx.link&&P&&P.rows){ progress&&progress('Checking the spelling of the new names…'); (await rlSpell(ctx.link.rows||P.rows,ctx.link)).forEach(s=>ctx.link.push(s)); } }catch(e){} return r; };
+const _rvBuildReportRL=rvBuildReport;
+rvBuildReport=function(kind,t,files,findings,ai,ctx){ const rep=_rvBuildReportRL(kind,t,files,findings,ai,ctx);
+  if(kind==='im'&&ctx&&ctx.link){ rep.link={sugg:ctx.link.slice(0,400),dec:{}}; if(rlLast) rlFiles[rep.id]=rlLast; }
+  return rep; };
+/* the IM rows carry the Definition Type and Acronym too (the Master Change List needs every column) */
+const _imDraftRowsRL=imDraftRows;
+imDraftRows=function(P,findings,ai){ const rows=_imDraftRowsRL(P,findings,ai); rows.forEach((x,i)=>{ const r=P.rows[i]||{}; ['dt','ac','dtt'].forEach(k=>{ if(r[k]&&k!=='dtt') x[k]=String(r[k]).slice(0,300); }); x._row=r._row; }); return rows; };
+
+/* ---------- decisions ---------- */
+function rlState(rep){ const L=(rep.link&&rep.link.sugg)||[], D=(rep.link&&rep.link.dec)||{}; const acc=L.filter(s=>(D[s.id]||{}).d==='accept'), dec=L.filter(s=>(D[s.id]||{}).d==='decline'); return {L,D,acc,dec,open:L.filter(s=>!D[s.id]&&s.ch.length),info:L.filter(s=>!s.ch.length)}; }
+function rlLocked(rep){ const doc=typeof S.imr!=='undefined'&&S.imr?S.imr[rep.id]:null; return !!(doc&&doc.status&&doc.status!=='draft'); }
+function rlCanDecide(rep){ const t=S.tickets[rep.ticket]; return !!t&&!S.viewAs&&(canAct(t)||S.isStaff)&&!rlLocked(rep); }
+/* accepted fixes change the rows IM gets; declined ones go along with a note */
+function rlApplyToDoc(rep){ const doc=S.imr&&S.imr[rep.id]; if(!doc||doc.status!=='draft') return null; const st=rlState(rep);
+  doc.rows.forEach(row=>{ const base=row._base||(row._base=Object.fromEntries(['ct','pc','cn','alias','cg','dp','at','en','xp','def','old','dt','ac'].map(k=>[k,row[k]==null?'':row[k]])));
+    Object.assign(row,base); row.link=null; });
+  const byRow=r=>doc.rows.find(x=>x._row===r)||null;
+  st.acc.forEach(s=>{ const row=byRow(s.row); if(!row) return; s.ch.forEach(c=>{ row[c.f]=c.to; }); row.name=row.en||row.dp||row.at||row.alias||row.cn||row.ac||row.name; });
+  [...st.dec,...st.open].forEach(s=>{ const row=byRow(s.row); if(!row) return; row.link=row.link||[]; row.link.push((st.D[s.id]?'Declined':'Not decided')+': '+s.ch.map(c=>RL_FIELD[c.f]+' '+rvQ(c.from||'(blank)')+' → '+rvQ(c.to||'(blank)')).join('; ')); });
+  doc.rows.forEach(row=>{ const com=String(row.draft.com||'').replace(/\s*MISMO Link format \(facilitator kept as is\):.*$/,''); row.draft.com=row.link&&row.link.length?(com+(com?' ':'')+'MISMO Link format (facilitator kept as is): '+row.link.join(' | ')).slice(0,900):com; });
+  return doc; }
+async function rlDecide(rep,ids,d){ const t=S.tickets[rep.ticket]; if(!t||!rlCanDecide(rep)) return; rep.link.dec=rep.link.dec||{}; const by=S.me.name||'', at=new Date().toISOString();
+  ids.forEach(id=>{ if(d) rep.link.dec[id]={d,by,at}; else delete rep.link.dec[id]; });
+  await rvSave(t,rep); const doc=rlApplyToDoc(rep); if(doc) await imSaveDoc(doc); }
+const _imSendRL=imSend;
+imSend=async function(t,rep){ const r=rep&&rep.link?rep:(S.reviews&&rep&&S.reviews[rep.id])||rep; if(r&&r.link){ const doc=rlApplyToDoc(r); if(doc) try{ await imSaveDoc(doc); }catch(e){} } return _imSendRL(t,rep); };
+
+/* ---------- the corrected form: the accepted fixes written into the Reference Model Changes tab ---------- */
+const rlCol=n=>{ let s=''; n++; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); } return s; };
+async function rlCorrected(rep,file){
+  await needLibs(); const z=await JSZip.loadAsync(await file.arrayBuffer());
+  const P=new DOMParser(), X=new XMLSerializer(); const rd=async p=>{ const f=z.file(p); return f?f.async('string'):''; };
+  const wb=P.parseFromString(await rd('xl/workbook.xml'),'application/xml'), rels=P.parseFromString(await rd('xl/_rels/workbook.xml.rels'),'application/xml');
+  const sh=[...wb.getElementsByTagName('sheet')].find(s=>/^reference model changes$/i.test(String(s.getAttribute('name')).trim())); if(!sh) throw new Error('This file has no Reference Model Changes tab.');
+  const rid=sh.getAttribute('r:id')||sh.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id');
+  const tgt=[...rels.getElementsByTagName('Relationship')].find(r=>r.getAttribute('Id')===rid).getAttribute('Target'); const path='xl/'+tgt.replace(/^\/?xl\//,'').replace(/^\//,'');
+  const ss=[]; const sst=await rd('xl/sharedStrings.xml'); if(sst) [...P.parseFromString(sst,'application/xml').getElementsByTagName('si')].forEach(si=>ss.push([...si.getElementsByTagName('t')].map(t=>t.textContent).join('')));
+  const d=P.parseFromString(await rd(path),'application/xml'), NS=d.documentElement.namespaceURI; const val=c=>{ const t=c.getAttribute('t'), v=c.getElementsByTagName('v')[0]; if(t==='s') return v?ss[+v.textContent]||'':''; if(t==='inlineStr') return [...c.getElementsByTagName('t')].map(x=>x.textContent).join(''); return v?v.textContent:''; };
+  const rowsEl=[...d.getElementsByTagName('row')]; const hdr=rowsEl.find(r=>[...r.getElementsByTagName('c')].some(c=>/change type/i.test(val(c)))); if(!hdr) throw new Error('Couldn’t find the header row on the Reference Model Changes tab.');
+  const hm={}; [...hdr.getElementsByTagName('c')].forEach(c=>{ hm[c.getAttribute('r').replace(/\d+/g,'')]=val(c); }); const cm=rvColMap(hm);
+  const st=rlState(rep); let n=0, formula=false;
+  const rowEl=num=>{ let r=rowsEl.find(x=>+x.getAttribute('r')===num); if(r) return r; r=d.createElementNS(NS,'row'); r.setAttribute('r',num); const sd=d.getElementsByTagName('sheetData')[0]; const after=[...sd.children].find(x=>+x.getAttribute('r')>num); sd.insertBefore(r,after||null); rowsEl.push(r); return r; };
+  const colN=L=>[...L].reduce((a,ch)=>a*26+ch.charCodeAt(0)-64,0);
+  st.acc.forEach(s=>s.ch.forEach(c=>{ const L=cm[c.f]; if(!L||!s.row) return; const r=rowEl(s.row), ref=L+s.row; let cell=[...r.getElementsByTagName('c')].find(x=>x.getAttribute('r')===ref);
+    if(!cell){ cell=d.createElementNS(NS,'c'); cell.setAttribute('r',ref); const after=[...r.getElementsByTagName('c')].find(x=>colN(x.getAttribute('r').replace(/\d+/g,''))>colN(L)); r.insertBefore(cell,after||null); }
+    while(cell.firstChild){ if(cell.firstChild.nodeName==='f') formula=true; cell.removeChild(cell.firstChild); }
+    if(c.to===''||c.to==null) cell.removeAttribute('t'); else { cell.setAttribute('t','inlineStr'); const is=d.createElementNS(NS,'is'), t=d.createElementNS(NS,'t'); t.setAttribute('xml:space','preserve'); t.textContent=String(c.to); is.appendChild(t); cell.appendChild(is); }
+    n++; }));
+  z.file(path,X.serializeToString(d));
+  if(formula&&z.file('xl/calcChain.xml')){ z.remove('xl/calcChain.xml'); const ct=await rd('[Content_Types].xml'); z.file('[Content_Types].xml',ct.replace(/<Override[^>]*calcChain[^>]*\/>/,'')); const rr=await rd('xl/_rels/workbook.xml.rels'); z.file('xl/_rels/workbook.xml.rels',rr.replace(/<Relationship[^>]*calcChain[^>]*\/>/,'')); }
+  const blob=await z.generateAsync({type:'blob',compression:'DEFLATE',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const name=String(file.name).replace(/\.xls[xm]$/i,'')+' - MISMO Link Format.xlsx';
+  return {file:new File([blob],name,{type:blob.type}),cells:n}; }
+/* the original form: from this session, from SharePoint, or chosen again */
+async function rlOriginal(rep){ if(rlFiles[rep.id]) return rlFiles[rep.id].file;
+  const t=S.tickets[rep.ticket]; const nm=(rep.files||[])[0]||''; if(t&&typeof rvSrcFiles==='function'&&typeof rvSrcGet==='function'){ const f=rvSrcFiles(t,'im').find(x=>x.n===nm); if(f) try{ const got=await rvSrcGet(f); rlFiles[rep.id]={name:got.name,file:got}; return got; }catch(e){} }
+  return await new Promise(res=>{ const i=document.createElement('input'); i.type='file'; i.accept='.xlsx,.xlsm'; i.onchange=()=>res(i.files[0]||null); i.click(); }); }
+async function rlMakeFile(rep){ const f=await rlOriginal(rep); if(!f) return null; if((rep.files||[])[0]&&f.name!==rep.files[0]) toast('Using '+f.name+' (the review read '+rep.files[0]+')'); return rlCorrected(rep,f); }
+function rlSaveAs(file){ const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
+
+/* ---------- in the IM Pre-Review report ---------- */
+function rlSecHtml(rep,forWord){ if(!rep||!rep.link) return ''; const st=rlState(rep), e=esc; const can=!forWord&&rlCanDecide(rep);
+  const cell=c=>e(RL_FIELD[c.f]||c.f)+': '+(c.from?'<s>'+e(rvTrim(c.from,140))+'</s> ':'')+'<b>'+(c.to?e(rvTrim(c.to,140)):'(blank)')+'</b>';
+  const decided=s=>{ const x=st.D[s.id]; return x?'<span class="rl-d rl-'+e(x.d)+'">'+(x.d==='accept'?'Accepted':'Declined')+'</span>'+(forWord?'':'<span class="muted rl-by">'+e(firstName(x.by||''))+'</span>'):''; };
+  const rows=st.L.map(s=>'<tr data-rls="'+e(s.id)+'"><td>'+e(s.item||'')+'</td><td>'+e(rvTrim(s.name,60))+'</td><td>'+(s.ch.length?s.ch.map(cell).join('<br>'):'<i>Needs a person to fix</i>')+'</td><td>'+e(s.why)+(s.judge?' <span class="rl-j">Check this one</span>':'')+'</td><td class="rl-act">'+(st.D[s.id]?decided(s)+(can?'<button type="button" class="btn sm ghost" data-rlx="'+e(s.id)+'">Undo</button>':''):(s.ch.length&&can?'<button type="button" class="btn sm" data-rld="'+e(s.id)+'">Decline</button><button type="button" class="btn sm pri" data-rla="'+e(s.id)+'">Accept</button>':(s.ch.length?'<span class="muted">Not decided</span>':'')))+'</td></tr>').join('');
+  const head='<h3>MISMO Link Format<span class="rl-cnt">'+st.L.length+' suggestion'+(st.L.length===1?'':'s')+' · '+st.acc.length+' accepted · '+st.dec.length+' declined'+(st.open.length?' · '+st.open.length+' to decide':'')+'</span></h3>';
+  const intro='<p class="rvr-note">MISMO Link builds the Reference Model from this tab exactly as typed. These are the fixes its vendor makes when it can’t read a row. Accept the ones that are right; declined ones go to IM with a note.'+(rlLocked(rep)?' This form has gone to IM, so the decisions are final.':'')+'</p>';
+  if(!st.L.length) return head+'<p>Nothing to fix: the Reference Model Changes tab is in the format MISMO Link reads.</p>';
+  const bar=forWord?'':'<div class="rl-bar">'+(can&&st.open.length?'<button type="button" class="btn sm" data-rlall="1">Accept All Remaining ('+st.open.length+')</button>':'')+(st.acc.length?'<button type="button" class="btn sm" data-rlget="dl">Download the Corrected Form</button>'+(S.notify&&S.notify.docFlowUrl&&can?'<button type="button" class="btn sm" data-rlget="sp">Save It to This Work Request’s Files</button>':''):'')+'<span class="rl-msg muted"></span></div>';
+  return '<div class="rl-sec" data-rlrep="'+e(rep.id)+'">'+head+intro+bar+'<table class="rvt rl-t"><thead><tr><th>Item</th><th>Name</th><th>Change</th><th>Why</th><th>'+(forWord?'Decision':'')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div>'; }
+const _rvReportHtmlRL=rvReportHtml;
+rvReportHtml=function(rep,forWord){ const h=_rvReportHtmlRL(rep,forWord); if(!rep||rep.kind!=='im'||!rep.link) return h; const sec=rlSecHtml(rep,forWord); const i=h.indexOf('<h3>'); return i<0?h.replace(/<\/div>\s*$/,sec+'</div>'):h.slice(0,i)+sec+h.slice(i); };
+document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-rla],[data-rld],[data-rlx],[data-rlall],[data-rlget]'); if(!b) return; const sec=b.closest('[data-rlrep]'); if(!sec) return; e.preventDefault();
+  const rep=S.reviews[sec.dataset.rlrep]; if(!rep||!rep.link) return; const msg=$('.rl-msg',sec); const re=()=>{ const w=document.createElement('div'); w.innerHTML=rlSecHtml(rep,false); sec.replaceWith(w.firstChild); };
+  try{ if(b.dataset.rlget){ b.disabled=true; if(msg) msg.textContent='Writing the corrected form…'; const r=await rlMakeFile(rep); if(!r){ if(msg) msg.textContent=''; b.disabled=false; return; }
+      if(b.dataset.rlget==='dl'){ rlSaveAs(r.file); toast(r.cells+' cell'+(r.cells===1?'':'s')+' corrected'); }
+      else { const t=S.tickets[rep.ticket]; await ssUpload(t,[r.file]); toast('Saved to the work request’s files: '+r.file.name); const x=clone(S.tickets[t.id]); hist(x,'MISMO Link format: corrected form saved ('+r.file.name+')'); await saveTicket(x,'Saved'); }
+      if(msg) msg.textContent=''; b.disabled=false; return; }
+    b.disabled=true; const st=rlState(rep);
+    if(b.dataset.rlall) await rlDecide(rep,st.open.map(s=>s.id),'accept');
+    else await rlDecide(rep,[b.dataset.rla||b.dataset.rld||b.dataset.rlx],b.dataset.rla?'accept':b.dataset.rld?'decline':'');
+    re(); }catch(err){ b.disabled=false; toast((err&&err.message)||'That didn’t save. Try again.'); } });
+const _rvCardRL=rvCard;
+rvCard=function(rep){ const h=_rvCardRL(rep); if(rep.kind!=='im'||!rep.link) return h; const o=rlState(rep).open.length; return o?h.replace('</span><span class="rv-cd">',' · '+o+' MISMO Link fix'+(o===1?'':'es')+' to decide</span><span class="rv-cd">'):h; };
+
+/* ---------- the Master Change List for the vendor (on a Reference Model release work request) ---------- */
+const RL_MASTER_HEAD=['Item #','Approval Body','Review Decision\n(IM AWG Only)','Review Comments\n(IM AWG Only) ','Submitter Comments','Change Type ','Change Target Type','Original/Old Value\n(If Applicable)','Reference Model Location of Target  (XPATH) ','Parent CONTAINER Name','CONTAINER Name','Alias CONTAINER Name \n(if applicable)','Choice Group Location\n (if applicable)','Data Point Name','Attribute Name','Enumeration Name','Attribute Association Type','Definition Type ',' Definition Type Template','Definition','Acronym Name','RELATIONSHIP: Verb Phrase','RELATIONSHIP: From ','RELATIONSHIP: To ','WR #','WR Name','Originating Work Group'];
+function rlIsRelease(t){ return !!t&&/reference model release|reference model v?\d+\.\d+(\.\d+)? release/i.test(t.name||''); }
+function rlRelOf(t){ const m=String(t.rmRelease||'').match(/\d+\.\d+(\.\d+)?/)||String(t.name||'').match(/\d+\.\d+\.\d+/); return m?'v'+m[0]:''; }
+function rlReleases(){ return [...new Set(allTickets().map(x=>rlRelOf(x)).filter(Boolean))].sort((a,b)=>b.localeCompare(a,undefined,{numeric:true})); }
+function rlInRelease(rel){ return allTickets().filter(x=>!x.archived&&rlRelOf(x)===rel&&!rlIsRelease(x)); }
+function rlLatestDoc(tid){ return Object.values(S.imr||{}).filter(d=>d&&d.ticket===tid&&d.status==='decided').sort((a,b)=>String(b.decidedAt||b.at).localeCompare(String(a.decidedAt||a.at)))[0]||null; }
+async function rlMasterRows(rel){ const T=rlInRelease(rel); T.forEach(t=>imEnsureR(t.id)); for(let i=0;i<12&&T.some(t=>!Object.values(S.imr||{}).some(d=>d&&d.ticket===t.id));i++) await new Promise(r=>setTimeout(r,250));
+  const rows=[], miss=[]; T.forEach(t=>{ const d=rlLatestDoc(t.id); if(!d){ miss.push(t); return; }
+    (d.rows||[]).forEach(r=>{ const f=r.final||{}; const dec=f.dec||''; if(!/^approved/i.test(dec)) return; rows.push({t,r,dec,com:(f.agreed?'':f.com)||'',sug:f.sug||''}); }); });
+  return {T,rows,miss}; }
+async function rlMaster(rel){ await needLibs(); const R=await rlMasterRows(rel);
+  const flat=R.rows.map((x,i)=>Object.assign({item:String(i+1),_row:i+2},{ct:x.r.ct,tt:x.r.tt,old:x.r.old,xp:x.r.xp,pc:x.r.pc,cn:x.r.cn,alias:x.r.alias,cg:x.r.cg,dp:x.r.dp,at:x.r.at,en:x.r.en,dt:x.r.dt,def:x.r.def,ac:x.r.ac,vp:x.r.rel,rf:x.r.rf,rt:x.r.rt}));
+  const chk=rlCheck(flat);
+  const aoa=[RL_MASTER_HEAD,...R.rows.map((x,i)=>{ const r=x.r; return [i+1,'',x.dec.replace(/Approved as Submitted/i,'Approved as submitted').replace(/Approved with Modification/i,'Approved with modification'),[x.com,x.sug?'IM suggested: '+x.sug:''].filter(Boolean).join(' '),r.sc||'',r.ct||'',r.tt||'',r.old||'',r.xp||'',r.pc||'',r.cn||'',r.alias||'',r.cg||'',r.dp||'',r.at||'',r.en||'',r.aat||'',r.dt||'','',r.def||'',r.ac||'',r.rel||'',r.rf||'',r.rt||'',x.t.wr||'',x.t.name||'',x.t.workgroup||'']; })];
+  const ws=XLSX.utils.aoa_to_sheet(aoa); ws['!cols']=[6,8,18,30,24,14,14,24,60,28,28,22,18,32,18,26,14,30,10,70,10,18,18,18,12,30,24].map(w=>({wch:w})); ws['!autofilter']={ref:'A1:AA'+aoa.length};
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Sheet1');
+  const notes=[['Item #','WR #','Name','Change','Why']].concat(chk.map(s=>[s.item,(R.rows[+s.item-1]||{t:{}}).t.wr||'',s.name,s.ch.map(c=>RL_FIELD[c.f]+': '+(c.from||'(blank)')+' → '+(c.to||'(blank)')).join('; ')||'(needs a person)',s.why]));
+  const ws2=XLSX.utils.aoa_to_sheet(notes); ws2['!cols']=[6,12,32,80,80].map(w=>({wch:w})); XLSX.utils.book_append_sheet(wb,ws2,'MISMO Link Check');
+  if(R.miss.length){ const ws3=XLSX.utils.aoa_to_sheet([['WR #','Name','Stage','Why it isn’t in the list'],...R.miss.map(t=>[t.wr,t.name,stageDef(t.stage).name,'No IM decision in the MMS yet'])]); ws3['!cols']=[14,50,20,40].map(w=>({wch:w})); XLSX.utils.book_append_sheet(wb,ws3,'Not Included'); }
+  const d=new Date(), mmddyyyy=String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+d.getFullYear();
+  XLSX.writeFile(wb,'Reference Model Changes_'+rel+' Master Change List '+mmddyyyy+'.xlsx');
+  return {rows:R.rows.length,wrs:R.T.length-R.miss.length,miss:R.miss.length,check:chk.length}; }
+function rlMasterSec(t){ if(!rlIsRelease(t)||!(S.isStaff||isRole('imawg',S.me))) return ''; const L=rlReleases(); const cur=rlRelOf(t)||L[0]||''; if(!L.length) return '';
+  const T=rlInRelease(cur); const done=T.filter(x=>rlLatestDoc(x.id)).length;
+  return '<div class="psec full rl-master"><h4>Master Change List for MISMO Link</h4><p class="muted" style="font-size:12.5px;margin:0 0 8px">Every row IM approved for the release, from each work request’s IM decision, in the vendor’s layout (with WR #, WR Name and Originating Work Group). A second tab lists anything MISMO Link may still not read, across work requests.</p>'+
+    '<div class="rl-mrow"><select data-rlrel="1">'+L.map(v=>'<option'+(v===cur?' selected':'')+'>'+esc(v)+'</option>').join('')+'</select><span class="muted rl-mn">'+T.length+' work request'+(T.length===1?'':'s')+(T.length?', '+done+' with an IM decision in the MMS':'')+'</span><button type="button" class="btn sm pri" data-rlmaster="1">Download the Master Change List</button></div></div>'; }
+const _renderPanelRL=renderPanel;
+renderPanel=function(){ _renderPanelRL(); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const h=rlMasterSec(t); if(!h) return;
+  const P=$('#panel'), pb=P&&$('.pb',P); if(!pb||$('.rl-master',pb)) return; const host=$('[data-wtab="over"]',pb)||pb; const w=document.createElement('div'); w.innerHTML=h; host.appendChild(w.firstChild); rlInRelease(rlRelOf(t)).forEach(x=>imEnsureR(x.id)); };
+document.addEventListener('change',e=>{ const s=e.target&&e.target.closest&&e.target.closest('[data-rlrel]'); if(!s) return; const sec=s.closest('.rl-master'); const T=rlInRelease(s.value); T.forEach(x=>imEnsureR(x.id)); const n=$('.rl-mn',sec); if(n) n.textContent=T.length+' work request'+(T.length===1?'':'s')+(T.length?', '+T.filter(x=>rlLatestDoc(x.id)).length+' with an IM decision in the MMS':''); });
+document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-rlmaster]'); if(!b) return; e.preventDefault(); const sec=b.closest('.rl-master'), rel=$('[data-rlrel]',sec).value; b.disabled=true; const old=b.textContent; b.textContent='Building…';
+  try{ const r=await rlMaster(rel); toast(r.rows+' rows from '+r.wrs+' work request'+(r.wrs===1?'':'s')+(r.miss?'; '+r.miss+' not included yet':'')+(r.check?'; '+r.check+' format notes on the second tab':'')); }catch(err){ toast((err&&err.message)||'The list didn’t build. Try again.'); }
+  b.disabled=false; b.textContent=old; });
+window.__mmsLink={check:rlCheck,plain:rlPlain,corrected:rlCorrected,state:rlState,master:rlMaster,rows:rlMasterRows};
 /* ---------- Out-of-date tabs can't save (Nov 21, 2026) ----------
    When a newer version of the MMS is published, an older open tab stops saving: it lets the person finish what they
    are typing (unsaved work-request changes or an open window), then goes read-only and asks them to reload. Any save

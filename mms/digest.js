@@ -11,7 +11,7 @@
   var D = {};
   var APP = 'https://resources.mismo.org/mms/';
   var LOGO = 'https://resources.mismo.org/mismo-signature-logo.png';
-  var HOURS_URL = 'https://resources.mismo.org/service-orders/';
+  var HOURS_URL = 'https://resources.mismo.org/contractor-hq/';
   var MT_URL = 'https://resources.mismo.org/meeting-trackers/';
 
   /* Every switch the digest has. Settings shows them as tick boxes. */
@@ -42,7 +42,7 @@
       ['wkOverdue', 'Still past target', '']
     ] },
     { group: 'Monday', items: [
-      ['hours', 'Hours still to log in the Service Orders portal', 'Weeks the facilitator has not submitted yet. Only for people who log time.']
+      ['hours', 'Hours still to log in Contractor HQ', 'Weeks the facilitator has not submitted yet. Only for people who log time.']
     ] }
   ];
   D.DEFAULTS = {
@@ -207,7 +207,7 @@
     return out.sort(function (a, b) { return a.name.localeCompare(b.name); });
   };
 
-  /* ---------- Service Orders: weeks of hours not submitted (Fridays end a week) ---------- */
+  /* ---------- Contractor HQ (formerly Service Orders): weeks of hours not submitted (Fridays end a week) ---------- */
   function weMDY(ymd) { var d = U(ymd); return String(d.getUTCMonth() + 1).padStart(2, '0') + '/' + String(d.getUTCDate()).padStart(2, '0') + '/' + String(d.getUTCFullYear()).slice(2); }
   function mdyToYmd(s) { var m = String(s || '').match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/); if (!m) return String(s || '').slice(0, 10); var y = m[3].length === 2 ? '20' + m[3] : m[3]; return y + '-' + String(m[1]).padStart(2, '0') + '-' + String(m[2]).padStart(2, '0'); }
   D.hoursOwed = function (file, now) {
@@ -331,7 +331,7 @@
     /* Monday hours */
     if (monday && on.hours && input.hours) {
       var hw = D.hoursOwed(input.hours[person.name], now);
-      if (hw && hw.length) S.push({ key: 'hours', title: 'Hours Still to Log', tone: 'bad', note: 'In the Service Orders portal', button: { href: HOURS_URL, label: 'Log My Hours' },
+      if (hw && hw.length) S.push({ key: 'hours', title: 'Hours Still to Log', tone: 'bad', note: 'In Contractor HQ', button: { href: HOURS_URL, label: 'Log My Hours' },
         rows: hw.map(function (w) { return { lead: 'Week ending', main: fl(w.ending), sub: w.back ? 'Sent back to you to correct' : 'Not submitted yet', badge: w.back ? 'Sent back' : 'Not submitted', tone: w.back ? 'warn' : 'bad', href: HOURS_URL }; }) });
     }
     /* staff who get the digest instead of emails also get a summary of each facilitator's digest (Nov 20) */

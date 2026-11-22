@@ -1,6 +1,6 @@
 /* MMS Daily Digest: the scheduled sender.
    Run by .github/workflows/mms-digest.yml every weekday afternoon. It reads the MMS,
-   Meeting Trackers and Service Orders records straight from their private repositories,
+   Meeting Trackers and Contractor HQ (formerly Service Orders) records straight from their private repositories,
    builds each facilitator's email with the same engine the MMS uses (mms/digest.js),
    and hands each one to the MMS email flow in Power Automate.
 
@@ -86,7 +86,7 @@ try {
   mt = { groups: G, logged };
 } catch (e) { console.log('Meeting Trackers not read:', e.message); }
 
-/* Service Orders hours */
+/* Contractor HQ (formerly Service Orders) hours: still read from the so-<company>-data repositories */
 const hours = {};
 const V = ['actualize', 'falcon', 'phoenix', 'trex', 'trudigital', 'vianteye'];
 for (const p of ((config.people || {}).facilitators || [])) {
