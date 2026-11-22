@@ -34,6 +34,13 @@
       "by": "jycritchley",
       "note": "Oct-Dec joiners run through next year; roomier application note",
       "sha256": "dc1ce38bf6408d713c5fc57055dac2e9f5a4ef7090538a43f669f7948d5e0c8e"
+    },
+    {
+      "version": "20261122-2348",
+      "at": "2026-11-22T23:48:35.030Z",
+      "by": "jycritchley",
+      "note": "Padding inside the Membership Application box",
+      "sha256": "33344a1b8d7acc70e2521d89d26b2b120259e79b7bc7b6468b4a86214b2ec9d9"
     }
   ]
 }
