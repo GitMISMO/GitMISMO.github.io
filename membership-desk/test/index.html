@@ -718,6 +718,9 @@ function deskSetup(x,left,kv){
  const s=dsiMerge(x);
  const link=(u,t)=>h("a",{href:u,target:"_blank",rel:"noopener"},t);
  const ad=a=>{if(!a)return "";const l2=[a.city,[a.state,a.zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");return [a.street,l2,a.country&&!/^(us|usa|united states)$/i.test(a.country)?a.country:""].filter(Boolean).join("\n");};
+ /* the membership application itself, as a PDF (Jonna, Nov 22, 2026): Member 360 makes one for every application */
+ if(x.app){const ab=h("button",{type:"button",class:"btn",onclick:()=>deskAppPdf(x.app,ab)},"Open the Application (PDF)");
+  left.appendChild(h("div",{class:"sect"},h("h3",null,"Membership Application"),h("p",{style:"margin:0 0 6px"},"Reference "+x.app+". Everything the applicant entered, with their logo."),ab));}
  if((s.missing||[]).length)left.appendChild(dsiForm(x,s));
  const site=s.website||x.website||"";
  const addr=ad(s.address),bill=ad(s.billing);
@@ -864,6 +867,17 @@ function cdLib(){return window.XLSX?Promise.resolve(window.XLSX):new Promise((ok
    with the same columns as the Aptify view Member 360 - MISMO Cases. When a Desk administrator has the Desk open and that
    email is newer than the cases shown here, the Desk reads the sheet and saves it exactly as Weekly Case Update would.
    Dropping a file by hand still works, and a newer hand drop always wins. */
+/* Opens a membership application's PDF (data/application-pdfs/<id>.pdf in Member 360's data) in a new tab. */
+async function deskAppPdf(id,btn){const t=btn.textContent;btn.disabled=true;btn.textContent="Opening…";
+  try{const tk=window.ResourcesSession&&ResourcesSession.token?ResourcesSession.token():"";
+    const r=await fetch("https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/member-360/file/data/application-pdfs/"+encodeURIComponent(id)+".pdf",{headers:{Authorization:"Bearer "+tk},cache:"no-store"});
+    if(!r.ok)throw new Error(String(r.status));const b=String(((await r.json())||{}).content||"").replace(/\s/g,"");if(!b)throw new Error("empty");
+    const bin=atob(b),u8=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);
+    const url=URL.createObjectURL(new Blob([u8],{type:"application/pdf"}));const w=window.open(url,"_blank");
+    if(!w){const a=document.createElement("a");a.href=url;a.download="MISMO membership application "+id+".pdf";document.body.appendChild(a);a.click();a.remove();}
+    setTimeout(()=>URL.revokeObjectURL(url),120000);btn.textContent=t;}
+  catch(e){console.error("application pdf",e);btn.textContent="Couldn't open it yet. Try again in a minute.";setTimeout(()=>{btn.textContent=t;},5000);}
+  finally{btn.disabled=false;}}
 async function caseAuto(){try{if(!(window.__deskAdmin&&window.__deskAdmin()))return;const RS=window.ResourcesSession,tk=RS&&RS.token?RS.token():"";if(!tk)return;
   const R="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/member-360",H={headers:{Authorization:"Bearer "+tk},cache:"no-store"};
   const g=await fetch(R+"/data/aptifypull",H);if(!g.ok)return;const j=await g.json(),d=((((j&&j.data)||{}).docs)||{})["aptifypull/main"];
