@@ -517,5 +517,17 @@
     "writable": [
       "data/"
     ]
+  },
+  "huddle": {
+    "repo": "GitMISMO/huddle-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [
+      "data/"
+    ],
+    "membersOnly": {
+      "polls": ["jcritchley@mismo.org", "jcritchley@mba.org", "vrios@mismo.org", "vrios@mba.org"]
+    },
+    "groupPolls": true
   }
 }
