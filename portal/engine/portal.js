@@ -88,26 +88,15 @@ function stepSub(st) {
 }
 
 /* ---------- Certified Consultant points scorecard (21 Nov 2026) ----------
-   The CMS works it out from MISMO's records and saves it; the page record carries it as "scorecard". */
-var SC_CATS = ["membership", "leadership", "participation", "mismoEd", "otherEd", "ancillary"];
-function scoreHTML(sc) {
-  var M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  var dt = function (d) { if (!d) return ""; var p = String(d).slice(0, 10).split("-"); return M[+p[1] - 1] + " " + (+p[2]) + ", " + p[0]; };
-  var cats = SC_CATS.filter(function (k) { return sc.categories && sc.categories[k]; });
-  var miss = cats.filter(function (k) { return !sc.categories[k].met; }).map(function (k) { return sc.categories[k].label; });
-  var h = '<div class="scc"><div class="scc-head"><div><div class="kicker">Your Points Scorecard</div><h2>' + esc(sc.total) + ' points</h2>' +
-    '<p>' + (sc.kind === "renewal" ? "Renewal" : "Initial certification") + " scorecard as of " + esc(dt(sc.asOf)) + ". Participation and ancillary points count from " + esc(dt(sc.from)) +
-    ". Minimums for " + (sc.size === "small" ? "10 employees and under" : "11 employees and over") + ".</p></div>" +
-    '<span class="scc-verdict ' + (sc.meetsAll ? "yes" : "no") + '">' + (sc.meetsAll ? "Meets Every Minimum" : "Not Yet: " + esc(miss.join(", "))) + "</span></div>" +
-    '<div class="scc-cats">' + cats.map(function (k) { var c = sc.categories[k], w = c.min ? Math.min(100, Math.round(c.points / c.min * 100)) : 100;
-      return '<div class="scc-cat' + (c.met ? " met" : "") + '"><span>' + esc(c.label) + "</span><b>" + esc(c.points) + "</b><i>" + (c.min ? "Minimum " + esc(c.min) : "No minimum") + '</i><div class="m"><em style="width:' + w + '%"></em></div></div>'; }).join("") + "</div>";
-  var rows = cats.map(function (k) { var its = (sc.items || []).filter(function (i) { return i.cat === k; }); if (!its.length) return "";
-    return '<tr class="scc-cr"><td colspan="3">' + esc(sc.categories[k].label) + "</td></tr>" + its.map(function (i) {
-      return "<tr><td>" + esc(i.name) + (i.detail ? '<span class="d">' + esc(i.detail) + "</span>" : "") + "</td><td>" + esc(i.person || "Your company") + '</td><td class="n">' + esc(i.pts) + "</td></tr>"; }).join(""); }).join("");
-  if (rows) h += '<details class="scc-more"><summary>Where your points come from</summary><table>' + rows + "</table></details>";
-  h += '<p class="scc-note">Points come from MISMO\u2019s own records (membership, leadership roles, meeting and Summit attendance, certifications and designations). Something missing? Email <a href="mailto:certifications@mismo.org">certifications@mismo.org</a> and MISMO will add it.</p></div>';
-  return h;
+   The CMS works it out from MISMO's records and saves it; the page record carries this company's own as "scorecard".
+   Drawn by the shared view (scorecard-view.js), the same one MISMO sees. */
+function withScoreView(fn) {
+  if (window.ScorecardView) { fn(); return; }
+  var s = document.getElementById("scv-js");
+  if (!s) { s = document.createElement("script"); s.id = "scv-js"; s.src = "/portal/engine/scorecard-view.js?v=20261121a"; document.head.appendChild(s); }
+  s.addEventListener("load", fn);
 }
+var SC_NOTE = 'Points come from MISMO\u2019s own records: membership, leadership roles, workgroup and Summit attendance, certifications and designations. Something missing? Email <a href="mailto:certifications@mismo.org">certifications@mismo.org</a> and MISMO will add it.';
 /* ---------- hero and steps ---------- */
 function paintHero() {
   var p = overall(), now = S.submitted ? CFG.now + 1 : CFG.now;
@@ -289,7 +278,9 @@ function render() {
 function paintScore() {
   var sc = LIVE && PAGE && PAGE.scorecard, host = $("scorecard");
   if (!host) { var m = $("main"); if (!m || !sc) return; host = document.createElement("section"); host.id = "scorecard"; host.className = "panel scc-panel"; m.parentNode.insertBefore(host, m.nextSibling); }
-  host.hidden = !sc; if (sc) host.innerHTML = scoreHTML(sc);
+  host.hidden = !sc; if (!sc) return;
+  if (!host.querySelector(".scc-view")) host.innerHTML = '<div class="kicker scc-k">Your Points Scorecard</div><div class="scc-view"></div>';
+  withScoreView(function () { window.ScorecardView.render(host.querySelector(".scc-view"), sc, { company: "Your company", note: SC_NOTE }); });
 }
 function rerender() { var y = window.scrollY; render(); window.scrollTo(0, y); }
 function go(n) { S.step = n; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} render(); window.scrollTo({ top: $("steps").getBoundingClientRect().top + window.scrollY - 70, behavior: "smooth" }); }

@@ -443,4 +443,4 @@ table.docs td .in{padding:6px 8px}
 .scc-more td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:top}.scc-more td.n{text-align:right;font-weight:700}
 .scc-more .d{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}.scc-cr td{background:var(--surface-2,var(--surface));font-weight:700;font-size:12.5px;color:var(--ink-2)}
 .scc-note{margin:12px 0 0;color:var(--ink-3);font-size:12.5px;line-height:1.5}
-.scc .kicker{text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--ink-3);font-weight:700}
+.scc-k{text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--ink-3);font-weight:700;margin-bottom:10px}
