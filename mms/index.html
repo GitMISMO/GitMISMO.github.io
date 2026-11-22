@@ -2109,7 +2109,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-21T02:02:32Z',fp:'58989530'};
+window.__mmsBuild={at:'2026-11-22T00:57:09Z',fp:'fa16d0ba'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2196,11 +2196,11 @@ const DEFAULT_PEOPLE={
     {name:'Leeann Walker',email:'lwalker@mismo.org'},
     {name:'Meghan Tidgewell',email:'mtidgewell@mismo.org'}],
   roles:{
-    staff:[{name:'Perry Williams',email:'workrequests@mismo.org'},{name:'Jonna Critchley',email:'jcritchley@mba.org'},{name:'Vanessa Rios',email:'vrios@mismo.org'}],
+    staff:[{name:'Perry Williams',email:'workrequests@mismo.org'},{name:'Jonna Critchley',email:''},{name:'Vanessa Rios',email:'vrios@mismo.org'}],
     media:[{name:'Amy Moses',email:'amoses@mba.org'},{name:'Perry Williams',email:'pwilliams@mba.org'}],
     imawg:[{name:'Erin Bittenbender',email:'ebittenbender@mismo.org'}],
-    director:[{name:'Jonna Critchley',email:'jcritchley@mba.org'}],
-    vps:[{name:'Jonna Critchley',email:'jcritchley@mba.org'}],
+    director:[{name:'Jonna Critchley',email:''}],
+    vps:[{name:'Jonna Critchley',email:''}],
     gov:[],
     website:[{name:'Vanessa Rios',email:'vrios@mismo.org'}],
     pm:[{name:'Perry Williams',email:'pwilliams@mba.org'}],
@@ -3453,7 +3453,7 @@ function wireArch(m){
     ] }
   ];
   D.DEFAULTS = {
-    on: false, days: [1, 2, 3, 4, 5], hour: 16, cc: ['pwilliams@mba.org', 'jcritchley@mba.org'], ccNames: 'Perry Williams, Jonna Critchley',
+    on: false, days: [1, 2, 3, 4, 5], hour: 16, cc: [], ccNames: '',
     skipEmpty: true, actionOnly: true, targetSoonDays: 14, staleDays: 45, attendanceDays: 60,
     sections: { yourMove: true, overdue: true, targetUpdate: true, stalled: true, cpToday: true, cpTomorrow: true, cpWeek: true, cpOpening: false, cpAll: false,
       comments: true, attendance: true, asks: true, arch: true, media: false, movedToday: true,
@@ -4488,9 +4488,10 @@ async function loadComments(){
   S.comments=S.commentsAll.filter(cmCanSee);
 }
 /* test comments (source "test") are seen only by the person who tests the comment flow, and never go in a digest */
-const CM_TESTERS=['jcritchley@mba.org','jcritchley@mismo.org'];
+/* the tester is the Director in Settings › People and Roles (no personal address is written into the code) */
 function cmIsTest(c){ return String((c&&c.source)||'').toLowerCase()==='test'; }
-function cmCanSee(c){ return !cmIsTest(c)||CM_TESTERS.includes(String((S.me&&S.me.email)||'').toLowerCase()); }
+function cmCanSee(c){ if(!cmIsTest(c)) return true; const D=((S.people&&S.people.roles&&S.people.roles.director)||[]).filter(Boolean), me=S.me||{};
+  return D.some(p=>sameName(p.name,me.name)||(me.email&&String(p.email||'').toLowerCase()===String(me.email).toLowerCase())); }
 window.__mmsCm={canSee:cmCanSee,isTest:cmIsTest};
 function commentsFor(t){ return (S.comments||[]).filter(c=>c.ticket===t.id||c.wr===t.wr); }
 function commentRow(c,withWr){ const st=(S.cstat||{})[c.id]||{}; const t=S.tickets[c.ticket]||allTickets().find(x=>x.wr===c.wr);
@@ -7978,7 +7979,8 @@ document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.tar
 function cpfNeedsNotice(t){ return t&&t.state==='active'&&t.stage==='comment'&&t.cpFile&&t.cpFile.url&&!(t.links&&t.links.resourceLibrary)&&!t.rlNoticeAt&&!t.rides; }
 async function cpfNotice(t){ if(!cpfNeedsNotice(t)||!S.canWrite||!S.isStaff&&!sameName(t.facilitator,S.me&&S.me.name)) return false;
   const to=peopleFor('website',t).map(p=>p.email).filter(Boolean); if(!to.length) return false;
-  const me=personByName('Jonna Critchley'), cc=[(me&&me.email)||'jcritchley@mba.org'].filter(e=>!to.includes(e));
+  /* copies the Director in Settings › People and Roles (no personal address is written into the code) */
+  const cc=peopleFor('director').map(p=>p.email).filter(e=>e&&!to.includes(e));
   const c=cpCardOf(t), F=t.cpFile, d=t.dates||{}; const link='https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id);
   const body='Governance approved '+c.title+' ('+t.wr+') for public comment, and the file for comment is ready. Please make its Resource Library entry and put the link in the MMS.\n\n'+
     'Title: '+c.title+'\nFile: '+F.name+'\n  '+F.url+(F.path&&typeof ssUrl==='function'?'\n  In SharePoint: '+ssUrl({p:F.path}):'')+'\n'+(c.text?'Description (from the Comment Period card): '+c.text+'\n':'')+'Workgroup: '+(t.workgroup||'')+'\nFacilitator: '+(t.facilitator||'')+'\n'+(d.commentStart?'Comment period: '+fmt(d.commentStart)+' to '+fmt(d.commentEnd||'')+'\n':'')+
@@ -8443,7 +8445,7 @@ VIEWS.health=function(){
     '<div class="hh-two"><div class="card"><h3>Storage</h3>'+bars+'<p class="muted hh-note">Each file can hold about 1 MB. Emails are filed by month, so none fills up.</p></div>'+
     '<div class="card"><h3>Errors on This Page'+(E.length?'<span class="sp chip warn">'+E.length+'</span>':'')+'</h3>'+errs+'</div></div>'+
     '<div class="hh-two"><div class="card"><h3>Team Error Log (Last 7 Days)</h3>'+teamH+'</div>'+
-    '<div class="card"><h3>What Isn’t Watched from Here</h3><p class="hh-note" style="margin-top:0">These only show up once their work lands, so a stop can’t be seen from the MMS: the public comment form flow, the MMS Comments flow into GitHub, and the website pages themselves. Power Automate emails a flow’s owner when it keeps failing.</p><p class="hh-note" style="margin:0">On weekdays, GitHub’s digest run reads the last check and emails '+esc(((S.notify||{}).healthTo||['jcritchley@mba.org']).join(', '))+' if something is red or yellow. The MMS Robot runs these checks every 30 minutes, so they stay fresh even when nobody has the MMS open.</p></div></div>';
+    '<div class="card"><h3>What Isn’t Watched from Here</h3><p class="hh-note" style="margin-top:0">These only show up once their work lands, so a stop can’t be seen from the MMS: the public comment form flow, the MMS Comments flow into GitHub, and the website pages themselves. Power Automate emails a flow’s owner when it keeps failing.</p><p class="hh-note" style="margin:0">On weekdays, GitHub’s digest run reads the last check and emails '+esc((((S.notify||{}).healthTo&&(S.notify||{}).healthTo.length)?S.notify.healthTo:peopleFor('director').map(p=>p.email).filter(Boolean)).join(', ')||'the Director in People and Roles')+' if something is red or yellow. The MMS Robot runs these checks every 30 minutes, so they stay fresh even when nobody has the MMS open.</p></div></div>';
 };
 (function(){ const s=$('#nav-settings'); if(!s||$('[data-hq="health"]')) return; const b=document.createElement('button'); b.type='button'; b.dataset.hq='health'; b.title='System Health'; b.hidden=true; b.id='nav-healthbtn';
   b.innerHTML='<svg viewBox="0 0 24 24"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg><span>System Health</span><b id="nav-health" hidden></b>'; s.parentNode.insertBefore(b,s.nextSibling); })();

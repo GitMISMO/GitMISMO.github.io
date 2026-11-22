@@ -150,7 +150,8 @@ try {
   rows.filter(r => r.level === 'bad' || r.level === 'warn').forEach(r => hl.push([r.level === 'bad' ? 'RED' : 'YELLOW', r.label, r.text + (r.who ? ` Who fixes it: ${r.who}.` : '')]));
   if (failedMail.length && !rows.some(r => r.label === 'Email' && r.level === 'bad')) hl.push(['RED', 'Email', `${failedMail.length} email${failedMail.length === 1 ? '' : 's'} didn’t send in the last 7 days${failedMail[0].error ? ` (“${failedMail[0].error}”)` : ''}. See Notifications › Didn’t Send in the MMS.`]);
   Object.entries(SIZES).forEach(([p, n]) => { const pct = Math.round(n / 940000 * 100); if (pct >= 70 && !rows.some(r => r.label === 'Storage' && r.level !== 'ok')) hl.push([pct >= 90 ? 'RED' : 'YELLOW', 'Storage', `${p.replace(/^data\/|\.json$/g, '')} is ${pct}% full and needs splitting before it fills.`]); });
-  const to = (Array.isArray(N.healthTo) && N.healthTo.length ? N.healthTo : ['jcritchley@mba.org']);
+  /* the Director in Settings › People and Roles, unless Settings names someone else (no address is written into the code) */
+  const to = (Array.isArray(N.healthTo) && N.healthTo.length ? N.healthTo : ((((config.people || {}).roles || {}).director) || []).map(p => p && p.email).filter(Boolean));
   if (!hl.length) console.log('System Health: everything is working.');
   else {
     const red = hl.filter(x => x[0] === 'RED').length;
