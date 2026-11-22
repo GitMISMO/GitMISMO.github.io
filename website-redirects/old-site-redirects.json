@@ -1,6 +1,6 @@
 {
  "note": "Old mismo.org addresses and where they go now. Read by the website footer script (Nav Behavior, old-site redirects) on Page Not Found pages. Keys are lower-case paths without a trailing slash. Source: GitMISMO/website-migration-data mismo-redirect-list-2026-11-17.csv. To add or change one, edit this file.",
- "updated": "2026-11-21",
+ "updated": "2026-11-22",
  "map": {
   "/": "/home",
   "/2018-mismo-intellectual-property-rights-policy": "/policies-and-procedures",
@@ -1034,6 +1034,16 @@
   "/standards-resources/mismo-product/the-respa-application-decision-date": "/viewdocument/the-respa-application-decision-date",
   "/standards-resources/mismo-product/title---settlement-pricing-dataset": "/standards-resources?get=title-settlement-pricing-dataset",
   "/get-involved/eheloc": "/get-involved/workgroups",
-  "/get-involved/title-pricing-api": "/get-involved/workgroups"
+  "/get-involved/title-pricing-api": "/get-involved/workgroups",
+  "/standards-resources/eheloc": "/get-involved/workgroups",
+  "/standards-resources/organization-certifications": "/standards-resources/certification/organization-certifications",
+  "/standards-resources/certification/organization-certifications/organization-certifications": "/standards-resources/certification/organization-certifications",
+  "/standards-resources/certification/organization-certifications/eclose/organization-certifications": "/standards-resources/certification/organization-certifications",
+  "/events/organization-certifications": "/standards-resources/certification/organization-certifications",
+  "/standards-resources/individual-certifications": "/standards-resources/certification/individual-certifications",
+  "/individual-certifications": "/standards-resources/certification/individual-certifications",
+  "/events/individual-certifications": "/standards-resources/certification/individual-certifications",
+  "/get-involved/mismo-frame": "/mismo-frame",
+  "/standards-resources/mismo-product/mortgage-compliance-dataset-(mcd": "/mcd"
  }
 }
