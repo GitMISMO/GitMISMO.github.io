@@ -720,7 +720,7 @@ function deskSetup(x,left,kv){
  const ad=a=>{if(!a)return "";const l2=[a.city,[a.state,a.zip].filter(Boolean).join(" ")].filter(Boolean).join(", ");return [a.street,l2,a.country&&!/^(us|usa|united states)$/i.test(a.country)?a.country:""].filter(Boolean).join("\n");};
  /* the membership application itself, as a PDF (Jonna, Nov 22, 2026): Member 360 makes one for every application */
  if(x.app){const ab=h("button",{type:"button",class:"btn",onclick:()=>deskAppPdf(x.app,ab)},"Open the Application (PDF)");
-  left.appendChild(h("div",{class:"sect"},h("h3",null,"Membership Application"),h("p",{style:"margin:0 0 6px"},"Reference "+x.app+". Everything the applicant entered, with their logo."),ab));}
+  left.appendChild(h("div",{class:"sect"},h("h3",null,"Membership Application"),h("p",{class:"muted",style:"margin:0 0 8px"},"Reference "+x.app+": everything the applicant entered, with their logo."),ab));}
  if((s.missing||[]).length)left.appendChild(dsiForm(x,s));
  const site=s.website||x.website||"";
  const addr=ad(s.address),bill=ad(s.billing);
