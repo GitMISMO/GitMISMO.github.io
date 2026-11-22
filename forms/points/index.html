@@ -280,7 +280,6 @@ body{background:#fff}
     </li>
   </ul>
   </nav>
-  <a class="mm-login" href="https://www.mismo.org/HigherLogic/Security/OAUTH/SignIn.aspx?ReturnUrl=https%3A%2F%2Fwww.mismo.org%2Fsigned-in%3Fto%3Dhttps%253A%252F%252Fresources.mismo.org%252Fforms%252Fpoints%252F">Log In</a>
   <button type="button" class="mm-burger" aria-label="Open menu" aria-expanded="false" aria-controls="mm-nav"><span></span><span></span><span></span></button>
 </header>
 <script>
@@ -613,6 +612,5 @@ body{background:#fff}
   } else setStep(1);
 })();
 </script>
-<script>/* Log In returns to this exact page (keeps any code in the address) */(function(){var a=document.querySelectorAll('a.mm-login');if(!a.length)return;var u='https://www.mismo.org/signed-in?to='+encodeURIComponent(location.href.split('#')[0]);var h='https://www.mismo.org/HigherLogic/Security/OAUTH/SignIn.aspx?ReturnUrl='+encodeURIComponent(u);for(var i=0;i<a.length;i++)a[i].setAttribute('href',h);})();</script>
 </body>
 </html>
