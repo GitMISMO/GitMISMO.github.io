@@ -65,11 +65,12 @@ function placement(opp, day, S) {
 }
 
 function logoFor(name) {
-  if (KNOWN[name]) return KNOWN[name][1];
   for (const ext of ['svg', 'png', 'jpg', 'jpeg', 'webp']) {
     const f = `sponsors/logos/${slug(name)}.${ext}`;
     if (fs.existsSync(f)) return `https://resources.mismo.org/${f}`;
   }
+  // a logo in sponsors/logos (usually the Portal's) wins over the old website logo
+  if (KNOWN[name]) return KNOWN[name][1];
   return '';
 }
 
@@ -80,6 +81,88 @@ function urlFor(name, email) {
   return 'https://' + (dom.split('.').length === 2 ? 'www.' + dom : dom);
 }
 
+// ---- Sponsor logos from the Sponsorship Portal (Nov 21, 2026) ----
+// The logo a sponsor gives the Portal is the one the website shows. Before each build this copies the
+// Portal's own logo copies (private GitMISMO/sponsorship-data) into sponsors/logos/<slug>.<ext>:
+//   1. a logo the team added on the company card: data/logo-co-<company key>.json
+//   2. the logo sent with the online prospectus: data/logo-<reference>.json (the Intake flow's copy)
+// Each is {name, type, data (base64)}. Only a real PNG, JPG or WebP, or an SVG with no scripts, up to 4 MB.
+// A logo in sponsors/logos wins over the KNOWN list. A replaced logo moves to sponsors/logos/archive/
+// (archive, never delete). A Portal problem never stops the sponsor feed.
+// The Portal keeps the original in SharePoint (Sponsor Logos), which this run cannot read, so a logo
+// reaches the website only once the Portal has its copy in sponsorship-data.
+const DATA_DIR = 'https://api.github.com/repos/GitMISMO/sponsorship-data/contents/data';
+const LOGO_MAX = 4 * 1024 * 1024;
+const CO_NOISE = new Set(['inc', 'llc', 'ltd', 'corp', 'corporation', 'co', 'company', 'the', 'ai', 'io', 'com', 'group', 'technologies', 'technology']);
+// the same keys the Portal uses (companyKey and refKey in the Portal's index.html)
+const companyKey = (s) => String(s || '').toLowerCase().replace(/&/g, ' and ').split(/[^a-z0-9]+/).filter((w) => w && !CO_NOISE.has(w)).join('');
+const refKey = (s) => String(s || '').trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const gh = (url, raw) => fetch(url, { headers: { authorization: 'Bearer ' + TOKEN, accept: raw ? 'application/vnd.github.raw' : 'application/vnd.github+json', 'user-agent': 'mismo-sponsor-feed' } });
+
+function decodeLogo(doc) {
+  if (doc && doc.content && typeof doc.content === 'object') doc = doc.content;
+  const b64 = String((doc && (doc.data || doc.base64)) || '').replace(/^data:[^,]*,/, '').replace(/\s+/g, '');
+  if (!b64) return null;
+  const buf = Buffer.from(b64, 'base64');
+  if (!buf.length || buf.length > LOGO_MAX) return null;
+  // trust the bytes, not the file name
+  if (buf[0] === 0x89 && buf.toString('latin1', 1, 4) === 'PNG') return { buf, ext: 'png' };
+  if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return { buf, ext: 'jpg' };
+  if (buf.toString('latin1', 0, 4) === 'RIFF' && buf.toString('latin1', 8, 12) === 'WEBP') return { buf, ext: 'webp' };
+  const t = buf.toString('utf8');
+  if (/<svg[\s>]/i.test(t) && !/<script|<foreignobject|<iframe|<embed|<object|javascript:|\son[a-z]+\s*=/i.test(t)) return { buf, ext: 'svg' };
+  return null;
+}
+
+async function syncLogos(docs) {
+  const r = await gh(DATA_DIR, false);
+  if (!r.ok) throw new Error('could not list the Portal data folder (' + r.status + ')');
+  const have = new Set((await r.json()).map((f) => f.name));
+  const byName = new Map();
+  for (const a of Object.values(docs)) {
+    if (!SHOW.includes(a.status)) continue;
+    const raw = String(a.company || '').trim();
+    if (!raw) continue;
+    const name = NAMES[raw] || raw;
+    if (!byName.has(name)) byName.set(name, { raws: new Set(), recs: [] });
+    byName.get(name).raws.add(raw);
+    byName.get(name).recs.push(a);
+  }
+  const today = new Date().toISOString().slice(0, 10);
+  let wrote = 0;
+  for (const [name, e] of byName) {
+    const s = slug(name);
+    if (!s) continue;
+    const stores = [];
+    for (const raw of [...e.raws, name]) { const k = companyKey(raw); if (k) stores.push('logo-co-' + k); }
+    e.recs.slice().sort((x, y) => String(y.dateSubmitted || '').localeCompare(String(x.dateSubmitted || '')))
+      .forEach((x) => { const k = refKey(x.prospectusRef); if (k) stores.push('logo-' + k); });
+    let got = null, from = '';
+    for (const st of new Set(stores)) {
+      if (!have.has(st + '.json')) continue;
+      try {
+        const rr = await gh(DATA_DIR + '/' + st + '.json', true);
+        if (rr.ok) got = decodeLogo(await rr.json());
+      } catch (err) { console.log('::warning::' + st + '.json: ' + err.message); }
+      if (got) { from = st; break; }
+      console.log('::warning::' + st + '.json is not a usable PNG, JPG, WebP or SVG logo; skipped.');
+    }
+    if (!got) continue;
+    const file = 'sponsors/logos/' + s + '.' + got.ext;
+    if (fs.existsSync(file) && fs.readFileSync(file).equals(got.buf)) continue;
+    for (const ext of ['svg', 'png', 'jpg', 'jpeg', 'webp']) {
+      const f = 'sponsors/logos/' + s + '.' + ext;
+      if (!fs.existsSync(f)) continue;
+      fs.mkdirSync('sponsors/logos/archive', { recursive: true });
+      fs.renameSync(f, 'sponsors/logos/archive/' + s + '-' + today + '.' + ext);
+    }
+    fs.writeFileSync(file, got.buf);
+    wrote++;
+    console.log('Logo for ' + name + ' from the Portal (' + from + '.json) saved as ' + file);
+  }
+  console.log('Portal logos: ' + wrote + ' new or changed.');
+}
+
 async function main() {
   if (!TOKEN) { // not set up yet: leave the current file alone, don't fail the run
     console.log('::warning::No token yet. Add the SPONSOR_DATA_TOKEN repository secret (read access to GitMISMO/sponsorship-data). The current sponsors file is unchanged.');
@@ -88,6 +171,7 @@ async function main() {
   const r = await fetch(SRC, { headers: { authorization: `Bearer ${TOKEN}`, accept: 'application/vnd.github.raw', 'user-agent': 'mismo-sponsor-feed' } });
   if (!r.ok) throw new Error(`Could not read the Portal records (${r.status}). The token needs read access to GitMISMO/sponsorship-data.`);
   const docs = (await r.json()).docs || {};
+  try { await syncLogos(docs); } catch (e) { console.log('::warning::Portal logos skipped: ' + e.message); }
   for (const S of SUMMITS) build(S, docs);
 }
 
