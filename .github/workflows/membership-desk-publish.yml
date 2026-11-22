@@ -1,0 +1,52 @@
+name: "Membership Desk: Publish a Version"
+
+# Makes the Membership Desk's test copy live, or rolls back to an earlier version (Jonna, Nov 22, 2026). Nobody uploads
+# membership-desk/index.html by hand: every change goes to membership-desk/test/index.html first, gets tried at
+# https://resources.mismo.org/membership-desk/test/, and goes live here only if the checks pass.
+#
+#   Actions > Membership Desk: Publish a Version > Run workflow
+#     - leave "test copy" to make the test copy live
+#     - or type an earlier version (from membership-desk/releases/index.json, for example 20261122-1530) to roll back
+#
+# Each version made live is kept in membership-desk/releases/ (never deleted). Details: membership-desk/DEVELOPING.md.
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Leave as "test copy" to make the test copy live. To roll back, type an earlier version from membership-desk/releases/index.json (for example 20261122-1530).'
+        required: true
+        default: "test copy"
+      note:
+        description: "What changed, in a few words (optional; kept with the version)"
+        required: false
+        default: ""
+permissions:
+  contents: write
+concurrency:
+  group: membership-desk-publish
+  cancel-in-progress: false
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Checks before publishing
+        run: node membership-desk/tools/desk.js check
+      - name: Make the version live
+        env:
+          VERSION: ${{ inputs.version }}
+          NOTE: ${{ inputs.note }}
+          ACTOR: ${{ github.actor }}
+        run: node membership-desk/tools/desk.js publish
+      - name: Save it
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add membership-desk
+          git commit -m "Membership Desk: publish version $(cat membership-desk/releases/LAST)"
+          git pull --rebase
+          git push

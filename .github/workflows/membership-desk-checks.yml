@@ -1,0 +1,25 @@
+# Membership Desk Page Checks (Jonna, Nov 22, 2026). Runs on every save under membership-desk/ and fails (GitHub emails
+# the person who saved) when a script doesn't parse, a key or token slipped into a page, the page safety list is missing,
+# the test copy could save or couldn't be published, or the live page was uploaded by hand instead of published.
+# The checks themselves are in membership-desk/tools/desk.js, which Publish a Version also runs. Details:
+# membership-desk/DEVELOPING.md.
+name: Membership Desk Page Checks
+on:
+  push:
+    paths:
+      - "membership-desk/**"
+      - ".github/workflows/membership-desk-checks.yml"
+      - ".github/workflows/membership-desk-publish.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Pages parse, no secrets, safety list, test copy can't save and can be published, live page is a published version
+        run: node membership-desk/tools/desk.js check
