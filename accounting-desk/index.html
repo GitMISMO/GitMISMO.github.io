@@ -361,7 +361,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <nav aria-label="MBA Accounting Desk">
     <button type="button" data-hq="overview" aria-current="page" title="Overview"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg><span>Overview</span></button>
     <button type="button" data-hq="certs" title="Certification Complete"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="9" r="5"/><path d="M8.5 13l-1.5 8 5-3 5 3-1.5-8"/></svg><span>Certification Complete</span></button>
-    <button type="button" data-hq="budget" title="Approved Budget"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/><path d="M12 13h5M12 16.5h5"/></svg><span id="nav-budget">FY 2027 Approved Budget</span></button>
+    <button type="button" data-hq="budget" title="Approved Budget"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4z"/><path d="M4 9h16M9 9v11"/><path d="M12 13h5M12 16.5h5"/></svg><span id="nav-budget">Approved Budget</span></button>
     <button type="button" data-hq="iif" title="IIF Payments"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>IIF Payments</span></button>
     <button type="button" data-hq="invoices" title="Invoices"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Invoices</span></button>
     <button type="button" data-hq="close" title="Monthly Close"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M8 15l2.5 2.5L16 13"/></svg><span>Monthly Close</span></button>
@@ -945,10 +945,15 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ================= Approved Budget (Jonna, 22 Nov 2026: "a view of our SoA for FY 2027 the Approved Budget") ================= */
-  var BS = { open: {} };
+  var BS = { open: {}, year: null };
   function fyMonth(year, i) { var y = i < 3 ? year - 1 : year, m = (i + 9) % 12; return y + "-" + String(m + 1).padStart(2, "0"); }
   function drawBudget() {
-    var b = D.budget || {}, rows = b.rows || [], year = b.year, title = "FY " + year + " " + (b.version || "Approved Budget");
+    /* every year the Board approved, newest first; she picks the year (Jonna, 22 Nov 2026) */
+    var all = (D.budget && (D.budget.years || (D.budget.rows ? [D.budget] : []))) || [];
+    if (!all.length) { $("v-budget").innerHTML = '<div class="card"><div class="empty">No approved budget is here yet.</div></div>'; return; }
+    var b = all.filter(function (y) { return y.year === BS.year; })[0] || all[0];
+    BS.year = b.year;
+    var rows = b.rows || [], year = b.year, title = "FY " + year + " Approved Budget";
     var mk = []; for (var i = 0; i < 12; i++) mk.push(fyMonth(year, i));
     var now = lastMonths(1)[0], done = mk.filter(function (k) { return k < now; }).length;
     var kids = {}; rows.forEach(function (r) { (kids[r.parent] || (kids[r.parent] = [])).push(r); });
@@ -976,13 +981,15 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       total("Net (Revenue Less Expenses)", rev.concat(exp), "net", function (r) { return r.section === "Expense" ? -1 : 1; });
     var tRev = sumOf(rev, yr), tExp = sumOf(exp, yr);
     var anyOpen = Object.keys(BS.open).some(function (k) { return BS.open[k]; });
-    $("v-budget").innerHTML = hero("For Accounting", title, "MISMO&rsquo;s Statement of Activities budget for FY " + esc(year) + " (October " + (year - 1) + " to September " + year + ")" + (b.approved ? ", as approved by the Board" : "") + ", line by line and month by month, exactly as MISMO Money shows it. Click a line with an arrow to see the lines under it.", "",
+    $("v-budget").innerHTML = hero("For Accounting", title, "MISMO&rsquo;s Statement of Activities budget for FY " + esc(year) + " (October " + (year - 1) + " to September " + year + ")" + (b.approved ? ", as approved by the Board" : "") + ", line by line and month by month, exactly as MISMO Money shows it. Pick the fiscal year to see; each new year is added here once the Board approves it. Click a line with an arrow to see the lines under it.",
+      '<div class="picker">' + select("bud-year", "Fiscal Year", all.map(function (y) { return [String(y.year), "FY " + y.year]; }), String(year)) + "</div>",
       tile("Revenue", usd(tRev, 1), "full year") + tile("Expenses", usd(tExp, 1), "full year") + tile("Net", usd(tRev - tExp, 1), "revenue less expenses") +
       tile(ytdSay.replace("Year to Date, ", "Net, "), usd(sumOf(rev, ytd) - sumOf(exp, ytd), 1), done ? done + (done === 1 ? " month" : " months") + " ended" : "no month ended yet")) +
       '<div class="bar"><h2>Statement of Activities, ' + esc(title) + '</h2><button class="btn ghost" type="button" id="bud-all">' + (anyOpen ? "Collapse All" : "Expand All") + '</button><button class="btn" type="button" id="bud-dl">Download for Excel</button></div>' +
       '<div class="card"><div class="tablewrap"><table class="soa"><thead>' + head + "</thead><tbody>" + body + "</tbody></table></div></div>" +
       '<p class="stamp">' + esc(stamp(b.writtenAt)) + "</p>";
     document.querySelectorAll("#v-budget [data-bk]").forEach(function (bt) { bt.addEventListener("click", function () { var k = bt.getAttribute("data-bk"); BS.open[k] = !BS.open[k]; drawBudget(); }); });
+    $("bud-year").addEventListener("change", function () { BS.year = +this.value; BS.open = {}; drawBudget(); });
     $("bud-all").addEventListener("click", function () { BS.open = {}; if (!anyOpen) rows.forEach(function (r) { if (kids[r.key]) BS.open[r.key] = true; }); drawBudget(); });
     $("bud-dl").addEventListener("click", function () {
       var out = [], walk = function (r, d) { out.push([r.section, new Array(d + 1).join("    ") + r.name, ytd(r), yr(r)].concat(r.months)); (kids[r.key] || []).forEach(function (k) { walk(k, d + 1); }); };
@@ -1149,7 +1156,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
       "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. Once Aptify's Monday workbook carries each order's status and balance, this becomes what is still owed on Aptify's own orders (every order Shipped with a balance over $0), and the AR aging is no longer needed.</p>" +
       "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each and its membership term (when it starts and ends, and whether it is a dues deal). Pick a month or a year, or choose All Time and search.</p>" +
-      "<h2>FY 2027 Approved Budget</h2><p>MISMO&rsquo;s budget for the fiscal year, laid out like the Statement of Activities: Revenue, Expenses and Net, with Year to Date (the months that have ended) and the Full Year first, then every month from October to September. Lines start folded to their main lines; click a line with an arrow to see the lines under it, or Expand All. It is view only, exactly as MISMO Money shows it. Download for Excel saves every line.</p>" +
+      "<h2>Approved Budget</h2><p>MISMO&rsquo;s Board-approved budget for each fiscal year, newest first. Pick the year at the top; each new year&rsquo;s budget is added once the Board approves it. It is laid out like the Statement of Activities: Revenue, Expenses and Net, with Year to Date (the months that have ended) and the Full Year first, then every month from October to September. Lines start folded to their main lines; click a line with an arrow to see the lines under it, or Expand All. It is view only, exactly as MISMO Money shows it. Download for Excel saves every line.</p>" +
       "<h2>IIF Payments</h2><p>Every Innovation Investment Fee payment, by fiscal year or month, with Member 360&rsquo;s count of lenders paid in full and partly paid.</p>" +
       "<h2>Workgroup Sponsorships</h2><p>Every workgroup and community of practice sponsorship MISMO has been paid for, for accrual: the sponsor, the Aptify order, when it was paid and how much, and when it starts and ends. Each one is earned evenly over the months it runs (the last month takes any leftover cents). The list shows what is earned through the last month that has ended and what is still to earn. Open one to see it month by month and by fiscal year. Sponsorships ordered in Aptify but not paid yet are listed below, apart; they are not counted until they are paid.</p>" +
       "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
