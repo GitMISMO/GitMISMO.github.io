@@ -2,6 +2,7 @@
 
 One line per change people would notice, newest first.
 
+- 2026-11-22: New website applications show on the To Do as soon as they arrive, without anyone opening Member 360; Open the Application (PDF) works with Desk access only; a new membership starting Oct 1 or later runs through Dec 31 of the next year; more room around the application note.
 - 2026-11-22: Automatic checks on every change, and changes go live only through Membership Desk: Publish a Version, with every version kept for rollback. Developer guide and this change log added.
 - 2026-11-21: Aptify Data Updated date at the foot of the left menu.
 - 2026-11-20: An Aptify Updates tab was added and then removed the same day (MISMO is moving away from Aptify upkeep).

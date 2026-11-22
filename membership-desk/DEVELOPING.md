@@ -75,6 +75,7 @@ same session as any change to one. Add fields; never rename or remove one anothe
 | Data (`membership-desk/data/...`) | Written by | Read by | What it holds |
 | --- | --- | --- | --- |
 | `todos` | Member 360, whenever someone with edit rights has it open | the desk | New members, free memberships and IIF lenders to set up; what Aptify shows done; Payment in Process items from Member 360 (`pip`) and paid marks (`invPaid`) |
+| `applications` (+ `file/data/application-pdfs/<id>.pdf`) | Member 360's Membership Application PDFs job (member-360-data), on each application | the desk | Website applications (tests left out) and their PDFs: an application Member 360 hasn't listed yet shows on the To Do as a set-up built from the application alone, and Open the Application (PDF) reads the desk's own copy first (Nov 22, 2026) |
 | `square` | MISMO Money | the desk | Square special-rate members (TMC, Broker, ACUMA) to set up, set up and waiting for payment |
 | `done` | the desk | the desk, Member 360 | Every set-up marked done, with who, when, order and dates. Never deleted: Undo marks one undone |
 | `setupinfo` | the desk | Member 360 | Still Needed details the team filled in on a set-up; Member 360 adds them to the company |
