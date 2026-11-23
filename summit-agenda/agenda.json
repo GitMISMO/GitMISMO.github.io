@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-23T19:57:39.268Z",
+ "updated": "2026-11-23T20:11:36.311Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-23T19:57:19.402Z",
+ "sourceUpdated": "2026-11-23T20:10:17.823Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -131,8 +131,8 @@
       "people": [
        {
         "name": "Noah Israel",
-        "title": "Senior Director, Product Management, Enterprise Data",
-        "company": "Fannie Mae",
+        "title": "",
+        "company": "",
         "role": "Speaker",
         "photo": ""
        }
