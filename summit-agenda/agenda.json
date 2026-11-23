@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-23T20:36:58.043Z",
+ "updated": "2026-11-23T21:27:03.292Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-23T20:35:35.539Z",
+ "sourceUpdated": "2026-11-23T21:25:42.889Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -125,7 +125,7 @@
       "end": "11:30 AM",
       "kind": "Presentation",
       "title": "GSE UMPD Updates",
-      "desc": "GSE Uniform Mortgage Data Program (UMPD) Updates\n\nJoin this can’t‑miss session to hear the latest updates from the GSEs on the Uniform Mortgage Data Program (UMDP), including developments related to:\nDesktop Underwriter® and Loan Product Advisor® data specifications\nThe Uniform Appraisal Dataset (UAD) Broad Production Period\nThe Uniform Closing Dataset (UCD) v2.0 Specification Mandate\nThe Uniform Loan Delivery Dataset (ULDD) Update",
+      "desc": "GSE Uniform Mortgage Data Program (UMPD) Updates\n\nJoin this can’t‑miss session to hear the latest updates from the GSEs on the Uniform Mortgage Data Program (UMDP), including developments related to:\n• Desktop Underwriter® and Loan Product Advisor® data specifications\n• The Uniform Appraisal Dataset (UAD) Broad Production Period\n• The Uniform Closing Dataset (UCD) v2.0 Specification Mandate\n• The Uniform Loan Delivery Dataset (ULDD) Update",
       "sponsor": "",
       "brk": false,
       "people": [
