@@ -11,11 +11,14 @@
      "requested","done","link","wr","name","publicName","workgroup","groupType","classification","releaseStatus",
      "facilitator","summary","license","availableTo","memberUrl","nonMemberUrl","websiteId","version",
      "commentOpens","commentCloses","mmsUrl","shareUrl","leaders":[{"name","position","company"}],
-     "pressRelease","draftNow","readyToPost","readyAt"}]}
+     "pressRelease","draftNow","readyToPost","readyAt","stage","inComment"}]}
    Nov 22, 2026 (Jonna): no press release for a comment period, so "comment" entries carry pressRelease false (a
    LinkedIn post only). The Final / Candidate Recommendation release is asked for while the work is out for
    comment with draftNow true and readyToPost false: draft and finalize it, don't post it. When the work reaches
-   Release the same entry turns readyToPost true (readyAt = that date): post it then. */
+   Release the same entry turns readyToPost true (readyAt = that date): post it then.
+   stage is the work request's MMS step today (e.g. "Comment Period", "Post-Comment", "Release"); inComment is true while
+   it is out for public comment, so MISMO Media can mark those drafts (the release itself must not say it is going to
+   comment: it announces the Final or Candidate Recommendation). */
 import fs from 'fs';
 const TOKEN = process.env.MMS_DATA_TOKEN; if (!TOKEN) { console.log('No MMS_DATA_TOKEN; nothing published.'); process.exit(0); }
 const GH = process.env.GH_API || 'https://api.github.com', OUT = process.env.ANN_OUT || 'mms/announcements.json', KEEP_DAYS = 90;
@@ -26,6 +29,7 @@ async function data(name) {
 }
 const gnorm = s => String(s || '').toLowerCase().replace(/\(.*?\)/g, ' ').replace(/\b(cop|dwg|community of practice|development workgroup|workgroup|task force|area of focus|docs)\b/g, ' ').replace(/[^a-z0-9]/g, '');
 const rank = p => { p = String(p).toLowerCase(); return /^chair|^co-chair/.test(p) ? 0 : /vice/.test(p) ? 1 : /lead/.test(p) ? 2 : /rep/.test(p) ? 3 : 4; };
+const STAGE_NAME = { approved: 'Approved', cfp: 'Call for Participation', kickoff: 'Kickoff', work: 'In Work', aireview: 'AI Review', im: 'IM Review', awg: 'AWG Review', designation: 'License Designation', 'gc-comment': 'Governance Approval to Comment', comment: 'Comment Period', post: 'Post-Comment', 'gc-publish': 'Governance Approval to Publish', release: 'Release', published: 'Published' };
 const TYPE = k => /call for participation/i.test(k) ? 'cfp' : /linkedin post/i.test(k) ? 'comment' : /announcement/i.test(k) ? 'release' : '';
 const shard = id => { const m = String(id).match(/(19|20)\d{2}/); return 'tickets-' + (m ? m[0] : 'other'); };
 const clean = s => String(s || '').trim();
@@ -55,6 +59,7 @@ for (const m of reqs) {
     mmsUrl: 'https://resources.mismo.org/mms/#wr=' + encodeURIComponent(t.id),
     shareUrl: (W.queuedAt && W.id && !W.off) ? 'https://www.mismo.org/standards-resources?get=' + encodeURIComponent(W.id) : '',
     pressRelease: m.pressRelease === false ? false : TYPE(m.kind) !== 'comment',
+    stage: STAGE_NAME[t.stage] || (t.state === 'published' ? 'Published' : t.stage || ''), inComment: t.stage === 'comment' && t.state === 'active',
     draftNow: !!(m.draftEarly && !m.readyToPost), readyToPost: TYPE(m.kind) === 'release' ? (m.readyToPost === undefined ? !m.draftEarly : !!m.readyToPost) : false, readyAt: m.readyAt || '',
     leaders: k ? leaders.filter(l => l.groups.some(g => g && gnorm(g) === k)).sort((a, b) => rank(a.position) - rank(b.position) || a.name.localeCompare(b.name)).map(l => ({ name: l.name, position: l.position || '', company: l.company || '' })) : []
   });
