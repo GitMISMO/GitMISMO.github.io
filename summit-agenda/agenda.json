@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-23T18:46:36.246Z",
+ "updated": "2026-11-23T19:34:17.735Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-23T18:44:58.629Z",
+ "sourceUpdated": "2026-11-23T19:32:36.000Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -143,7 +143,7 @@
     ]
    },
    "grid": {
-    "updated": "2026-11-21T00:36:33.708Z",
+    "updated": "2026-11-23T19:32:36.000Z",
     "sessions": [
      {
       "id": "breakfast@mon",
@@ -267,7 +267,7 @@
       "day": "Monday",
       "date": "2027-01-11",
       "start": "13:30",
-      "end": "16:30",
+      "end": "17:00",
       "type": "Workshop",
       "title": "AI Governance in Practice Workshop: Lessons from Lenders and Regulators",
       "room": "La Salle A",
