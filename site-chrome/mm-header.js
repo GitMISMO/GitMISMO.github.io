@@ -1,7 +1,7 @@
 /* MISMO shared site header for pages outside Higher Logic (forms and tools on resources.mismo.org).
    One file, so every form matches www.mismo.org. Owned by the website's Claude. Do not copy it into a page:
    load it with  <script src="https://resources.mismo.org/site-chrome/mm-header.js"></script>  placed right after <body>.
-   It replaces any old header.mm-header on the page. No Log in button, by Jonna's decision. Version 2026-11-22. */
+   It hides any old header.mm-header on the page (left in place so the page's own scripts keep working). No Log in button, by Jonna's decision. Version 2026-11-22. */
 (function () {
   if (window.__mmSiteHeader) return;
   window.__mmSiteHeader = '2026-11-22';
@@ -171,11 +171,6 @@
       if (e.key === 'Escape') { h.classList.remove('mmsh-s-open'); h.classList.remove('mmsh-open'); }
     });
   }
-  function removeOld() {
-    [].forEach.call(document.querySelectorAll('header.mm-header'), function (o) { if (o.id !== 'mmsh') o.parentNode.removeChild(o); });
-  }
   if (document.body) build();
   else document.addEventListener('DOMContentLoaded', build);
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', removeOld);
-  else removeOld();
 })();
