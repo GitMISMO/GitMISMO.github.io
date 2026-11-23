@@ -205,6 +205,11 @@ function build(S, docs) {
     seen.set(name, { name, tier, url: urlFor(name, a.contactEmail), logo: logoFor(name), placements: p ? [{ ...p, day: p.day || day }] : [] });
   }
   const sponsors = [...seen.values()].sort((x, y) => Object.values(TIERS).indexOf(x.tier) - Object.values(TIERS).indexOf(y.tier) || x.name.localeCompare(y.name));
+  // Placements held back from the website (Jonna). Delete an entry once the Portal record is changed.
+  const HOLD_PLACEMENTS = [
+    { name: 'Optimal Blue', match: 'AI Governance in Practice' }, // Nov 23, 2026: may sponsor a different session instead
+  ];
+  for (const s of sponsors) s.placements = s.placements.filter(p => !HOLD_PLACEMENTS.some(h => h.name === s.name && String(p.match || p.title || '').includes(h.match)));
   const body = { summit: SUMMIT, source: 'Sponsorship Portal', sponsors };
   let prev = null;
   try { prev = JSON.parse(fs.readFileSync(OUT, 'utf8')); } catch {}
