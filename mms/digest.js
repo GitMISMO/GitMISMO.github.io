@@ -382,9 +382,9 @@
       if (late.length) bits.push(late.length + ' past target');
       if (stale.length) bits.push(stale.length + ' sitting too long');
       if (moved.length) bits.push(moved.length + (friday ? ' moved this week' : ' moved today'));
-      rows.push({ lead: m.name, main: bits.join(' · '), badge: late.length ? 'Past Target' : '', tone: late.length ? 'bad' : '', href: APP + '#board' });
-      ym.slice(0, 3).forEach(function (r) { rows.push({ lead: '', main: (r.lead ? r.lead + ' ' : '') + r.main, sub: r.sub, badge: r.badge, tone: r.tone, href: r.href }); });
-      if (ym.length > 3) rows.push({ lead: '', main: '+ ' + (ym.length - 3) + ' more for ' + String(m.name).split(' ')[0], href: APP + '#board' });
+      rows.push({ kind: 'person', lead: '', main: m.name, sub: bits.join(' · '), badge: late.length ? 'Past Target' : '', tone: late.length ? 'bad' : '', href: APP + '#board' });
+      ym.slice(0, 3).forEach(function (r) { rows.push({ indent: true, lead: r.lead, main: r.main, sub: r.sub, badge: r.badge, tone: r.tone, href: r.href }); });
+      if (ym.length > 3) rows.push({ kind: 'more', indent: true, lead: '', main: '+ ' + (ym.length - 3) + ' more for ' + String(m.name).split(' ')[0], href: APP + '#board' });
     });
     return rows.length ? [{ key: 'team', title: friday ? 'The Facilitators’ Week' : 'The Facilitators’ Digests', tone: 'info', noCount: true, max: 80, note: 'What each facilitator’s digest says today, in one place.', rows: rows }] : [];
   };
@@ -392,10 +392,11 @@
 
   /* ---------- the email itself: email-safe tables, MISMO navy and sky ---------- */
   var TONE = { bad: ['#b3372c', '#fbe9e7'], warn: ['#8a5d0f', '#fbf1dc'], info: ['#1f5f93', '#e4f2fb'], good: ['#0f7b5c', '#e3f4ed'], '': ['#456179', '#eef3f7'] };
-  /* a plain, squared button that looks the same in Outlook (padding on the cell, not the link) */
+  /* a squared, solid button that looks the same in Outlook: the colour and padding sit on the cell, the link fills it */
   function btn(href, label, big) {
-    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:' + (big ? '20px 0 6px' : '10px 0 2px') + '"><tr><td bgcolor="#eef6fc" style="background:#eef6fc;border:1px solid #9fc9e6;border-radius:4px;padding:' + (big ? '8px 16px' : '6px 12px') + '">' +
-      '<a href="' + esc(href) + '" target="_blank" style="display:block;font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '14px' : '13px') + ';line-height:20px;font-weight:600;color:#0d314c;text-decoration:none">' + esc(label) + '&nbsp;&nbsp;&rsaquo;</a></td></tr></table>';
+    var bg = big ? '#0d314c' : '#ffffff', fg = big ? '#ffffff' : '#0d314c', bd = big ? '#0d314c' : '#9fc9e6';
+    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="' + bg + '" style="background:' + bg + ';border:1px solid ' + bd + ';border-radius:4px;mso-padding-alt:' + (big ? '10px 20px' : '6px 12px') + '">' +
+      '<a href="' + esc(href) + '" target="_blank" style="display:inline-block;padding:' + (big ? '10px 20px' : '6px 12px') + ';font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '14px' : '13px') + ';line-height:18px;font-weight:600;color:' + fg + ';text-decoration:none;border-radius:4px">' + esc(label) + '&nbsp;&nbsp;&rsaquo;</a></td></tr></table>';
   }
   /* The email: what needs them first, then what is good to know. Short rows, a few per section,
      and a link to the rest in the MMS, so it reads in under a minute. */
@@ -403,21 +404,32 @@
   D.html = function (o) {
     var F = "font-family:'IBM Plex Sans',Arial,Helvetica,sans-serif;";
     var all = o.sections || [], act = all.filter(function (s) { return ACT_KEYS[s.key]; }), info = all.filter(function (s) { return !ACT_KEYS[s.key]; });
+    /* one tidy row: the item on the left (number, name, then the detail on its own line), the tag in its own
+       column on the right, so nothing runs together even where an email program drops floats */
+    var tag = function (r) { var rc = TONE[r.tone || ''] || TONE['']; return '<span style="' + F + 'display:inline-block;font-size:11px;line-height:16px;font-weight:700;color:' + rc[0] + ';background:' + rc[1] + ';border-radius:3px;padding:2px 7px;white-space:nowrap">' + esc(r.badge) + '</span>'; };
+    var line = function (r, first) {
+      var top = first ? '' : 'border-top:1px solid #e9f0f6;';
+      if (r.kind === 'more') return '<tr><td colspan="2" style="' + F + 'padding:4px 0 8px 14px;font-size:12.5px"><a href="' + esc(r.href || APP) + '" target="_blank" style="color:#2477b8;font-weight:600;text-decoration:none">' + esc(r.main) + ' ›</a></td></tr>';
+      if (r.kind === 'person') return '<tr><td colspan="2" bgcolor="#f3f7fb" style="' + F + 'background:#f3f7fb;' + (first ? '' : 'border-top:8px solid #ffffff;') + 'padding:7px 10px;font-size:13.5px;line-height:1.5;color:#0d314c">' +
+        '<a href="' + esc(r.href || APP) + '" target="_blank" style="font-weight:700;color:#0d314c;text-decoration:none">' + esc(r.main) + '</a>' +
+        (r.sub ? '<span style="font-size:12.5px;color:#5a7489">&nbsp;&nbsp;' + esc(r.sub) + '</span>' : '') + (r.badge ? '&nbsp;&nbsp; ' + tag(r) : '') + '</td></tr>';
+      return '<tr><td valign="top" style="' + F + top + 'padding:8px 0 8px ' + (r.indent ? '14px' : '0') + ';font-size:13px;line-height:1.45;color:#0d314c">' +
+        (r.lead ? '<span style="font-size:11.5px;font-weight:700;color:#5a7489;white-space:nowrap">' + esc(r.lead) + '</span>&nbsp;&nbsp;' : '') +
+        '<a href="' + esc(r.href || APP) + '" target="_blank" style="font-weight:600;color:#0d314c;text-decoration:none">' + esc(r.main) + '</a>' +
+        (r.sub ? '<div style="font-size:12.5px;line-height:1.45;color:#5a7489;padding-top:2px">' + esc(r.sub) + '</div>' : '') + '</td>' +
+        '<td valign="top" align="right" style="' + top + 'padding:8px 0 8px 12px;white-space:nowrap">' + (r.badge ? tag(r) : '') + '</td></tr>';
+    };
     var block = function (s, max) {
       var c = TONE[s.tone || ''] || TONE[''], rows = s.rows || [], shown = rows.slice(0, s.max || max), more = rows.length - shown.length;
-      return '<tr><td style="padding:0 28px 12px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-left:4px solid ' + c[0] + ';border-radius:6px;border-collapse:separate">' +
-        '<tr><td style="' + F + 'padding:8px 14px 4px"><span style="font-size:14px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (rows.length && !s.noCount ? '<span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;&nbsp;' + rows.length + '</span>' : '') + (s.note ? '<span style="font-size:12px;color:#7794aa">&nbsp;&nbsp;' + esc(s.note) + '</span>' : '') + '</td></tr>' +
-        shown.map(function (r) {
-          var rc = TONE[r.tone || ''] || TONE[''];
-          return '<tr><td style="' + F + 'padding:3px 14px;font-size:13px;line-height:1.4;color:#0d314c">' +
-            (r.badge ? '<span style="float:right;font-size:11px;font-weight:700;color:' + rc[0] + ';background:' + rc[1] + ';border-radius:4px;padding:1px 6px;margin-left:8px">' + esc(r.badge) + '</span>' : '') +
-            (r.lead ? '<span style="font-size:11px;font-weight:700;color:#7794aa">' + esc(r.lead) + '</span>&nbsp; ' : '') +
-            '<a href="' + esc(r.href || APP) + '" target="_blank" style="font-weight:600;color:#0d314c;text-decoration:none">' + esc(r.main) + '</a>' +
-            (r.sub ? '<span style="color:#456179"> · ' + esc(r.sub) + '</span>' : '') + '</td></tr>';
-        }).join('') +
-        (more > 0 ? '<tr><td style="' + F + 'padding:3px 14px 2px;font-size:12.5px"><a href="' + esc(s.button && s.button.href || APP + '#mine') + '" target="_blank" style="color:#2477b8;font-weight:600;text-decoration:none">+ ' + more + ' more in the MMS ›</a></td></tr>' : '') +
-        (s.button ? '<tr><td style="padding:6px 14px 4px">' + btn(s.button.href, s.button.label) + '</td></tr>' : '') +
-        '<tr><td style="height:6px;line-height:6px;font-size:0">&nbsp;</td></tr></table></td></tr>';
+      return '<tr><td style="padding:0 28px 14px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-left:4px solid ' + c[0] + ';border-radius:6px;border-collapse:separate">' +
+        '<tr><td style="' + F + 'padding:11px 16px ' + (s.note ? '2px' : '6px') + '"><span style="font-size:14.5px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' +
+        (rows.length && !s.noCount ? '&nbsp;&nbsp;<span style="' + F + 'display:inline-block;font-size:11.5px;line-height:16px;font-weight:700;color:' + c[0] + ';background:' + c[1] + ';border-radius:3px;padding:1px 7px">' + rows.length + '</span>' : '') + '</td></tr>' +
+        (s.note ? '<tr><td style="' + F + 'padding:0 16px 6px;font-size:12px;line-height:1.4;color:#7794aa">' + esc(s.note) + '</td></tr>' : '') +
+        '<tr><td style="padding:0 16px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">' +
+        shown.map(function (r, i) { return line(r, i === 0 || (r.kind !== 'person' && shown[i - 1] && shown[i - 1].kind === 'person')); }).join('') + '</table></td></tr>' +
+        (more > 0 ? '<tr><td style="' + F + 'padding:2px 16px 4px;font-size:12.5px"><a href="' + esc(s.button && s.button.href || APP + '#mine') + '" target="_blank" style="color:#2477b8;font-weight:600;text-decoration:none">+ ' + more + ' more in the MMS ›</a></td></tr>' : '') +
+        (s.button ? '<tr><td style="padding:8px 16px 4px">' + btn(s.button.href, s.button.label) + '</td></tr>' : '') +
+        '<tr><td style="height:8px;line-height:8px;font-size:0">&nbsp;</td></tr></table></td></tr>';
     };
     var head = function (t, sub) { return '<tr><td style="' + F + 'padding:10px 28px 6px"><span style="font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0d314c">' + t + '</span>' + (sub ? '<span style="font-size:12px;color:#7794aa">&nbsp;&nbsp;' + sub + '</span>' : '') + '</td></tr>'; };
     var sec = (act.length ? head('Needs You', 'do these first') + act.map(function (s) { return block(s, 5); }).join('') : '') +
@@ -430,15 +442,15 @@
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img src="' + LOGO + '" alt="MISMO" width="110" style="display:block;border:0;background:#ffffff;border-radius:6px;padding:5px 9px"></td>' +
       '<td align="right" style="' + F + 'font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#74bfeb">' + esc(o.dateLine) + '</td></tr></table></td></tr>' +
       '<tr><td style="' + F + 'padding:18px 28px 4px"><div style="font-size:21px;font-weight:700;color:#0d314c;margin:0 0 6px">' + esc(o.title) + '</div>' +
-      '<div style="font-size:14.5px;color:#456179;line-height:1.5">Hi ' + esc(o.first || 'there') + '. ' + o.intro + '</div>' +
-      btn(o.button ? o.button.href : APP + '#mine', o.button ? o.button.label : 'Open My Queue', true) + '</td></tr>' +
+      '<div style="font-size:14.5px;color:#456179;line-height:1.5">Hi ' + esc(o.first || 'there') + '. ' + o.intro + '</div></td></tr>' +
+      '<tr><td style="padding:14px 28px 6px">' + btn(o.button ? o.button.href : APP + '#mine', o.button ? o.button.label : 'Open My Queue', true) + '</td></tr>' +
       '<tr><td style="height:8px;line-height:8px;font-size:0">&nbsp;</td></tr>' + sec +
       '<tr><td style="' + F + 'padding:8px 28px 18px;font-size:11.5px;color:#7794aa;line-height:1.5;border-top:1px solid #e5eef5">' + (o.footer || 'From the MMS. A daily email comes only on days something needs you; the weekly wrap-up comes on Fridays.') + ' Questions: <a href="mailto:workrequests@mismo.org" style="color:#2477b8">workrequests@mismo.org</a>.</td></tr>' +
       '</table></td></tr></table></body></html>';
   };
   D.text = function (first, intro, S) {
     var t = 'Hi ' + first + ',\n\n' + intro.replace(/<[^>]+>/g, '') + '\n\nOpen My Queue: ' + APP + '#mine\n';
-    S.forEach(function (s) { t += '\n' + s.title.toUpperCase() + '\n'; (s.rows || []).forEach(function (r) { t += '- ' + (r.lead ? r.lead + ' ' : '') + r.main + (r.sub ? ': ' + r.sub : '') + (r.badge ? ' (' + r.badge + ')' : '') + '\n'; }); });
+    S.forEach(function (s) { t += '\n' + s.title.toUpperCase() + '\n'; (s.rows || []).forEach(function (r) { t += (r.indent ? '    - ' : '- ') + (r.lead ? r.lead + ' ' : '') + r.main + (r.sub ? ': ' + r.sub : '') + (r.badge ? ' (' + r.badge + ')' : '') + '\n'; }); });
     return t;
   };
   D.et = et;

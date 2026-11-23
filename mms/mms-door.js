@@ -33,7 +33,10 @@
   var RELAY_URL = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws';
   var PROJECT = 'mms', TOOL = 'the MISMO Manufacturing System';
   var PREVIEW = false;
-  var POLL_MS = 60000, IDLE_POLL_MS = 180000, IDLE_AFTER = 10 * 60000;
+  /* Nov 23: every read is a GitHub call on the relay's one key (5,000 an hour, shared by every resources app).
+     The busy lists are checked every 2 minutes, everything else every 15, idle tabs every 10 and 30, hidden tabs never. */
+  var POLL_MS = 120000, IDLE_POLL_MS = 600000, IDLE_AFTER = 10 * 60000, SLOW_POLL_MS = 900000, SLOW_IDLE_MS = 1800000;
+  var LIMIT_WAIT = 5 * 60000;   /* GitHub said "rate limit": nobody reads or saves for 5 minutes, then try again */
   var FLUSH_MS = 350, RETRY_MS = 8000;
   var MAX_FILE = 940000;        /* the relay takes at most 1,000,000 bytes a save */
   var FIRST_YEAR = 2015;
@@ -82,7 +85,9 @@
   function idOf(path) { var s = String(path).split('/'); return s[s.length - 1]; }
 
   /* ---------- talking to the relay ---------- */
-  var status = { offline: false, lastError: '' };
+  var status = { offline: false, lastError: '', limitedUntil: 0 };
+  function isLimited(e) { return !!e && (e.status === 429 || e.gh === 429 || e.code === 'RATE_LIMITED' || /rate.?limit|abuse detection/i.test(String(e.message || '') + ' ' + String(e.code || ''))); }
+  function limitedFor() { return Math.max(0, status.limitedUntil - now()); }
   function net(method, name, body) {
     var rs = RS(), tok = rs && rs.token();
     if (!tok) return Promise.reject(err('SIGNED_OUT', 'Not signed in', 401));
@@ -93,9 +98,10 @@
     }).then(function (r) {
       status.offline = false;
       return r.json().catch(function () { return {}; }).then(function (b) {
-        if (r.ok) return b;
+        if (r.ok) { if (status.limitedUntil && method === 'GET') status.limitedUntil = 0; return b; }
         var e = err((b && b.error) || ('HTTP_' + r.status), b && b.message, r.status);
         e.gh = (b && typeof b.status === 'number') ? b.status : 0;
+        if (isLimited(e)) { e.code = 'RATE_LIMITED'; status.limitedUntil = now() + LIMIT_WAIT; status.lastError = 'RATE_LIMITED'; }
         if (r.status === 401 && rs) { needSignIn(); }
         throw e;
       });
@@ -231,12 +237,12 @@
       });
     };
     attempt().catch(function (e) {
-      var transient = e && (e.code === 'OFFLINE' || e.status === 401 || e.code === 'SIGNED_OUT' ||
+      var transient = e && (e.code === 'RATE_LIMITED' || e.code === 'OFFLINE' || e.status === 401 || e.code === 'SIGNED_OUT' ||
         (e.status >= 500 && e.code !== 'TOKEN' && e.code !== 'GITHUB' && e.code !== 'REJECTED') ||
         (e.code === 'GITHUB' && (e.gh >= 500 || !e.gh && /timed? ?out|ETIMEDOUT|ECONNRESET|fetch failed/i.test(e.message || ''))));
       if (transient) {
         if (e.status === 401 || e.code === 'SIGNED_OUT') f.waitingSignIn = true;
-        else setTimeout(function () { schedule(f, 0); }, RETRY_MS);
+        else setTimeout(function () { schedule(f, 0); }, Math.max(RETRY_MS, limitedFor() + 2000));
         problem(e); return;
       }
       f.pending = f.pending.filter(function (op) { return batch.indexOf(op) < 0; }); f.view = null; persist();
@@ -332,7 +338,7 @@
             l.primed = true; cb(collSnap(coll, null, false));
           }).catch(function (e) {
             if (errCb) errCb(e);
-            if (collL.indexOf(l) >= 0 && !l.primed) setTimeout(prime, Math.min(60000, 5000 * Math.pow(2, tries++)));
+            if (collL.indexOf(l) >= 0 && !l.primed) setTimeout(prime, Math.max(limitedFor(), Math.min(60000, 5000 * Math.pow(2, tries++))));
           });
         };
         prime();
@@ -354,13 +360,18 @@
     if (!ready || !(RS() && RS().token())) return;
     if (PREVIEW && !force) return;
     if (!force && document.visibilityState === 'hidden') return;
+    if (limitedFor()) return;
+    /* coming back to the tab checks everything, but not more than once a minute */
+    if (force) { if (now() - (status.forcedAt || 0) < 60000) force = false; else status.forcedAt = now(); }
     var idle = now() - lastActive > IDLE_AFTER;
     Object.keys(F).forEach(function (k) {
       var f = F[k];
       if (!f.loaded || f.flushing || f.pending.length || f.loading || !hasListener(f)) return;
       /* last year's tickets and file lists and older barely change (nor the old one-file list): every half hour */
       var old = (/^(tickets|ssfiles)-(\d{4})$/.test(k) && +k.slice(-4) < new Date().getFullYear() - 1) || k === 'ssfiles';
-      var gap = old ? 1800000 : (idle ? IDLE_POLL_MS : POLL_MS);
+      /* the lists people change all day; the rest (learning, settings people, metrics, files that don't exist) are slow */
+      var busy = /^(tickets-other|config|outbox|media|arch|cstatus|imqueue|queue)$/.test(k) || k === 'tickets-' + new Date().getFullYear() || /^outbox-/.test(k) && k === 'outbox-' + new Date().toISOString().slice(0, 7);
+      var gap = old ? 1800000 : (!f.sha && !busy) ? SLOW_IDLE_MS : busy ? (idle ? IDLE_POLL_MS : POLL_MS) : (idle ? SLOW_IDLE_MS : SLOW_POLL_MS);
       if (!force && now() - (f.polledAt || f.loadedAt) < gap) return;
       f.polledAt = now();
       load(f).catch(function () {});
@@ -463,7 +474,7 @@
     status.lastError = (e && (e.code || e.message)) || 'error';
     if (lost) { toast('A change didn’t save (' + ((e && (WHY[e.code] || e.message)) || 'relay error') + '). It has been taken back.', 'bad'); return; }
     troubled = true;
-    toast(e && (e.status === 401 || e.code === 'SIGNED_OUT') ? 'Sign in again to finish saving — nothing is lost.' : 'Not saved yet — trying again. Keep this tab open.', 'bad');
+    toast(e && (e.status === 401 || e.code === 'SIGNED_OUT') ? 'Sign in again to finish saving — nothing is lost.' : e && e.code === 'RATE_LIMITED' ? 'GitHub is busy right now. Your change is kept and saves on its own in a few minutes. Keep this tab open.' : 'Not saved yet — trying again. Keep this tab open.', 'bad');
   }
   function saved() { if (troubled && !anyPending()) { troubled = false; toast('All changes saved.'); } }
 

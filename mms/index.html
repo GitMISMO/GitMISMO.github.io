@@ -2140,7 +2140,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-23T20:47:14Z',fp:'b4013a44'};
+window.__mmsBuild={at:'2026-11-23T22:13:32Z',fp:'e187e9f1'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2289,8 +2289,9 @@ const Store={db:null,mem:null,subs:{},
   },
   sub(coll,cb){
     if(this.db){
-      return this.db.collection(coll).onSnapshot(snap=>{ const o={}; snap.docs.forEach(d=>{ o[d.id]=d.data(); }); cb(o, snap.metadata||{}); },
-        e=>{ saveState(false,(e&&e.message)||'Could not load '+coll); });
+      /* a list that fails to load is tried again on its own; say so calmly (nothing is unsaved) and clear it once it arrives */
+      return this.db.collection(coll).onSnapshot(snap=>{ const o={}; snap.docs.forEach(d=>{ o[d.id]=d.data(); }); if(S.loadErr&&S.loadErr[coll]){ delete S.loadErr[coll]; saveState(); } cb(o, snap.metadata||{}); },
+        e=>{ (S.loadErr=S.loadErr||{})[coll]=1; saveState(); });
     }
     (this.subs[coll]=this.subs[coll]||[]).push(cb); setTimeout(()=>cb(clone(this.mem[coll]||{}),{}),0); return ()=>{};
   },
@@ -2310,7 +2311,7 @@ const Store={db:null,mem:null,subs:{},
   }
 };
 let pendingSaves=0;
-function saveState(ok,msg){ const el=$('#savestate'); if(!el) return; if(ok===false){ el.textContent='Not saved: '+msg; el.className='savestate err'; return; } el.className='savestate'; el.textContent=pendingSaves?'Saving…':(S.mode==='memory'?'Not connected: changes stay on this screen':''); }
+function saveState(ok,msg){ const el=$('#savestate'); if(!el) return; if(ok===false){ el.textContent='Not saved: '+msg; el.className='savestate err'; return; } el.className='savestate'; el.textContent=pendingSaves?'Saving…':(S.loadErr&&Object.keys(S.loadErr).length?(window.__hqRelay&&window.__hqRelay.status&&window.__hqRelay.status.limitedUntil>Date.now()?'GitHub is busy: still loading some records, trying again in a few minutes':'Reconnecting: still loading some records'):(S.mode==='memory'?'Not connected: changes stay on this screen':'')); }
 async function write(coll,id,data,base){
   /* a work request saved from an older copy (a background tidy-up, a pop-up left open) carries the copy it
      started from, so only what it changed is applied over anything newer */
@@ -2794,7 +2795,7 @@ function stageActions(t){
     case 'aireview':
       add(sub==='reviewed'?'Run AI Review Again':'Run AI Review',()=>aiReview(t),sub==='reviewed'?'':'pri');
       /* AI Review never holds a work request back (Nov 20): Send to IM Review is always there, whatever the review said or whether it ran */
-      add('Send to IM Review →',()=>move(t,nextStage(t),{dates:{aiDecision:today()},patch:{ai:Object.assign({},t.ai,{status:sub==='reviewed'?'Passed':'Sent on'})},text:(sub==='reviewed'?'AI Review passed; sent to ':'Sent to ')+stageDef(nextStage(t)).name}),sub==='reviewed'?'pri':'');
+      add('Send to IM Review →',()=>move(t,nextStage(t),{dates:{aiDecision:today()},patch:{ai:Object.assign({},t.ai,{status:(sub==='reviewed'||(typeof AI_PASS_ALL!=='undefined'&&AI_PASS_ALL))?'Passed':'Sent on'})},text:((sub==='reviewed'||(typeof AI_PASS_ALL!=='undefined'&&AI_PASS_ALL))?'AI Review passed; sent to ':'Sent to ')+stageDef(nextStage(t)).name}),(sub==='reviewed'||(typeof AI_PASS_ALL!=='undefined'&&AI_PASS_ALL))?'pri':'');
       if(sub!=='updates') add('Make Updates First',()=>setSub(t,'updates','Facilitator making updates from AI Review'));
       else add('Resubmit for AI Review',()=>setSub(t,'resubmitted','Resubmitted for AI Review'),'pri');
       break;
@@ -3092,7 +3093,7 @@ async function aiReview(t){
     const prompt='You are the MISMO editor and readiness reviewer for the MISMO Manufacturing System. MISMO (Mortgage Industry Standards Maintenance Organization) builds mortgage data standards and collateral. Review the work product below before it goes to Information Management (IM) review.\n\nWork request: '+t.wr+' '+t.name+'\nWorkgroup: '+(t.workgroup||'')+'\nWork type: '+(t.workType||'')+' / '+(t.reqType||'')+'\nNote from facilitator: '+((t.ai&&t.ai.note)||'none')+'\n\nCheck:\n1. Editorial: spelling, grammar, American spelling, consistent terms and capitalization, clear and unambiguous wording, defined acronyms.\n2. MISMO conventions: the work product name and version follow MISMO naming, Comment Period IPR (intellectual property rights) language is present, the MISMO name is used correctly, no internal notes or tracked comments left in.\n3. Readiness: complete sections, no placeholders or TODOs, definitions present for new data points, consistent cross-references, examples match the specification.\n4. Anything IM or the Architecture Workgroup would likely send back.\n\nReturn ONLY JSON: {"verdict":"ready"|"fix","summary":"two sentences","checks":[{"name":"short check name","result":"pass"|"fix"|"note","detail":"one sentence"}],"edits":[{"where":"section or quote","issue":"what is wrong","suggestion":"the fix"}]}. Keep edits to the 25 most important.\n\nSUBMISSION:\n'+text;
     try{
       const r=await S.sample.json(prompt,{modelTier:'complex'});
-      const round={at:new Date().toISOString(),by:S.me.name||'',verdict:r.verdict==='ready'?'ready':'fix',summary:r.summary||'',checks:(r.checks||[]).slice(0,30),edits:(r.edits||[]).slice(0,25),files:names,clipped};
+      const round={at:new Date().toISOString(),by:S.me.name||'',verdict:(r.verdict==='ready'||(typeof AI_PASS_ALL!=='undefined'&&AI_PASS_ALL))?'ready':'fix',summary:r.summary||'',checks:(r.checks||[]).slice(0,30),edits:(r.edits||[]).slice(0,25),files:names,clipped};
       const x=clone(S.tickets[t.id]||t); x.ai=Object.assign({},x.ai,{rounds:[...((x.ai&&x.ai.rounds)||[]),round]});
       root.innerHTML=''; await setSub(x,'reviewed','AI Review round '+x.ai.rounds.length+': '+(round.verdict==='ready'?'ready for IM':'updates suggested'));
       showAI(round);
@@ -3833,9 +3834,9 @@ function wireArch(m){
       if (late.length) bits.push(late.length + ' past target');
       if (stale.length) bits.push(stale.length + ' sitting too long');
       if (moved.length) bits.push(moved.length + (friday ? ' moved this week' : ' moved today'));
-      rows.push({ lead: m.name, main: bits.join(' · '), badge: late.length ? 'Past Target' : '', tone: late.length ? 'bad' : '', href: APP + '#board' });
-      ym.slice(0, 3).forEach(function (r) { rows.push({ lead: '', main: (r.lead ? r.lead + ' ' : '') + r.main, sub: r.sub, badge: r.badge, tone: r.tone, href: r.href }); });
-      if (ym.length > 3) rows.push({ lead: '', main: '+ ' + (ym.length - 3) + ' more for ' + String(m.name).split(' ')[0], href: APP + '#board' });
+      rows.push({ kind: 'person', lead: '', main: m.name, sub: bits.join(' · '), badge: late.length ? 'Past Target' : '', tone: late.length ? 'bad' : '', href: APP + '#board' });
+      ym.slice(0, 3).forEach(function (r) { rows.push({ indent: true, lead: r.lead, main: r.main, sub: r.sub, badge: r.badge, tone: r.tone, href: r.href }); });
+      if (ym.length > 3) rows.push({ kind: 'more', indent: true, lead: '', main: '+ ' + (ym.length - 3) + ' more for ' + String(m.name).split(' ')[0], href: APP + '#board' });
     });
     return rows.length ? [{ key: 'team', title: friday ? 'The Facilitators’ Week' : 'The Facilitators’ Digests', tone: 'info', noCount: true, max: 80, note: 'What each facilitator’s digest says today, in one place.', rows: rows }] : [];
   };
@@ -3843,10 +3844,11 @@ function wireArch(m){
 
   /* ---------- the email itself: email-safe tables, MISMO navy and sky ---------- */
   var TONE = { bad: ['#b3372c', '#fbe9e7'], warn: ['#8a5d0f', '#fbf1dc'], info: ['#1f5f93', '#e4f2fb'], good: ['#0f7b5c', '#e3f4ed'], '': ['#456179', '#eef3f7'] };
-  /* a plain, squared button that looks the same in Outlook (padding on the cell, not the link) */
+  /* a squared, solid button that looks the same in Outlook: the colour and padding sit on the cell, the link fills it */
   function btn(href, label, big) {
-    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:' + (big ? '20px 0 6px' : '10px 0 2px') + '"><tr><td bgcolor="#eef6fc" style="background:#eef6fc;border:1px solid #9fc9e6;border-radius:4px;padding:' + (big ? '8px 16px' : '6px 12px') + '">' +
-      '<a href="' + esc(href) + '" target="_blank" style="display:block;font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '14px' : '13px') + ';line-height:20px;font-weight:600;color:#0d314c;text-decoration:none">' + esc(label) + '&nbsp;&nbsp;&rsaquo;</a></td></tr></table>';
+    var bg = big ? '#0d314c' : '#ffffff', fg = big ? '#ffffff' : '#0d314c', bd = big ? '#0d314c' : '#9fc9e6';
+    return '<table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td bgcolor="' + bg + '" style="background:' + bg + ';border:1px solid ' + bd + ';border-radius:4px;mso-padding-alt:' + (big ? '10px 20px' : '6px 12px') + '">' +
+      '<a href="' + esc(href) + '" target="_blank" style="display:inline-block;padding:' + (big ? '10px 20px' : '6px 12px') + ';font-family:\'IBM Plex Sans\',Arial,sans-serif;font-size:' + (big ? '14px' : '13px') + ';line-height:18px;font-weight:600;color:' + fg + ';text-decoration:none;border-radius:4px">' + esc(label) + '&nbsp;&nbsp;&rsaquo;</a></td></tr></table>';
   }
   /* The email: what needs them first, then what is good to know. Short rows, a few per section,
      and a link to the rest in the MMS, so it reads in under a minute. */
@@ -3854,21 +3856,32 @@ function wireArch(m){
   D.html = function (o) {
     var F = "font-family:'IBM Plex Sans',Arial,Helvetica,sans-serif;";
     var all = o.sections || [], act = all.filter(function (s) { return ACT_KEYS[s.key]; }), info = all.filter(function (s) { return !ACT_KEYS[s.key]; });
+    /* one tidy row: the item on the left (number, name, then the detail on its own line), the tag in its own
+       column on the right, so nothing runs together even where an email program drops floats */
+    var tag = function (r) { var rc = TONE[r.tone || ''] || TONE['']; return '<span style="' + F + 'display:inline-block;font-size:11px;line-height:16px;font-weight:700;color:' + rc[0] + ';background:' + rc[1] + ';border-radius:3px;padding:2px 7px;white-space:nowrap">' + esc(r.badge) + '</span>'; };
+    var line = function (r, first) {
+      var top = first ? '' : 'border-top:1px solid #e9f0f6;';
+      if (r.kind === 'more') return '<tr><td colspan="2" style="' + F + 'padding:4px 0 8px 14px;font-size:12.5px"><a href="' + esc(r.href || APP) + '" target="_blank" style="color:#2477b8;font-weight:600;text-decoration:none">' + esc(r.main) + ' ›</a></td></tr>';
+      if (r.kind === 'person') return '<tr><td colspan="2" bgcolor="#f3f7fb" style="' + F + 'background:#f3f7fb;' + (first ? '' : 'border-top:8px solid #ffffff;') + 'padding:7px 10px;font-size:13.5px;line-height:1.5;color:#0d314c">' +
+        '<a href="' + esc(r.href || APP) + '" target="_blank" style="font-weight:700;color:#0d314c;text-decoration:none">' + esc(r.main) + '</a>' +
+        (r.sub ? '<span style="font-size:12.5px;color:#5a7489">&nbsp;&nbsp;' + esc(r.sub) + '</span>' : '') + (r.badge ? '&nbsp;&nbsp; ' + tag(r) : '') + '</td></tr>';
+      return '<tr><td valign="top" style="' + F + top + 'padding:8px 0 8px ' + (r.indent ? '14px' : '0') + ';font-size:13px;line-height:1.45;color:#0d314c">' +
+        (r.lead ? '<span style="font-size:11.5px;font-weight:700;color:#5a7489;white-space:nowrap">' + esc(r.lead) + '</span>&nbsp;&nbsp;' : '') +
+        '<a href="' + esc(r.href || APP) + '" target="_blank" style="font-weight:600;color:#0d314c;text-decoration:none">' + esc(r.main) + '</a>' +
+        (r.sub ? '<div style="font-size:12.5px;line-height:1.45;color:#5a7489;padding-top:2px">' + esc(r.sub) + '</div>' : '') + '</td>' +
+        '<td valign="top" align="right" style="' + top + 'padding:8px 0 8px 12px;white-space:nowrap">' + (r.badge ? tag(r) : '') + '</td></tr>';
+    };
     var block = function (s, max) {
       var c = TONE[s.tone || ''] || TONE[''], rows = s.rows || [], shown = rows.slice(0, s.max || max), more = rows.length - shown.length;
-      return '<tr><td style="padding:0 28px 12px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-left:4px solid ' + c[0] + ';border-radius:6px;border-collapse:separate">' +
-        '<tr><td style="' + F + 'padding:8px 14px 4px"><span style="font-size:14px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' + (rows.length && !s.noCount ? '<span style="font-size:12px;font-weight:700;color:' + c[0] + '">&nbsp;&nbsp;' + rows.length + '</span>' : '') + (s.note ? '<span style="font-size:12px;color:#7794aa">&nbsp;&nbsp;' + esc(s.note) + '</span>' : '') + '</td></tr>' +
-        shown.map(function (r) {
-          var rc = TONE[r.tone || ''] || TONE[''];
-          return '<tr><td style="' + F + 'padding:3px 14px;font-size:13px;line-height:1.4;color:#0d314c">' +
-            (r.badge ? '<span style="float:right;font-size:11px;font-weight:700;color:' + rc[0] + ';background:' + rc[1] + ';border-radius:4px;padding:1px 6px;margin-left:8px">' + esc(r.badge) + '</span>' : '') +
-            (r.lead ? '<span style="font-size:11px;font-weight:700;color:#7794aa">' + esc(r.lead) + '</span>&nbsp; ' : '') +
-            '<a href="' + esc(r.href || APP) + '" target="_blank" style="font-weight:600;color:#0d314c;text-decoration:none">' + esc(r.main) + '</a>' +
-            (r.sub ? '<span style="color:#456179"> · ' + esc(r.sub) + '</span>' : '') + '</td></tr>';
-        }).join('') +
-        (more > 0 ? '<tr><td style="' + F + 'padding:3px 14px 2px;font-size:12.5px"><a href="' + esc(s.button && s.button.href || APP + '#mine') + '" target="_blank" style="color:#2477b8;font-weight:600;text-decoration:none">+ ' + more + ' more in the MMS ›</a></td></tr>' : '') +
-        (s.button ? '<tr><td style="padding:6px 14px 4px">' + btn(s.button.href, s.button.label) + '</td></tr>' : '') +
-        '<tr><td style="height:6px;line-height:6px;font-size:0">&nbsp;</td></tr></table></td></tr>';
+      return '<tr><td style="padding:0 28px 14px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border:1px solid #d5e2ed;border-left:4px solid ' + c[0] + ';border-radius:6px;border-collapse:separate">' +
+        '<tr><td style="' + F + 'padding:11px 16px ' + (s.note ? '2px' : '6px') + '"><span style="font-size:14.5px;font-weight:700;color:#0d314c">' + esc(s.title) + '</span>' +
+        (rows.length && !s.noCount ? '&nbsp;&nbsp;<span style="' + F + 'display:inline-block;font-size:11.5px;line-height:16px;font-weight:700;color:' + c[0] + ';background:' + c[1] + ';border-radius:3px;padding:1px 7px">' + rows.length + '</span>' : '') + '</td></tr>' +
+        (s.note ? '<tr><td style="' + F + 'padding:0 16px 6px;font-size:12px;line-height:1.4;color:#7794aa">' + esc(s.note) + '</td></tr>' : '') +
+        '<tr><td style="padding:0 16px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse">' +
+        shown.map(function (r, i) { return line(r, i === 0 || (r.kind !== 'person' && shown[i - 1] && shown[i - 1].kind === 'person')); }).join('') + '</table></td></tr>' +
+        (more > 0 ? '<tr><td style="' + F + 'padding:2px 16px 4px;font-size:12.5px"><a href="' + esc(s.button && s.button.href || APP + '#mine') + '" target="_blank" style="color:#2477b8;font-weight:600;text-decoration:none">+ ' + more + ' more in the MMS ›</a></td></tr>' : '') +
+        (s.button ? '<tr><td style="padding:8px 16px 4px">' + btn(s.button.href, s.button.label) + '</td></tr>' : '') +
+        '<tr><td style="height:8px;line-height:8px;font-size:0">&nbsp;</td></tr></table></td></tr>';
     };
     var head = function (t, sub) { return '<tr><td style="' + F + 'padding:10px 28px 6px"><span style="font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#0d314c">' + t + '</span>' + (sub ? '<span style="font-size:12px;color:#7794aa">&nbsp;&nbsp;' + sub + '</span>' : '') + '</td></tr>'; };
     var sec = (act.length ? head('Needs You', 'do these first') + act.map(function (s) { return block(s, 5); }).join('') : '') +
@@ -3881,15 +3894,15 @@ function wireArch(m){
       '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td><img src="' + LOGO + '" alt="MISMO" width="110" style="display:block;border:0;background:#ffffff;border-radius:6px;padding:5px 9px"></td>' +
       '<td align="right" style="' + F + 'font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#74bfeb">' + esc(o.dateLine) + '</td></tr></table></td></tr>' +
       '<tr><td style="' + F + 'padding:18px 28px 4px"><div style="font-size:21px;font-weight:700;color:#0d314c;margin:0 0 6px">' + esc(o.title) + '</div>' +
-      '<div style="font-size:14.5px;color:#456179;line-height:1.5">Hi ' + esc(o.first || 'there') + '. ' + o.intro + '</div>' +
-      btn(o.button ? o.button.href : APP + '#mine', o.button ? o.button.label : 'Open My Queue', true) + '</td></tr>' +
+      '<div style="font-size:14.5px;color:#456179;line-height:1.5">Hi ' + esc(o.first || 'there') + '. ' + o.intro + '</div></td></tr>' +
+      '<tr><td style="padding:14px 28px 6px">' + btn(o.button ? o.button.href : APP + '#mine', o.button ? o.button.label : 'Open My Queue', true) + '</td></tr>' +
       '<tr><td style="height:8px;line-height:8px;font-size:0">&nbsp;</td></tr>' + sec +
       '<tr><td style="' + F + 'padding:8px 28px 18px;font-size:11.5px;color:#7794aa;line-height:1.5;border-top:1px solid #e5eef5">' + (o.footer || 'From the MMS. A daily email comes only on days something needs you; the weekly wrap-up comes on Fridays.') + ' Questions: <a href="mailto:workrequests@mismo.org" style="color:#2477b8">workrequests@mismo.org</a>.</td></tr>' +
       '</table></td></tr></table></body></html>';
   };
   D.text = function (first, intro, S) {
     var t = 'Hi ' + first + ',\n\n' + intro.replace(/<[^>]+>/g, '') + '\n\nOpen My Queue: ' + APP + '#mine\n';
-    S.forEach(function (s) { t += '\n' + s.title.toUpperCase() + '\n'; (s.rows || []).forEach(function (r) { t += '- ' + (r.lead ? r.lead + ' ' : '') + r.main + (r.sub ? ': ' + r.sub : '') + (r.badge ? ' (' + r.badge + ')' : '') + '\n'; }); });
+    S.forEach(function (s) { t += '\n' + s.title.toUpperCase() + '\n'; (s.rows || []).forEach(function (r) { t += (r.indent ? '    - ' : '- ') + (r.lead ? r.lead + ' ' : '') + r.main + (r.sub ? ': ' + r.sub : '') + (r.badge ? ' (' + r.badge + ')' : '') + '\n'; }); });
     return t;
   };
   D.et = et;
@@ -5631,7 +5644,13 @@ async function rvAiIm(P,ctx,progress){
   return {rows:out,summaries:sums.slice(0,2),error:errs?errs+' of '+parts.length+' groups of rows didn’t come back from Claude; the rest are below.':''};
 }
 /* ---------- the report ---------- */
+/* Nov 23 (Jonna): the AI Review is new, so for now everyone passes it. The findings are still listed as
+   suggestions; set this to false to go back to Ready / A Few Fixes / Needs Updates. The IM Pre-Review is unchanged. */
+const AI_PASS_ALL=true;
+function rvPassAll(rep){ return AI_PASS_ALL&&!!rep&&rep.kind!=='im'; }
+function rvShown(rep){ return rvPassAll(rep)?{k:'ready',l:'Pass',fx:'to fix'}:{k:rep.readiness,l:rep.readinessLabel,fx:'must fix'}; }
 function rvReadiness(findings,ai){
+  if(AI_PASS_ALL) return ['ready','Pass'];
   const fix=findings.filter(f=>f.sev==='fix').length, ai3=(ai&&ai.readiness)||[];
   if(fix>=5||ai3.includes('needs-updates')) return ['needs','Needs Updates'];
   if(fix>0) return ['minor','A Few Fixes Before IM'];
@@ -5662,8 +5681,8 @@ function rvReportHtml(rep,forWord){
   const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'f'+i},f)), fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
   const title=rep.kind==='im'?'IM Pre-Review Report':'AI Review Report';
   let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(atDay(rep.at)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):(rep.rm?' · Checked against the '+e(rep.rm):''))+'</div>'+
-    '<div class="rvr-score rv-'+e(rep.readiness)+'"><b>'+e(rep.readinessLabel)+'</b> <span>'+fx.length+' must fix · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
-    (rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
+    '<div class="rvr-score rv-'+e(rvShown(rep).k)+'"><b>'+e(rvShown(rep).l)+'</b> <span>'+fx.length+' '+rvShown(rep).fx+' · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
+    (rvPassAll(rep)?'<p class="rvr-note"><b>Everyone passes the AI Review while the process is new.</b> The findings below are suggestions to make the work stronger before IM; nothing here holds the work request back.</p>':'')+(rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
     '<p class="rvr-note">This report recommends; it doesn’t change the work product. '+(rep.kind==='editor'?'Editorial suggestions are judgment calls: the facilitator and workgroup decide.':'IM makes the final decision on every row.')+'</p></div>';
   const sec=(t2,body)=>body?'<h3>'+e(t2)+'</h3>'+body:'';
   h+=sec('Must Fix Before Submitting',tbl(['Area','Where','What’s Wrong','What to Do'],fx.map(f=>({key:f._k,cells:[e(f.area),e(f.where),e(f.issue)+(f.fb?'<div class="rv-fbnote">'+e(f.fb)+'</div>':''),e(f.suggestion)]}))));
@@ -5981,7 +6000,7 @@ function rvRun(t,kind){
       if(kind==='im'&&typeof imCreateDraft==='function'){ say('Drafting IM’s decision for every row…'); try{ await imCreateDraft(t,rep,ctx.P,findings,ai); }catch(e){ console.warn(e); } }
       say('Saving the report…'); await rvSave(t,rep);
       // keep the AI Review stage moving the way it did
-      if(kind==='editor'&&S.tickets[t.id]){ const x=clone(S.tickets[t.id]); const round={at:rep.at,by:rep.by,verdict:rep.readiness==='ready'?'ready':'fix',summary:rep.readinessLabel+(rep.summary?': '+rep.summary:''),checks:[],edits:[],files:rep.files,report:rep.id};
+      if(kind==='editor'&&S.tickets[t.id]){ const x=clone(S.tickets[t.id]); const round={at:rep.at,by:rep.by,verdict:(rep.readiness==='ready'||rvPassAll(rep))?'ready':'fix',summary:rep.readinessLabel+(rep.summary?': '+rep.summary:''),checks:[],edits:[],files:rep.files,report:rep.id};
         x.ai=Object.assign({},x.ai,{rounds:[...((x.ai&&x.ai.rounds)||[]),round]});
         if(x.stage==='aireview') await setSub(x,'reviewed','AI Review: '+rep.readinessLabel); else { hist(x,'AI Review: '+rep.readinessLabel); await saveTicket(x,'Review saved'); } }
       else if(S.tickets[t.id]){ const x=clone(S.tickets[t.id]); hist(x,'IM Pre-Review: '+rep.readinessLabel); await saveTicket(x,'Review saved'); }
@@ -6006,7 +6025,7 @@ aiReview=function(t){ rvRun(t,'editor'); };
 /* ---------- on the work request ---------- */
 WH_IC.check='M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11';
 function rvCard(rep){ const F=rep.findings||[]; const fx=F.filter(f=>f.sev==='fix').length;
-  return '<button type="button" class="rv-card rv-'+esc(rep.readiness)+'" data-rvopen="'+esc(rep.id)+'"><span class="rv-ck">'+esc(rep.kind==='im'?'IM Pre-Review':'AI Review')+'</span><b>'+esc(rep.readinessLabel)+'</b><span class="rv-cm">'+fx+' must fix · '+(rep.kind==='im'?(rep.rows||[]).length+' rows to check':(rep.corrections||[]).length+' corrections')+'</span><span class="rv-cd">'+esc(fmtS(atDay(rep.at)))+' · '+esc(firstName(rep.by||''))+'</span></button>'; }
+  return '<button type="button" class="rv-card rv-'+esc(rvShown(rep).k)+'" data-rvopen="'+esc(rep.id)+'"><span class="rv-ck">'+esc(rep.kind==='im'?'IM Pre-Review':'AI Review')+'</span><b>'+esc(rvShown(rep).l)+'</b><span class="rv-cm">'+fx+' '+rvShown(rep).fx+' · '+(rep.kind==='im'?(rep.rows||[]).length+' rows to check':(rep.corrections||[]).length+' corrections')+'</span><span class="rv-cd">'+esc(fmtS(atDay(rep.at)))+' · '+esc(firstName(rep.by||''))+'</span></button>'; }
 /* the IM Pre-Review is sent to IM, so it is offered only once the work request is at AI Review or IM Review */
 function imReady(t){ return t&&t.state==='active'&&['aireview','im'].includes(t.stage)&&!t.split&&!t.rides; }
 function rvTabHtml(t){ rvEnsure(t); const L=rvFor(t), can=canAct(t)||S.isStaff, canIM=can&&imReady(t);
@@ -7258,7 +7277,7 @@ const HELP_TOPICS={
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
      'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.',
      'On the IM Pre-Review report, go through MISMO Link Format: accept or decline each fix before you click Send to IM.'],
-    ['Fixes are things IM will send back. Suggestions are up to you.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+    ['While the process is new, everyone passes the AI Review: the result reads Pass and its findings are suggestions to make the work stronger before IM.','Fixes are things IM will send back. Suggestions are up to you.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
     [['Open the Review Desk','reviews']]],
   mislink:['MISMO Link Format: Fixes Before IM','*',
     'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The IM Pre-Review lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
@@ -7943,7 +7962,7 @@ function rvNotes(rep){ const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'
 async function rvExcel(rep){
   try{ await needLibs(); }catch(e){ toast('Couldn’t load the Excel tools; try again'); return; }
   const title=rep.kind==='im'?'IM Pre-Review':'AI Review';
-  const sum=[['Report',title+' Report'],['Work Request',rep.wr],['Name',rep.name],['Date',fmt(atDay(rep.at))],['Run By',rep.by||''],['Files',(rep.files||[]).join(', ')],['Result',rep.readinessLabel||''],['Summary',rep.summary||''],
+  const sum=[['Report',title+' Report'],['Work Request',rep.wr],['Name',rep.name],['Date',fmt(atDay(rep.at))],['Run By',rep.by||''],['Files',(rep.files||[]).join(', ')],['Result',(typeof rvShown==='function'?rvShown(rep).l:rep.readinessLabel)||''],['Summary',rep.summary||''],
     ['Note','This report recommends; it doesn’t change the work product. Marking notes is optional and never holds up the work request.']];
   const ws1=XLSX.utils.aoa_to_sheet(sum); ws1['!cols']=[{wch:16},{wch:100}];
   const N=rvNotes(rep), head=['#','Section','Area','Where','What’s Wrong','What to Do','Right?','Marked By','Why'];
@@ -8231,7 +8250,7 @@ function dpRecord(t){ const e=s=>esc(s==null?'':String(s)); const d=t.dates||{};
   const awQ=Object.values(S.awgPortalQ||{}).filter(q=>q&&(q.ticket===t.id||(!q.ticket&&q.wr===t.wr))&&q.status==='decided'&&!q.test).sort((a,b)=>String(a.decidedAt).localeCompare(String(b.decidedAt)));
   const cnt=c=>Object.entries(c||{}).filter(x=>x[1]).map(([k,n])=>n+' '+k.toLowerCase()).join(', ');
   const rev=[];
-  if(t.ai&&t.ai.status) rev.push(['AI Review',e(t.ai.status)+(d.aiDecision?' · '+e(fmtD(d.aiDecision)):'')]);
+  if(t.ai&&t.ai.status) rev.push(['AI Review',e((typeof AI_PASS_ALL!=='undefined'&&AI_PASS_ALL&&t.ai.status==='Sent on')?'Passed':t.ai.status)+(d.aiDecision?' · '+e(fmtD(d.aiDecision)):'')]);
   imQ.forEach(q=>rev.push(['IM Review',e(fmtD(q.decidedAt))+' · '+e(cnt(q.counts)||'decided')+(q.decidedBy?' · recorded by '+e(q.decidedBy):'')]));
   if(!imQ.length&&(t.im&&t.im.status||d.imDecision)) rev.push(['IM Review',e((t.im&&t.im.status)||'Decided')+(d.imDecision?' · '+e(fmtD(d.imDecision)):'')+' (before the MMS)']);
   awQ.forEach(q=>rev.push(['AWG Review',e(fmtD(q.decidedAt))+' · '+e(q.outcome||'decided')+(q.conds?' · conditions: '+e(q.conds):'')+(q.decidedBy?' · recorded by '+e(q.decidedBy):'')]));
