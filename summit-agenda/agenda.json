@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-21T16:52:38.769Z",
+ "updated": "2026-11-23T18:28:53.147Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-21T16:51:20.612Z",
+ "sourceUpdated": "2026-11-23T18:27:32.476Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -35,6 +35,31 @@
         "company": "MISMO",
         "role": "Speaker",
         "photo": "https://resources.mismo.org/summit-agenda/photos/photo-brian-vieaux-1cdae0d6.webp"
+       }
+      ]
+     },
+     {
+      "start": "9:20 AM",
+      "end": "9:50 AM",
+      "kind": "Fireside Chat",
+      "title": "Quantum Computing: The Mortgage Industry's Next Big Disruption?",
+      "desc": "It sounds like science fiction, but it's closer than you think. Brian Vieaux leads a conversation with Dr. Daniel Conway as he unpacks what quantum computing means for data security and the future of lending.",
+      "sponsor": "Crittora",
+      "brk": false,
+      "people": [
+       {
+        "name": "Brian Vieaux",
+        "title": "President",
+        "company": "MISMO",
+        "role": "Moderator",
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-brian-vieaux-1cdae0d6.webp"
+       },
+       {
+        "name": "Dr. Daniel Conway",
+        "title": "Professor of Information Systems and Associate Director, Blockchain Center of Excellence, Sam M. Walton College of Business, University of Arkansas Chair, U.S. ",
+        "company": "University of Arkansas",
+        "role": "Panelist",
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-dan-conway-85dedc53.webp"
        }
       ]
      }
