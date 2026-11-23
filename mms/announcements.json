@@ -1,14 +1,63 @@
 {
   "source": "MMS",
   "note": "Announcement requests from the MMS for MISMO Media, with the facts to draft from. Public information only.",
-  "updated": "2026-11-21T02:46:14.036Z",
+  "updated": "2026-11-23T03:16:42.825Z",
   "announcements": [
+    {
+      "id": "WR2023_20_03-Candidate-Recommendation-Announcement",
+      "type": "release",
+      "kind": "Candidate Recommendation Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2023_20",
+      "name": "VA Documents to Data - VA Form 26-1805 - Part B",
+      "publicName": "VA Documents to Data - VA Form 26-1805 - Part B",
+      "workgroup": "VA Documents to Data DWG",
+      "groupType": "",
+      "classification": "Standard",
+      "releaseStatus": "Candidate Recommendation",
+      "facilitator": "Erin Bittenbender",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-11-03",
+      "commentCloses": "2026-12-03",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2023_20_03",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": true,
+      "readyToPost": false,
+      "readyAt": "",
+      "leaders": [
+        {
+          "name": "Jose Ferrer",
+          "position": "Chair",
+          "company": "U.S. Department of Veterans Affairs"
+        },
+        {
+          "name": "Nick Fisseler",
+          "position": "Co-Chair",
+          "company": "U.S. Department of Veterans Affairs"
+        },
+        {
+          "name": "Michael McCarthy",
+          "position": "Education Rep",
+          "company": "Guidehouse"
+        }
+      ]
+    },
     {
       "id": "WR2024_19-Final-Release-Announcement",
       "type": "release",
       "kind": "Final Release Announcement",
       "status": "Requested",
-      "requested": "2026-11-20",
+      "requested": "2026-11-22",
       "done": "",
       "link": "",
       "wr": "WR2024_19",
@@ -30,6 +79,10 @@
       "commentCloses": "2026-10-29",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2024_19",
       "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": false,
+      "readyToPost": true,
+      "readyAt": "2026-11-22",
       "leaders": [
         {
           "name": "Charles Epperson",
@@ -43,7 +96,7 @@
       "type": "release",
       "kind": "Final Release Announcement",
       "status": "Requested",
-      "requested": "2026-11-20",
+      "requested": "2026-11-22",
       "done": "",
       "link": "",
       "wr": "WR2024_22",
@@ -65,6 +118,10 @@
       "commentCloses": "2026-11-07",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2024_22",
       "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": false,
+      "readyToPost": true,
+      "readyAt": "2026-11-22",
       "leaders": [
         {
           "name": "Chris Trujillo",
@@ -83,7 +140,7 @@
       "type": "release",
       "kind": "Candidate Recommendation Announcement",
       "status": "Requested",
-      "requested": "2026-11-20",
+      "requested": "2026-11-22",
       "done": "",
       "link": "",
       "wr": "WR2025_03",
@@ -105,6 +162,10 @@
       "commentCloses": "2026-10-29",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_03",
       "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": false,
+      "readyToPost": true,
+      "readyAt": "2026-11-22",
       "leaders": [
         {
           "name": "Leslie Bensen",
@@ -143,7 +204,7 @@
       "type": "release",
       "kind": "Final Release Announcement",
       "status": "Requested",
-      "requested": "2026-11-20",
+      "requested": "2026-11-22",
       "done": "",
       "link": "",
       "wr": "WR2025_05",
@@ -165,6 +226,10 @@
       "commentCloses": "2026-11-07",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_05",
       "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": false,
+      "readyToPost": true,
+      "readyAt": "2026-11-22",
       "leaders": [
         {
           "name": "Vonda Renfrow",
@@ -180,6 +245,433 @@
           "name": "Jake Daniels",
           "position": "Education Rep",
           "company": "Federal Home Loan Bank of Des Moines"
+        }
+      ]
+    },
+    {
+      "id": "WR2025_21-Candidate-Recommendation-Announcement",
+      "type": "release",
+      "kind": "Candidate Recommendation Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2025_21",
+      "name": "Revise Loan Estimate Mapping Specification",
+      "publicName": "Loan Estimate Mapping",
+      "workgroup": "Origination COP",
+      "groupType": "",
+      "classification": "Standard",
+      "releaseStatus": "Candidate Recommendation",
+      "facilitator": "Kellie Stoll",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-11-03",
+      "commentCloses": "2026-12-03",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_21",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": true,
+      "readyToPost": false,
+      "readyAt": "",
+      "leaders": [
+        {
+          "name": "Michelle Pogatchnik",
+          "position": "Chair",
+          "company": "Fannie Mae Single-Family"
+        },
+        {
+          "name": "David Garrett",
+          "position": "Co-Vice-Chair",
+          "company": "DocMagic"
+        },
+        {
+          "name": "Todd White",
+          "position": "Co-Vice-Chair",
+          "company": "Xpanse"
+        },
+        {
+          "name": "Michael Zannetti",
+          "position": "AWG Rep",
+          "company": "United Wholesale Mortgage"
+        },
+        {
+          "name": "Michelle Pogatchnik",
+          "position": "Education Rep",
+          "company": "Fannie Mae Single-Family"
+        },
+        {
+          "name": "Sandra Griebe",
+          "position": "IM Rep",
+          "company": "Self-employed"
+        }
+      ]
+    },
+    {
+      "id": "WR2025_22_02-Candidate-Recommendation-Announcement",
+      "type": "release",
+      "kind": "Candidate Recommendation Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2025_22",
+      "name": "Title Order Dataset Specification - Part B",
+      "publicName": "Title and Closing Dataset Specifications (existing page)",
+      "workgroup": "Title and Closing Docs to Data DWG",
+      "groupType": "",
+      "classification": "Standard",
+      "releaseStatus": "Candidate Recommendation",
+      "facilitator": "Kellie Stoll",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-11-03",
+      "commentCloses": "2026-12-03",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_22_02",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": true,
+      "readyToPost": false,
+      "readyAt": "",
+      "leaders": [
+        {
+          "name": "Bryan Bedard",
+          "position": "Vice-Chair",
+          "company": "Rocket Close"
+        },
+        {
+          "name": "Ruth Dillingham",
+          "position": "Education Rep",
+          "company": "Dillingham Consulting, LLC"
+        }
+      ]
+    },
+    {
+      "id": "WR2025_23-Final-Release-Announcement",
+      "type": "release",
+      "kind": "Final Release Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2025_23",
+      "name": "Artificial Intelligence (AI) Glossary Update",
+      "publicName": "Artificial Intelligence (AI) Glossary Update",
+      "workgroup": "Artificial Intelligence (AI) CoP",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "Final",
+      "facilitator": "Meghan Tidgewell",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "",
+      "commentCloses": "",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_23",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": true,
+      "readyToPost": false,
+      "readyAt": "",
+      "leaders": [
+        {
+          "name": "Brian Stucky",
+          "position": "Co-Chair",
+          "company": "Decision-X"
+        },
+        {
+          "name": "Praveen Chandramohan",
+          "position": "Co-Chair",
+          "company": "Cotality"
+        },
+        {
+          "name": "Devin Caster",
+          "position": "Co-Vice-Chair",
+          "company": "Cotality"
+        },
+        {
+          "name": "Timothy Marlowe",
+          "position": "Co-Vice-Chair",
+          "company": ""
+        },
+        {
+          "name": "Angela Sella",
+          "position": "IM Rep",
+          "company": "Mortgage Guaranty Insurance Corporation (MGIC)"
+        },
+        {
+          "name": "Daniel Rocklein",
+          "position": "Education Rep",
+          "company": "Ernst & Young LLP"
+        },
+        {
+          "name": "Eric Litwin",
+          "position": "AWG Rep",
+          "company": "Pennymac"
+        },
+        {
+          "name": "Tammy Butler, Master CMB",
+          "position": "Education Rep",
+          "company": "Mortgage Guidelines"
+        }
+      ]
+    },
+    {
+      "id": "WR2025_27-Final-Release-Announcement",
+      "type": "release",
+      "kind": "Final Release Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2025_27",
+      "name": "Business Process Model Maintenance 2026.01",
+      "publicName": "Business Process Model Maintenance 2026.01",
+      "workgroup": "Business Process Model COP",
+      "groupType": "",
+      "classification": "",
+      "releaseStatus": "Final",
+      "facilitator": "Meghan Tidgewell",
+      "summary": "",
+      "license": "",
+      "availableTo": "",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-09-14",
+      "commentCloses": "2026-10-14",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_27",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": true,
+      "readyToPost": false,
+      "readyAt": "",
+      "leaders": [
+        {
+          "name": "Tammy Pegg Kienlen",
+          "position": "Chair",
+          "company": "Self-employed"
+        },
+        {
+          "name": "Kenneth Chenault",
+          "position": "Vice-Chair",
+          "company": "PrimeLending"
+        },
+        {
+          "name": "Ashley Wells",
+          "position": "Education Rep",
+          "company": "Actualize Consulting"
+        },
+        {
+          "name": "Kenneth Chenault",
+          "position": "IM Rep",
+          "company": "PrimeLending"
+        }
+      ]
+    },
+    {
+      "id": "WR2026_01-Candidate-Recommendation-Announcement",
+      "type": "release",
+      "kind": "Candidate Recommendation Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2026_01",
+      "name": "Minor Reference Model Release v3.6.4",
+      "publicName": "Minor Reference Model Release v3.6.4",
+      "workgroup": "Architecture Workgroup",
+      "groupType": "",
+      "classification": "Standard",
+      "releaseStatus": "Candidate Recommendation",
+      "facilitator": "Erin Bittenbender",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "",
+      "commentCloses": "",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_01",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": true,
+      "readyToPost": false,
+      "readyAt": "",
+      "leaders": [
+        {
+          "name": "Chris Trujillo",
+          "position": "Co-Chair",
+          "company": "Viant Eye"
+        },
+        {
+          "name": "Mark Kleingers",
+          "position": "Co-Chair",
+          "company": "Actualize Consulting"
+        }
+      ]
+    },
+    {
+      "id": "WR2026_04-Final-Release-Announcement",
+      "type": "release",
+      "kind": "Final Release Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2026_04",
+      "name": "SMART Doc V3 iGuide Updates",
+      "publicName": "https://www.mismo.org/standards-resources/mismo-product/smart-doc-version-3",
+      "workgroup": "Verifiable Profile SMARTDoc® DWG",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "Final",
+      "facilitator": "Meghan Tidgewell",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "https://collaborate.mismo.org/viewdocument/smart-doc-version-3",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "2026-09-29",
+      "commentCloses": "2026-10-29",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_04",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": false,
+      "readyToPost": true,
+      "readyAt": "2026-11-22",
+      "leaders": [
+        {
+          "name": "Charles Epperson",
+          "position": "Chair",
+          "company": ""
+        },
+        {
+          "name": "Harry Gardner",
+          "position": "Vice-Chair",
+          "company": "ICE Mortgage Technology"
+        },
+        {
+          "name": "Jay Arneja",
+          "position": "Education Rep",
+          "company": "nCino"
+        }
+      ]
+    },
+    {
+      "id": "WR2026_10-Final-Release-Announcement",
+      "type": "release",
+      "kind": "Final Release Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2026_10",
+      "name": "Business Glossary Maintenance 2026.02",
+      "publicName": "Business Glossary Maintenance 2026.02",
+      "workgroup": "Business Glossary CoP",
+      "groupType": "",
+      "classification": "Collateral",
+      "releaseStatus": "Final",
+      "facilitator": "Kellie Stoll",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "",
+      "commentCloses": "",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_10",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": true,
+      "readyToPost": false,
+      "readyAt": "",
+      "leaders": [
+        {
+          "name": "Rusty Emory",
+          "position": "Chair",
+          "company": "PrimeLending"
+        },
+        {
+          "name": "Richard Collins",
+          "position": "Vice-Chair",
+          "company": "United Wholesale Mortgage"
+        },
+        {
+          "name": "Kristie Flores",
+          "position": "IM Rep",
+          "company": "Ranieri Solutions LLC"
+        },
+        {
+          "name": "Lauren Scott",
+          "position": "Education Rep",
+          "company": "LodeStar Software Solutions"
+        }
+      ]
+    },
+    {
+      "id": "WR2026_11-Candidate-Recommendation-Announcement",
+      "type": "release",
+      "kind": "Candidate Recommendation Announcement",
+      "status": "Requested",
+      "requested": "2026-11-22",
+      "done": "",
+      "link": "",
+      "wr": "WR2026_11",
+      "name": "ALTA Settlement Statement Dataset Revisions",
+      "publicName": "Title and Closing Dataset Specifications (existing page)",
+      "workgroup": "Title and Closing Docs to Data DWG",
+      "groupType": "",
+      "classification": "Standard",
+      "releaseStatus": "Candidate Recommendation",
+      "facilitator": "Kellie Stoll",
+      "summary": "",
+      "license": "Commercial Distributor",
+      "availableTo": "Public",
+      "memberUrl": "",
+      "nonMemberUrl": "",
+      "websiteId": "",
+      "version": "",
+      "commentOpens": "",
+      "commentCloses": "",
+      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_11",
+      "shareUrl": "",
+      "pressRelease": true,
+      "draftNow": true,
+      "readyToPost": false,
+      "readyAt": "",
+      "leaders": [
+        {
+          "name": "Bryan Bedard",
+          "position": "Vice-Chair",
+          "company": "Rocket Close"
+        },
+        {
+          "name": "Ruth Dillingham",
+          "position": "Education Rep",
+          "company": "Dillingham Consulting, LLC"
         }
       ]
     },
@@ -210,6 +702,10 @@
       "commentCloses": "",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_23",
       "shareUrl": "",
+      "pressRelease": false,
+      "draftNow": false,
+      "readyToPost": false,
+      "readyAt": "",
       "leaders": [
         {
           "name": "Brian Stucky",
@@ -280,6 +776,10 @@
       "commentCloses": "",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_01",
       "shareUrl": "",
+      "pressRelease": false,
+      "draftNow": false,
+      "readyToPost": false,
+      "readyAt": "",
       "leaders": [
         {
           "name": "Chris Trujillo",
@@ -290,51 +790,6 @@
           "name": "Mark Kleingers",
           "position": "Co-Chair",
           "company": "Actualize Consulting"
-        }
-      ]
-    },
-    {
-      "id": "WR2026_04-Final-Release-Announcement",
-      "type": "release",
-      "kind": "Final Release Announcement",
-      "status": "Requested",
-      "requested": "2026-11-20",
-      "done": "",
-      "link": "",
-      "wr": "WR2026_04",
-      "name": "SMART Doc V3 iGuide Updates",
-      "publicName": "https://www.mismo.org/standards-resources/mismo-product/smart-doc-version-3",
-      "workgroup": "Verifiable Profile SMARTDoc® DWG",
-      "groupType": "",
-      "classification": "Collateral",
-      "releaseStatus": "Final",
-      "facilitator": "Meghan Tidgewell",
-      "summary": "",
-      "license": "Commercial Distributor",
-      "availableTo": "Public",
-      "memberUrl": "https://collaborate.mismo.org/viewdocument/smart-doc-version-3",
-      "nonMemberUrl": "",
-      "websiteId": "",
-      "version": "",
-      "commentOpens": "2026-09-29",
-      "commentCloses": "2026-10-29",
-      "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_04",
-      "shareUrl": "",
-      "leaders": [
-        {
-          "name": "Charles Epperson",
-          "position": "Chair",
-          "company": ""
-        },
-        {
-          "name": "Harry Gardner",
-          "position": "Vice-Chair",
-          "company": "ICE Mortgage Technology"
-        },
-        {
-          "name": "Jay Arneja",
-          "position": "Education Rep",
-          "company": "nCino"
         }
       ]
     },
@@ -365,6 +820,10 @@
       "commentCloses": "",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_10",
       "shareUrl": "",
+      "pressRelease": false,
+      "draftNow": false,
+      "readyToPost": false,
+      "readyAt": "",
       "leaders": [
         {
           "name": "Rusty Emory",
@@ -415,6 +874,10 @@
       "commentCloses": "",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_11",
       "shareUrl": "",
+      "pressRelease": false,
+      "draftNow": false,
+      "readyToPost": false,
+      "readyAt": "",
       "leaders": [
         {
           "name": "Bryan Bedard",
@@ -455,6 +918,10 @@
       "commentCloses": "2026-11-07",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_24",
       "shareUrl": "https://www.mismo.org/standards-resources?get=flood-risk-disclosure-guide",
+      "pressRelease": true,
+      "draftNow": false,
+      "readyToPost": true,
+      "readyAt": "",
       "leaders": [
         {
           "name": "Martha-Rosalind Stainton",
