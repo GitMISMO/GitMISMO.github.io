@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-23T18:34:06.350Z",
+ "updated": "2026-11-23T18:37:37.058Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-23T18:32:41.528Z",
+ "sourceUpdated": "2026-11-23T18:36:11.355Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -92,6 +92,31 @@
         "company": "Urban Institute",
         "role": "Speaker",
         "photo": ""
+       }
+      ]
+     },
+     {
+      "start": "10:40 AM",
+      "end": "11:10 AM",
+      "kind": "Presentation",
+      "title": "A Conversation with the CSBS Chair",
+      "desc": "MISMO's Amy Moses sits down with Rhoshunda Kelly, Commissioner of the Mississippi Department of Banking and Consumer Finance, to discuss her department's plans for rolling out AI governance reviews. As Chair of the Conference of State Bank Supervisors, she'll also share the state system's progress on testing and implementing the Mortgage Compliance Dataset.",
+      "sponsor": "",
+      "brk": false,
+      "people": [
+       {
+        "name": "Rhoshunda Kelly",
+        "title": "Commissioner",
+        "company": "Mississippi Department of Banking & Consumer Finance",
+        "role": "Speaker",
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-rhoshunda-kelly-e3ab7e1e.jpg"
+       },
+       {
+        "name": "Amy Moses",
+        "title": "VP, Strategic Growth",
+        "company": "MISMO",
+        "role": "Speaker",
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-amy-moses-064e4236.webp"
        }
       ]
      }
