@@ -102,6 +102,12 @@ body.railmini .nb{display:none}
 /* the count on a nav item, squared like Elections HQ's */
 .nb{margin-left:auto;font-size:11px;font-weight:700;min-width:20px;padding:1px 6px;border-radius:4px;background:#c94a3b;color:#fff;text-align:center}
 .nb.quiet{background:rgba(255,255,255,.14);color:rgba(255,255,255,.85)}
+/* Jonna, 23 Nov 2026: when the desk's copy was last brought up to date, above Dark Mode */
+.railupd{padding:6px 10px 8px;display:flex;flex-direction:column;gap:2px}
+.railupd[hidden]{display:none}
+.railupd span{font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.52)}
+.railupd b{font-family:var(--display);font-size:12.5px;font-weight:600;color:rgba(255,255,255,.86);white-space:nowrap}
+body.railmini .railupd{display:none}
 .hq .mast-right{margin-top:auto;display:flex;flex-direction:column;align-items:stretch;gap:1px;padding:8px 8px 10px;border-top:1px solid rgba(80,164,219,.2);flex:0 0 auto}
 .theme-btn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;color:rgba(255,255,255,.76);padding:8px 10px;font:inherit;font-family:var(--display);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
 .theme-btn .ti{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;opacity:.85}
@@ -371,6 +377,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <button type="button" data-hq="help" title="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2v.1"/></svg><span>Help</span></button>
   </nav>
   <div class="mast-right">
+    <div class="railupd" id="rail-upd" hidden><span>Last Updated</span><b id="rail-upd-t"></b></div>
     <button class="theme-btn" id="theme-btn" type="button"><svg class="ti ti-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6.4 6.4 0 009 9 9 9 0 11-9-9z"/></svg><svg class="ti ti-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.1"/><path d="M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg><span id="theme-lab">Dark Mode</span></button>
   </div>
 </aside>
@@ -438,8 +445,15 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function load(tab) {
     if (LOADED[tab]) return LOADED[tab];
     var p = tab === "certs" ? readFile(CERTS, "data/accounting/completions.json") : readFile(PROJECT, "accounting-desk/" + FILES[tab] + ".json");
-    LOADED[tab] = p.then(function (j) { D[tab] = j; return j; }, function (e) { FAILED[tab] = e; LOADED[tab] = null; throw e; });
+    LOADED[tab] = p.then(function (j) { D[tab] = j; lastUpdated(); return j; }, function (e) { FAILED[tab] = e; LOADED[tab] = null; throw e; });
     return LOADED[tab];
+  }
+  /* the newest copy of MISMO's own parts, shown at the foot of the menu */
+  function lastUpdated() {
+    var at = ""; Object.keys(FILES).forEach(function (t) { var w = D[t] && D[t].writtenAt; if (w && w > at) at = w; });
+    if (!at) return;
+    $("rail-upd-t").textContent = new Date(at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+    $("rail-upd").hidden = false;
   }
   function failSay(tab, e) {
     var who = tab === "certs" && e && e.status === 403 ? "Your account does not have access to Certification Completions yet. Ask Jonna Critchley to add it."
@@ -519,6 +533,12 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     if (pv) pv.addEventListener("click", function () { var k = keysFor(), i = k.indexOf(st.key); if (i < k.length - 1) { st.key = k[i + 1]; resetPage(id); redraw(); } });
     if (nx) nx.addEventListener("click", function () { var k = keysFor(), i = k.indexOf(st.key); if (i > 0) { st.key = k[i - 1]; resetPage(id); redraw(); } });
   }
+  /* the period a month (YYYY-MM) falls in, for the pickers that offer a fiscal year (October to September) */
+  function periodKeys(ms, period) { var s = {}; ms.forEach(function (m) { if (m) s[period === "month" ? m.slice(0, 7) : period === "fy" ? fyOf(m) : m.slice(0, 4)] = 1; }); return Object.keys(s).sort().reverse(); }
+  function inPeriod(m, st) { if (st.period === "all") return true; if (!m) return false; return st.period === "month" ? m.slice(0, 7) === st.key : st.period === "fy" ? fyOf(m) === st.key : m.slice(0, 4) === st.key; }
+  function periodLabel(st) { return st.period === "all" ? "All Time" : st.period === "month" ? monthName(st.key) : st.key; }
+  /* a period to start on: the newest one that is not in the future (a deposit for a 2028 summit is not where to open) */
+  function settle(st, keys) { if (st.period !== "all" && (!st.key || keys.indexOf(st.key) < 0)) { var now = new Date().toISOString().slice(0, 7), cur = st.period === "month" ? now : st.period === "fy" ? fyOf(now) : now.slice(0, 4); st.key = keys.filter(function (k) { return k <= cur; })[0] || keys[keys.length - 1] || null; } if (st.period !== "all" && !st.key) st.period = "all"; }
   function keysOf(rows, period, f) { var s = {}; rows.forEach(function (r) { var m = f(r); if (!m) return; s[period === "month" ? m.slice(0, 7) : m.slice(0, 4)] = 1; }); return Object.keys(s).sort().reverse(); }
   function findBox(id, ph, val) { return '<div class="fld"><label for="' + id + '">Find</label><input class="find" type="search" id="' + id + '" placeholder="' + esc(ph) + '" value="' + esc(val || "") + '"></div>'; }
   function wireFind(id, st, key, redraw) { var f = $(id); if (!f) return; f.addEventListener("input", function () { st.q = f.value; resetPage(key); redraw(true); }); }
@@ -575,16 +595,18 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ================= Invoices ================= */
-  var IS = { month: null, status: "", cat: "", q: "" };
+  var IS = { period: keep("invoices-period") || "month", key: null, status: "", cat: "", q: "" };
   function drawInvoices(listOnly) {
     var rows = (D.invoices && D.invoices.rows) || [];
-    var months = Object.keys(rows.reduce(function (s, r) { if (r.serviceMonth) s[r.serviceMonth] = 1; return s; }, {})).sort().reverse();
-    if (IS.month === null) { var now = new Date().toISOString().slice(0, 7); IS.month = months.filter(function (m) { return m < now; })[0] || months[0] || ""; }
-    var inM = rows.filter(function (r) { return !IS.month || r.serviceMonth === IS.month; });
+    var keys = function () { return periodKeys(rows.map(function (r) { return r.serviceMonth; }), IS.period); };
+    /* a month to start: the newest one that is over */
+    if (IS.period === "month" && !IS.key) { var now = new Date().toISOString().slice(0, 7); IS.key = keys().filter(function (m) { return m < now; })[0] || null; }
+    settle(IS, keys());
+    var inM = rows.filter(function (r) { return inPeriod(r.serviceMonth, IS); });
     var shown = inM.filter(function (r) { return (!IS.status || r.status === IS.status) && (!IS.cat || r.category === IS.cat) && has(r, IS.q, ["vendor", "invoiceNo", "netsuite", "period", "line"]); })
       .sort(function (a, b) { return (b.serviceMonth || "").localeCompare(a.serviceMonth || "") || String(b.sentToAp || "").localeCompare(String(a.sentToAp || "")); });
     var statuses = Object.keys(rows.reduce(function (s, r) { if (r.status) s[r.status] = 1; return s; }, {})).sort();
-    var label = IS.month ? monthName(IS.month) : "Every Month";
+    var label = periodLabel(IS);
     var cols = [
       { h: "Invoice #", cls: "nw", cell: function (r) { return esc(r.invoiceNo); } },
       { h: "Vendor", cell: function (r) { return "<b>" + esc(r.vendor) + "</b>" + (r.file && r.file.path ? '<span class="sub">Invoice PDF to view</span>' : r.old && r.old.files && r.old.files.length ? '<span class="sub">' + r.old.files.length + (r.old.files.length === 1 ? " file" : " files") + " to view</span>" : ""); } },
@@ -599,19 +621,20 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       { h: "Status", cls: "nw", cell: function (r) { return '<span class="tag' + (r.status === "Paid" ? " good" : "") + '">' + esc(r.status) + "</span>"; } },
       { h: "Expense Line", cls: "clip", cell: function (r) { return esc(r.line); } }];
     var foot = function (l) { return '<tr><td colspan="5">' + l.length + (l.length === 1 ? " invoice" : " invoices") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + '</td><td colspan="6"></td></tr>'; };
-    var paint = function () { list($("invoices-list"), { key: "invoices", rows: shown, cols: cols, foot: foot, none: "No invoice matches that.", open: invOpen }); };
+    var paint = function () { list($("invoices-list"), { key: "invoices", rows: shown, cols: cols, foot: foot, none: "No invoice" + (IS.q || IS.status || IS.cat ? " matches that." : " for " + label + "."), open: invOpen }); };
     drawWith("invoices", listOnly, function () {
       var byStatus = {}; inM.forEach(function (r) { byStatus[r.status] = (byStatus[r.status] || 0) + 1; });
-      $("v-invoices").innerHTML = hero("For Accounting", "Invoices", "Every contractor and expense invoice MISMO sends to AP, with where it is: sent to AP, in NetSuite, approved and paid. The service month is the month the work was done.", "",
+      $("v-invoices").innerHTML = hero("For Accounting", "Invoices", "Every contractor and expense invoice MISMO sends to AP, with where it is: sent to AP, in NetSuite, approved and paid. The service month is the month the work was done.",
+        periodPicker("invoices", IS, keys(), ["month", "fy", "all"]),
         tile("Invoices", String(inM.length), label) + tile("Amount", usd(sum(inM, function (r) { return r.amount; }), 1), label) +
         statuses.filter(function (s) { return byStatus[s]; }).slice(0, 3).map(function (s) { return tile(s, String(byStatus[s]), "invoices"); }).join("")) +
         '<div class="bar"><h2>Invoices, ' + esc(label) + "</h2>" +
-        select("inv-month", "Service Month", [["", "Every Month"]].concat(months.map(function (m) { return [m, monthName(m)]; })), IS.month) +
         select("inv-status", "Status", [["", "Every Status"]].concat(statuses.map(function (s) { return [s, s]; })), IS.status) +
         select("inv-cat", "Category", [["", "Every Category"], ["Contractor", "Contractor"], ["Summit", "Summit"], ["Marketing", "Marketing"], ["Other", "Other"]], IS.cat) +
         findBox("inv-q", "Vendor, invoice or NetSuite number", IS.q) + '<button class="btn" type="button" id="inv-dl">Download for Excel</button></div>' +
         '<div class="card" id="invoices-list"></div><p class="stamp">' + esc(stamp(D.invoices.writtenAt)) + "</p>";
-      [["inv-month", "month"], ["inv-status", "status"], ["inv-cat", "cat"]].forEach(function (p) { $(p[0]).addEventListener("change", function () { IS[p[1]] = this.value; resetPage("invoices"); drawInvoices(); }); });
+      wirePeriod("invoices", IS, keys, drawInvoices);
+      [["inv-status", "status"], ["inv-cat", "cat"]].forEach(function (p) { $(p[0]).addEventListener("change", function () { IS[p[1]] = this.value; resetPage("invoices"); drawInvoices(); }); });
       wireFind("inv-q", IS, "invoices", drawInvoices);
       $("inv-dl").addEventListener("click", function () {
         download("Invoices - " + label, ["Invoice #", "Vendor", "Period", "Service Month", "Category", "Summit", "Amount", "Sent to AP", "Reviewed", "NetSuite #", "Approved", "Paid", "Status", "GL", "Expense Line"],
@@ -703,19 +726,25 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     var cls = s.state === "waiting" ? (/^Was due/.test(s.due) ? "late" : "wait") : s.state === "done" || s.state === "inferred" ? "done" : "";
     return { cls: cls, html: esc(s.say) + (s.due ? '<span class="sub">' + esc(s.due) + "</span>" : s.by ? '<span class="sub">' + esc(s.by) + "</span>" : "") };
   }
+  var CL = { period: keep("close-period") || "all", key: null };
   function drawClose() {
-    var months = (D.close && D.close.months) || [];
+    var every = (D.close && D.close.months) || [];
+    var keys = function () { return periodKeys(every.map(function (m) { return m.month; }), CL.period); };
+    settle(CL, keys());
+    var months = every.filter(function (m) { return inPeriod(m.month, CL); }), label = periodLabel(CL);
     var latest = months.filter(function (m) { return m.ended; })[0];
     var closed = months.filter(function (m) { return m.complete; }).length;
     var stepsHead = months.length ? months[0].steps.map(function (s) { return s.label; }) : [];
-    $("v-close").innerHTML = hero("For Accounting", "Monthly Close", "Each month&rsquo;s six close steps, in order: MISMO sends the Monthly Summary, Accounting sends the admin expense, MISMO approves it, Accounting sends the draft statement, MISMO reviews it, and Accounting issues the final. Open a month for its steps and the Monthly Summary as it was sent.", "",
+    $("v-close").innerHTML = hero("For Accounting", "Monthly Close", "Each month&rsquo;s six close steps, in order: MISMO sends the Monthly Summary, Accounting sends the admin expense, MISMO approves it, Accounting sends the draft statement, MISMO reviews it, and Accounting issues the final. Open a month for its steps and the Monthly Summary as it was sent.",
+      periodPicker("close", CL, keys(), ["year", "fy", "all"]),
       tile("Newest Month Over", latest ? latest.label : "—", latest ? latest.line.replace(/^[^:]*: /, "") : "") +
-      tile("Months Closed", String(closed), "of " + months.filter(function (m) { return m.ended; }).length + " shown") +
+      tile("Months Closed", String(closed), "of " + months.filter(function (m) { return m.ended; }).length + " over, " + label) +
       tile("Next Step", latest && !latest.complete ? (latest.steps.filter(function (s) { return s.state === "waiting"; })[0] || {}).label || "—" : "—", latest && !latest.complete ? "waiting on " + ((latest.steps.filter(function (s) { return s.state === "waiting"; })[0] || {}).who || "") : "nothing waiting")) +
-      '<div class="bar"><h2>Every Month, Newest First</h2></div><div class="card steps" id="close-list"></div><p class="stamp">' + esc(stamp(D.close.writtenAt)) + "</p>";
+      '<div class="bar"><h2>' + (CL.period === "all" ? "Every Month" : esc(label)) + ', Newest First</h2></div><div class="card steps" id="close-list"></div><p class="stamp">' + esc(stamp(D.close.writtenAt)) + "</p>";
     var cols = [{ h: "Month", cls: "nw", cell: function (m) { return "<b>" + esc(m.label) + "</b>"; } }, { h: "Status", cell: function (m) { var t = m.ended ? (m.complete ? "Closed" : m.line.replace(/^[^:]*: /, "").replace(/\.$/, "")) : "Month not over"; return esc(t.charAt(0).toUpperCase() + t.slice(1)); } }]
       .concat(stepsHead.map(function (h, i) { return { h: h, cls: "nw", cell: function (m) { var c = stepCell(m.steps[i]); return '<span class="' + c.cls + '">' + c.html + "</span>"; } }; }));
-    list($("close-list"), { key: "close", rows: months, cols: cols, none: "No month yet.", open: closeOpen });
+    wirePeriod("close", CL, keys, drawClose);
+    list($("close-list"), { key: "close", rows: months, cols: cols, none: "No month in " + label + ".", open: closeOpen });
     $("close-list").querySelectorAll("span.wait,span.late,span.done").forEach(function (s) { s.parentNode.classList.add(s.className); });
   }
   function closeOpen(m) {
@@ -727,11 +756,14 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ================= Receivables ================= */
-  var AS = { status: null, q: "" };
+  var AS = { period: keep("ar-period") || "all", key: null, status: null, q: "" };
   function lastNote(r) { var t = (r.mismoNote || r.mismoNoteOnFile || "").split(/\n+/).filter(Boolean); return t[0] || ""; }
   function drawAr(listOnly) {
     var a = D.ar || { items: [] };
-    var items = a.items || [];
+    var every = a.items || [];
+    var keys = function () { return periodKeys(every.map(function (r) { return r.invoicedOn; }), AS.period); };
+    settle(AS, keys());
+    var items = every.filter(function (r) { return inPeriod(r.invoicedOn, AS); }), label = periodLabel(AS), whole = AS.period === "all";
     if (AS.status === null) AS.status = items.some(function (r) { return r.status === "Open"; }) ? "Open" : "";
     var shown = items.filter(function (r) { return (!AS.status || r.status === AS.status) && has(r, AS.q, ["company", "order", "description", "mismoNote", "mismoNoteOnFile"]); })
       .sort(function (x, y) { return String(y.invoicedOn).localeCompare(String(x.invoicedOn)); });
@@ -752,17 +784,19 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       var wk = a.source === "weekly", yr = String(a.asOf || a.reportDate || "").slice(0, 4);
       $("v-ar").innerHTML = hero("For Accounting", "Receivables", wk
         ? "What is still owed on Aptify's orders: every order Shipped with a balance over $0, from the Monday Aptify workbook. Every morning MISMO checks each one against the Aptify payments, so an order paid since the workbook shows as Paid."
-        : "Your AR aging as MISMO reads it. Every morning MISMO checks each item against the Aptify payments, so an item paid since your report shows as Paid. You no longer need to add items to a shared sheet.", "",
-        tile("Still Owed to MISMO", usd(a.owedTotal, 1), items.filter(function (r) { return r.status === "Open"; }).length + " open") +
-        tile("Over 90 Days", usd(a.owedOver90 && a.owedOver90.amount, 1), (a.owedOver90 && a.owedOver90.count || 0) + " of what is owed") +
+        : "Your AR aging as MISMO reads it. Every morning MISMO checks each item against the Aptify payments, so an item paid since your report shows as Paid. You no longer need to add items to a shared sheet.",
+        periodPicker("ar", AS, keys(), ["month", "year", "all"]),
+        tile("Still Owed to MISMO", usd(whole ? a.owedTotal : sum(items.filter(function (r) { return r.status === "Open"; }), function (r) { return r.amount; }), 1), items.filter(function (r) { return r.status === "Open"; }).length + " open") +
+        (whole ? tile("Over 90 Days", usd(a.owedOver90 && a.owedOver90.amount, 1), (a.owedOver90 && a.owedOver90.count || 0) + " of what is owed")
+          : (function (o) { return tile("Over 90 Days", usd(sum(o, function (r) { return r.amount; }), 1), o.length + " of what is owed"); })(items.filter(function (r) { return r.status === "Open" && r.age > 90; }))) +
         tile("Received", usd(sum(received, function (r) { return r.amount; }), 1), received.length + " paid or complete") +
         tile("Bad Debt", usd(sum(bad, function (r) { return r.amount; }), 1), bad.length + " kept out of what is owed") +
         (wk ? tile("Aptify Workbook", day(a.asOf || a.reportDate), a.count + " orders owed" + (a.taken && a.taken.count ? ", " + a.taken.count + " Taken left out" : ""))
             : tile("Newest AR Aging", day(a.reportDate), a.count + " items on file"))) +
-        (items.some(function (r) { return r.status === "Open"; }) ? "" :
+        (!whole || items.some(function (r) { return r.status === "Open"; }) ? "" :
           '<div class="nowed">' + (wk ? "Nothing is owed to MISMO on Aptify's orders as of " + esc(day(a.asOf || a.reportDate)) + "."
             : "Nothing is owed to MISMO on the AR aging dated " + esc(day(a.reportDate)) + ": every item on it is paid, complete, canceled or bad debt.") + "</div>") +
-        '<div class="bar"><h2>Every Receivable</h2>' +
+        '<div class="bar"><h2>' + (whole ? "Every Receivable" : "Invoiced in " + esc(label)) + "</h2>" +
         select("ar-status", "Status", [["", "Every Status"], ["Open", "Open"], ["Paid", "Paid"], ["Complete", "Complete"], ["Canceled", "Canceled"], ["Bad Debt", "Bad Debt"]], AS.status) +
         findBox("ar-q", "Company, order or note", AS.q) + '<button class="btn" type="button" id="ar-dl">Download for Excel</button></div>' +
         '<div class="card" id="ar-list"></div><p class="note">' + (wk
@@ -770,10 +804,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
             (a.taken && a.taken.count ? " " + a.taken.count + " Taken orders (" + usd(a.taken.amount, 1) + ") are left out: they are not money owed." : "")
           : "The newest AR aging on file is dated " + esc(day(a.reportDate)) + ". A newer aging sent to Jonna is loaded into MISMO Money and shows here the next morning.") + "</p>" +
         '<p class="stamp">' + esc(stamp(a.writtenAt)) + "</p>";
+      wirePeriod("ar", AS, keys, drawAr);
       $("ar-status").addEventListener("change", function () { AS.status = this.value; resetPage("ar"); drawAr(); });
       wireFind("ar-q", AS, "ar", drawAr);
       $("ar-dl").addEventListener("click", function () {
-        download("Receivables", ["Company", "Order", "Description", "Amount", "Invoiced", "On the Aging Dated", "Status", "Status on Your File", "Paid in Aptify Since", "MISMO's Notes"],
+        download("Receivables - " + label, ["Company", "Order", "Description", "Amount", "Invoiced", "On the Aging Dated", "Status", "Status on Your File", "Paid in Aptify Since", "MISMO's Notes"],
           shown.map(function (r) { return [r.company, r.order, r.description, r.amount, r.invoicedOn, r.reportedOn || r.reportedRaw, r.status, r.statusOnFile, r.paidInAptify ? r.paidInAptify.amount : "", [r.mismoNote, r.mismoNoteOnFile].filter(Boolean).join(" | ")]; }));
       });
       paint();
@@ -888,7 +923,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ================= Sponsorships (Jonna: workgroups 21 Nov 2026; "all the sponsorships ... summit, ai webinar and workgroup" 23 Nov 2026) ================= */
-  var WS = { show: keep("wg-show") || "", type: keep("wg-type") || "", q: "" };
+  var WS = { period: keep("wg-period") || "all", key: null, show: keep("wg-show") || "", type: keep("wg-type") || "", q: "" };
   var WG_TYPES = ["Summit", "AI Webinar", "Workgroup"];
   function fyOf(m) { return "FY" + (+m.slice(5, 7) >= 10 ? +m.slice(0, 4) + 1 : +m.slice(0, 4)); }
   function wgState(r, thru) {
@@ -905,7 +940,12 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
   function drawWg(listOnly) {
     var d = D.wg || {}, rows = d.rows || [], thru = d.earnedThrough || "", thruSay = monthName(thru);
-    var inT = rows.filter(function (r) { return !WS.type || r.type === WS.type; });
+    var keys = function () { var ms = []; rows.forEach(function (r) { r.months.forEach(function (x) { ms.push(x[0]); }); }); return periodKeys(ms, WS.period); };
+    settle(WS, keys());
+    var whole = WS.period === "all", label = periodLabel(WS);
+    /* what a sponsorship earns in the period picked (Jonna, 23 Nov 2026: a date picker on every page) */
+    var inP = function (r) { return sum(r.months.filter(function (x) { return inPeriod(x[0], WS); }), function (x) { return x[1]; }); };
+    var inT = rows.filter(function (r) { return (!WS.type || r.type === WS.type) && (whole || r.months.some(function (x) { return inPeriod(x[0], WS); })); });
     var shown = inT.filter(function (r) { var st = wgState(r, thru); return (!WS.show || st === WS.show || (WS.show === "open" && st !== "Finished")) && has(r, WS.q, ["company", "group", "level", "order", "type"]); })
       .sort(function (a, b) { return WG_TYPES.indexOf(a.type) - WG_TYPES.indexOf(b.type) || String(b.start || b.paidOn).localeCompare(String(a.start || a.paidOn)) || a.company.localeCompare(b.company); });
     var cols = [
@@ -914,20 +954,23 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       { h: "When It Is Earned", cls: "nw", cell: function (r) { return esc(wgWhen(r)); } },
       { h: "Paid", num: 1, cell: function (r) { return usd(r.amount) + '<span class="sub">' + esc(day(r.paidOn)) + "</span>"; } },
       { h: "MISMO's Share", num: 1, cell: function (r) { return usd(r.mismo) + (r.mba ? '<span class="sub">MBA gets ' + usd(r.mba) + "</span>" : ""); } },
-      { h: "Earned Through " + shortMon(thru || "2000-01") + " " + thru.slice(0, 4), num: 1, cell: function (r) { return usd(r.earned); } },
+      /* with a period picked, what it earns there takes the Earned Through column's place, so the table still fits */
+      whole ? { h: "Earned Through " + shortMon(thru || "2000-01") + " " + thru.slice(0, 4), num: 1, cell: function (r) { return usd(r.earned); } }
+        : { h: "Earned in " + label, num: 1, cell: function (r) { return usd(Math.round(inP(r) * 100) / 100); } },
       { h: "Still to Earn", num: 1, cell: function (r) { return usd(r.toEarn); } },
       { h: "Where It Stands", cls: "nw", cell: function (r) { var st = wgState(r, thru); return '<span class="tag' + (st === "Finished" ? "" : st === "Dates Not Known" ? " warn" : " good") + '">' + esc(st) + "</span>"; } }];
-    var foot = function (l) { return '<tr><td colspan="3">' + l.length + (l.length === 1 ? " sponsorship" : " sponsorships") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + '</td><td class="num">' + usd(sum(l, function (r) { return r.mismo; })) + '</td><td class="num">' + usd(sum(l, function (r) { return r.earned; })) + '</td><td class="num">' + usd(sum(l, function (r) { return r.toEarn; })) + "</td><td></td></tr>"; };
-    var paint = function () { list($("wg-list"), { key: "wg", rows: shown, cols: cols, foot: foot, none: "No sponsorship matches that.", open: wgOpen }); };
+    var foot = function (l) { return '<tr><td colspan="3">' + l.length + (l.length === 1 ? " sponsorship" : " sponsorships") + '</td><td class="num">' + usd(sum(l, function (r) { return r.amount; })) + '</td><td class="num">' + usd(sum(l, function (r) { return r.mismo; })) + '</td><td class="num">' + usd(whole ? sum(l, function (r) { return r.earned; }) : sum(l, inP)) + '</td><td class="num">' + usd(sum(l, function (r) { return r.toEarn; })) + "</td><td></td></tr>"; };
+    var paint = function () { list($("wg-list"), { key: "wg", rows: shown, cols: cols, foot: foot, none: "No sponsorship" + (whole ? " matches that." : " is earned in " + label + (WS.type || WS.show || WS.q ? " that matches that." : ".")), open: wgOpen }); };
     drawWith("wg", listOnly, function () {
       var np = d.notPaid || [], nowM = lastMonths(1)[0];
       var running = inT.filter(function (r) { return wgState(r, thru) === "Being Earned"; }), ahead = inT.filter(function (r) { return wgState(r, thru) === "Not Started"; });
       var perMonth = sum(inT, function (r) { return sum(r.months.filter(function (x) { return x[0] === nowM; }), function (x) { return x[1]; }); });
       var lab = WS.type || "every type";
-      $("v-wg").innerHTML = hero("For Accounting", "Sponsorships", "Every summit, AI webinar and workgroup sponsorship MISMO has been paid for: who paid, how much, and when it is earned. A summit sponsorship is earned in the month the summit is held, or the month it ends if it runs into the next (a series sponsorship is split over that year&rsquo;s three summits). An AI webinar is earned in the month it is held, and MISMO keeps half (MBA gets the other half). A workgroup sponsorship is earned evenly over the months it runs. What is still to earn is as of the end of " + esc(thruSay) + ".", "",
+      $("v-wg").innerHTML = hero("For Accounting", "Sponsorships", "Every summit, AI webinar and workgroup sponsorship MISMO has been paid for: who paid, how much, and when it is earned. A summit sponsorship is earned in the month the summit is held, or the month it ends if it runs into the next (a series sponsorship is split over that year&rsquo;s three summits). An AI webinar is earned in the month it is held, and MISMO keeps half (MBA gets the other half). A workgroup sponsorship is earned evenly over the months it runs. What is still to earn is as of the end of " + esc(thruSay) + ". Pick a month or fiscal year to see what is earned in it.",
+        periodPicker("wg", WS, keys(), ["month", "fy", "all"]),
         tile("Left on Running Ones", usd(sum(running, function (r) { return r.toEarn; }), 1), running.length + " running, " + lab) +
         tile("Paid Ahead, Not Started", usd(sum(ahead, function (r) { return r.toEarn; }), 1), ahead.length + " not started, " + lab) +
-        tile("Earned This Month", usd(perMonth, 1), monthName(nowM)) +
+        (whole ? tile("Earned This Month", usd(perMonth, 1), monthName(nowM)) : tile("Earned in " + label, usd(sum(inT, inP), 1), inT.length + (inT.length === 1 ? " sponsorship" : " sponsorships"))) +
         tile("MISMO's Share Paid", usd(sum(inT, function (r) { return r.mismo; }), 1), inT.length + (inT.length === 1 ? " sponsorship" : " sponsorships"))) +
         '<div class="bar"><h2>Sponsorships</h2>' + select("wg-type", "Type", [["", "Every Type"]].concat(WG_TYPES.map(function (t) { return [t, t]; })), WS.type) +
         select("wg-show", "Show", [["", "Every Sponsorship"], ["open", "Being Earned or Not Started"], ["Finished", "Finished"]], WS.show) +
@@ -937,12 +980,13 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
           np.map(function (o) { return "<tr><td><b>" + esc(o.company) + '</b><span class="sub">' + esc(o.product) + "</span></td><td>" + esc(o.order) + "</td><td>" + esc(o.kind) + '</td><td class="nw">' + esc(day(o.orderedOn)) + '</td><td class="num nw">' + usd(o.amount) + "</td></tr>"; }).join("") +
           '</tbody></table></div></div><p class="note">These are not counted above. Each one is added, with its dates, once it is paid.</p>' : "") +
         '<p class="note">From the payments MISMO Money holds, which start in October 2025. Summit dates are MISMO Money&rsquo;s own; a summit MISMO Money does not have yet takes the dates Summit HQ publishes with its agenda, or dates MISMO has confirmed. A summit whose date is not set yet is counted as still to earn. Where a sponsorship is spread over months, the last month takes any leftover cents, so the months add up exactly.</p><p class="stamp">' + esc(stamp(d.writtenAt)) + "</p>";
+      wirePeriod("wg", WS, keys, drawWg);
       $("wg-type").addEventListener("change", function () { WS.type = this.value; keep("wg-type", WS.type); resetPage("wg"); drawWg(); });
       $("wg-show").addEventListener("change", function () { WS.show = this.value; keep("wg-show", WS.show); resetPage("wg"); drawWg(); });
       wireFind("wg-q", WS, "wg", drawWg);
       $("wg-dl").addEventListener("click", function () {
-        download("Sponsorships", ["Type", "Sponsor", "What It Is", "Level", "Aptify Order", "Paid On", "When It Is Earned", "Starts", "Ends", "Paid", "MISMO's Share", "MBA's Half", "Earned Through " + thruSay, "Still to Earn", "Where It Stands"],
-          shown.map(function (r) { return [r.type, r.company, r.group, r.level, r.order, r.paidOn, wgWhen(r), r.start, r.end, r.amount, r.mismo, r.mba || "", r.earned, r.toEarn, wgState(r, thru)]; }));
+        download("Sponsorships", ["Type", "Sponsor", "What It Is", "Level", "Aptify Order", "Paid On", "When It Is Earned", "Starts", "Ends", "Paid", "MISMO's Share", "MBA's Half", "Earned Through " + thruSay, "Still to Earn", "Where It Stands"].concat(whole ? [] : ["Earned in " + label]),
+          shown.map(function (r) { return [r.type, r.company, r.group, r.level, r.order, r.paidOn, wgWhen(r), r.start, r.end, r.amount, r.mismo, r.mba || "", r.earned, r.toEarn, wgState(r, thru)].concat(whole ? [] : [Math.round(inP(r) * 100) / 100]); }));
       });
       paint();
     }, paint);
@@ -1177,16 +1221,17 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
   function drawHelp() {
     $("v-help").innerHTML = '<section class="hero"><div class="eyebrow">For Accounting</div><h1>Help</h1><p>This desk is view only. Nothing here can be changed, and nothing you do here changes MISMO&rsquo;s records.</p></section>' +
+      "<h2>Picking the Dates</h2><p>Every page with a list has a date picker at the top: Month, Year or Fiscal Year (October to September), or All Time. Use the arrows beside it to step to the period before or after, or pick one from the list. The tiles, the list and Download for Excel all follow the period picked, and the desk remembers your choice on each page. The Overview shows today, and the Approved Budget has its own Fiscal Year picker.</p>" +
       "<h2>Overview</h2><p>The desk opens here. The tiles across the top are today&rsquo;s headline numbers, and each card below shows one part: the month being closed and which of its six steps is next, what is still owed to MISMO, invoices sent to AP that are still waiting for approval, new and renewing members, certifications, IIF payments and sponsorships. Click a tile, a card&rsquo;s Open button or a receivable to go to its page.</p>" +
-      "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page.</p>" +
-      "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid. Where MISMO has the invoice itself, its panel has View the Invoice, which opens the PDF right there, and Save a Copy. Invoices logged on MISMO&rsquo;s Invoice Log since October 2026 carry their PDF. Older invoices show the files that were attached to them on the old Invoice Tracking sheet (the invoice, and often the approval and payment emails): View opens a PDF or picture in the panel, and Save a Copy saves any of them. An email file (.msg) opens in Outlook once saved.</p>" +
-      "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it.</p>" +
-      "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. Once Aptify's Monday workbook carries each order's status and balance, this becomes what is still owed on Aptify's own orders (every order Shipped with a balance over $0), and the AR aging is no longer needed.</p>" +
-      "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each and its membership term (when it starts and ends, and whether it is a dues deal). Pick a month or a year, or choose All Time and search.</p>" +
       "<h2>Approved Budget</h2><p>MISMO&rsquo;s Board-approved budget for each fiscal year, newest first. Pick the year at the top; each new year&rsquo;s budget is added once the Board approves it. It is laid out like the Statement of Activities: Revenue, Expenses and Net, with Year to Date (the months that have ended) and the Full Year first, then every month from October to September. Lines start folded to their main lines; click a line with an arrow to see the lines under it, or Expand All. It is view only, exactly as MISMO Money shows it. Download for Excel saves every line.</p>" +
-      "<h2>IIF Payments</h2><p>Every Innovation Investment Fee payment, by fiscal year or month, with Member 360&rsquo;s count of lenders paid in full and partly paid.</p>" +
-      "<h2>Sponsorships</h2><p>Every summit, AI webinar and workgroup sponsorship MISMO has been paid for, for accrual: the sponsor, what it is, the Aptify order, what was paid and when, and when it is earned. A summit sponsorship is earned in the month the summit is held (the month it ends, if it runs into the next), and a series sponsorship is split evenly over that year&rsquo;s three summits. An AI webinar is earned in the month it is held, and MISMO keeps half (MBA gets the other half, as Accounting books it). A workgroup sponsorship is earned evenly over the months it runs (the last month takes any leftover cents). The tiles split what is still to earn in two: what is left on sponsorships that are running, and sponsorships paid ahead that have not started yet. Pick a type, or open one to see it month by month and by fiscal year. Workgroup sponsorships ordered in Aptify but not paid yet are listed apart. Summit dates come from MISMO Money&rsquo;s own summit records; a summit it does not have yet (such as next year&rsquo;s) takes the dates Summit HQ publishes with its agenda, read every morning, or failing that dates MISMO has confirmed. Until a summit&rsquo;s dates are published, its sponsorships say the date is not set yet and count as still to earn.</p>" +
-      "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
+      "<h2>Certification Complete</h2><p>Every certification the CMS recorded as complete, with its Aptify order, fee, payment and the assessor&rsquo;s fee. It is the same list as the Certification Completions page. Pick a month or a year at the top, or All Time.</p>" +
+      "<h2>IIF Payments</h2><p>Every Innovation Investment Fee payment, by fiscal year or month, with Member 360&rsquo;s count of lenders paid in full and partly paid. Pick a fiscal year or a month at the top, or All Time and search.</p>" +
+      "<h2>Invoices</h2><p>Every contractor and expense invoice MISMO logs and sends to AP, by the month the work was done, with when it went to AP, its NetSuite number, when it was approved and paid. Where MISMO has the invoice itself, its panel has View the Invoice, which opens the PDF right there, and Save a Copy. Invoices logged on MISMO&rsquo;s Invoice Log since October 2026 carry their PDF. Older invoices show the files that were attached to them on the old Invoice Tracking sheet (the invoice, and often the approval and payment emails): View opens a PDF or picture in the panel, and Save a Copy saves any of them. An email file (.msg) opens in Outlook once saved. Pick a service month or a fiscal year at the top, or All Time; it opens on the newest month that is over.</p>" +
+      "<h2>Monthly Close</h2><p>Each month&rsquo;s six close steps and who each one waits on. Open a month to see each step&rsquo;s date and note, and the Monthly Summary exactly as MISMO sent it. Pick a year or a fiscal year at the top, or All Time (the default) for every month, newest first.</p>" +
+      "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each and its membership term (when it starts and ends, and whether it is a dues deal). Pick a month or a year, or choose All Time and search.</p>" +
+      "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. Once Aptify's Monday workbook carries each order's status and balance, this becomes what is still owed on Aptify's own orders (every order Shipped with a balance over $0), and the AR aging is no longer needed. Pick the month or year an item was invoiced at the top, or All Time (the default); the tiles then add up only what was invoiced in it.</p>" +
+      "<h2>Sponsorships</h2><p>Every summit, AI webinar and workgroup sponsorship MISMO has been paid for, for accrual: the sponsor, what it is, the Aptify order, what was paid and when, and when it is earned. A summit sponsorship is earned in the month the summit is held (the month it ends, if it runs into the next), and a series sponsorship is split evenly over that year&rsquo;s three summits. An AI webinar is earned in the month it is held, and MISMO keeps half (MBA gets the other half, as Accounting books it). A workgroup sponsorship is earned evenly over the months it runs (the last month takes any leftover cents). The tiles split what is still to earn in two: what is left on sponsorships that are running, and sponsorships paid ahead that have not started yet. Pick a type, or open one to see it month by month and by fiscal year. Workgroup sponsorships ordered in Aptify but not paid yet are listed apart. Summit dates come from MISMO Money&rsquo;s own summit records; a summit it does not have yet (such as next year&rsquo;s) takes the dates Summit HQ publishes with its agenda, read every morning, or failing that dates MISMO has confirmed. Until a summit&rsquo;s dates are published, its sponsorships say the date is not set yet and count as still to earn. Pick a month or a fiscal year at the top to see only the sponsorships earned in it and how much each earns there (the Earned In column and tile take the place of Earned Through); All Time (the default) shows every one.</p>" +
+      "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made, and Last Updated at the foot of the left menu, above Dark Mode, shows when the desk was last brought up to date. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
   }
 
   /* ---- tabs ---- */
