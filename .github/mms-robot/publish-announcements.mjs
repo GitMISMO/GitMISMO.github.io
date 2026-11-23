@@ -1,7 +1,7 @@
 /* Publishes the MMS's announcement requests for MISMO Media: resources.mismo.org/mms/announcements.json.
    One entry for each announcement the MMS asks MISMO Media for (Call for Participation, open for comment,
    Candidate Recommendation or Final release), with the facts a press release is drafted from: the work
-   request, its workgroup leaders (from Elections HQ, as the MMS shows them), the summary, status, license
+   request, its workgroup leaders (from Leadership HQ, as the MMS shows them), the summary, status, license
    and links. Every item here is already public when it is listed (a call for participation, a comment
    period, an approved release). Emails and everything else stay private.
    Requests stay listed while open and for 90 days after MISMO Media marks them done. The file changes only
@@ -10,7 +10,12 @@
    {"source":"MMS","updated":"<ISO>","announcements":[{"id","type":"cfp|comment|release","kind","status",
      "requested","done","link","wr","name","publicName","workgroup","groupType","classification","releaseStatus",
      "facilitator","summary","license","availableTo","memberUrl","nonMemberUrl","websiteId","version",
-     "commentOpens","commentCloses","mmsUrl","shareUrl","leaders":[{"name","position","company"}]}]} */
+     "commentOpens","commentCloses","mmsUrl","shareUrl","leaders":[{"name","position","company"}],
+     "pressRelease","draftNow","readyToPost","readyAt"}]}
+   Nov 22, 2026 (Jonna): no press release for a comment period, so "comment" entries carry pressRelease false (a
+   LinkedIn post only). The Final / Candidate Recommendation release is asked for while the work is out for
+   comment with draftNow true and readyToPost false: draft and finalize it, don't post it. When the work reaches
+   Release the same entry turns readyToPost true (readyAt = that date): post it then. */
 import fs from 'fs';
 const TOKEN = process.env.MMS_DATA_TOKEN; if (!TOKEN) { console.log('No MMS_DATA_TOKEN; nothing published.'); process.exit(0); }
 const GH = process.env.GH_API || 'https://api.github.com', OUT = process.env.ANN_OUT || 'mms/announcements.json', KEEP_DAYS = 90;
@@ -49,6 +54,8 @@ for (const m of reqs) {
     websiteId: W.off ? '' : (W.id || ''), version: W.version || '', commentOpens: d.commentStart || '', commentCloses: d.commentEnd || '',
     mmsUrl: 'https://resources.mismo.org/mms/#wr=' + encodeURIComponent(t.id),
     shareUrl: (W.queuedAt && W.id && !W.off) ? 'https://www.mismo.org/standards-resources?get=' + encodeURIComponent(W.id) : '',
+    pressRelease: m.pressRelease === false ? false : TYPE(m.kind) !== 'comment',
+    draftNow: !!(m.draftEarly && !m.readyToPost), readyToPost: TYPE(m.kind) === 'release' ? (m.readyToPost === undefined ? !m.draftEarly : !!m.readyToPost) : false, readyAt: m.readyAt || '',
     leaders: k ? leaders.filter(l => l.groups.some(g => g && gnorm(g) === k)).sort((a, b) => rank(a.position) - rank(b.position) || a.name.localeCompare(b.name)).map(l => ({ name: l.name, position: l.position || '', company: l.company || '' })) : []
   });
 }

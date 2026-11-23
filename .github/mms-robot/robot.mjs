@@ -2,7 +2,7 @@
    (reminders, retrying emails, bringing in approved Initiative Hub requests, IM and AWG hand-offs, the System Health
    check). It opens the real MMS page in a headless browser, signed in as "MMS Robot", with the save relay replaced
    by GitHub: reads and saves go straight to each system's data repository, with the same conflict checks.
-   It never writes to another system's repository: the Initiative Hub, Elections HQ and Meeting Trackers are read only.
+   It never writes to another system's repository: the Initiative Hub, Leadership HQ (formerly Elections HQ; repo elections-hq-data) and Meeting Trackers are read only.
    This repository is public: the log shows counts only, never record contents.
    Secrets: MMS_ROBOT_TOKEN (read and write: mms-data, im-review-data, awg-review-data),
             MMS_DATA_TOKEN (read only: meeting-trackers-data, elections-hq-data, GitMISMO-initiative-hub-requests, so-*-data),
