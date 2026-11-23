@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-23T18:37:37.058Z",
+ "updated": "2026-11-23T18:46:36.246Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-23T18:36:11.355Z",
+ "sourceUpdated": "2026-11-23T18:44:58.629Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -97,7 +97,7 @@
      },
      {
       "start": "10:40 AM",
-      "end": "11:10 AM",
+      "end": "11:05 AM",
       "kind": "Presentation",
       "title": "A Conversation with the CSBS Chair",
       "desc": "MISMO's Amy Moses sits down with Rhoshunda Kelly, Commissioner of the Mississippi Department of Banking and Consumer Finance, to discuss her department's plans for rolling out AI governance reviews. As Chair of the Conference of State Bank Supervisors, she'll also share the state system's progress on testing and implementing the Mortgage Compliance Dataset.",
@@ -119,6 +119,26 @@
         "photo": "https://resources.mismo.org/summit-agenda/photos/photo-amy-moses-064e4236.webp"
        }
       ]
+     },
+     {
+      "start": "11:05 AM",
+      "end": "11:30 AM",
+      "kind": "Presentation",
+      "title": "GSE UMPD Updates",
+      "desc": "GSE Uniform Mortgage Data Program (UMPD) Updates\n\nJoin this can’t‑miss session to hear the latest updates from the GSEs on the Uniform Mortgage Data Program (UMDP), including developments related to:\nDesktop Underwriter® and Loan Product Advisor® data specifications\nThe Uniform Appraisal Dataset (UAD) Broad Production Period\nThe Uniform Closing Dataset (UCD) v2.0 Specification",
+      "sponsor": "",
+      "brk": false,
+      "people": []
+     },
+     {
+      "start": "12:05 PM",
+      "end": "1:30 PM",
+      "kind": "Lunch",
+      "title": "Lunch",
+      "desc": "Enjoy lunch on your own in the area around the hotel! The InterContinental sits in the Central Business District, a few blocks from some of the best cooking in the country. See lunch recommendations here - https://www.mismo.org/events/hotel.",
+      "sponsor": "",
+      "brk": true,
+      "people": []
      }
     ]
    },
