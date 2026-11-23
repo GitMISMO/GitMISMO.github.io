@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-23T19:34:17.735Z",
+ "updated": "2026-11-23T19:57:39.268Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-23T19:32:36.000Z",
+ "sourceUpdated": "2026-11-23T19:57:19.402Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -125,10 +125,18 @@
       "end": "11:30 AM",
       "kind": "Presentation",
       "title": "GSE UMPD Updates",
-      "desc": "GSE Uniform Mortgage Data Program (UMPD) Updates\n\nJoin this can’t‑miss session to hear the latest updates from the GSEs on the Uniform Mortgage Data Program (UMDP), including developments related to:\nDesktop Underwriter® and Loan Product Advisor® data specifications\nThe Uniform Appraisal Dataset (UAD) Broad Production Period\nThe Uniform Closing Dataset (UCD) v2.0 Specification",
+      "desc": "GSE Uniform Mortgage Data Program (UMPD) Updates\n\nJoin this can’t‑miss session to hear the latest updates from the GSEs on the Uniform Mortgage Data Program (UMDP), including developments related to:\nDesktop Underwriter® and Loan Product Advisor® data specifications\nThe Uniform Appraisal Dataset (UAD) Broad Production Period\nThe Uniform Closing Dataset (UCD) v2.0 Specification Mandate\nThe Uniform Loan Delivery Dataset (ULDD) Update",
       "sponsor": "",
       "brk": false,
-      "people": []
+      "people": [
+       {
+        "name": "Noah Israel",
+        "title": "Senior Director, Product Management, Enterprise Data",
+        "company": "Fannie Mae",
+        "role": "Speaker",
+        "photo": ""
+       }
+      ]
      },
      {
       "start": "12:05 PM",
