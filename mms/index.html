@@ -2063,6 +2063,10 @@ p,.sub,.lede{text-wrap:pretty}
 .mc-tag.go{background:rgba(31,138,76,.14);color:#1f6e43}
 .mc-tag.cmt{background:rgba(180,83,9,.13);color:#92400e;margin-left:6px}
 :root[data-theme=dark] .mc-tag{color:#a9d8f3}:root[data-theme=dark] .mc-tag.go{color:#8fe0b0}:root[data-theme=dark] .mc-tag.cmt{color:#f5b971}
+
+/* Review Desk: a facilitator sending their own work back (app11) */
+.lane.rv-nodrop{opacity:.45}
+.rv-next.rv-next-info{border-style:dashed;opacity:.85}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2136,7 +2140,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-23T15:37:04Z',fp:'712d5506'};
+window.__mmsBuild={at:'2026-11-23T20:47:14Z',fp:'b4013a44'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2803,7 +2807,8 @@ function stageActions(t){
         if(pq) add('Open in '+nm+' Review ↗',()=>portalOpen(k,pq.rep),'pri');
         else if(k==='im') add('Run the IM Pre-Review →',()=>{ S.ptab='reviews'; rvRun(t,'im'); },'pri');
         else add('Open AWG Review ↗',()=>portalOpen('awg',''),'pri'); }
-      add('Not Required: Skip',()=>move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)'})},text:nm+' review not required; skipped'}),'ghost');
+      /* skipping a review is MISMO staff's call, and it asks first (Nov 23: a facilitator clicked it thinking it skipped the IM Pre-Review) */
+      if(S.isStaff) add('Not Required: Skip '+nm+' Review',async()=>{ const ok=await modal({title:'Skip '+nm+' Review?',body:'<p style="margin:0">'+esc(t.wr)+' goes straight to '+esc(stageDef(nextStage(t)).name)+' without '+esc(nm)+' reviewing it. Only do this when '+esc(nm)+' review isn’t required. (This isn’t the IM Pre-Review.)</p>',ok:'Skip '+nm+' Review'}); if(ok) return move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)'})},text:nm+' review not required; skipped'}); },'ghost');
       break; }
     case 'designation':
       if(S.isStaff||isRole('vps',S.me)||isRole('director',S.me)){ add('Designate as Recommended →',()=>approveRec(t),'pri'); add('Change the Designation',()=>directorRec(t)); }
@@ -2842,7 +2847,7 @@ function renderPanel(){
     else if(type==='select') el='<select data-k="'+key+'">'+['',...opts].map(o=>{ const ov=Array.isArray(o)?o[0]:o, ol=Array.isArray(o)?o[1]:o; return '<option value="'+esc(ov)+'"'+(String(ov)===String(v)?' selected':'')+'>'+esc(ol||'—')+'</option>'; }).join('')+(v&&!opts.some(o=>(Array.isArray(o)?o[0]:o)===v)?'<option selected>'+esc(v)+'</option>':'')+'</select>';
     else if(type==='area') el='<textarea data-k="'+key+'" rows="4">'+esc(v)+'</textarea>';
     else el='<input data-k="'+key+'" value="'+esc(v)+'">';
-    if(!edit) el='<div class="ro">'+(esc(type==='date'?fmt(v):(type==='select'&&opts?((opts.find(o=>(Array.isArray(o)?o[0]:o)===v)||[])[1]||v):v))||'—')+'</div>';
+    if(!edit) el='<div class="ro">'+(esc(type==='date'?fmt(v):(type==='select'&&opts?((f=>Array.isArray(f)?f[1]:f)(opts.find(o=>(Array.isArray(o)?o[0]:o)===v))||v):v))||'—')+'</div>';
     return '<div class="f'+(wide?' wide':'')+'"><label>'+esc(label)+'</label>'+el+'</div>';
   };
   const sec=(id,title,inner,full,extra)=>'<div class="psec'+(full?' full':'')+'" data-sec="'+id+'"><h4>'+title+(extra||'')+'</h4>'+inner+(edit&&id!=='hist'&&id!=='stage'?'<div class="savebar"><button class="btn sm pri" data-save="'+id+'" type="button">Save</button><span class="dirty" hidden>Unsaved changes</span></div>':'')+'</div>';
@@ -4782,15 +4787,27 @@ renderPanel=function(){ _renderPanel3(); const t=S.tickets[S.panel]; if(!t) retu
 
 /* ---------- Review Desk: drag a card to the next review, or on to the next stop ---------- */
 function wireReviewDrag(m){
-  const box=$('[data-lanes="rev"]',m); if(!box||!S.isStaff||!S.canWrite) return;
+  /* MISMO staff drag any card anywhere. A facilitator can drag their own work requests back to an earlier review
+     if they clicked the wrong thing (Nov 23, 2026: Kellie skipped IM Review by mistake); never forward or past a review. */
+  const box=$('[data-lanes="rev"]',m); if(!box||!S.canWrite||S.viewAs) return; const staff=!!S.isStaff;
+  const mine=t=>!!t&&t.state==='active'&&sameName(t.facilitator,S.me&&S.me.name);
+  const canBack=(t,to)=>!!t&&['aireview','im','awg'].includes(to)&&stageIndex(to)<stageIndex(t.stage);
+  if(!staff&&!$$('.tk2[data-open]',box).some(c=>mine(S.tickets[c.dataset.open]))) return;
   let next=$('#rvnext',m); if(!next){ box.insertAdjacentHTML('afterend','<div class="rv-next" id="rvnext">Drop here to send it on</div>'); next=$('#rvnext',m); }
   let dragId=null;
-  $$('.tk2[data-open]',box).forEach(c=>{ c.setAttribute('draggable','true');
-    c.addEventListener('dragstart',e=>{ dragId=c.dataset.open; const t=S.tickets[dragId]; c.classList.add('dragging'); m.classList.add('rv-drag'); next.textContent='Drop here to send it on to '+stageDef(nextStage(t)).name; try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragId); }catch(x){} });
-    c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); m.classList.remove('rv-drag'); $$('.lane.over,.rv-next.over',m).forEach(x=>x.classList.remove('over')); }); });
-  const drop=async(el,to)=>{ el.classList.remove('over'); m.classList.remove('rv-drag'); const t=S.tickets[dragId]; if(!t) return; const dest=to||nextStage(t); if(dest===t.stage) return; await dragMove(t,dest,'Review Desk'); };
-  $$('.lane[data-lanekey]',box).forEach(l=>{ l.addEventListener('dragover',e=>{ e.preventDefault(); l.classList.add('over'); }); l.addEventListener('dragleave',e=>{ if(!l.contains(e.relatedTarget)) l.classList.remove('over'); }); l.addEventListener('drop',e=>{ e.preventDefault(); drop(l,l.dataset.lanekey); }); });
-  next.addEventListener('dragover',e=>{ e.preventDefault(); next.classList.add('over'); }); next.addEventListener('dragleave',()=>next.classList.remove('over')); next.addEventListener('drop',e=>{ e.preventDefault(); drop(next,null); });
+  $$('.tk2[data-open]',box).forEach(c=>{ const t0=S.tickets[c.dataset.open]; if(!staff&&!mine(t0)) return; c.setAttribute('draggable','true');
+    c.addEventListener('dragstart',e=>{ dragId=c.dataset.open; const t=S.tickets[dragId]; c.classList.add('dragging'); m.classList.add('rv-drag');
+      next.textContent=staff?'Drop here to send it on to '+stageDef(nextStage(t)).name:'Drop it on an earlier review to send it back';
+      if(!staff) next.classList.add('rv-next-info');
+      $$('.lane[data-lanekey]',box).forEach(l=>l.classList.toggle('rv-nodrop',!staff&&!canBack(t,l.dataset.lanekey)&&l.dataset.lanekey!==t.stage));
+      try{ e.dataTransfer.effectAllowed='move'; e.dataTransfer.setData('text/plain',dragId); }catch(x){} });
+    c.addEventListener('dragend',()=>{ c.classList.remove('dragging'); m.classList.remove('rv-drag'); $$('.lane.over,.rv-next.over',m).forEach(x=>x.classList.remove('over')); $$('.lane.rv-nodrop',box).forEach(x=>x.classList.remove('rv-nodrop')); }); });
+  const ok=(t,to)=>staff||(mine(t)&&to&&canBack(t,to));
+  const drop=async(el,to)=>{ el.classList.remove('over'); m.classList.remove('rv-drag'); const t=S.tickets[dragId]; if(!t) return; const dest=to||nextStage(t); if(dest===t.stage) return;
+    if(!ok(t,to)){ toast('You can send your own work back to an earlier review here. To move it forward, use its buttons; MISMO staff can help.'); return; }
+    await dragMove(t,dest,'Review Desk'); };
+  $$('.lane[data-lanekey]',box).forEach(l=>{ l.addEventListener('dragover',e=>{ const t=S.tickets[dragId]; if(!ok(t,l.dataset.lanekey)) return; e.preventDefault(); l.classList.add('over'); }); l.addEventListener('dragleave',e=>{ if(!l.contains(e.relatedTarget)) l.classList.remove('over'); }); l.addEventListener('drop',e=>{ e.preventDefault(); drop(l,l.dataset.lanekey); }); });
+  next.addEventListener('dragover',e=>{ if(!staff) return; e.preventDefault(); next.classList.add('over'); }); next.addEventListener('dragleave',()=>next.classList.remove('over')); next.addEventListener('drop',e=>{ e.preventDefault(); if(staff) drop(next,null); });
 }
 const _wireMain4=wireMain;
 wireMain=function(m){ _wireMain4(m);
@@ -4815,7 +4832,9 @@ async function dragMove(t0,to,where){
     if(GOV_STAGES.includes(from)) patch.votes=[...(t0.votes||[]),{stage:from,outcome:'Approved',date:td,method:'Recorded by '+(S.me.name||'MISMO staff')+' on the '+where}];
     if(from==='comment'&&(!(t0.dates||{}).commentEnd||t0.dates.commentEnd>td)) dates.commentEnd=td;
   }
-  return move(t0,to,{text:'Moved on the '+where+' from '+stageDef(from).name+' to '+stageDef(to).name+(fwd?'':' (sent back)'),patch,dates});
+  /* sent back to a review: that review starts over (no "Passed" or "not required" left from before) */
+  if(!fwd){ const rk={aireview:'ai',im:'im',awg:'awg'}[to]; if(rk&&t0[rk]&&t0[rk].status) patch[rk]=Object.assign({},t0[rk],{status:''}); if(to==='im'||to==='awg') dates[to+'Decision']=''; }
+  return move(t0,to,{text:'Moved on the '+where+' from '+stageDef(from).name+' to '+stageDef(to).name+(fwd?'':' (sent back)')+(S.isStaff?'':' by the facilitator'),patch,dates});
 }
 
 /* ---------- My Queue: each person's own order ---------- */
@@ -5198,7 +5217,9 @@ const ROLE_ROWS=[
   ['See every page and every work request','Yes','Yes'],
   ['Do the next step on their own work (Submit for AI Review, etc.)','Yes, on work waiting on them','Yes, on any work request'],
   ['Drag cards in My Queue','Yes: reorder, or drop to do the next step','Yes'],
-  ['Drag cards on the Pipeline Board and Review Desk','No','Yes: moves it and records the approval'],
+  ['Drag cards on the Pipeline Board','No','Yes: moves it and records the approval'],
+  ['Drag cards on the Review Desk','Their own, back to an earlier review only (to fix a wrong click)','Yes: moves it and records the approval'],
+  ['Skip IM or AWG Review (Not Required)','No','Yes, after confirming'],
   ['Move to any stage','No','Yes, for one-off fixes (logged)'],
   ['Put on Hold, Close, Cancel','Ask to… (staff approve or decline)','Yes, right away'],
   ['Approve or decline a facilitator’s ask','No','Yes'],
@@ -7237,7 +7258,7 @@ const HELP_TOPICS={
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
      'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.',
      'On the IM Pre-Review report, go through MISMO Link Format: accept or decline each fix before you click Send to IM.'],
-    ['Fixes are things IM will send back. Suggestions are up to you.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+    ['Fixes are things IM will send back. Suggestions are up to you.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
     [['Open the Review Desk','reviews']]],
   mislink:['MISMO Link Format: Fixes Before IM','*',
     'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The IM Pre-Review lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
