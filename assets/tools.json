@@ -147,10 +147,10 @@
     },
     {
       "key": "elections-hq",
-      "label": "Elections HQ",
+      "label": "Leadership HQ",
       "colour": "#0E7490",
       "group": "Planning",
-      "path": "/elections-hq/",
+      "path": "/leadership-hq/",
       "also": ["elections-hq-public"]
     },
     {
