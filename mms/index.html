@@ -2061,7 +2061,8 @@ p,.sub,.lede{text-wrap:pretty}
 /* MISMO Media requests: press release drafted ahead (prdraft.js) */
 .mc-tag{display:inline-block;margin:6px 0 2px;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:600;background:rgba(116,191,235,.18);color:#14486e}
 .mc-tag.go{background:rgba(31,138,76,.14);color:#1f6e43}
-:root[data-theme=dark] .mc-tag{color:#a9d8f3}:root[data-theme=dark] .mc-tag.go{color:#8fe0b0}
+.mc-tag.cmt{background:rgba(180,83,9,.13);color:#92400e;margin-left:6px}
+:root[data-theme=dark] .mc-tag{color:#a9d8f3}:root[data-theme=dark] .mc-tag.go{color:#8fe0b0}:root[data-theme=dark] .mc-tag.cmt{color:#f5b971}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2135,7 +2136,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-23T03:09:17Z',fp:'3071f83e'};
+window.__mmsBuild={at:'2026-11-23T15:37:04Z',fp:'712d5506'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2257,7 +2258,7 @@ function presetNext(){
   const s=baseStages('RSGC');
   s.find(x=>x.key==='approved').desc='Approved by BET (RSGC approval delegated to BET). Set the start date, T-shirt size and Target to Submit to IM, and decide on a Call for Participation.';
   s.find(x=>x.key==='kickoff').on=false;
-  s.find(x=>x.key==='comment').desc='30 days. Posts to the website standards page and MISMO Media is asked for a LinkedIn post. Moves on by itself when it ends.';
+  s.find(x=>x.key==='comment').desc='30 days, starting the day the Resource Library link is added. Posts to the website standards page. No press release or LinkedIn post; MISMO Media drafts the Final or Candidate Recommendation press release. Moves on by itself when it ends.';
   return {label:'New Process',gov:'RSGC',commentDays:[30],stages:s};
 }
 const DEFAULT_PROCESS={active:'current',switchOn:'',presets:{current:presetCurrent(),next:presetNext()}};
@@ -2483,9 +2484,8 @@ function onEnter(t,to){
     t.cpRlBefore=(t.links&&t.links.resourceLibrary)||'';   /* the comment period starts when a (new) Resource Library link is added: cpstart.js */
     if(!t.dates.commentStart){ t.sub='setup'; }
     else if(!t.dates.commentEnd){ t.dates.commentEnd=addDays(t.dates.commentStart,days); }
-    /* no press release for a comment period (MISMO isn't obligated to announce one, Nov 22): a LinkedIn post only.
+    /* no press release and no LinkedIn post for a comment period (Jonna, Nov 22: MISMO isn't obligated to announce one).
        The Final or Candidate Recommendation press release is drafted now, so it is ready to post at Release. */
-    mediaRequest(t,'LinkedIn Post','LinkedIn post announcing '+(t.productPageName||t.name)+' is open for public comment. No press release for the comment period.',{pressRelease:false});
     prDraft(t);
   }
   if(to==='release'){ prReady(t); }
@@ -2714,7 +2714,7 @@ function counts(){
   set('#nav-mine',liveTickets().filter(t=>waitingOn(t)).length,true);
   set('#nav-reviews',liveTickets().filter(t=>t.state==='active'&&['aireview','im','awg','designation'].includes(t.stage)).length);
   set('#nav-gov',liveTickets().filter(t=>t.state==='active'&&['kickoff','gc-comment','gc-publish'].includes(t.stage)).length);
-  set('#nav-media',Object.values(S.media).filter(m=>m.status!=='Done').length);
+  set('#nav-media',Object.values(S.media).filter(m=>m.status!=='Done'&&m.status!=='Canceled').length);
   set('#nav-arch',Object.values(S.arch||{}).filter(a=>(a.status==='Requested'&&isRole('pm'))||(['Approved','In Progress'].includes(a.status)&&isRole('architect'))).length,true);
   set('#nav-outbox',Object.values(S.outbox).filter(m=>mailHeld()?m.status==='Held':['Queued','Failed'].includes(mailGroup(m))).length);
   $('#nav-settings').hidden=!S.isStaff;
@@ -2991,7 +2991,7 @@ async function decide(t){
 }
 async function commentSetup(t){
   const days=Number(t.commentDays)||proc().commentDays[0]||30; const d=t.dates||{};
-  const v=await modal({title:'Comment Period',text:'Posted to the website standards page; MISMO Media has the LinkedIn request.',ok:'Save',body:fld('Comment Start',dateField('s',d.commentStart||today()))+fld('Comment End',dateField('e',d.commentEnd||''),'Leave blank for '+days+' days after the start.')+fld('MISMO.org Product Page',inp('pp',(t.links&&t.links.productPage)||'','https://'))+fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'))});
+  const v=await modal({title:'Comment Period',text:'Posted to the website standards page. (It starts on its own the day the Resource Library link is added.)',ok:'Save',body:fld('Comment Start',dateField('s',d.commentStart||today()))+fld('Comment End',dateField('e',d.commentEnd||''),'Leave blank for '+days+' days after the start.')+fld('MISMO.org Product Page',inp('pp',(t.links&&t.links.productPage)||'','https://'))+fld('Resource Library',inp('rl',(t.links&&t.links.resourceLibrary)||'','https://'))});
   if(!v) return; const x=clone(t), b=clone(t); const end=v.e||addDays(v.s||today(),days);
   x.dates=Object.assign({},x.dates,{commentStart:v.s||today(),commentEnd:end,commentPublished:x.dates&&x.dates.commentPublished||today()}); x.links=Object.assign({},x.links,{productPage:v.pp,resourceLibrary:v.rl}); x.sub='';
   hist(x,'Comment period set: '+fmt(x.dates.commentStart)+' to '+fmt(end)); await saveTicket(x,'Comment period set',b);
@@ -3757,7 +3757,7 @@ function wireArch(m){
       if (ar.length) S.push({ key: 'arch', title: 'Architecture Help', tone: 'info', rows: ar.map(function (a) { return { lead: a.id, main: a.title, sub: (a.wr ? a.wr + ' · ' : '') + (a.needBy ? 'Target ' + f(a.needBy) : ''), badge: a.status, href: APP + '#arch' }; }) });
     }
     if (on.media && input.media) {
-      var md = Object.keys(input.media).map(function (k) { return input.media[k]; }).filter(function (m) { var t = (input.tickets || {})[m.ticket]; return m.status !== 'Done' && t && same(t.facilitator, person.name); });
+      var md = Object.keys(input.media).map(function (k) { return input.media[k]; }).filter(function (m) { var t = (input.tickets || {})[m.ticket]; return m.status !== 'Done' && m.status !== 'Canceled' && t && same(t.facilitator, person.name); });
       if (md.length) S.push({ key: 'media', title: 'MISMO Media Requests', tone: 'info', rows: md.map(function (m) { return { lead: m.wr, main: m.kind, sub: m.name, badge: m.status, href: APP + '#media' }; }) });
     }
     var hist = function (from) { var out = []; mine.concat(T.filter(function (t) { return t.state === 'published' && same(t.facilitator, person.name); })).forEach(function (t) { (t.history || []).forEach(function (h) { var d = String(h.at || '').slice(0, 10); if (d >= from && d <= today && !same(h.by, person.name) && !/^Brought over/.test(h.text || '')) out.push([t, h]); }); }); return out.sort(function (a, b) { return String(b[1].at).localeCompare(String(a[1].at)); }); };
@@ -4129,17 +4129,17 @@ VIEWS.all=function(){
 /* ---------------- MISMO Media ---------------- */
 const MEDIA_IC={'Call for Participation':'M4 11v2a1 1 0 001 1h2l5 4V6L7 10H5a1 1 0 00-1 1zM16 8a5 5 0 010 8','LinkedIn Post':'M4 4h16v16H4zM8 10v6M8 7v.01M12 16v-3a2 2 0 014 0v3M12 10v6'};
 VIEWS.media=function(){
-  const M=Object.values(S.media).sort((a,b)=>(b.requested||'').localeCompare(a.requested||''));
-  const mc=m=>'<div class="mcard" style="--sc:'+(m.status==='Done'?'var(--good)':m.status==='In Progress'?'var(--c1)':'var(--c2)')+'"><div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="'+(MEDIA_IC[m.kind]||'M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z')+'"/></svg></span><b>'+esc(m.kind)+'</b><span class="muted">'+esc(fmtS(m.requested))+'</span></div>'+(m.readyToPost&&m.pressRelease!==false&&/announcement/i.test(m.kind)?'<span class="mc-tag go">Ready to Post'+(m.readyAt?' · '+esc(fmtS(m.readyAt)):'')+'</span>':m.draftEarly?'<span class="mc-tag">Draft Now · Post at Release</span>':'')+'<div class="mc-wr" data-open="'+esc(m.ticket)+'">'+esc(m.wr)+' '+esc(m.name)+'</div><div class="mc-tx">'+esc(m.text||'')+'</div>'+(m.link?'<a href="'+esc(m.link)+'" target="_blank" rel="noopener" class="mc-ln">View the post ↗</a>':'')+'<div class="mc-acts"><button class="btn sm" data-mform="'+esc(m.id)+'" type="button">Open Request Form</button>'+(S.canWrite&&(S.isStaff||isRole('media'))&&m.status!=='Done'?'<button class="btn sm ghost" data-media="'+esc(m.id)+'" type="button">Update</button>':'')+'</div></div>';
+  const M=Object.values(S.media).filter(m=>m&&m.status!=='Canceled').sort((a,b)=>(b.requested||'').localeCompare(a.requested||''));
+  const mc=m=>'<div class="mcard" style="--sc:'+(m.status==='Done'?'var(--good)':m.status==='In Progress'?'var(--c1)':'var(--c2)')+'"><div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="'+(MEDIA_IC[m.kind]||'M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z')+'"/></svg></span><b>'+esc(m.kind)+'</b><span class="muted">'+esc(fmtS(m.requested))+'</span></div>'+(m.readyToPost&&m.pressRelease!==false&&/announcement/i.test(m.kind)?'<span class="mc-tag go">Ready to Post'+(m.readyAt?' · '+esc(fmtS(m.readyAt)):'')+'</span>':m.draftEarly?'<span class="mc-tag">Draft Now · Post at Release</span>':'')+((S.tickets[m.ticket]||{}).stage==='comment'&&(S.tickets[m.ticket]||{}).state==='active'?'<span class="mc-tag cmt">Out for Comment'+(((S.tickets[m.ticket]||{}).dates||{}).commentEnd?' · closes '+esc(fmtS(S.tickets[m.ticket].dates.commentEnd)):'')+'</span>':'')+'<div class="mc-wr" data-open="'+esc(m.ticket)+'">'+esc(m.wr)+' '+esc(m.name)+'</div><div class="mc-tx">'+esc(m.text||'')+'</div>'+(m.link?'<a href="'+esc(m.link)+'" target="_blank" rel="noopener" class="mc-ln">View the post ↗</a>':'')+'<div class="mc-acts"><button class="btn sm" data-mform="'+esc(m.id)+'" type="button">Open Request Form</button>'+(S.canWrite&&(S.isStaff||isRole('media'))&&m.status!=='Done'?'<button class="btn sm ghost" data-media="'+esc(m.id)+'" type="button">Update</button>':'')+'</div></div>';
   const todo=M.filter(m=>m.status!=='Done'&&m.status!=='In Progress'), ip=M.filter(m=>m.status==='In Progress'), done=M.filter(m=>m.status==='Done');
-  return '<div class="pagehead slim"><div><h1>MISMO Media Requests</h1><div class="sub">Calls for Participation, LinkedIn posts and release announcements the MMS asks for on its own at the right stage. No press release for a comment period; the Final or Candidate Recommendation press release is drafted while it’s out for comment and posted at Release.</div></div><div class="acts"><a class="btn" href="https://resources.mismo.org/forms/request/" target="_blank" rel="noopener">MISMO Media Request Form ↗</a></div></div>'+
+  return '<div class="pagehead slim"><div><h1>MISMO Media Requests</h1><div class="sub">Calls for Participation and release announcements the MMS asks for on its own at the right stage. Nothing for a comment period (no press release, no LinkedIn post); the Final or Candidate Recommendation press release is drafted while it’s out for comment and posted at Release.</div></div><div class="acts"><a class="btn" href="https://resources.mismo.org/forms/request/" target="_blank" rel="noopener">MISMO Media Request Form ↗</a></div></div>'+
     (M.length?lanesHtml('media',[{key:'todo',title:'To Do',n:todo.length,c:'var(--c2)',items:todo.map(mc)},{key:'ip',title:'In Progress',n:ip.length,c:'var(--c1)',items:ip.map(mc)},{key:'done',title:'Done',n:done.length,c:'var(--good)',sub:'Most recent first',items:done.map(mc)}],'var(--lt-media)',190):'<div class="empty">No requests yet. They’re made automatically when work reaches Call for Participation, Comment Period and Release. Work brought over from the old Smartsheet MMS was already past those steps, so it has none; the next ones are below.</div>'+mediaAhead());
 };
 /* with no requests yet, show the work that will ask MISMO Media for something next */
 function mediaAhead(){ const up=liveTickets().filter(t=>t.state==='active'), by=(a,b)=>String(a.wr).localeCompare(String(b.wr));
   const L=(key,title,sub,list,c)=>({key,title,sub,n:list.length,c,items:list.sort(by).map((t,i)=>card2(t,{next:true,stage:true,i})),empty:'Nothing coming'});
   return '<div class="secthead" style="margin-top:18px"><h2>Coming Up for MISMO Media</h2><span class="muted" style="font-size:12.5px">Work requests one step away from a request.</span></div>'+
-    lanesHtml('mediaup',[L('cfp','Calls for Participation','Approved work being set up',up.filter(t=>t.stage==='approved'||t.stage==='cfp'),'var(--c2)'),L('li','LinkedIn Posts','Waiting on '+esc(govName())+' approval to comment',up.filter(t=>t.stage==='gc-comment'),'var(--c1)'),L('rel','Release Announcements','Waiting on '+esc(govName())+' approval to publish',up.filter(t=>t.stage==='gc-publish'),'var(--good)')],'var(--lt-media)'); }
+    lanesHtml('mediaup',[L('cfp','Calls for Participation','Approved work being set up',up.filter(t=>t.stage==='approved'||t.stage==='cfp'),'var(--c2)'),L('li','Press Releases to Draft','Waiting on '+esc(govName())+' approval to comment; drafting starts when it goes out for comment',up.filter(t=>t.stage==='gc-comment'),'var(--c1)'),L('rel','Release Announcements','Waiting on '+esc(govName())+' approval to publish',up.filter(t=>t.stage==='gc-publish'),'var(--good)')],'var(--lt-media)'); }
 
 /* an address in the Notifications list reads as the person's name when People and Roles knows it */
 function mailWho(x){ const e=String(x||'').toLowerCase(), all=[...(S.people.facilitators||[]),...Object.values(S.people.roles||{}).flat()]; const p=all.find(q=>q&&q.email&&q.email.toLowerCase()===e); return p?p.name:String(x||'').split('@')[0]; }
@@ -4325,7 +4325,7 @@ VIEWS.home=function(){
   const faces=list=>{ const fs=[...new Set(list.map(t=>t.facilitator).filter(Boolean))]; return '<span class="kp-faces">'+fs.slice(0,4).map(n=>av(n,'xs')).join('')+(fs.length>4?'<em>+'+(fs.length-4)+'</em>':'')+'</span>'; };
   const days=soon?daysBetween(td,soon.dates.commentEnd):null, span=soon?Math.max(1,daysBetween(soon.dates.commentStart,soon.dates.commentEnd)):1;
   const ring=soon?'<span class="kp-ring" style="--p:'+Math.max(4,Math.min(100,100-days/span*100))+'"><b>'+days+'d</b></span>':'';
-  const govOld=gov.reduce((m,t)=>Math.max(m,stageAge(t)||0),0), hc=hubCounts(), media=Object.values(S.media).filter(m=>m.status!=='Done').length;
+  const govOld=gov.reduce((m,t)=>Math.max(m,stageAge(t)||0),0), hc=hubCounts(), media=Object.values(S.media).filter(m=>m.status!=='Done'&&m.status!=='Canceled').length;
   const kp=(k,v,s,goTo,c,vis,cls)=>'<button type="button" class="kp '+(cls||'')+'" data-go="'+goTo+'" style="--kc:'+c+'"><span class="kp-k">'+k+'</span><span class="kp-v" data-count="'+v+'">'+v+'</span><span class="kp-s">'+s+'</span>'+(vis||'')+'</button>';
   const K=[kp('Your Move',mine.length,mine.length?'waiting on you':'all caught up','mine','var(--c4)',mine.length?faces(mine):'<span class="kp-ok">✓</span>',mine.length?'hot':''),
     kp('Live Work',act.length,'on the line','board','var(--c1)',phaseBar),
@@ -6669,7 +6669,7 @@ async function wpPrefill(){
   await saveTicket(x,'',clone(t));
 }
 /* ---------- Press releases drafted ahead (Nov 22, 2026) ----------
-   Jonna: no press release for a comment period (MISMO isn't obligated to announce one). The Final or
+   Jonna: no press release and no LinkedIn post for a comment period (MISMO isn't obligated to announce one). The Final or
    Candidate Recommendation press release is drafted and finalized while the work is out for comment, so it
    is ready to post when the work reaches Release. New comment periods ask for the draft on their own
    (app1.js prDraft); this sweep asks for it for work already past that point, and marks it Ready to Post
@@ -6679,7 +6679,11 @@ async function prSweep(){
   for(const t of liveTickets()){ if(t.state!=='active'||t.rides) continue;
     const m=S.media&&S.media[prId(t)];
     if(['comment','post','gc-publish'].includes(t.stage)&&!m) prDraft(t);
-    else if(t.stage==='release'&&(!m||!m.readyToPost)) prReady(t); } }
+    else if(t.stage==='release'&&(!m||!m.readyToPost)) prReady(t); }
+  /* no LinkedIn post for a comment period either (Jonna, Nov 22): the comment-period LinkedIn post requests not
+     started yet are removed, not kept as canceled (she wants this process to start clean and accurate) */
+  for(const m of Object.values(S.media||{})){ if(!m||m.kind!=='LinkedIn Post'||!['Requested','Canceled'].includes(m.status)||m.link) continue; const t=S.tickets[m.ticket]; if(!t||!['gc-comment','comment','post','gc-publish','release'].includes(t.stage)) continue;
+    delete S.media[m.id]; await Store.del('media',m.id); } }
 const _runAutoPR=runAutomations;
 runAutomations=async function(){ await _runAutoPR(); try{ await prSweep(); }catch(e){} };
 /* ---------- Share link on the published work request (Nov 20) ----------
@@ -7286,7 +7290,7 @@ const HELP_TOPICS={
     ['The number on Architecture Help is what is waiting on you, if you are the Program Manager or the Architect.','Linking a task to the wrong work request? Open it and pick the right one, or unlink it.'],
     [['Open Architecture Help','arch']]],
   mediareq:['MISMO Media Requests','media staff facilitator',
-    'The MMS asks MISMO Media for a Call for Participation, a LinkedIn post or a release announcement at the right step, on its own. A comment period gets a LinkedIn post only, no press release. While the work is out for comment, MISMO Media is asked to draft and finalize the Final or Candidate Recommendation press release (Draft Now · Post at Release); it turns Ready to Post when the work reaches Release. Within half an hour MISMO Media also gets the facts a press release is drafted from: the name, summary, status, license, links and the workgroup’s leaders.',
+    'The MMS asks MISMO Media for a Call for Participation or a release announcement at the right step, on its own. A comment period gets nothing (no press release, no LinkedIn post). While the work is out for comment, MISMO Media is asked to draft and finalize the Final or Candidate Recommendation press release (Draft Now · Post at Release); it turns Ready to Post when the work reaches Release. Within half an hour MISMO Media also gets the facts a press release is drafted from: the name, summary, status, license, links and the workgroup’s leaders.',
     ['Open MISMO Media to see every request and its status: To Do, In Progress and Done.',
      'Click Open Request Form to copy the request and open the MISMO Media Request Form.',
      'Click Update to set it to In Progress, add the link, and set it to Done when it is published.'],
@@ -7547,7 +7551,7 @@ const RC2_STAGE_HOW={
   awg:['AWG reviews and votes on the call.','Approved goes to License Designation with a recommendation.'],
   designation:['Jonna approves the recommended designation (one per part, if it has parts).','The recommendation is drawn from past designations of the same kind.'],
   'gc-comment':['Governance approves it for public comment.','Staff record the vote; approved work goes to the website.'],
-  comment:['Starts the day the Resource Library link is added: 30 days, on mismo.org with the approved card; MISMO Media does a LinkedIn post (no press release) and starts drafting the Final or Candidate Recommendation press release.','Moves to Post-Comment by itself when the period ends.'],
+  comment:['Starts the day the Resource Library link is added: 30 days, on mismo.org with the approved card; no press release or LinkedIn post; MISMO Media starts drafting the Final or Candidate Recommendation press release.','Moves to Post-Comment by itself when the period ends.'],
   post:['Report what came back from the comment period.','Comments from the website form land on the work request. If Governance already approved publishing when there are no material or significant changes, a report of none sends it straight to Release.'],
   'gc-publish':['Governance approves it to publish.','Staff record the vote; approved work goes to Release.'],
   release:['Announce it, then Mark Published.','Mark Published also lists it on the website’s Find a Work Product with its public files (members-only products are listed without files); it is posted within half an hour. The press release MISMO Media drafted during the comment period turns Ready to Post, with the facts for it, on its own. The published work request shows its share link (www.mismo.org/standards-resources?get=<website id>) with a Copy button, for press releases and emails; the website id never changes once listed.']

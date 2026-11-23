@@ -311,7 +311,7 @@
       if (ar.length) S.push({ key: 'arch', title: 'Architecture Help', tone: 'info', rows: ar.map(function (a) { return { lead: a.id, main: a.title, sub: (a.wr ? a.wr + ' · ' : '') + (a.needBy ? 'Target ' + f(a.needBy) : ''), badge: a.status, href: APP + '#arch' }; }) });
     }
     if (on.media && input.media) {
-      var md = Object.keys(input.media).map(function (k) { return input.media[k]; }).filter(function (m) { var t = (input.tickets || {})[m.ticket]; return m.status !== 'Done' && t && same(t.facilitator, person.name); });
+      var md = Object.keys(input.media).map(function (k) { return input.media[k]; }).filter(function (m) { var t = (input.tickets || {})[m.ticket]; return m.status !== 'Done' && m.status !== 'Canceled' && t && same(t.facilitator, person.name); });
       if (md.length) S.push({ key: 'media', title: 'MISMO Media Requests', tone: 'info', rows: md.map(function (m) { return { lead: m.wr, main: m.kind, sub: m.name, badge: m.status, href: APP + '#media' }; }) });
     }
     var hist = function (from) { var out = []; mine.concat(T.filter(function (t) { return t.state === 'published' && same(t.facilitator, person.name); })).forEach(function (t) { (t.history || []).forEach(function (h) { var d = String(h.at || '').slice(0, 10); if (d >= from && d <= today && !same(h.by, person.name) && !/^Brought over/.test(h.text || '')) out.push([t, h]); }); }); return out.sort(function (a, b) { return String(b[1].at).localeCompare(String(a[1].at)); }); };
