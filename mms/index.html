@@ -2057,6 +2057,11 @@ p,.sub,.lede{text-wrap:pretty}
 .rl-mrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .rl-mrow select{min-width:110px}
 @media (max-width:700px){.rl-act{white-space:normal}}
+
+/* MISMO Media requests: press release drafted ahead (prdraft.js) */
+.mc-tag{display:inline-block;margin:6px 0 2px;padding:2px 8px;border-radius:4px;font-size:11.5px;font-weight:600;background:rgba(116,191,235,.18);color:#14486e}
+.mc-tag.go{background:rgba(31,138,76,.14);color:#1f6e43}
+:root[data-theme=dark] .mc-tag{color:#a9d8f3}:root[data-theme=dark] .mc-tag.go{color:#8fe0b0}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2130,7 +2135,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-22T18:41:44Z',fp:'11b85273'};
+window.__mmsBuild={at:'2026-11-23T03:09:17Z',fp:'3071f83e'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2368,7 +2373,7 @@ function whoseMove(t){
       const ld=peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'License Designator';
       return {role:'vps',label:ld,text:t.designation&&(t.designation.auto||t.designation.recommended)?'Designate the license (the MMS has a recommendation)':'Designate the license'}; }
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
-    case 'comment': return sub==='setup'?{role:'website',label:'Website Admin',text:'Post to the standards page and set the dates'}:(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
+    case 'comment': return sub==='setup'?{role:'website',label:'Website Admin',text:'Add the Resource Library link: the comment period starts that day'}:(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
     case 'post': return {role:'facilitator',label:'Facilitator',text:'Report what came back from comment'};
     case 'gc-publish': return {role:'gov',label:g,text:g+' approval to publish as '+(isStandard(t)?'Candidate Recommendation':'Final')};
     case 'release': return {role:'website',label:'Website Admin',text:'Publish the pages and announcement'};
@@ -2475,16 +2480,29 @@ function onEnter(t,to){
   if(to==='cfp'){ mediaRequest(t,'Call for Participation','Draft and publish the Call for Participation for '+t.name+'.'); }
   if(to==='comment'){
     const days=Number(t.commentDays)||proc().commentDays[0]||30;
+    t.cpRlBefore=(t.links&&t.links.resourceLibrary)||'';   /* the comment period starts when a (new) Resource Library link is added: cpstart.js */
     if(!t.dates.commentStart){ t.sub='setup'; }
     else if(!t.dates.commentEnd){ t.dates.commentEnd=addDays(t.dates.commentStart,days); }
-    mediaRequest(t,'LinkedIn Post','LinkedIn post announcing '+(t.productPageName||t.name)+' is open for public comment.');
+    /* no press release for a comment period (MISMO isn't obligated to announce one, Nov 22): a LinkedIn post only.
+       The Final or Candidate Recommendation press release is drafted now, so it is ready to post at Release. */
+    mediaRequest(t,'LinkedIn Post','LinkedIn post announcing '+(t.productPageName||t.name)+' is open for public comment. No press release for the comment period.',{pressRelease:false});
+    prDraft(t);
   }
-  if(to==='release'){ mediaRequest(t,isStandard(t)?'Candidate Recommendation Announcement':'Final Release Announcement','Announce '+(t.productPageName||t.name)+' as '+(isStandard(t)?'a Candidate Recommendation':'Final')+'.'); }
+  if(to==='release'){ prReady(t); }
 }
-function mediaRequest(t,kind,text){
+/* the Final / Candidate Recommendation press release: drafted while it is out for comment, posted at Release */
+function prKind(t){ return isStandard(t)?'Candidate Recommendation Announcement':'Final Release Announcement'; }
+function prAs(t){ return isStandard(t)?'a Candidate Recommendation':'Final'; }
+function prId(t){ return (t.id+'-'+prKind(t)).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,120); }
+function prDraft(t){ mediaRequest(t,prKind(t),'Draft and finalize the press release announcing '+(t.productPageName||t.name)+' as '+prAs(t)+', so it is ready. Don’t post it yet: the MMS marks it Ready to Post when it reaches Release (after Governance approves publishing).',{pressRelease:true,draftEarly:true,readyToPost:false,postWhen:'Release'}); }
+function prReady(t){ if(t.rides) return; const id=prId(t), m=S.media&&S.media[id];
+  const text='Ready to post: '+(t.productPageName||t.name)+' is approved for publication as '+prAs(t)+'. Post the press release.';
+  if(m&&m.status!=='Canceled'){ if(m.readyToPost) return; const x=Object.assign({},m,{readyToPost:true,readyAt:today(),text}); if(x.status==='Done'&&!x.link) x.status='Requested'; S.media[id]=x; write('media',id,x); return; }
+  mediaRequest(t,prKind(t),text,{pressRelease:true,readyToPost:true,readyAt:today()}); }
+function mediaRequest(t,kind,text,extra){
   const id=(t.id+'-'+kind).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,120);
   if(t.rides) return; /* work riding with a release: the release's own request covers it */
-  const m={id,ticket:t.id,wr:t.wr,name:t.name,kind,text,status:'Requested',requested:today(),by:S.me.name||'',due:'',at:new Date().toISOString()};
+  const m=Object.assign({id,ticket:t.id,wr:t.wr,name:t.name,kind,text,status:'Requested',requested:today(),by:S.me.name||'',due:'',at:new Date().toISOString()},extra||{});
   if(S.media[id] && S.media[id].status!=='Done') return;
   S.media[id]=m; write('media',id,m);
 }
@@ -3568,7 +3586,7 @@ function wireArch(m){
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
-      case 'comment': return sub === 'setup' ? { role: 'website', text: 'Post to the standards page and set the dates' } : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
+      case 'comment': return sub === 'setup' ? { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' } : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
       case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
       case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
       case 'release': return { role: 'website', text: 'Publish the pages and announcement' };
@@ -4112,9 +4130,9 @@ VIEWS.all=function(){
 const MEDIA_IC={'Call for Participation':'M4 11v2a1 1 0 001 1h2l5 4V6L7 10H5a1 1 0 00-1 1zM16 8a5 5 0 010 8','LinkedIn Post':'M4 4h16v16H4zM8 10v6M8 7v.01M12 16v-3a2 2 0 014 0v3M12 10v6'};
 VIEWS.media=function(){
   const M=Object.values(S.media).sort((a,b)=>(b.requested||'').localeCompare(a.requested||''));
-  const mc=m=>'<div class="mcard" style="--sc:'+(m.status==='Done'?'var(--good)':m.status==='In Progress'?'var(--c1)':'var(--c2)')+'"><div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="'+(MEDIA_IC[m.kind]||'M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z')+'"/></svg></span><b>'+esc(m.kind)+'</b><span class="muted">'+esc(fmtS(m.requested))+'</span></div><div class="mc-wr" data-open="'+esc(m.ticket)+'">'+esc(m.wr)+' '+esc(m.name)+'</div><div class="mc-tx">'+esc(m.text||'')+'</div>'+(m.link?'<a href="'+esc(m.link)+'" target="_blank" rel="noopener" class="mc-ln">View the post ↗</a>':'')+'<div class="mc-acts"><button class="btn sm" data-mform="'+esc(m.id)+'" type="button">Open Request Form</button>'+(S.canWrite&&(S.isStaff||isRole('media'))&&m.status!=='Done'?'<button class="btn sm ghost" data-media="'+esc(m.id)+'" type="button">Update</button>':'')+'</div></div>';
+  const mc=m=>'<div class="mcard" style="--sc:'+(m.status==='Done'?'var(--good)':m.status==='In Progress'?'var(--c1)':'var(--c2)')+'"><div class="mc-top"><span class="mc-ic"><svg viewBox="0 0 24 24"><path d="'+(MEDIA_IC[m.kind]||'M12 3l2.5 5.5L20 9l-4 4 1 6-5-3-5 3 1-6-4-4 5.5-.5z')+'"/></svg></span><b>'+esc(m.kind)+'</b><span class="muted">'+esc(fmtS(m.requested))+'</span></div>'+(m.readyToPost&&m.pressRelease!==false&&/announcement/i.test(m.kind)?'<span class="mc-tag go">Ready to Post'+(m.readyAt?' · '+esc(fmtS(m.readyAt)):'')+'</span>':m.draftEarly?'<span class="mc-tag">Draft Now · Post at Release</span>':'')+'<div class="mc-wr" data-open="'+esc(m.ticket)+'">'+esc(m.wr)+' '+esc(m.name)+'</div><div class="mc-tx">'+esc(m.text||'')+'</div>'+(m.link?'<a href="'+esc(m.link)+'" target="_blank" rel="noopener" class="mc-ln">View the post ↗</a>':'')+'<div class="mc-acts"><button class="btn sm" data-mform="'+esc(m.id)+'" type="button">Open Request Form</button>'+(S.canWrite&&(S.isStaff||isRole('media'))&&m.status!=='Done'?'<button class="btn sm ghost" data-media="'+esc(m.id)+'" type="button">Update</button>':'')+'</div></div>';
   const todo=M.filter(m=>m.status!=='Done'&&m.status!=='In Progress'), ip=M.filter(m=>m.status==='In Progress'), done=M.filter(m=>m.status==='Done');
-  return '<div class="pagehead slim"><div><h1>MISMO Media Requests</h1><div class="sub">Calls for Participation, LinkedIn posts and release announcements the MMS asks for on its own at the right stage.</div></div><div class="acts"><a class="btn" href="https://resources.mismo.org/forms/request/" target="_blank" rel="noopener">MISMO Media Request Form ↗</a></div></div>'+
+  return '<div class="pagehead slim"><div><h1>MISMO Media Requests</h1><div class="sub">Calls for Participation, LinkedIn posts and release announcements the MMS asks for on its own at the right stage. No press release for a comment period; the Final or Candidate Recommendation press release is drafted while it’s out for comment and posted at Release.</div></div><div class="acts"><a class="btn" href="https://resources.mismo.org/forms/request/" target="_blank" rel="noopener">MISMO Media Request Form ↗</a></div></div>'+
     (M.length?lanesHtml('media',[{key:'todo',title:'To Do',n:todo.length,c:'var(--c2)',items:todo.map(mc)},{key:'ip',title:'In Progress',n:ip.length,c:'var(--c1)',items:ip.map(mc)},{key:'done',title:'Done',n:done.length,c:'var(--good)',sub:'Most recent first',items:done.map(mc)}],'var(--lt-media)',190):'<div class="empty">No requests yet. They’re made automatically when work reaches Call for Participation, Comment Period and Release. Work brought over from the old Smartsheet MMS was already past those steps, so it has none; the next ones are below.</div>'+mediaAhead());
 };
 /* with no requests yet, show the work that will ask MISMO Media for something next */
@@ -6108,7 +6126,7 @@ function cpCardOf(t){ const c=t.cpCard||{}, L=t.links||{};
 function cpCanEdit(t){ return S.canWrite&&!S.viewAs&&(S.isStaff||sameName(t.facilitator,S.me&&S.me.name)); }
 function cpPreview(c,t){ const d=t.dates||{};
   return '<div class="cpc"><div class="cpc-eb">Open for Comment'+(d.commentEnd?' · closes '+esc(fmtS(d.commentEnd)):'')+'</div><b class="cpc-t">'+esc(c.title)+'</b>'+
-    '<p class="cpc-x'+(c.text?'':' muted')+'">'+esc(c.text||'Not written yet. Say in a sentence or two what the work product is and what reviewers should look at.')+'</p>'+
+    '<p class="cpc-x'+(c.text?'':' muted')+'">'+esc(c.text||'Not written yet. Say briefly what the work product is and that it’s in a 30-day comment period.')+'</p>'+
     '<div class="cpc-a"><span class="cpc-b'+(c.member?'':' off')+'">Member Access</span><span class="cpc-b'+(c.nonMember?'':' off')+'">Non-Member Access</span><span class="cpc-b pri">Comment</span></div></div>'; }
 function cpSection(t){ const c=cpCardOf(t);
   const miss=[!c.text&&'what the card says',!c.member&&'the Resource Library link (members)',!c.nonMember&&'the non-member download (behind the license form)'].filter(Boolean);
@@ -6117,7 +6135,7 @@ function cpSection(t){ const c=cpCardOf(t);
 async function cpEdit(t){ const c=cpCardOf(t), raw=t.cpCard||{};
   const v=await modal({title:'Comment Period Card',text:esc(t.wr)+' · what the website’s Open for Comment card says',ok:'Save the Card',body:
     fld('Card Title',inp('title',raw.title||'',cpName(t)),'Leave blank to use '+esc(cpName(t))+'.')+
-    fld('What the Card Says','<textarea name="text" rows="4" maxlength="'+CP_TEXT_MAX+'" placeholder="One or two sentences: what it is, who it’s for, and what reviewers should look at.">'+esc(raw.text||'')+'</textarea>'+(S.sample?'<div class="cp-draft"><button type="button" class="btn sm" data-cpdraft="'+esc(t.id)+'">'+(raw.text?'Draft Again with AI':'Draft with AI')+'</button><span class="muted" data-cpdraftmsg></span></div>':''),'Up to '+CP_TEXT_MAX+' characters. Plain sentences; no links. AI drafts from the work request, its reviews and its files; edit it or keep it.')+
+    fld('What the Card Says','<textarea name="text" rows="4" maxlength="'+CP_TEXT_MAX+'" placeholder="Briefly what the work product is, and that it’s in a 30-day comment period.">'+esc(raw.text||'')+'</textarea>'+(S.sample?'<div class="cp-draft"><button type="button" class="btn sm" data-cpdraft="'+esc(t.id)+'">'+(raw.text?'Draft Again with AI':'Draft with AI')+'</button><span class="muted" data-cpdraftmsg></span></div>':''),'Up to '+CP_TEXT_MAX+' characters. Plain sentences; no links (the website adds the member and non-member download). AI drafts from the work request, its reviews and its files; edit it or keep it. Saving it is the approval: the website shows what’s saved here.')+
     fld('Member Access: Resource Library Link',inp('member',c.member||cpAutoMember(t),'https://collaborate.mismo.org/…'),(c.member?'':cpAutoMember(t)?'Filled in from the work request. ':'')+'Members open the work product here.')+
     fld('Non-Member Access: Download Link',inp('nonmember',raw.nonMember||cpAutoNonMember(t),'https://…'),(!raw.nonMember&&cpAutoNonMember(t)?'Filled in from the file posted on the website. ':'')+'The file non-members get after they sign the Proposed (open for comment) license form.'),
     validate:x=>{ for(const k of ['member','nonmember']){ const u=(x[k]||'').trim(); if(u&&!/^https:\/\//i.test(u)) return 'Links start with https://'; } return ''; }});
@@ -6265,7 +6283,9 @@ function cpDraftFacts(t){ const rv=(typeof rvFor==='function'?rvFor(t):[]).find(
     'Designation notes: '+((t.designation&&t.designation.notes)||''),'Latest AI Review summary: '+((rv&&rv.summary)||(ai&&ai.summary)||''),'Files: '+f.join('; '),
     'Comment period: '+((t.dates&&t.dates.commentStart)||'')+' to '+((t.dates&&t.dates.commentEnd)||'')].filter(x=>!/: *$/.test(x)).join('\n'); }
 async function cpDraft(t){ if(!S.sample) throw new Error('Claude isn’t reachable from here');
-  const prompt='Write the text for a MISMO website "Open for Comment" card. One or two plain sentences, at most '+(CP_TEXT_MAX-20)+' characters in all: what the work product is, who it is for, and what reviewers should look at. MISMO voice: clear, factual, no hype, no links, no dates, no "we", American spelling. Use only the facts below; do not invent features or numbers. Do not mention AI Review findings or edits.\n\n'+cpDraftFacts(t)+'\n\nAnswer in JSON only: {"text":"..."}';
+  /* Jonna (Nov 22): a brief description of what the work product is, and that it's in a 30-day comment period; the website adds the member / non-member download */
+  const days=Number(t.commentDays)||((typeof proc==='function'&&proc().commentDays||[])[0])||30;
+  const prompt='Write the text for a MISMO website "Open for Comment" card. Two short plain sentences, at most '+(CP_TEXT_MAX-20)+' characters in all: first, briefly what the work product is (and who it is for); second, that it is open for a '+days+'-day public comment period. MISMO voice: clear, factual, no hype, no links, no dates, no "we", American spelling. Use only the facts below; do not invent features or numbers. Do not mention AI Review findings or edits, or how to download it (the website adds that).\n\n'+cpDraftFacts(t)+'\n\nAnswer in JSON only: {"text":"..."}';
   const r=await S.sample.json(prompt,{modelTier:'complex'}); let x=(r&&(r.text||(r.content&&r.content.text)))||(typeof r==='string'?r:''); if(typeof x!=='string') x='';
   x=x.replace(/\s+/g,' ').trim().replace(/(https?:\/\/|www\.)\S*[^\s.,;:!?)]/gi,'\u0001'); x=((x.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g)||[x]).filter(z=>!z.includes('\u0001')).join('').trim())||x.replace(/\u0001/g,'').trim();   /* a sentence with a web address is dropped */ if(x.length>CP_TEXT_MAX){ const cut=x.slice(0,CP_TEXT_MAX); x=cut.slice(0,Math.max(cut.lastIndexOf('. ')+1,cut.lastIndexOf(' '))).trim(); }
   if(!x) throw new Error('no draft came back'); return x; }
@@ -6648,6 +6668,20 @@ async function wpPrefill(){
   hist(x,'Website listing set up for Mark Published: it updates the existing Find a Work Product entry (flood-risk-disclosure-guide) as the Homeowners Insurance Guide, Final, license 4 (Commercial Distributor), with “Flood Risk Disclosure Guide” kept as a search name. The final file is needed when it is marked published.');
   await saveTicket(x,'',clone(t));
 }
+/* ---------- Press releases drafted ahead (Nov 22, 2026) ----------
+   Jonna: no press release for a comment period (MISMO isn't obligated to announce one). The Final or
+   Candidate Recommendation press release is drafted and finalized while the work is out for comment, so it
+   is ready to post when the work reaches Release. New comment periods ask for the draft on their own
+   (app1.js prDraft); this sweep asks for it for work already past that point, and marks it Ready to Post
+   for work already at Release. Staff tabs and the MMS Robot run it. */
+async function prSweep(){
+  if(!S.ready||!S.canWrite||S.partial||S.stale||S.viewAs||!(S.isStaff||S.isOwnerish)) return;
+  for(const t of liveTickets()){ if(t.state!=='active'||t.rides) continue;
+    const m=S.media&&S.media[prId(t)];
+    if(['comment','post','gc-publish'].includes(t.stage)&&!m) prDraft(t);
+    else if(t.stage==='release'&&(!m||!m.readyToPost)) prReady(t); } }
+const _runAutoPR=runAutomations;
+runAutomations=async function(){ await _runAutoPR(); try{ await prSweep(); }catch(e){} };
 /* ---------- Share link on the published work request (Nov 20) ----------
    The website gives every product in work-products/catalog.json a share link,
    https://www.mismo.org/standards-resources?get=<catalog id>, which opens its Download pop-up
@@ -7229,7 +7263,7 @@ const HELP_TOPICS={
     []],
   comments:['Comment Periods and Comments','facilitator staff website gov',
     'Comment Periods shows what is open for public comment, what just closed and what is approved but not posted yet.',
-    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Choose the File for Comment picks the file that goes out for comment from the work request’s Files; the MMS posts it as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a first version of the one or two sentences from the work request, its reviews and its files; edit it or keep it. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
+    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Choose the File for Comment picks the file that goes out for comment from the work request’s Files; the MMS posts it as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a brief description of what the work product is and that it’s in a 30-day comment period, from the work request, its reviews and its files; edit it or keep it. Saving the card is the approval: that text is what the website shows, and the website adds the member and non-member download. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
      'Members click Member Access on the card and open the work product in the Resource Library. They do not use the MMS.',
      'Non-members click Non-Member Access, sign the Proposed (open for comment) license form, and then get the download.',
      'Still needed on the card lists anything missing: the card text, the Resource Library link or the non-member download.',
@@ -7252,7 +7286,7 @@ const HELP_TOPICS={
     ['The number on Architecture Help is what is waiting on you, if you are the Program Manager or the Architect.','Linking a task to the wrong work request? Open it and pick the right one, or unlink it.'],
     [['Open Architecture Help','arch']]],
   mediareq:['MISMO Media Requests','media staff facilitator',
-    'The MMS asks MISMO Media for a Call for Participation, a LinkedIn post or a release announcement at the right step, on its own. Within half an hour MISMO Media also gets the facts a press release is drafted from: the name, summary, status, license, links and the workgroup’s leaders.',
+    'The MMS asks MISMO Media for a Call for Participation, a LinkedIn post or a release announcement at the right step, on its own. A comment period gets a LinkedIn post only, no press release. While the work is out for comment, MISMO Media is asked to draft and finalize the Final or Candidate Recommendation press release (Draft Now · Post at Release); it turns Ready to Post when the work reaches Release. Within half an hour MISMO Media also gets the facts a press release is drafted from: the name, summary, status, license, links and the workgroup’s leaders.',
     ['Open MISMO Media to see every request and its status: To Do, In Progress and Done.',
      'Click Open Request Form to copy the request and open the MISMO Media Request Form.',
      'Click Update to set it to In Progress, add the link, and set it to Done when it is published.'],
@@ -7369,8 +7403,8 @@ const HELP_TOPICS={
   web:['Comment Periods on the Website','website staff',
     'The Comment Period step belongs to the website. Approved work is posted to the standards page and announced.',
     ['Comment Periods lists what is approved but not posted yet.',
-     'Post it on mismo.org using its Comment Period Card: the title, what the card says, Member Access (Resource Library) and Non-Member Access (license form, then the download).',
-     'Post it on mismo.org, then the period runs on its own.',
+     'Make the Resource Library entry and put its link on the work request (the Links tab or the Comment Period card). The comment period starts that day on its own: 30 days, on mismo.org’s Open for Comment list with the approved card, and the website adds the member and non-member download.',
+     'The period then runs on its own.',
      'When the period ends, the MMS moves it to Post-Comment.',
      'The website feed in Settings › Website can post and remove open comment periods on the new mismo.org on its own once it is switched on.',
      'When the facilitator chooses the file for comment, your daily digest lists the Resource Library entry to make (Resource Library Entries to Make). Make the entry with that file, then put its link on the work request’s Links tab.'],
@@ -7513,10 +7547,10 @@ const RC2_STAGE_HOW={
   awg:['AWG reviews and votes on the call.','Approved goes to License Designation with a recommendation.'],
   designation:['Jonna approves the recommended designation (one per part, if it has parts).','The recommendation is drawn from past designations of the same kind.'],
   'gc-comment':['Governance approves it for public comment.','Staff record the vote; approved work goes to the website.'],
-  comment:['Post its Comment Period Card on mismo.org and announce it.','Moves to Post-Comment by itself when the period ends.'],
+  comment:['Starts the day the Resource Library link is added: 30 days, on mismo.org with the approved card; MISMO Media does a LinkedIn post (no press release) and starts drafting the Final or Candidate Recommendation press release.','Moves to Post-Comment by itself when the period ends.'],
   post:['Report what came back from the comment period.','Comments from the website form land on the work request. If Governance already approved publishing when there are no material or significant changes, a report of none sends it straight to Release.'],
   'gc-publish':['Governance approves it to publish.','Staff record the vote; approved work goes to Release.'],
-  release:['Announce it, then Mark Published.','Mark Published also lists it on the website’s Find a Work Product with its public files (members-only products are listed without files); it is posted within half an hour. MISMO Media gets the release request, with the facts for the press release, on its own. The published work request shows its share link (www.mismo.org/standards-resources?get=<website id>) with a Copy button, for press releases and emails; the website id never changes once listed.']
+  release:['Announce it, then Mark Published.','Mark Published also lists it on the website’s Find a Work Product with its public files (members-only products are listed without files); it is posted within half an hour. The press release MISMO Media drafted during the comment period turns Ready to Post, with the facts for it, on its own. The published work request shows its share link (www.mismo.org/standards-resources?get=<website id>) with a Copy button, for press releases and emails; the website id never changes once listed.']
 };
 const GOV_DESC={'Business Executive Team (BET)':'Approves new work and sets priorities.','Residential Standards Governance Committee':'Governs residential standards.','Commercial Standards Governance Committee':'Governs commercial standards.','Council of Chairs':'Workgroup and community chairs.','Education Council':'Guides MISMO education.'};
 function rc2Tile(x,c){ const [n,d,u,ic]=x, int=/^go:/.test(u);
@@ -8028,6 +8062,34 @@ async function cpfNotice(t){ if(!cpfNeedsNotice(t)||!S.canWrite||!S.isStaff&&!sa
 /* the automatic steps (staff tabs and the MMS Robot) pick up work that reached Comment Period after the file was chosen */
 const _runAutoCPF=runAutomations;
 runAutomations=async function(){ await _runAutoCPF(); try{ for(const t of allTickets()) if(cpfNeedsNotice(t)) await cpfNotice(t); }catch(e){} };
+/* ---------- The comment period starts when the Resource Library link is added (Nov 22, 2026) ----------
+   Jonna: when the Website Admin (Vanessa) gives the work request its Resource Library link, the comment
+   period opens that day on its own: the 30-day timer starts (the process's comment days), it goes on the
+   website's Open for Comment list with the card the facilitator or staff approved (the feed's summary), and
+   the website adds the member / non-member download. The link has to be new for this comment period: one
+   already there when the work entered Comment Period (an earlier round) doesn't start it. Setting the
+   dates by hand (the Website Admin's button) still works. Staff tabs, the facilitator's tab and the MMS
+   Robot all check, so it starts the day the link is saved. */
+function cpReadyToStart(t){ if(!t||t.state!=='active'||t.stage!=='comment'||t.rides) return false; const d=t.dates||{};
+  if(!(t.sub==='setup'||!d.commentStart)) return false;
+  const rl=String((t.links||{}).resourceLibrary||'').trim(); return /^https:\/\//i.test(rl)&&rl!==String(t.cpRlBefore||'').trim(); }
+let cpStarting=false;
+async function cpAutoStart(t){ if(cpStarting) return; cpStarting=true;
+  try{ const days=Number(t.commentDays)||proc().commentDays[0]||30, s=today(), e=addDays(s,days); const x=clone(t), b=clone(t);
+    x.dates=Object.assign({},x.dates,{commentStart:s,commentEnd:e,commentPublished:(x.dates&&x.dates.commentPublished)||s}); x.sub='';
+    const card=!!(x.cpCard&&String(x.cpCard.text||'').trim());
+    hist(x,'Comment period started '+fmt(s)+' ('+days+' days, closes '+fmt(e)+'): the Resource Library link was added. '+(card?'The website shows the approved Comment Period card.':'The Comment Period card isn’t written yet, so the website lists it without a description until it is.'));
+    await saveTicket(x,'Comment period started',b);
+    for(const r of ridersOf(t.id)){ if(r.stage!=='comment') continue; const y=clone(r); y.dates=Object.assign({},y.dates,{commentStart:s,commentEnd:e,commentPublished:x.dates.commentPublished}); y.sub=''; hist(y,'Comment period started with '+t.wr+': '+fmt(s)+' to '+fmt(e)); await saveTicket(y); }
+    queueMail({to:[emailOf(t.facilitator)].filter(Boolean),subject:t.wr+' '+t.name+' is open for comment',body:t.name+' is open for public comment from '+fmt(s)+' to '+fmt(e)+'.'+(card?'':'\n\nWrite the Comment Period card so the website shows a short description: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id)),ticket:t.id,kind:'stage',key:t.id+'-copen-'+s});
+    if(typeof publishFeed==='function') try{ publishFeed(); }catch(err){}
+  }finally{ cpStarting=false; } }
+async function cpStartSweep(){ if(!S.ready||!S.canWrite||S.partial||S.stale||S.viewAs) return; for(const t of liveTickets()) if(cpReadyToStart(t)) await cpAutoStart(t); }
+const _runAutoCS=runAutomations;
+runAutomations=async function(){ await _runAutoCS(); try{ await cpStartSweep(); }catch(e){} };
+/* right away when the link is saved, from the card, the Comment Period dates, or the work request's links */
+const _saveTicketCS=saveTicket;
+saveTicket=async function(x){ const r=await _saveTicketCS.apply(this,arguments); try{ const t=x&&S.tickets[x.id]; if(!cpStarting&&S.canWrite&&!S.viewAs&&cpReadyToStart(t)) await cpAutoStart(t); }catch(e){} return r; };
 /* ---------- Work request links that go nowhere (Nov 20, 2026) ----------
    About 250 links brought over from Smartsheet hold only a name ("Closing Instructions Development Workgroup (DWG)")
    instead of a web address, so clicking them did nothing. Each such link now opens: the same workgroup's address
