@@ -543,6 +543,23 @@ html body div[style*="min-height: clamp(380px,37vw,520px)"]:not(#mm-hero-x) h1 s
 @media (min-width:601px){html body div[style*="min-height: clamp(380px,37vw,520px)"]:not(#mm-hero-x) a[style*="flex: 1 1 190px"]{flex:0 0 auto!important}}
 @media (max-width:600px){html body div[style*="min-height: clamp(380px,37vw,520px)"]:not(#mm-hero-x){min-height:0!important;padding-top:30px!important;padding-bottom:30px!important}html body div[style*="min-height: clamp(380px,37vw,520px)"]:not(#mm-hero-x) a[style*="flex: 1 1 190px"]{flex:0 0 100%!important;min-width:0!important;padding:14px 13px!important;font-size:13px!important}html body div[style*="min-height: clamp(380px,37vw,520px)"]:not(#mm-hero-x) div[style*="flex: 0 1 200px"]{flex:1 1 100%!important;min-width:0!important;border-left:0!important;border-top:1px solid rgba(116,191,235,.35)!important;padding-left:0!important;padding-top:14px!important;margin-top:2px!important;display:flex!important;flex-wrap:wrap!important;gap:6px 16px!important}html body div[style*="min-height: clamp(380px,37vw,520px)"]:not(#mm-hero-x) div[style*="flex: 0 1 200px"] > div:nth-child(n+5){display:none!important}}
 </style>
+<style id="mm-nav-spacing">
+/* Header spacing to match the www.mismo.org Home header (Nov 23, 2026): the bar's content sits in the same 1600px-wide
+   centered band as the Home page, the logo at its left edge, the five links centered in the space the Home page gives them
+   with the same space between them, and search at the band's right edge. No Log in button here. */
+@media (min-width:1101px){
+  .mm-header{gap:0;padding:0 max(50px,calc((100% - 1600px) / 2))}
+  .mm-header>nav{flex:1 1 auto;min-width:0;display:flex;padding-right:225px}
+  .mm-header .mm-nav{flex:1 1 auto;justify-content:center;padding-right:50px}
+  .mm-header .mm-nav-link{padding:8px 29.5px;font-size:clamp(15px,1.02vw,17px)}
+  .mm-header .mm-actions{position:absolute;top:0;bottom:0;right:max(50px,calc((100% - 1600px) / 2));display:flex;align-items:center}
+}
+@media (min-width:1101px) and (max-width:1399px){.mm-header .mm-nav-link{padding:8px 23.5px}}
+@media (min-width:1101px) and (max-width:1319px){.mm-header .mm-nav-link{padding:8px 17px}}
+@media (min-width:1101px) and (max-width:1249px){.mm-header .mm-nav-link{font-size:14px}}
+@media (min-width:1101px) and (max-width:1199px){.mm-header .mm-nav-link{font-size:13px}}
+@media (min-width:1101px) and (max-width:1199px){.mm-header{padding:0 25px}.mm-header .mm-actions{right:25px}}
+</style>
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197
