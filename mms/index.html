@@ -2067,6 +2067,20 @@ p,.sub,.lede{text-wrap:pretty}
 /* Review Desk: a facilitator sending their own work back (app11) */
 .lane.rv-nodrop{opacity:.45}
 .rv-next.rv-next-info{border-style:dashed;opacity:.85}
+
+/* AI Review: Your Choice on every note (Nov 23) */
+.rv-decbar{position:sticky;top:0;z-index:3;background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--sky,#74bfeb);border-radius:6px;padding:10px 12px;margin:14px 0 6px;box-shadow:0 2px 8px rgba(13,49,76,.08)}
+.rv-dectx{font-size:13px;color:var(--ink-2);line-height:1.45}.rv-dectx b{color:var(--ink);margin-right:6px}
+.rv-decrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:8px}.rv-declab{font-size:12.5px;font-weight:600;color:var(--ink)}
+.rv-deccount{margin-left:auto;font-size:12.5px;color:var(--ink-2);font-weight:600}
+.rvt .rv-dech{width:226px;white-space:normal}.rv-decsec{font-size:11px;font-weight:500;color:var(--ink-2);margin-top:3px;line-height:1.5;text-transform:none;letter-spacing:0}
+.rv-decsec button{font:inherit;font-weight:600;color:var(--link,#2477b8);background:none;border:0;padding:0 4px 0 0;cursor:pointer}.rv-decsec button:hover{text-decoration:underline}
+.rvt .rv-decc{width:226px}.rv-dec{display:grid;grid-template-columns:auto auto;gap:3px 4px}
+.rv-decb{display:flex;align-items:center;gap:5px;font-size:12px;line-height:1.3;color:var(--ink-2);padding:2px 5px;border:1px solid transparent;border-radius:3px;cursor:pointer;white-space:nowrap}
+.rv-decb input{margin:0;width:13px;height:13px;accent-color:#0d314c}
+.rv-decb.on{color:var(--ink);font-weight:600;background:var(--surface-2,#eef4f9);border-color:var(--border)}
+.rv-decb-update.on{border-color:#0f7b5c;color:#0f7b5c}.rv-decb-dont.on{border-color:#b3372c;color:#b3372c}.rv-decb-unsure.on{border-color:#8a5d0f;color:#8a5d0f}
+@media (max-width:640px){ .rvt .rv-dech,.rvt .rv-decc{width:auto} .rv-deccount{margin-left:0;width:100%} }
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2140,7 +2154,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-23T22:13:32Z',fp:'e187e9f1'};
+window.__mmsBuild={at:'2026-11-23T23:39:05Z',fp:'5ac30442'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -5644,11 +5658,13 @@ async function rvAiIm(P,ctx,progress){
   return {rows:out,summaries:sums.slice(0,2),error:errs?errs+' of '+parts.length+' groups of rows didn’t come back from Claude; the rest are below.':''};
 }
 /* ---------- the report ---------- */
-/* Nov 23 (Jonna): the AI Review is new, so for now everyone passes it. The findings are still listed as
-   suggestions; set this to false to go back to Ready / A Few Fixes / Needs Updates. The IM Pre-Review is unchanged. */
-const AI_PASS_ALL=true;
+/* Nov 23 (Jonna): the AI Review isn't passed automatically. The facilitator chooses Update, Do Not Update, Unsure or
+   Pass for each note (or all at once) and submits; none are required and they can move on either way (rvdecide.js).
+   A review with its choices in reads Reviewed. AI_PASS_ALL=true would pass everyone without choosing. */
+const AI_PASS_ALL=false;
 function rvPassAll(rep){ return AI_PASS_ALL&&!!rep&&rep.kind!=='im'; }
-function rvShown(rep){ return rvPassAll(rep)?{k:'ready',l:'Pass',fx:'to fix'}:{k:rep.readiness,l:rep.readinessLabel,fx:'must fix'}; }
+function rvShown(rep){ if(rvPassAll(rep)) return {k:'ready',l:'Pass',fx:'to fix'};
+  if(rep&&rep.kind!=='im'&&rep.decided) return {k:'ready',l:'Reviewed',fx:'to fix'}; return {k:rep.readiness,l:rep.readinessLabel,fx:'must fix'}; }
 function rvReadiness(findings,ai){
   if(AI_PASS_ALL) return ['ready','Pass'];
   const fix=findings.filter(f=>f.sev==='fix').length, ai3=(ai&&ai.readiness)||[];
@@ -5677,12 +5693,12 @@ function rvReportHtml(rep,forWord){
   const e=esc; const sevL={fix:'Must Fix',recommend:'Recommended',question:'Question'};
   // rows carry a key so people can mark each note right or wrong (not in the Word copy)
   const fbOn=!forWord&&typeof rvFbCell==='function';
-  const tbl=(head,rows)=>rows.length?'<table class="rvt"><thead><tr>'+head.map(h=>'<th>'+e(h)+'</th>').join('')+(fbOn?'<th class="rv-fbh">Right?</th>':'')+'</tr></thead><tbody>'+rows.map(r=>{ const k=r.key; const cells=r.cells||r; return '<tr>'+cells.map(c=>'<td>'+c+'</td>').join('')+(fbOn?'<td class="rv-fbc">'+(k?rvFbCell(rep,k):'')+'</td>':'')+'</tr>'; }).join('')+'</tbody></table>':'';
+  const tbl=(head,rows)=>rows.length?'<table class="rvt"><thead><tr>'+head.map(h=>'<th>'+e(h)+'</th>').join('')+(fbOn?(rep.kind!=='im'&&typeof rvDecHead==='function'?rvDecHead():'<th class="rv-fbh">Right?</th>'):'')+'</tr></thead><tbody>'+rows.map(r=>{ const k=r.key; const cells=r.cells||r; return '<tr>'+cells.map(c=>'<td>'+c+'</td>').join('')+(fbOn?(rep.kind!=='im'&&typeof rvDecCell==='function'?'<td class="rv-decc">'+(k?rvDecCell(rep,k):'')+'</td>':'<td class="rv-fbc">'+(k?rvFbCell(rep,k):'')+'</td>'):'')+'</tr>'; }).join('')+'</tbody></table>':'';
   const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'f'+i},f)), fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
   const title=rep.kind==='im'?'IM Pre-Review Report':'AI Review Report';
   let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(atDay(rep.at)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):(rep.rm?' · Checked against the '+e(rep.rm):''))+'</div>'+
     '<div class="rvr-score rv-'+e(rvShown(rep).k)+'"><b>'+e(rvShown(rep).l)+'</b> <span>'+fx.length+' '+rvShown(rep).fx+' · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
-    (rvPassAll(rep)?'<p class="rvr-note"><b>Everyone passes the AI Review while the process is new.</b> The findings below are suggestions to make the work stronger before IM; nothing here holds the work request back.</p>':'')+(rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
+    (rvPassAll(rep)?'<p class="rvr-note"><b>Everyone passes the AI Review while the process is new.</b> The findings below are suggestions to make the work stronger before IM; nothing here holds the work request back.</p>':'')+(rep.kind!=='im'&&rep.decided?'<p class="rvr-note"><b>Choices submitted</b> '+e(fmt(atDay(rep.decided.at)))+' by '+e(rep.decided.by||'')+': '+e(rvDecSummary(rep.decided.counts))+'.</p>':'')+(rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
     '<p class="rvr-note">This report recommends; it doesn’t change the work product. '+(rep.kind==='editor'?'Editorial suggestions are judgment calls: the facilitator and workgroup decide.':'IM makes the final decision on every row.')+'</p></div>';
   const sec=(t2,body)=>body?'<h3>'+e(t2)+'</h3>'+body:'';
   h+=sec('Must Fix Before Submitting',tbl(['Area','Where','What’s Wrong','What to Do'],fx.map(f=>({key:f._k,cells:[e(f.area),e(f.where),e(f.issue)+(f.fb?'<div class="rv-fbnote">'+e(f.fb)+'</div>':''),e(f.suggestion)]}))));
@@ -7277,7 +7293,7 @@ const HELP_TOPICS={
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
      'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.',
      'On the IM Pre-Review report, go through MISMO Link Format: accept or decline each fix before you click Send to IM.'],
-    ['While the process is new, everyone passes the AI Review: the result reads Pass and its findings are suggestions to make the work stronger before IM.','Fixes are things IM will send back. Suggestions are up to you.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+    ['On the report, tick Update, Do Not Update, Unsure or Pass by each note, or use Choose for Every Note (or All in this section) to set them all at once, then click Submit Choices. None are required: blank notes count as Pass, and you can send the work on to IM Review either way.','Fixes are things IM will send back. Suggestions are up to you.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
     [['Open the Review Desk','reviews']]],
   mislink:['MISMO Link Format: Fixes Before IM','*',
     'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The IM Pre-Review lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
@@ -7965,8 +7981,8 @@ async function rvExcel(rep){
   const sum=[['Report',title+' Report'],['Work Request',rep.wr],['Name',rep.name],['Date',fmt(atDay(rep.at))],['Run By',rep.by||''],['Files',(rep.files||[]).join(', ')],['Result',(typeof rvShown==='function'?rvShown(rep).l:rep.readinessLabel)||''],['Summary',rep.summary||''],
     ['Note','This report recommends; it doesn’t change the work product. Marking notes is optional and never holds up the work request.']];
   const ws1=XLSX.utils.aoa_to_sheet(sum); ws1['!cols']=[{wch:16},{wch:100}];
-  const N=rvNotes(rep), head=['#','Section','Area','Where','What’s Wrong','What to Do','Right?','Marked By','Why'];
-  const rows=N.map((n,i)=>{ const fb=n.k?(S.rvfb[rvFbId(rep,n.k)]||{}):{}; return [i+1,n.section,n.area||'',n.where||'',n.issue||'',n.suggestion||'',RV_FB_LABEL[fb.verdict]||'',fb.verdict?(fb.by||''):'',fb.why||'']; });
+  const N=rvNotes(rep), head=['#','Section','Area','Where','What’s Wrong','What to Do',rep.kind==='im'?'Right?':'Your Choice','Marked By','Why'];
+  const rows=N.map((n,i)=>{ const fb=n.k?(S.rvfb[rvFbId(rep,n.k)]||{}):{}; return [i+1,n.section,n.area||'',n.where||'',n.issue||'',n.suggestion||'',(fb.choice&&typeof RV_DEC_LABEL!=='undefined'?RV_DEC_LABEL[fb.choice]:RV_FB_LABEL[fb.verdict])||'',fb.verdict?(fb.by||''):'',fb.why||'']; });
   const ws2=XLSX.utils.aoa_to_sheet([head,...rows]); ws2['!cols']=[5,26,18,28,60,60,9,18,40].map(w=>({wch:w})); ws2['!autofilter']={ref:'A1:I'+(rows.length+1)};
   const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws1,'Summary'); XLSX.utils.book_append_sheet(wb,ws2,'Notes');
   XLSX.writeFile(wb,title+' - '+rep.wr+' - '+atDay(rep.at)+'.xlsx'); }
@@ -8051,6 +8067,53 @@ async function rvReadRest(rep){
     rvShow(S.reviews[cur.id]||cur); toast('Claude read all '+p.total+' parts. The new notes are in the report.');
   }catch(e){ say('Stopped: '+((e&&e.message)||'something went wrong')+'. What was read so far is saved; click Read the Rest to carry on.','bad'); if(btn) btn.disabled=false; }
 }
+/* ---------- AI Review: Your Choice on every note (Nov 23, 2026, Jonna) ----------
+   Each note in an AI Review report has four boxes: Update, Do Not Update, Unsure and Pass. The facilitator ticks
+   one per note, or uses Choose for Every Note (or All in one section) to set them in bulk, then Submit Choices.
+   None are required: a note left blank counts as Pass, and the work request can go on to IM Review whether or not
+   the choices were submitted. Update and Do Not Update teach the review (as Yes and No did); Unsure and Pass don't.
+   The IM Pre-Review keeps its own Right? column. */
+const RV_DEC=[['update','Update'],['dont','Do Not Update'],['unsure','Unsure'],['pass','Pass']];
+const RV_DEC_LABEL={update:'Update',dont:'Do Not Update',unsure:'Unsure',pass:'Pass'};
+const RV_DEC_TEACH={update:'right',dont:'wrong',unsure:'unsure',pass:'pass'};
+const rvDecDraft={};
+function rvDecOf(rep,k){ const d=(rvDecDraft[rep.id]||{})[k]; if(d!==undefined) return d; const f=(S.rvfb||{})[rvFbId(rep,k)]; return (f&&f.choice)||''; }
+function rvDecKeys(rep){ return (typeof rvNotes==='function'?rvNotes(rep):[]).filter(n=>n.k).map(n=>n.k); }
+function rvDecSummary(c){ c=c||{}; return RV_DEC.filter(([v])=>c[v]).map(([v,l])=>c[v]+' '+l).join(', ')||'no notes'; }
+function rvDecHead(){ return '<th class="rv-dech">Your Choice<div class="rv-decsec">All in this section: '+RV_DEC.map(([v,l])=>'<button type="button" data-decsec="'+v+'">'+l+'</button>').join('')+'</div></th>'; }
+function rvDecCell(rep,k){ const v=rvDecOf(rep,k);
+  return '<span class="rv-dec" data-deck="'+esc(k)+'">'+RV_DEC.map(([val,lab])=>'<label class="rv-decb rv-decb-'+val+(v===val?' on':'')+'"><input type="checkbox" data-decv="'+val+'"'+(v===val?' checked':'')+'>'+lab+'</label>').join('')+'</span>'; }
+function rvDecBar(rep){ const n=rvDecKeys(rep).length;
+  return '<div class="rv-decbar" id="rvdecbar"><div class="rv-dectx"><b>Your choices</b> For each note, tick Update, Do Not Update, Unsure or Pass. None are required: notes left blank count as Pass, and you can send the work on to IM Review either way.</div>'+
+    '<div class="rv-decrow"><span class="rv-declab">Choose for every note:</span>'+RV_DEC.map(([v,l])=>'<button type="button" class="btn sm" data-decall="'+v+'">'+l+'</button>').join('')+
+    '<span class="rv-deccount" id="rvdeccount"></span><button type="button" class="btn pri sm" id="rvdecgo"'+(n?'':' disabled')+'>Submit Choices</button></div></div>'; }
+function rvDecCount(rep,box){ const K=rvDecKeys(rep), chosen=K.filter(k=>rvDecOf(rep,k)).length, el=$('#rvdeccount',box); if(el) el.textContent=chosen+' of '+K.length+' chosen'; }
+function rvDecPaint(rep,box,k){ const v=rvDecOf(rep,k); $$('[data-deck="'+k+'"] .rv-decb',box).forEach(l=>{ const on=l.querySelector('input').dataset.decv===v; l.classList.toggle('on',on); l.querySelector('input').checked=on; }); }
+function rvDecSet(rep,k,v){ (rvDecDraft[rep.id]=rvDecDraft[rep.id]||{})[k]=v; }
+async function rvDecSubmit(rep,box){
+  if(S.viewAs){ toast('Viewing as someone else: choices aren’t saved'); return; }
+  const K=rvDecKeys(rep), counts={update:0,dont:0,unsure:0,pass:0}, at=new Date().toISOString(), saves=[];
+  K.forEach(k=>{ const c=rvDecOf(rep,k)||'pass'; counts[c]++; const id=rvFbId(rep,k), cur=S.rvfb[id]||{}; if(cur.choice===c) return; const it=rvFbItem(rep,k);
+    S.rvfb[id]=Object.assign({},cur,{rep:rep.id,kind:rep.kind,wr:rep.wr,key:k,src:it.src||'',rule:it.rule||'',area:it.area||'',text:rvTrim(it.issue||it.note||'',220),verdict:RV_DEC_TEACH[c],choice:c,by:S.me.name||'',at});
+    saves.push(write('rvfeedback',id,S.rvfb[id])); });
+  const go=$('#rvdecgo',box); if(go) go.disabled=true;
+  const r=Object.assign({},S.reviews[rep.id]||rep,{decided:{at,by:S.me.name||'',counts}}); const t=S.tickets[rep.ticket];
+  if(t) saves.push(rvSave(t,r)); else S.reviews[r.id]=r;
+  await Promise.all(saves); delete rvDecDraft[rep.id];
+  if(t){ const x=clone(S.tickets[t.id]||t), line='AI Review choices submitted: '+rvDecSummary(counts);
+    if(x.stage==='aireview'&&x.state==='active') await setSub(x,'reviewed',line); else { hist(x,line); await saveTicket(x,'Choices saved'); } }
+  $('#modal-root').innerHTML=''; toast('Choices saved: '+rvDecSummary(counts)+'. Send it on to IM Review whenever you’re ready.');
+  if(t&&typeof openPanel==='function') openPanel(t.id);
+}
+const _rvShowDec=rvShow;
+rvShow=function(rep){ _rvShowDec(rep); if(!rep||rep.kind==='im') return; const box=$('#modal-root .modal'); if(!box||$('#rvdecbar',box)||!rvDecKeys(rep).length) return;
+  const first=$('.rvr h3',box); if(first) first.insertAdjacentHTML('beforebegin',rvDecBar(rep)); else return; rvDecCount(rep,box);
+  if(S.viewAs) $$('#rvdecbar button,.rv-dec input,.rv-decsec button',box).forEach(b=>b.disabled=true);
+  box.addEventListener('change',e=>{ const i=e.target.closest('[data-decv]'); if(!i) return; const k=i.closest('[data-deck]').dataset.deck; rvDecSet(rep,k,i.checked?i.dataset.decv:''); rvDecPaint(rep,box,k); rvDecCount(rep,box); });
+  box.addEventListener('click',e=>{ const a=e.target.closest('[data-decall],[data-decsec]'); if(a){ e.preventDefault(); const v=a.dataset.decall||a.dataset.decsec;
+      const scope=a.dataset.decsec?a.closest('table'):box; $$('[data-deck]',scope).forEach(s=>{ rvDecSet(rep,s.dataset.deck,v); rvDecPaint(rep,box,s.dataset.deck); }); rvDecCount(rep,box); return; }
+    if(e.target.closest('#rvdecgo')){ e.preventDefault(); rvDecSubmit(S.reviews[rep.id]||rep,box); } });
+};
 /* ---------- The comment-period file, and the Resource Library notice (Nov 20, 2026) ----------
    On the Comment Period Card, the facilitator (or staff) ticks the file that goes out for comment from the work
    request's Files. The MMS posts it on resources.mismo.org (work-products/comment/<WR>/<file>, through the MMS Robot,
