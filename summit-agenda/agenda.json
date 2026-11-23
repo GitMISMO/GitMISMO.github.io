@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-23T18:28:53.147Z",
+ "updated": "2026-11-23T18:34:06.350Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-23T18:27:32.476Z",
+ "sourceUpdated": "2026-11-23T18:32:41.528Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -60,6 +60,38 @@
         "company": "University of Arkansas",
         "role": "Panelist",
         "photo": "https://resources.mismo.org/summit-agenda/photos/photo-dan-conway-85dedc53.webp"
+       }
+      ]
+     },
+     {
+      "start": "9:50 AM",
+      "end": "10:20 AM",
+      "kind": "Presentation",
+      "title": "The New Rules of AI Governance",
+      "desc": "With state examinations and updated GSE requirements arriving in 2027, the expectations are getting real. Cathy Puente of Newrez, Mike Bray of CSBS and Linna Zhu of the Urban Institute break down what's changing, what regulators will look for, what the latest research reveals about AI governance in mortgage lending, and how lenders are getting ready.",
+      "sponsor": "",
+      "brk": false,
+      "people": [
+       {
+        "name": "Cathy Puente",
+        "title": "Chief Information Security Officer",
+        "company": "Newrez",
+        "role": "Speaker",
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-cathy-60891002.jpg"
+       },
+       {
+        "name": "Mike Bray",
+        "title": "Senior Director",
+        "company": "Conference of State Bank Supervisors",
+        "role": "Speaker",
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-mike-bray-61e14726.jpg"
+       },
+       {
+        "name": "Linna Zhu",
+        "title": "",
+        "company": "Urban Institute",
+        "role": "Speaker",
+        "photo": ""
        }
       ]
      }
