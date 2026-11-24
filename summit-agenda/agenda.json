@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-24T23:16:17.251Z",
+ "updated": "2026-11-24T23:59:40.559Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-24T23:14:51.290Z",
+ "sourceUpdated": "2026-11-24T23:58:14.806Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -155,7 +155,7 @@
         "title": "Senior Manager, Product Management, Enterprise Data",
         "company": "Fannie Mae",
         "role": "Speaker",
-        "photo": ""
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-james-babalitis-99b8f91a.webp"
        },
        {
         "name": "Sandro Barchitta",
