@@ -48,6 +48,13 @@
       "by": "jycritchley",
       "note": "Home in Member 360's style; new Contact Updates page",
       "sha256": "b5ecc2a16f94ae5afd6772e66ac90171943f253c9da914218453bb50810ddc61"
+    },
+    {
+      "version": "20261124-0314",
+      "at": "2026-11-24T03:14:50.449Z",
+      "by": "jycritchley",
+      "note": "One Update a Contact button; companies not in Member 360 can be added",
+      "sha256": "9b3ae2dfbf733958faca3d43a9de34b442a13f09836d3361218fc801cf49f20e"
     }
   ]
 }
