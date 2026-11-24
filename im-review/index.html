@@ -1257,6 +1257,13 @@ async function refreshOpen(){ const r=route(); if(!S.loaded||document.hidden||r.
   const y=window.scrollY, f=document.activeElement&&document.activeElement.closest&&document.activeElement.closest("[data-row]"); render(); window.scrollTo(0,y); if(f) refocus(f.dataset.row);
   if(was!=="decided"&&n.status==="decided") toast((n.decidedBy||"Someone")+" finished this review"+(n.decidedAt?" on "+fmtDE(n.decidedAt)+" at "+fmtT(n.decidedAt):"")+"."); }
 setInterval(refreshOpen,45000);
+/* attendance from Meeting Trackers (Nov 24, Erin): the quorum line follows an update to the call's attendance without
+   reloading the page. Checked every minute and on coming back to the tab; it redraws only when nothing is being typed. */
+const typing=()=>busy()||[...document.querySelectorAll("textarea,input[type=text]")].some(x=>x.value!==x.defaultValue);
+async function refreshAtt(){ if(!S.loaded||document.hidden) return; let a; try{ a=await get("attendance"); }catch(e){ return; }
+  const n=Object.fromEntries(Object.entries((a&&a.data)||{}).filter(([k])=>/^\d{4}-\d{2}-\d{2}$/.test(k))); if(JSON.stringify(n)===JSON.stringify(S.att||{})) return;
+  S.att=n; if(typing()) return; const y=window.scrollY; render(); window.scrollTo(0,y); }
+setInterval(refreshAtt,60000); document.addEventListener("visibilitychange",()=>{ if(!document.hidden) refreshAtt(); });
 
 /* ---------- start: sign in, then the gate decides who gets in ---------- */
 function start(){ toastEl(); const rs=RS(); if(!rs){ setTimeout(start,100); return; }
