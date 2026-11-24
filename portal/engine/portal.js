@@ -129,7 +129,7 @@ function fieldHTML(f, val, scope, idx, fromApp) {
   return '<div class="fld' + (f.type === "longtext" ? " wide" : "") + '"><label for="' + id + '">' + esc(f.label) + (f.required ? '<span class="req" aria-hidden="true">*</span>' : "") + (fromApp && filled(val) ? '<span class="from">From your application</span>' : "") + "</label>" + (f.help ? '<span class="help">' + esc(f.help) + "</span>" : "") + inputFor(f, val, scope, idx) + "</div>";
 }
 function stepFields(st) {
-  var h = '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div><div class="tools"><span class="muted" id="savedline" style="font-size:12.5px"></span></div></div><div class="pb">';
+  var h = '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div><div class="tools"><button type="button" class="btn ghost sm" id="wordcopy" title="A Word file of everything here, laid out as it is on screen, to share and gather answers">Download a Copy</button><span class="muted" id="savedline" style="font-size:12.5px"></span></div></div><div class="pb">';
   st.sections.forEach(function (sec) {
     h += '<div class="sectlabel">' + esc(sec.heading) + "</div>" + (sec.help ? '<p class="muted" style="margin:-4px 0 12px;font-size:13.5px">' + esc(sec.help) + "</p>" : "");
     if (sec.fields && sec.fields.length) {
@@ -206,7 +206,7 @@ function stepQuestionnaire(st) {
   body += (sec.blocks || []).map(function (b, bi) { return blockCard(b, cur, bi); }).join("");
   var back = cur > 0 ? '<button type="button" class="btn ghost" data-qsec="' + (cur - 1) + '">‹ ' + esc(secs[cur - 1].heading.replace(/^\d+\.\s*/, "")) + "</button>" : (S.step > 1 ? '<button type="button" class="btn ghost" data-step="' + (S.step - 1) + '">‹ Back</button>' : "<span></span>");
   var fwd = cur < secs.length - 1 ? '<button type="button" class="btn" data-qsec="' + (cur + 1) + '">Next: ' + esc(secs[cur + 1].heading.replace(/^\d+\.\s*/, "")) + " ›</button>" : '<button type="button" class="btn" data-step="' + (S.step + 1) + '">Next: ' + esc(CFG.steps[S.step].title) + " ›</button>";
-  return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div><div class="tools"><span class="tag">' + all.done + " of " + all.tot + ' answered</span><span class="muted" id="savedline" style="font-size:12.5px"></span></div></div><div class="pb"><div class="qlayout"><nav class="anav" aria-label="Sections">' + nav + '</nav><div class="qcol">' + body +
+  return '<div class="panel"><div class="ph"><div><h2>' + esc(st.title) + "</h2><p>" + esc(st.intro) + '</p></div><div class="tools"><button type="button" class="btn ghost sm" id="wordcopy" title="A Word file of everything here, laid out as it is on screen, to share and gather answers">Download a Copy</button><span class="tag">' + all.done + " of " + all.tot + ' answered</span><span class="muted" id="savedline" style="font-size:12.5px"></span></div></div><div class="pb"><div class="qlayout"><nav class="anav" aria-label="Sections">' + nav + '</nav><div class="qcol">' + body +
     '<div class="foot-actions">' + back + fwd + "</div></div></div></div></div>";
 }
 
@@ -321,6 +321,180 @@ document.addEventListener("input", function (e) {
 });
 document.addEventListener("change", function (e) { var t = e.target; if ((t.type === "radio" || t.type === "checkbox") && !t.dataset.scope && t.id !== "attest") t.dispatchEvent(new Event("input", { bubbles: true })); if (t.id === "filein") addFiles(t.files, $("drop").dataset.area); });
 
+/* ---------- Download a Copy: a Word file laid out like the form (Jonna, 24 Nov 2026: FRAME applicants "need the ability to
+   download the application and questionnaire in the exact format that it was entered - they need the ability to pass the
+   information around to gather to apply"). Every section, question and choice in the same order as on screen, with what
+   has been entered so far (empty boxes where nothing has been). Made in the browser; nothing is sent. ---------- */
+var WordCopy = (function () {
+  var CRC = (function () { var t = [], c, n, k; for (n = 0; n < 256; n++) { c = n; for (k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(b) { var c = 0xFFFFFFFF; for (var i = 0; i < b.length; i++) c = CRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+  function u8(s) { return new TextEncoder().encode(s); }
+  function zip(files) {
+    var parts = [], central = [], off = 0;
+    files.forEach(function (f) {
+      var nm = u8(f.name), d = u8(f.text), crc = crc32(d), h = new Uint8Array(30 + nm.length), v = new DataView(h.buffer);
+      v.setUint32(0, 0x04034b50, true); v.setUint16(4, 20, true); v.setUint16(6, 0x0800, true); v.setUint16(12, 0x21, true);
+      v.setUint32(14, crc, true); v.setUint32(18, d.length, true); v.setUint32(22, d.length, true); v.setUint16(26, nm.length, true); h.set(nm, 30);
+      var c = new Uint8Array(46 + nm.length), w = new DataView(c.buffer);
+      w.setUint32(0, 0x02014b50, true); w.setUint16(4, 20, true); w.setUint16(6, 20, true); w.setUint16(8, 0x0800, true); w.setUint16(14, 0x21, true);
+      w.setUint32(16, crc, true); w.setUint32(20, d.length, true); w.setUint32(24, d.length, true); w.setUint16(28, nm.length, true); w.setUint32(42, off, true); c.set(nm, 46);
+      parts.push(h, d); central.push(c); off += h.length + d.length;
+    });
+    var cs = central.reduce(function (n, c) { return n + c.length; }, 0), e = new Uint8Array(22), x = new DataView(e.buffer);
+    x.setUint32(0, 0x06054b50, true); x.setUint16(8, files.length, true); x.setUint16(10, files.length, true); x.setUint32(12, cs, true); x.setUint32(16, off, true);
+    return new Blob(parts.concat(central, [e]), { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" });
+  }
+  function x(s) { return String(s == null ? "" : s).replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g, "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  function str(v) { if (v == null || v === false) return ""; if (Array.isArray(v)) return v.join(", "); if (typeof v === "object") return Object.keys(v).filter(function (k) { return v[k] != null && String(v[k]).trim() !== ""; }).map(function (k) { return k + ": " + v[k]; }).join("\n"); return String(v); }
+  function runs(text, o) {
+    o = o || {};
+    var rp = "<w:rPr>" + (o.b ? "<w:b/>" : "") + (o.i ? "<w:i/>" : "") + (o.color ? '<w:color w:val="' + o.color + '"/>' : "") + (o.sz ? '<w:sz w:val="' + o.sz + '"/><w:szCs w:val="' + o.sz + '"/>' : "") + "</w:rPr>";
+    return String(text == null ? "" : text).split(/\r?\n/).map(function (l, i) { return "<w:r>" + rp + (i ? "<w:br/>" : "") + '<w:t xml:space="preserve">' + x(l) + "</w:t></w:r>"; }).join("");
+  }
+  function p(text, o) {
+    o = o || {};
+    return "<w:p><w:pPr>" + (o.style ? '<w:pStyle w:val="' + o.style + '"/>' : "") + (o.keep ? "<w:keepNext/>" : "") + (o.style ? "" : '<w:spacing w:before="' + (o.before || 0) + '" w:after="' + (o.after == null ? 80 : o.after) + '"/>') + (o.ind ? '<w:ind w:left="' + o.ind + '"/>' : "") + "</w:pPr>" + runs(text, o) + "</w:p>";
+  }
+  var LINE = '<w:top w:val="single" w:sz="4" w:space="0" w:color="B8C7D6"/><w:left w:val="single" w:sz="4" w:space="0" w:color="B8C7D6"/><w:bottom w:val="single" w:sz="4" w:space="0" w:color="B8C7D6"/><w:right w:val="single" w:sz="4" w:space="0" w:color="B8C7D6"/>';
+  var FULL = 9360;
+  function table(rows, o) {
+    o = o || {}; rows = rows.length ? rows : [[""]];
+    var n = rows.reduce(function (m, r) { return Math.max(m, r.length); }, 1), ws = o.widths || rows[0].map(function () { return Math.floor(FULL / n); });
+    return '<w:tbl><w:tblPr><w:tblW w:w="' + FULL + '" w:type="dxa"/><w:tblBorders>' + LINE + '<w:insideH w:val="single" w:sz="4" w:space="0" w:color="B8C7D6"/><w:insideV w:val="single" w:sz="4" w:space="0" w:color="B8C7D6"/></w:tblBorders><w:tblLayout w:type="fixed"/><w:tblCellMar><w:top w:w="70" w:type="dxa"/><w:left w:w="110" w:type="dxa"/><w:bottom w:w="70" w:type="dxa"/><w:right w:w="110" w:type="dxa"/></w:tblCellMar></w:tblPr><w:tblGrid>' +
+      ws.map(function (w) { return '<w:gridCol w:w="' + w + '"/>'; }).join("") + "</w:tblGrid>" +
+      rows.map(function (r, ri) {
+        var head = ri === 0 && o.head;
+        return "<w:tr><w:trPr><w:cantSplit/>" + (head ? "<w:tblHeader/>" : "") + (o.minH ? '<w:trHeight w:val="' + o.minH + '"/>' : "") + "</w:trPr>" + ws.map(function (w, ci) {
+          var hc = head || (o.firstCol && ci === 0), c = r[ci] == null ? "" : r[ci];
+          return '<w:tc><w:tcPr><w:tcW w:w="' + w + '" w:type="dxa"/>' + (hc ? '<w:shd w:val="clear" w:color="auto" w:fill="EEF5FB"/>' : "") + (o.center && ci > 0 && !head ? '<w:vAlign w:val="center"/>' : "") + "</w:tcPr>" +
+            "<w:p><w:pPr><w:spacing w:before=\"0\" w:after=\"0\"/>" + (o.center && ci > 0 ? '<w:jc w:val="center"/>' : "") + "</w:pPr>" + runs(c, { b: hc, color: hc ? "0D314C" : null }) + "</w:p></w:tc>";
+        }).join("") + "</w:tr>";
+      }).join("") + "</w:tbl>" + p("", { after: 120 });
+  }
+  function questionnaire(sections, A) {
+    var W = api, b = "", obj = function (a) { return a && typeof a === "object" && !Array.isArray(a) ? a : {}; };
+    A = A || {};
+    (sections || []).forEach(function (sec, si) {
+        b += W.h2(sec.heading);
+        (sec.pre || []).forEach(function (x) { b += W.label(x.heading) + (x.paras || []).map(function (t) { return W.p(t); }).join(""); });
+        (sec.intro || []).forEach(function (x) { b += W.p(x); });
+        (sec.tables || []).forEach(function (tb, ti) {
+          var id = si + "-t" + ti;
+          if (tb.kind === "field_block") { var fv = obj(A[id]); b += W.table((tb.fields || []).map(function (f) { return [f, W.str(fv[f])]; }), { firstCol: true, widths: [3400, 5960] }); }
+          if (tb.kind === "checkbox_grid" && tb.options) { var sel = Array.isArray(A[id]) ? A[id] : []; b += W.label("Documents you are providing") + W.opts(tb.options, function (o) { return sel.indexOf(o) >= 0; }); }
+        });
+        (sec.items || []).filter(function (it) { return it.number; }).forEach(function (it) {
+          var id = si + "-" + it.number, a = A[id], t = it.type, tableOf = function (k) { return (it.tables || []).filter(function (x) { return x.kind === k; })[0]; };
+          b += W.q("Question " + it.number, it.text);
+          (it.guidance || []).forEach(function (g) { b += W.note(g); });
+          if (t === "single_select" || t === "single_select_explain") {
+            var cur = a && typeof a === "object" ? a.pick : a;
+            b += W.opts(it.options, function (o) { return o === cur; });
+            if (t === "single_select_explain") b += W.label("Explain") + W.box(a && a.explain, 2);
+          } else if (t === "multi_select" || t === "checkbox_unspecified") {
+            var ms = Array.isArray(a) ? a : [], ol = (it.options && it.options.length) ? it.options : ((tableOf("checkbox_grid") || {}).options || []);
+            b += W.opts(ol, function (o) { return ms.indexOf(o) >= 0; });
+          } else if (t === "yes_no" || t === "yes_no_explain") {
+            var yn = a && typeof a === "object" ? a.yn : a;
+            b += W.inline(["Yes", "No"], function (o) { return o === yn; });
+            if (t === "yes_no_explain") b += W.label("Explain") + W.box(a && a.explain, 2);
+          } else if (t === "matrix") {
+            var m = tableOf("matrix") || {}, mv = obj(a), lv = m.levels || [];
+            b += W.table([[""].concat(lv)].concat((m.subjects || []).map(function (sj) { return [sj].concat(lv.map(function (l) { return mv[sj] === l ? W.ON : W.OFF; })); })), { head: true, firstCol: true, center: true, widths: [3360].concat(lv.map(function () { return Math.floor(6000 / Math.max(1, lv.length)); })) });
+          } else if (t === "grid") {
+            var g = tableOf("grid") || {}, cols = g.columns || [], gv = obj(a), rows = Math.min(g.blank_rows || 3, 4);
+            Object.keys(gv).forEach(function (k) { var r = parseInt(k, 10); if (r + 1 > rows && W.str(gv[k])) rows = r + 1; });
+            b += W.table([cols].concat(Array.apply(null, Array(rows)).map(function (_, r) { return cols.map(function (c) { return W.str(gv[r + ":" + c]); }); })), { head: true, minH: 360 });
+          } else if (t === "repeating_block") {
+            var rv = obj(a);
+            (it.subparts || []).forEach(function (sp) { var fb = (sp.tables || [])[0] || {}; b += W.h3(sp.label) + W.table((fb.fields || []).map(function (f) { return [f, W.str(rv[sp.label + ":" + f])]; }), { firstCol: true, widths: [3400, 5960] }); });
+          } else if (t === "multi_part_text" && it.subparts && it.subparts.length) {
+            var pv = obj(a);
+            it.subparts.forEach(function (sp) { b += W.label(sp.label) + W.box(pv[sp.label], 2); });
+          } else {
+            if (t === "long_text_with_checklist" && it.options && it.options.length) b += W.label("Make sure you cover") + W.opts(it.options, function () { return false; });
+            b += W.box(a, t === "short_text" ? 1 : Math.max(3, Math.min(6, it.response_lines || 3)));
+          }
+        });
+        (sec.blocks || []).forEach(function (bk, bi) { var bv = obj(A[si + "-b" + bi]), fb = (bk.tables || [])[0] || {}; b += W.h3(bk.label) + W.table((fb.fields || []).map(function (f) { return [f, W.str(bv[f])]; }), { firstCol: true, widths: [3400, 5960] }); });
+      });
+        return b;
+  }
+  var ON = "☒", OFF = "☐";
+  var api = {
+    title: function (t) { return p(t, { style: "Title" }); },
+    h1: function (t) { return p(t, { style: "Heading1" }); },
+    h2: function (t) { return p(t, { style: "Heading2" }); },
+    h3: function (t) { return p(t, { b: true, color: "0D314C", before: 120, after: 60, keep: true }); },
+    p: function (t, o) { return p(t, o); },
+    note: function (t) { return p(t, { i: true, color: "5B6B7C" }); },
+    q: function (tag, text) { return p(tag, { b: true, color: "2477B8", sz: 18, before: 160, after: 20, keep: true }) + p(text, { b: true, after: 60, keep: true }); },
+    label: function (t) { return p(t, { b: true, color: "0D314C", sz: 19, after: 40, keep: true }); },
+    box: function (v, lines) { return table([[str(v)]], { minH: 300 * Math.max(1, lines || 1) }); },
+    opts: function (list, isOn) { return (list || []).map(function (o) { return p((isOn(o) ? ON : OFF) + "  " + o, { ind: 240, after: 40 }); }).join("") + p("", { after: 60 }); },
+    inline: function (list, isOn) { return p((list || []).map(function (o) { return (isOn(o) ? ON : OFF) + " " + o; }).join("      "), { ind: 240, after: 80 }); },
+    questionnaire: questionnaire, table: table, str: str, ON: ON, OFF: OFF, FULL: FULL,
+    save: function (filename, body) {
+      var W = 'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"';
+      var doc = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document ' + W + "><w:body>" + body +
+        '<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1080" w:right="1440" w:bottom="1080" w:left="1440" w:header="720" w:footer="720" w:gutter="0"/></w:sectPr></w:body></w:document>';
+      var styles = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles ' + W + '><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="Calibri" w:cs="Calibri"/><w:color w:val="13293D"/><w:sz w:val="21"/><w:szCs w:val="21"/><w:lang w:val="en-US"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="80" w:line="264" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults>' +
+        '<w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/><w:qFormat/></w:style>' +
+        '<w:style w:type="paragraph" w:styleId="Title"><w:name w:val="Title"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:spacing w:before="0" w:after="60"/></w:pPr><w:rPr><w:b/><w:color w:val="0D314C"/><w:sz w:val="36"/><w:szCs w:val="36"/></w:rPr></w:style>' +
+        '<w:style w:type="paragraph" w:styleId="Heading1"><w:name w:val="heading 1"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:pBdr><w:bottom w:val="single" w:sz="12" w:space="4" w:color="0D314C"/></w:pBdr><w:spacing w:before="360" w:after="160"/><w:outlineLvl w:val="0"/></w:pPr><w:rPr><w:b/><w:color w:val="0D314C"/><w:sz w:val="30"/><w:szCs w:val="30"/></w:rPr></w:style>' +
+        '<w:style w:type="paragraph" w:styleId="Heading2"><w:name w:val="heading 2"/><w:basedOn w:val="Normal"/><w:next w:val="Normal"/><w:qFormat/><w:pPr><w:keepNext/><w:spacing w:before="280" w:after="100"/><w:outlineLvl w:val="1"/></w:pPr><w:rPr><w:b/><w:color w:val="0D314C"/><w:sz w:val="25"/><w:szCs w:val="25"/></w:rPr></w:style></w:styles>';
+      var blob = zip([
+        { name: "[Content_Types].xml", text: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>' },
+        { name: "_rels/.rels", text: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>' },
+        { name: "word/_rels/document.xml.rels", text: '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>' },
+        { name: "word/document.xml", text: doc },
+        { name: "word/styles.xml", text: styles }
+      ]);
+      var u = URL.createObjectURL(blob), a = document.createElement("a");
+      a.href = u; a.download = filename.replace(/[\\\/:*?"<>|]+/g, "-"); document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(u); }, 4000);
+      return blob;
+    }
+  };
+  return api;
+})();
+function wordCopy() {
+  var W = WordCopy, b = "", v = S.values || {}, A = S.answers || {};
+  var org = (PAGE && PAGE.org) || v.org || v.company || (CO && CO.org) || "";
+  var obj = function (a) { return a && typeof a === "object" && !Array.isArray(a) ? a : {}; };
+  b += W.title(CFG.programName) + W.p((org ? org + "  ·  " : "") + "Copy made " + new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }), { color: "5B6B7C", after: 60 });
+  b += W.note("What has been entered in the portal so far, laid out as it is there. Share it to gather answers, then enter them in the portal" + (LIVE ? "" : " (this is the sample portal)") + ". Changing this file changes nothing in the portal.");
+  (CFG.steps || []).forEach(function (st) {
+    if (st.type === "fields") {
+      b += W.h1(st.title);
+      (st.sections || []).forEach(function (sec) {
+        b += W.h2(sec.heading) + (sec.help ? W.note(sec.help) : "");
+        var rows = (sec.fields || []).filter(function (f) { return visible(f, v); }).map(function (f) {
+          var val = v[f.key];
+          if (f.type === "checkbox") return [f.label, (val ? W.ON : W.OFF) + " " + (val ? "Yes" : "No")];
+          if (f.type === "choice") return [f.label + (f.required ? " *" : ""), (f.options || []).map(function (o) { return (o === val ? W.ON : W.OFF) + " " + o; }).join("\n")];
+          return [f.label + (f.required ? " *" : ""), W.str(val)];
+        });
+        if (rows.length) b += W.table(rows, { firstCol: true, widths: [3400, 5960] });
+        (sec.repeatingBlocks || []).forEach(function (bk) {
+          var items = (S.reps || {})[bk.key] || [];
+          (items.length ? items : [{}]).forEach(function (it, i) { b += W.h3(bk.itemLabel + " " + (i + 1)) + W.table(bk.fields.map(function (f) { return [f.label + (f.required ? " *" : ""), W.str(it[f.key])]; }), { firstCol: true, widths: [3400, 5960] }); });
+        });
+      });
+    }
+    if (st.type === "questionnaire") {
+      b += W.h1(st.title);
+      b += W.questionnaire(st.form.sections || [], A);
+    }
+    if (st.type === "docs") {
+      b += W.h1(st.title) + (st.intro ? W.note(st.intro) : "");
+      b += W.table([["Document", "Files added so far"]].concat(st.areas.map(function (ar) { return [ar.name + (ar.optional ? " (if you have it)" : ""), S.docs.filter(function (d) { return d.area === ar.code; }).map(function (d) { return d.name; }).join("\n") || "None yet"]; })), { head: true, widths: [4400, 4960] });
+    }
+  });
+  W.save("MISMO " + CFG.programName.replace(/ Certification$/, "") + (org ? " - " + org : "") + ".docx", b);
+  toast("Your copy is downloading");
+}
+
 /* ---------- clicks ---------- */
 function addFiles(list, area) {
   if (LIVE) { liveUpload(list, area); return; }
@@ -346,6 +520,7 @@ document.addEventListener("click", function (e) {
   if (d.lslot) { BK.picked = BK.picked === d.lslot ? null : d.lslot; rerender(); return; }
   if (t.id === "bookit") { liveBook(); return; }
   if (t.id === "getinvoice") { liveInvoice(t); return; }
+  if (t.id === "wordcopy") { wordCopy(); return; }
   if (t.id === "confirmdetails") { S.confirmed = true; save(); rerender(); toast("Thank you"); return; }
   if (t.id === "liveretry") { start(); return; }
   if (t.id === "reopen") { if (LIVE) { S.step = 1; S.viewAnswers = true; render(); return; } S.submitted = false; S.step = 1; save(); render(); return; }
