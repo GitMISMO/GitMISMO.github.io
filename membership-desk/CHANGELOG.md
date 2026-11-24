@@ -2,6 +2,7 @@
 
 One line per change people would notice, newest first.
 
+- 2026-11-24: Home redone in Member 360's style: the navy hero with On Your Plate, the dark Desk at a Glance boxes, the full width of the screen, and a set-up seen twice counted once. New Contact Updates page: send a change to a member's contacts straight into Member 360, with a record of every update, who sent it and where it stands.
 - 2026-11-22: New website applications show on the To Do as soon as they arrive, without anyone opening Member 360; Open the Application (PDF) works with Desk access only; a new membership starting Oct 1 or later runs through Dec 31 of the next year; more room around the application note.
 - 2026-11-22: Automatic checks on every change, and changes go live only through Membership Desk: Publish a Version, with every version kept for rollback. Developer guide and this change log added.
 - 2026-11-21: Aptify Data Updated date at the foot of the left menu.

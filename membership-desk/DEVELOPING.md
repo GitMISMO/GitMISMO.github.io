@@ -19,7 +19,8 @@ shows what they need to set up in Aptify for MISMO and what they've done, so the
 Amy and Kelly use it too, mostly for Payment in Process.
 
 Pages (left menu): **Home** (the to-do list and how the work is going), **Payment in Process** (invoices sent and not
-paid yet, Lenders and Non-Lenders apart), **Case Management** (MISMO's cases from Aptify case management), **Completed**
+paid yet, Lenders and Non-Lenders apart), **Contact Updates** (send a change to a
+member's contacts straight into Member 360; every update is kept with who sent it and where it stands), **Case Management** (MISMO's cases from Aptify case management), **Completed**
 (what's been set up, a page at a time) and **Help**. The foot of the menu shows **Aptify Data Updated** (the date of the
 latest weekly Aptify data) and Dark Mode.
 
@@ -79,6 +80,8 @@ same session as any change to one. Add fields; never rename or remove one anothe
 | `square` | MISMO Money | the desk | Square special-rate members (TMC, Broker, ACUMA) to set up, set up and waiting for payment |
 | `done` | the desk | the desk, Member 360 | Every set-up marked done, with who, when, order and dates. Never deleted: Undo marks one undone |
 | `setupinfo` | the desk | Member 360 | Still Needed details the team filled in on a set-up; Member 360 adds them to the company |
+| `contactupdates` | the desk | Member 360 | Contact changes sent from Contact Updates (add someone, change details or roles, someone has left), with who and when. Never deleted: Withdraw only marks one. Member 360 applies each one once (Nov 24, 2026) |
+| `people` | Member 360, whenever someone who can save has it open (and every 5 minutes) | the desk | Each member's and prospect's current contacts and roles, for the Contact Updates form, and what Member 360 did with each update (In Member 360, or Needs a Look with the reason) |
 | `invoices` | the desk | the desk, Member 360 | Invoices added on Payment in Process. Never deleted: Entered by Mistake only marks one |
 | `cases` | the weekly Aptify email (MISMO Cases sheet); administrators can also drop the report on Case Management | the desk | MISMO-only case management numbers and the latest cases. Its date is the Aptify Data Updated date at the foot of the menu |
 
@@ -89,6 +92,7 @@ The desk sends no email of its own.
 - The membership team never goes into Member 360 or MISMO Money; everything they need is here.
 - Each person signs in as themselves, so every mark shows who made it.
 - Still Needed is optional and never blocks a set-up.
+- Contact updates go straight into Member 360, with no approval step, and every one stays on Contact Updates. Aptify isn't changed. Someone who has left moves to Former Contacts in Member 360 (Nov 24, 2026).
 - Square and IIF set-ups ship the IIF quotation already in Aptify for the amount paid.
 - Payment in Process lists Lenders and Non-Lenders apart; an invoice comes off when Aptify payments on or after its
   date add up to it, or when someone selects Mark Paid.
