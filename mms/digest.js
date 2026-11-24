@@ -140,7 +140,7 @@
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
-      case 'comment': return sub === 'setup' ? { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' } : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
+      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
       case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
       case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
       case 'release': return { role: 'website', text: 'Publish the pages and announcement' };

@@ -2168,7 +2168,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-24T22:01:06Z',fp:'945c754f'};
+window.__mmsBuild={at:'2026-11-24T22:50:26Z',fp:'36c26d6a'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2407,7 +2407,7 @@ function whoseMove(t){
       const ld=peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'License Designator';
       return {role:'vps',label:ld,text:t.designation&&(t.designation.auto||t.designation.recommended)?'Designate the license (the MMS has a recommendation)':'Designate the license'}; }
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
-    case 'comment': return sub==='setup'?{role:'website',label:'Website Admin',text:'Add the Resource Library link: the comment period starts that day'}:(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
+    case 'comment': return sub==='setup'?(!(t.cpFile&&t.cpFile.url)?{role:'facilitator',label:'Facilitator',text:'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you)'}:{role:'website',label:'Website Admin',text:'Add the Resource Library link: the comment period starts that day'}):(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
     case 'post': return {role:'facilitator',label:'Facilitator',text:'Report what came back from comment'};
     case 'gc-publish': return {role:'gov',label:g,text:g+' approval to publish as '+(isStandard(t)?'Candidate Recommendation':'Final')};
     case 'release': return {role:'website',label:'Website Admin',text:'Publish the pages and announcement'};
@@ -3625,7 +3625,7 @@ function wireArch(m){
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
-      case 'comment': return sub === 'setup' ? { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' } : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
+      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
       case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
       case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
       case 'release': return { role: 'website', text: 'Publish the pages and announcement' };
@@ -7519,7 +7519,7 @@ const HELP_TOPICS={
     []],
   comments:['Comment Periods and Comments','facilitator staff website gov',
     'Comment Periods shows what is open for public comment, what just closed and what is approved but not posted yet.',
-    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Choose the File for Comment picks the file that goes out for comment from the work request’s Files; the MMS posts it as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a brief description of what the work product is and that it’s in a 30-day comment period, from the work request, its reviews and its files; edit it or keep it. Saving the card is the approval: that text is what the website shows, and the website adds the member and non-member download. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
+    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Before the comment period, put the Comment Period (IPR) boilerplate language in the work product files and add them to the work request’s Files. Then Choose the Files for Comment: tick the files that go out for comment (several are zipped into one download, and the zip is saved to Files too). The MMS checks each Word, Excel and PDF file for the Comment Period language first and says which ones don’t have it. It posts the file as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a brief description of what the work product is and that it’s in a 30-day comment period, from the work request, its reviews and its files; edit it or keep it. Saving the card is the approval: that text is what the website shows, and the website adds the member and non-member download. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
      'Members click Member Access on the card and open the work product in the Resource Library. They do not use the MMS.',
      'Non-members click Non-Member Access, sign the Proposed (open for comment) license form, and then get the download.',
      'Still needed on the card lists anything missing: the card text, the Resource Library link or the non-member download.',
@@ -8340,22 +8340,35 @@ cpAutoNonMember=function(t){ const F=t.cpFile; if(F&&F.url&&!F.off) return F.url
 const _cpSectionF=cpSection;
 cpSection=function(t){ const h=_cpSectionF(t), F=t.cpFile; const can=cpCanEdit(t);
   const row='<div class="cpf-row"><b>File for Comment:</b> '+(F&&F.url?'<a href="'+esc(F.url)+'" target="_blank" rel="noopener">'+esc(F.name)+'</a> <span class="muted">· posted '+esc(fmtS(String(F.at||'').slice(0,10)))+(F.by?' by '+esc(F.by):'')+'; it’s the non-member download</span>':'<span class="muted">not chosen yet. Pick the file that goes out for comment; it becomes the non-member download and the Website Admin is asked to make the Resource Library entry.</span>')+
-    (can?' <button type="button" class="btn sm'+(F&&F.url?'':' pri')+'" data-cpfile="'+esc(t.id)+'">'+(F&&F.url?'Change the File':'Choose the File for Comment')+'</button>':'')+'</div>';
+    (can?' <button type="button" class="btn sm'+(F&&F.url?'':' pri')+'" data-cpfile="'+esc(t.id)+'">'+(F&&F.url?'Change the Files':'Choose the Files for Comment')+'</button>':'')+'</div>';
   return h.replace(/<\/div>\s*$/,row+'</div>'); };
+/* Nov 24 (Meghan: "Does the system update the IPR language and zip it?"): the facilitator still puts the Comment
+   Period (IPR) language in the files; the MMS checks each Word, Excel and PDF file for it before posting, and when
+   several files are ticked it zips them into one download (saved to the work request's Files too). */
 async function cpfChoose(t){
-  const L=cpfFiles(t); if(!L.length) return toast('No files in this work request’s folder yet. Add the comment-period file on the Files tab first.');
-  const v=await modal({title:'File for Comment',text:esc(t.wr)+' · the file non-members download after they sign the Proposed (open for comment) license form',ok:'Post This File',
-    body:'<div class="rv-src-l">'+L.map((f,i)=>'<label class="rv-src-f"><input type="radio" name="cpf" value="'+i+'"'+(i===0?' checked':'')+'><span class="ss-i ss-'+ssKind(f.n)+'">'+ssIc(ssKind(f.n))+'</span><span class="rv-src-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',ssTag(f.n)||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span></label>').join('')+'</div>'});
-  if(!v) return; const f=L[+v.cpf]; if(!f) return;
-  wpSay('Getting '+f.n+' from the work request’s files…');
+  const L=cpfFiles(t); if(!L.length) return toast('No files in this work request’s folder yet. Add the comment-period files on the Files tab first.');
+  const v=await modal({title:'Files for Comment',text:esc(t.wr)+' · what non-members download after they sign the Proposed (open for comment) license form',ok:'Check and Post',
+    body:'<p class="muted" style="margin:0 0 8px;font-size:12.5px">Tick the work product files that go out for comment. One file is posted as it is; several are zipped into one download. Each file needs the Comment Period (IPR) boilerplate language; the MMS checks before posting.</p><div class="rv-src-l">'+L.map((f,i)=>'<label class="rv-src-f"><input type="checkbox" name="cpf_'+i+'"'+(i===0?' checked':'')+'><span class="ss-i ss-'+ssKind(f.n)+'">'+ssIc(ssKind(f.n))+'</span><span class="rv-src-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',ssTag(f.n)||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span></label>').join('')+'</div>'});
+  if(!v) return; const sel=L.filter((f,i)=>v['cpf_'+i]===true); if(!sel.length) return toast('Tick at least one file');
   try{
-    const file=await rvSrcGet(f); const u8=new Uint8Array(await file.arrayBuffer()); if(u8.length>20*1048576) throw new Error('it’s over 20 MB; post it on the website by hand');
-    const zb=wpZipBad(file.name,u8); if(zb) throw new Error(file.name+' '+zb);
-    const name=wpFileName(file.name), key=Date.now().toString(36)+Math.random().toString(36).slice(2,6), n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
-    for(let i=0;i<n;i++){ wpSay('Posting '+f.n+': '+Math.round(i/n*100)+'%. Keep this tab open.'); await wpPut('wpup-'+key+'-0-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
-    await write('wpqueue',key,{key,ticket:t.id,id:'comment',fileOnly:'comment/'+String(t.wr||t.id).replace(/[^A-Za-z0-9_.-]/g,'_'),product:{},files:[{name:f.n,file:name,bytes:u8.length,chunks:n}],status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''});
-    const x=clone(S.tickets[t.id]||t), b=clone(x); x.cpFile={name:f.n,file:name,path:f.p,url:cpfUrl(t,name),bytes:u8.length,at:new Date().toISOString(),by:(S.me&&S.me.name)||''};
-    hist(x,'File for comment chosen: '+f.n+' (posted as the non-member download)'); await saveTicket(x,'File posted',b);
+    const got=[]; for(const f of sel){ wpSay('Getting '+f.n+' from the work request’s files…'); got.push({f,file:await rvSrcGet(f)}); }
+    /* the Comment Period (IPR) language, checked in every file the review can read */
+    const off=[]; for(const g of got){ if(!/\.(docx|xlsx|xlsm|pdf)$/i.test(g.file.name)) continue; wpSay('Checking the boilerplate in '+g.f.n+'…');
+      try{ const r=await rvReadFile(g.file); const k=rvDetectBoiler(r.text||''); if(k!=='comment') off.push(g.f.n+': '+(k?'has the '+RV_BP_LABEL[k]+' language':'no MISMO boilerplate found')); }catch(e){} }
+    wpSay('',''); const pb=document.getElementById('wpprog'); if(pb) pb.className='wp-prog';
+    if(off.length){ const go=await modal({title:'Comment Period Language Missing',text:esc(t.wr),ok:'Post Anyway',body:'<p style="margin:0 0 6px">These files don’t have the IPR/COMMENT PERIOD boilerplate language yet:</p><ul style="margin:0 0 8px 18px">'+off.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p class="muted" style="margin:0;font-size:12.5px">Update them (How To - MISMO Work Product Boilerplate Language and Guidance), add them to Files again and choose them, or post as they are if this is intended.</p>'}); if(!go) return; }
+    let name, u8, label;
+    if(got.length===1){ const file=got[0].file; u8=new Uint8Array(await file.arrayBuffer()); name=wpFileName(file.name); label=got[0].f.n; }
+    else { await needLibs(); const z=new JSZip(); const used={}; for(const g of got){ let n=g.file.name; while(used[n.toLowerCase()]) n=n.replace(/(\.[^.]*)?$/,m=>' (2)'+m); used[n.toLowerCase()]=1; z.file(n,await g.file.arrayBuffer()); }
+      u8=await z.generateAsync({type:'uint8array',compression:'DEFLATE'}); label=(String(t.wr||t.id)+' '+String((typeof cpCardOf==='function'&&cpCardOf(t).title)||t.name||'')+' - Comment Period').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,120)+'.zip'; name=wpFileName(label);
+      try{ if(typeof ssUpload==='function') await ssUpload(t,[new File([u8],label,{type:'application/zip'})]); }catch(e){} }
+    if(u8.length>20*1048576) throw new Error('it’s over 20 MB; post it on the website by hand');
+    const zb=wpZipBad(name,u8); if(zb) throw new Error(name+' '+zb);
+    const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6), n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
+    for(let i=0;i<n;i++){ wpSay('Posting '+label+': '+Math.round(i/n*100)+'%. Keep this tab open.'); await wpPut('wpup-'+key+'-0-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
+    await write('wpqueue',key,{key,ticket:t.id,id:'comment',fileOnly:'comment/'+String(t.wr||t.id).replace(/[^A-Za-z0-9_.-]/g,'_'),product:{},files:[{name:label,file:name,bytes:u8.length,chunks:n}],status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''});
+    const x=clone(S.tickets[t.id]||t), b=clone(x); x.cpFile={name:label,file:name,path:got.length===1?got[0].f.p:'',parts:got.length>1?got.map(g=>g.f.n):undefined,url:cpfUrl(t,name),bytes:u8.length,at:new Date().toISOString(),by:(S.me&&S.me.name)||''};
+    hist(x,(got.length>1?'Files for comment zipped and chosen: '+got.map(g=>g.f.n).join(', '):'File for comment chosen: '+label)+' (posted as the non-member download)'+(off.length?'; posted without the Comment Period language in '+off.length+' file'+(off.length===1?'':'s'):'')); await saveTicket(x,'File posted',b);
     wpSay('Posted. It’s the non-member download within half an hour.','ok');
     try{ await cpfNotice(S.tickets[t.id]||x); }catch(e){}
     if(typeof publishFeed==='function') try{ publishFeed(); }catch(e){}
