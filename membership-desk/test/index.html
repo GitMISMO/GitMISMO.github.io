@@ -510,7 +510,12 @@ main{max-width:none}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cu-how b{background:var(--sky);color:var(--navy)}}
 .cu-how span{font-size:13px;color:var(--ink-2);line-height:1.5}
 .cu-how strong{display:block;font-size:13.5px;color:var(--ink);margin-bottom:2px}
-#v-contacts .hgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
+#v-contacts .hgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:stretch}
+.cu-start{display:flex;align-items:center;gap:14px;padding:22px 18px}
+.cu-start .ac-i{background:color-mix(in srgb,#b79cff 26%,var(--surface));color:var(--ink)}
+.cu-start b{display:block;font-size:15px}
+.cu-start span{font-size:13px;color:var(--ink-2);line-height:1.5}
+.cu-start .btn{margin-left:auto}
 @media(max-width:700px){.cu-roles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
@@ -1356,7 +1361,7 @@ const ch=$("cu-chips");ch.textContent="";[["","Everything"],["wait","On the Way"
 ch.appendChild(h("button",{type:"button",class:"chipb"+(cuF===v?" on":""),"aria-pressed":cuF===v?"true":"false",style:"--k:"+(v?KC2[v]:"#b79cff"),onclick:()=>{cuF=v;cuPg=0;renderContacts();}},h("i",null),l,h("em",null,String(n))));});
 const F=L.filter(u=>!cuF||cuState(u).k===cuF),per=25,pages=Math.max(1,Math.ceil(F.length/per));if(cuPg>=pages)cuPg=pages-1;
 const box=$("cu-list");box.textContent="";F.slice(cuPg*per,cuPg*per+per).forEach(u=>box.appendChild(cuRow(u)));
-if(!F.length)box.appendChild(h("div",{class:"empty"},L.length?"Nothing here.":"No contact updates yet. Select Update a Contact to send the first one."));
+if(!F.length){if(L.length)box.appendChild(h("div",{class:"empty"},"Nothing here."));else{const ic=h("span",{class:"ac-i"});ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M18 8v6M15 11h6"/></svg>';box.appendChild(h("div",{class:"cu-start"},ic,h("div",null,h("b",null,"No contact updates yet"),h("span",null,"When a member tells you about a new contact, a new email or title, new roles, or someone who has left, send it here. It goes straight into Member 360, and every update you send is listed here.")),h("button",{type:"button",class:"btn",onclick:()=>openCU(null)},"Update a Contact")));}}
 const pg=$("cu-pager");pg.textContent="";pg.hidden=pages<2;
 if(pages>1)pg.append(h("button",{type:"button",disabled:cuPg?null:"",onclick:()=>{cuPg--;renderContacts();}},"‹ Newer"),h("span",null,"Page "+(cuPg+1)+" of "+pages),h("span",{class:"sp"},F.length+" updates"),h("button",{type:"button",disabled:cuPg<pages-1?null:"",onclick:()=>{cuPg++;renderContacts();}},"Older ›"));
 {const cn=$("cu-co-n");if(cn)cn.textContent=CO.length?CO.length.toLocaleString("en-US")+" companies to choose from":"";}$("cu-h").textContent=F.length?F.length+" "+(F.length===1?"update":"updates")+", newest first":"";
