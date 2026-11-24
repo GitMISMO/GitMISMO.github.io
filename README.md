@@ -78,3 +78,16 @@ MCD for Mortgage Compliance) are searchable too: an initiative or workgroup in, 
 answers to its acronym. A search of two letters alone is treated as an acronym and matched whole. Business Glossary terms are deliberately left
 out; the glossary has its own search.
 
+
+## Read-only keys one system gives another (Nov 23, 2026)
+
+Some relay keys in `_internal/projects.json` exist only so one system can read a folder of another
+system's data repository: `"writable": []` and one `readable` folder, nothing else.
+
+| Key | Reads | Who gets it |
+|---|---|---|
+| `cert-completions` | cms-data `data/accounting/` | Its own row in People & Access (the Accounting Desk's Certification Completions tab) |
+| `cms-member-360` | cms-data `data/member-360/` (`certifications.json`, written by the CMS) | Everyone with Member 360: it is in Member 360's `also` in `assets/tools.json`, so People & Access gives it the same access as Member 360 (CN-017) |
+
+A key added to a tool's `also` reaches people who already have that tool the next time a platform
+admin opens People & Access: the panel brings their keys into line and asks for Save Access.

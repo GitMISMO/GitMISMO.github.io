@@ -6,7 +6,10 @@
            "label": "Member 360",
            "colour": "#0F7B5C",
            "group": "Planning",
-           "path": "/member-360/"
+           "path": "/member-360/",
+           "also": [
+             "cms-member-360"
+           ]
          },
              {
            "key": "membership-desk",
