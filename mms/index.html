@@ -2168,7 +2168,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-24T21:21:02Z',fp:'40522a4a'};
+window.__mmsBuild={at:'2026-11-24T22:01:06Z',fp:'945c754f'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7087,7 +7087,7 @@ async function imPush(rep){ const q=S.imq[rep], doc=S.imr[rep]; if(!q||!doc) ret
   const last=earlier[earlier.length-1], resub=/IMSub[2-9]|resub/i.test(doc.file||'')||earlier.length>0;
   const why=last?'IM decided it '+fmtS(atDay(last.decidedAt))+(last.counts?': '+Object.entries(last.counts).filter(x=>x[1]).map(([d,n])=>n+' '+d.replace(/^Approved /,'').toLowerCase()).join(', '):''):'';
   const rs=resub?{n:earlier.length?earlier.length+1:'',first:atDay((earlier[0]&&(earlier[0].sentAt||earlier[0].decidedAt))||(t.dates&&t.dates.imSubmitted)||''),date:today(),why,prior:last?last.rep:''}:null;
-  const item=Object.assign({},q,{form:sp?{n:sp.n,u:sp.u}:null,docs:t.id&&typeof ssDocs==='function'?ssDocs(t):[],wg:t.workgroup||'',resub,prior:last?atDay(last.decidedAt):'',fac:{name:t.facilitator||'',email:fac.email||''},flow:'',from:''}); /* the email flow link never goes to the portals: the MMS emails the facilitator when the decision comes home */
+  const item=Object.assign({},q,{upload:imUploadSpot(t),form:sp?{n:sp.n,u:sp.u}:null,docs:t.id&&typeof ssDocs==='function'?ssDocs(t):[],wg:t.workgroup||'',resub,prior:last?atDay(last.decidedAt):'',fac:{name:t.facilitator||'',email:fac.email||''},flow:'',from:''}); /* the email flow link never goes to the portals: the MMS emails the facilitator when the decision comes home */
   try{ /* never overwrite a review IM has started or finished */
     await imrUpdate('rev-'+imrSafe(rep),cur=>cur&&(cur.status==='decided'||(cur.rows||[]).some(r=>r.final)||cur.final)?cur:Object.assign({},doc,{status:'awaiting',resub:rs}));
     await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; const old=o.items[rep]; if(!(old&&old.status==='decided')) o.items[rep]=Object.assign({},item,old?{done:old.done,lastAt:old.lastAt,lastBy:old.lastBy}:{}); return o; });
@@ -7132,8 +7132,9 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
     /* (the review's rows load a moment after the first look, so wait for them rather than leaving it a minute more) */
     for(const x of Object.values(S.imq||{})) if(x.status==='awaiting'&&!x.pushed){ imEnsureR(x.ticket); for(let k=0;k<16&&!S.imr[x.rep];k++) await new Promise(z=>setTimeout(z,250)); if(S.imr[x.rep]) await imPush(x.rep); }
     // waiting items carry the work request's documents (refreshed as files are added)
-    try{ const pq=(q&&q.data&&q.data.items)||{}; const upd={}; Object.values(pq).forEach(it=>{ if(it.hist||it.status==='decided'||!it.ticket) return; const t=S.tickets[it.ticket]; if(!t||typeof ssDocs!=='function') return; const d=ssDocs(t); if(JSON.stringify(d)!==JSON.stringify(it.docs||[])) upd[it.rep]=d; });
-      if(S.isStaff&&Object.keys(upd).length) await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; Object.entries(upd).forEach(([r,d])=>{ if(o.items&&o.items[r]) o.items[r].docs=d; }); return o; }); }catch(e){}
+    try{ const pq=(q&&q.data&&q.data.items)||{}; const upd={}; Object.values(pq).forEach(it=>{ if(it.hist||it.status==='decided'||!it.ticket) return; const t=S.tickets[it.ticket]; if(!t||typeof ssDocs!=='function') return; const d=ssDocs(t), keep=(it.docs||[]).filter(x=>x&&x.up&&!d.some(y=>y.u===x.u)), all=d.concat(keep), up=imUploadSpot(t);
+        if(JSON.stringify(all)!==JSON.stringify(it.docs||[])||JSON.stringify(up)!==JSON.stringify(it.upload||null)) upd[it.rep]={docs:all,upload:up}; });
+      if(S.isStaff&&Object.keys(upd).length) await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; Object.entries(upd).forEach(([r,x])=>{ if(o.items&&o.items[r]){ const ex=(o.items[r].docs||[]).filter(y=>y&&y.up&&!x.docs.some(z=>z.u===y.u)); o.items[r].docs=x.docs.concat(ex); o.items[r].upload=x.upload; } }); return o; }); }catch(e){}
     // decided in the portal: bring the decisions home
     const items=(q&&q.data&&q.data.items)||{};
     for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist||(it.test&&!(S.tickets[it.ticket]&&S.tickets[it.ticket].practice))) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
@@ -7144,6 +7145,15 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
       S.imq[it.rep]=nq; S.imr[it.rep]=doc; await write(imColl(doc.ticket),it.rep,doc); await write('imqueue',it.rep,nq);
       const t=doc.ticket?await freshTicket(doc.ticket):null;
       try{ if(t) await imDecided(t,doc,it); }catch(e){ console.warn('im decision',e); const back=Object.assign({},mine||nq,{status:(mine&&mine.status)||'awaiting'}); delete back.home; S.imq[it.rep]=back; await write('imqueue',it.rep,back); } }
+    /* a decision claimed by a page that never finished moving the work request (Nov 24: iLAD was approved in IM Review
+       but stayed at IM Review): after 10 minutes a MISMO staff page brings it home again, once */
+    for(const it of Object.values(items)){ try{ if(!S.isStaff||it.status!=='decided'||it.hist) continue; const mine=S.imq[it.rep]; if(!mine||mine.status!=='decided') continue;
+      const t0=S.tickets[it.ticket]; if(!t0||t0.stage!=='im'||t0.state!=='active'||(it.test&&!t0.practice)) continue;
+      if(Date.now()-Date.parse(mine.homeAt||it.decidedAt||0)<10*60000) continue;
+      const dAt=String(it.decidedAt||''); if((t0.history||[]).some(h=>String(h.at||'')>=dAt&&/^IM (approved|decision)/.test(String(h.text||'')))) continue;
+      const nq=Object.assign({},mine,{homeRetryAt:new Date().toISOString(),home:S.me.name||'MMS',homeAt:new Date().toISOString()});
+      if(!await mmsClaim('imqueue','imqueue/'+it.rep,c=>!!(c&&c.homeRetryAt&&Date.now()-Date.parse(c.homeRetryAt)<10*60000),nq)) continue; S.imq[it.rep]=nq;
+      const d=await rGet(IMR,'rev-'+imrSafe(it.rep)); if(!d||!d.data) continue; const t=await freshTicket(it.ticket); if(t&&t.stage==='im') await imDecided(t,d.data,it); }catch(e){ console.warn('im decision retry',e); } }
     try{ await awgRetryPending(items); }catch(e){ console.warn('awg retry',e); }
   }catch(e){ console.warn('im sync',e); } finally{ imSyncing=false; } }
 const _imSend0=imSend;
@@ -7183,7 +7193,8 @@ const AWGR='awg-review', AWGR_URL='https://resources.mismo.org/awg-review/';
 function portalItemFor(t,k){ const Q=k==='im'?S.imPortalQ:S.awgPortalQ; return Object.values(Q||{}).filter(q=>!q.hist&&(q.status==='awaiting'||q.status==='carried')&&(q.ticket===t.id||(!q.ticket&&q.wr===t.wr))).sort((a,b)=>(a.test?1:0)-(b.test?1:0))[0]||null; }
 function portalOpen(k,rep){ window.open((k==='im'?IMR_URL:AWGR_URL)+(rep?'#/review/'+encodeURIComponent(rep):''),k==='im'?'imreview':'awgreview'); }
 function imOutcome(doc,it){ const c=it.counts||imTally(doc.rows||[]); if(!(doc.rows||[]).length&&doc.final) c[doc.final.dec]=1; const ok=(c['Approved as Submitted']||0)+(c['Approved with Modification']||0); return {c,ok,ret:(c['Returned']||0)+(c['Deferred']||0),den:c['Denied']||0}; }
-async function imDecided(t,doc,it){ const o=imOutcome(doc,it), sum=Object.entries(o.c).filter(x=>x[1]).map(([k,n])=>n+' '+k.toLowerCase()).join(', ');
+async function imDecided(t,doc,it){ try{ await imUploadsHome(t,doc); }catch(e){ console.warn('im uploads',e); }
+  const o=imOutcome(doc,it), sum=Object.entries(o.c).filter(x=>x[1]).map(([k,n])=>n+' '+k.toLowerCase()).join(', ');
   const who=(it.decidedBy||'IM')+' in IM Review', d=atDay(it.decidedAt)||today();
   /* IM Review emails the facilitator itself only when it was given the email flow; otherwise (email on hold,
      or sent before go-live) the notice goes through Notifications (while email is on hold it waits there as a preview and is never sent later) */
@@ -7307,6 +7318,15 @@ async function mtToPortals(){ if(!(S.isStaff||(typeof isRole==='function'&&isRol
 /* attendance logged in Meeting Trackers reaches IM Review and AWG Review within about 3 minutes (Nov 24, Erin: the
    quorum line still showed the first count after she updated the Nov 23 call). Every 3 minutes a staff or IM/AWG
    tab reads just the two groups' attendance files; when they changed, the full copy runs right away. */
+/* documents added in IM Review (Nov 24, Erin: the approved Submission Form and updated artifacts, added while
+   recording the decision). IM Review saves them into the work request's SharePoint folder through the same
+   "MMS Documents - Upload" flow the Files tab uses (it checks the person's sign-in), and lists them on the decision;
+   when the decision comes home they join the work request's Files. */
+function imUploadSpot(t){ const url=S.notify&&S.notify.docFlowUrl; if(!url||!t||!t.id||typeof ssFolderName!=='function') return null; const f=ssFolderName(t); if(!f) return null;
+  return {flow:url,folder:'MMS Smartsheet Files/'+f,path:f,base:SP_HOST+(SS_ROOT+f+'/').split('/').map(encodeURIComponent).join('/')}; }
+async function imUploadsHome(t,doc){ const U=(doc&&doc.uploads)||[]; if(!U.length) return; const D=clone(ssFor(t)||{wr:t.wr,files:[],links:[]}); D.files=D.files||[];
+  const add=U.filter(u=>u&&u.p&&!D.files.some(f=>f.p===u.p)); if(!add.length) return; D.files=D.files.concat(add.map(u=>({n:u.n,p:u.p,u:u.u||today(),b:u.b||'',sz:u.sz||'',im:1}))); S.ssfiles[t.id]=D; await write('ssfiles',t.id,D);
+  const x=clone(S.tickets[t.id]||t); hist(x,'Added in IM Review by '+(add[0].b||'IM')+': '+add.map(u=>u.n).join(', ')); await saveTicket(x,'IM documents added'); }
 let mtSig='', mtSigAt=0;
 const _mtToPortalsQ=mtToPortals;
 mtToPortals=async function(){ if(!(S.isStaff||(typeof isRole==='function'&&isRole('imawg')))||!S.canWrite||S.viewAs) return;
