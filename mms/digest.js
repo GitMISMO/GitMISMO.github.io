@@ -235,7 +235,7 @@
     var cfg = D.settings(input.settings), on = cfg.sections, P = proc(input.process), gov = P.gov || 'GC';
     var now = input.now || new Date(), n = et(now), today = n.ymd, dow = n.dow;
     var friday = dow === 5 && on.wkOn, monday = dow === 1;
-    var T = Object.keys(input.tickets || {}).map(function (k) { return input.tickets[k]; });
+    var T = Object.keys(input.tickets || {}).map(function (k) { return input.tickets[k]; }).filter(function (t) { return t && !t.practice; });
     var mine = T.filter(function (t) { return (t.state === 'active' || t.state === 'hold') && !t.split && same(t.facilitator, person.name); });
     var act = mine.filter(function (t) { return t.state === 'active'; });
     var S = [], count = { todo: 0, late: 0 };

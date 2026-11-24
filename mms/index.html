@@ -2168,7 +2168,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-24T14:42:44Z',fp:'82ecc089'};
+window.__mmsBuild={at:'2026-11-24T20:43:18Z',fp:'b6f5c628'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2433,7 +2433,9 @@ function myFacTickets(who){ who=who||viewer(); return liveTickets().filter(t=>sa
 function viewer(){ if(S.viewAs){ return personByName(S.viewAs)||{name:S.viewAs}; } const p=personByName(S.me.name); return p&&!S.me.email?Object.assign({},S.me,{name:p.name}):S.me; }
 
 /* ---------- ticket lists ---------- */
-const allTickets=()=>Object.values(S.tickets);
+/* practice work requests (Nov 24): only their facilitator and MISMO staff see them, and never in Metrics */
+const practiceSees=t=>!t||!t.practice||(!S._noPractice&&(!!S.isStaff||(typeof sameName==='function'&&sameName(t.facilitator,S.me&&S.me.name))));
+const allTickets=()=>Object.values(S.tickets).filter(practiceSees);
 const liveTickets=()=>allTickets().filter(t=>(t.state==='active'||t.state==='hold')&&!t.split);
 const ridersOf=id=>allTickets().filter(x=>x.rides===id&&x.state!=='canceled'&&x.state!=='closed');
 function pastTarget(t){ const d=t.dates||{}; return t.state==='active' && !t.split && !t.rides && d.targetIM && d.targetIM<today() && ['approved','cfp','kickoff','work','aireview'].includes(t.stage); }
@@ -2535,6 +2537,7 @@ function prReady(t){ if(t.rides) return; const id=prId(t), m=S.media&&S.media[id
 function mediaRequest(t,kind,text,extra){
   const id=(t.id+'-'+kind).replace(/[^A-Za-z0-9_-]/g,'-').slice(0,120);
   if(t.rides) return; /* work riding with a release: the release's own request covers it */
+  if(t.practice) return; /* a practice work request asks MISMO Media for nothing */
   const m=Object.assign({id,ticket:t.id,wr:t.wr,name:t.name,kind,text,status:'Requested',requested:today(),by:S.me.name||'',due:'',at:new Date().toISOString()},extra||{});
   if(S.media[id] && S.media[id].status!=='Done') return;
   S.media[id]=m; write('media',id,m);
@@ -2579,6 +2582,8 @@ async function sendFiled(id,doc){
   return res.ok;
 }
 async function queueMail(m){
+  /* a practice work request sends no email: the toast says what would have gone */
+  if(/PRACTICE-/.test(String(m&&m.subject||'')+' '+String(m&&m.key||'')+' '+String(m&&m.body||''))){ if(S.me&&S.me.name!=='MMS Robot'&&typeof toast==='function') toast('Practice: no email sent (“'+String(m.subject||'').slice(0,80)+'” would go to '+((m.to||[]).filter(Boolean).length||'no one')+' '+(((m.to||[]).filter(Boolean).length===1)?'person':'people')+')'); return 'practice'; }
   const held=mailHeld(), key=mailKey(m,held);
   if(mailFiled(key,held)) return false;
   const to=(m.to||[]).filter(Boolean), cc=(m.cc||[]).filter(Boolean);
@@ -3715,7 +3720,7 @@ function wireArch(m){
     var cfg = D.settings(input.settings), on = cfg.sections, P = proc(input.process), gov = P.gov || 'GC';
     var now = input.now || new Date(), n = et(now), today = n.ymd, dow = n.dow;
     var friday = dow === 5 && on.wkOn, monday = dow === 1;
-    var T = Object.keys(input.tickets || {}).map(function (k) { return input.tickets[k]; });
+    var T = Object.keys(input.tickets || {}).map(function (k) { return input.tickets[k]; }).filter(function (t) { return t && !t.practice; });
     var mine = T.filter(function (t) { return (t.state === 'active' || t.state === 'hold') && !t.split && same(t.facilitator, person.name); });
     var act = mine.filter(function (t) { return t.state === 'active'; });
     var S = [], count = { todo: 0, late: 0 };
@@ -4627,7 +4632,7 @@ function webName(n){ n=String(n||'').trim();
 const cpPublic=t=>{ const n=String(cpName(t)||'').replace(/\s*\((?:[^()]*\bpages?\b[^()]*|existing|new)\)/gi,'').replace(/\s{2,}/g,' ').trim(); return webName(n&&n.length<=100?n:t.name); };   /* a long product-page note isn't a name */
 function webFeed(){
   const td=today();
-  const cps=allTickets().filter(t=>t.stage==='comment'&&t.state==='active'&&t.sub!=='setup'&&t.dates&&t.dates.commentStart&&t.dates.commentStart<=td&&t.dates.commentEnd&&t.dates.commentEnd>=addDays(td,-1)) /* not before it opens */.sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))
+  const cps=allTickets().filter(t=>!t.practice&&t.stage==='comment'&&t.state==='active'&&t.sub!=='setup'&&t.dates&&t.dates.commentStart&&t.dates.commentStart<=td&&t.dates.commentEnd&&t.dates.commentEnd>=addDays(td,-1)) /* not before it opens */.sort((a,b)=>a.dates.commentEnd.localeCompare(b.dates.commentEnd))
     .map(t=>({id:t.id,name:cpPublic(t),opens:t.dates.commentStart,closes:t.dates.commentEnd,wr:t.wr,workgroup:t.workgroup||'',commentForm:'https://resources.mismo.org/forms/comment/?wr='+encodeURIComponent(t.wr)}));
   const recent=webRecent();
   return {updated:td,libraryUrl:'https://collaborate.mismo.org/mismolibraries',recent,commentPeriods:cps,source:'MISMO Manufacturing System'};
@@ -6500,6 +6505,7 @@ async function wpPut(name,content){ const tok=window.ResourcesSession&&Resources
   for(let a=0;a<4;a++){ try{ const r=await fetch(RELAY()+'/mms/data/'+encodeURIComponent(name),{method:'PUT',headers:{'Content-Type':'application/json',Authorization:'Bearer '+tok},body:JSON.stringify({content})}); if(r.ok) return; if(r.status===409) return; /* each piece has its own name, so a conflict means an earlier try already saved it */ if(r.status===401||r.status===403) throw new Error('no access'); }catch(e){ if(/no access|signed out/.test(e.message)) throw e; } await new Promise(z=>setTimeout(z,800*(a+1))); }
   throw new Error('the save service is busy'); }
 async function wpQueue(t,v,files){
+  if(t&&t.practice){ toast('Practice: nothing is sent to the website'); return; }
   files=(files||[]).filter(Boolean); const W0=(S.tickets[t.id]||t).wp||{}; const id=(W0.queuedAt&&W0.id)?W0.id:wpSlug(v.wpid); const mo=!!v.wpmo;
   v.wpsum=String(v.wpsum||'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
   if(W0.queuedAt&&W0.title&&String(v.wptitle).trim()&&W0.title.trim()!==String(v.wptitle).trim()){ const al=String(v.wpalias||'').split(',').map(x=>x.trim()).filter(Boolean); if(!al.some(x=>x.toLowerCase()===W0.title.trim().toLowerCase())) al.push(W0.title.trim()); v.wpalias=al.join(', '); }
@@ -7130,7 +7136,7 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
       if(S.isStaff&&Object.keys(upd).length) await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; Object.entries(upd).forEach(([r,d])=>{ if(o.items&&o.items[r]) o.items[r].docs=d; }); return o; }); }catch(e){}
     // decided in the portal: bring the decisions home
     const items=(q&&q.data&&q.data.items)||{};
-    for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist||it.test) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
+    for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist||(it.test&&!(S.tickets[it.ticket]&&S.tickets[it.ticket].practice))) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
       const d=await rGet(IMR,'rev-'+imrSafe(it.rep)); if(!d||!d.data) continue; const doc=d.data;
       /* several people have the MMS open: the first to claim it moves the work request, the others leave it */
       const nq=Object.assign({},mine||{},{rep:it.rep,ticket:doc.ticket,wr:doc.wr,name:doc.name,status:'decided',decidedBy:it.decidedBy,decidedAt:it.decidedAt,agree:it.agree,counts:it.counts,pushed:true,home:S.me.name||'MMS',homeAt:new Date().toISOString()});
@@ -7214,10 +7220,10 @@ async function awgPushFromIm(t,doc,it){ const base=imrSafe((t.wr||'wr')+'-'+(atD
     ['body','at','alias','cg','rel','rf','rt','sc'].forEach(k=>{ if(r[k]) o[k]=r[k]; }); return o; });
   await ssReady(); const fac=personByName(t.facilitator)||{}; const docs=typeof ssDocs==='function'?ssDocs(t):[];
   const at=new Date().toISOString(); const nc=(((S.awgCfg||{}).calls)||[]).filter(x=>x>=today()).sort()[0]||'';
-  const adoc={rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',file:doc.file||'',at,by:'IM Review',fromIm:{rep:doc.rep,decidedAt:it.decidedAt,decidedBy:it.decidedBy,counts:it.counts||{}},imOutcome:'Approved',imDate:atDay(it.decidedAt),resub:doc.resub||null,rows,status:'awaiting',calls:[],call:{date:nc,method:'Standard Meeting',present:[],others:[],votes:{},outcome:'',conditions:'',notes:''}};
+  const adoc={test:!!(doc.test||t.practice),rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',file:doc.file||'',at,by:'IM Review',fromIm:{rep:doc.rep,decidedAt:it.decidedAt,decidedBy:it.decidedBy,counts:it.counts||{}},imOutcome:'Approved',imDate:atDay(it.decidedAt),resub:doc.resub||null,rows,status:'awaiting',calls:[],call:{date:nc,method:'Standard Meeting',present:[],others:[],votes:{},outcome:'',conditions:'',notes:''}};
   /* never overwrite a submission AWG already has: the chair may have drafted, recorded attendance or carried it */
   await awgUpdate('rev-'+rep,cur=>cur||adoc);
-  await awgUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!o.items[rep]) o.items[rep]={rep,fromImRep:doc.rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',status:'awaiting',sentAt:at,sentBy:'IM Review',rows:rows.length,awgRows:rows.filter(r=>/awg/i.test(r.body||'')).length,resub:!!doc.resub,fac:{name:t.facilitator||'',email:fac.email||''},docs,flow:(S.notify&&S.notify.flowUrl&&!mailHeld()?S.notify.flowUrl:''),from:(S.notify&&S.notify.from)||'',fromIm:true}; return o; }); }
+  await awgUpdate('queue',cur=>{ const o=cur||{items:{}}; o.items=o.items||{}; if(!o.items[rep]) o.items[rep]={test:!!(doc.test||t.practice),rep,fromImRep:doc.rep,ticket:t.id,wr:t.wr,name:t.name,wg:t.workgroup||'',status:'awaiting',sentAt:at,sentBy:'IM Review',rows:rows.length,awgRows:rows.filter(r=>/awg/i.test(r.body||'')).length,resub:!!doc.resub,fac:{name:t.facilitator||'',email:fac.email||''},docs,flow:(S.notify&&S.notify.flowUrl&&!mailHeld()&&!t.practice?S.notify.flowUrl:''),from:(S.notify&&S.notify.from)||'',fromIm:true}; return o; }); }
 
 /* ---------- AWG Review: what's coming, the documents, and AWG's decisions coming home ---------- */
 let awgSyncing=false, awgSynced=0;
@@ -7234,7 +7240,7 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
     try{ const upd={}; Object.values(S.awgPortalQ).forEach(it=>{ if(it.hist||it.status==='decided') return; const t=S.tickets[it.ticket]||liveTickets().find(x=>x.wr===it.wr); if(!t||typeof ssDocs!=='function') return; const d=ssDocs(t); if(JSON.stringify(d)!==JSON.stringify(it.docs||[])||!it.ticket) upd[it.rep]={docs:d,ticket:t.id}; });
       if(Object.keys(upd).length) S.awgPortalQ=(await awgUpdate('queue',cur=>{ const o=cur||{items:{}}; Object.entries(upd).forEach(([r,v])=>{ if(o.items&&o.items[r]) Object.assign(o.items[r],v); }); return o; })).items; }catch(e){}
     // AWG decided: move the work request
-    for(const it0 of Object.values(S.awgPortalQ)){ if(it0.status!=='decided'||it0.hist||it0.test||it0.home) continue; const t0=S.tickets[it0.ticket]||liveTickets().find(x=>x.wr===it0.wr); if(!t0) continue;
+    for(const it0 of Object.values(S.awgPortalQ)){ if(it0.status!=='decided'||it0.hist||(it0.test&&!(S.tickets[it0.ticket]&&S.tickets[it0.ticket].practice))||it0.home) continue; const t0=S.tickets[it0.ticket]||liveTickets().find(x=>x.wr===it0.wr); if(!t0) continue;
       /* claim it first, so two open MMS pages don't both move the work request */
       let it=null; try{ const o=await awgUpdate('queue',cur=>{ it=null; const x=cur&&cur.items&&cur.items[it0.rep]; if(!x||x.home||x.status!=='decided') return cur; x.home=true; x.homeBy=S.me.name||'MMS'; x.homeAt=new Date().toISOString(); it=Object.assign({},x); return cur; }); S.awgPortalQ=(o&&o.items)||S.awgPortalQ; }catch(e){ it=null; }
       if(!it) continue; let t=await freshTicket(t0.id)||t0;
@@ -8052,6 +8058,18 @@ wireMain=function(m){ _wireMainMx(m); if(S.view!=='metrics') return;
 document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&S.view==='metrics'&&S.mx.drill&&!S.panel){ S.mx.drill=null; renderAll(); } });
 
 window.addEventListener('resize',()=>{ clearTimeout(window._mxRz); window._mxRz=setTimeout(()=>{ if(S.view==='metrics'){ S._lastHtml=''; renderAll(); } },250); });
+/* ---------- Practice work requests (Nov 24, 2026: Kellie, Meghan and Erin's working session) ----------
+   A work request with practice:true (WR number PRACTICE-…) moves through every step like a real one, but:
+   - only its facilitator and MISMO staff see it (allTickets, app1.js), and never in Metrics or digests;
+   - it sends no email (queueMail shows what would have gone), asks MISMO Media for nothing, puts nothing on the
+     website (comment periods, Find a Work Product) and teaches the reviews nothing;
+   - in IM Review and AWG Review it arrives marked as a test. */
+const _imPushPR=imPush;
+imPush=async function(rep){ const q=S.imq&&S.imq[rep]; const t=q&&S.tickets[q.ticket];
+  if(t&&t.practice){ q.test=true; if(S.imr[rep]) S.imr[rep].test=true; try{ await write('imqueue',rep,q); }catch(e){} }
+  return _imPushPR(rep); };
+const _vMetricsPR=VIEWS.metrics;
+VIEWS.metrics=function(){ S._noPractice=true; try{ return _vMetricsPR.apply(this,arguments); } finally{ S._noPractice=false; } };
 
 /* ================= Review fixes (Nov 2026): small additions layered on the screens above ================= */
 /* Pipeline Board: work requests sitting in a stage that has been switched off in Settings › Process are listed
@@ -8253,7 +8271,7 @@ async function rvDecSubmit(rep,box){
   if(S.viewAs){ toast('Viewing as someone else: choices aren’t saved'); return; }
   const K=rvDecKeys(rep), counts={update:0,dont:0,unsure:0,pass:0}, at=new Date().toISOString(), saves=[];
   K.forEach(k=>{ const c=rvDecOf(rep,k)||'pass'; counts[c]++; const id=rvFbId(rep,k), cur=S.rvfb[id]||{}; if(cur.choice===c) return; const it=rvFbItem(rep,k);
-    S.rvfb[id]=Object.assign({},cur,{rep:rep.id,kind:rep.kind,wr:rep.wr,key:k,src:it.src||'',rule:it.rule||'',area:it.area||'',text:rvTrim(it.issue||it.note||'',220),verdict:RV_DEC_TEACH[c],choice:c,by:S.me.name||'',at});
+    S.rvfb[id]=Object.assign({},cur,{rep:rep.id,kind:rep.kind,wr:rep.wr,key:k,src:it.src||'',rule:it.rule||'',area:it.area||'',text:rvTrim(it.issue||it.note||'',220),verdict:(S.tickets[rep.ticket]&&S.tickets[rep.ticket].practice)?'pass':RV_DEC_TEACH[c],choice:c,by:S.me.name||'',at});
     saves.push(write('rvfeedback',id,S.rvfb[id])); });
   const go=$('#rvdecgo',box); if(go) go.disabled=true;
   const r=Object.assign({},S.reviews[rep.id]||rep,{decided:{at,by:S.me.name||'',counts}}); const t=S.tickets[rep.ticket];
