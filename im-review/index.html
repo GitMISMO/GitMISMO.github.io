@@ -1167,7 +1167,10 @@ function callCard(doc,can){ if(doc.hist) return ''; const decided=doc.status==="
   /* who was there comes from Meeting Trackers, where Erin logs each IM call */
   const a=(S.att||{})[c.date], known=!!(a&&a.present&&a.present.length); c.present=known?a.present.slice():[]; c.others=known?(a.others||[]).slice():[];
   const V=imVoters(), here=known?V.filter(m=>c.present.includes(m.name)):[], q=here.length>=imNeed(), open=S.callOpen===doc.rep;
-  const dates=[...new Set([c.date].concat(imCalls(4)).concat(Object.keys(S.att||{}).filter(d=>d>=String(doc.at||"").slice(0,10)&&d<=todayS())))].filter(Boolean).sort();
+  /* the last four IM calls too (Nov 24, Erin: iLAD was decided on the Nov 23 call, before it was sent here), counted back a week at a time from the calendar's first call */
+  const td=todayS(), kn=(S.cfg.calls||IM_CALLS0).slice().sort(), past=[]; for(let d=kn[0]?addD(kn[0],-7):"",k=0;d&&past.length<4&&k<20;d=addD(d,-7),k++) if(d<=td&&!mismoHoliday(d)) past.push(d);
+  kn.filter(d=>d<=td).forEach(d=>past.push(d));
+  const dates=[...new Set([c.date].concat(past.filter(d=>d>=addD(td,-35))).concat(imCalls(4)).concat(Object.keys(S.att||{}).filter(d=>d>=addD(td,-35)&&d<=td)))].filter(Boolean).sort();
   return '<div class="card imcall"><div class="ic-h"><h3>The IM Call</h3>'+(can&&!decided?'<select class="inp sel" data-icdate="1" aria-label="Call date">'+dates.map(d=>'<option value="'+d+'"'+(d===c.date?' selected':'')+'>'+esc(fmtL(d))+'</option>').join('')+'</select>':'<b>'+esc(fmtL(c.date))+'</b>')+
     (known?'<span class="q '+(q?'ok':'no')+'">'+here.length+' of '+V.length+' voting members · '+imNeed()+' needed · '+(q?'Quorum ✓':'No quorum')+'</span><button type="button" class="lnk" data-icopen="1">'+(open?'Hide Who Was There':'Who Was There')+'</button>':'<span class="q no">Not in Meeting Trackers yet</span><span class="muted">The facilitator logs attendance in Meeting Trackers after the call.</span>')+'</div>'+
     (known&&open?'<p class="muted ic-who">'+esc(here.map(m=>m.name).join(', '))+(c.others.length?'; also '+esc(c.others.join(', ')):'')+'</p>':'')+'</div>'; }
