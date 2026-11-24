@@ -1232,7 +1232,7 @@ steps:[["Select Update a Contact","On Contact Updates, or at the top of Home. St
 ["Pick What's Changing","Add Someone New, Change Someone's Details or Roles, or Someone Has Left the Company. For a change or someone leaving, choose the contact; their details fill in so you only change what's different."],
 ["Fill In the Details","First and last name, title, email and phone, and tick their roles: Primary, Alternate, Billing, Marketing, Voting Rep and the rest. For a change, the roles ticked replace the contact's roles."],
 ["Send to Member 360","It saves with your name and the time. Member 360 puts it on the company's record as soon as Member 360 is open, usually within minutes, and the update then shows In Member 360."]],
-notes:["<b>Sent one by mistake?</b> Open it and select Withdraw This Update while it still shows On the Way. Once it's In Member 360, send another update to put it right.","<b>Needs a Look</b> means Member 360 couldn't apply it, for example the contact was no longer on the record. The reason shows when you open it.","<b>Someone who has left</b> moves to Former Contacts on the company's record in Member 360. Nothing is deleted, and Aptify isn't changed: Member 360 is where MISMO's contacts and roles are kept."]},
+notes:["<b>Sent one by mistake?</b> Open it and select Withdraw This Update while it still shows On the Way. Once it's In Member 360, send another update to put it right.","<b>Needs a Look</b> means Member 360 couldn't apply it, for example the contact was no longer on the record. The reason shows when you open it.","<b>Company not in the list?</b> Type its full name. If it really isn't in Member 360 under another name, Member 360 adds it as a new prospect with the person you add. Add its Aptify Company ID if it has one, so the right record is found.","<b>Someone who has left</b> moves to Former Contacts on the company's record in Member 360. Nothing is deleted, and Aptify isn't changed: Member 360 is where MISMO's contacts and roles are kept."]},
 {id:"faq",k:"#ff8f7d",name:"Questions",faq:[
   ["Where do I find the Aptify Company ID?","It's the ID on the company's record in Aptify. For a new company, add it in Aptify first and use the ID it's given."],
   ["Where do I find the order number?","It's the ID of the membership order you created in Aptify for this set-up."],
@@ -1361,7 +1361,7 @@ const ch=$("cu-chips");ch.textContent="";[["","Everything"],["wait","On the Way"
 ch.appendChild(h("button",{type:"button",class:"chipb"+(cuF===v?" on":""),"aria-pressed":cuF===v?"true":"false",style:"--k:"+(v?KC2[v]:"#b79cff"),onclick:()=>{cuF=v;cuPg=0;renderContacts();}},h("i",null),l,h("em",null,String(n))));});
 const F=L.filter(u=>!cuF||cuState(u).k===cuF),per=25,pages=Math.max(1,Math.ceil(F.length/per));if(cuPg>=pages)cuPg=pages-1;
 const box=$("cu-list");box.textContent="";F.slice(cuPg*per,cuPg*per+per).forEach(u=>box.appendChild(cuRow(u)));
-if(!F.length){if(L.length)box.appendChild(h("div",{class:"empty"},"Nothing here."));else{const ic=h("span",{class:"ac-i"});ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M18 8v6M15 11h6"/></svg>';box.appendChild(h("div",{class:"cu-start"},ic,h("div",null,h("b",null,"No contact updates yet"),h("span",null,"When a member tells you about a new contact, a new email or title, new roles, or someone who has left, send it here. It goes straight into Member 360, and every update you send is listed here.")),h("button",{type:"button",class:"btn",onclick:()=>openCU(null)},"Update a Contact")));}}
+if(!F.length){if(L.length)box.appendChild(h("div",{class:"empty"},"Nothing here."));else{const ic=h("span",{class:"ac-i"});ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M18 8v6M15 11h6"/></svg>';box.appendChild(h("div",{class:"cu-start"},ic,h("div",null,h("b",null,"No contact updates yet"),h("span",null,"When a member tells you about a new contact, a new email or title, new roles, or someone who has left, select Update a Contact at the top. It goes straight into Member 360, and every update you send is listed here."))));}}
 const pg=$("cu-pager");pg.textContent="";pg.hidden=pages<2;
 if(pages>1)pg.append(h("button",{type:"button",disabled:cuPg?null:"",onclick:()=>{cuPg--;renderContacts();}},"‹ Newer"),h("span",null,"Page "+(cuPg+1)+" of "+pages),h("span",{class:"sp"},F.length+" updates"),h("button",{type:"button",disabled:cuPg<pages-1?null:"",onclick:()=>{cuPg++;renderContacts();}},"Older ›"));
 {const cn=$("cu-co-n");if(cn)cn.textContent=CO.length?CO.length.toLocaleString("en-US")+" companies to choose from":"";}$("cu-h").textContent=F.length?F.length+" "+(F.length===1?"update":"updates")+", newest first":"";
@@ -1390,13 +1390,14 @@ const act=h("select",{id:"cu-act"},...Object.keys(CU_ACT).map(k=>h("option",{val
 const who=h("select",{id:"cu-who"});
 const fn=h("input",{id:"cu-fn",autocomplete:"off"}),ln=h("input",{id:"cu-ln",autocomplete:"off"}),ti=h("input",{id:"cu-ti",autocomplete:"off"}),em2=h("input",{id:"cu-em",type:"email",autocomplete:"off"}),ph=h("input",{id:"cu-ph",autocomplete:"off"}),note=h("textarea",{id:"cu-note",rows:"2",placeholder:"e.g. from Jane's email of Nov 20"});
 const rbox=h("div",{class:"cu-roles"},...CU_ROLES.map(r=>h("label",{class:"cu-role"},h("input",{type:"checkbox",value:r}),h("span",null,r))));
+const cidI=h("input",{id:"cu-cid",inputmode:"numeric",autocomplete:"off",placeholder:"e.g. 724700"}),cidF=h("div",{class:"fld",hidden:""},h("label",{for:"cu-cid"},"Aptify Company ID"),cidI,h("small",null,"Optional, for a company that isn't in Member 360 yet"));
 const curBox=h("div",{class:"cu-cur"}),say=h("span",{class:"saynote"},"Saves with your name and the time.");
 let C=null;
 const findCo=()=>{const v=co.value.trim().toLowerCase();C=v?(CO.find(c=>c.n.toLowerCase()===v)||null):null;return C;};
-const fillWho=()=>{who.textContent="";if(!C){who.disabled=true;who.appendChild(h("option",{value:""},co.value.trim()?"Choose the company from the list":"Choose the company first"));return;}
+const fillWho=()=>{who.textContent="";if(!C){who.disabled=true;who.appendChild(h("option",{value:""},co.value.trim()?"Not in Member 360 yet":"Choose the company first"));return;}
 who.disabled=false;who.appendChild(h("option",{value:""},C.p.length?"Choose the contact":"No contacts on file"));C.p.forEach((p,i)=>who.appendChild(h("option",{value:String(i)},(p[1]||p[3])+(p[1]&&p[3]?" · "+p[3]:""))));};
-const showCur=()=>{curBox.textContent="";if(!C){curBox.appendChild(h("div",{class:"empty"},CO.length?"Choose a company to see its contacts in Member 360.":"The company list comes from Member 360 and arrives the next time Member 360 is open."));return;}
-curBox.appendChild(h("div",{class:"cu-ch"},C.n+(C.cid?" · Aptify ID "+C.cid:"")+(C.m?" · Member":" · Prospect")));
+const showCur=()=>{curBox.textContent="";cidF.hidden=!!C||!co.value.trim();if(!C){curBox.appendChild(h("div",{class:"empty"},co.value.trim()?"Not in Member 360 yet. If it isn't in the list under another name, send it: Member 360 adds "+co.value.trim()+" as a new prospect with this contact. Add its Aptify Company ID if it has one.":CO.length?"Choose a company to see its contacts in Member 360.":"The company list comes from Member 360 and arrives the next time Member 360 is open."));return;}
+curBox.appendChild(h("div",{class:"cu-ch"},C.n+(C.cid?" · Aptify ID "+C.cid:"")+(C.m?" · Member":(!C.l||C.l==="Prospect")?" · Prospect":" · "+({"Former":"Former Member","Lost":"Lost","IIF Invoiced":"IIF Lender","Other":"Other"}[C.l]||C.l))));
 if(!C.p.length)curBox.appendChild(h("div",{class:"empty"},"No contacts on file yet."));
 C.p.forEach(p=>curBox.appendChild(h("div",{class:"cu-p"},h("b",null,p[1]||p[3]||"No name"),h("span",null,[p[2],p[3]].filter(Boolean).join(" · ")),p[4]?h("em",null,p[4].split(",").join(" · ")):null)));};
 const clear=()=>{[fn,ln,ti,em2,ph].forEach(x=>x.value="");rbox.querySelectorAll("input").forEach(i=>i.checked=false);};
@@ -1405,17 +1406,20 @@ const pickWho=()=>{const p=C&&who.value!==""?C.p[+who.value]:null;clear();if(!p)
 co.addEventListener("input",()=>{findCo();fillWho();showCur();});act.addEventListener("change",sync);who.addEventListener("change",pickWho);
 const send=h("button",{type:"button",class:"btn",onclick:async()=>{const a=act.value;[co,who,fn,em2].forEach(x=>x.classList.remove("bad"));
 if(!co.value.trim()){co.classList.add("bad");say.textContent="Enter the company.";co.focus();return;}
-findCo();if(!C){co.classList.add("bad");say.textContent="Choose the company from the list, so Member 360 finds the right record.";co.focus();return;}
+findCo();const nc=co.value.trim(),cidV=cidI.value.trim();[act,cidI].forEach(x=>x.classList.remove("bad"));
+if(!C&&a!=="add"){act.classList.add("bad");say.textContent="A company that isn't in Member 360 yet can only have someone added.";act.focus();return;}
+if(!C&&nc.length<3){co.classList.add("bad");say.textContent="Enter the company's full name.";co.focus();return;}
+if(!C&&cidV&&!/^\d{3,9}$/.test(cidV)){cidI.classList.add("bad");say.textContent="The Aptify Company ID is numbers only.";cidI.focus();return;}
 const p=a!=="add"&&who.value!==""?C.p[+who.value]:null;if(a!=="add"&&!p){who.classList.add("bad");say.textContent="Choose the contact.";who.focus();return;}
 const name=[fn.value.trim(),ln.value.trim()].filter(Boolean).join(" "),e=em2.value.trim();
 if(a==="add"&&!name&&!e){fn.classList.add("bad");say.textContent="Enter at least a name or an email.";fn.focus();return;}
 if(e&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){em2.classList.add("bad");say.textContent="That email doesn't look right.";em2.focus();return;}
 const roles=[...rbox.querySelectorAll("input:checked")].map(i=>i.value);send.disabled=true;say.textContent="Saving…";
-const L=a==="left";const x={id:"cu-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),at:new Date().toISOString(),by:me.email||"",byName:me.name||"",key:C.k,cid:C.cid||"",company:C.n,action:a,
+const L=a==="left";const x={id:"cu-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),at:new Date().toISOString(),by:me.email||"",byName:me.name||"",key:C?C.k:"",cid:C?(C.cid||""):cidV,company:C?C.n:nc,newCo:!C,action:a,
 target:p?{key:p[0],name:p[1]||"",email:p[3]||""}:null,name:L?(p[1]||""):name,first:L?"":fn.value.trim(),last:L?"":ln.value.trim(),title:L?"":ti.value.trim(),email:L?(p[3]||""):e,phone:L?"":ph.value.trim(),roles:L?[]:roles,note:note.value.trim()};
 if(!await cuSave(P=>{P.items.push(x);},cuWhat(x)+" at "+x.company+": sent to Member 360")){send.disabled=false;say.textContent=window.DESK_TEST?"This is the test copy, so nothing is saved.":"That didn't save. Please try again.";}}},"Send to Member 360");
 B.appendChild(h("div",{class:"sect"},h("h3",null,"The Update"),h("div",{class:"form"},dl,
-h("div",{class:"fld wide"},h("label",{for:"cu-co"},"Company"),co,h("small",null,"As it is in Member 360, members and prospects")),
+h("div",{class:"fld wide"},h("label",{for:"cu-co"},"Company"),co,h("small",null,"Pick it from the list. Not there? Type its full name and Member 360 adds it as a new prospect")),cidF,
 h("div",{class:"fld"},h("label",{for:"cu-act"},"What's Changing"),act),
 h("div",{class:"fld"},h("label",{for:"cu-who"},"Which Contact"),who),
 h("div",{class:"fld"},h("label",{for:"cu-fn"},"First Name"),fn),
