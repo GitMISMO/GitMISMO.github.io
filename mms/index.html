@@ -2168,7 +2168,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-24T01:13:49Z',fp:'70abf80e'};
+window.__mmsBuild={at:'2026-11-24T14:42:44Z',fp:'82ecc089'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2401,7 +2401,7 @@ function whoseMove(t){
       if(sub==='updates') return {role:'facilitator',label:'Facilitator',text:'Make the '+nm+' updates, then resubmit'};
       if(sub==='prep') return {role:'facilitator',label:'Facilitator',text:'Submit to '+nm+' through MISMO Connect'};
       const pq=typeof portalItemFor==='function'?portalItemFor(t,t.stage):null; if(pq) return {role:'imawg',label:nm+' Review',text:pq.status==='carried'?'Carried to the next AWG call':(t.stage==='awg'?'On the AWG agenda':'With the IM reviewers'+(pq.rows&&pq.done?': '+pq.done+' of '+pq.rows+' rows decided':''))};
-      return {role:'imawg',label:'IM and AWG',text:sub==='in-review'?nm+' is reviewing':t.stage==='im'?'Run the IM Pre-Review and send it to IM Review':'Waiting for '+nm+' Review'};
+      return {role:'imawg',label:'IM and AWG',text:sub==='in-review'?nm+' is reviewing':t.stage==='im'?'Send it to IM: run Reference Model QC if it has Reference Model changes':'Waiting for '+nm+' Review'};
     }
     case 'designation': { /* the License Designator designates; nothing waits for a second approval (Jonna, Nov 20) */
       const ld=peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'License Designator';
@@ -2834,10 +2834,10 @@ function stageActions(t){
       /* the review itself happens in IM Review / AWG Review; its decision moves the work request */
       if(sub!=='updates'&&sub!=='prep'){ const pq=typeof portalItemFor==='function'?portalItemFor(t,k):null;
         if(pq) add('Open in '+nm+' Review ↗',()=>portalOpen(k,pq.rep),'pri');
-        else if(k==='im') add('Run the IM Pre-Review →',()=>{ S.ptab='reviews'; rvRun(t,'im'); },'pri');
+        else if(k==='im'){ add('Run Reference Model QC →',()=>{ S.ptab='reviews'; rvRun(t,'im'); },'pri'); if(typeof imSendDocsOnly==='function') add('No Reference Model Changes: Send to IM',()=>imSendDocsOnly(t)); }
         else add('Open AWG Review ↗',()=>portalOpen('awg',''),'pri'); }
-      /* skipping a review is MISMO staff's call, and it asks first (Nov 23: a facilitator clicked it thinking it skipped the IM Pre-Review) */
-      if(S.isStaff) add('Not Required: Skip '+nm+' Review',async()=>{ const ok=await modal({title:'Skip '+nm+' Review?',body:'<p style="margin:0">'+esc(t.wr)+' goes straight to '+esc(stageDef(nextStage(t)).name)+' without '+esc(nm)+' reviewing it. Only do this when '+esc(nm)+' review isn’t required. (This isn’t the IM Pre-Review.)</p>',ok:'Skip '+nm+' Review'}); if(ok) return move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)'})},text:nm+' review not required; skipped'}); },'ghost');
+      /* skipping a review is MISMO staff's call, and it asks first (Nov 23: a facilitator clicked it thinking it skipped the Reference Model QC) */
+      if(S.isStaff) add('Not Required: Skip '+nm+' Review',async()=>{ const ok=await modal({title:'Skip '+nm+' Review?',body:'<p style="margin:0">'+esc(t.wr)+' goes straight to '+esc(stageDef(nextStage(t)).name)+' without '+esc(nm)+' reviewing it. Only do this when '+esc(nm)+' review isn’t required. (This isn’t the Reference Model QC.)</p>',ok:'Skip '+nm+' Review'}); if(ok) return move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)'})},text:nm+' review not required; skipped'}); },'ghost');
       break; }
     case 'designation':
       if(S.isStaff||isRole('vps',S.me)||isRole('director',S.me)){ add('Designate as Recommended →',()=>approveRec(t),'pri'); add('Change the Designation',()=>directorRec(t)); }
@@ -2956,7 +2956,7 @@ async function changeTarget(t){
   hist(x,'Target to Submit to IM changed'+(old?' from '+fmt(old):'')+' to '+fmt(v.d),{note:v.why}); await saveTicket(x,'Target updated',b);
 }
 async function submitAI(t){
-  const v=await modal({title:'Submit for AI Review',text:'Claude checks the work product the way MISMO’s editor would and lists anything to fix before IM. You’ll see the report on the Reviews tab, usually within a few minutes. Fix what it lists, then run the IM Pre-Review to send it to IM.',ok:'Submit',body:fld('Work Product File Link',inp('link',(t.links&&t.links.workFile)||'','SharePoint or MISMO Connect link'))+fld('Note for the Review',ta('note','','Anything the review should know'))});
+  const v=await modal({title:'Submit for AI Review',text:'Claude checks the work product the way MISMO’s editor would and lists anything to fix before IM. You’ll see the report on the Reviews tab, usually within a few minutes. Fix what it lists, then run the Reference Model QC to send it to IM.',ok:'Submit',body:fld('Work Product File Link',inp('link',(t.links&&t.links.workFile)||'','SharePoint or MISMO Connect link'))+fld('Note for the Review',ta('note','','Anything the review should know'))});
   if(!v) return; const x=clone(t); x.links=Object.assign({},x.links,{workFile:v.link}); x.ai=Object.assign({},x.ai,{note:v.note});
   const nt=await move(x,'aireview',{text:'Submitted for AI Review',note:v.note}); if(nt) aiReview(nt);
 }
@@ -3574,7 +3574,7 @@ function wireArch(m){
   function pastTarget(t, today) { var d = t.dates || {}; return t.state === 'active' && !t.split && !t.rides && d.targetIM && d.targetIM < today && ['approved', 'cfp', 'kickoff', 'work', 'aireview'].indexOf(t.stage) >= 0; }
   /* ---------- whose move it is: the MMS's own My Queue rule, so the scheduled sender's email
      matches My Queue. A copy of whoseMove() (app1.js) with its wrappers: Architecture Help
-     (archwr.js) and the IM Pre-Review step (imdesk.js); isMine() with the IM and AWG
+     (archwr.js) and the Reference Model QC step (imdesk.js); isMine() with the IM and AWG
      facilitator rule (cpcard.js); dueNow() and waitingOn() (app1.js). The MMS passes its own
      moveFor, which always wins; this is used when nothing is passed (the GitHub sender). ---------- */
   var ASK_THIS = { hold: 'put this on hold', resume: 'resume this', close: 'close this', cancel: 'cancel this' };
@@ -3616,7 +3616,7 @@ function wireArch(m){
         if (sub === 'prep') return { role: 'facilitator', text: 'Submit to ' + nm + ' through MISMO Connect' };
         var pq = portalItemFor(ctx, t, t.stage);
         if (pq) return { role: 'imawg', text: pq.status === 'carried' ? 'Carried to the next AWG call' : (t.stage === 'awg' ? 'On the AWG agenda' : 'With the IM reviewers' + (pq.rows && pq.done ? ': ' + pq.done + ' of ' + pq.rows + ' rows decided' : '')) };
-        return { role: 'imawg', text: sub === 'in-review' ? nm + ' is reviewing' : t.stage === 'im' ? 'Run the IM Pre-Review and send it to IM Review' : 'Waiting for ' + nm + ' Review' };
+        return { role: 'imawg', text: sub === 'in-review' ? nm + ' is reviewing' : t.stage === 'im' ? 'Send it to IM: run Reference Model QC if it has Reference Model changes' : 'Waiting for ' + nm + ' Review' };
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
@@ -3632,10 +3632,10 @@ function wireArch(m){
     var w = baseMove(ctx, t);
     /* Architecture Help (archwr.js): building work waits on its open architecture tasks */
     if (t.stage === 'work' && t.state === 'active' && w.role === 'facilitator') { var L = archOpenFor(ctx, t); if (L.length) w = { role: w.role, text: 'Waiting on Architecture Help (' + L.map(function (a) { return a.id; }).join(', ') + '), then submit for AI Review' }; }
-    /* the IM Pre-Review (imdesk.js): the facilitator runs it and sends it to IM */
+    /* the Reference Model QC (imdesk.js): the facilitator runs it and sends it to IM */
     if (t.state === 'active' && !t.request && !t.split && !t.rides && t.stage === 'im' && ['', 'new', 'resubmitted'].indexOf(t.sub || '') >= 0 && !portalItemFor(ctx, t, 'im')) {
       var Q = ctx.imq || {}, sent = Object.keys(Q).some(function (k) { var q = Q[k]; return q && q.ticket === t.id && q.status === 'awaiting'; });
-      w = sent ? { role: 'imawg', text: 'Sent to IM; it reaches IM Review when Erin or MISMO staff next open the MMS' } : { role: 'facilitator', text: 'Run the IM Pre-Review and send it to the IM reviewers' };
+      w = sent ? { role: 'imawg', text: 'Sent to IM; it reaches IM Review when Erin or MISMO staff next open the MMS' } : { role: 'facilitator', text: 'Send it to IM: run Reference Model QC if it has Reference Model changes' };
     }
     return w;
   };
@@ -5300,7 +5300,7 @@ const RV_BOILER={"draft": ["©2026 Mortgage Industry Standards Maintenance Organ
 /* =====================================================================
    Two separate reviews, each with its own report:
      1. AI Review (editor and readiness in one): the work product itself (Word, Excel).
-     2. IM Pre-Review: the IM Submission Form, row by row, the way IM reads it.
+     2. Reference Model QC: the IM Submission Form, row by row, the way IM reads it.
    Software checks the things that have one right answer (boilerplate word for
    word, copyright year, page numbers, merged cells, required columns,
    definition templates). Claude adds the editor's judgment. Neither one ever
@@ -5528,7 +5528,7 @@ function rvEditorChecks(files,ctx){
   return out;
 }
 
-/* ---------- 2. IM Pre-Review: the checks software can settle ---------- */
+/* ---------- 2. Reference Model QC: the checks software can settle ---------- */
 const RV_TEMPLATES={Amount:/^the\b.*\b(amount|sum)\b/i,Count:/^the\b.*\bnumber of\b/i,Date:/^the date\b/i,Datetime:/^the date and time\b/i,Day:/^the day of the month\b/i,Description:/^a free-form text field\b/i,Identifier:/^an? unique alphanumeric string\b/i,Indicator:/^when true, indicates\b/i,Month:/^the month\b/i,Name:/^an unstructured name\b/i,Number:/^a numeric value\b/i,Percent:/^a portion of 100\b/i,Rate:/^a decimal value\b/i,Text:/^a free-form alphanumeric string\b/i,Time:/^the time of day\b/i,Type:/^a value from a mismo prescribed list\b/i,Value:/^the specific value of\b/i,Year:/^the calendar year\b/i,Code:/^an? .*(enumerated|coded) value\b/i};
 const RV_TEMPLATE_TEXT={Amount:'The [qualifier] amount of [thing]…',Count:'The [qualifier] number of [thing counted]…',Date:'The date [event or action]…',Datetime:'The date and time [event or action]…',Day:'The day of the month [event]…',Description:'A free-form text field describing [thing]…',Identifier:'A unique alphanumeric string identifying [thing]…',Indicator:'When true, indicates [positive situation]…',Month:'The month in a year that [event]…',Name:'An unstructured name that identifies [person, entity, place or thing]…',Number:'A numeric value that specifies [thing]…',Percent:'A portion of 100 that represents [usage or calculation]…',Rate:'A decimal value representing a fraction of one…',Text:'A free-form alphanumeric string which contains [thing]…',Time:'The time of day [event]…',Type:'A value from a MISMO prescribed list that represents [thing enumerated]…',Value:'The specific value of [thing]…',Year:'The calendar year [event]…',Code:'An [length] enumerated or coded value identifying [thing]…'};
 const RV_ABBR=/\b(amt|nbr|num|pct|info|desc|dt|ind|qty|acct|mgmt|condo|govt|dept|addr|tel|ph|cnt|yr|mo)\b/i;
@@ -5720,7 +5720,7 @@ function rvReportHtml(rep,forWord){
   const fbOn=!forWord&&typeof rvFbCell==='function';
   const tbl=(head,rows)=>rows.length?'<table class="rvt"><thead><tr>'+head.map(h=>'<th>'+e(h)+'</th>').join('')+(fbOn?(rep.kind!=='im'&&typeof rvDecHead==='function'?rvDecHead():'<th class="rv-fbh">Right?</th>'):'')+'</tr></thead><tbody>'+rows.map(r=>{ const k=r.key; const cells=r.cells||r; return '<tr>'+cells.map(c=>'<td>'+c+'</td>').join('')+(fbOn?(rep.kind!=='im'&&typeof rvDecCell==='function'?'<td class="rv-decc">'+(k?rvDecCell(rep,k):'')+'</td>':'<td class="rv-fbc">'+(k?rvFbCell(rep,k):'')+'</td>'):'')+'</tr>'; }).join('')+'</tbody></table>':'';
   const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'f'+i},f)), fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
-  const title=rep.kind==='im'?'IM Pre-Review Report':'AI Review Report';
+  const title=rep.kind==='im'?'Reference Model QC Report':'AI Review Report';
   let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(atDay(rep.at)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'&&rep.types&&rep.types.length?' · Reviewed as: '+e(rep.types.map(x=>x.name+' ('+x.type+')').join(', ')):'')+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):(rep.rm?' · Checked against the '+e(rep.rm):''))+'</div>'+
     '<div class="rvr-score rv-'+e(rvShown(rep).k)+'"><b>'+e(rvShown(rep).l)+'</b> <span>'+fx.length+' '+rvShown(rep).fx+' · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
     (rvPassAll(rep)?'<p class="rvr-note"><b>Everyone passes the AI Review while the process is new.</b> The findings below are suggestions to make the work stronger before IM; nothing here holds the work request back.</p>':'')+(rep.kind!=='im'&&rep.decided?'<p class="rvr-note"><b>Choices submitted</b> '+e(fmt(atDay(rep.decided.at)))+' by '+e(rep.decided.by||'')+': '+e(rvDecSummary(rep.decided.counts))+'.</p>':'')+(rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
@@ -5737,7 +5737,7 @@ function rvReportHtml(rep,forWord){
   if(!forWord) return h;
   return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+e(title)+'</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#0d314c}h2{font-size:16pt;margin:4pt 0}h3{font-size:13pt;margin:14pt 0 4pt;color:#0d314c}.rvr-k{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#456179}.rvr-m,.rvr-note{font-size:9.5pt;color:#456179}.rvr-score b{font-size:13pt;margin-right:8pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #adc4d6;padding:4pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#e4f2fb}</style></head><body>'+h+'<p class="rvr-note">©'+RV_YEAR()+' Mortgage Industry Standards Maintenance Organization, Inc. Prepared by the MISMO Manufacturing System.</p></body></html>';
 }
-function rvDownload(rep){ const html=rvReportHtml(rep,true); const blob=new Blob(['\ufeff',html],{type:'application/msword'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(rep.kind==='im'?'IM Pre-Review':'AI Review')+' - '+rep.wr+' - '+atDay(rep.at)+'.doc'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
+function rvDownload(rep){ const html=rvReportHtml(rep,true); const blob=new Blob(['\ufeff',html],{type:'application/msword'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(rep.kind==='im'?'Reference Model QC':'AI Review')+' - '+rep.wr+' - '+atDay(rep.at)+'.doc'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
 /* ---------- AI Review: Dataset Review (Nov 23, 2026, Jonna) ----------
    Three kinds of review, picked by the file:
    - Document Review (Word, PDF): the editor and boilerplate review, read part by part.
@@ -5805,7 +5805,7 @@ async function rvAiDataset(f,ctx){
     '\n\nAnswer in this compact JSON only (no other text): {"s":"one sentence on the dataset","r":"ready|minor|needs","p":[["the pattern","how widespread, with 2 or 3 example rows","the suggestion","short category"]],"q":["question for the facilitator"]}. At most 8 items in p and 2 in q, most important first, each string under 30 words. Answer right away.\n\nDATASET:\n'+rvDatasetProfile(f);
   return await rvAsk(prompt); }
 /* ============================================================================
-   The MISMO Reference Model (Logical Data Dictionary) for the IM Pre-Review.
+   The MISMO Reference Model (Logical Data Dictionary) for the Reference Model QC.
    Loaded from the private mms-data repo (rm-meta + rm-dp1..n), which holds a
    compact copy of the current LDD taken from the Resource Library package.
    ============================================================================ */
@@ -6076,8 +6076,8 @@ function rvFbAvoid(kind){ return Object.values(S.rvfb||{}).filter(f=>f&&f.kind==
 
 const RV_KIND={editor:{title:'AI Review',short:'AI Review',accept:'.docx,.xlsx,.xlsm,.csv,.pdf',multiple:true,
     intro:'Add the work product files (Word, Excel, CSV or PDF). Each file gets the review that fits it: Word and PDF documents get an editor’s read for spelling, grammar, terms, acronyms and MISMO voice, following the habits of MISMO’s editor (Erin); datasets (Excel or CSV data) are looked over as a whole for patterns, not cell by cell; the IM/AWG Submission Form is read on its three tabs. Software checks the boilerplate word for word, copyright, page numbers and setup. Nothing in your files is changed or stored.'},
-  im:{title:'IM Pre-Review',short:'IM Pre-Review',accept:'.xlsx,.xlsm',multiple:false,
-    intro:'Add the IM/AWG Submission Form (July 2026 version). It checks the Face Page and every Reference Model row the way IM reads them: required columns, class words and definition templates, names, XPATHs and the Proposed Structure tab. Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided. Nothing in the form is changed or stored.'}};
+  im:{title:'Reference Model QC',short:'Reference Model QC',accept:'.xlsx,.xlsm',multiple:false,
+    intro:'Only for submissions with Reference Model changes. (No Reference Model changes? Close this and click No Reference Model Changes: Send to IM; the AI Review covers everything else.) Add the IM/AWG Submission Form (July 2026 version). It checks the Face Page and every Reference Model row the way IM reads them: required columns, class words and definition templates, names, XPATHs and the Proposed Structure tab. Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided. Nothing in the form is changed or stored.'}};
 
 function rvRun(t,kind){
   const K=RV_KIND[kind], root=$('#modal-root'); const exp=rvExpectedBoiler(t);
@@ -6110,7 +6110,7 @@ function rvRun(t,kind){
       if(kind==='editor'&&S.tickets[t.id]){ const x=clone(S.tickets[t.id]); const round={at:rep.at,by:rep.by,verdict:(rep.readiness==='ready'||rvPassAll(rep))?'ready':'fix',summary:rep.readinessLabel+(rep.summary?': '+rep.summary:''),checks:[],edits:[],files:rep.files,report:rep.id};
         x.ai=Object.assign({},x.ai,{rounds:[...((x.ai&&x.ai.rounds)||[]),round]});
         if(x.stage==='aireview') await setSub(x,'reviewed','AI Review: '+rep.readinessLabel); else { hist(x,'AI Review: '+rep.readinessLabel); await saveTicket(x,'Review saved'); } }
-      else if(S.tickets[t.id]){ const x=clone(S.tickets[t.id]); hist(x,'IM Pre-Review: '+rep.readinessLabel); await saveTicket(x,'Review saved'); }
+      else if(S.tickets[t.id]){ const x=clone(S.tickets[t.id]); hist(x,'Reference Model QC: '+rep.readinessLabel); await saveTicket(x,'Review saved'); }
       root.innerHTML=''; rvShow(rep);
     }catch(e){ say(esc((e&&e.message)||'The review didn’t finish. Try again.'),'bad'); go.disabled=false; inp.disabled=false; }
   };
@@ -6132,15 +6132,15 @@ aiReview=function(t){ rvRun(t,'editor'); };
 /* ---------- on the work request ---------- */
 WH_IC.check='M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11';
 function rvCard(rep){ const F=rep.findings||[]; const fx=F.filter(f=>f.sev==='fix').length;
-  return '<button type="button" class="rv-card rv-'+esc(rvShown(rep).k)+'" data-rvopen="'+esc(rep.id)+'"><span class="rv-ck">'+esc(rep.kind==='im'?'IM Pre-Review':'AI Review')+'</span><b>'+esc(rvShown(rep).l)+'</b><span class="rv-cm">'+fx+' '+rvShown(rep).fx+' · '+(rep.kind==='im'?(rep.rows||[]).length+' rows to check':(rep.corrections||[]).length+' corrections')+'</span><span class="rv-cd">'+esc(fmtS(atDay(rep.at)))+' · '+esc(firstName(rep.by||''))+'</span></button>'; }
-/* the IM Pre-Review is sent to IM, so it is offered only once the work request is at AI Review or IM Review */
+  return '<button type="button" class="rv-card rv-'+esc(rvShown(rep).k)+'" data-rvopen="'+esc(rep.id)+'"><span class="rv-ck">'+esc(rep.kind==='im'?'Reference Model QC':'AI Review')+'</span><b>'+esc(rvShown(rep).l)+'</b><span class="rv-cm">'+fx+' '+rvShown(rep).fx+' · '+(rep.kind==='im'?(rep.rows||[]).length+' rows to check':(rep.corrections||[]).length+' corrections')+'</span><span class="rv-cd">'+esc(fmtS(atDay(rep.at)))+' · '+esc(firstName(rep.by||''))+'</span></button>'; }
+/* the Reference Model QC is sent to IM, so it is offered only once the work request is at AI Review or IM Review */
 function imReady(t){ return t&&t.state==='active'&&['aireview','im'].includes(t.stage)&&!t.split&&!t.rides; }
 function rvTabHtml(t){ rvEnsure(t); const L=rvFor(t), can=canAct(t)||S.isStaff, canIM=can&&imReady(t);
-  return '<div class="psec full rv-tab"><h4>Reviews'+(can?'<span class="sp"><button type="button" class="btn sm" data-rvrun="editor">Run AI Review</button>'+(canIM?'<button type="button" class="btn sm" data-rvrun="im">Run IM Pre-Review</button>':'')+'</span>':'')+'</h4>'+
-    '<p class="muted rv-why">Two steps before IM. <b>AI Review</b> reads the work product the way MISMO’s editor would (editor and readiness in one). <b>IM Pre-Review</b> then reads the IM Submission Form the way IM does, drafts IM’s decision for each row and sends it to the IM reviewers. Each one leaves a report here that facilitators and staff can open or download.</p>'+
-    (can&&!canIM&&t.state==='active'?'<p class="muted" style="font-size:12.5px;margin:0 0 8px">The IM Pre-Review opens once the work request is at AI Review or IM Review.</p>':'')+
+  return '<div class="psec full rv-tab"><h4>Reviews'+(can?'<span class="sp"><button type="button" class="btn sm" data-rvrun="editor">Run AI Review</button>'+(canIM?'<button type="button" class="btn sm" data-rvrun="im">Run Reference Model QC</button><button type="button" class="btn sm ghost" data-imdocsonly="'+esc(t.id)+'">No Reference Model Changes: Send to IM</button>':'')+'</span>':'')+'</h4>'+
+    '<p class="muted rv-why"><b>AI Review</b> reads every work product before IM, the way MISMO’s editor would. <b>Reference Model QC</b> is only for submissions with Reference Model changes: it reads the Reference Model Changes on the IM Submission Form the way IM does, drafts IM’s decision for each row and sends it to IM. No Reference Model changes? Click <b>No Reference Model Changes: Send to IM</b>. Each review leaves a report here that facilitators and staff can open or download.</p>'+
+    (can&&!canIM&&t.state==='active'?'<p class="muted" style="font-size:12.5px;margin:0 0 8px">The Reference Model QC opens once the work request is at AI Review or IM Review.</p>':'')+
     (L.length?'<div class="rv-list">'+L.map(rvCard).join('')+'</div>':'<div class="rv-list">'+rvNone('editor',can)+rvNone('im',canIM)+'</div>')+'</div>'; }
-function rvNone(k,can){ const tag=can?'button type="button" data-rvrun="'+k+'"':'div'; return '<'+tag+' class="rv-card rv-none"><span class="rv-ck">'+(k==='im'?'IM Pre-Review':'AI Review')+'</span><b>Not run yet</b><span class="rv-cm">'+(k==='im'?'Checks the IM Submission Form, then sends it to IM':'Run it before submitting to IM')+'</span></'+(can?'button':'div')+'>'; }
+function rvNone(k,can){ const tag=can?'button type="button" data-rvrun="'+k+'"':'div'; return '<'+tag+' class="rv-card rv-none"><span class="rv-ck">'+(k==='im'?'Reference Model QC':'AI Review')+'</span><b>Not run yet</b><span class="rv-cm">'+(k==='im'?'Checks the IM Submission Form, then sends it to IM':'Run it before submitting to IM')+'</span></'+(can?'button':'div')+'>'; }
 function rvLatestHtml(t){ rvEnsure(t); const L=rvFor(t); const ed=L.find(r=>r.kind==='editor'), im=L.find(r=>r.kind==='im');
   if(!ed&&!im&&!['work','aireview','im'].includes(t.stage)) return '';
   const can=canAct(t)||S.isStaff;
@@ -6918,7 +6918,7 @@ function mismoHoliday(ymd){ const d=new Date(String(ymd).slice(0,10)+"T12:00:00"
   if((m===11&&day>=25)||(m===0&&day===1)) return true;
   return false; }
 /* =====================================================================
-   IM Review Desk. The IM Pre-Review drafts IM's decision for every row of the
+   IM Review Desk. The Reference Model QC drafts IM's decision for every row of the
    IM Submission Form (decision, comment, suggested wording). IM reviewers
    (People and Roles › IM Reviewer) open the draft, agree or correct each row,
    and finish. Their corrections teach the next draft; once a kind of row has
@@ -7026,8 +7026,8 @@ async function imSend(t,rep){ imEnsureQ(); imEnsureR(t.id); const doc=S.imr[rep.
   const q={rep:rep.id,ticket:t.id,wr:t.wr,name:t.name,at:rep.at,status:'awaiting',sentAt:new Date().toISOString(),sentBy:S.me.name||'',rows:rows.length,look,clean:rows.length-look,form:rep.sp?{n:rep.sp.n,u:rep.sp.u}:null}; S.imq[rep.id]=q; await write('imqueue',rep.id,q);
   if(doc){ doc.status='awaiting'; await imSaveDoc(doc); }
   const to=peopleFor('imreview').map(p=>p.email).filter(Boolean);
-  if(to.length) await queueMail({to,subject:'IM review ready: '+t.wr+' '+t.name,body:t.wr+' '+t.name+' is ready for IM: '+rows.length+' rows, '+look+' to look at and '+(rows.length-look)+' with no issues found.\n\nOpen it in IM Review: https://resources.mismo.org/im-review/#/review/'+encodeURIComponent(rep.id)+'',kind:'imreview',key:'imreview-'+rep.id});
-  const x=clone(S.tickets[t.id]||t); hist(x,'IM Pre-Review sent to IM reviewers ('+rows.length+' rows, '+look+' to look at)'); await saveTicket(x,'Sent to IM');
+  if(to.length) await queueMail({to,subject:'IM review ready: '+t.wr+' '+t.name,body:t.wr+' '+t.name+' is ready for IM: '+(rows.length?rows.length+' rows, '+look+' to look at and '+(rows.length-look)+' with no issues found.':'documents only (no Reference Model changes), so IM makes one decision on the submission.')+'\n\nOpen it in IM Review: https://resources.mismo.org/im-review/#/review/'+encodeURIComponent(rep.id)+'',kind:'imreview',key:'imreview-'+rep.id});
+  const x=clone(S.tickets[t.id]||t); hist(x,(rep.direct?'Sent to IM reviewers':'Reference Model QC sent to IM reviewers')+' ('+(rows.length?rows.length+' rows, '+look+' to look at':'documents only, no Reference Model changes')+')'); await saveTicket(x,'Sent to IM');
 }
 function imExport(doc){ const head=['Item #','Change Type','Change Target Type','Parent CONTAINER Name','CONTAINER Name','Data Point Name','Enumeration Name','Definition','Review Decision','Review Comments','Suggested Definition or Name','Draft Decision','IM Agreed With Draft'];
   const rows=(doc.rows||[]).map(r=>{ const f=r.final||{}; return [r.item,r.ct,r.tt,r.pc,r.cn,r.dp,r.en,r.def,f.dec||r.draft.dec,(f.agreed?r.draft.com:f.com)||r.draft.com||'',f.sug||r.draft.sug||'',r.draft.dec,f.dec?(f.agreed?'Yes':'No'):'']; });
@@ -7141,23 +7141,23 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
     try{ await awgRetryPending(items); }catch(e){ console.warn('awg retry',e); }
   }catch(e){ console.warn('im sync',e); } finally{ imSyncing=false; } }
 const _imSend0=imSend;
-/* sending the IM Pre-Review to IM is the facilitator's "send to IM": a work request still at AI Review moves to IM Review with it */
+/* sending the Reference Model QC to IM is the facilitator's "send to IM": a work request still at AI Review moves to IM Review with it */
 /* one copy at IM at a time: sending again withdraws the earlier copy still waiting (after asking) */
 async function imWithdrawEarlier(t,rep){ const old=Object.values(S.imq||{}).filter(q=>q&&q.ticket===t.id&&q.rep!==rep.id&&q.status==='awaiting'); if(!old.length) return true;
-  const ok=await modal({title:'Replace What IM Has?',text:esc(t.wr+' '+t.name),ok:'Send This One Instead',body:'<p style="margin:0">IM already has an earlier IM Pre-Review of this work request waiting ('+old.map(q=>'sent '+fmtS(atDay(q.sentAt))).join(', ')+'). Sending this one takes that one back, so IM only sees the newest.</p>'}); if(!ok) return false;
+  const ok=await modal({title:'Replace What IM Has?',text:esc(t.wr+' '+t.name),ok:'Send This One Instead',body:'<p style="margin:0">IM already has an earlier Reference Model QC of this work request waiting ('+old.map(q=>'sent '+fmtS(atDay(q.sentAt))).join(', ')+'). Sending this one takes that one back, so IM only sees the newest.</p>'}); if(!ok) return false;
   for(const q of old){ const x=Object.assign({},q,{status:'withdrawn',withdrawnAt:new Date().toISOString(),withdrawnBy:S.me.name||''}); S.imq[q.rep]=x; await write('imqueue',q.rep,x);
     try{ await imrUpdate('queue',cur=>{ const o=cur||{items:{}}; const it=o.items&&o.items[q.rep]; if(it&&it.status!=='decided'){ it.status='withdrawn'; it.hist=true; } return o; }); }catch(e){} }
   return true; }
 imSend=async function(t,rep){ if(!(await imWithdrawEarlier(t,rep))) return false; await _imSend0(t,rep); const ok=await imPush(rep.id);
-  const cur=S.tickets[t.id]; if(cur&&cur.state==='active'&&['work','aireview'].includes(cur.stage)&&!cur.split&&!cur.rides){ const x=clone(cur); if(nextStage(x)==='im'||x.stage==='aireview'){ x.ai=Object.assign({},x.ai,{status:x.ai&&x.ai.status||'Passed'}); await move(x,'im',{sub:ok?'in-review':'new',dates:{aiDecision:(cur.dates&&cur.dates.aiDecision)||today()},text:'IM Pre-Review sent to the IM reviewers; moved to IM Review'+(ok?'':'. It reaches IM Review when Erin or MISMO staff next open the MMS'),toast:t.wr+' sent to IM Review'}); } }
+  const cur=S.tickets[t.id]; if(cur&&cur.state==='active'&&['work','aireview'].includes(cur.stage)&&!cur.split&&!cur.rides){ const x=clone(cur); if(nextStage(x)==='im'||x.stage==='aireview'){ x.ai=Object.assign({},x.ai,{status:x.ai&&x.ai.status||'Passed'}); await move(x,'im',{sub:ok?'in-review':'new',dates:{aiDecision:(cur.dates&&cur.dates.aiDecision)||today()},text:'Reference Model QC sent to the IM reviewers; moved to IM Review'+(ok?'':'. It reaches IM Review when Erin or MISMO staff next open the MMS'),toast:t.wr+' sent to IM Review'}); } }
   toast(ok?'Sent to IM Review':'Saved. It reaches IM Review when Erin or MISMO staff next open the MMS.'); };
-/* at IM Review with nothing sent yet, the next move is the facilitator's: run the IM Pre-Review and send it.
+/* at IM Review with nothing sent yet, the next move is the facilitator's: run the Reference Model QC and send it.
    Once it is sent (even if it hasn't reached the portal yet) it is IM's. */
 const _whoseMoveIM=whoseMove;
 whoseMove=function(t){ const w=_whoseMoveIM(t);
   if(t&&t.state==='active'&&!t.request&&!t.split&&!t.rides&&t.stage==='im'&&['','new','resubmitted'].includes(t.sub||'')&&!portalItemFor(t,'im')){
     const sent=Object.values(S.imq||{}).some(q=>q&&q.ticket===t.id&&q.status==='awaiting');
-    return sent?{role:'imawg',label:'IM Review',text:'Sent to IM; it reaches IM Review when Erin or MISMO staff next open the MMS'}:{role:'facilitator',label:'Facilitator',text:'Run the IM Pre-Review and send it to the IM reviewers'}; }
+    return sent?{role:'imawg',label:'IM Review',text:'Sent to IM; it reaches IM Review when Erin or MISMO staff next open the MMS'}:{role:'facilitator',label:'Facilitator',text:'Send it to IM: run Reference Model QC if it has Reference Model changes'}; }
   return w; };
 const _imEnsureQ0=imEnsureQ;
 imEnsureQ=function(){ _imEnsureQ0(); setTimeout(imSync,1500); };
@@ -7314,6 +7314,47 @@ function awgCount(){ const n=Object.values(S.awgPortalQ||{}).filter(q=>!q.hist&&
   if(btn) btn.hidden=!((im&&!im.hidden)||S.isStaff||isRole('imawg',S.me)||isRole('architect',S.me)||chair); }
 const _imCount_awg=imCount; imCount=function(){ _imCount_awg(); awgCount(); };
 const _awgSync0=awgSync; awgSync=async function(){ await _awgSync0(); awgCount(); };
+/* ---------- Documents-only submissions and stale review statuses (Nov 24, 2026) ----------
+   Erin and Kellie couldn't move iLAD (WR2024_31): its Submission Form has no Reference Model changes, so the IM
+   Pre-Review built no IM draft and its report had no Send to IM; with Skip now staff-only, nothing could move it.
+   1. A form with no Reference Model rows now gets a documents-only IM draft (no rows; IM Review already shows those
+      as one decision on the whole submission), so Send to IM appears. A documents-only report run before this fix
+      gets its draft the first time the facilitator or staff open it.
+   2. A work request sitting at IM Review (or AWG Review) can't have that review marked Passed: passing moves it on.
+      A status left behind by a move back (iLAD had "Passed" from the accidental skip) is cleared, with its decision
+      date, by the staff sweep. */
+function imDocOnlyDoc(t,rep){ return {rep:rep.id,ticket:t.id,wr:t.wr,name:t.name,at:rep.at,by:rep.by,rm:rep.rm||'',file:(rep.files||[])[0]||'',status:'draft',rows:[],docOnly:true,aiNote:rep.aiNote||'',rmLoaded:!!rep.rm}; }
+const _imCreateDraftDO=imCreateDraft;
+imCreateDraft=async function(t,rep,P,findings,ai){
+  if(P&&P.rows&&!P.rows.length){ const doc=imDocOnlyDoc(t,rep); S.imr[rep.id]=doc; await write(imColl(t.id),rep.id,doc); rep.imDraft=true; rep.imCounts={}; rep.docOnly=true; return; }
+  return _imCreateDraftDO(t,rep,P,findings,ai); };
+const _rvShowDO=rvShow;
+rvShow=function(rep){
+  const t=rep&&S.tickets[rep.ticket];
+  if(rep&&rep.kind==='im'&&!rep.imDraft&&rep.form&&rep.form.rows===0&&t&&!S.viewAs&&S.canWrite&&(S.isStaff||canAct(t))&&!(S.imq&&S.imq[rep.id])){
+    const doc=imDocOnlyDoc(t,rep); S.imr[rep.id]=doc; rep=Object.assign({},rep,{imDraft:true,imCounts:{},docOnly:true}); S.reviews[rep.id]=rep;
+    write(imColl(t.id),rep.id,doc).catch(()=>{}); rvSave(t,rep).catch(()=>{}); }
+  _rvShowDO(rep);
+  if(rep&&rep.kind==='im'&&rep.docOnly){ const sec=$('#modal-root .rvr-h'); if(sec&&!$('.im-doconly',sec)) sec.insertAdjacentHTML('beforeend','<p class="rvr-note im-doconly"><b>Documents only.</b> This form lists no Reference Model changes, so IM makes one decision on the whole submission. Send to IM when you’re ready.</p>'); } };
+async function imStaleSweep(){ if(!S.isStaff||!S.canWrite||S.partial||S.viewAs) return;
+  for(const t of Object.values(S.tickets||{})){ if(!t||t.state!=='active'||!['im','awg'].includes(t.stage)) continue; const k=t.stage, st=String((t[k]||{}).status||'');
+    if(!/^Passed/.test(st)) continue; const x=clone(t); x[k]=Object.assign({},x[k]); delete x[k].status; x.dates=Object.assign({},x.dates); delete x.dates[k+'Decision'];
+    if(k==='im'){ delete x.dates.awgSubmitted; if(x.awg&&/^Passed/.test(String(x.awg.status||''))){ x.awg=Object.assign({},x.awg); delete x.awg.status; delete x.dates.awgDecision; } }
+    hist(x,'Cleared a leftover “'+st+'” '+(k==='im'?'IM':'AWG')+' status: the work request is back at '+(k==='im'?'IM':'AWG')+' Review'); try{ await saveTicket(x,'Review status cleared'); }catch(e){} } }
+const _runAutoDO=runAutomations;
+runAutomations=async function(){ await _runAutoDO(); try{ await imStaleSweep(); }catch(e){} };
+/* Nov 24 (Jonna): the IM Pre-Review is now Reference Model QC, and it's only for submissions with Reference Model
+   changes; everything else is the AI Review. A submission with none goes to IM straight from the work request:
+   No Reference Model Changes: Send to IM files a documents-only entry and sends it, and IM makes one decision. */
+async function imSendDocsOnly(t){ if(S.viewAs||!S.canWrite) return false;
+  const ok=await modal({title:'Send to IM Without Reference Model Changes?',text:esc(t.wr+' '+t.name),ok:'Send to IM',body:'<p style="margin:0">Use this when the submission has no Reference Model changes. IM gets the work request’s documents and makes one decision on the whole submission. If it does have Reference Model changes, run Reference Model QC instead.</p>'});
+  if(!ok) return false;
+  const rep={id:'im-'+t.id+'-'+Date.now().toString(36),kind:'im',ticket:t.id,wr:t.wr,name:t.name,at:new Date().toISOString(),by:S.me.name||'',files:[],readiness:'ready',readinessLabel:'Documents Only',
+    summary:'No Reference Model changes: sent to IM for one decision on the submission’s documents.',aiNote:'',findings:[],rows:[],questions:[],form:{rows:0},docOnly:true,direct:true,imDraft:true,imCounts:{}};
+  const doc=imDocOnlyDoc(t,rep); S.imr[rep.id]=doc; await write(imColl(t.id),rep.id,doc); await rvSave(t,rep);
+  const r=await imSend(t,rep); if(r===false) return false; toast(t.wr+' sent to IM (no Reference Model changes)'); if(S.panel) renderPanel(); return true; }
+const _renderPanelDO=renderPanel;
+renderPanel=function(){ _renderPanelDO(); $$('#panel [data-imdocsonly]').forEach(b=>b.onclick=e=>{ e.preventDefault(); const t=S.tickets[b.dataset.imdocsonly]; if(t) imSendDocsOnly(t); }); };
 
 /* ================= Help (by role) and the Resource Center ================= */
 const HELP_ROLES=[
@@ -7378,7 +7419,7 @@ const HELP_TOPICS={
      'Architecture: shows only when the work request has Architecture Help. It covers what was asked, who is working on it, the status, the hours and the notes.',
      'Links: anything else worth keeping with it, such as a draft or a Teams thread.',
      'Comments: what came in through the public comment form, during and after its comment period.',
-     'Reviews: the AI Review and IM Pre-Review reports, and IM’s past decisions.',
+     'Reviews: the AI Review and Reference Model QC reports, and IM’s past decisions.',
      'History: every move, who made it and when. Type in Add a note to the history and press Enter or click Add Note.',
      'On your own work, change anything in Details, Key Dates or Links, then click Save Changes. Leave without saving and the MMS asks whether to save, discard or keep editing.'],
     ['Every saved change is logged in History, and the Undo on the Saved message puts it back.','Your browser no longer asks “Leave site?” when you close or leave the MMS. The only question you get is the MMS’s own Save, Discard or Keep Editing, and only when you have unsaved changes.'],
@@ -7400,21 +7441,22 @@ const HELP_TOPICS={
      'Check Boilerplate It Should Have (set from the stage; change it only if MISMO staff told you to), add a note for the reviewer if you like, and click Run AI Review. A progress bar shows how far along it is: keep the tab open until the report opens.',
      'On the report, tick Update, Do Not Update, Unsure or Pass by each note, or use Choose for Every Note (or All in this section) to set them all at once, then click Submit Choices. None are required; blank notes count as Pass.',
      'Make the updates you chose in your own files, and run the AI Review again if you like.',
-     'Click Send to IM Review, then run the IM Pre-Review on the Submission Form.'],
-    ['Each file gets the review that fits it. Word and PDF documents: the editor’s read for spelling, grammar, terms, acronyms and MISMO voice. Datasets (Excel or CSV data): looked over as a whole, one note per pattern with a count and example rows, never cell by cell. The IM/AWG Submission Form: its Face Page, Reference Model Changes and Proposed Structure tabs. The report says how each file was reviewed.','Every file also gets the software checks: the boilerplate word for word, the copyright and its year, and MISMO’s terms and product names.','Report sections: Must Fix Before Submitting (what IM is likely to send back), Editorial Corrections (clear errors), Recommended (judgment calls) and Questions for the Facilitator.','After you submit your choices the report reads Reviewed with your counts, the history notes them, and Update and Do Not Update teach the review what’s useful.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found and whether or not you made choices.','For a big document, Claude reads 30 parts at a time; Read the Rest on the report carries on and adds the notes to the same report (keep the tab open).','Ran a review more than once? Open the report and click Delete This Review, or on the Reviews tab click Keep Only the Latest. An IM Pre-Review already sent to IM stays. Deleted reports are kept 60 days, and MISMO staff can put one back.','Download for Word or Download for Excel gives you a copy of the report to share.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.'],
+     'Click Send to IM Review. If the submission has Reference Model changes, run Reference Model QC on the Submission Form; if not, click No Reference Model Changes: Send to IM.'],
+    ['Each file gets the review that fits it. Word and PDF documents: the editor’s read for spelling, grammar, terms, acronyms and MISMO voice. Datasets (Excel or CSV data): looked over as a whole, one note per pattern with a count and example rows, never cell by cell. The IM/AWG Submission Form: its Face Page, Reference Model Changes and Proposed Structure tabs. The report says how each file was reviewed.','Every file also gets the software checks: the boilerplate word for word, the copyright and its year, and MISMO’s terms and product names.','Report sections: Must Fix Before Submitting (what IM is likely to send back), Editorial Corrections (clear errors), Recommended (judgment calls) and Questions for the Facilitator.','After you submit your choices the report reads Reviewed with your counts, the history notes them, and Update and Do Not Update teach the review what’s useful.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found and whether or not you made choices.','For a big document, Claude reads 30 parts at a time; Read the Rest on the report carries on and adds the notes to the same report (keep the tab open).','Ran a review more than once? Open the report and click Delete This Review, or on the Reviews tab click Keep Only the Latest. A Reference Model QC already sent to IM stays. Deleted reports are kept 60 days, and MISMO staff can put one back.','Download for Word or Download for Excel gives you a copy of the report to share.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.'],
     [['Open the Review Desk','reviews']]],
-  impre:['IM Pre-Review: Getting the Submission Ready for IM','facilitator staff',
-    'The IM Pre-Review reads the IM/AWG Submission Form (July 2026 version) the way IM does, fixes the MISMO Link format, drafts IM’s decision for every row and sends it to the IM reviewers.',
-    ['Once the work request is at AI Review or IM Review, click Run IM Pre-Review on its Reviews tab.',
-     'Add the Submission Form: choose it, drop it in, or pick it from the work request’s files. Click Run IM Pre-Review and keep the tab open until the report opens.',
+  impre:['Reference Model QC: Getting the Submission Ready for IM','facilitator staff',
+    'The Reference Model QC reads the IM/AWG Submission Form (July 2026 version) the way IM does, fixes the MISMO Link format, drafts IM’s decision for every row and sends it to the IM reviewers.',
+    ['Only for submissions with Reference Model changes. No Reference Model changes? Click No Reference Model Changes: Send to IM on the work request (at IM Review) or its Reviews tab; IM makes one decision on the whole submission. The AI Review covers everything else.',
+     'Once the work request is at AI Review or IM Review, click Run Reference Model QC on its Reviews tab.',
+     'Add the Submission Form: choose it, drop it in, or pick it from the work request’s files. Click Run Reference Model QC and keep the tab open until the report opens.',
      'Go through MISMO Link Format first: Accept or Decline each fix (see MISMO Link Format: Fixes Before IM).',
      'Look over Must Fix Before Submitting and Rows IM May Question; fix your form if you want to and run it again.',
      'Click Send to IM. IM gets the form with a draft decision for every row, and the IM reviewers are told it’s ready.'],
-    ['What it checks: the Face Page; every Reference Model row’s required columns for its action, class words and definition templates, names, abbreviations and XPATHs; the Proposed Structure tab; and, against the current MISMO Reference Model, whether a name already exists, a parent container is real and an XPATH matches.','Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided since 2021, with each row’s likely outcome, what IM would say and a suggested name or definition.','Draft IM Decisions counts how many rows look Approved as Submitted, Approved with Modification and so on. IM reviewers agree with or correct each one.','If IM already has an earlier pre-review of this work request, Send to IM asks before replacing it.','A pre-review sent to IM can’t be deleted; older runs that weren’t sent can (Delete This Review, or Keep Only the Latest on the Reviews tab).'],
+    ['What it checks: the Face Page; every Reference Model row’s required columns for its action, class words and definition templates, names, abbreviations and XPATHs; the Proposed Structure tab; and, against the current MISMO Reference Model, whether a name already exists, a parent container is real and an XPATH matches.','Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided since 2021, with each row’s likely outcome, what IM would say and a suggested name or definition.','Draft IM Decisions counts how many rows look Approved as Submitted, Approved with Modification and so on. IM reviewers agree with or correct each one.','Ran it on a form with no Reference Model changes? The report says Documents only and Send to IM still works: IM makes one decision on the whole submission.','If IM already has an earlier Reference Model QC of this work request, Send to IM asks before replacing it.','A pre-review sent to IM can’t be deleted; older runs that weren’t sent can (Delete This Review, or Keep Only the Latest on the Reviews tab).'],
     [['Open the Review Desk','reviews']]],
   mislink:['MISMO Link Format: Fixes Before IM','*',
-    'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The IM Pre-Review lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
-    ['Run the IM Pre-Review on the work request. The report opens with MISMO Link Format.',
+    'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The Reference Model QC lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
+    ['Run the Reference Model QC on the work request. The report opens with MISMO Link Format.',
      'Each row shows the change (old value crossed out, new value in bold) and why. Click Accept or Decline. Accept All Remaining takes the rest.',
      '“Check this one” means the fix is a best guess (a parent container name, spelling, a second XPATH): look before you accept.',
      'Download the Corrected Form, or Save It to This Work Request’s Files. It is your form with the accepted fixes written into the Reference Model Changes tab.',
@@ -7533,7 +7575,7 @@ const HELP_TOPICS={
     [['Open Meeting Trackers','https://resources.mismo.org/meeting-trackers/']]],
   imrun:['Running an IM Review','imawg',
     'IM Review is its own page, where Colleen (IM chair) and Erin (IM facilitator) record IM’s decision on each submission.',
-    ['Facilitators send their own submissions from the work request: Run the IM Pre-Review, then Send to IM on the report.',
+    ['Facilitators send their own submissions from the work request: Run the Reference Model QC, then Send to IM on the report.',
      'Open IM Review from the left rail. It opens in a new tab.',
      'Each submission comes with a draft decision for every row. Agree, or correct what the draft got wrong.',
      'Click a document to open it. Resubmissions link to the earlier decision.',
@@ -7720,7 +7762,7 @@ const RC2_STAGE_HOW={
   kickoff:['Approve kicking off the Development Workgroup.','Staff record the decision; approved work moves to In Work.'],
   work:['Build the work product and keep the target date current.','Reminders before the target and when it passes.'],
   aireview:['Finish any Architecture Help, submit for AI Review, make the fixes, then send it to IM.','Claude reviews it in minutes and lists fixes and suggestions.'],
-  im:['The facilitator runs the IM Pre-Review and sends it to IM. On the IM call, Colleen and Erin agree with or correct the draft for each row and record IM’s decision.','Approved goes to AWG on its own; returned goes back to the facilitator.'],
+  im:['The facilitator runs the Reference Model QC and sends it to IM. On the IM call, Colleen and Erin agree with or correct the draft for each row and record IM’s decision.','Approved goes to AWG on its own; returned goes back to the facilitator.'],
   awg:['AWG reviews and votes on the call.','Approved goes to License Designation with a recommendation.'],
   designation:['Jonna approves the recommended designation (one per part, if it has parts).','The recommendation is drawn from past designations of the same kind.'],
   'gc-comment':['Governance approves it for public comment.','Staff record the vote; approved work goes to the website.'],
@@ -8072,7 +8114,7 @@ function needLibs(){ if(window.JSZip&&window.XLSX) return Promise.resolve(); if(
   return libsP; }
 const _readFileLib=readFile; readFile=async function(f){ if(/\.(docx|xlsx|xls|pptx)$/i.test(f&&f.name||'')) try{ await needLibs(); }catch(e){} return _readFileLib(f); };
 const _imExportLib=imExport; imExport=async function(doc){ try{ await needLibs(); }catch(e){ toast('Couldn’t load the Excel tools; try again'); return; } return _imExportLib(doc); };
-/* ---------- AI Review and IM Pre-Review reports: Unsure and Pass, and Download for Excel (Nov 20, 2026) ----------
+/* ---------- AI Review and Reference Model QC reports: Unsure and Pass, and Download for Excel (Nov 20, 2026) ----------
    Each note's "Right?" now has Yes, No, Unsure and Pass. Only Yes and No teach the review (a rule people keep marking
    No drops to Recommended; notes marked No are avoided); Unsure and Pass are recorded but teach nothing. Marking notes
    is never required: nothing in the process waits on it. The report also downloads for Excel (a Summary sheet and a
@@ -8094,7 +8136,7 @@ function rvNotes(rep){ const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'
   return out; }
 async function rvExcel(rep){
   try{ await needLibs(); }catch(e){ toast('Couldn’t load the Excel tools; try again'); return; }
-  const title=rep.kind==='im'?'IM Pre-Review':'AI Review';
+  const title=rep.kind==='im'?'Reference Model QC':'AI Review';
   const sum=[['Report',title+' Report'],['Work Request',rep.wr],['Name',rep.name],['Date',fmt(atDay(rep.at))],['Run By',rep.by||''],['Files',(rep.files||[]).join(', ')],['Result',(typeof rvShown==='function'?rvShown(rep).l:rep.readinessLabel)||''],['Summary',rep.summary||''],
     ['Note','This report recommends; it doesn’t change the work product. Marking notes is optional and never holds up the work request.']];
   const ws1=XLSX.utils.aoa_to_sheet(sum); ws1['!cols']=[{wch:16},{wch:100}];
@@ -8106,7 +8148,7 @@ async function rvExcel(rep){
 const _rvShowX=rvShow;
 rvShow=function(rep){ _rvShowX(rep); const dl=$('#modal-root #rvdl'); if(!dl||$('#modal-root #rvxl')) return;
   dl.insertAdjacentHTML('afterend','<button class="btn" id="rvxl" type="button">Download for Excel</button>'); $('#modal-root #rvxl').onclick=()=>rvExcel(rep); };
-/* ---------- AI Review / IM Pre-Review: pick files from the work request's Files (Nov 20, 2026) ----------
+/* ---------- AI Review / Reference Model QC: pick files from the work request's Files (Nov 20, 2026) ----------
    Instead of finding the file on your computer and dropping it in, tick it in the list of this work request's
    files (its SharePoint folder, newest first). The MMS gets each ticked file from SharePoint through the
    "MMS Documents - Upload" flow (mode "get") and adds it to the review, alongside any file chosen or dropped. */
@@ -8189,7 +8231,7 @@ async function rvReadRest(rep){
    one per note, or uses Choose for Every Note (or All in one section) to set them in bulk, then Submit Choices.
    None are required: a note left blank counts as Pass, and the work request can go on to IM Review whether or not
    the choices were submitted. Update and Do Not Update teach the review (as Yes and No did); Unsure and Pass don't.
-   The IM Pre-Review keeps its own Right? column. */
+   The Reference Model QC keeps its own Right? column. */
 const RV_DEC=[['update','Update'],['dont','Do Not Update'],['unsure','Unsure'],['pass','Pass']];
 const RV_DEC_LABEL={update:'Update',dont:'Do Not Update',unsure:'Unsure',pass:'Pass'};
 const RV_DEC_TEACH={update:'right',dont:'wrong',unsure:'unsure',pass:'pass'};
@@ -8845,7 +8887,7 @@ async function trTidy(){ if(!S.isStaff||!S.canWrite||S.partial) return; const cu
   for(const [k,t] of all.filter(([k,t],i)=>i>=300||Date.parse(t.at||0)<cut)) try{ await Store.del('trash',k); delete S.trash[k]; }catch(e){} }
 async function trOpen(){ trEnsure();
   const L=Object.entries(S.trash||{}).filter(([k,t])=>t&&(t.coll==='outbox'||/^reviews-/.test(t.coll))).sort((a,b)=>String(b[1].at||'').localeCompare(String(a[1].at||'')));
-  const body=L.length?'<p class="muted" style="margin:0 0 10px;font-size:12.5px">Kept 60 days. Putting one back returns it to Notifications as it was; an email that hadn’t gone yet will send once email is on.</p><div class="tr-list">'+L.slice(0,60).map(([k,t])=>'<div class="tr-row"><div><b>'+esc(t.data.subject||(/^reviews-/.test(t.coll)?(t.data.kind==='im'?'IM Pre-Review':'AI Review')+' report · '+(t.data.wr||'')+' · '+fmtS(atDay(t.data.at||'')):'(no subject)'))+'</b><div class="muted">'+esc(t.why)+(t.by?' by '+esc(t.by):'')+' · '+esc(hWhen(t.at))+'</div></div><button class="btn sm" type="button" data-trput="'+esc(k)+'">Put Back</button></div>').join('')+'</div>':'<p class="muted" style="margin:0">Nothing has been deleted in the last 60 days.</p>';
+  const body=L.length?'<p class="muted" style="margin:0 0 10px;font-size:12.5px">Kept 60 days. Putting one back returns it to Notifications as it was; an email that hadn’t gone yet will send once email is on.</p><div class="tr-list">'+L.slice(0,60).map(([k,t])=>'<div class="tr-row"><div><b>'+esc(t.data.subject||(/^reviews-/.test(t.coll)?(t.data.kind==='im'?'Reference Model QC':'AI Review')+' report · '+(t.data.wr||'')+' · '+fmtS(atDay(t.data.at||'')):'(no subject)'))+'</b><div class="muted">'+esc(t.why)+(t.by?' by '+esc(t.by):'')+' · '+esc(hWhen(t.at))+'</div></div><button class="btn sm" type="button" data-trput="'+esc(k)+'">Put Back</button></div>').join('')+'</div>':'<p class="muted" style="margin:0">Nothing has been deleted in the last 60 days.</p>';
   const p=modal({title:'Recently Deleted Emails',body,ok:'Done',cancel:'Close'});
   $$('#modal-root [data-trput]').forEach(b=>b.onclick=async()=>{ b.disabled=true; const ok=await trRestore(b.dataset.trput); if(ok){ b.closest('.tr-row').remove(); toast('Put back'); renderAll(); } else b.disabled=false; });
   await p; }
@@ -8858,15 +8900,15 @@ wireMain=function(m){ _wireTr(m); const b=$('#tropen',m); if(b) b.onclick=()=>tr
 /* ---------- Deleting review reports (Nov 23, 2026, Jonna) ----------
    Retries fill the Reviews tab quickly. The report has Delete This Review, and the Reviews tab has Keep Only the
    Latest when a kind has been run more than once. Who: MISMO staff, the work request's facilitator, or whoever ran it.
-   An IM Pre-Review already sent to IM can't be deleted (IM is working from it). Deleted reports go to Recently Deleted
+   A Reference Model QC already sent to IM can't be deleted (IM is working from it). Deleted reports go to Recently Deleted
    for 60 days (MISMO staff can put them back from Notifications); the history notes it. */
 function rvCanDelete(rep){ if(!rep||S.viewAs||!S.canWrite) return false; if(S.imq&&S.imq[rep.id]) return false; const t=S.tickets[rep.ticket];
   return !!(S.isStaff||(t&&canAct(t))||(rep.by&&sameName(rep.by,S.me.name||''))); }
-function rvKindName(rep){ return rep.kind==='im'?'IM Pre-Review':'AI Review'; }
+function rvKindName(rep){ return rep.kind==='im'?'Reference Model QC':'AI Review'; }
 async function rvDelete(rep,quiet){ const t=S.tickets[rep.ticket]; const c=rvShard({id:rep.ticket});
   let d=clone(rep); if(JSON.stringify(d).length>150000){ d.corrections=(d.corrections||[]).slice(0,60); d.recommendations=(d.recommendations||[]).slice(0,30); d.trimmed=true; }
   await setAside(c,rep.id,d,rvKindName(rep)+' report deleted');
-  if(rep.kind==='im'&&S.imr&&S.imr[rep.id]){ const ic=imColl(rep.ticket); await setAside(ic,rep.id,S.imr[rep.id],'IM Pre-Review draft deleted with its report'); delete S.imr[rep.id]; try{ await Store.del(ic,rep.id); }catch(e){} }
+  if(rep.kind==='im'&&S.imr&&S.imr[rep.id]){ const ic=imColl(rep.ticket); await setAside(ic,rep.id,S.imr[rep.id],'Reference Model QC draft deleted with its report'); delete S.imr[rep.id]; try{ await Store.del(ic,rep.id); }catch(e){} }
   delete S.reviews[rep.id]; await Store.del(c,rep.id);
   if(t&&!quiet){ const x=clone(S.tickets[t.id]||t); hist(x,rvKindName(rep)+' report from '+fmtS(atDay(rep.at))+' deleted'); await saveTicket(x,'Review deleted'); }
   return true; }
@@ -8885,10 +8927,10 @@ rvTabHtml=function(t){ let h=_rvTabHtmlDel(t); const old=rvOlder(t); if(!old.len
   return h.replace('<div class="rv-list">','<div class="rv-oldbar"><span>'+old.length+' older run'+(old.length===1?'':'s')+' of the same review'+(old.length===1?'':'s')+'.</span><button type="button" class="btn sm ghost" data-rvprune="'+esc(t.id)+'">Keep Only the Latest</button></div><div class="rv-list">'); };
 const _renderPanelDel=renderPanel;
 renderPanel=function(){ _renderPanelDel(); const b=$('#panel [data-rvprune]'); if(!b) return; b.onclick=async e=>{ e.preventDefault(); const t=S.tickets[b.dataset.rvprune]; if(!t) return; const old=rvOlder(t); if(!old.length) return;
-  const ok=await modal({title:'Keep Only the Latest?',text:esc(t.wr+' '+t.name),ok:'Delete '+old.length+' Older',body:'<p style="margin:0">Keeps the newest AI Review and the newest IM Pre-Review, and deletes the '+old.length+' older run'+(old.length===1?'':'s')+'. They’re kept in Recently Deleted for 60 days, where MISMO staff can put them back.'+(Object.values(S.reviews).some(r=>r.ticket===t.id&&S.imq&&S.imq[r.id])?' A pre-review already sent to IM stays.':'')+'</p>'});
+  const ok=await modal({title:'Keep Only the Latest?',text:esc(t.wr+' '+t.name),ok:'Delete '+old.length+' Older',body:'<p style="margin:0">Keeps the newest AI Review and the newest Reference Model QC, and deletes the '+old.length+' older run'+(old.length===1?'':'s')+'. They’re kept in Recently Deleted for 60 days, where MISMO staff can put them back.'+(Object.values(S.reviews).some(r=>r.ticket===t.id&&S.imq&&S.imq[r.id])?' A pre-review already sent to IM stays.':'')+'</p>'});
   if(!ok) return; b.disabled=true; for(const r of old) await rvDelete(r,true);
   const x=clone(S.tickets[t.id]); hist(x,old.length+' older review report'+(old.length===1?'':'s')+' deleted (kept the latest of each)'); await saveTicket(x,'Older reviews deleted'); toast(old.length+' older report'+(old.length===1?'':'s')+' deleted'); renderPanel(); }; };
-/* putting a deleted IM Pre-Review back brings its IM draft back too */
+/* putting a deleted Reference Model QC back brings its IM draft back too */
 const _trRestoreDel=trRestore;
 trRestore=async function(k){ const t=S.trash[k]; const ok=await _trRestoreDel(k); if(ok&&t&&/^reviews-/.test(t.coll)&&t.data&&t.data.kind==='im'){ const ik=trKey(imColl(t.data.ticket),t.id); if(S.trash[ik]) await _trRestoreDel(ik); } if(ok&&t&&/^reviews-/.test(t.coll)) S.reviews[t.id]=t.data; return ok; };
 /* ---------- Digest instead of individual emails; access without emails (Nov 20, 2026) ----------
@@ -8933,7 +8975,7 @@ wireDigest=function(m){ _wireDigestDGO(m); if(!$('#dgframe',m)) return;
    (v3.6.4 master list vs. the vendor's Corrected Draft v5, reproducing all of its
    corrections; v3.6.3 list vs. the published v3.6.3 dictionary) and from the
    form's own "What Columns When" table.
-   The IM Pre-Review suggests each fix; the facilitator accepts or declines it.
+   The Reference Model QC suggests each fix; the facilitator accepts or declines it.
    Accepted fixes go to IM in the rows; declined ones go with a note, so IM sees
    them. The corrected form can be downloaded or saved to the work request.
    Release work requests get the Master Change List for the vendor.
@@ -9045,7 +9087,7 @@ async function rlSpell(rows,list){
   return out;
 }
 
-/* ---------- hooked into the IM Pre-Review ---------- */
+/* ---------- hooked into the Reference Model QC ---------- */
 const rlFiles={}; let rlLast=null;
 const _rvReadFileRL=rvReadFile;
 rvReadFile=async function(f){ const x=await _rvReadFileRL(f); if(x&&x.kind==='excel') rlLast={name:f.name,file:f}; return x; };
@@ -9115,7 +9157,7 @@ async function rlOriginal(rep){ if(rlFiles[rep.id]) return rlFiles[rep.id].file;
 async function rlMakeFile(rep){ const f=await rlOriginal(rep); if(!f) return null; if((rep.files||[])[0]&&f.name!==rep.files[0]) toast('Using '+f.name+' (the review read '+rep.files[0]+')'); return rlCorrected(rep,f); }
 function rlSaveAs(file){ const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
 
-/* ---------- in the IM Pre-Review report ---------- */
+/* ---------- in the Reference Model QC report ---------- */
 function rlSecHtml(rep,forWord){ if(!rep||!rep.link) return ''; const st=rlState(rep), e=esc; const can=!forWord&&rlCanDecide(rep);
   const cell=c=>e(RL_FIELD[c.f]||c.f)+': '+(c.from?'<s>'+e(rvTrim(c.from,140))+'</s> ':'')+'<b>'+(c.to?e(rvTrim(c.to,140)):'(blank)')+'</b>';
   const decided=s=>{ const x=st.D[s.id]; return x?'<span class="rl-d rl-'+e(x.d)+'">'+(x.d==='accept'?'Accepted':'Declined')+'</span>'+(forWord?'':'<span class="muted rl-by">'+e(firstName(x.by||''))+'</span>'):''; };

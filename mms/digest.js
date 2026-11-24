@@ -94,7 +94,7 @@
   function pastTarget(t, today) { var d = t.dates || {}; return t.state === 'active' && !t.split && !t.rides && d.targetIM && d.targetIM < today && ['approved', 'cfp', 'kickoff', 'work', 'aireview'].indexOf(t.stage) >= 0; }
   /* ---------- whose move it is: the MMS's own My Queue rule, so the scheduled sender's email
      matches My Queue. A copy of whoseMove() (app1.js) with its wrappers: Architecture Help
-     (archwr.js) and the IM Pre-Review step (imdesk.js); isMine() with the IM and AWG
+     (archwr.js) and the Reference Model QC step (imdesk.js); isMine() with the IM and AWG
      facilitator rule (cpcard.js); dueNow() and waitingOn() (app1.js). The MMS passes its own
      moveFor, which always wins; this is used when nothing is passed (the GitHub sender). ---------- */
   var ASK_THIS = { hold: 'put this on hold', resume: 'resume this', close: 'close this', cancel: 'cancel this' };
@@ -136,7 +136,7 @@
         if (sub === 'prep') return { role: 'facilitator', text: 'Submit to ' + nm + ' through MISMO Connect' };
         var pq = portalItemFor(ctx, t, t.stage);
         if (pq) return { role: 'imawg', text: pq.status === 'carried' ? 'Carried to the next AWG call' : (t.stage === 'awg' ? 'On the AWG agenda' : 'With the IM reviewers' + (pq.rows && pq.done ? ': ' + pq.done + ' of ' + pq.rows + ' rows decided' : '')) };
-        return { role: 'imawg', text: sub === 'in-review' ? nm + ' is reviewing' : t.stage === 'im' ? 'Run the IM Pre-Review and send it to IM Review' : 'Waiting for ' + nm + ' Review' };
+        return { role: 'imawg', text: sub === 'in-review' ? nm + ' is reviewing' : t.stage === 'im' ? 'Send it to IM: run Reference Model QC if it has Reference Model changes' : 'Waiting for ' + nm + ' Review' };
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
@@ -152,10 +152,10 @@
     var w = baseMove(ctx, t);
     /* Architecture Help (archwr.js): building work waits on its open architecture tasks */
     if (t.stage === 'work' && t.state === 'active' && w.role === 'facilitator') { var L = archOpenFor(ctx, t); if (L.length) w = { role: w.role, text: 'Waiting on Architecture Help (' + L.map(function (a) { return a.id; }).join(', ') + '), then submit for AI Review' }; }
-    /* the IM Pre-Review (imdesk.js): the facilitator runs it and sends it to IM */
+    /* the Reference Model QC (imdesk.js): the facilitator runs it and sends it to IM */
     if (t.state === 'active' && !t.request && !t.split && !t.rides && t.stage === 'im' && ['', 'new', 'resubmitted'].indexOf(t.sub || '') >= 0 && !portalItemFor(ctx, t, 'im')) {
       var Q = ctx.imq || {}, sent = Object.keys(Q).some(function (k) { var q = Q[k]; return q && q.ticket === t.id && q.status === 'awaiting'; });
-      w = sent ? { role: 'imawg', text: 'Sent to IM; it reaches IM Review when Erin or MISMO staff next open the MMS' } : { role: 'facilitator', text: 'Run the IM Pre-Review and send it to the IM reviewers' };
+      w = sent ? { role: 'imawg', text: 'Sent to IM; it reaches IM Review when Erin or MISMO staff next open the MMS' } : { role: 'facilitator', text: 'Send it to IM: run Reference Model QC if it has Reference Model changes' };
     }
     return w;
   };
