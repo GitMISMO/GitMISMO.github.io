@@ -2168,7 +2168,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-24T20:43:18Z',fp:'b6f5c628'};
+window.__mmsBuild={at:'2026-11-24T21:21:02Z',fp:'40522a4a'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7277,7 +7277,7 @@ function withAutoDesignation(x){ const a=autoDesignation(x), days=(proc().commen
 /* ---------- Meeting Trackers → IM Review and AWG Review: the voting roster, the call dates and who was there ----------
    Erin keeps these in Meeting Trackers; the portals only record what was decided. */
 let mtPortalAt=0;
-async function mtToPortals(){ if(!S.isStaff||!S.canWrite||Date.now()-mtPortalAt<30*60000) return; mtPortalAt=Date.now();
+async function mtToPortals(){ if(!(S.isStaff||(typeof isRole==='function'&&isRole('imawg')))||!S.canWrite||S.viewAs||Date.now()-mtPortalAt<30*60000) return; mtPortalAt=Date.now();
   try{ const base=await rGet('meeting-trackers','baseline'); const B=base&&base.data&&base.data.doc&&base.data.doc.z?await gunzipB64(base.data.doc.z):null;
     const doc=async n=>{ const d=await rGet('meeting-trackers',n); return d&&d.data; };
     const [vo,le,pe,sc]=await Promise.all(['voters','leaders','people','sched'].map(doc));
@@ -7304,6 +7304,17 @@ async function mtToPortals(){ if(!S.isStaff||!S.canWrite||Date.now()-mtPortalAt<
       const a0=await rGet(proj,'attendance'); const A=Object.assign({},(a0&&a0.data)||{}); delete A.savedBy; delete A.savedAt; let ch=false; Object.entries(att).forEach(([d,x])=>{ if(JSON.stringify(A[d])!==JSON.stringify(x)){ A[d]=x; ch=true; } }); if(ch) await up('attendance',()=>A);
     }
   }catch(e){ console.warn('meeting trackers to portals',e); } }
+/* attendance logged in Meeting Trackers reaches IM Review and AWG Review within about 3 minutes (Nov 24, Erin: the
+   quorum line still showed the first count after she updated the Nov 23 call). Every 3 minutes a staff or IM/AWG
+   tab reads just the two groups' attendance files; when they changed, the full copy runs right away. */
+let mtSig='', mtSigAt=0;
+const _mtToPortalsQ=mtToPortals;
+mtToPortals=async function(){ if(!(S.isStaff||(typeof isRole==='function'&&isRole('imawg')))||!S.canWrite||S.viewAs) return;
+  if(Date.now()-mtSigAt>=3*60000){ mtSigAt=Date.now(); const yr=new Date().getFullYear(); let sig='';
+    try{ for(const gk of ['informationmanagement','architectureworkgroup']){ const d=await rGet('meeting-trackers',mtFile('m-'+gk+'-'+yr)).catch(()=>null); const it=(d&&d.data&&d.data.doc&&d.data.doc.items)||{};
+      sig+=gk+':'+Object.keys(it).sort().map(k=>k+'='+((it[k]&&it[k].at)||'')+'/'+((it[k]&&it[k].p)||[]).length).join(',')+';'; } }catch(e){ sig=''; }
+    if(sig&&mtSig&&sig!==mtSig) mtPortalAt=0; if(sig) mtSig=sig; }
+  return _mtToPortalsQ(); };
 const _imEnsureQ2=imEnsureQ; imEnsureQ=function(){ _imEnsureQ2(); setTimeout(mtToPortals,4000); };
 /* an MMS left open (and not touched) still brings IM's and AWG's decisions home and keeps the portals current */
 setInterval(()=>{ try{ if(!S.ready||S.mode!=='relay'||document.hidden) return; imSync(); setTimeout(()=>{ awgSync(); },2500); setTimeout(()=>{ mtToPortals(); },5000); }catch(e){} },65000);
