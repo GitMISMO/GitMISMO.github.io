@@ -1,0 +1,13 @@
+# resources.mismo.org: MISMO's internal tools and forms.
+# Added Nov 24, 2026 (Jonna). Search-engine and AI crawlers opening the application and form pages
+# set off the flows behind them (a Bytespider visit sent a false "membership application problem" alert).
+# These pages aren't meant to be found through search; people reach them from links on mismo.org and emails.
+
+# ByteDance's crawler: not welcome anywhere on this site.
+User-agent: Bytespider
+Disallow: /
+
+# Everyone else: stay off the application and form pages.
+User-agent: *
+Disallow: /member-360/apply/
+Disallow: /forms/
