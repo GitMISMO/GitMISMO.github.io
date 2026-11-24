@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-23T22:25:46.718Z",
+ "updated": "2026-11-24T19:36:44.540Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-23T22:24:23.713Z",
+ "sourceUpdated": "2026-11-24T19:34:57.551Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -27,14 +27,14 @@
         "title": "VP, Strategic Growth",
         "company": "MISMO",
         "role": "Host",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-amy-moses-064e4236.webp"
+        "photo": ""
        },
        {
         "name": "Brian Vieaux",
         "title": "President",
         "company": "MISMO",
         "role": "Speaker",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-brian-vieaux-1cdae0d6.webp"
+        "photo": ""
        }
       ]
      },
@@ -52,14 +52,7 @@
         "title": "President",
         "company": "MISMO",
         "role": "Moderator",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-brian-vieaux-1cdae0d6.webp"
-       },
-       {
-        "name": "Dr. Daniel Conway",
-        "title": "Professor of Information Systems and Associate Director, Blockchain Center of Excellence, Sam M. Walton College of Business, University of Arkansas Chair, U.S. ",
-        "company": "University of Arkansas",
-        "role": "Panelist",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-dan-conway-85dedc53.webp"
+        "photo": ""
        }
       ]
      },
@@ -73,23 +66,9 @@
       "brk": false,
       "people": [
        {
-        "name": "Cathy Puente",
-        "title": "Chief Information Security Officer",
-        "company": "Newrez",
-        "role": "Speaker",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-cathy-60891002.jpg"
-       },
-       {
         "name": "Mike Bray",
-        "title": "Senior Director",
+        "title": "Senior Director, Nonbank Supervision & Enforcement",
         "company": "Conference of State Bank Supervisors",
-        "role": "Speaker",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-mike-bray-61e14726.jpg"
-       },
-       {
-        "name": "Linna Zhu",
-        "title": "",
-        "company": "Urban Institute",
         "role": "Speaker",
         "photo": ""
        }
@@ -105,18 +84,11 @@
       "brk": false,
       "people": [
        {
-        "name": "Rhoshunda Kelly",
-        "title": "Commissioner",
-        "company": "Mississippi Department of Banking & Consumer Finance",
-        "role": "Speaker",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-rhoshunda-kelly-e3ab7e1e.jpg"
-       },
-       {
         "name": "Amy Moses",
         "title": "VP, Strategic Growth",
         "company": "MISMO",
         "role": "Speaker",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-amy-moses-064e4236.webp"
+        "photo": ""
        }
       ]
      },
@@ -131,35 +103,28 @@
       "people": [
        {
         "name": "Noah Israel",
-        "title": "Senior Director, Product Management, Enterprise Data",
-        "company": "Fannie Mae",
-        "role": "Speaker",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-noah-israel-2ddc26d9.webp"
-       },
-       {
-        "name": "Colleen Flaxington",
-        "title": "Director, Industry Standards",
-        "company": "Freddie Mac",
-        "role": "Speaker",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-colleen-flaxington-5fb60980.webp"
-       },
-       {
-        "name": "Sunil Vaid",
-        "title": "Manager, Industry Standards",
-        "company": "Freddie Mac",
-        "role": "Speaker",
-        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-sunil-vaid-94b2288d.webp"
-       },
-       {
-        "name": "James Babalitis",
-        "title": "Senior Manager, Product Management, Enterprise Data",
-        "company": "Fannie Mae",
+        "title": "",
+        "company": "",
         "role": "Speaker",
         "photo": ""
        },
        {
-        "name": "Sandro Barchitta",
-        "title": "Advisor, Product Management, Enterprise Data",
+        "name": "Colleen Flaxington",
+        "title": "Director of Industry Standards",
+        "company": "Freddie Mac",
+        "role": "Speaker",
+        "photo": ""
+       },
+       {
+        "name": "Sunil Vaid",
+        "title": "",
+        "company": "",
+        "role": "Speaker",
+        "photo": ""
+       },
+       {
+        "name": "James Babalitis",
+        "title": "Senior Manager, Product Management, Enterprise Data",
         "company": "Fannie Mae",
         "role": "Speaker",
         "photo": ""
