@@ -366,6 +366,157 @@ html,body{overflow-x:clip}
 .rail-apt b{display:block;font-weight:600;color:#fff;white-space:nowrap}
 body.railmini .rail-apt{justify-content:center;padding:8px 0 4px}
 body.railmini .rail-apt span{display:none}
+/* ===== Glow-up (Jonna, Nov 24, 2026): Home now matches Member 360's home, its navy hero with On Your Plate and the dark
+   at-a-glance tiles, and the page uses the full width. The .m3h-* rules are copied from Member 360 so the two stay siblings. ===== */
+/* ---------- Home (Jonna, Oct 31, 2026): hero and tiles copied from MISMO Media's home (.hm-hero, .st-tile) ---------- */
+#v-home{padding-top:4px}
+.m3h-hero{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px;background:var(--navy,#0d314c);color:#fff;border-radius:10px;padding:22px 24px;margin-bottom:22px;position:relative;overflow:hidden}
+.m3h-hero::after{content:"";position:absolute;right:-60px;top:-80px;width:280px;height:280px;border-radius:50%;background:radial-gradient(circle,rgba(116,191,235,.22),rgba(116,191,235,0) 70%);pointer-events:none}
+.m3h-eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:#74bfeb}
+.m3h-hi{position:relative;z-index:1;min-width:0}
+.m3h-hi h1{font-size:30px;font-weight:700;line-height:1.15;margin:6px 0 10px;color:#fff}
+.m3h-hi p{font-size:15px;line-height:1.6;color:rgba(255,255,255,.86);margin:0}
+.m3h-em{color:#74bfeb;font-weight:600;text-decoration:none;border-bottom:1px dashed rgba(116,191,235,.45)}
+.m3h-em:hover{color:#fff;border-bottom-color:#fff}
+.m3h-em.late{color:#ffb4a8;border-bottom-color:rgba(255,180,168,.5)}
+.m3h-needs{background:rgba(255,255,255,.07);border:1px solid rgba(116,191,235,.25);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:6px;position:relative;z-index:1;min-width:0}
+.m3h-nh{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.7);display:flex;gap:8px;align-items:baseline}
+.m3h-nh span{letter-spacing:0;text-transform:none;font-weight:500;color:rgba(255,255,255,.5)}
+.m3h-need{all:unset;box-sizing:border-box;cursor:pointer;display:grid;grid-template-columns:62px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:8px 10px;border-radius:6px;background:rgba(255,255,255,.06);border-left:3px solid #74bfeb;font-size:13px;color:#fff;transition:background .15s}
+.m3h-need:hover{background:rgba(255,255,255,.12)}
+.m3h-need.late{border-left-color:#ff8f7d}
+.m3h-need .d{font-size:12px;color:rgba(255,255,255,.65);white-space:nowrap}
+.m3h-need.late .d{color:#ffb4a8;font-weight:600}
+.m3h-need .t{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m3h-need .t b{font-weight:600;margin-right:6px}
+.m3h-need .t span{color:rgba(255,255,255,.7)}
+.m3h-need .w{font-size:12px;color:rgba(255,255,255,.55)}
+.m3h-clear{font-size:13px;color:rgba(255,255,255,.7);padding:6px 2px}
+.m3h-all{margin-top:4px;font-size:13px;font-weight:600;color:#74bfeb;text-decoration:none;white-space:nowrap}
+.m3h-all:hover{color:#fff}
+.m3h-h2row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px;flex-wrap:wrap}
+.m3h-h2{font-size:20px;font-weight:700;margin:0;color:var(--ink)}
+.m3h-asof{font-size:12.5px;color:var(--ink-3)}
+.m3h-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(150px,auto);gap:14px;grid-auto-flow:row dense}
+.m3h-tile{all:unset;box-sizing:border-box;cursor:pointer;position:relative;overflow:hidden;min-width:0;display:flex;flex-direction:column;gap:10px;padding:16px 18px;border-radius:12px;color:#fff;
+  background:radial-gradient(120% 90% at 100% 0%,color-mix(in srgb,var(--k,#74bfeb) 26%,transparent),transparent 60%),linear-gradient(160deg,#10324a,#0b2436);
+  border:1px solid rgba(116,191,235,.18);box-shadow:0 1px 0 rgba(255,255,255,.04) inset,0 10px 24px -14px rgba(6,32,47,.6);transition:transform .18s,box-shadow .18s}
+.m3h-tile:hover{transform:translateY(-3px);box-shadow:0 0 0 1px color-mix(in srgb,var(--k,#74bfeb) 55%,transparent),0 18px 34px -16px rgba(6,32,47,.75)}
+.m3h-tile.still{cursor:default}
+.m3h-tile.still:hover{transform:none}
+.m3h-tile:focus-visible{outline:2px solid #74bfeb;outline-offset:3px}
+.m3h-tile.w2{grid-column:span 2}
+.m3h-tile.w3{grid-column:span 3}
+.m3h-tile.h2{grid-row:span 2}
+.m3h-top{display:flex;align-items:center;gap:8px}
+.m3h-lab{font-size:11px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:color-mix(in srgb,var(--k,#74bfeb) 70%,#fff)}
+.m3h-pill{margin-left:auto;font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;background:rgba(255,255,255,.12);color:#fff;white-space:nowrap}
+.m3h-pill.hot{background:#c94a3b}
+.m3h-big{font-size:40px;font-weight:700;line-height:1;letter-spacing:-.02em;display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums}
+.m3h-big small{font-size:13px;font-weight:600;color:#74bfeb;letter-spacing:0}
+.m3h-sub{font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.78)}
+.m3h-sub b{color:#fff}
+.m3h-ringrow{display:flex;align-items:center;gap:22px;flex-wrap:wrap;flex:1}
+.m3h-renx{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:22px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)}
+@media(max-width:700px){.m3h-renx{grid-template-columns:1fr}}
+.m3h-rxh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.62);margin-bottom:8px}
+.m3h-rxh span{letter-spacing:.02em;text-transform:none;font-weight:500;color:rgba(255,255,255,.5)}
+.m3h-wkb{display:flex;align-items:flex-end;gap:6px;height:66px}
+.m3h-wkb span{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px;height:100%}
+.m3h-wkb i{display:block;width:100%;border-radius:3px 3px 1px 1px;background:rgba(116,191,235,.42)}
+.m3h-wkb .now i{background:#74bfeb}
+.m3h-wkb b{font-size:11px;font-weight:600;line-height:13px;min-height:13px;color:rgba(255,255,255,.82);font-variant-numeric:tabular-nums}
+.m3h-wka{display:flex;justify-content:space-between;font-size:11px;color:rgba(255,255,255,.5);margin-top:5px}
+.m3h-rxf{font-size:12.5px;line-height:1.45;color:rgba(255,255,255,.78);margin-top:8px}
+.m3h-rxf b{color:#fff}
+.m3h-rxi{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:13px}
+.m3h-rxi b{font-weight:600;color:#fff;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.m3h-rxi span{flex:none;font-size:12px;color:rgba(255,255,255,.6)}
+.m3h-ring{position:relative;width:150px;height:150px;flex:none}
+.m3h-ring .arc{transition:stroke-dasharray 1.1s cubic-bezier(.2,.8,.2,1)}
+.m3h-ringmid{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.m3h-ringmid b{font-size:32px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+.m3h-ringmid span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.65);margin-top:4px}
+.m3h-legend{display:flex;flex-direction:column;gap:8px;min-width:170px;flex:1}
+.m3h-li{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13.5px;color:rgba(255,255,255,.85);padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.m3h-li i{width:12px;height:12px;border-radius:3px}
+.m3h-li b{font-size:16px;font-variant-numeric:tabular-nums}
+.m3h-stack{display:flex;height:10px;border-radius:3px;overflow:hidden;background:rgba(255,255,255,.08)}
+.m3h-stack i{display:block;height:100%;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.m3h-prog{height:10px;border-radius:3px;background:rgba(255,255,255,.1);overflow:hidden}
+.m3h-prog i{display:block;height:100%;background:linear-gradient(90deg,#5fd39a,#74bfeb);transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.m3h-trio{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:auto}
+.m3h-tc{background:rgba(255,255,255,.06);border-radius:8px;padding:10px 12px;border-top:3px solid var(--c)}
+.m3h-tc b{display:block;font-size:22px;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.m3h-tc span{font-size:11.5px;color:rgba(255,255,255,.7)}
+.m3h-n{font-family:inherit}
+.m3h-names{display:flex;flex-direction:column;gap:4px;font-size:13px;color:rgba(255,255,255,.85)}
+.m3h-names span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:10px;border-left:2px solid #5fd39a}
+.m3h-bars{display:flex;align-items:flex-end;gap:8px;height:54px}
+.m3h-b{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.m3h-b i{display:block;width:100%;border-radius:3px 3px 0 0;background:color-mix(in srgb,#b79cff 70%,#fff 0%);transition:height .8s cubic-bezier(.2,.8,.2,1);min-height:3px}
+.m3h-b span{font-size:10.5px;color:rgba(255,255,255,.55)}
+.m3h-b.today i{background:#fff}
+.m3h-b.today span{color:#fff;font-weight:700}
+.m3h-fun{display:flex;flex-direction:column;gap:7px;flex:1}
+.m3h-fr{display:grid;grid-template-columns:150px minmax(0,1fr) 36px;gap:10px;align-items:center;font-size:12.5px;color:rgba(255,255,255,.82)}
+.m3h-fr .l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m3h-fr .b{height:10px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.m3h-fr .b i{display:block;height:100%;background:linear-gradient(90deg,#f0b94a,#ffd88a);transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.m3h-fr b{text-align:right;font-variant-numeric:tabular-nums}
+.m3h-feed{display:flex;flex-direction:column;gap:6px}
+.m3h-fi{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:10px;align-items:center;font-size:13px;color:rgba(255,255,255,.8);padding:5px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.m3h-fi .av{width:24px;height:24px;border-radius:5px;background:rgba(116,191,235,.25);color:#fff;font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+.m3h-fi .tx{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.m3h-fi .tx b{color:#fff;font-weight:600}
+.m3h-fi .tm{font-size:11.5px;color:rgba(255,255,255,.5);white-space:nowrap}
+@media(max-width:1200px){.m3h-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.m3h-tile.w3{grid-column:span 2}}
+@media(max-width:860px){.m3h-hero{grid-template-columns:1fr}}
+@media(max-width:700px){.m3h-grid{grid-template-columns:1fr}.m3h-tile.w2,.m3h-tile.w3{grid-column:auto}.m3h-tile.h2{grid-row:auto}.m3h-fr{grid-template-columns:110px minmax(0,1fr) 30px}}
+@media(prefers-reduced-motion:reduce){.m3h-tile{transition:none}}
+
+
+
+/* Home: Team Activity runs the full width under the boxes above it, two columns of entries, so the last row has no empty space (Jonna, Nov 1, 2026) */
+#v-home .m3h-tile.full{grid-column:1/-1}
+#v-home .m3h-tile.full .m3h-feed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:28px;row-gap:6px}
+@media(max-width:700px){#v-home .m3h-tile.full .m3h-feed{grid-template-columns:1fr}}
+main{max-width:none}
+#v-home{padding-top:0}
+#v-home .hgrid{margin-top:22px;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr)}
+.m3h-hi .hero-acts{margin-top:16px}
+.m3h-big{flex-wrap:wrap;row-gap:2px}
+.m3h-names span{border-left-color:var(--k,#5fd39a)}
+/* lists, like Member 360's Payment in Process cards: a colored top edge and a small capital label */
+.panel.pk{border-top:3px solid var(--pk)}
+.ph h2{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+/* Contact Updates (Jonna, Nov 24, 2026) */
+.cu-roles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 12px;padding:2px 0}
+.cu-role{display:flex;align-items:center;gap:8px;font-size:13.5px;color:var(--ink);cursor:pointer;white-space:nowrap;line-height:1.2}
+.cu-role input{margin:0;width:16px;height:16px;flex:none;accent-color:var(--navy-mid)}
+.cu-cur{display:flex;flex-direction:column}
+.cu-ch{padding:10px 14px;font-size:12.5px;font-weight:600;color:var(--ink-2);border-bottom:1px solid var(--rule)}
+.cu-p{display:grid;gap:2px;padding:9px 14px;border-bottom:1px solid var(--rule);font-size:13px}
+.cu-p:last-child{border-bottom:0}
+.cu-p span{color:var(--ink-2);font-size:12.5px;overflow-wrap:anywhere}
+.cu-p em{font-style:normal;font-size:11.5px;font-weight:600;color:var(--ink-3)}
+.fld[hidden]{display:none}
+.pager[hidden]{display:none}
+.cu-how{display:flex;flex-direction:column}
+.cu-how div{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;padding:12px 16px;border-bottom:1px solid var(--rule)}
+.cu-how div:last-child{border-bottom:0}
+.cu-how b{width:24px;height:24px;border-radius:5px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+:root[data-theme="dark"] .cu-how b{background:var(--sky);color:var(--navy)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cu-how b{background:var(--sky);color:var(--navy)}}
+.cu-how span{font-size:13px;color:var(--ink-2);line-height:1.5}
+.cu-how strong{display:block;font-size:13.5px;color:var(--ink);margin-bottom:2px}
+#v-contacts .hgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:stretch}
+.cu-start{display:flex;align-items:center;gap:14px;padding:22px 18px}
+.cu-start .ac-i{background:color-mix(in srgb,#b79cff 26%,var(--surface));color:var(--ink)}
+.cu-start b{display:block;font-size:15px}
+.cu-start span{font-size:13px;color:var(--ink-2);line-height:1.5}
+.cu-start .btn{margin-left:auto}
+@media(max-width:700px){.cu-roles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
 <body>
@@ -413,7 +564,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <div class="railfind">
     <button class="railfind-b" id="rail-qb" type="button" aria-label="Search" title="Search" tabindex="-1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
     <svg class="fi" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
-    <input type="search" id="rail-q" autocomplete="off" spellcheck="false" placeholder="Search" aria-label="Search companies, set-ups and cases">
+    <input type="search" id="rail-q" autocomplete="off" spellcheck="false" placeholder="Search" aria-label="Search companies, set-ups, contact updates and cases">
     <button class="railq-x" id="rail-qx" type="button" aria-label="Clear the search" hidden>×</button>
     <div class="railhits" id="rail-hits" hidden></div>
   </div>
@@ -421,6 +572,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <button type="button" data-hq="home" aria-current="page" title="Home"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg><span>Home</span><b class="nb" id="nb-todo" hidden></b></button>
     
     <button type="button" data-hq="pip" title="Payment in Process"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h3"/></svg><span>Payment in Process</span><b class="nb" id="nb-pip"></b></button>
+<button type="button" data-hq="contacts" title="Contact Updates"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M18 8v6M15 11h6"/></svg><span>Contact Updates</span><b class="nb" id="nb-cu" hidden></b></button>
     <button type="button" data-hq="cases" title="Case Management"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Case Management</span></button>
     <button type="button" data-hq="done" title="Completed"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Completed</span></button>
     <button type="button" data-hq="help" title="Help"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2v.1"/></svg><span>Help</span></button>
@@ -434,32 +586,34 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 
 <main>
   <section class="view" id="v-home">
-    <div class="hero">
-      <div class="hero-l">
-        <div class="hero-eb"><span>Membership Desk</span><span class="hero-dot"></span><span id="asof"></span></div>
-        <h1 id="hello">Membership Desk</h1>
-        <p class="hero-s" id="hero-s"></p>
-        <div class="hero-acts"><button class="hbtn" type="button" data-go="todo">Start on Your To Do</button><button class="hbtn ghost" type="button" id="hero-inv">Add an Invoice</button></div>
-      </div>
-      <div class="hero-r" id="hero-ring"></div>
-    </div>
-    <div class="tiles htiles" id="home-tiles"></div>
-    <div class="hgrid">
-      <div class="hside">
-        <div class="panel" id="work">
-          <div class="ph"><h2>Your To Do</h2><span class="hint" id="work-h"></span></div>
-          <p class="wtip">Open one to see what to set up. Set it up in Aptify, then enter the Aptify Company ID and order number and select Mark Set Up.</p>
-          <div class="chips hchips" id="work-chips"></div>
-          <div class="rows" id="home-todo"></div>
-        </div>
-        <div class="panel"><div class="ph"><h2>Recently Completed</h2><button class="link" type="button" data-go="done">See All&nbsp;→</button></div><div class="rows" id="home-done"></div></div>
-      </div>
-      <div class="hside">
-        <div class="panel"><div class="ph"><h2>Payments to Track</h2><button class="link" type="button" data-go="pip" id="home-piplink">See All&nbsp;→</button></div><div id="home-pipbar"></div><div class="rows" id="home-pip"></div></div>
-        <div class="panel"><div class="ph"><h2>Latest MISMO Cases</h2><button class="link" type="button" data-go="cases">See All&nbsp;→</button></div><div class="rows" id="home-cases"></div></div>
-      </div>
-    </div>
-  </section>
+<div class="m3h-hero">
+<div class="m3h-hi">
+<div class="m3h-eyebrow" id="asof"></div>
+<h1 id="hello">Membership Desk</h1>
+<p id="hero-s"></p>
+<div class="hero-acts"><button class="hbtn" type="button" data-go="todo">Start on Your To Do</button><button class="hbtn ghost" type="button" id="hero-inv">Add an Invoice</button><button class="hbtn ghost" type="button" id="hero-cu">Update a Contact</button></div>
+</div>
+<div class="m3h-needs" id="hero-needs"></div>
+</div>
+<div class="m3h-h2row"><h2 class="m3h-h2">The Desk at a Glance</h2><span class="m3h-asof">Live from Member 360, MISMO Money and Aptify</span></div>
+<div class="m3h-grid" id="home-glance"></div>
+<div class="hgrid">
+<div class="hside">
+<div class="panel pk" id="work" style="--pk:#ff8f7d">
+<div class="ph"><h2>Your To Do</h2><span class="hint" id="work-h"></span></div>
+<p class="wtip">Open one to see what to set up. Set it up in Aptify, then enter the Aptify Company ID and order number and select Mark Set Up.</p>
+<div class="chips hchips" id="work-chips"></div>
+<div class="rows" id="home-todo"></div>
+</div>
+<div class="panel pk" style="--pk:#5fd39a"><div class="ph"><h2>Recently Completed</h2><button class="link" type="button" data-go="done">See All&nbsp;→</button></div><div class="rows" id="home-done"></div></div>
+</div>
+<div class="hside">
+<div class="panel pk" style="--pk:#f0b94a"><div class="ph"><h2>Payments to Track</h2><button class="link" type="button" data-go="pip" id="home-piplink">See All&nbsp;→</button></div><div id="home-pipbar"></div><div class="rows" id="home-pip"></div></div>
+<div class="panel pk" style="--pk:#b79cff"><div class="ph"><h2>Contact Updates</h2><button class="link" type="button" data-go="contacts">See All&nbsp;→</button></div><div class="rows" id="home-cu"></div></div>
+<div class="panel pk" style="--pk:#9fb3c8"><div class="ph"><h2>Latest MISMO Cases</h2><button class="link" type="button" data-go="cases">See All&nbsp;→</button></div><div class="rows" id="home-cases"></div></div>
+</div>
+</div>
+</section>
 
   <section class="view" id="v-todo" hidden>
     <div class="vhead"><div><h1>To Do</h1><div class="vsub">Open one to see what to set up, then enter the Aptify Company ID and order number and select Mark Set Up.</div></div></div>
@@ -470,7 +624,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   <section class="view" id="v-done" hidden>
     <div class="vhead"><div><h1>Completed</h1><div class="vsub">Set-ups marked here, the ones MISMO Money and Aptify confirmed, and your MISMO cases.</div></div></div>
     <div class="chips" id="done-chips"></div>
-    <div class="panel"><div class="rows" id="done-list"></div><div class="pager" id="done-pager"></div></div>
+    <div class="panel pk" style="--pk:#5fd39a"><div class="rows" id="done-list"></div><div class="pager" id="done-pager"></div></div>
   </section>
 
   <section class="view" id="v-help" hidden>
@@ -482,17 +636,30 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     <div class="vhead"><div><h1>Payment in Process</h1><div class="vsub">Invoices that have been sent and not paid yet, Lenders and Non-Lenders apart. Each one comes off when the payment shows up in Aptify, or when someone selects Mark Paid.</div></div><button class="btn" type="button" id="pip-add">Add an Invoice</button></div>
     <div class="tiles" id="pip-tiles"></div>
     <div class="grid2">
-      <div class="panel"><div class="ph"><h2>Lenders</h2><span class="hint" id="pip-lh"></span></div><div class="rows" id="pip-lender"></div></div>
-      <div class="panel"><div class="ph"><h2>Non-Lenders</h2><span class="hint" id="pip-nh"></span></div><div class="rows" id="pip-non"></div></div>
+      <div class="panel pk" style="--pk:#f0b94a"><div class="ph"><h2>Lenders</h2><span class="hint" id="pip-lh"></span></div><div class="rows" id="pip-lender"></div></div>
+      <div class="panel pk" style="--pk:#5fd39a"><div class="ph"><h2>Non-Lenders</h2><span class="hint" id="pip-nh"></span></div><div class="rows" id="pip-non"></div></div>
     </div>
-    <div class="panel" style="margin-top:16px"><div class="ph"><h2>Paid in the Last 60 Days</h2><span class="hint">newest first</span></div><div class="rows" id="pip-paid"></div></div>
+    <div class="panel pk" style="margin-top:16px;--pk:#74bfeb"><div class="ph"><h2>Paid in the Last 60 Days</h2><span class="hint">newest first</span></div><div class="rows" id="pip-paid"></div></div>
   </section>
 
-  <section class="view" id="v-cases" hidden>
+  <section class="view" id="v-contacts" hidden>
+<div class="vhead"><div><h1>Contact Updates</h1><div class="vsub">Send a change to a member's contacts. It goes straight into Member 360, and every update is kept here with who sent it and when.</div></div><button class="btn" type="button" id="cu-add">Update a Contact</button></div>
+<div class="tiles" id="cu-tiles"></div>
+<div class="chips" id="cu-chips"></div>
+<div class="hgrid"><div class="panel pk" style="--pk:#b79cff"><div class="ph"><h2>Submitted Updates</h2><span class="hint" id="cu-h"></span></div><div class="rows" id="cu-list"></div><div class="pager" id="cu-pager"></div></div>
+<div class="panel pk" style="--pk:#74bfeb"><div class="ph"><h2>How It Works</h2><span class="hint" id="cu-co-n"></span></div><div class="cu-how">
+<div><b>1</b><span><strong>Choose the Company</strong>Start typing and pick it from the list, so Member 360 finds the right record. Its contacts show beside the form.</span></div>
+<div><b>2</b><span><strong>Pick What's Changing</strong>Someone new, new details or roles for someone, or someone who has left.</span></div>
+<div><b>3</b><span><strong>Fill In the Details</strong>Name, title, email, phone and roles: Primary, Alternate, Billing, Marketing, Voting Rep and the rest.</span></div>
+<div><b>4</b><span><strong>Send to Member 360</strong>It saves with your name and the time, and shows In Member 360 once it's on the record, usually within minutes.</span></div>
+</div></div></div>
+</section>
+
+<section class="view" id="v-cases" hidden>
     <div class="vhead"><div><h1>Case Management</h1><div class="vsub" id="cases-sub"></div></div></div>
     <div class="tiles" id="case-tiles"></div>
     <div class="band" id="band" style="grid-template-columns:minmax(0,1.25fr) minmax(0,1.1fr) minmax(0,1fr)"></div>
-    <div class="panel" style="margin-top:16px" id="case-panel"><div class="ph" id="case-h"></div><div class="rows cgrid" id="case-list"></div><div class="pager" id="case-pager"></div></div>
+    <div class="panel pk" style="margin-top:16px;--pk:#9fb3c8" id="case-panel"><div class="ph" id="case-h"></div><div class="rows cgrid" id="case-list"></div><div class="pager" id="case-pager"></div></div>
     <div class="panel" style="margin-top:16px" id="case-drop" hidden></div>
   </section>
 </main>
@@ -545,8 +712,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   window.__deskUndo=async f=>change(P=>{const it=P.items.find(x=>x.entry===f.entry);if(it){it.undone=true;it.undoneAt=new Date().toISOString();it.undoneBy=window.__deskMe().name;}});
   /* Payment in Process: the invoices the team adds, kept in desk/invoices (never deleted: Entered by Mistake only marks one) (Jonna, Nov 2, 2026) */
   window.__deskInv=async fn=>{for(let i=0;i<4;i++){const g=await get("invoices");const P=(g.data&&Array.isArray(g.data.items))?g.data:{items:[]};fn(P);P.writtenAt=new Date().toISOString();const r=await put("invoices",P,g.sha);if(r.ok)return P;if(r.status!==409)throw new Error("save "+r.status);}throw new Error("busy");};
-  async function load(){say("Opening the Membership Desk…","Loading what's waiting and what's been set up.");
-    const [T,S,C,Dn,I,AP]=await Promise.all(["todos","square","cases","done","invoices","applications"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
+  /* Contact Updates: every update the team sends, kept in desk/contactupdates (never deleted: Withdraw only marks one) (Jonna, Nov 24, 2026).
+   A missing file starts a new list; any other read error stops the save, so nothing already there is ever written over. */
+window.__deskCU=async fn=>{for(let i=0;i<4;i++){const g=await get("contactupdates").catch(e=>{if(/ 404$/.test(String(e&&e.message)))return {data:null,sha:undefined};throw e;});const P=(g.data&&Array.isArray(g.data.items))?g.data:{items:[]};fn(P);P.writtenAt=new Date().toISOString();const r=await put("contactupdates",P,g.sha);if(r.ok)return P;if(r.status!==409)throw new Error("save "+r.status);}throw new Error("busy");};
+async function load(){say("Opening the Membership Desk…","Loading what's waiting and what's been set up.");
+    const [T,S,C,Dn,I,AP,CUd,PPd]=await Promise.all(["todos","square","cases","done","invoices","applications","contactupdates","people"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
     if(!T.data&&!S.data&&T.err&&S.err){say("The Membership Desk couldn't load","Please refresh. If it keeps happening, email Jonna.");return;}
     const t=T.data||{},s=S.data||{},items=((Dn.data&&Dn.data.items)||[]).filter(x=>!x.undone),doneIds=new Set(items.map(x=>x.id));
     /* a set-up marked done before it had an Aptify ID still counts once the ID arrives (Jonna, Nov 7, 2026) */
@@ -562,7 +732,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         if(a.setupAt||a.setup||a.aptifyId||a.orderNo||a.setUpAt||have.has(a.id)||have.has(nz(a.company)))return;
         if(since&&String(a.submittedAt||"")<since)return;
         appItems.push(deskAppItem(a));have.add(a.id);});}catch(e){console.error("desk applications",e);}
-    window.DESK={asOf:today(),inv:((I&&I.data&&I.data.items)||[]),pip:t.pip||[],invPaid:t.invPaid||{},
+    window.DESK={asOf:today(),cu:((CUd&&CUd.data&&CUd.data.items)||[]),people:((PPd&&PPd.data)||{}),inv:((I&&I.data&&I.data.items)||[]),pip:t.pip||[],invPaid:t.invPaid||{},
       todo:{square:keep("square",s.pending),members:keep("members",(tt.members||[]).concat(appItems)),free:keep("free",tt.free),iif:keep("iif",tt.iif)},
       done:{square:s.done||[],squareWaitingPay:s.waitingPay||[],iif:td.iif||[],members:td.members||[],freeActive:td.freeActive||0},
       cases:C.data||{asOf:today(),total:0,months:{},topicsY:{},channelY:{},byY:{},sameDay:0,closed:0,list:{T:[],C:[],B:[],R:[]}},
@@ -640,44 +810,78 @@ function renderWork(){const kc=k=>TODO.filter(x=>x.kind===k).length;if(hkind&&!k
   const wt=document.querySelector("#work .wtip");if(wt)wt.hidden=!TODO.length;
   const nb=$("nb-todo");if(nb){nb.textContent=TODO.length||"";nb.hidden=!TODO.length;}}
 function renderHome(){const hr=new Date().getHours(),first=(((window.__deskMe&&window.__deskMe().name)||"").split(" ")[0]);
-  $("hello").textContent=(hr<12?"Good Morning":hr<17?"Good Afternoon":"Good Evening")+", "+(first||"Membership Team");
-  const SU=finished().filter(r=>r.grp==="setup"&&r.d),mo=TODAY.slice(0,7),monName=new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{month:"long"}),
-    finM=SU.filter(r=>r.d.slice(0,7)===mo).length,since=SU.map(r=>r.d).sort()[0]||TODAY,
-    oldest=TODO.map(x=>x.sold||x.paid).filter(Boolean).sort()[0],oldD=oldest?Math.max(0,days(oldest,TODAY)):0,
-    P=pipRows(),pL=P.filter(r=>r.lender),pN=P.filter(r=>!r.lender),late=P.filter(r=>r.d&&days(r.d,TODAY)>30).length,C=D.cases,yr=TODAY.slice(0,4),
-    same=C.closed?Math.round(100*C.sameDay/C.closed):0,pl=(n,a,b)=>n===1?a:b,B=x=>h("b",null,x);
-  /* the sentence at the top */
-  const hs=$("hero-s");hs.textContent="";
-  if(SU.length)hs.append("You've completed ",B(SU.length+" "+pl(SU.length,"set-up","set-ups")),(since<TODAY?" since "+fmtS(since):"")+(finM?", "+finM+" of them in "+monName:"")+". ");
-  hs.append(TODO.length?B(TODO.length+" "+pl(TODO.length,"is","are")+" waiting on you"):B("Nothing is waiting on you"),TODO.length?(oldest?", the oldest from "+fmtS(oldest)+".":"."):" right now.");
-  if(P.length)hs.append(" "+P.length+" "+pl(P.length,"payment","payments")+" to track, ",B(money(pipSum(P))+" out"),".");
-  /* the ring: of all the set-ups that have come in, how many are done */
-  const pct=(SU.length+TODO.length)?Math.floor(100*SU.length/(SU.length+TODO.length)):100,LEN=2*Math.PI*54,ring=$("hero-ring"),off=v=>(LEN*(1-v/100)).toFixed(1);
-  ring.innerHTML='<div class="hring"><svg viewBox="0 0 132 132" aria-hidden="true"><defs><linearGradient id="hring-g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#74bfeb"/><stop offset="1" stop-color="#5fd39a"/></linearGradient></defs><circle cx="66" cy="66" r="54" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="12"/><circle class="arc" cx="66" cy="66" r="54" fill="none" stroke="url(#hring-g)" stroke-width="12" stroke-linecap="'+(pct?"round":"butt")+'" stroke-dasharray="'+LEN.toFixed(1)+'" stroke-dashoffset="'+(RED()?off(pct):off(0))+'" transform="rotate(-90 66 66)"/></svg><div class="hring-m"><b>'+pct+'%</b><span>Set Up</span></div></div><div class="hring-c"><b>'+SU.length+'</b> done · <b>'+TODO.length+'</b> to go</div>';
-  ring.title=pct+"% of the set-ups that have come in are done: "+SU.length+" completed, "+TODO.length+" still waiting";
-  if(!RED())setTimeout(()=>{const a=ring.querySelector(".arc");if(a)a.setAttribute("stroke-dashoffset",off(pct));},80);
-  /* the four boxes */
-  const months=[];{let y=+yr,m=+TODAY.slice(5,7);for(let i=0;i<6;i++){months.unshift(y+"-"+String(m).padStart(2,"0"));m--;if(!m){m=12;y--;}}}
-  const mc=months.map(m=>SU.filter(r=>r.d.slice(0,7)===m).length),mx=Math.max(1,...mc),kn=k=>TODO.filter(x=>x.kind===k).length;
-  const T=$("home-tiles");T.textContent="";
-  T.append(
-    ktile({k:"#ff8f7d",ic:HICON.todo,lab:"To Set Up",v:TODO.length,sub:TODO.length?(oldest?"oldest waiting "+oldD+" "+pl(oldD,"day","days"):"ready for you"):"you're all caught up",go:()=>go("todo"),
-      viz:m=>{const ks=Object.keys(KINDS).filter(kn);if(!TODO.length)kbar(m,"Nothing waiting",[{v:1,k:"#5fd39a"}]);else kbar(m,ks.map(k=>kn(k)+" "+(kn(k)===1?KINDS[k].name:KINDS[k].plural)).join(" · "),ks.map(k=>({v:kn(k),k:KINDS[k].k,t:KINDS[k].plural})));}}),
-    ktile({k:"#f0b94a",ic:HICON.pay,lab:"Payments Pending",v:P.length,sub:P.length?money(pipSum(P))+" out"+(late?" · "+late+" over 30 days":""):"nothing waiting on payment",go:()=>go("pip"),
-      viz:m=>kbar(m,P.length?"Lenders "+pL.length+" · Non-Lenders "+pN.length:"No invoices out",[{v:pipSum(pL),k:"#f0b94a",t:"Lenders "+money(pipSum(pL))},{v:pipSum(pN),k:"#5fd39a",t:"Non-Lenders "+money(pipSum(pN))}])}),
-    ktile({k:"#5fd39a",ic:HICON.done,lab:"Completed",v:SU.length,sub:finM+" in "+monName+" · since "+fmtS(since),go:()=>go("done"),
-      viz:m=>{m.classList.add("cols");months.forEach((mm,i)=>{const hh=Math.max(10,Math.round(100*mc[i]/mx)),b=h("i",{class:i===5?"now":"",style:"height:"+(RED()?hh:0)+"%",title:MON[+mm.slice(5)-1]+" "+mm.slice(0,4)+": "+mc[i]+" set up"});m.appendChild(b);if(!RED())setTimeout(()=>{b.style.height=hh+"%";},60+i*60);});}}),
-    ktile({k:"#74bfeb",ic:HICON.cases,lab:"Cases Closed Same Day",v:same,f:v=>Math.round(v)+"%",sub:C.sameDay+" of "+C.closed+" MISMO cases in "+yr,go:()=>go("cases"),
-      viz:m=>kbar(m,C.closed?(C.closed-C.sameDay)+" took longer than a day":caseYTD()+" MISMO cases so far in "+yr,[{v:same,k:"#74bfeb",t:same+"% closed the same day"},{v:100-same,k:"transparent"}])}));
-  /* payments to track: Lenders and Non-Lenders, the oldest five */
-  const pb=$("home-pipbar");pb.textContent="";const aL=pipSum(pL),aN=pipSum(pN);
-  if(P.length){const bb=h("div",{class:"pbar-b"});pb.appendChild(h("div",{class:"pbar"},h("div",{class:"pbar-k"},h("span",null,h("i",{style:"background:#f0b94a"}),"Lenders ",h("b",null,money(aL)),h("em",null,"· "+pL.length)),h("span",null,h("i",{style:"background:#5fd39a"}),"Non-Lenders ",h("b",null,money(aN)),h("em",null,"· "+pN.length))),bb));
-    [[aL,"#f0b94a"],[aN,"#5fd39a"]].forEach(([v,k])=>{if(v>0){const i=h("i",{style:"flex:"+(RED()?v:0)+" 1 0;background:"+k});bb.appendChild(i);if(!RED())setTimeout(()=>{i.style.flexGrow=String(v);},60);}});}
-  const hp=$("home-pip");hp.textContent="";P.slice(0,5).forEach(r=>hp.appendChild(pipRow(r)));if(!P.length)hp.appendChild(h("div",{class:"empty"},"No invoices waiting on payment. Use Add an Invoice at the top to add one."));
-  const pk=$("home-piplink");if(pk)pk.textContent=P.length>5?"See All "+P.length+" →":"See All →";
-  const dn=$("home-done");dn.textContent="";SU.slice(0,6).forEach(r=>dn.appendChild(doneRow2(r)));if(!SU.length)dn.appendChild(h("div",{class:"empty"},"Set-ups you finish show here."));
-  const hc=$("home-cases");hc.textContent="";finished().filter(r=>r.grp==="case").slice(0,4).forEach(r=>hc.appendChild(doneRow2(r)));if(!hc.children.length)hc.appendChild(h("div",{class:"empty"},"No MISMO cases yet this year."));
-  renderWork();pipBadge();}
+$("hello").textContent=(hr<12?"Good Morning":hr<17?"Good Afternoon":"Good Evening")+", "+(first||"Membership Team");
+const SU=(()=>{const seen=new Set();return finished().filter(r=>r.grp==="setup"&&r.d).filter(r=>{const k=slug(r.nm)+"|"+r.kind+"|"+r.d.slice(0,7);if(seen.has(k))return false;seen.add(k);return true;});})()/* the same set-up seen twice (marked here and confirmed by MISMO Money or Aptify) counts once */,mo=TODAY.slice(0,7),monName=new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{month:"long"}),
+finM=SU.filter(r=>r.d.slice(0,7)===mo),since=SU.map(r=>r.d).sort()[0]||TODAY,
+oldest=TODO.map(x=>x.sold||x.paid).filter(Boolean).sort()[0],oldD=oldest?Math.max(0,days(oldest,TODAY)):0,
+P=pipRows(),pL=P.filter(r=>r.lender),pN=P.filter(r=>!r.lender),lateP=P.filter(r=>r.d&&days(r.d,TODAY)>30),C=D.cases,yr=TODAY.slice(0,4),
+same=C.closed?Math.round(100*C.sameDay/C.closed):0,pl=(n,a,b)=>n===1?a:b,
+CU=cuList(),cuM=CU.filter(u=>!u.withdrawn&&String(u.at).slice(0,7)===mo),cuWait=CU.filter(u=>cuState(u).k==="wait");
+const em=(txt,fn,late)=>h("a",{class:"m3h-em"+(late?" late":""),href:"#",onclick:e=>{e.preventDefault();fn();}},txt);
+/* the sentence at the top: what matters today, each part a link to it (Jonna, Nov 24, 2026) */
+const hs=$("hero-s");hs.textContent="";
+if(TODO.length)hs.append(em(TODO.length+" "+pl(TODO.length,"set-up is","set-ups are")+" waiting on you",()=>go("todo"),oldD>14),oldest?", the oldest from "+fmtS(oldest)+". ":". ");
+else hs.append("Nothing is waiting to be set up. ");
+if(P.length){hs.append(em(P.length+" "+pl(P.length,"payment","payments")+" to track",()=>go("pip")),", "+money(pipSum(P))+" out");if(lateP.length)hs.append(", ",em(lateP.length+" over 30 days",()=>go("pip"),true));hs.append(". ");}
+hs.append("You've finished ",em(finM.length+" "+pl(finM.length,"set-up","set-ups")+" in "+monName,()=>go("done")));
+if(cuM.length)hs.append(" and sent ",em(cuM.length+" contact "+pl(cuM.length,"update","updates"),()=>go("contacts")));hs.append(".");
+/* On Your Plate: the next things to do, oldest first */
+const nd=$("hero-needs");nd.textContent="";
+const need=(d,b,s,w,late,fn)=>h("button",{type:"button",class:"m3h-need"+(late?" late":""),onclick:fn},h("span",{class:"d"},d),h("span",{class:"t"},h("b",null,b),h("span",null,s)),h("span",{class:"w"},w));
+const NL=[];
+TODO.forEach(x=>{const dd=x.sold||x.paid,ag=dd?Math.max(0,days(dd,TODAY)):0;NL.push({s:dd||"9999",n:need(dd?fmtS(dd):"New",x.name,KINDS[x.kind].name,"Set Up",ag>14,()=>openPane(x))});});
+lateP.forEach(r=>NL.push({s:r.d,n:need(fmtS(r.d),r.name,money(r.amount)+" · "+days(r.d,TODAY)+" days","Payment",true,()=>openInv(r))}));
+CU.filter(u=>cuState(u).k==="bad").forEach(u=>NL.push({s:String(u.at).slice(0,10),n:need(fmtS(String(u.at).slice(0,10)),u.company,"Contact update needs a look","Contact",true,()=>openCU(u))}));
+NL.sort((a,b)=>a.s.localeCompare(b.s));
+nd.appendChild(h("div",{class:"m3h-nh"},"On Your Plate",h("span",null,NL.length?NL.length+" "+pl(NL.length,"item","items")+", oldest first":"all clear")));
+NL.slice(0,4).forEach(x=>nd.appendChild(x.n));
+if(!NL.length){const lf=SU[0];nd.appendChild(h("div",{class:"m3h-clear"},"Nothing is on your plate. New set-ups from MISMO Money and Member 360 land here"+(lf?"; the last one finished was "+lf.nm+", "+fmtS(lf.d)+".":".")));}
+nd.appendChild(h("a",{class:"m3h-all",href:"#",onclick:e=>{e.preventDefault();go(TODO.length?"todo":P.length?"pip":"done");}},(TODO.length?"Open Your To Do":P.length?"Open Payment in Process":"See What's Been Completed")+"\u00a0→"));
+/* the Desk at a Glance: Member 360's tiles, one big one for the set-up work and four for the rest, so the grid has no gaps */
+const T=$("home-glance");T.textContent="";
+const tile=(cls,k,fn,...kids)=>h("button",{type:"button",class:"m3h-tile"+(cls?" "+cls:""),style:"--k:"+k,onclick:fn},...kids);
+const top=(lab,pill,hot)=>h("div",{class:"m3h-top"},h("span",{class:"m3h-lab"},lab),pill?h("span",{class:"m3h-pill"+(hot?" hot":"")},pill):null);
+const tot=SU.length+TODO.length,pct=tot?Math.floor(100*SU.length/tot):100,R=62,LEN=2*Math.PI*R,kn=k=>TODO.filter(x=>x.kind===k).length;
+const ring=h("div",{class:"m3h-ring"});ring.innerHTML='<svg viewBox="0 0 150 150" aria-hidden="true"><circle cx="75" cy="75" r="'+R+'" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="14"/><circle class="arc" cx="75" cy="75" r="'+R+'" fill="none" stroke="#5fd39a" stroke-width="14" stroke-dasharray="'+(RED()?(LEN*pct/100).toFixed(1):"0")+' '+LEN.toFixed(1)+'" transform="rotate(-90 75 75)"/></svg><div class="m3h-ringmid"><b>'+pct+'%</b><span>Set Up</span></div>';
+if(!RED())setTimeout(()=>{const ar=ring.querySelector(".arc");if(ar)ar.setAttribute("stroke-dasharray",(LEN*pct/100).toFixed(1)+" "+LEN.toFixed(1));},80);
+const leg=h("div",{class:"m3h-legend"},h("div",{class:"m3h-li"},h("i",{style:"background:#5fd39a"}),"Completed",h("b",null,String(SU.length))),...Object.keys(KINDS).map(k=>h("div",{class:"m3h-li"},h("i",{style:"background:"+KINDS[k].k}),KINDS[k].plural+" Waiting",h("b",null,String(kn(k))))));
+const months=[];{let y=+yr,m=+TODAY.slice(5,7);for(let i=0;i<8;i++){months.unshift(y+"-"+String(m).padStart(2,"0"));m--;if(!m){m=12;y--;}}}
+const mc=months.map(m=>SU.filter(r=>r.d.slice(0,7)===m).length),mx=Math.max(1,...mc);
+const wk=h("div",{class:"m3h-wkb"},...months.map((m,i)=>h("span",{class:i===months.length-1?"now":null,title:MON[+m.slice(5)-1]+" "+m.slice(0,4)+": "+mc[i]+" set up"},h("b",null,mc[i]?String(mc[i]):""),h("i",{style:"height:"+Math.max(3,Math.round(50*mc[i]/mx))+"px"}))));
+const longest=TODO.slice().sort((a,b)=>String(a.sold||a.paid||"9999").localeCompare(String(b.sold||b.paid||"9999"))).slice(0,4);
+const right=longest.length?[h("div",{class:"m3h-rxh"},"Waiting the Longest",h("span",null,TODO.length+" in all")),...longest.map(x=>h("div",{class:"m3h-rxi"},h("b",null,x.name),h("span",null,(x.sold||x.paid)?Math.max(0,days(x.sold||x.paid,TODAY))+" days":"new")))]
+:[h("div",{class:"m3h-rxh"},"Latest Finished",h("span",null,finM.length+" in "+monName)),...SU.slice(0,4).map(r=>h("div",{class:"m3h-rxi"},h("b",null,r.nm),h("span",null,fmtS(r.d))))];
+T.appendChild(tile("w2 h2","#5fd39a",()=>go(TODO.length?"todo":"done"),top("Set-Ups",TODO.length?TODO.length+" to set up":"All caught up",TODO.length&&oldD>14),
+h("div",{class:"m3h-ringrow"},ring,leg),
+h("div",{class:"m3h-renx"},h("div",null,h("div",{class:"m3h-rxh"},"Completed by Month",h("span",null,"last 8 months")),wk,h("div",{class:"m3h-wka"},h("span",null,MON[+months[0].slice(5)-1]),h("span",null,"This month"))),h("div",null,...right)),
+h("div",{class:"m3h-sub"},h("b",null,String(SU.length))," set-ups completed since "+fmt(since)+" · "+pct+"% of everything that has come in")));
+const aL=pipSum(pL),aN=pipSum(pN),aT=(aL+aN)||1;
+T.appendChild(tile("","#f0b94a",()=>go("pip"),top("Payments Pending",lateP.length?lateP.length+" over 30 days":(P.length?"on track":"none out"),lateP.length>0),
+h("div",{class:"m3h-big"},h("span",{class:"m3h-n"},money(pipSum(P))),h("small",null,P.length+" "+pl(P.length,"invoice","invoices"))),
+h("div",{class:"m3h-stack"},h("i",{style:"width:"+(100*aL/aT).toFixed(1)+"%;background:#f0b94a"}),h("i",{style:"width:"+(100*aN/aT).toFixed(1)+"%;background:#5fd39a"})),
+h("div",{class:"m3h-sub"},"Lenders ",h("b",null,money(aL))," · Non-Lenders ",h("b",null,money(aN)))));
+T.appendChild(tile("","#74bfeb",()=>go("done"),top("Completed in "+monName,SU.length+" since "+fmtS(since)),
+h("div",{class:"m3h-big"},h("span",{class:"m3h-n"},String(finM.length)),h("small",null,"this month")),
+finM.length?h("div",{class:"m3h-names"},...finM.slice(0,3).map(r=>h("span",null,r.nm))):h("div",{class:"m3h-sub"},SU[0]?"The last one was "+SU[0].nm+", "+fmtS(SU[0].d)+".":"Set-ups you finish show here.")));
+T.appendChild(tile("","#9fb3c8",()=>go("cases"),top("Cases Closed Same Day",caseYTD()+" in "+yr),
+h("div",{class:"m3h-big"},h("span",{class:"m3h-n"},same+"%")),
+h("div",{class:"m3h-prog"},h("i",{style:"width:"+same+"%"})),
+h("div",{class:"m3h-sub"},h("b",null,String(C.sameDay))," of "+C.closed+" MISMO cases closed the day they came in")));
+T.appendChild(tile("","#b79cff",()=>go("contacts"),top("Contact Updates",cuWait.length?cuWait.length+" on the way":(CU.length?"all in Member 360":"")),
+h("div",{class:"m3h-big"},h("span",{class:"m3h-n"},String(cuM.length)),h("small",null,"this month")),
+cuM.length?h("div",{class:"m3h-names"},...cuM.slice(0,3).map(u=>h("span",null,cuWho(u)+" · "+u.company))):h("div",{class:"m3h-sub"},"Use Update a Contact when a member's contact changes. It goes straight into Member 360.")));
+/* payments to track: Lenders and Non-Lenders, the oldest five */
+const pb=$("home-pipbar");pb.textContent="";
+if(P.length){const bb=h("div",{class:"pbar-b"});pb.appendChild(h("div",{class:"pbar"},h("div",{class:"pbar-k"},h("span",null,h("i",{style:"background:#f0b94a"}),"Lenders ",h("b",null,money(aL)),h("em",null,"· "+pL.length)),h("span",null,h("i",{style:"background:#5fd39a"}),"Non-Lenders ",h("b",null,money(aN)),h("em",null,"· "+pN.length))),bb));
+[[aL,"#f0b94a"],[aN,"#5fd39a"]].forEach(([v,k])=>{if(v>0){const i=h("i",{style:"flex:"+(RED()?v:0)+" 1 0;background:"+k});bb.appendChild(i);if(!RED())setTimeout(()=>{i.style.flexGrow=String(v);},60);}});}
+const hp=$("home-pip");hp.textContent="";P.slice(0,5).forEach(r=>hp.appendChild(pipRow(r)));if(!P.length)hp.appendChild(h("div",{class:"empty"},"No invoices waiting on payment. Use Add an Invoice at the top to add one."));
+const pk=$("home-piplink");if(pk)pk.textContent=P.length>5?"See All "+P.length+"\u00a0→":"See All\u00a0→";
+const dn=$("home-done");dn.textContent="";SU.slice(0,6).forEach(r=>dn.appendChild(doneRow2(r)));if(!SU.length)dn.appendChild(h("div",{class:"empty"},"Set-ups you finish show here."));
+/* the two columns end together: Recently Completed shows more when the right side is taller, so there is no empty space under it */
+requestAnimationFrame(()=>{const sd=document.querySelectorAll("#v-home .hgrid>.hside");if(sd.length<2||$("v-home").hidden)return;let i=dn.children.length;while(SU.length&&i<SU.length&&i<20&&sd[0].offsetHeight+40<sd[1].offsetHeight){dn.appendChild(doneRow2(SU[i]));i++;}});
+const hcu=$("home-cu");hcu.textContent="";CU.slice(0,4).forEach(u=>hcu.appendChild(cuRow(u)));if(!CU.length)hcu.appendChild(h("div",{class:"empty"},"Contact updates you send show here. Use Update a Contact at the top."));
+const hc=$("home-cases");hc.textContent="";finished().filter(r=>r.grp==="case").slice(0,4).forEach(r=>hc.appendChild(doneRow2(r)));if(!hc.children.length)hc.appendChild(h("div",{class:"empty"},"No MISMO cases yet this year."));
+renderWork();pipBadge();cuBadge();}
 
 /* ---------- To Do ---------- */
 let tkind="";
@@ -977,7 +1181,7 @@ const HELP=[
    ["Open It","The email button, or selecting it under Your To Do on Home, opens that exact item, with everything you need on the left: company, level, price, special rate and membership dates. Sign in with your own MISMO sign-in if asked."],
    ["Set It Up in Aptify","Add or find the company in Aptify and create the membership order with the level, price and dates shown. Put any special rate (TMC, Broker, ACUMA) in the order line's description. For Square set-ups and IIF lenders, update the IIF quotation already in Aptify to the amount paid and ship it instead."],
    ["Record the IDs and Mark Set Up","Back here, enter the Aptify Company ID (required), the Aptify order number and, if you added a person, the Aptify Person ID. Select Mark Set Up. It moves to Completed."]],
-  notes:["<b>Marked one by mistake?</b> Select Undo in the message at the bottom of the screen right after. Later than that, email Jonna and she'll reopen it.","<b>Nothing arrives by email?</b> Everything waiting is always on Home, under Your To Do, oldest first, so you can work straight from there.","<b>The boxes at the top of Home</b> show how things stand: what's left to set up, payments waiting, what's been completed and how many cases closed the same day. Select any box to go to it. The ring shows how much of all the set-up work that has come in is done."]},
+  notes:["<b>Marked one by mistake?</b> Select Undo in the message at the bottom of the screen right after. Later than that, email Jonna and she'll reopen it.","<b>Nothing arrives by email?</b> Everything waiting is always on Home, under Your To Do, oldest first, so you can work straight from there.","<b>The boxes at the top of Home</b> show how things stand: what's left to set up, payments waiting, what's been completed and how many cases closed the same day. Select any box to go to it. The Set-Ups box shows how much of all the set-up work that has come in is done."]},
  {id:"square",k:"#74bfeb",name:"Square Set-Ups",lead:"A company paid MISMO through Square for a special rate (TMC, Broker or ACUMA). MISMO Money sees the payment and sends the set-up here.",
   steps:[["Check the Details","The left side shows the company, the level, the special rate, what they paid and the membership dates."],
    ["Set Up in Aptify","Find the company's IIF quotation, which is already in Aptify. Update it to the amount paid, put the special rate in the order line's description, and ship it. If there's no quotation, add the membership order at the level and price shown."],
@@ -1023,7 +1227,13 @@ const HELP=[
    ["Renewals","A renewal covers the renewal year, January 1 to December 31. The 15th rule never applies to a renewal."],
    ["Through Date","A new membership runs to December 31 of its first year; a dues deal adds the following year. A free membership for a subsidiary runs to its parent company's end date."]],
   notes:[]},
- {id:"faq",k:"#ff8f7d",name:"Questions",faq:[
+ {id:"contacts",k:"#b79cff",name:"Contact Updates",lead:"When a member's contacts change (someone new, a new email, title or roles, or someone who has left), send it from Contact Updates. It goes straight into Member 360, and every update stays on the Contact Updates page with who sent it and when.",
+steps:[["Select Update a Contact","On Contact Updates, or at the top of Home. Start typing the company and choose it from the list, so Member 360 finds the right record. Its contacts in Member 360 show on the right."],
+["Pick What's Changing","Add Someone New, Change Someone's Details or Roles, or Someone Has Left the Company. For a change or someone leaving, choose the contact; their details fill in so you only change what's different."],
+["Fill In the Details","First and last name, title, email and phone, and tick their roles: Primary, Alternate, Billing, Marketing, Voting Rep and the rest. For a change, the roles ticked replace the contact's roles."],
+["Send to Member 360","It saves with your name and the time. Member 360 puts it on the company's record as soon as Member 360 is open, usually within minutes, and the update then shows In Member 360."]],
+notes:["<b>Sent one by mistake?</b> Open it and select Withdraw This Update while it still shows On the Way. Once it's In Member 360, send another update to put it right.","<b>Needs a Look</b> means Member 360 couldn't apply it, for example the contact was no longer on the record. The reason shows when you open it.","<b>Someone who has left</b> moves to Former Contacts on the company's record in Member 360. Nothing is deleted, and Aptify isn't changed: Member 360 is where MISMO's contacts and roles are kept."]},
+{id:"faq",k:"#ff8f7d",name:"Questions",faq:[
   ["Where do I find the Aptify Company ID?","It's the ID on the company's record in Aptify. For a new company, add it in Aptify first and use the ID it's given."],
   ["Where do I find the order number?","It's the ID of the membership order you created in Aptify for this set-up."],
   ["Do I need the Person ID?","Only if you added a new person record in Aptify for this set-up. Otherwise leave it blank."],
@@ -1122,19 +1332,119 @@ function openInv(r){cur=r||{add:true};const B=$("pane-b");B.textContent="";const
 $("pip-add").addEventListener("click",()=>openInv(null));
 {const hi=$("hero-inv");if(hi)hi.addEventListener("click",()=>openInv(null));}
 
+/* ---------- Contact Updates (Jonna, Nov 24, 2026): the membership team sends a change to a member's contacts: someone new, new
+details or roles, or someone who has left. Each one is saved to data/contactupdates with who sent it and when (kept, never deleted:
+one sent by mistake is withdrawn). Member 360 puts it on the company's record as soon as it's open (and every 5 minutes while it
+stays open) and reports back in data/people, which also lists each member's and prospect's current contacts for the form. ---------- */
+const CU_ITEMS=(D.cu||[]).slice(),PEOPLE=D.people||{},CO=(PEOPLE.companies||[]),APPLIED=PEOPLE.applied||{};
+const CU_ROLES=["Primary","Alternate","Billing","Marketing","Voting Rep","Voting Alternate","Compliance","Authorized Signer","IIF Primary","IIF Secondary","IIF Billing","IIF Rep"];
+const CU_ACT={add:"Add Someone New",change:"Change Someone's Details or Roles",left:"Someone Has Left the Company"};
+function cuList(){return CU_ITEMS.slice().sort((a,b)=>String(b.at).localeCompare(String(a.at)));}
+function cuWho(u){return u.name||(u.target&&(u.target.name||u.target.email))||u.email||"Contact";}
+function cuState(u){const a=APPLIED[u.id];if(a&&a.ok!==false)return {k:"in",t:"In Member 360",c:"#5fd39a",r:a.r,at:a.at};if(u.withdrawn)return {k:"off",t:"Withdrawn",c:"#9fb3c8"};
+if(a)return {k:"bad",t:"Needs a Look",c:"#ff8f7d",r:a.r};return {k:"wait",t:"On the Way",c:"#f0b94a"};}
+function cuWhat(u){const r=(u.roles||[]).join(", ");return u.action==="left"?cuWho(u)+" has left":u.action==="change"?"Updated "+cuWho(u)+(r?", "+r:""):"Added "+cuWho(u)+(r?" as "+r:"");}
+function cuRow(u){const s=cuState(u);return h("button",{type:"button",class:"row r2",style:"--k:"+s.c,onclick:()=>openCU(u)},h("span",{class:"dot"}),h("span",{class:"nm",title:u.company},u.company,h("small",null,fmtS(String(u.at).slice(0,10))+" · "+cuWhat(u)+(u.byName?" · "+String(u.byName).split(" ")[0]:""))),h("span",{class:"age"+(s.k==="in"?" ok":s.k==="bad"?" late":"")},s.t));}
+function cuBadge(){const n=CU_ITEMS.filter(u=>cuState(u).k==="bad").length,nb=$("nb-cu");if(nb){nb.textContent=n||"";nb.hidden=!n;}}
+async function cuSave(fn,okText){try{const P=await window.__deskCU(fn);CU_ITEMS.length=0;(P.items||[]).forEach(x=>CU_ITEMS.push(x));closePane();renderAll();
+$("toast-t").textContent=okText;$("toast-u").hidden=true;$("toast").classList.add("on");clearTimeout(tt);tt=setTimeout(()=>{$("toast").classList.remove("on");$("toast-u").hidden=false;},5000);return true;}
+catch(e){console.error("contact update save",e);return false;}}
+let cuF="",cuPg=0;
+function renderContacts(){const L=cuList(),yr=TODAY.slice(0,4),mo=TODAY.slice(0,7),Y=L.filter(u=>!u.withdrawn&&String(u.at).startsWith(yr)),by=a=>Y.filter(u=>u.action===a).length;
+tiles($("cu-tiles"),[
+{k:"#b79cff",lab:"Sent This Month",v:L.filter(u=>!u.withdrawn&&String(u.at).slice(0,7)===mo).length,sub:Y.length+" this year",go:()=>{cuF="";cuPg=0;renderContacts();}},
+{k:"#5fd39a",lab:"People Added",v:by("add"),sub:"in "+yr},
+{k:"#74bfeb",lab:"Details or Roles Changed",v:by("change"),sub:"in "+yr},
+{k:"#ff8f7d",lab:"Left the Company",v:by("left"),sub:"moved to Former Contacts in Member 360"}]);
+const KC2={wait:"#f0b94a",in:"#5fd39a",bad:"#ff8f7d",off:"#9fb3c8"};
+const ch=$("cu-chips");ch.textContent="";[["","Everything"],["wait","On the Way"],["in","In Member 360"],["bad","Needs a Look"],["off","Withdrawn"]].forEach(([v,l])=>{const n=v?L.filter(u=>cuState(u).k===v).length:L.length;if(v&&!n)return;
+ch.appendChild(h("button",{type:"button",class:"chipb"+(cuF===v?" on":""),"aria-pressed":cuF===v?"true":"false",style:"--k:"+(v?KC2[v]:"#b79cff"),onclick:()=>{cuF=v;cuPg=0;renderContacts();}},h("i",null),l,h("em",null,String(n))));});
+const F=L.filter(u=>!cuF||cuState(u).k===cuF),per=25,pages=Math.max(1,Math.ceil(F.length/per));if(cuPg>=pages)cuPg=pages-1;
+const box=$("cu-list");box.textContent="";F.slice(cuPg*per,cuPg*per+per).forEach(u=>box.appendChild(cuRow(u)));
+if(!F.length){if(L.length)box.appendChild(h("div",{class:"empty"},"Nothing here."));else{const ic=h("span",{class:"ac-i"});ic.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.6-3.6 3.3-5.5 6.5-5.5s5.9 1.9 6.5 5.5"/><path d="M18 8v6M15 11h6"/></svg>';box.appendChild(h("div",{class:"cu-start"},ic,h("div",null,h("b",null,"No contact updates yet"),h("span",null,"When a member tells you about a new contact, a new email or title, new roles, or someone who has left, send it here. It goes straight into Member 360, and every update you send is listed here.")),h("button",{type:"button",class:"btn",onclick:()=>openCU(null)},"Update a Contact")));}}
+const pg=$("cu-pager");pg.textContent="";pg.hidden=pages<2;
+if(pages>1)pg.append(h("button",{type:"button",disabled:cuPg?null:"",onclick:()=>{cuPg--;renderContacts();}},"‹ Newer"),h("span",null,"Page "+(cuPg+1)+" of "+pages),h("span",{class:"sp"},F.length+" updates"),h("button",{type:"button",disabled:cuPg<pages-1?null:"",onclick:()=>{cuPg++;renderContacts();}},"Older ›"));
+{const cn=$("cu-co-n");if(cn)cn.textContent=CO.length?CO.length.toLocaleString("en-US")+" companies to choose from":"";}$("cu-h").textContent=F.length?F.length+" "+(F.length===1?"update":"updates")+", newest first":"";
+cuBadge();}
+/* the panel: send an update, or one update with where it stands */
+function openCU(u,pre){cur=u||{cuAdd:true};const B=$("pane-b");B.textContent="";const me=(window.__deskMe&&window.__deskMe())||{};
+const kv=rows=>h("div",{class:"kv"},...rows.filter(x=>x&&x[1]!=null&&x[1]!=="").flatMap(x=>[h("div",null,x[0]),h("div",null,String(x[1]))]));
+const open=()=>{$("pane").classList.add("on");$("pane").setAttribute("aria-hidden","false");};
+if(u){const s=cuState(u),tm=new Date(u.at);$("pane-t").textContent=u.company;$("pane-s").textContent=CU_ACT[u.action]+" · "+s.t;
+B.appendChild(h("div",{class:"sect"},h("h3",null,"The Update"),kv([["Company",u.company],["Aptify Company ID",u.cid],["What's Changing",CU_ACT[u.action]],["Which Contact",u.action!=="add"&&u.target?(u.target.name||u.target.email):""],["Name",u.name],["Title",u.title],["Email",u.email],["Phone",u.phone],["Roles",(u.roles||[]).join(", ")],["Note",u.note],["Sent By",(u.byName||"")+", "+fmt(String(u.at).slice(0,10))+(isNaN(tm)?"":" at "+tm.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}))]])));
+const st=h("div",{style:"padding:12px 14px;font-size:13.5px;line-height:1.55;color:var(--ink-2)"});
+if(s.k==="in")st.textContent="Member 360 put this on "+u.company+"'s record"+(s.at?" on "+fmt(String(s.at).slice(0,10)):"")+": "+(s.r||"done")+". To change it again, send another update.";
+else if(s.k==="bad")st.textContent="Member 360 couldn't apply this: "+(s.r||"something didn't match")+". Check the company and the contact and send it again, or email Jonna.";
+else if(s.k==="off")st.textContent="Withdrawn by "+(u.withdrawnBy||"the desk")+(u.withdrawnAt?" on "+fmt(String(u.withdrawnAt).slice(0,10)):"")+". Nothing was changed in Member 360.";
+else st.textContent="Saved. Member 360 puts it on the company's record the next time it's open, usually within minutes. Nothing more to do.";
+const sect=h("div",{class:"sect"},h("h3",null,"Where It Stands"),st);
+if(s.k==="wait"){const say=h("span",{class:"saynote"},"Only while it's still on the way to Member 360.");
+const wd=h("button",{type:"button",class:"btn ghost",onclick:async()=>{wd.disabled=true;say.textContent="Saving…";
+if(!await cuSave(P=>{const x=P.items.find(i=>i.id===u.id);if(x&&!x.withdrawn){x.withdrawn=true;x.withdrawnAt=new Date().toISOString();x.withdrawnBy=me.name||"";}},"Update withdrawn")){wd.disabled=false;say.textContent=window.DESK_TEST?"This is the test copy, so nothing is saved.":"That didn't save. Please try again.";}}},"Withdraw This Update");
+sect.appendChild(h("div",{class:"acts",style:"padding:0 14px 14px"},wd,say));}
+B.appendChild(sect);open();return;}
+$("pane-t").textContent="Update a Contact";$("pane-s").textContent="Goes straight into Member 360, with your name";
+const dl=h("datalist",{id:"cu-cos"},...CO.map(c=>h("option",{value:c.n})));
+const co=h("input",{id:"cu-co",list:"cu-cos",autocomplete:"off",placeholder:"Start typing the company name",value:pre||""});
+const act=h("select",{id:"cu-act"},...Object.keys(CU_ACT).map(k=>h("option",{value:k},CU_ACT[k])));
+const who=h("select",{id:"cu-who"});
+const fn=h("input",{id:"cu-fn",autocomplete:"off"}),ln=h("input",{id:"cu-ln",autocomplete:"off"}),ti=h("input",{id:"cu-ti",autocomplete:"off"}),em2=h("input",{id:"cu-em",type:"email",autocomplete:"off"}),ph=h("input",{id:"cu-ph",autocomplete:"off"}),note=h("textarea",{id:"cu-note",rows:"2",placeholder:"e.g. from Jane's email of Nov 20"});
+const rbox=h("div",{class:"cu-roles"},...CU_ROLES.map(r=>h("label",{class:"cu-role"},h("input",{type:"checkbox",value:r}),h("span",null,r))));
+const curBox=h("div",{class:"cu-cur"}),say=h("span",{class:"saynote"},"Saves with your name and the time.");
+let C=null;
+const findCo=()=>{const v=co.value.trim().toLowerCase();C=v?(CO.find(c=>c.n.toLowerCase()===v)||null):null;return C;};
+const fillWho=()=>{who.textContent="";if(!C){who.disabled=true;who.appendChild(h("option",{value:""},co.value.trim()?"Choose the company from the list":"Choose the company first"));return;}
+who.disabled=false;who.appendChild(h("option",{value:""},C.p.length?"Choose the contact":"No contacts on file"));C.p.forEach((p,i)=>who.appendChild(h("option",{value:String(i)},(p[1]||p[3])+(p[1]&&p[3]?" · "+p[3]:""))));};
+const showCur=()=>{curBox.textContent="";if(!C){curBox.appendChild(h("div",{class:"empty"},CO.length?"Choose a company to see its contacts in Member 360.":"The company list comes from Member 360 and arrives the next time Member 360 is open."));return;}
+curBox.appendChild(h("div",{class:"cu-ch"},C.n+(C.cid?" · Aptify ID "+C.cid:"")+(C.m?" · Member":" · Prospect")));
+if(!C.p.length)curBox.appendChild(h("div",{class:"empty"},"No contacts on file yet."));
+C.p.forEach(p=>curBox.appendChild(h("div",{class:"cu-p"},h("b",null,p[1]||p[3]||"No name"),h("span",null,[p[2],p[3]].filter(Boolean).join(" · ")),p[4]?h("em",null,p[4].split(",").join(" · ")):null)));};
+const clear=()=>{[fn,ln,ti,em2,ph].forEach(x=>x.value="");rbox.querySelectorAll("input").forEach(i=>i.checked=false);};
+const sync=()=>{const a=act.value;who.closest(".fld").hidden=a==="add";[fn,ln,ti,em2,ph].forEach(x=>x.closest(".fld").hidden=a==="left");rbox.closest(".fld").hidden=a==="left";send.textContent=a==="left"?"Send: Has Left":"Send to Member 360";if(a==="add"){who.value="";clear();}};
+const pickWho=()=>{const p=C&&who.value!==""?C.p[+who.value]:null;clear();if(!p)return;const nm=String(p[1]||"").trim().split(/\s+/).filter(Boolean);fn.value=nm.length>1?nm.slice(0,-1).join(" "):(nm[0]||"");ln.value=nm.length>1?nm[nm.length-1]:"";ti.value=p[2]||"";em2.value=p[3]||"";const R=String(p[4]||"").split(",");rbox.querySelectorAll("input").forEach(i=>i.checked=R.includes(i.value));};
+co.addEventListener("input",()=>{findCo();fillWho();showCur();});act.addEventListener("change",sync);who.addEventListener("change",pickWho);
+const send=h("button",{type:"button",class:"btn",onclick:async()=>{const a=act.value;[co,who,fn,em2].forEach(x=>x.classList.remove("bad"));
+if(!co.value.trim()){co.classList.add("bad");say.textContent="Enter the company.";co.focus();return;}
+findCo();if(!C){co.classList.add("bad");say.textContent="Choose the company from the list, so Member 360 finds the right record.";co.focus();return;}
+const p=a!=="add"&&who.value!==""?C.p[+who.value]:null;if(a!=="add"&&!p){who.classList.add("bad");say.textContent="Choose the contact.";who.focus();return;}
+const name=[fn.value.trim(),ln.value.trim()].filter(Boolean).join(" "),e=em2.value.trim();
+if(a==="add"&&!name&&!e){fn.classList.add("bad");say.textContent="Enter at least a name or an email.";fn.focus();return;}
+if(e&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){em2.classList.add("bad");say.textContent="That email doesn't look right.";em2.focus();return;}
+const roles=[...rbox.querySelectorAll("input:checked")].map(i=>i.value);send.disabled=true;say.textContent="Saving…";
+const L=a==="left";const x={id:"cu-"+Date.now().toString(36)+Math.random().toString(36).slice(2,6),at:new Date().toISOString(),by:me.email||"",byName:me.name||"",key:C.k,cid:C.cid||"",company:C.n,action:a,
+target:p?{key:p[0],name:p[1]||"",email:p[3]||""}:null,name:L?(p[1]||""):name,first:L?"":fn.value.trim(),last:L?"":ln.value.trim(),title:L?"":ti.value.trim(),email:L?(p[3]||""):e,phone:L?"":ph.value.trim(),roles:L?[]:roles,note:note.value.trim()};
+if(!await cuSave(P=>{P.items.push(x);},cuWhat(x)+" at "+x.company+": sent to Member 360")){send.disabled=false;say.textContent=window.DESK_TEST?"This is the test copy, so nothing is saved.":"That didn't save. Please try again.";}}},"Send to Member 360");
+B.appendChild(h("div",{class:"sect"},h("h3",null,"The Update"),h("div",{class:"form"},dl,
+h("div",{class:"fld wide"},h("label",{for:"cu-co"},"Company"),co,h("small",null,"As it is in Member 360, members and prospects")),
+h("div",{class:"fld"},h("label",{for:"cu-act"},"What's Changing"),act),
+h("div",{class:"fld"},h("label",{for:"cu-who"},"Which Contact"),who),
+h("div",{class:"fld"},h("label",{for:"cu-fn"},"First Name"),fn),
+h("div",{class:"fld"},h("label",{for:"cu-ln"},"Last Name"),ln),
+h("div",{class:"fld"},h("label",{for:"cu-ti"},"Title"),ti),
+h("div",{class:"fld"},h("label",{for:"cu-em"},"Email"),em2),
+h("div",{class:"fld"},h("label",{for:"cu-ph"},"Phone"),ph),
+h("div",{class:"fld"},h("label",null,"Sent By"),h("input",{value:me.name||"",disabled:""}),h("small",null,"From your sign-in")),
+h("div",{class:"fld wide"},h("label",null,"Roles"),rbox,h("small",null,"For a change, these replace the contact's roles")),
+h("div",{class:"fld wide"},h("label",{for:"cu-note"},"Note"),note,h("small",null,"Optional: where the change came from")),
+h("div",{class:"acts"},send,h("button",{type:"button",class:"btn ghost",onclick:closePane},"Cancel"),say))));
+B.appendChild(h("div",{class:"sect",style:"align-self:start"},h("h3",null,"Contacts in Member 360 Now"),curBox));
+findCo();fillWho();showCur();sync();open();setTimeout(()=>co.focus(),240);}
+$("cu-add").addEventListener("click",()=>openCU(null));
+{const hc=$("hero-cu");if(hc)hc.addEventListener("click",()=>openCU(null));}
+
 /* ---------- pages ---------- */
 function go(tab){if(tab==="todo"){if($("v-home").hidden)show("home");setTimeout(()=>{const w=$("work");if(w)w.scrollIntoView({behavior:RED()?"auto":"smooth",block:"start"});},80);return;}const b=document.querySelector('.hq nav button[data-hq="'+tab+'"]');if(b)b.click();}
 function show(tab){document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>{if(b.dataset.hq===tab)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");});
  document.querySelectorAll("main .view").forEach(v=>v.hidden=v.id!=="v-"+tab);closePane();
- ({home:renderHome,todo:renderHome,pip:renderPip,done:renderDone,cases:renderCases,help:renderHelp})[tab]();window.scrollTo(0,0);}
+ ({home:renderHome,todo:renderHome,pip:renderPip,contacts:renderContacts,done:renderDone,cases:renderCases,help:renderHelp})[tab]();window.scrollTo(0,0);}
 document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.hq)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 function renderAll(){const t=(document.querySelector(".hq nav button[aria-current]")||{dataset:{hq:"home"}}).dataset.hq;renderHome();if(t!=="home")show(t);}
-$("asof").textContent="As of "+fmt(TODAY);try{const c=(window.DESK&&window.DESK.cases)||{},d=String(c.asOf||"").slice(0,10),el=$("rail-apt-d");if(el)el.textContent=d?new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}):"Not yet";const r=$("rail-apt");if(r)r.title="The latest Aptify data on the desk is from "+(d?fmt(d):"no report yet")+(c.fromEmail?", from the weekly Aptify email received "+new Date(c.fromEmail).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"")}catch(e){console.error("rail apt",e)}
-window.__desk={todo:()=>TODO,finished,open:openPane,go};
+$("asof").textContent=new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+" · Membership Desk";try{const c=(window.DESK&&window.DESK.cases)||{},d=String(c.asOf||"").slice(0,10),el=$("rail-apt-d");if(el)el.textContent=d?new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}):"Not yet";const r=$("rail-apt");if(r)r.title="The latest Aptify data on the desk is from "+(d?fmt(d):"no report yet")+(c.fromEmail?", from the weekly Aptify email received "+new Date(c.fromEmail).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"")}catch(e){console.error("rail apt",e)}
+window.__desk={todo:()=>TODO,finished,open:openPane,go,cu:()=>CU_ITEMS.map(u=>({u,company:u.company,what:cuWhat(u)})),openCU};
 renderHome();
 /* a link from an email opens the set-up straight away: #todo/<id> */
-function fromHash(){const v=/^#(home|todo|pip|cases|done|help)$/.exec(location.hash||"");if(v){go(v[1]);return;}const m=/^#todo\/(.+)$/.exec(location.hash||"");if(m){const x=TODO.find(t=>t.id===decodeURIComponent(m[1]));go("todo");if(x)setTimeout(()=>openPane(x),150);}}
+function fromHash(){const v=/^#(home|todo|pip|contacts|cases|done|help)$/.exec(location.hash||"");if(v){go(v[1]);return;}const m=/^#todo\/(.+)$/.exec(location.hash||"");if(m){const x=TODO.find(t=>t.id===decodeURIComponent(m[1]));go("todo");if(x)setTimeout(()=>openPane(x),150);}}
 fromHash();window.addEventListener("hashchange",fromHash);
  /* ---------- Shared Rules (Jonna, Nov 7, 2026): the IIF amount and the start-date cutoff day come from Member 360, Settings, Shared Rules, so the Desk's wording always matches the rules in use. ---------- */
  (async()=>{try{let tok="";for(let i=0;i<30&&!tok;i++){try{tok=window.ResourcesSession&&ResourcesSession.token&&ResourcesSession.token();}catch(e){}if(!tok)await new Promise(r=>setTimeout(r,1000));}if(!tok)return;
@@ -1191,9 +1501,10 @@ if(new Date().getMonth()===11)document.documentElement.setAttribute("data-season
     const score=(name)=>{ const n=norm(name); return n===t ? 3 : n.indexOf(t)===0 ? 2 : n.indexOf(t)>=0 ? 1 : 0; };
     const push=(group,name,where,go)=>{ if(out.length<60) out.push({group,name,where,go,s:score(name)}); };
     try{ (window.__desk.todo()||[]).forEach(x=>{ if(norm(x.name).indexOf(t)<0) return; push('Waiting on You', x.name, x.level+(x.paid?' · paid '+new Date(x.paid+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''), ()=>{ window.__desk.go('todo'); setTimeout(()=>window.__desk.open(x),150); }); }); }catch(e){}
-    try{ (window.__desk.finished()||[]).forEach(r=>{ if(norm(r.nm+' '+r.wh).indexOf(t)<0) return; push(r.grp==='case'?'Aptify Cases':'Completed', r.nm, r.wh, ()=>{ window.__desk.go('done'); }); }); }catch(e){}
+    try{ (window.__desk.cu()||[]).forEach(r=>{ if(norm(r.company+' '+r.what).indexOf(t)<0) return; push('Contact Updates', r.company, r.what, ()=>{ window.__desk.go('contacts'); setTimeout(()=>window.__desk.openCU(r.u),150); }); }); }catch(e){}
+try{ (window.__desk.finished()||[]).forEach(r=>{ if(norm(r.nm+' '+r.wh).indexOf(t)<0) return; push(r.grp==='case'?'Aptify Cases':'Completed', r.nm, r.wh, ()=>{ window.__desk.go('done'); }); }); }catch(e){}
     const best={}; out.forEach(h=>{ best[h.group]=Math.max(best[h.group]||0, h.s); });
-    const ORDER=['Waiting on You','Completed','Aptify Cases'];
+    const ORDER=['Waiting on You','Contact Updates','Completed','Aptify Cases'];
     out.sort((a,b)=>(best[b.group]-best[a.group])||(ORDER.indexOf(a.group)-ORDER.indexOf(b.group))||(b.s-a.s)||String(a.name).localeCompare(String(b.name)));
     return out;
   }

@@ -41,6 +41,13 @@
       "by": "jycritchley",
       "note": "Padding inside the Membership Application box",
       "sha256": "33344a1b8d7acc70e2521d89d26b2b120259e79b7bc7b6468b4a86214b2ec9d9"
+    },
+    {
+      "version": "20261124-0249",
+      "at": "2026-11-24T02:49:03.825Z",
+      "by": "jycritchley",
+      "note": "Home in Member 360's style; new Contact Updates page",
+      "sha256": "b5ecc2a16f94ae5afd6772e66ac90171943f253c9da914218453bb50810ddc61"
     }
   ]
 }
