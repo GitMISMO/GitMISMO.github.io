@@ -2081,6 +2081,20 @@ p,.sub,.lede{text-wrap:pretty}
 .rv-decb.on{color:var(--ink);font-weight:600;background:var(--surface-2,#eef4f9);border-color:var(--border)}
 .rv-decb-update.on{border-color:#0f7b5c;color:#0f7b5c}.rv-decb-dont.on{border-color:#b3372c;color:#b3372c}.rv-decb-unsure.on{border-color:#8a5d0f;color:#8a5d0f}
 @media (max-width:640px){ .rvt .rv-dech,.rvt .rv-decc{width:auto} .rv-deccount{margin-left:0;width:100%} }
+/* review progress bar (Nov 23) */
+.rv-prog{border:1px solid var(--border);border-left:4px solid var(--accent);border-radius:6px;padding:10px 12px;background:var(--surface)}
+.rv-prog-top{display:flex;align-items:baseline;gap:10px;font-size:13px;color:var(--ink)}
+.rv-prog-pct{font-size:15px;min-width:40px;color:var(--ink)}.rv-prog-tx{flex:1;color:var(--ink-2)}.rv-prog-time{font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:12px}
+.rv-prog-track{position:relative;height:10px;margin-top:8px;background:var(--accent-soft);border-radius:3px;overflow:hidden}
+.rv-prog-fill{position:relative;display:block;height:100%;width:3%;background:var(--accent);border-radius:3px;transition:width .5s ease;overflow:hidden}
+.rv-prog-fill::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(116,191,235,.65),transparent);transform:translateX(-100%);animation:rvShim 1.4s linear infinite}
+@keyframes rvShim{to{transform:translateX(100%)}}
+.rv-prog-note{margin-top:6px;font-size:11.5px;color:var(--ink-2)}
+@media (prefers-reduced-motion:reduce){ .rv-prog-fill::after{animation:none} }
+
+/* deleting review reports (Nov 23) */
+.rv-rep footer .rv-delbtn{margin-right:auto;color:var(--bad,#b3372c)}.rv-rep footer .rv-delnote{margin-right:auto;font-size:12px;align-self:center}
+.rv-oldbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;margin:0 0 8px}.rv-oldbar span{flex:1}
 </style>
 <script src="/assets/session.js"></script>
 <script src="mms-door.js"></script>
@@ -2154,7 +2168,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-24T00:21:51Z',fp:'b8c6bf13'};
+window.__mmsBuild={at:'2026-11-24T00:56:02Z',fp:'08160cce'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -6040,7 +6054,7 @@ function rvEditorExtra(){ const names=RV_TERMS.filter(t=>!/Style|Industry/.test(
    ===================================================================== */
 S.reviews=S.reviews||{}; const rvSubs={};
 function rvShard(t){ const m=String(t.id||t.wr||'').match(/(19|20)\d{2}/); return 'reviews-'+(m?m[0]:'other'); }
-function rvEnsure(t){ const c=rvShard(t); if(rvSubs[c]) return; rvSubs[c]=1; try{ Store.sub(c,o=>{ Object.values(o||{}).forEach(r=>{ if(r&&r.id) S.reviews[r.id]=r; }); if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel(); }); }catch(e){} }
+function rvEnsure(t){ const c=rvShard(t); if(rvSubs[c]) return; rvSubs[c]=1; try{ Store.sub(c,o=>{ o=o||{}; /* a report deleted anywhere drops out here too */ Object.values(S.reviews).forEach(r=>{ if(r&&r.id&&!o[r.id]&&rvShard({id:r.ticket})===c) delete S.reviews[r.id]; }); Object.values(o).forEach(r=>{ if(r&&r.id) S.reviews[r.id]=r; }); if(S.panel&&!String(S.panel).startsWith('arch:')) renderPanel(); }); }catch(e){} }
 function rvFor(t){ return Object.values(S.reviews).filter(r=>r.ticket===t.id).sort((a,b)=>String(b.at).localeCompare(String(a.at))); }
 async function rvSave(t,rep){ S.reviews[rep.id]=rep; rvEnsure(t); return write(rvShard(t),rep.id,rep); }
 
@@ -6078,7 +6092,7 @@ function rvRun(t,kind){
   ['dragover','dragenter'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.add('over'); }));
   ['dragleave','drop'].forEach(ev=>drop.addEventListener(ev,e=>{ e.preventDefault(); drop.classList.remove('over'); if(ev==='drop'&&e.dataTransfer) setFiles(e.dataTransfer.files); }));
   $('[data-m=cancel]',box).onclick=()=>root.innerHTML='';
-  const say=(m,cls)=>{ out.innerHTML='<div class="banner'+(cls?' '+cls:' info')+'">'+(cls?'':'<span class="spin"></span> ')+m+'</div>'; };
+  const prog=rvProgNew(); const say=(m,cls)=>{ if(cls){ rvProgStop(prog); out.innerHTML='<div class="banner '+cls+'">'+m+'</div>'; } else rvProgSay(out,prog,m); };
   go.onclick=async()=>{ go.disabled=true; inp.disabled=true;
     try{
       say('Reading '+files.length+' file'+(files.length===1?'':'s')+'…');
@@ -6091,7 +6105,7 @@ function rvRun(t,kind){
       const rep=rvBuildReport(kind,t,read,findings,ai,ctx);
       if(kind==='im'&&typeof rvSpRead==='function'){ const sp=rvSpRead(box,t); if(sp) rep.sp=sp; }
       if(kind==='im'&&typeof imCreateDraft==='function'){ say('Drafting IM’s decision for every row…'); try{ await imCreateDraft(t,rep,ctx.P,findings,ai); }catch(e){ console.warn(e); } }
-      say('Saving the report…'); await rvSave(t,rep);
+      say('Saving the report…'); await rvSave(t,rep); rvProgStop(prog);
       // keep the AI Review stage moving the way it did
       if(kind==='editor'&&S.tickets[t.id]){ const x=clone(S.tickets[t.id]); const round={at:rep.at,by:rep.by,verdict:(rep.readiness==='ready'||rvPassAll(rep))?'ready':'fix',summary:rep.readinessLabel+(rep.summary?': '+rep.summary:''),checks:[],edits:[],files:rep.files,report:rep.id};
         x.ai=Object.assign({},x.ai,{rounds:[...((x.ai&&x.ai.rounds)||[]),round]});
@@ -6145,6 +6159,22 @@ renderPanel=function(){ _renderPanel7(); const P=$('#panel'); if(!S.panel||Strin
   $$('[data-rvrun]',pb).forEach(x=>x.onclick=e=>{ e.preventDefault(); if(S.viewAs) return; rvRun(t,x.dataset.rvrun); });
   $$('[data-rvopen]',pb).forEach(x=>x.onclick=e=>{ e.preventDefault(); const r=S.reviews[x.dataset.rvopen]; if(r) rvShow(r); });
 };
+/* ---------- a progress bar while a review runs (Nov 23, Jonna) ----------
+   The bar moves with each step (reading the files, the software checks, each part or row Claude reads, the dataset
+   pass, saving), never goes backward, shows how long it has been running, and shimmers so you can see it's alive. */
+function rvProgNew(){ return {pct:0,t0:Date.now(),timer:null,el:null}; }
+function rvProgPct(m,cur){ const s=String(m).replace(/<[^>]+>/g,''); const n=s.match(/(\d+) of (\d+)/);
+  if(n&&+n[2]>0) return 15+Math.round(75*Math.min(1,+n[1]/+n[2]));
+  if(/^Getting|^Reading/i.test(s)) return 4; if(/^Checking|^Loading/i.test(s)) return 10;
+  if(/looking over the dataset/i.test(s)) return Math.max(cur,40); if(/^Drafting/i.test(s)) return 92; if(/^Saving/i.test(s)) return 97; return cur; }
+function rvProgSay(host,P,m){ P.pct=Math.max(P.pct,Math.min(99,rvProgPct(m,P.pct)));
+  if(!P.el||!host.contains(P.el)){ host.innerHTML='<div class="rv-prog" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="rv-prog-top"><b class="rv-prog-pct"></b><span class="rv-prog-tx"></span><span class="rv-prog-time"></span></div><div class="rv-prog-track"><span class="rv-prog-fill"></span></div><div class="rv-prog-note">Keep this tab open while the review runs.</div></div>'; P.el=host.querySelector('.rv-prog'); try{ P.el.scrollIntoView({block:'nearest',behavior:'smooth'}); }catch(e){} }
+  P.el.setAttribute('aria-valuenow',P.pct); P.el.querySelector('.rv-prog-pct').textContent=P.pct+'%'; P.el.querySelector('.rv-prog-tx').innerHTML=m; P.el.querySelector('.rv-prog-fill').style.width=Math.max(3,P.pct)+'%';
+  const tick=()=>{ const s=Math.round((Date.now()-P.t0)/1000); const e=P.el&&P.el.querySelector('.rv-prog-time'); if(e) e.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+  P.at=Date.now(); tick(); if(!P.timer) P.timer=setInterval(()=>{ if(!P.el||!document.body.contains(P.el)){ rvProgStop(P); return; } tick();
+    /* a long wait on one step (one big Claude call) still creeps forward a little, never past 88% */
+    if(Date.now()-P.at>3000&&P.pct<88){ P.pct++; P.at=Date.now(); P.el.setAttribute('aria-valuenow',P.pct); P.el.querySelector('.rv-prog-pct').textContent=P.pct+'%'; P.el.querySelector('.rv-prog-fill').style.width=P.pct+'%'; } },1000); }
+function rvProgStop(P){ if(P&&P.timer){ clearInterval(P.timer); P.timer=null; } }
 /* =====================================================================
    Files from Smartsheet: every attachment that was on the work request's
    row in 1. Master [MMS], now kept in SharePoint
@@ -7370,7 +7400,7 @@ const HELP_TOPICS={
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
      'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.',
      'On the IM Pre-Review report, go through MISMO Link Format: accept or decline each fix before you click Send to IM.'],
-    ['Each file gets the review that fits it: Word and PDF documents get the editor’s read; datasets (Excel or CSV data) are looked over as a whole, one note per pattern with a count and example rows, never cell by cell; the IM/AWG Submission Form is read on its Face Page, Reference Model Changes and Proposed Structure tabs. The report says how each file was reviewed.','On the report, tick Update, Do Not Update, Unsure or Pass by each note, or use Choose for Every Note (or All in this section) to set them all at once, then click Submit Choices. None are required: blank notes count as Pass, and you can send the work on to IM Review either way.','Fixes are things IM will send back. Suggestions are up to you.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+    ['Each file gets the review that fits it: Word and PDF documents get the editor’s read; datasets (Excel or CSV data) are looked over as a whole, one note per pattern with a count and example rows, never cell by cell; the IM/AWG Submission Form is read on its Face Page, Reference Model Changes and Proposed Structure tabs. The report says how each file was reviewed.','On the report, tick Update, Do Not Update, Unsure or Pass by each note, or use Choose for Every Note (or All in this section) to set them all at once, then click Submit Choices. None are required: blank notes count as Pass, and you can send the work on to IM Review either way.','Fixes are things IM will send back. Suggestions are up to you.','Ran a review more than once? Open the report and click Delete This Review, or on the Reviews tab click Keep Only the Latest. An IM Pre-Review already sent to IM stays. Deleted reports are kept 60 days, and MISMO staff can put one back.','A progress bar shows how far along the review is and how long it has been running. Keep the tab open until the report opens.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
     [['Open the Review Desk','reviews']]],
   mislink:['MISMO Link Format: Fixes Before IM','*',
     'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The IM Pre-Review lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
@@ -8121,7 +8151,7 @@ async function rvRestFiles(rep,t,say){ const out=[], missing=[]; const D=(typeof
 async function rvReadRest(rep){
   const t=S.tickets[rep.ticket]; if(!t) return toast('The work request isn’t loaded.'); if(!S.sample) return toast('Claude isn’t reachable from here.');
   const btn=$('#modal-root #rvrest'), host=$('#modal-root .rv-rep'); const bar=document.createElement('div'); bar.className='banner info rv-restbar'; host&&host.prepend(bar);
-  const say=(m,cls)=>{ bar.className='banner '+(cls||'info')+' rv-restbar'; bar.innerHTML=(cls?'':'<span class="spin"></span> ')+esc(m); };
+  const prog=rvProgNew(); const say=(m,cls)=>{ if(cls){ rvProgStop(prog); bar.className='banner '+cls+' rv-restbar'; bar.innerHTML=esc(m); } else { bar.className='rv-restbar'; rvProgSay(bar,prog,esc(m)); } };
   if(btn) btn.disabled=true;
   try{
     const files=await rvRestFiles(rep,t,say); if(!files){ bar.remove(); if(btn) btn.disabled=false; return; }
@@ -8804,17 +8834,53 @@ async function trTidy(){ if(!S.isStaff||!S.canWrite||S.partial) return; const cu
   const all=Object.entries(S.trash||{}).sort((a,b)=>String(b[1].at||'').localeCompare(String(a[1].at||'')));
   for(const [k,t] of all.filter(([k,t],i)=>i>=300||Date.parse(t.at||0)<cut)) try{ await Store.del('trash',k); delete S.trash[k]; }catch(e){} }
 async function trOpen(){ trEnsure();
-  const L=Object.entries(S.trash||{}).filter(([k,t])=>t&&t.coll==='outbox').sort((a,b)=>String(b[1].at||'').localeCompare(String(a[1].at||'')));
-  const body=L.length?'<p class="muted" style="margin:0 0 10px;font-size:12.5px">Kept 60 days. Putting one back returns it to Notifications as it was; an email that hadn’t gone yet will send once email is on.</p><div class="tr-list">'+L.slice(0,60).map(([k,t])=>'<div class="tr-row"><div><b>'+esc(t.data.subject||'(no subject)')+'</b><div class="muted">'+esc(t.why)+(t.by?' by '+esc(t.by):'')+' · '+esc(hWhen(t.at))+'</div></div><button class="btn sm" type="button" data-trput="'+esc(k)+'">Put Back</button></div>').join('')+'</div>':'<p class="muted" style="margin:0">Nothing has been deleted in the last 60 days.</p>';
+  const L=Object.entries(S.trash||{}).filter(([k,t])=>t&&(t.coll==='outbox'||/^reviews-/.test(t.coll))).sort((a,b)=>String(b[1].at||'').localeCompare(String(a[1].at||'')));
+  const body=L.length?'<p class="muted" style="margin:0 0 10px;font-size:12.5px">Kept 60 days. Putting one back returns it to Notifications as it was; an email that hadn’t gone yet will send once email is on.</p><div class="tr-list">'+L.slice(0,60).map(([k,t])=>'<div class="tr-row"><div><b>'+esc(t.data.subject||(/^reviews-/.test(t.coll)?(t.data.kind==='im'?'IM Pre-Review':'AI Review')+' report · '+(t.data.wr||'')+' · '+fmtS(atDay(t.data.at||'')):'(no subject)'))+'</b><div class="muted">'+esc(t.why)+(t.by?' by '+esc(t.by):'')+' · '+esc(hWhen(t.at))+'</div></div><button class="btn sm" type="button" data-trput="'+esc(k)+'">Put Back</button></div>').join('')+'</div>':'<p class="muted" style="margin:0">Nothing has been deleted in the last 60 days.</p>';
   const p=modal({title:'Recently Deleted Emails',body,ok:'Done',cancel:'Close'});
-  $$('#modal-root [data-trput]').forEach(b=>b.onclick=async()=>{ b.disabled=true; const ok=await trRestore(b.dataset.trput); if(ok){ b.closest('.tr-row').remove(); toast('Put back in Notifications'); renderAll(); } else b.disabled=false; });
+  $$('#modal-root [data-trput]').forEach(b=>b.onclick=async()=>{ b.disabled=true; const ok=await trRestore(b.dataset.trput); if(ok){ b.closest('.tr-row').remove(); toast('Put back'); renderAll(); } else b.disabled=false; });
   await p; }
 const _vOutboxTr=VIEWS.outbox;
-VIEWS.outbox=function(){ trEnsure(); const h=_vOutboxTr(); if(!S.isStaff) return h; const n=Object.values(S.trash||{}).filter(t=>t&&t.coll==='outbox').length;
+VIEWS.outbox=function(){ trEnsure(); const h=_vOutboxTr(); if(!S.isStaff) return h; const n=Object.values(S.trash||{}).filter(t=>t&&(t.coll==='outbox'||/^reviews-/.test(t.coll))).length;
   return h.replace('<div class="acts">','<div class="acts"><button class="btn" id="tropen" type="button">Recently Deleted'+(n?' ('+n+')':'')+'</button> '); };
 const _wireTr=wireMain;
 wireMain=function(m){ _wireTr(m); const b=$('#tropen',m); if(b) b.onclick=()=>trOpen(); };
 (function(){ const st=setInterval(()=>{ if(!S.ready) return; clearInterval(st); setTimeout(()=>{ if(S.isStaff){ trEnsure(); setTimeout(trTidy,30000); } },15000); },1000); })();
+/* ---------- Deleting review reports (Nov 23, 2026, Jonna) ----------
+   Retries fill the Reviews tab quickly. The report has Delete This Review, and the Reviews tab has Keep Only the
+   Latest when a kind has been run more than once. Who: MISMO staff, the work request's facilitator, or whoever ran it.
+   An IM Pre-Review already sent to IM can't be deleted (IM is working from it). Deleted reports go to Recently Deleted
+   for 60 days (MISMO staff can put them back from Notifications); the history notes it. */
+function rvCanDelete(rep){ if(!rep||S.viewAs||!S.canWrite) return false; if(S.imq&&S.imq[rep.id]) return false; const t=S.tickets[rep.ticket];
+  return !!(S.isStaff||(t&&canAct(t))||(rep.by&&sameName(rep.by,S.me.name||''))); }
+function rvKindName(rep){ return rep.kind==='im'?'IM Pre-Review':'AI Review'; }
+async function rvDelete(rep,quiet){ const t=S.tickets[rep.ticket]; const c=rvShard({id:rep.ticket});
+  let d=clone(rep); if(JSON.stringify(d).length>150000){ d.corrections=(d.corrections||[]).slice(0,60); d.recommendations=(d.recommendations||[]).slice(0,30); d.trimmed=true; }
+  await setAside(c,rep.id,d,rvKindName(rep)+' report deleted');
+  if(rep.kind==='im'&&S.imr&&S.imr[rep.id]){ const ic=imColl(rep.ticket); await setAside(ic,rep.id,S.imr[rep.id],'IM Pre-Review draft deleted with its report'); delete S.imr[rep.id]; try{ await Store.del(ic,rep.id); }catch(e){} }
+  delete S.reviews[rep.id]; await Store.del(c,rep.id);
+  if(t&&!quiet){ const x=clone(S.tickets[t.id]||t); hist(x,rvKindName(rep)+' report from '+fmtS(atDay(rep.at))+' deleted'); await saveTicket(x,'Review deleted'); }
+  return true; }
+async function rvDeleteAsk(rep){ if(!rvCanDelete(rep)) return false;
+  const ok=await modal({title:'Delete This '+rvKindName(rep)+'?',text:esc(rep.wr+' '+rep.name),ok:'Delete Review',body:'<p style="margin:0">The '+esc(rvKindName(rep))+' report from '+esc(fmt(atDay(rep.at)))+(rep.by?' run by '+esc(rep.by):'')+' comes off the work request. It’s kept in Recently Deleted for 60 days, where MISMO staff can put it back.</p>'});
+  if(!ok) return false; await rvDelete(rep); toast(rvKindName(rep)+' report deleted'); if(S.panel) renderPanel(); return true; }
+/* the report: Delete This Review at the left of its footer */
+const _rvShowDel=rvShow;
+rvShow=function(rep){ _rvShowDel(rep); const f=$('#modal-root .rv-rep footer'); if(!f||$('#rvdel',f)) return;
+  if(rvCanDelete(rep)){ f.insertAdjacentHTML('afterbegin','<button class="btn ghost rv-delbtn" id="rvdel" type="button">Delete This Review</button>'); $('#rvdel',f).onclick=async()=>{ const r=S.reviews[rep.id]||rep; $('#modal-root').innerHTML=''; if(!(await rvDeleteAsk(r))) rvShow(r); }; }
+  else if(S.imq&&S.imq[rep.id]) f.insertAdjacentHTML('afterbegin','<span class="muted rv-delnote">Sent to IM, so it stays.</span>'); };
+/* the Reviews tab: Keep Only the Latest when a kind was run more than once */
+function rvOlder(t){ const L=rvFor(t), seen={}; return L.filter(r=>{ if(!seen[r.kind]){ seen[r.kind]=1; return false; } return rvCanDelete(r); }); }
+const _rvTabHtmlDel=rvTabHtml;
+rvTabHtml=function(t){ let h=_rvTabHtmlDel(t); const old=rvOlder(t); if(!old.length) return h;
+  return h.replace('<div class="rv-list">','<div class="rv-oldbar"><span>'+old.length+' older run'+(old.length===1?'':'s')+' of the same review'+(old.length===1?'':'s')+'.</span><button type="button" class="btn sm ghost" data-rvprune="'+esc(t.id)+'">Keep Only the Latest</button></div><div class="rv-list">'); };
+const _renderPanelDel=renderPanel;
+renderPanel=function(){ _renderPanelDel(); const b=$('#panel [data-rvprune]'); if(!b) return; b.onclick=async e=>{ e.preventDefault(); const t=S.tickets[b.dataset.rvprune]; if(!t) return; const old=rvOlder(t); if(!old.length) return;
+  const ok=await modal({title:'Keep Only the Latest?',text:esc(t.wr+' '+t.name),ok:'Delete '+old.length+' Older',body:'<p style="margin:0">Keeps the newest AI Review and the newest IM Pre-Review, and deletes the '+old.length+' older run'+(old.length===1?'':'s')+'. They’re kept in Recently Deleted for 60 days, where MISMO staff can put them back.'+(Object.values(S.reviews).some(r=>r.ticket===t.id&&S.imq&&S.imq[r.id])?' A pre-review already sent to IM stays.':'')+'</p>'});
+  if(!ok) return; b.disabled=true; for(const r of old) await rvDelete(r,true);
+  const x=clone(S.tickets[t.id]); hist(x,old.length+' older review report'+(old.length===1?'':'s')+' deleted (kept the latest of each)'); await saveTicket(x,'Older reviews deleted'); toast(old.length+' older report'+(old.length===1?'':'s')+' deleted'); renderPanel(); }; };
+/* putting a deleted IM Pre-Review back brings its IM draft back too */
+const _trRestoreDel=trRestore;
+trRestore=async function(k){ const t=S.trash[k]; const ok=await _trRestoreDel(k); if(ok&&t&&/^reviews-/.test(t.coll)&&t.data&&t.data.kind==='im'){ const ik=trKey(imColl(t.data.ticket),t.id); if(S.trash[ik]) await _trRestoreDel(ik); } if(ok&&t&&/^reviews-/.test(t.coll)) S.reviews[t.id]=t.data; return ok; };
 /* ---------- Digest instead of individual emails; access without emails (Nov 20, 2026) ----------
    Settings › Daily Digest › Who Gets It has two more lists:
    - Digest Instead of Individual Emails (Jonna, Perry, Vanessa): they get the daily digest and the Friday wrap-up,
