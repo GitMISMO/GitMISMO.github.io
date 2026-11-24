@@ -2154,7 +2154,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-23T23:39:05Z',fp:'5ac30442'};
+window.__mmsBuild={at:'2026-11-24T00:21:51Z',fp:'b8c6bf13'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -5378,8 +5378,9 @@ async function rvReadFile(f){
   if(ext==='pdf') return Object.assign(await rvReadPdf(buf),{name:f.name});
   if(ext==='docx') return Object.assign(await rvReadDocx(buf),{name:f.name});
   if(ext==='xlsx'||ext==='xlsm') return rvSubFormOnly(Object.assign(await rvReadXlsx(buf),{name:f.name}));
-  if(ext==='txt'||ext==='md'||ext==='csv') return {kind:'text',name:f.name,text:await f.text()};
-  throw new Error(f.name+': the review reads Word (.docx), Excel (.xlsx) and PDF files.');
+  if(ext==='csv') return rvCsvAsSheet(f.name,await f.text());
+  if(ext==='txt'||ext==='md') return {kind:'text',name:f.name,text:await f.text()};
+  throw new Error(f.name+': the review reads Word (.docx), Excel (.xlsx), CSV and PDF files.');
 }
 
 /* ---------- small text helpers ---------- */
@@ -5490,6 +5491,7 @@ function rvEditorChecks(files,ctx){
       const S=f.sheets; const merged=S.filter(s=>s.merged>0); if(merged.length) add('recommend','Excel Setup','Merged cells on '+merged.map(s=>s.name+' ('+s.merged+')').join(', ')+'.','Avoid merged cells in the rows IM reads.',W,'xl-merged');
       rvTermChecks(f.text,W,add);
     }
+    else if(f.kind==='excel'&&f.csv){ rvDatasetChecks(f,add); rvTermChecks(f.text,W,add); }
     else if(f.kind==='excel'){
       const S=f.sheets.filter(s=>s.state==='visible');
       const merged=S.filter(s=>s.merged>0); if(merged.length) add('fix','Excel Setup','Merged cells on '+merged.map(s=>s.name+' ('+s.merged+')').join(', ')+'.','Don’t use merged cells (they break sorting and filtering).',W,'xl-merged');
@@ -5504,6 +5506,7 @@ function rvEditorChecks(files,ctx){
       const oldCp=S.filter(s=>{ const m=(s.footer+' '+s.rows.map(r=>Object.values(r.c).join(' ')).join(' ')).match(/©\s?(\d{4})/); return m&&m[1]!==yr; }); if(oldCp.length) add('fix','Copyright','Copyright year isn’t '+yr+' on: '+oldCp.map(s=>s.name).slice(0,6).join(', ')+'.','Update the copyright year to '+yr+'.',W,'xl-cp-year');
       const noHead=S.filter(s=>!s.header.trim()&&!/cover|title/i.test(s.name)); if(noHead.length) add('recommend','Excel Setup','No printed header with the title on: '+noHead.map(s=>s.name).slice(0,6).join(', ')+'.','Print the artifact title in each sheet’s header (except a cover page that already has it).',W,'xl-header');
       const zooms=[...new Set(S.map(s=>s.zoom))]; if(zooms.length>1) add('recommend','Excel Setup','Tabs are saved at different zoom levels ('+zooms.join('%, ')+'%).','Save every tab at the same zoom.',W,'xl-zoom');
+      rvDatasetChecks(f,add);
       rvTermChecks(f.text,W,add);
       const hid=f.sheets.filter(s=>s.state!=='visible'); if(hid.length) add('question','Excel Setup','Hidden tabs: '+hid.map(s=>s.name).join(', ')+'.','Should these be published, removed, or left hidden?',W,'xl-hidden');
     }
@@ -5626,13 +5629,20 @@ async function rvPool(items,n,fn){ const out=new Array(items.length); let k=0; a
 function rvChunks(text,max){ const out=[]; let cur=''; String(text).split(/\n/).forEach(l=>{ while(l.length>max){ out.push(l.slice(0,max)); l=l.slice(max); } if((cur+l).length>max&&cur){ out.push(cur); cur=''; } cur+=l+'\n'; }); if(cur.trim()) out.push(cur); return out; }
 async function rvAiEditor(files,ctx,progress,start){ start=start||0;
   if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
-  const all=files.map(f=>'# FILE: '+f.name+' ('+(f.kind==='excel'?'Excel workbook':f.kind==='pdf'?'PDF':'Word document')+')\n'+f.text).join('\n\n');
+  /* Nov 23 (Jonna): datasets aren't read cell by cell. Word, PDF and the Submission Form are read part by part;
+     each dataset (Excel or CSV data) gets one pass that looks at it as a whole (rvAiDataset). */
+  const docs=files.filter(f=>!rvIsDataset(f)), sets=files.filter(rvIsDataset);
+  const all=docs.map(f=>'# FILE: '+f.name+' ('+(f.kind==='excel'?'Excel workbook':f.kind==='pdf'?'PDF':'Word document')+')\n'+f.text).join('\n\n');
   const parts=rvChunks(all,5000), use=parts.slice(start,start+30); let done=0;   /* 30 parts per pass; Read the Rest carries on from where it stopped */
   const res={corrections:[],recommendations:[],questions:[],summaries:[],readiness:[]};
   const got=await rvPool(use,4,async(part,i)=>{
     const prompt=RV_EDITOR_PERSONA+'\n\n'+RV_EDITOR_RULES+(typeof rvEditorExtra==='function'?rvEditorExtra():'')+(typeof rvFbAvoid==='function'&&rvFbAvoid('editor').length?'\n- MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('editor').join(' | '):'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nStage: '+stageDef(ctx.t.stage).name+'\nFacilitator note: '+(ctx.note||'none')+'\nThis is part '+(start+i+1)+' of '+parts.length+'.\n'+
       '\nAnswer in this compact JSON only (no other text): {"s":"one sentence on this part","r":"ready|minor|needs","c":[["exact short quote","what is wrong","the fix","category"]],"m":[["where","recommendation","suggestion"]],"q":["question for the facilitator"]}. At most 6 items in c, 2 in m, 1 in q; most important first; each string under 20 words. Answer right away.\n\nTEXT:\n'+part;
     const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+(start+done)+' of '+parts.length+' part'+(parts.length===1?'':'s')+'…'); return r; });
+  if(!start&&sets.length){ for(const f of sets){ progress&&progress('Claude is looking over the dataset '+f.name+' as a whole…');
+      try{ const d=await rvAiDataset(f,ctx); (d.p||[]).forEach(x=>Array.isArray(x)&&res.recommendations.push({where:x[1],issue:x[0],suggestion:x[2],area:'Dataset'+(x[3]?': '+x[3]:'')}));
+        (d.q||[]).forEach(q=>res.questions.push(q)); if(d.s) res.summaries.push(d.s); if(d.r) res.readiness.push(d.r==='needs'?'needs-updates':d.r); }
+      catch(e){ res.error=[res.error,'Claude couldn’t look over '+f.name+' just now; the software checks for it are below.'].filter(Boolean).join(' '); } } }
   let errs=0; res.parts={read:start+use.length,total:parts.length};
   got.forEach(r=>{ if(!r||r.__err){ errs++; return; }
     (r.c||[]).forEach(x=>Array.isArray(x)?res.corrections.push({where:x[0],issue:x[1],suggestion:x[2],category:x[3]}):res.corrections.push(x));
@@ -5640,7 +5650,7 @@ async function rvAiEditor(files,ctx,progress,start){ start=start||0;
     (r.q||[]).forEach(q=>res.questions.push(q)); if(r.s) res.summaries.push(r.s); if(r.r) res.readiness.push(r.r==='needs'?'needs-updates':r.r); });
   const seen=new Set(); res.corrections=res.corrections.filter(c=>{ const k=rvNorm(c.where)+'|'+rvNorm(c.issue).slice(0,30); if(seen.has(k)) return false; seen.add(k); return true; });
   res.summaries=res.summaries.slice(0,3);
-  if(errs) res.error=errs+' of '+use.length+' parts didn’t come back from Claude; the rest are below.';
+  if(errs) res.error=[res.error,errs+' of '+use.length+' parts didn’t come back from Claude; the rest are below.'].filter(Boolean).join(' ');
   if(parts.length>start+use.length) res.note='Claude read the first '+(start+use.length)+' of '+parts.length+' parts; the software checks covered everything.';
   return res;
 }
@@ -5682,7 +5692,8 @@ function rvBuildReport(kind,t,files,findings,ai,ctx){
     aiParts:(ai&&ai.parts)||null,readiness:rk,readinessLabel:rl,summary:((ai&&ai.summaries)||[]).join(' ')||'',aiNote:(ai&&(ai.skipped||ai.error||ai.note))||'',
     findings:findings.slice(0,160).map(f=>({sev:f.sev,area:f.area,issue:rvTrim(f.issue,400),suggestion:rvTrim(f.suggestion,400),where:rvTrim(f.where,180),item:f.item||'',src:f.src,rule:f.rule||'',fb:f.fb||''}))};
   if(kind==='editor'){ rep.corrections=((ai&&ai.corrections)||[]).slice(0,80).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300),category:rvTrim(c.category,30)}));
-    rep.recommendations=((ai&&ai.recommendations)||[]).slice(0,24).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300)}));
+    rep.recommendations=((ai&&ai.recommendations)||[]).slice(0,40).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300),area:rvTrim(c.area||'',40)}));
+    rep.types=files.map(f=>({name:f.name,type:rvReviewType(f)}));
     rep.questions=[...findings.filter(f=>f.sev==='question').map(f=>f.issue+' '+f.suggestion),...((ai&&ai.questions)||[])].slice(0,20).map(q=>rvTrim(q,300)); }
   else { rep.rows=((ai&&ai.rows)||[]).slice(0,150).map(r=>({item:String(r.item||''),likely:rvTrim(r.likely,24),note:rvTrim(r.note,300),def:rvTrim(r.suggestedDefinition,400),name:rvTrim(r.suggestedName,120)}));
     rep.questions=findings.filter(f=>f.sev==='question').map(f=>rvTrim(f.issue+' '+f.suggestion,300)); rep.form=ctx.formStats||null; rep.rm=ctx.rm||''; if(!ctx.rm) rep.aiNote=[rep.aiNote,'The Reference Model couldn’t be loaded here, so “already exists” and XPATH checks didn’t run. Run the review on the live MMS at resources.mismo.org.'].filter(Boolean).join(' '); }
@@ -5696,7 +5707,7 @@ function rvReportHtml(rep,forWord){
   const tbl=(head,rows)=>rows.length?'<table class="rvt"><thead><tr>'+head.map(h=>'<th>'+e(h)+'</th>').join('')+(fbOn?(rep.kind!=='im'&&typeof rvDecHead==='function'?rvDecHead():'<th class="rv-fbh">Right?</th>'):'')+'</tr></thead><tbody>'+rows.map(r=>{ const k=r.key; const cells=r.cells||r; return '<tr>'+cells.map(c=>'<td>'+c+'</td>').join('')+(fbOn?(rep.kind!=='im'&&typeof rvDecCell==='function'?'<td class="rv-decc">'+(k?rvDecCell(rep,k):'')+'</td>':'<td class="rv-fbc">'+(k?rvFbCell(rep,k):'')+'</td>'):'')+'</tr>'; }).join('')+'</tbody></table>':'';
   const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'f'+i},f)), fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
   const title=rep.kind==='im'?'IM Pre-Review Report':'AI Review Report';
-  let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(atDay(rep.at)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):(rep.rm?' · Checked against the '+e(rep.rm):''))+'</div>'+
+  let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(atDay(rep.at)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'&&rep.types&&rep.types.length?' · Reviewed as: '+e(rep.types.map(x=>x.name+' ('+x.type+')').join(', ')):'')+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):(rep.rm?' · Checked against the '+e(rep.rm):''))+'</div>'+
     '<div class="rvr-score rv-'+e(rvShown(rep).k)+'"><b>'+e(rvShown(rep).l)+'</b> <span>'+fx.length+' '+rvShown(rep).fx+' · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
     (rvPassAll(rep)?'<p class="rvr-note"><b>Everyone passes the AI Review while the process is new.</b> The findings below are suggestions to make the work stronger before IM; nothing here holds the work request back.</p>':'')+(rep.kind!=='im'&&rep.decided?'<p class="rvr-note"><b>Choices submitted</b> '+e(fmt(atDay(rep.decided.at)))+' by '+e(rep.decided.by||'')+': '+e(rvDecSummary(rep.decided.counts))+'.</p>':'')+(rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
     '<p class="rvr-note">This report recommends; it doesn’t change the work product. '+(rep.kind==='editor'?'Editorial suggestions are judgment calls: the facilitator and workgroup decide.':'IM makes the final decision on every row.')+'</p></div>';
@@ -5705,7 +5716,7 @@ function rvReportHtml(rep,forWord){
   if(rep.kind==='editor') h+=sec('Editorial Corrections',tbl(['Category','Where','Issue','Suggestion'],(rep.corrections||[]).map((c,i)=>({key:'c'+i,cells:[e(c.category||''),e(c.where),e(c.issue),e(c.suggestion)]}))));
   if(rep.kind==='im') if(rep.kind==='im'&&rep.imCounts) h+=sec('Draft IM Decisions','<p>'+Object.entries(rep.imCounts).map(([d,n])=>'<b>'+n+'</b> '+e(d.toLowerCase())).join(' · ')+'. IM reviewers see a draft decision for every row and agree or correct it.</p>');
   h+=sec('Rows IM May Question',tbl(['Item','Likely Outcome','What IM Would Say','Suggested Definition or Name'],(rep.rows||[]).map((r,i)=>({key:'r'+i,cells:[e(r.item),e(r.likely),e(r.note),e([r.name,r.def].filter(Boolean).join(' — '))]}))));
-  h+=sec('Recommended',tbl(['Area','Where','Recommendation','Suggestion'],[...rc.map(f=>({key:f._k,cells:[e(f.area),e(f.where),e(f.issue)+(f.fb?'<div class="rv-fbnote">'+e(f.fb)+'</div>':''),e(f.suggestion)]})),...(rep.recommendations||[]).map((c,i)=>({key:'m'+i,cells:['Editorial',e(c.where),e(c.issue),e(c.suggestion)]}))]));
+  h+=sec('Recommended',tbl(['Area','Where','Recommendation','Suggestion'],[...rc.map(f=>({key:f._k,cells:[e(f.area),e(f.where),e(f.issue)+(f.fb?'<div class="rv-fbnote">'+e(f.fb)+'</div>':''),e(f.suggestion)]})),...(rep.recommendations||[]).map((c,i)=>({key:'m'+i,cells:[e(c.area||'Editorial'),e(c.where),e(c.issue),e(c.suggestion)]}))]));
   h+=sec('Questions for the Facilitator',(rep.questions||[]).length?'<ol>'+rep.questions.map(q=>'<li>'+e(q)+'</li>').join('')+'</ol>':'');
   if(rep.kind==='im'&&rep.form) h+=sec('What IM Has Done Before','<p>Across '+RV_IM_LEARNED.decided.toLocaleString()+' decided rows since 2021, '+Math.round(RV_IM_LEARNED.asSubmitted/RV_IM_LEARNED.decided*100)+'% were approved as submitted and '+Math.round(RV_IM_LEARNED.withMod/RV_IM_LEARNED.decided*100)+'% with modification. The most common reasons for changes: '+RV_IM_LEARNED.themes.slice(0,5).map(t=>t[0].toLowerCase()).join(', ')+'.</p>');
   h+='</div>';
@@ -5713,6 +5724,72 @@ function rvReportHtml(rep,forWord){
   return '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>'+e(title)+'</title><style>body{font-family:Calibri,Arial,sans-serif;font-size:11pt;color:#0d314c}h2{font-size:16pt;margin:4pt 0}h3{font-size:13pt;margin:14pt 0 4pt;color:#0d314c}.rvr-k{font-size:9pt;font-weight:bold;letter-spacing:1px;text-transform:uppercase;color:#456179}.rvr-m,.rvr-note{font-size:9.5pt;color:#456179}.rvr-score b{font-size:13pt;margin-right:8pt}table{border-collapse:collapse;width:100%}th,td{border:1px solid #adc4d6;padding:4pt;vertical-align:top;font-size:9.5pt;text-align:left}th{background:#e4f2fb}</style></head><body>'+h+'<p class="rvr-note">©'+RV_YEAR()+' Mortgage Industry Standards Maintenance Organization, Inc. Prepared by the MISMO Manufacturing System.</p></body></html>';
 }
 function rvDownload(rep){ const html=rvReportHtml(rep,true); const blob=new Blob(['\ufeff',html],{type:'application/msword'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(rep.kind==='im'?'IM Pre-Review':'AI Review')+' - '+rep.wr+' - '+atDay(rep.at)+'.doc'; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
+/* ---------- AI Review: Dataset Review (Nov 23, 2026, Jonna) ----------
+   Three kinds of review, picked by the file:
+   - Document Review (Word, PDF): the editor and boilerplate review, read part by part.
+   - Submission Form Review (the IM/AWG form): its Face Page, Reference Model Changes and Proposed Structure tabs.
+   - Dataset Review (any other Excel workbook, or CSV): the workbook setup checks, then the data as a whole. Software
+     finds the patterns (blank cells in columns that are otherwise filled, names listed twice, extra spaces, definitions
+     that end differently, repeated column names), one note per pattern with a count and example rows. Claude then looks
+     over the dataset once (its columns, the first rows and a sample from across it) for patterns only, never
+     cell-by-cell grammar. Erin's editing evidence is all Word documents (41 files, about 14 edits each); nothing shows
+     cell-by-cell editing of data. */
+function rvIsDataset(f){ return !!f&&f.kind==='excel'&&!f.subForm; }
+function rvReviewType(f){ return f.subForm?'Submission Form':rvIsDataset(f)?'Dataset':'Document'; }
+function rvCsvRows(text){ const rows=[]; let row=[], cell='', q=false; const s=String(text).replace(/^﻿/,'');
+  for(let i=0;i<s.length;i++){ const c=s[i];
+    if(q){ if(c==='"'){ if(s[i+1]==='"'){ cell+='"'; i++; } else q=false; } else cell+=c; continue; }
+    if(c==='"') q=true; else if(c===','){ row.push(cell); cell=''; } else if(c==='\n'||c==='\r'){ if(c==='\r'&&s[i+1]==='\n') i++; row.push(cell); rows.push(row); row=[]; cell=''; } else cell+=c; }
+  if(cell!==''||row.length){ row.push(cell); rows.push(row); } return rows; }
+function rvColName(i){ let s=''; i++; while(i>0){ const m=(i-1)%26; s=String.fromCharCode(65+m)+s; i=Math.floor((i-1)/26); } return s; }
+function rvCsvAsSheet(name,text){ const R=rvCsvRows(text), rows=[];
+  R.forEach((r,i)=>{ const c={}; r.forEach((v,j)=>{ if(String(v)!=='') c[rvColName(j)]=v; }); if(Object.keys(c).length) rows.push({n:i+1,c}); });
+  const sh={name:name.replace(/\.csv$/i,''),state:'visible',rows,merged:0,orientation:'',fit:false,printArea:false,header:'',footer:'',zoom:'100',textCells:0,offAlign:0};
+  return {kind:'excel',csv:true,name,sheets:[sh],text:'## '+sh.name+'\n'+rows.map(r=>Object.values(r.c).join(' | ')).join('\n')}; }
+/* the header row: the first of the top 15 rows that is mostly text and about as wide as the data under it */
+function rvSheetTable(s){ const top=s.rows.slice(0,15); const wide=Math.max(0,...s.rows.slice(0,60).map(r=>Object.keys(r.c).length));
+  const h=top.find(r=>{ const v=Object.values(r.c); return v.length>=2&&v.length>=wide*0.6&&v.every(x=>!/^-?\d+(\.\d+)?$/.test(String(x).trim())); });
+  if(!h) return null; const cols=Object.keys(h.c).map(k=>({k,h:String(h.c[k]).trim()})); const data=s.rows.filter(r=>r.n>h.n);
+  return {head:h.n,cols,data}; }
+const rvRowList=(L,n)=>L.slice(0,n||5).join(', ')+(L.length>(n||5)?' …':'');
+function rvDatasetChecks(f,add){ const W=f.name; let notes=0; const say=(sev,issue,sug,rule)=>{ if(notes<14){ add(sev,'Dataset',issue,sug,W,rule); notes++; } };
+  f.sheets.filter(s=>s.state==='visible').forEach(s=>{ const T=rvSheetTable(s); if(!T||T.data.length<5||T.cols.length<2) return; const N=T.data.length, sn=f.csv?'':'“'+s.name+'”: ';
+    /* column names used twice */
+    const seen={}, dupH=[]; T.cols.forEach(c=>{ const k=c.h.toLowerCase(); if(k&&seen[k]) dupH.push(c.h); seen[k]=1; });
+    if(dupH.length) say('recommend',sn+'column names used more than once: '+[...new Set(dupH)].slice(0,4).map(rvQ).join(', ')+'.','Give each column its own name.','ds-dup-head');
+    /* blanks in columns that are otherwise filled (90% or more) */
+    const gaps=[]; T.cols.forEach(c=>{ const blank=T.data.filter(r=>!String(r.c[c.k]||'').trim()).map(r=>r.n); const filled=N-blank.length;
+      if(blank.length&&filled/N>=0.9) gaps.push(rvQ(c.h||c.k)+' is blank in '+blank.length+' row'+(blank.length===1?'':'s')+' ('+rvRowList(blank)+')'); });
+    if(gaps.length) say('recommend',sn+'columns that are filled almost everywhere have blanks: '+gaps.slice(0,4).join('; ')+(gaps.length>4?'; and '+(gaps.length-4)+' more columns':'')+'.','Fill them in, or say on the description tab why they’re blank.','ds-blanks');
+    /* the same name listed twice */
+    const key=T.cols.find(c=>/\b(name|term|id|code|data ?point|element|enumeration)\b/i.test(c.h))||T.cols[0]; const byV={};
+    T.data.forEach(r=>{ const v=String(r.c[key.k]||'').trim(); if(v) (byV[v.toLowerCase()]=byV[v.toLowerCase()]||{v,rows:[]}).rows.push(r.n); });
+    const dups=Object.values(byV).filter(x=>x.rows.length>1);
+    if(dups.length&&dups.length<N/2) say('recommend',sn+dups.length+' value'+(dups.length===1?' appears':'s appear')+' more than once in '+rvQ(key.h||key.k)+': '+dups.slice(0,3).map(x=>rvQ(x.v)+' (rows '+x.rows.slice(0,3).join(', ')+')').join(', ')+(dups.length>3?' …':'')+'.','Check whether each one is meant to repeat.','ds-dups');
+    /* extra spaces */
+    const sp=[]; T.data.forEach(r=>Object.entries(r.c).forEach(([k,v])=>{ v=String(v); if(/^\s|\s$| {2,}/.test(v)&&v.trim()) sp.push(k+r.n); }));
+    if(sp.length) say('recommend',sn+sp.length+' cell'+(sp.length===1?' has':'s have')+' extra spaces at the start, at the end or between words ('+rvRowList(sp)+').','Remove the extra spaces (Excel’s TRIM does it in one step).','ds-spaces');
+    /* definitions that end differently */
+    T.cols.filter(c=>/definition|description/i.test(c.h)).forEach(c=>{ const v=T.data.map(r=>({n:r.n,v:String(r.c[c.k]||'').trim()})).filter(x=>x.v.length>20);
+      const dot=v.filter(x=>/[.!?:)"”]$/.test(x.v)), no=v.filter(x=>!/[.!?:)"”]$/.test(x.v)); const few=dot.length<no.length?dot:no;
+      if(v.length>=10&&few.length&&few.length/v.length>=0.03&&few.length/v.length<=0.5) say('recommend',sn+rvQ(c.h)+': '+(v.length-few.length)+' end with a period and '+few.length+(few===dot?' do':' don’t')+' (rows '+rvRowList(few.map(x=>x.n))+').','End them all the same way.','ds-def-end'); });
+  });
+}
+/* one whole-dataset look from Claude: the columns, the first rows and a sample from across each sheet */
+function rvDatasetProfile(f){ const cut=v=>{ v=String(v).replace(/\s+/g,' ').trim(); return v.length>140?v.slice(0,139)+'…':v; }; const parts=[];
+  f.sheets.filter(s=>s.state==='visible'&&s.rows.length).sort((a,b)=>b.rows.length-a.rows.length).slice(0,4).forEach((s,si)=>{ const T=rvSheetTable(s);
+    const line=r=>'row '+r.n+': '+Object.values(r.c).map(cut).join(' | ');
+    if(!T){ parts.push('## Sheet “'+s.name+'” ('+s.rows.length+' rows, no header row found)\n'+s.rows.slice(0,12).map(line).join('\n')); return; }
+    const N=T.data.length, fill=T.cols.map(c=>c.k+' “'+c.h+'” '+Math.round(T.data.filter(r=>String(r.c[c.k]||'').trim()).length/Math.max(1,N)*100)+'% filled').join('; ');
+    const head=T.data.slice(0,si?8:20), step=Math.max(1,Math.floor(N/(si?12:30))), samp=T.data.slice(head.length).filter((r,i)=>i%step===0).slice(0,si?12:30);
+    parts.push('## Sheet “'+s.name+'”: '+N+' data rows. Columns: '+fill+'\nFirst rows:\n'+head.map(line).join('\n')+(samp.length?'\nSample from across the sheet:\n'+samp.map(line).join('\n'):'')); });
+  const out=parts.join('\n\n'); return out.length>16000?out.slice(0,16000)+'\n…':out; }
+async function rvAiDataset(f,ctx){
+  const prompt='You review MISMO datasets (Excel or CSV data such as data glossaries, code lists, mappings and sample data) for publication readiness, the way MISMO’s editor would look over a dataset: as a whole, for patterns. Never list one cell’s spelling or grammar unless the same problem repeats across the data. Report only systematic issues: a column used inconsistently, the same term written different ways, definitions that don’t follow one pattern (for example some start with “The” and some don’t), values in the wrong column, inconsistent capitalization or abbreviations across names, a column that looks unused, or anything that would confuse someone using the data. Software already checked boilerplate, copyright, print setup, merged cells, blank cells, values listed twice, extra spaces and how definitions end: don’t repeat those. Don’t judge whether technical content (XPaths, mappings, data types, codes) is right. You see the columns, the first rows and a sample, so say “about” for counts.'+
+    (typeof rvFbAvoid==='function'&&rvFbAvoid('editor').length?'\nMISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('editor').join(' | '):'')+
+    '\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nWorkgroup: '+(ctx.t.workgroup||'')+'\nFile: '+f.name+'\nFacilitator note: '+(ctx.note||'none')+
+    '\n\nAnswer in this compact JSON only (no other text): {"s":"one sentence on the dataset","r":"ready|minor|needs","p":[["the pattern","how widespread, with 2 or 3 example rows","the suggestion","short category"]],"q":["question for the facilitator"]}. At most 8 items in p and 2 in q, most important first, each string under 30 words. Answer right away.\n\nDATASET:\n'+rvDatasetProfile(f);
+  return await rvAsk(prompt); }
 /* ============================================================================
    The MISMO Reference Model (Logical Data Dictionary) for the IM Pre-Review.
    Loaded from the private mms-data repo (rm-meta + rm-dp1..n), which holds a
@@ -5983,8 +6060,8 @@ function rvApplyFeedback(findings){ const st=rvFbStats(); return findings.map(f=
 /* notes Claude made that people marked wrong, so it doesn't repeat them */
 function rvFbAvoid(kind){ return Object.values(S.rvfb||{}).filter(f=>f&&f.kind===kind&&f.src==='ai'&&f.verdict==='wrong'&&f.text).sort((a,b)=>String(b.at).localeCompare(String(a.at))).slice(0,8).map(f=>f.text+(f.why?' (why: '+f.why+')':'')); }
 
-const RV_KIND={editor:{title:'AI Review',short:'AI Review',accept:'.docx,.xlsx,.xlsm,.pdf',multiple:true,
-    intro:'Add the work product files (Word, Excel or PDF). Software checks the boilerplate word for word, copyright, page numbers, Excel setup and more; Claude adds an editor’s read for spelling, grammar, terms, acronyms and MISMO voice, following the habits of MISMO’s editor (Erin) from her past reviews. Nothing in your files is changed or stored.'},
+const RV_KIND={editor:{title:'AI Review',short:'AI Review',accept:'.docx,.xlsx,.xlsm,.csv,.pdf',multiple:true,
+    intro:'Add the work product files (Word, Excel, CSV or PDF). Each file gets the review that fits it: Word and PDF documents get an editor’s read for spelling, grammar, terms, acronyms and MISMO voice, following the habits of MISMO’s editor (Erin); datasets (Excel or CSV data) are looked over as a whole for patterns, not cell by cell; the IM/AWG Submission Form is read on its three tabs. Software checks the boilerplate word for word, copyright, page numbers and setup. Nothing in your files is changed or stored.'},
   im:{title:'IM Pre-Review',short:'IM Pre-Review',accept:'.xlsx,.xlsm',multiple:false,
     intro:'Add the IM/AWG Submission Form (July 2026 version). It checks the Face Page and every Reference Model row the way IM reads them: required columns, class words and definition templates, names, XPATHs and the Proposed Structure tab. Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided. Nothing in the form is changed or stored.'}};
 
@@ -7293,7 +7370,7 @@ const HELP_TOPICS={
      'Make the updates in your documents, then click Resubmit for AI Review to check again.',
      'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.',
      'On the IM Pre-Review report, go through MISMO Link Format: accept or decline each fix before you click Send to IM.'],
-    ['On the report, tick Update, Do Not Update, Unsure or Pass by each note, or use Choose for Every Note (or All in this section) to set them all at once, then click Submit Choices. None are required: blank notes count as Pass, and you can send the work on to IM Review either way.','Fixes are things IM will send back. Suggestions are up to you.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+    ['Each file gets the review that fits it: Word and PDF documents get the editor’s read; datasets (Excel or CSV data) are looked over as a whole, one note per pattern with a count and example rows, never cell by cell; the IM/AWG Submission Form is read on its Face Page, Reference Model Changes and Proposed Structure tabs. The report says how each file was reviewed.','On the report, tick Update, Do Not Update, Unsure or Pass by each note, or use Choose for Every Note (or All in this section) to set them all at once, then click Submit Choices. None are required: blank notes count as Pass, and you can send the work on to IM Review either way.','Fixes are things IM will send back. Suggestions are up to you.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
     [['Open the Review Desk','reviews']]],
   mislink:['MISMO Link Format: Fixes Before IM','*',
     'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The IM Pre-Review lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
@@ -7972,7 +8049,7 @@ function rvNotes(rep){ const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'
   (rep.corrections||[]).forEach((c,i)=>out.push({k:'c'+i,section:'Editorial Corrections',area:c.category||'',where:c.where,issue:c.issue,suggestion:c.suggestion}));
   (rep.rows||[]).forEach((r,i)=>out.push({k:'r'+i,section:'Rows IM May Question',area:r.likely,where:r.item,issue:r.note,suggestion:[r.name,r.def].filter(Boolean).join(' — ')}));
   F.filter(f=>f.sev==='recommend').forEach(f=>out.push({k:f._k,section:'Recommended',area:f.area,where:f.where,issue:f.issue+(f.fb?' ('+f.fb+')':''),suggestion:f.suggestion}));
-  (rep.recommendations||[]).forEach((c,i)=>out.push({k:'m'+i,section:'Recommended',area:'Editorial',where:c.where,issue:c.issue,suggestion:c.suggestion}));
+  (rep.recommendations||[]).forEach((c,i)=>out.push({k:'m'+i,section:'Recommended',area:c.area||'Editorial',where:c.where,issue:c.issue,suggestion:c.suggestion}));
   (rep.questions||[]).forEach(q=>out.push({k:'',section:'Questions for the Facilitator',area:'',where:'',issue:q,suggestion:''}));
   return out; }
 async function rvExcel(rep){
