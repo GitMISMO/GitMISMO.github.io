@@ -2168,7 +2168,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-24T00:56:02Z',fp:'08160cce'};
+window.__mmsBuild={at:'2026-11-24T01:13:49Z',fp:'70abf80e'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7393,14 +7393,24 @@ const HELP_TOPICS={
     ['To see an older version, open the file in SharePoint and use Version History.','Upload a new file only when it is a new document, such as an IM resubmission.'],
     []],
   aireview:['AI Review: Getting Ready for IM','facilitator staff',
-    'AI Review is the editor and readiness review in one. Claude reads the submission the way MISMO’s editor would and lists what to fix before IM sees it.',
+    'The AI Review reads your work product files the way MISMO’s editor would and lists what to fix and what to consider before IM sees them. It only suggests: you choose what to change, and it never holds the work request back.',
     ['If the work request has open Architecture Help, finish that first. The button reads Submit for AI Review (after Architecture Help) and shows what is still open.',
      'When the work product is ready, click Submit for AI Review on the work request.',
-     'The review runs in a few minutes. You get a list of what to fix and what is only a suggestion.',
-     'Make the updates in your documents, then click Resubmit for AI Review to check again.',
-     'When it looks right, click Send to IM Review. Then click Run the IM Pre-Review, and on the report click Send to IM. IM gets a draft decision for every row.',
-     'On the IM Pre-Review report, go through MISMO Link Format: accept or decline each fix before you click Send to IM.'],
-    ['Each file gets the review that fits it: Word and PDF documents get the editor’s read; datasets (Excel or CSV data) are looked over as a whole, one note per pattern with a count and example rows, never cell by cell; the IM/AWG Submission Form is read on its Face Page, Reference Model Changes and Proposed Structure tabs. The report says how each file was reviewed.','On the report, tick Update, Do Not Update, Unsure or Pass by each note, or use Choose for Every Note (or All in this section) to set them all at once, then click Submit Choices. None are required: blank notes count as Pass, and you can send the work on to IM Review either way.','Fixes are things IM will send back. Suggestions are up to you.','Ran a review more than once? Open the report and click Delete This Review, or on the Reviews tab click Keep Only the Latest. An IM Pre-Review already sent to IM stays. Deleted reports are kept 60 days, and MISMO staff can put one back.','A progress bar shows how far along the review is and how long it has been running. Keep the tab open until the report opens.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.','Run AI Review Again any time you change the documents.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found.','For a big file, Claude’s editorial read stops after 30 parts so the review finishes quickly; Read the Rest on the report carries on through the remaining parts and adds the notes to the same report (keep the tab open).','Mark each note Yes, No, Unsure or Pass if you like. It’s optional; Yes and No teach the review. Download the report for Word or Excel.','Two steps, two names: AI Review reads the work product (editor and readiness in one). The IM Pre-Review reads the IM Submission Form, drafts IM’s decision for each row and sends it to the IM reviewers.'],
+     'On the Reviews tab, click Run AI Review. Add the files (Word, Excel, CSV or PDF, up to 8): choose them, drop them in, or pick them from the work request’s files.',
+     'Check Boilerplate It Should Have (set from the stage; change it only if MISMO staff told you to), add a note for the reviewer if you like, and click Run AI Review. A progress bar shows how far along it is: keep the tab open until the report opens.',
+     'On the report, tick Update, Do Not Update, Unsure or Pass by each note, or use Choose for Every Note (or All in this section) to set them all at once, then click Submit Choices. None are required; blank notes count as Pass.',
+     'Make the updates you chose in your own files, and run the AI Review again if you like.',
+     'Click Send to IM Review, then run the IM Pre-Review on the Submission Form.'],
+    ['Each file gets the review that fits it. Word and PDF documents: the editor’s read for spelling, grammar, terms, acronyms and MISMO voice. Datasets (Excel or CSV data): looked over as a whole, one note per pattern with a count and example rows, never cell by cell. The IM/AWG Submission Form: its Face Page, Reference Model Changes and Proposed Structure tabs. The report says how each file was reviewed.','Every file also gets the software checks: the boilerplate word for word, the copyright and its year, and MISMO’s terms and product names.','Report sections: Must Fix Before Submitting (what IM is likely to send back), Editorial Corrections (clear errors), Recommended (judgment calls) and Questions for the Facilitator.','After you submit your choices the report reads Reviewed with your counts, the history notes them, and Update and Do Not Update teach the review what’s useful.','The AI Review never holds the work request back: Send to IM Review is always there, whatever the review found and whether or not you made choices.','For a big document, Claude reads 30 parts at a time; Read the Rest on the report carries on and adds the notes to the same report (keep the tab open).','Ran a review more than once? Open the report and click Delete This Review, or on the Reviews tab click Keep Only the Latest. An IM Pre-Review already sent to IM stays. Deleted reports are kept 60 days, and MISMO staff can put one back.','Download for Word or Download for Excel gives you a copy of the report to share.','Clicked the wrong thing and your work request moved ahead? On the Review Desk, drag your own card back to the earlier review (for example from AWG Review back to IM Review). That review starts over. Moving work forward is still done with its buttons.'],
+    [['Open the Review Desk','reviews']]],
+  impre:['IM Pre-Review: Getting the Submission Ready for IM','facilitator staff',
+    'The IM Pre-Review reads the IM/AWG Submission Form (July 2026 version) the way IM does, fixes the MISMO Link format, drafts IM’s decision for every row and sends it to the IM reviewers.',
+    ['Once the work request is at AI Review or IM Review, click Run IM Pre-Review on its Reviews tab.',
+     'Add the Submission Form: choose it, drop it in, or pick it from the work request’s files. Click Run IM Pre-Review and keep the tab open until the report opens.',
+     'Go through MISMO Link Format first: Accept or Decline each fix (see MISMO Link Format: Fixes Before IM).',
+     'Look over Must Fix Before Submitting and Rows IM May Question; fix your form if you want to and run it again.',
+     'Click Send to IM. IM gets the form with a draft decision for every row, and the IM reviewers are told it’s ready.'],
+    ['What it checks: the Face Page; every Reference Model row’s required columns for its action, class words and definition templates, names, abbreviations and XPATHs; the Proposed Structure tab; and, against the current MISMO Reference Model, whether a name already exists, a parent container is real and an XPATH matches.','Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided since 2021, with each row’s likely outcome, what IM would say and a suggested name or definition.','Draft IM Decisions counts how many rows look Approved as Submitted, Approved with Modification and so on. IM reviewers agree with or correct each one.','If IM already has an earlier pre-review of this work request, Send to IM asks before replacing it.','A pre-review sent to IM can’t be deleted; older runs that weren’t sent can (Delete This Review, or Keep Only the Latest on the Reviews tab).'],
     [['Open the Review Desk','reviews']]],
   mislink:['MISMO Link Format: Fixes Before IM','*',
     'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The IM Pre-Review lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
@@ -7653,8 +7663,8 @@ const HELP_TOPICS={
     [['Open MISMO Terms','rc:terms']]]
 };
 const HELP_ORDER={
-  facilitator:['start','hub','queue','panel','docs','arch','aireview','mislink','drafts','handoff','parts','asks','comments','dprec','invites','digest','mymail','mediareq','metrics','path','find','words'],
-  staff:['start','hub','queue','board','metrics','approvals','mislink','handoff','parts','govrec','dprec','settings','health','mt','notif','digest','mymail','panel','docs','drafts','arch','comments','invites','path','find'],
+  facilitator:['start','hub','queue','panel','docs','arch','aireview','impre','mislink','drafts','handoff','parts','asks','comments','dprec','invites','digest','mymail','mediareq','metrics','path','find','words'],
+  staff:['start','hub','queue','board','metrics','approvals','impre','mislink','handoff','parts','govrec','dprec','settings','health','mt','notif','digest','mymail','panel','docs','drafts','arch','comments','invites','path','find'],
   imawg:['start','imrun','mislink','awgrun','invites','mt','handoff','docs','drafts','digest','mymail','path','find'],
   member:['start','member','invites','docs','path','find'],
   approver:['start','approve','parts','queue','handoff','dprec','metrics','digest','mymail','path','find'],
