@@ -511,6 +511,15 @@
     ],
     "writable": []
   },
+  "media-member-360": {
+    "repo": "GitMISMO/marketing-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "readable": [
+      "data/member-360/"
+    ],
+    "writable": []
+  },
   "mms-feed": {
     "repo": "GitMISMO/mismo-standards",
     "branch": "main",

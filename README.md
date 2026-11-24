@@ -88,6 +88,7 @@ system's data repository: `"writable": []` and one `readable` folder, nothing el
 |---|---|---|
 | `cert-completions` | cms-data `data/accounting/` | Its own row in People & Access (the Accounting Desk's Certification Completions tab) |
 | `cms-member-360` | cms-data `data/member-360/` (`certifications.json`, written by the CMS) | Everyone with Member 360: it is in Member 360's `also` in `assets/tools.json`, so People & Access gives it the same access as Member 360 (CN-017) |
+| `media-member-360` | marketing-hq-data `data/member-360/` (`downloads.json`, website downloads written by MISMO Media) | Everyone with Member 360, through Member 360's `also` in `assets/tools.json`, the same way as `cms-member-360` (CN-020) |
 
 A key added to a tool's `also` reaches people who already have that tool the next time a platform
 admin opens People & Access: the panel brings their keys into line and asks for Save Access.
