@@ -502,6 +502,15 @@ main{max-width:none}
 .cu-p em{font-style:normal;font-size:11.5px;font-weight:600;color:var(--ink-3)}
 .fld[hidden]{display:none}
 .pager[hidden]{display:none}
+.cu-how{display:flex;flex-direction:column}
+.cu-how div{display:grid;grid-template-columns:26px minmax(0,1fr);gap:10px;padding:12px 16px;border-bottom:1px solid var(--rule)}
+.cu-how div:last-child{border-bottom:0}
+.cu-how b{width:24px;height:24px;border-radius:5px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px}
+:root[data-theme="dark"] .cu-how b{background:var(--sky);color:var(--navy)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cu-how b{background:var(--sky);color:var(--navy)}}
+.cu-how span{font-size:13px;color:var(--ink-2);line-height:1.5}
+.cu-how strong{display:block;font-size:13.5px;color:var(--ink);margin-bottom:2px}
+#v-contacts .hgrid{grid-template-columns:minmax(0,1.5fr) minmax(0,1fr)}
 @media(max-width:700px){.cu-roles{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 </head>
@@ -632,7 +641,13 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 <div class="vhead"><div><h1>Contact Updates</h1><div class="vsub">Send a change to a member's contacts. It goes straight into Member 360, and every update is kept here with who sent it and when.</div></div><button class="btn" type="button" id="cu-add">Update a Contact</button></div>
 <div class="tiles" id="cu-tiles"></div>
 <div class="chips" id="cu-chips"></div>
-<div class="panel pk" style="--pk:#b79cff"><div class="ph"><h2>Submitted Updates</h2><span class="hint" id="cu-h"></span></div><div class="rows" id="cu-list"></div><div class="pager" id="cu-pager"></div></div>
+<div class="hgrid"><div class="panel pk" style="--pk:#b79cff"><div class="ph"><h2>Submitted Updates</h2><span class="hint" id="cu-h"></span></div><div class="rows" id="cu-list"></div><div class="pager" id="cu-pager"></div></div>
+<div class="panel pk" style="--pk:#74bfeb"><div class="ph"><h2>How It Works</h2><span class="hint" id="cu-co-n"></span></div><div class="cu-how">
+<div><b>1</b><span><strong>Choose the Company</strong>Start typing and pick it from the list, so Member 360 finds the right record. Its contacts show beside the form.</span></div>
+<div><b>2</b><span><strong>Pick What's Changing</strong>Someone new, new details or roles for someone, or someone who has left.</span></div>
+<div><b>3</b><span><strong>Fill In the Details</strong>Name, title, email, phone and roles: Primary, Alternate, Billing, Marketing, Voting Rep and the rest.</span></div>
+<div><b>4</b><span><strong>Send to Member 360</strong>It saves with your name and the time, and shows In Member 360 once it's on the record, usually within minutes.</span></div>
+</div></div></div>
 </section>
 
 <section class="view" id="v-cases" hidden>
@@ -791,7 +806,7 @@ function renderWork(){const kc=k=>TODO.filter(x=>x.kind===k).length;if(hkind&&!k
   const nb=$("nb-todo");if(nb){nb.textContent=TODO.length||"";nb.hidden=!TODO.length;}}
 function renderHome(){const hr=new Date().getHours(),first=(((window.__deskMe&&window.__deskMe().name)||"").split(" ")[0]);
 $("hello").textContent=(hr<12?"Good Morning":hr<17?"Good Afternoon":"Good Evening")+", "+(first||"Membership Team");
-const SU=finished().filter(r=>r.grp==="setup"&&r.d),mo=TODAY.slice(0,7),monName=new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{month:"long"}),
+const SU=(()=>{const seen=new Set();return finished().filter(r=>r.grp==="setup"&&r.d).filter(r=>{const k=slug(r.nm)+"|"+r.kind+"|"+r.d.slice(0,7);if(seen.has(k))return false;seen.add(k);return true;});})()/* the same set-up seen twice (marked here and confirmed by MISMO Money or Aptify) counts once */,mo=TODAY.slice(0,7),monName=new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{month:"long"}),
 finM=SU.filter(r=>r.d.slice(0,7)===mo),since=SU.map(r=>r.d).sort()[0]||TODAY,
 oldest=TODO.map(x=>x.sold||x.paid).filter(Boolean).sort()[0],oldD=oldest?Math.max(0,days(oldest,TODAY)):0,
 P=pipRows(),pL=P.filter(r=>r.lender),pN=P.filter(r=>!r.lender),lateP=P.filter(r=>r.d&&days(r.d,TODAY)>30),C=D.cases,yr=TODAY.slice(0,4),
@@ -856,7 +871,9 @@ if(P.length){const bb=h("div",{class:"pbar-b"});pb.appendChild(h("div",{class:"p
 [[aL,"#f0b94a"],[aN,"#5fd39a"]].forEach(([v,k])=>{if(v>0){const i=h("i",{style:"flex:"+(RED()?v:0)+" 1 0;background:"+k});bb.appendChild(i);if(!RED())setTimeout(()=>{i.style.flexGrow=String(v);},60);}});}
 const hp=$("home-pip");hp.textContent="";P.slice(0,5).forEach(r=>hp.appendChild(pipRow(r)));if(!P.length)hp.appendChild(h("div",{class:"empty"},"No invoices waiting on payment. Use Add an Invoice at the top to add one."));
 const pk=$("home-piplink");if(pk)pk.textContent=P.length>5?"See All "+P.length+"\u00a0→":"See All\u00a0→";
-const dn=$("home-done");dn.textContent="";SU.slice(0,8).forEach(r=>dn.appendChild(doneRow2(r)));if(!SU.length)dn.appendChild(h("div",{class:"empty"},"Set-ups you finish show here."));
+const dn=$("home-done");dn.textContent="";SU.slice(0,6).forEach(r=>dn.appendChild(doneRow2(r)));if(!SU.length)dn.appendChild(h("div",{class:"empty"},"Set-ups you finish show here."));
+/* the two columns end together: Recently Completed shows more when the right side is taller, so there is no empty space under it */
+requestAnimationFrame(()=>{const sd=document.querySelectorAll("#v-home .hgrid>.hside");if(sd.length<2||$("v-home").hidden)return;let i=dn.children.length;while(SU.length&&i<SU.length&&i<20&&sd[0].offsetHeight+40<sd[1].offsetHeight){dn.appendChild(doneRow2(SU[i]));i++;}});
 const hcu=$("home-cu");hcu.textContent="";CU.slice(0,4).forEach(u=>hcu.appendChild(cuRow(u)));if(!CU.length)hcu.appendChild(h("div",{class:"empty"},"Contact updates you send show here. Use Update a Contact at the top."));
 const hc=$("home-cases");hc.textContent="";finished().filter(r=>r.grp==="case").slice(0,4).forEach(r=>hc.appendChild(doneRow2(r)));if(!hc.children.length)hc.appendChild(h("div",{class:"empty"},"No MISMO cases yet this year."));
 renderWork();pipBadge();cuBadge();}
@@ -1342,7 +1359,7 @@ const box=$("cu-list");box.textContent="";F.slice(cuPg*per,cuPg*per+per).forEach
 if(!F.length)box.appendChild(h("div",{class:"empty"},L.length?"Nothing here.":"No contact updates yet. Select Update a Contact to send the first one."));
 const pg=$("cu-pager");pg.textContent="";pg.hidden=pages<2;
 if(pages>1)pg.append(h("button",{type:"button",disabled:cuPg?null:"",onclick:()=>{cuPg--;renderContacts();}},"‹ Newer"),h("span",null,"Page "+(cuPg+1)+" of "+pages),h("span",{class:"sp"},F.length+" updates"),h("button",{type:"button",disabled:cuPg<pages-1?null:"",onclick:()=>{cuPg++;renderContacts();}},"Older ›"));
-$("cu-h").textContent=F.length?F.length+" "+(F.length===1?"update":"updates")+", newest first":"";
+{const cn=$("cu-co-n");if(cn)cn.textContent=CO.length?CO.length.toLocaleString("en-US")+" companies to choose from":"";}$("cu-h").textContent=F.length?F.length+" "+(F.length===1?"update":"updates")+", newest first":"";
 cuBadge();}
 /* the panel: send an update, or one update with where it stands */
 function openCU(u,pre){cur=u||{cuAdd:true};const B=$("pane-b");B.textContent="";const me=(window.__deskMe&&window.__deskMe())||{};
@@ -1405,7 +1422,7 @@ h("div",{class:"fld"},h("label",null,"Sent By"),h("input",{value:me.name||"",dis
 h("div",{class:"fld wide"},h("label",null,"Roles"),rbox,h("small",null,"For a change, these replace the contact's roles")),
 h("div",{class:"fld wide"},h("label",{for:"cu-note"},"Note"),note,h("small",null,"Optional: where the change came from")),
 h("div",{class:"acts"},send,h("button",{type:"button",class:"btn ghost",onclick:closePane},"Cancel"),say))));
-B.appendChild(h("div",{class:"sect"},h("h3",null,"Contacts in Member 360 Now"),curBox));
+B.appendChild(h("div",{class:"sect",style:"align-self:start"},h("h3",null,"Contacts in Member 360 Now"),curBox));
 findCo();fillWho();showCur();sync();open();setTimeout(()=>co.focus(),240);}
 $("cu-add").addEventListener("click",()=>openCU(null));
 {const hc=$("hero-cu");if(hc)hc.addEventListener("click",()=>openCU(null));}
