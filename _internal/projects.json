@@ -520,6 +520,15 @@
     ],
     "writable": []
   },
+  "connected-systems": {
+    "repo": "GitMISMO/team-hq-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "readable": [
+      "data/connected-systems/"
+    ],
+    "writable": []
+  },
   "mms-feed": {
     "repo": "GitMISMO/mismo-standards",
     "branch": "main",

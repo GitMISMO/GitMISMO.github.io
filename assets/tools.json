@@ -109,6 +109,13 @@
       "path": "/team-hq/"
     },
     {
+      "key": "connected-systems",
+      "label": "Connected Systems",
+      "colour": "#0D314C",
+      "group": "Planning",
+      "path": "/team-hq/connected-systems/"
+    },
+    {
       "key": "team-hq-private",
       "label": "Team HQ Private Notes",
       "colour": "#0D314C",

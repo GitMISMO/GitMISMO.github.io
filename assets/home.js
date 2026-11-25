@@ -20,6 +20,7 @@ const CONTEXT = {
   'iif-hq:IIF Planning HQ': 'iif innovation investment fee fees invoicing invoice invoices collections billing cycle plan tasks key dates decisions risks raid last cycle',
   'summit-hq:Plan the summit': 'summit event conference meeting rooms room session sessions agenda schedule venue placement conflicts',
   'website-migration:Check the migration': 'website site web page pages migration move sitefinity higher logic launch cutover redirects',
+  'connected-systems:See how the systems connect': 'connected systems connections map systems map how systems fit together data flows integrations automations what reads what',
   'team-hq:Open my board': 'board tasks task todo to-do plan plans projects priorities today key dates team meeting',
   'team-hq:Jot it down': 'note notes jot quick idea reminder remember capture',
   'meeting-trackers:Track meeting attendance': 'meeting meetings attendance attend attended attendee attendees tracker trackers workgroup dwg cop roster participation regulars summit session sessions who came member 360 activity',
@@ -132,6 +133,7 @@ const P = {
   so:'M7 3h8l4 4v14H7z M15 3v4h4 M10 13l2 2 4-4', sponsorship:'M12 3l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.4l6-.9z',
   summit:'M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z M8 3v4 M16 3v4 M3 10h18',
   website:'M12 3a9 9 0 1 0 0 18a9 9 0 1 0 0-18 M3 12h18 M12 3c3 3 3 15 0 18 M12 3c-3 3-3 15 0 18',
+  systems:'M5 5a2 2 0 1 0 0 .01 M19 5a2 2 0 1 0 0 .01 M5 19a2 2 0 1 0 0 .01 M19 19a2 2 0 1 0 0 .01 M12 9.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5 M6.5 6.5l3.7 3.7 M17.5 6.5l-3.7 3.7 M6.5 17.5l3.7-3.7 M17.5 17.5l-3.7-3.7',   /* Connected Systems (CN-026, Nov 24, 2026) */
   team:'M9 11a3.5 3.5 0 1 0 0-7a3.5 3.5 0 1 0 0 7 M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6 M17 11a3 3 0 1 0 0-6 M21 20c0-2.6-1.7-4.8-4-5.6',
   tracker:'M9 3h6v3H9z M7 4.5H5V21h14V4.5h-2 M8.5 13.5l2.5 2.5 4.5-5',
   money:'M3 6.5h18v11H3z M12 9.5a2.5 2.5 0 1 0 0 5a2.5 2.5 0 1 0 0-5 M6.5 9.5v.01 M17.5 14.5v.01',
@@ -160,6 +162,7 @@ const TOOLS = [
   { key:'summit-hq', name:'Summit HQ', c:'#B45309', icon:'summit', sec:'Planning' },
   { key:'website-migration', name:'Website Migration HQ', c:'#475569', icon:'website', sec:'Planning' },
   { key:'team-hq', name:'Team HQ', c:'#0D314C', icon:'team', sec:'Planning' },
+  { key:'connected-systems', name:'Connected Systems', c:'#0D314C', icon:'systems', sec:'Planning' },   /* view only, its own access (CN-026, Nov 24, 2026) */
   { key:'meeting-trackers', name:'Meeting Trackers', c:'#6D28D9', icon:'tracker', sec:'Planning' },
   { key:'iif-hq', name:'IIF Planning HQ', c:'#4D7C0F', icon:'iif', sec:'Planning' },
   { key:'member-360', name:'Member 360', c:'#0F7B5C', icon:'member', sec:'Planning' },
@@ -182,6 +185,7 @@ const ENTRIES = {
   'summit-hq': [['Plan the summit', 'Summit HQ', 'summit', '/summit-hq/']],
   'website-migration': [['Check the migration', 'Website Migration HQ', 'website', '/website-migration/']],
   'team-hq': [['Open my board', 'Team HQ', 'team', '/team-hq/'], ['Jot it down', 'Team HQ', 'note', '/team-hq/']],
+  'connected-systems': [['See how the systems connect', 'Connected Systems', 'systems', '/team-hq/connected-systems/']],   /* CN-026, Nov 24, 2026 */
   'meeting-trackers': [['Track meeting attendance', 'Meeting Trackers', 'tracker', '/meeting-trackers/']],
   'iif-hq': [['IIF Planning HQ', 'IIF Planning HQ', 'iif', '/iif-hq/']],   /* the main page only, named after the tool (Perry, 9 Oct 2026) */
   'elections-hq': [['Run the elections', 'Elections HQ', 'ballot', '/elections-hq/']],   /* Perry, 30 Oct 2026 */
@@ -197,6 +201,7 @@ const ENTRIES = {
    page in it. A tool's pages are its own entries that lead somewhere other than its main page, plus these pages that
    have their own address. */
 const TOOL_PATH = { hub:'/initiative-hub/', glossary:'/glossary/console/', qr:'/qr/', 'summit-hq':'/summit-hq/', 'website-migration':'/website-migration/', 'team-hq':'/team-hq/',
+  'connected-systems':'/team-hq/connected-systems/',
   'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/contractor-hq/',
   'mismo-link':'/mismo-link/', mms:'/mms/', financials:'/financials/', 'elections-hq':'/elections-hq/', 'marketing-hq':'/marketing-hq/', scheduler:'/scheduler/' };
 const MORE_PAGES = {
