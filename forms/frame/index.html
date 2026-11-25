@@ -701,7 +701,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       <button class="btn ghost" type="button" id="saveprog" title="Save a file you can open again later to carry on">Save</button>
       <button class="btn ghost" type="button" id="loadprog" title="Open a file you saved earlier and carry on from there">Resume</button>
       <button class="btn ghost" type="button" id="getcopy" title="A readable copy of everything entered, to keep or print">Print a Copy</button>
-      <button class="btn ghost" type="button" id="wordcopy" title="A Word file of the application as entered and the questionnaire, to share and gather answers">Download a Copy</button>
+      <button class="btn ghost" type="button" id="wordcopy" title="A Word file of the application as entered, to share">Download a Copy</button>
       <input type="file" id="progfile" accept=".json,application/json" hidden>
     </div>
   </div>
@@ -1424,6 +1424,41 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ================= submit ================= */
+  /* A readable copy of the application for the email to certifications@ (Jonna, 25 Nov 2026: the new application email
+     showed the raw data). Plain text that the "MISMO Application Forms - Submission" flow lays out as rows: one line per
+     answer, label and answer split by a tab; a line starting with character 1 is a section heading; a line break inside
+     an answer travels as character 13. Sent as "readable"; the application data itself is unchanged. */
+  function readableText(){
+    var H = String.fromCharCode(1), CR = String.fromCharCode(13), lines = [APP.title || "Application"];
+    function clean(v){
+      if(v === true) return "Yes";
+      if(v === false) return "No";
+      if(Array.isArray(v)) v = v.map(function(x){ return x && typeof x === "object" ? (x.name || Object.keys(x).map(function(k){ return x[k]; }).join(" ")) : x; }).join(", ");
+      else if(v && typeof v === "object") v = Object.keys(v).filter(function(k){ return filled(v[k]); }).map(function(k){ return k + ": " + v[k]; }).join(", ");
+      var s = String(v == null ? "" : v).replace(/\r\n|\r|\n/g, CR).replace(/[\t\x01]/g, " ").trim();
+      return s || "(not answered)";
+    }
+    function add(label, v){ lines.push(String(label || "").replace(/[\t\x01\r\n]+/g, " ") + "\t" + clean(v)); }
+    (APP.sections || []).forEach(function(sec){
+      var start = lines.length;
+      lines.push(H + sec.heading);
+      if(sec.attestText) add("I certify that the above is true", !!get("attestAgree"));
+      if(sec.repeating) (get(sec.repeating.key, []) || []).forEach(function(r, i){
+        (sec.repeating.fields || []).forEach(function(f){ add(sec.repeating.itemLabel + " " + (i + 1) + ": " + f.label, (r || {})[f.key]); });
+      });
+      (sec.repeatingBlocks || []).forEach(function(b){
+        (get(b.key, []) || []).forEach(function(r, i){
+          (b.fields || []).forEach(function(f){ add((b.itemLabel ? b.itemLabel + " " + (i + 1) + ": " : "") + f.label, (r || {})[f.key]); });
+        });
+      });
+      (sec.fields || []).forEach(function(f){ if(shows(f)) add(f.label, f.type === "checkbox" ? !!get(f.key) : get(f.key)); });
+      if(lines.length === start + 1) lines.pop();
+    });
+    var att = typeof attList === "function" ? attList() : [];
+    if(att.length){ lines.push(H + "Attachments"); att.forEach(function(a, i){ add("File " + (i + 1), a && a.name); }); }
+    return lines.join("\n");
+  }
+
   function payload(){
     return {
       formKey: FORM_KEY,
@@ -1436,6 +1471,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         if(PORTAL) q.portal = PORTAL;
         return q;
       }),
+      readable: (typeof PORTAL !== "undefined" && PORTAL) ? null : readableText(),
       submittedAt: new Date().toISOString(),
       organization: PORTAL ? ((PORTAL_REC && PORTAL_REC.org) || get("pName")) : get("org"),
       application: (function(){
@@ -1667,8 +1703,7 @@ var WordCopy = (function () {
   return api;
 })();
 
-  /* The application as entered, then the questionnaire the firm answers in its portal after paying (taken from the
-     portal page itself, so it is always the current one), so the firm can pass both around and gather answers early. */
+  /* The application as entered, as a Word file the firm can pass around. */
   function wordCopyForm(){
     var W = WordCopy, b = "", org = get("org") || get("company") || "", R = [3400, 5960];
     var req = function(f){ return f.label + (f.required ? " *" : ""); };
@@ -1679,8 +1714,7 @@ var WordCopy = (function () {
     };
     b += W.title(APP.h1 || APP.title || "MISMO Application") +
       W.p((org ? org + "  ·  " : "") + "Copy made " + new Date().toLocaleDateString("en-US", {year: "numeric", month: "long", day: "numeric"}), {color: "5B6B7C", after: 60}) +
-      W.note("What has been entered on the application so far, laid out as it is on the form, followed by the questionnaire you answer in your certification portal once the agreement is signed and the fee is paid. Share it to gather answers, then enter them on the form and in the portal. Changing this file changes nothing you have entered.");
-    b += W.h1("Application");
+      W.note("What has been entered on the application, laid out as it is on the form. The questionnaire and supporting documents come later, in your certification portal, which has its own Download a Copy. Changing this file changes nothing you have entered.");
     (APP.sections || []).forEach(function(sec){
       b += W.h2(sec.heading) + (sec.help ? W.note(sec.help) : "");
       if(sec.attestText) b += W.p(sec.attestText) + W.p((get("attestAgree") ? W.ON : W.OFF) + "  I certify that the above is true.", {ind: 240, after: 100});
@@ -1695,21 +1729,10 @@ var WordCopy = (function () {
       var rows = (sec.fields || []).filter(shows).map(function(f){ return rowOf(f, get(f.key)); });
       if(rows.length) b += W.table(rows, {firstCol: true, widths: R});
     });
-    if(APP.attachments){
-      var names = attList().map(function(f){ return f.name; });
-      b += W.h2(APP.attachments.heading) + (APP.attachments.help ? W.note(APP.attachments.help) : "") +
-        W.label("What to have ready") + W.opts(APP.attachments.expected || [], function(){ return false; }) +
-        W.label("Files added so far") + W.box(names.join("\n") || "None yet", 1);
-    }
-    var done = function(qs){
-      if(qs) b += W.h1(qs.title || "Questionnaire") + (qs.intro ? W.note(qs.intro) : "") + W.questionnaire(qs.form.sections || [], {});
-      W.save("MISMO " + programSlug() + " Application" + (org ? " - " + org : "") + ".docx", b);
-      toast("Your copy is downloading.");
-    };
-    fetch("/portal/" + programSlug().toLowerCase() + "/?copy=" + Date.now(), {cache: "no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(t){
-      var m = /<script id="cfg" type="application\/json">([\s\S]*?)<\/script>/.exec(t || ""), cfg = m ? JSON.parse(m[1]) : null;
-      done(cfg ? (cfg.steps || []).filter(function(s){ return s.type === "questionnaire"; })[0] : null);
-    }).catch(function(){ done(null); });
+    /* The application only (Erin, PhoenixTeam, 25 Nov 2026: the copy carried the whole questionnaire, which is now a
+       later step, in the portal). */
+    W.save("MISMO " + programSlug() + " Application" + (org ? " - " + org : "") + ".docx", b);
+    toast("Your copy is downloading.");
   }
 
   /* ---------- save, resume, and a readable copy ----------
