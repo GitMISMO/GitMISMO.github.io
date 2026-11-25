@@ -20,6 +20,12 @@ for (const p of [...pages, ...scripts]) { const t = read(p); const hit = SECRET.
 /* 3) the page safety list */
 for (const p of ['mms/index.html']) { const t = read(p); /http-equiv="Content-Security-Policy"/.test(t) ? pass(`${p}: page safety list present`) : fail(`${p}: no Content-Security-Policy`); }
 
+/* 3b) the browser tab icon: exactly one icon line, the shared MISMO icon (CN-030) */
+const ICON = '<link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">';
+for (const p of ['mms/index.html']) { const head = (read(p).match(/<head>([\s\S]*?)<\/head>/i) || [, ''])[1];
+  const icons = head.match(/<link\b[^>]*\brel=["']?(?:shortcut )?icon\b[^>]*>/gi) || [];
+  icons.length === 1 && icons[0] === ICON ? pass(`${p}: one browser tab icon, the shared MISMO icon`) : fail(`${p}: browser tab icon lines should be exactly the shared one (found ${icons.length}: ${icons.join(' ')})`); }
+
 /* 4) the MMS opens in a browser on made-up records */
 const { chromium } = createRequire(process.cwd() + '/')('playwright');
 const RELAY = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws';
