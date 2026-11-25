@@ -633,7 +633,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   </section>
 
   <section class="view" id="v-pip" hidden>
-    <div class="vhead"><div><h1>Payment in Process</h1><div class="vsub">Invoices that have been sent and not paid yet, Lenders and Non-Lenders apart. Each one comes off when the payment shows up in Aptify, or when someone selects Mark Paid.</div></div><button class="btn" type="button" id="pip-add">Add an Invoice</button></div>
+    <div class="vhead"><div><h1>Payment in Process</h1><div class="vsub">New Lender and Non-Lender members who have not paid yet, Lenders and Non-Lenders apart: invoices added here, plus new members and applications Member 360 sends. Renewals are followed in Member 360, not here. Each one comes off when the payment shows up in Aptify, or when someone selects Mark Paid.</div></div><button class="btn" type="button" id="pip-add">Add an Invoice</button></div>
     <div class="tiles" id="pip-tiles"></div>
     <div class="grid2">
       <div class="panel pk" style="--pk:#f0b94a"><div class="ph"><h2>Lenders</h2><span class="hint" id="pip-lh"></span></div><div class="rows" id="pip-lender"></div></div>
@@ -1208,7 +1208,8 @@ const HELP=[
   notes:[]},
   {id:"pip",k:"#f0b94a",name:"Payment in Process",lead:"Invoices that have been sent and not paid yet, with Lenders and Non-Lenders apart, so the membership team, Amy and Kelly all see what's still owed.",
   steps:[["Add an Invoice","On Payment in Process, or at the top of Home, select Add an Invoice and enter the company, Lender or Non-Lender, what it's for, the amount and the invoice date. The Aptify Company ID is optional, but with it the payment is tied for certain."],
-   ["Renewals Come In on Their Own","Non-Lender renewals that Member 360 has at Invoiced or Payment in Process show on the Non-Lender list by themselves, marked from Member 360. Don't enter those."],
+   ["New Members Come In on Their Own","New members on Member 360's New Members report who have not paid yet, and prospects whose application is in or who are at Payment in Process, show on the Lender or Non-Lender list by themselves, marked from Member 360. Don't enter those."],
+    ["No Renewals Here","Renewal payments are followed in Member 360's Renewals, so they are not on this page."],
    ["It Comes Off When Paid","Once Aptify shows payments from the company on or after the invoice date that add up to the invoice, it moves to Paid in the Last 60 Days. You can also open it and select Mark Paid."],
    ["Entered by Mistake","Open it and select Entered by Mistake. It comes off the list but is kept on the record."]],
   notes:["<b>The days on the right</b> count from the invoice date. Anything waiting more than 30 days shows in red."]},
@@ -1250,10 +1251,10 @@ function renderHelp(){const nav=$("help-nav"),body=$("help-body");nav.textConten
  if(t.id==="start")body.appendChild(h("button",{type:"button",class:"btn",onclick:()=>go("todo")},"Go to Your To Do"));}
 /* ---------- Payment in Process (Jonna, Nov 2, 2026): invoices that have been sent and not paid yet, Lenders and Non-Lenders apart, so
    Amy, Kelly and the membership team follow them together. Anyone on the desk adds an invoice (data/invoices.json, kept, never deleted).
-   Member 360 adds the Non-Lender renewals that are Invoiced or Payment in Process, and marks a desk invoice paid once Aptify shows
+   Member 360 adds new Lender and Non-Lender members not paid yet and prospects whose application is in, never renewals (Jonna, Nov 24, 2026), and marks a desk invoice paid once Aptify shows
    payments from that company on or after the invoice date that add up to it. Anyone can also select Mark Paid. ---------- */
 const INV=(D.inv||[]).slice(),PIP=D.pip||[],INVPAID=D.invPaid||{};
-const PIP_WHAT=["IIF","Membership Dues","Renewal","Other"];
+const PIP_WHAT=["IIF","Membership Dues","Other"];/* no Renewal: renewal payments stay in Member 360 (Jonna, Nov 24, 2026) */
 function invState(v){if(v.paidBy)return {paid:true,d:String(v.paidAt||"").slice(0,10),how:"Marked paid by "+String(v.paidByName||"the desk").split(" ")[0]+(v.paidAt?" on "+fmt(String(v.paidAt).slice(0,10)):"")+(v.paidNote?" · "+v.paidNote:"")};
  const a=INVPAID[v.id];if(a)return {paid:true,auto:true,d:a.d,how:"Paid in Aptify, "+money(a.n)+" by "+fmt(a.d)};return {paid:false};}
 function pipRows(){const open=INV.filter(v=>!v.archived&&!invState(v).paid).map(v=>({src:"inv",v,name:v.name,lender:!!v.lender,amount:+v.amount||0,d:v.date||"",what:v.what||"",num:v.number||""}));
