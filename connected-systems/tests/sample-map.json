@@ -1,0 +1,28 @@
+{
+  "docs": {
+    "current": {
+      "v": 1,
+      "asOf": "2026-11-25",
+      "lede": "A made-up map for the Connected Systems browser checks.",
+      "areas": { "mem": { "name": "Area One", "c": "--c4" }, "ops": { "name": "Area Two", "c": "--c5" } },
+      "systems": [
+        { "id": "alpha", "name": "Alpha Desk", "area": "mem", "zone": "apps", "status": "Live", "statusNote": null, "what": "A pretend app.", "where": "Nowhere real", "replaced": "A spreadsheet", "x": 365, "y": 95 },
+        { "id": "beta", "name": "Beta Hub", "area": "ops", "zone": "apps", "status": "Live", "statusNote": null, "what": "Another pretend app.", "where": "Nowhere real", "x": 640, "y": 95 },
+        { "id": "relay", "name": "Pretend Relay", "area": "ops", "zone": "eng", "status": "Live", "statusNote": null, "what": "Holds the pretend apps up.", "where": "Nowhere real", "x": 500, "y": 300 }
+      ],
+      "connections": [
+        { "id": "c01", "from": "alpha", "to": "beta", "what": "Pretend hand-off", "how": "auto" },
+        { "id": "c02", "from": "beta", "to": "relay", "what": "Pretend saves", "how": "auto" }
+      ],
+      "journeys": [
+        { "id": "j1", "title": "A Pretend Story", "area": "mem", "blurb": "Work moves from Alpha to Beta.", "steps": [
+          { "sys": "alpha", "to": "beta", "text": "Alpha hands the work to Beta." },
+          { "sys": "beta", "text": "Beta finishes it." } ] }
+      ],
+      "protection": [ { "title": "One sign-in", "detail": "Everyone signs in as themselves.", "status": "In place", "sys": "relay" } ],
+      "replaced": [ { "before": "A spreadsheet", "after": "Alpha Desk", "detail": "No more copying.", "sys": "alpha" } ],
+      "automations": [ { "cadence": "Every few minutes", "items": [ { "name": "Pretend job", "detail": "runs on its own", "sys": "beta" } ] } ],
+      "appGroups": [ { "name": "Area One", "ids": ["alpha"] }, { "name": "Area Two", "ids": ["beta"] } ]
+    }
+  }
+}

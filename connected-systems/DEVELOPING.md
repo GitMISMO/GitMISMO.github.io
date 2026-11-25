@@ -35,6 +35,24 @@ see **Edit in Team HQ**, which opens /team-hq/?page=systems.
   every 10 minutes: copies team-hq-data data/systemsmap.json to connected-systems-data when it changed. Uses that
   repository's NOTICES_TOKEN. It only ever writes that one file.
 
+## The Back Button
+
+CN-033 (Jonna, Nov 25, 2026): the shared `/assets/back.js` (owned by Forms and shared pages; loaded in `<head>` right
+after session.js, never copied here) makes each change of page in the left menu a step in the browser's history, so
+Back goes to the last page and Forward goes again. Help is in the menu itself (`nav button[data-hq="help"]`), and
+`mark()` puts aria-current on the page showing. Back first closes what's open, registered with `MismoBack.layer` at
+the end of the main script, bottom first: the list under a headline number (`.cs-drill`, closed with its ×), then the
+system or story panel beside the map (`.cs-panel`, closed with its × or the story's Close ×). The page still keeps the
+page name in the address (`#Security`, `#help`) with `history.replaceState`, as before; back.js keeps its note on the
+entry when it does. Never add a `history.pushState` of our own. If Team HQ's systems.js renames those classes, the
+browser check fails.
+
+## Build Note
+
+`tools/build.py` copies the masthead, menu and Dark Mode from fixed line ranges of accounting-desk/index.html. It now
+moves every range by however far the Accounting Desk's CSS has moved (it had grown by its favicon line, CN-030), and
+its asserts stop the build if anything else shifted. Rebuilding with the same stamp must give the same page.
+
 ## Access
 
 Relay key `connected-systems` in `_internal/projects.json`: repo GitMISMO/connected-systems-data, `readable:
@@ -47,6 +65,10 @@ People & Access would take it from people who have it on its own), so Team HQ pe
 
 - Checks: `.github/workflows/connected-systems-checks.yml` runs `tools/check.mjs` on every change (scripts parse,
   safety list, no keys, its own key and file only, never saves, version stamp).
+- Browser check: `connected-systems/tests/back.cjs` (same workflow) opens the page in headless Chrome with a pretend
+  sign-in and a made-up map (`tests/sample-map.json`, never the real one), loading back.js and Team HQ's systems.js
+  from their live copies, and checks the Back button (below). Locally: `npm install --prefix /tmp/pw playwright`, then
+  `NODE_PATH=/tmp/pw/node_modules CHROME_PATH=/usr/bin/google-chrome node connected-systems/tests/back.cjs`.
 - Version stamp: `BUILD` in the page, shown at the foot of Help.
 - Nothing saves: the stand-in db refuses every save, and the key has no writable folder.
 - System Health and incoming-data warnings live in Team HQ's Connected Systems (the record's own data); the copy job's

@@ -1,5 +1,6 @@
 # Connected Systems Page Checks: on every change to connected-systems/, the page parses, keeps its safety list,
-# carries no keys, reads only its own relay key and never saves (connected-systems/tools/check.mjs).
+# carries no keys, reads only its own relay key and never saves (connected-systems/tools/check.mjs); and in a headless
+# browser, the browser's Back button goes to the last page and closes an open panel first (connected-systems/tests/back.cjs, CN-033).
 name: Connected Systems Page Checks
 on:
   push:
@@ -17,3 +18,7 @@ jobs:
         with: { node-version: "20" }
       - name: Page checks
         run: node connected-systems/tools/check.mjs
+      - name: Back button (headless browser, with a made-up map)
+        run: |
+          npm install --silent --prefix "$RUNNER_TEMP/pw" playwright@1.63.0
+          NODE_PATH="$RUNNER_TEMP/pw/node_modules" CHROME_PATH="$(command -v google-chrome || command -v chromium)" node connected-systems/tests/back.cjs

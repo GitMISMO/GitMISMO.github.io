@@ -17,6 +17,7 @@
 <link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap">
 <script src="/assets/session.js"></script>
+<script src="/assets/back.js"></script>
 <style>
 :root{--navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
   --ground:#f1f6fa;--surface:#fff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;--border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
@@ -242,6 +243,8 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       <p>Access is its own item in People &amp; Access (Connected Systems), separate from Team HQ. Ask Jonna Critchley. Having it doesn’t give access to Team HQ or anything else.</p>
       <h2>Search</h2>
       <p>The search box finds systems and stories. Press Ctrl+K (Cmd+K on a Mac) to jump to it, and the backslash key to narrow or widen the menu.</p>
+      <h2>The Back Button</h2>
+      <p>Your browser’s Back button goes to the last page you were on and closes an open panel or list first; it never undoes a change.</p>
       <div class="vstamp" id="vstamp"></div>
     </div>
   </section>
@@ -250,7 +253,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 <script>
 (function(){
   'use strict';
-  var BUILD = '20261125-1600';
+  var BUILD = '20261125-1700';
   var RELAY = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws';
   var KEY = 'connected-systems', FILE = '/file/data/systemsmap.json';
   var EDITORS = ['jcritchley@mismo.org', 'jcritchley@mba.org', 'vrios@mismo.org', 'vrios@mba.org'];
@@ -361,6 +364,16 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     setTimeout(function(){ if (!wrap.querySelector('.cs-panel .cs-story')) return;
       show('overview', true); var mw = wrap.querySelector('.cs-mapwrap'); if (mw) window.scrollTo(0, Math.max(0, mw.getBoundingClientRect().top + window.scrollY - 80)); }, 60);
   });
+  /* the browser's Back button (CN-033, Jonna, Nov 25, 2026): the shared /assets/back.js makes each change of page in
+     the left menu a step in the browser's history. Back first closes what's open, one at a time: the list under a
+     headline number, then the system or story panel beside the map, each the way its own × does. */
+  function press(sel){ var b = wrap.querySelector(sel); if (b) b.click(); }
+  if (window.MismoBack) {
+    MismoBack.layer({ isOpen: function(){ var d = wrap.querySelector('.cs-drill'); return !!d && !d.hidden; },
+      close: function(){ press('.cs-drill .cs-dh .cs-dx'); } });
+    MismoBack.layer({ isOpen: function(){ var p = wrap.querySelector('.cs-panel'); return !!p && !!p.parentNode && !p.classList.contains('is-intro') && !p.parentNode.classList.contains('solo'); },
+      close: function(){ press('.cs-panel .cs-krow .cs-all, .cs-panel .cs-ph > button.x'); } });
+  }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
 })();
 </script>

@@ -1,9 +1,12 @@
 import re
 AD=open(__import__('os').path.join(__import__('os').path.dirname(__import__('os').path.abspath(__file__)),'..','..','accounting-desk','index.html')).read().split('\n')
 head_meta=AD[3]  # <meta charset> + CSP line
-css_shell='\n'.join(AD[15:129])   # lines 16..129: :root .. end of rail css
-defs='\n'.join(AD[316:347])       # svg defs
-rail_js='\n'.join(AD[1285:1441])  # the rail + theme scripts (without <script> tags)
+# The Accounting Desk grows above these blocks now and then (its favicon line, CN-030), so find where its CSS starts
+# and move every slice by the same amount (the asserts below catch anything else).
+o=next(i for i,l in enumerate(AD) if l.startswith(':root{'))-15
+css_shell='\n'.join(AD[15+o:129+o])   # :root .. end of rail css
+defs='\n'.join(AD[316+o:347+o])       # svg defs
+rail_js='\n'.join(AD[1285+o:1441+o])  # the rail + theme scripts (without <script> tags)
 rail_js=rail_js.replace("const ORDER=['Receivables','Invoices','Certification Complete','New and Renewing Members','IIF Payments','Sponsorships'];","const ORDER=['Systems','Stories','Sections'];")
 assert "const ORDER=['Systems','Stories','Sections'];" in rail_js
 assert head_meta.startswith('<meta charset') and 'Content-Security-Policy' in head_meta
@@ -41,6 +44,7 @@ __META__
 <link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap">
 <script src="/assets/session.js"></script>
+<script src="/assets/back.js"></script>
 <style>
 __CSS__
 /* the colors Team HQ's Connected Systems drawing uses */
@@ -123,6 +127,8 @@ __DEFS__
       <p>Access is its own item in People &amp; Access (Connected Systems), separate from Team HQ. Ask Jonna Critchley. Having it doesn’t give access to Team HQ or anything else.</p>
       <h2>Search</h2>
       <p>The search box finds systems and stories. Press Ctrl+K (Cmd+K on a Mac) to jump to it, and the backslash key to narrow or widen the menu.</p>
+      <h2>The Back Button</h2>
+      <p>Your browser’s Back button goes to the last page you were on and closes an open panel or list first; it never undoes a change.</p>
       <div class="vstamp" id="vstamp"></div>
     </div>
   </section>
@@ -242,6 +248,16 @@ __DEFS__
     setTimeout(function(){ if (!wrap.querySelector('.cs-panel .cs-story')) return;
       show('overview', true); var mw = wrap.querySelector('.cs-mapwrap'); if (mw) window.scrollTo(0, Math.max(0, mw.getBoundingClientRect().top + window.scrollY - 80)); }, 60);
   });
+  /* the browser's Back button (CN-033, Jonna, Nov 25, 2026): the shared /assets/back.js makes each change of page in
+     the left menu a step in the browser's history. Back first closes what's open, one at a time: the list under a
+     headline number, then the system or story panel beside the map, each the way its own × does. */
+  function press(sel){ var b = wrap.querySelector(sel); if (b) b.click(); }
+  if (window.MismoBack) {
+    MismoBack.layer({ isOpen: function(){ var d = wrap.querySelector('.cs-drill'); return !!d && !d.hidden; },
+      close: function(){ press('.cs-drill .cs-dh .cs-dx'); } });
+    MismoBack.layer({ isOpen: function(){ var p = wrap.querySelector('.cs-panel'); return !!p && !!p.parentNode && !p.classList.contains('is-intro') && !p.parentNode.classList.contains('solo'); },
+      close: function(){ press('.cs-panel .cs-krow .cs-all, .cs-panel .cs-ph > button.x'); } });
+  }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
 })();
 </script>
