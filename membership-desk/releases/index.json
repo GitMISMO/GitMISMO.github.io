@@ -90,6 +90,13 @@
       "by": "jycritchley",
       "note": "Finished set-ups never come back on the To Do if the finished list fails to load",
       "sha256": "69e393d2cc63fc61ae53716df0e638a3a64d4a99e35db6244479bb9f757ca8e7"
+    },
+    {
+      "version": "20261125-1748",
+      "at": "2026-11-25T17:48:22.390Z",
+      "by": "jycritchley",
+      "note": "Menu label: Case Management from Aptify Data Updated",
+      "sha256": "109547c16972c57976b99a087133957dd41dcee9d4536b48202c13a540cce2de"
     }
   ]
 }
