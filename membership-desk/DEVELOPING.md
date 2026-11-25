@@ -99,6 +99,8 @@ The desk sends no email of its own.
 - Archive, never delete: done items are undone, invoices are marked Entered by Mistake.
 - Contacts who leave a company are handled in Member 360 only. There is no Aptify Updates tab: Jonna is moving MISMO
   away from Aptify upkeep (Nov 20, 2026).
+- The browser tab icon is the one shared MISMO icon, from https://resources.mismo.org/assets/favicon-48x48.png, and
+  no other icon line (Nov 25, 2026). Never copy the image here.
 - Plain language and Title Case headings; squared-off buttons and tags, never pills; no big empty spaces.
 
 ## Safety Net
