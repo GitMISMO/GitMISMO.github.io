@@ -1426,6 +1426,41 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   }
 
   /* ================= submit ================= */
+  /* A readable copy of the application for the email to certifications@ (Jonna, 25 Nov 2026: the new application email
+     showed the raw data). Plain text that the "MISMO Application Forms - Submission" flow lays out as rows: one line per
+     answer, label and answer split by a tab; a line starting with character 1 is a section heading; a line break inside
+     an answer travels as character 13. Sent as "readable"; the application data itself is unchanged. */
+  function readableText(){
+    var H = String.fromCharCode(1), CR = String.fromCharCode(13), lines = [APP.title || "Application"];
+    function clean(v){
+      if(v === true) return "Yes";
+      if(v === false) return "No";
+      if(Array.isArray(v)) v = v.map(function(x){ return x && typeof x === "object" ? (x.name || Object.keys(x).map(function(k){ return x[k]; }).join(" ")) : x; }).join(", ");
+      else if(v && typeof v === "object") v = Object.keys(v).filter(function(k){ return filled(v[k]); }).map(function(k){ return k + ": " + v[k]; }).join(", ");
+      var s = String(v == null ? "" : v).replace(/\r\n|\r|\n/g, CR).replace(/[\t\x01]/g, " ").trim();
+      return s || "(not answered)";
+    }
+    function add(label, v){ lines.push(String(label || "").replace(/[\t\x01\r\n]+/g, " ") + "\t" + clean(v)); }
+    (APP.sections || []).forEach(function(sec){
+      var start = lines.length;
+      lines.push(H + sec.heading);
+      if(sec.attestText) add("I certify that the above is true", !!get("attestAgree"));
+      if(sec.repeating) (get(sec.repeating.key, []) || []).forEach(function(r, i){
+        (sec.repeating.fields || []).forEach(function(f){ add(sec.repeating.itemLabel + " " + (i + 1) + ": " + f.label, (r || {})[f.key]); });
+      });
+      (sec.repeatingBlocks || []).forEach(function(b){
+        (get(b.key, []) || []).forEach(function(r, i){
+          (b.fields || []).forEach(function(f){ add((b.itemLabel ? b.itemLabel + " " + (i + 1) + ": " : "") + f.label, (r || {})[f.key]); });
+        });
+      });
+      (sec.fields || []).forEach(function(f){ if(shows(f)) add(f.label, f.type === "checkbox" ? !!get(f.key) : get(f.key)); });
+      if(lines.length === start + 1) lines.pop();
+    });
+    var att = typeof attList === "function" ? attList() : [];
+    if(att.length){ lines.push(H + "Attachments"); att.forEach(function(a, i){ add("File " + (i + 1), a && a.name); }); }
+    return lines.join("\n");
+  }
+
   function payload(){
     return {
       formKey: FORM_KEY,
@@ -1436,6 +1471,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
         return {code: f.code, label: f.label,
                 version: f.source_title || f.source_file || f.code};
       }),
+      readable: (typeof PORTAL !== "undefined" && PORTAL) ? null : readableText(),
       submittedAt: new Date().toISOString(),
       organization: get("org"),
       application: (function(){
