@@ -1275,7 +1275,7 @@ function helpView(){ const roles=HELP_R, k=S.helpRole&&roles.some(r=>r[0]===S.he
   return '<div class="head"><div><h1>Help</h1><div class="sub">How AWG Review works, for each person who uses it. Pick who you are.</div></div></div><div class="help">'+
     '<div class="seg hr-seg" role="tablist" aria-label="Pick who you are">'+roles.map(r=>'<button type="button" role="tab" data-hrole="'+r[0]+'" aria-pressed="'+(r[0]===k)+'">'+esc(r[1])+'</button>').join('')+'</div>'+
     '<div class="g2"><div class="card"><h3>'+esc(R[1])+': What You Do Here</h3><p class="hr-who">'+esc(R[2])+'</p><ol class="hr-steps">'+R[3].map(s=>'<li>'+esc(s)+'</li>').join('')+'</ol></div>'+
-    '<div class="card"><h3>Good to Know</h3><ul>'+R[4].map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul><h3 style="margin-top:16px">What This Is</h3>'+'<p>AWG reviews each Reference Model submission after IM, for its architecture: MEGs, container structure, relationships, attributes, XPATHs and anything that would break existing implementations. Each submission arrives with a <b>draft</b>: a recommendation and the architecture points behind it. AWG votes on the submission as a whole on its call, with quorum.</p>'+'</div></div>'+
+    '<div class="card"><h3>Good to Know</h3><ul>'+R[4].concat(["The browser’s Back button goes to the last page or submission you were on. It never undoes a vote, a note or a decision."]).map(s=>'<li>'+esc(s)+'</li>').join('')+'</ul><h3 style="margin-top:16px">What This Is</h3>'+'<p>AWG reviews each Reference Model submission after IM, for its architecture: MEGs, container structure, relationships, attributes, XPATHs and anything that would break existing implementations. Each submission arrives with a <b>draft</b>: a recommendation and the architecture points behind it. AWG votes on the submission as a whole on its call, with quorum.</p>'+'</div></div>'+
     '<div class="card" style="margin-top:18px"><h3>How a Submission Gets Here</h3>'+flowHtml()+'</div></div>'; }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-hrole]"); if(!b) return; S.helpRole=b.dataset.hrole; render(); });
 
@@ -1377,6 +1377,9 @@ function wire(){ const m=$("#main"); tabRoles(m); $$(".chart",m).forEach(tipOn);
   $$("[data-resend]",m).forEach(b=>b.onclick=async()=>{ b.disabled=true; try{ await sendHome(S.docs[r.rep]||doc); toast("AWG’s decision is now on its way to the work request."); }catch(e){ toast("Still couldn’t reach it. Check your connection and try again in a minute."); } render(); });
   $$("[data-xl]",m).forEach(b=>b.onclick=()=>exportXl(doc));
 }
+/* Back and Forward (CN-033, Nov 25, 2026): every page and every opened submission has its own address (#/decided, #/review/<id>),
+   so the browser already makes each one a history step and Back returns to it. Do NOT load /assets/back.js here: it would add a
+   second step per click and Back would need pressing twice. AWG Review has no right-hand panels or drawers for Back to close. */
 document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
 window.addEventListener("hashchange",()=>{ S.edit=null; const r=route(); if(r.view==="review") S.filter="awg"; window.scrollTo(0,0); render(); });
 setInterval(async()=>{ if(document.hidden||route().view==="review"||route().view==="add"||route().view==="setup") return; await refreshQueue(); render(); },60000);
