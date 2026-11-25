@@ -55,6 +55,13 @@
       "by": "jycritchley",
       "note": "One Update a Contact button; companies not in Member 360 can be added",
       "sha256": "9b3ae2dfbf733958faca3d43a9de34b442a13f09836d3361218fc801cf49f20e"
+    },
+    {
+      "version": "20261125-0119",
+      "at": "2026-11-25T01:19:16.266Z",
+      "by": "jycritchley",
+      "note": "Payment in Process: new members only, no renewals",
+      "sha256": "cc65f4a115a1ae032ee423035e29cbad1ad833d2afd400e7748c5e7660fd46f7"
     }
   ]
 }
