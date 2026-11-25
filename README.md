@@ -96,3 +96,13 @@ system's data repository: `"writable": []` and one `readable` folder, nothing el
 
 A key added to a tool's `also` reaches people who already have that tool the next time a platform
 admin opens People & Access: the panel brings their keys into line and asks for Save Access.
+
+## MyMISMO's relay key (CN-035, Nov 25, 2026)
+
+`_internal/projects.json` has a `mymismo` key for MyMISMO (resources.mismo.org/mymismo/, GitMISMO/mymismo).
+Its data is the private GitMISMO/mymismo-data, written only by the relay. `writable` is empty on purpose:
+staff pages save nothing there yet. `attendees: true` and `attendeeFeed` (Summit HQ's
+`data/feed-mymismo-attendees.json` in GitMISMO/summit-hq-data) are for relay request 13: attendee sign-in
+with the registration email and an emailed 6-digit code, an opt-in attendee directory and messages
+between attendees. The key does nothing until Perry deploys relay request 13. MyMISMO is public, so it
+has no People & Access entry.

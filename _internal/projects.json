@@ -556,5 +556,17 @@
       "polls": ["jcritchley@mismo.org", "jcritchley@mba.org", "vrios@mismo.org", "vrios@mba.org"]
     },
     "groupPolls": true
+  },
+  "mymismo": {
+    "repo": "GitMISMO/mymismo-data",
+    "branch": "main",
+    "origin": "https://resources.mismo.org",
+    "writable": [],
+    "attendees": true,
+    "attendeeFeed": {
+      "repo": "GitMISMO/summit-hq-data",
+      "branch": "main",
+      "path": "data/feed-mymismo-attendees.json"
+    }
   }
 }
