@@ -2096,6 +2096,15 @@ p,.sub,.lede{text-wrap:pretty}
 /* deleting review reports (Nov 23) */
 .rv-rep footer .rv-delbtn{margin-right:auto;color:var(--bad,#b3372c)}.rv-rep footer .rv-delnote{margin-right:auto;font-size:12px;align-self:center}
 .rv-oldbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;margin:0 0 8px}.rv-oldbar span{flex:1}
+/* Files tab: Delete control beside each file (Nov 25, 2026) */
+.ss-row{display:flex;gap:6px;align-items:stretch}
+.ss-row>.ss-f{flex:1;min-width:0}
+.ss-del{flex:0 0 auto;width:38px;display:flex;align-items:center;justify-content:center;border:1px solid var(--line,#dbe5ee);border-radius:6px;background:var(--card,#fff);color:var(--muted,#5b7287);cursor:pointer;padding:0}
+.ss-del svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.ss-del:hover{border-color:#c0392b;color:#c0392b}
+.ss-del[data-sswhy]{opacity:.45;cursor:not-allowed}
+.ss-del[data-sswhy]:hover{border-color:var(--line,#dbe5ee);color:var(--muted,#5b7287)}
+.ss-del:focus-visible{outline:2px solid var(--sky,#74bfeb);outline-offset:1px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="/assets/back.js"></script>
@@ -2170,7 +2179,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-25T19:53:13Z',fp:'40ed9237'};
+window.__mmsBuild={at:'2026-11-25T23:13:54Z',fp:'ac9f018f'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7463,14 +7472,15 @@ const HELP_TOPICS={
      'On your own work, change anything in Details, Key Dates or Links, then click Save Changes. Leave without saving and the MMS asks whether to save, discard or keep editing.'],
     ['Every saved change is logged in History, and the Undo on the Saved message puts it back.','Your browser no longer asks “Leave site?” when you close or leave the MMS. The only question you get is the MMS’s own Save, Discard or Keep Editing, and only when you have unsaved changes.'],
     []],
-  docs:['Files: Opening and Adding Them','facilitator staff imawg member',
+  docs:['Files: Opening, Adding and Deleting Them','facilitator staff imawg member',
     'Each work request has its own folder in the MISMO Facilitator Team SharePoint (MMS Smartsheet Files). The MMS shows the files, not the folder.',
     ['Open a work request and click the Files tab.',
      'Click a file to open it in a new tab. Word, Excel and PDF all open the file itself.',
      'To add files, click Add Files and choose them. They are saved into that work request’s SharePoint folder and show up right away.',
      'Files someone puts straight into the SharePoint folder show up too. The MMS checks the folder each time you open the Files tab.',
-     'To change a Word or Excel file, open it and edit it in the browser. SharePoint saves as you go and keeps every version.'],
-    ['To see an older version, open the file in SharePoint and use Version History.','Upload a new file only when it is a new document, such as an IM resubmission.'],
+     'To change a Word or Excel file, open it and edit it in the browser. SharePoint saves as you go and keeps every version.',
+     'To delete a file, click the trash can beside it and confirm. It is deleted from the SharePoint folder, comes off the list, and the history says who deleted it. SharePoint keeps it in the site’s Recycle Bin for 93 days, so MISMO staff can put it back.'],
+    ['To see an older version, open the file in SharePoint and use Version History.','Upload a new file only when it is a new document, such as an IM resubmission.','You can delete the files you added. MISMO staff can delete any file.','A file can’t be deleted while the work request is out with IM or AWG reviewers (they see these files), or during the comment period if it is the file posted for comment. The trash can is dimmed and says why.'],
     []],
   aireview:['AI Review: Getting Ready for IM','facilitator staff',
     'The AI Review reads your work product files the way MISMO’s editor would and lists what to fix and what to consider before IM sees them. It only suggests: you choose what to change, and it never holds the work request back.',
@@ -8229,6 +8239,51 @@ rvRun=function(t,kind){ _rvRunSrc(t,kind); const box=$('#modal-root .modal'), dr
       try{ got[i]=await rvSrcGet(L[i]); st.textContent='Added'; }catch(e){ st.textContent='Couldn’t get it: '+e.message; c.checked=false; } c.disabled=false; }
     else st.textContent=c.checked?'Added':'';
     apply(); }); };
+/* ---------- Delete a file from the Files tab (Nov 25, 2026) ----------
+   Erin asked for it. Each SharePoint file on a work request's Files tab gets a small Delete control.
+   The "MMS Documents - Upload" flow deletes it (mode "delete"); SharePoint keeps it in the site's
+   Recycle Bin for 93 days, so it can be put back from there. The file comes off the list and the
+   work request's history says who deleted it.
+   Who can (Jonna): MISMO staff, and whoever added the file.
+   Not while it's in use: the file posted for the comment period (during the comment period), and any
+   file while the work request is out with IM or AWG reviewers (their list comes from these files). */
+function ssDelWhy(t,f){ /* '' = can delete; otherwise the reason it can't */
+  if(!f||!f.p) return 'x';
+  const cp=t.cpFile; if(cp&&/comment/.test(String(t.stage||''))){ if((cp.path&&String(cp.path).toLowerCase()===String(f.p).toLowerCase())||(cp.parts||[]).includes(f.n)) return 'It’s the file posted for the comment period.'; }
+  if((t.stage==='im'||t.stage==='awg')&&t.sub==='in-review') return 'The '+(t.stage==='im'?'IM':'AWG')+' reviewers are reviewing this work request now and see these files. Delete it once the review is back.';
+  return ''; }
+function ssCanDel(t,f){ if(!(S.notify&&S.notify.docFlowUrl)||!S.canWrite||S.viewAs||!f||!f.p) return false; const me=viewer();
+  return !!(S.isStaff||(f.b&&sameName(f.b,me.name))); }
+function ssDelBtn(t,f){ if(!ssCanDel(t,f)) return ''; const why=ssDelWhy(t,f);
+  return '<button type="button" class="ss-del" data-ssdel="'+esc(t.id)+'" data-ssp="'+esc(f.p)+'"'+(why?' data-sswhy="'+esc(why)+'"':'')+' title="'+esc(why||'Delete this file')+'" aria-label="Delete '+esc(f.n)+'"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></svg></button>'; }
+/* wrap each file row so the Delete control sits beside the link (a button can't go inside a link) */
+const _ssTabHtmlDel=ssTabHtml;
+const ssMsg={}; /* the last delete's message stays on the tab through the re-renders that follow a save */
+ssTabHtml=function(t){ const h=_ssTabHtmlDel(t); const D=ssFor(t); const M=ssMsg[t.id]&&Date.now()-ssMsg[t.id].at<60000?ssMsg[t.id]:null;
+  const host=document.createElement('div'); host.innerHTML=h;
+  if(M){ const u=host.querySelector('.ss-up'); if(u){ u.hidden=false; u.className='ss-up '+M.cls; u.textContent=M.text; } }
+  if(!D||!(D.files||[]).length) return host.innerHTML;
+  [...host.querySelectorAll('a.ss-f')].forEach(a=>{ const href=a.getAttribute('href'); const f=(D.files||[]).find(x=>ssUrl(x)===href&&x.p); const b=f?ssDelBtn(t,f):''; if(!b) return;
+    const w=document.createElement('div'); w.className='ss-row'; a.replaceWith(w); w.appendChild(a); w.insertAdjacentHTML('beforeend',b); });
+  return host.innerHTML; };
+async function ssDelete(t,p){ const D0=ssFor(t); const f=D0&&(D0.files||[]).find(x=>x.p===p); if(!f) return false;
+  const why=ssDelWhy(t,f); if(why){ toast(why); return false; }
+  const gone=!!f.gone;
+  const ok=await modal({title:'Delete This File?',text:esc(t.wr+' '+t.name),ok:gone?'Remove From List':'Delete File',danger:true,
+    body:'<p style="margin:0"><b>'+esc(f.n)+'</b> '+(gone?'is no longer in SharePoint, so it just comes off this list.':'is deleted from the work request’s SharePoint folder and comes off this list. SharePoint keeps it in the site’s Recycle Bin for 93 days, so MISMO staff can put it back from there.')+'</p>'});
+  if(!ok) return false;
+  const box=document.getElementById('ssup-'+t.id); const say=(m,cls)=>{ ssMsg[t.id]={text:m,cls:cls||'',at:Date.now()}; if(box){ box.hidden=false; box.className='ss-up '+(cls||''); box.textContent=m; } };
+  if(!gone){ say('Deleting '+f.n+'…');
+    try{ const r=await fetch(S.notify.docFlowUrl,{method:'POST',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({token:(window.ResourcesSession&&ResourcesSession.token())||'',project:'mms',mode:'delete',path:rvSrcPath(f)})});
+      const j=await r.json().catch(()=>({})); if(!r.ok||!j.deleted) throw new Error(j.error==='not found'?'SharePoint couldn’t find it (it may already be gone; the list updates the next time the folder is checked)':(j.error||'the flow answered '+r.status));
+    }catch(e){ say('Couldn’t delete '+f.n+': '+e.message,'bad'); return false; } }
+  const D=clone(ssFor(t)||D0); D.files=(D.files||[]).filter(x=>x.p!==p); S.ssfiles[t.id]=D; await write('ssfiles',t.id,D);
+  const x=clone(S.tickets[t.id]||t); hist(x,(gone?'File removed from the list (no longer in SharePoint): ':'File deleted from SharePoint: ')+f.n);
+  await saveTicket(x,gone?'Removed from the list':'File deleted'); /* no Undo here: the file itself comes back from the Recycle Bin */
+  ssMsg[t.id]={text:gone?f.n+' came off the list.':f.n+' was deleted. It’s in the SharePoint Recycle Bin for 93 days if it’s needed back.',cls:'ok',at:Date.now()}; renderPanel();
+  return true; }
+document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-ssdel]'); if(!b) return; e.preventDefault(); e.stopPropagation();
+  if(b.dataset.sswhy){ toast(b.dataset.sswhy); return; } const t=S.tickets[b.dataset.ssdel]; if(t) ssDelete(t,b.dataset.ssp); });
 /* ---------- AI Review: Read the Rest (Nov 20, 2026) ----------
    Claude's editorial read stops after 30 parts so a review finishes in a few minutes. For a big file the report
    offers "Read the Rest": the MMS gets the same files again (from the work request's Files when they're there,
@@ -8350,33 +8405,58 @@ cpSection=function(t){ const h=_cpSectionF(t), F=t.cpFile; const can=cpCanEdit(t
 function cpfDateWords(){ const d=new Date(); return d.toLocaleDateString('en-US',{timeZone:'America/New_York',month:'long',day:'numeric',year:'numeric'}); }
 /* replaces [INSERT DATE] (even split across formatting runs) in a Word or Excel file's text, and drops the red color
    the boilerplate template gives the token. Returns the new bytes and how many it filled. */
-async function cpfFillDate(fname,u8,day){ await needLibs(); const z=await JSZip.loadAsync(u8); const xl=/\.xlsx|\.xlsm$/i.test(fname);
+/* Nov 25 (Erin, the Reference Model artifacts froze the tab): only the paragraphs (Word) or shared strings (Excel)
+   that hold the word "insert" are parsed, one at a time, so a 15 MB spreadsheet is a string search, not a full parse */
+function cpfFixGroup(g,xl,day){ const W='http://schemas.openxmlformats.org/wordprocessingml/2006/main', X='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+  const ts=[...g.getElementsByTagNameNS(xl?X:W,'t')]; let hit=0; if(!ts.length) return 0;
+  for(let guard=0;guard<5;guard++){ const all=ts.map(t=>t.textContent).join(''); const m=/\[\s*insert\s+date\s*\]/i.exec(all); if(!m) break;
+    let pos=0, a=m.index, b=m.index+m[0].length, first=true;
+    for(const t of ts){ const s0=pos, e0=pos+t.textContent.length; pos=e0; if(e0<=a||s0>=b) continue; const tx=t.textContent, cut0=Math.max(0,a-s0), cut1=Math.min(tx.length,b-s0);
+      t.textContent=tx.slice(0,cut0)+(first?day:'')+tx.slice(cut1); if(!xl) t.setAttributeNS('http://www.w3.org/XML/1998/namespace','xml:space','preserve'); first=false;
+      const run=t.parentNode; const rp=run&&[...run.childNodes].find(c=>c.localName==='rPr'); const col=rp&&[...rp.childNodes].find(c=>c.localName==='color'); if(col) rp.removeChild(col); }
+    hit++; }
+  return hit; }
+function cpfFillXml(x,xl,day){ const tag=xl?'si':'w:p', low=x.toLowerCase(), close='</'+tag+'>'; const spans=[]; let i=low.indexOf('insert');
+  while(i>=0){ let s=low.lastIndexOf('<'+tag,i); while(s>=0&&!/[\s>]/.test(low[s+tag.length+1])) s=low.lastIndexOf('<'+tag,s-1); /* <si> or <w:p ...>, not <w:pPr> */ const e=low.indexOf(close,i); if(s<0||e<0) break; const end=e+close.length;
+    if(/\[\s*insert\s+date\s*\]/i.test(x.slice(s,end).replace(/<[^>]*>/g,''))) spans.push([s,end]); i=low.indexOf('insert',end); }
+  if(!spans.length) return {x,n:0};
+  const root=/<(?![?!])[\w:.-]+(\s[^>]*?)?\/?>/.exec(x), attrs=(root&&root[1])||''; let n=0, out=x;
+  for(let k=spans.length-1;k>=0;k--){ const [s,end]=spans[k]; const doc=new DOMParser().parseFromString('<cpfw'+attrs+'>'+out.slice(s,end)+'</cpfw>','application/xml');
+    if(doc.getElementsByTagName('parsererror').length) continue; const g=doc.documentElement.firstElementChild; if(!g) continue; const h=cpfFixGroup(g,xl,day); if(!h) continue;
+    const ser=new XMLSerializer().serializeToString(doc.documentElement).replace(/^<cpfw[^>]*>/,'').replace(/<\/cpfw>$/,''); out=out.slice(0,s)+ser+out.slice(end); n+=h; }
+  return {x:out,n}; }
+async function cpfFillDate(fname,u8,day){ await needLibs(); const z=await JSZip.loadAsync(u8); const xl=/\.(xlsx|xlsm)$/i.test(fname);
   const parts=Object.keys(z.files).filter(p=>xl?/^xl\/sharedStrings\.xml$/.test(p):/^word\/(document|header\d*|footer\d*|footnotes|endnotes)\.xml$/.test(p)); let n=0;
-  const W='http://schemas.openxmlformats.org/wordprocessingml/2006/main', X='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
-  for(const p of parts){ const x=await z.file(p).async('string'); if(!/insert/i.test(x)) continue; const doc=new DOMParser().parseFromString(x,'application/xml'); let hit=0;
-    const groups=xl?[...doc.getElementsByTagNameNS(X,'si')]:[...doc.getElementsByTagNameNS(W,'p')];
-    for(const g of groups){ const ts=[...g.getElementsByTagNameNS(xl?X:W,'t')]; if(!ts.length) continue;
-      for(let guard=0;guard<5;guard++){ const all=ts.map(t=>t.textContent).join(''); const m=/\[\s*insert\s+date\s*\]/i.exec(all); if(!m) break;
-        let pos=0, a=m.index, b=m.index+m[0].length, first=true;
-        for(const t of ts){ const s0=pos, e0=pos+t.textContent.length; pos=e0; if(e0<=a||s0>=b) continue; const tx=t.textContent, cut0=Math.max(0,a-s0), cut1=Math.min(tx.length,b-s0);
-          t.textContent=tx.slice(0,cut0)+(first?day:'')+tx.slice(cut1); if(!xl) t.setAttributeNS('http://www.w3.org/XML/1998/namespace','xml:space','preserve'); first=false;
-          const run=t.parentNode; const rp=run&&[...run.childNodes].find(c=>c.localName==='rPr'); const col=rp&&[...rp.childNodes].find(c=>c.localName==='color'); if(col) rp.removeChild(col); }
-        hit++; } }
-    if(hit){ n+=hit; z.file(p,new XMLSerializer().serializeToString(doc)); } }
+  for(const p of parts){ const x=await z.file(p).async('string'); const r=cpfFillXml(x,xl,day); if(r.n){ n+=r.n; z.file(p,r.x); } }
   return n?{u8:await z.generateAsync({type:'uint8array',compression:'DEFLATE'}),n}:{u8,n:0}; }
+/* the boilerplate check for a big Word or Excel file: just the text near the words the IPR language uses, without
+   reading the whole workbook (a full read of the Enhanced LDD locked the tab) */
+const CPF_BIG=3*1048576;
+async function cpfBoilerText(fname,u8){ await needLibs(); const z=await JSZip.loadAsync(u8); const xl=/\.(xlsx|xlsm)$/i.test(fname);
+  const parts=Object.keys(z.files).filter(p=>xl?/^xl\/(sharedStrings\.xml|worksheets\/sheet\d+\.xml)$/.test(p):/^word\/(document|header\d*|footer\d*)\.xml$/.test(p)); let out=''; const R=/intellectual property|comment period|ipr policy|copyright/gi;
+  for(const p of parts){ if(out.length>400000) break; const f=z.file(p); if(!f) continue; const x=await f.async('string'); if(xl&&/^xl\/worksheets/.test(p)&&!/inlineStr/.test(x)) continue;
+    const plain=x.replace(/<[^>]*>/g,' '); let m, last=-1, c=0; R.lastIndex=0; while((m=R.exec(plain))&&c<120){ if(m.index<last){ continue; } const a=Math.max(0,m.index-3000), b=Math.min(plain.length,m.index+6000); out+=' '+plain.slice(Math.max(a,last),b); last=b; R.lastIndex=b; c++; } }
+  return out; }
+const cpfBreathe=()=>new Promise(r=>setTimeout(r,30));
+const CPF_MAX=20*1048576, CPF_SKIP=CPF_MAX; /* the website's comment-period download limit; files bigger than CPF_SKIP aren't opened to check */
+function cpfBytes(f){ const m=/([\d.]+)\s*(KB|MB|GB)/i.exec(String(f&&f.sz||'')); return m?Math.round(+m[1]*({kb:1024,mb:1048576,gb:1073741824}[m[2].toLowerCase()])):0; }
+function cpfMB(n){ return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB'; }
 async function cpfChoose(t){
   const L=cpfFiles(t); if(!L.length) return toast('No files in this work request’s folder yet. Add the comment-period files on the Files tab first.');
   const v=await modal({title:'Files for Comment',text:esc(t.wr)+' · what non-members download after they sign the Proposed (open for comment) license form',ok:'Check and Post',
     body:'<p class="muted" style="margin:0 0 8px;font-size:12.5px">Tick the work product files that go out for comment. One file is posted as it is; several are zipped into one download. Each file needs the Comment Period (IPR) boilerplate language; the MMS checks before posting and fills in its [INSERT DATE] with the day it posts.</p><div class="rv-src-l">'+L.map((f,i)=>'<label class="rv-src-f"><input type="checkbox" name="cpf_'+i+'"'+(i===0?' checked':'')+'><span class="ss-i ss-'+ssKind(f.n)+'">'+ssIc(ssKind(f.n))+'</span><span class="rv-src-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',ssTag(f.n)||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span></label>').join('')+'</div>'});
   if(!v) return; const sel=L.filter((f,i)=>v['cpf_'+i]===true); if(!sel.length) return toast('Tick at least one file');
+  /* Nov 25 (Erin, Reference Model artifacts): the sizes are known from the list, so a set too big to post says so before anything is fetched */
+  const tot=sel.reduce((a,f)=>a+cpfBytes(f),0); if(tot>CPF_MAX){ await modal({title:'Too Big to Post Here',text:esc(t.wr),ok:'OK',body:'<p style="margin:0 0 6px">These files add up to about '+esc(cpfMB(tot))+'. The comment-period download can be up to '+esc(cpfMB(CPF_MAX))+'.</p><ul style="margin:0 0 8px 18px">'+sel.slice().sort((a,b)=>cpfBytes(b)-cpfBytes(a)).map(f=>'<li>'+esc(f.n)+(cpfBytes(f)?' ('+esc(cpfMB(cpfBytes(f)))+')':'')+'</li>').join('')+'</ul><p class="muted" style="margin:0;font-size:12.5px">Choose fewer files, or ask MISMO staff to post the large ones.</p>'}); return; }
   try{
     const got=[]; for(const f of sel){ wpSay('Getting '+f.n+' from the work request’s files…'); const file=await rvSrcGet(f); got.push({f,file,bytes:new Uint8Array(await file.arrayBuffer())}); }
     /* the Comment Period IPR date: "[INSERT DATE]" becomes today's date in every Word and Excel file posted (Nov 25,
        Meghan: MISMO staff used to type it when posting); the files in Files stay as they are */
-    let dated=0; const day=cpfDateWords(); for(const g of got){ if(!/\.(docx|xlsx|xlsm)$/i.test(g.file.name)) continue; try{ const r=await cpfFillDate(g.file.name,g.bytes,day); if(r.n){ g.bytes=r.u8; g.file=new File([r.u8],g.file.name,{type:g.file.type}); dated+=r.n; } }catch(e){} }
+    let dated=0; const day=cpfDateWords(); for(const g of got){ if(!/\.(docx|xlsx|xlsm)$/i.test(g.file.name)||g.bytes.length>CPF_SKIP) continue; wpSay('Filling in the IPR date in '+g.f.n+'…'); await cpfBreathe(); try{ const r=await cpfFillDate(g.file.name,g.bytes,day); if(r.n){ g.bytes=r.u8; g.file=new File([r.u8],g.file.name,{type:g.file.type}); dated+=r.n; } }catch(e){} }
     /* the Comment Period (IPR) language, checked in every file the review can read */
-    const off=[]; for(const g of got){ if(!/\.(docx|xlsx|xlsm|pdf)$/i.test(g.file.name)) continue; wpSay('Checking the boilerplate in '+g.f.n+'…');
-      try{ const r=await rvReadFile(g.file); const k=rvDetectBoiler(r.text||''); if(k!=='comment') off.push(g.f.n+': '+(k?'has the '+RV_BP_LABEL[k]+' language':'no MISMO boilerplate found')); }catch(e){} }
+    const off=[]; for(const g of got){ if(!/\.(docx|xlsx|xlsm|pdf)$/i.test(g.file.name)) continue; wpSay('Checking the boilerplate in '+g.f.n+'…'); await cpfBreathe();
+      const big=g.bytes.length>CPF_BIG; if(g.bytes.length>CPF_SKIP||(big&&/\.pdf$/i.test(g.file.name))) continue; /* too big to read here; the date and language are the facilitator's to check */
+      try{ const txt=big?await cpfBoilerText(g.file.name,g.bytes):((await rvReadFile(g.file)).text||''); const k=rvDetectBoiler(txt); if(k!=='comment') off.push(g.f.n+': '+(k?'has the '+RV_BP_LABEL[k]+' language':'no MISMO boilerplate found')); }catch(e){} }
     wpSay('',''); const pb=document.getElementById('wpprog'); if(pb) pb.className='wp-prog';
     if(off.length){ const go=await modal({title:'Comment Period Language Missing',text:esc(t.wr),ok:'Post Anyway',body:'<p style="margin:0 0 6px">These files don’t have the IPR/COMMENT PERIOD boilerplate language yet:</p><ul style="margin:0 0 8px 18px">'+off.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p class="muted" style="margin:0;font-size:12.5px">Update them (How To - MISMO Work Product Boilerplate Language and Guidance), add them to Files again and choose them, or post as they are if this is intended.</p>'}); if(!go) return; }
     let name, u8, label;
@@ -8384,7 +8464,7 @@ async function cpfChoose(t){
     else { await needLibs(); const z=new JSZip(); const used={}; for(const g of got){ let n=g.file.name; while(used[n.toLowerCase()]) n=n.replace(/(\.[^.]*)?$/,m=>' (2)'+m); used[n.toLowerCase()]=1; z.file(n,g.bytes); }
       u8=await z.generateAsync({type:'uint8array',compression:'DEFLATE'}); label=(String(t.wr||t.id)+' '+String((typeof cpCardOf==='function'&&cpCardOf(t).title)||t.name||'')+' - Comment Period').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,120)+'.zip'; name=wpFileName(label);
       try{ if(typeof ssUpload==='function') await ssUpload(t,[new File([u8],label,{type:'application/zip'})]); }catch(e){} }
-    if(u8.length>20*1048576) throw new Error('it’s over 20 MB; post it on the website by hand');
+    if(u8.length>CPF_MAX) throw new Error('it’s over '+cpfMB(CPF_MAX)+'; choose fewer files, or ask MISMO staff to post it');
     const zb=wpZipBad(name,u8); if(zb) throw new Error(name+' '+zb);
     const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6), n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
     for(let i=0;i<n;i++){ wpSay('Posting '+label+': '+Math.round(i/n*100)+'%. Keep this tab open.'); await wpPut('wpup-'+key+'-0-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
