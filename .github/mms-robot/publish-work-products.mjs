@@ -5,7 +5,7 @@
    data/products.json there (its own workflow then rebuilds catalog.json), marks the listing done and removes the pieces.
    Logs counts only. Needs MMS_ROBOT_TOKEN to include work-products. */
 import crypto from 'node:crypto'; import { checkBuf } from './filecheck.mjs';
-const BIG = 20 * 1048576, PART = 15 * 1048576;
+const BIG = 20 * 1048576, PART = 15 * 1048576, COMMENT_MAX = 95 * 1048576;
 export async function publishWorkProducts({ RW, GH = 'https://api.github.com', ORG = 'GitMISMO' }) {
   const head = { Authorization: `Bearer ${RW}`, Accept: 'application/vnd.github+json', 'User-Agent': 'mms-robot', 'X-GitHub-Api-Version': '2022-11-28' };
   const url = (repo, p) => `${GH}/repos/${ORG}/${repo}/contents/${p.split('/').map(encodeURIComponent).join('/')}`;
@@ -35,9 +35,17 @@ export async function publishWorkProducts({ RW, GH = 'https://api.github.com', O
       for (const [fi, f] of (d.files || []).entries()) {
         const parts = [];
         for (let i = 0; i < f.chunks; i++) { const c = await get('mms-data', `data/wpup-${d.key}-${fi}-${i}.json`); if (!c) throw new Error('a piece of ' + f.file + ' is missing'); parts.push(Buffer.from(c.data.c || '', 'base64')); tidy.push([`data/wpup-${d.key}-${fi}-${i}.json`, c.sha]); }
-        const buf = Buffer.concat(parts); const bad = checkBuf(buf, f.file, f.bytes); if (bad) throw new Error(f.file + ' ' + bad); if (d.fileOnly && buf.length > BIG) throw new Error(f.file + ' is over 20 MB'); /* size and, for zips, "PK" + whole directory (Nov 20) */
+        const buf = Buffer.concat(parts); const bad = checkBuf(buf, f.file, f.bytes); if (bad) throw new Error(f.file + ' ' + bad); if (d.fileOnly && buf.length > COMMENT_MAX) throw new Error(f.file + ' is over 95 MB'); /* size and, for zips, "PK" + whole directory (Nov 20) */
         const blobId = b => crypto.createHash('sha1').update(`blob ${b.length}\0`).update(b).digest('hex');
-        if (buf.length > BIG && !d.fileOnly) {   /* GitHub won't take a file this big in one save (Nov 20: 422 on a 42.7 MB zip): it goes to incoming/ in parts and the Work Products repair joins, checks and saves it */
+        if (buf.length > BIG && d.fileOnly) {   /* a big comment-period file (Nov 25, Erin's Reference Model artifacts): saved in parts to incoming/<fileOnly>/,
+            then a small <file>.bytes with its size, last; the Work Products workflow joins the parts, checks them against that size and saves <fileOnly>/<file> */
+          if (!/^comment\/[A-Za-z0-9_.-]+$/.test(d.fileOnly)) throw new Error('not a comment-period folder');
+          for (let i = 0, n = 1; i < buf.length; i += PART, n++) { const part = buf.subarray(i, i + PART), pp = `incoming/${d.fileOnly}/${f.file}.part${String(n).padStart(3, '0')}`; const ex = await get('work-products', pp, true).catch(() => null);
+            const saved = await put('work-products', pp, part, ex && ex.sha, `MMS: comment ${f.file} part ${n}`); if (saved !== blobId(part)) throw new Error(f.file + ' part ' + n + ' was not saved whole'); }
+          const bp = `incoming/${d.fileOnly}/${f.file}.bytes`, exb = await get('work-products', bp, true).catch(() => null);
+          await put('work-products', bp, Buffer.from(String(buf.length)), exb && exb.sha, `MMS: comment ${f.file} ready to join`);
+          files++;
+        } else if (buf.length > BIG && !d.fileOnly) {   /* GitHub won't take a file this big in one save (Nov 20: 422 on a 42.7 MB zip): it goes to incoming/ in parts and the Work Products repair joins, checks and saves it */
           for (let i = 0, n = 1; i < buf.length; i += PART, n++) { const part = buf.subarray(i, i + PART), pp = `incoming/${f.file}.part${String(n).padStart(3, '0')}`; const ex = await get('work-products', pp, true).catch(() => null);
             const saved = await put('work-products', pp, part, ex && ex.sha, `MMS: ${d.id} ${f.file} part ${n}`); if (saved !== blobId(part)) throw new Error(f.file + ' part ' + n + ' was not saved whole'); }
           files++;
