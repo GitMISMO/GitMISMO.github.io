@@ -1,5 +1,5 @@
 {
- "updated": "2026-11-23",
+ "updated": "2026-11-25",
  "source": "Member 360 member list saved 2026-11-25",
  "count": 740,
  "cats": {
@@ -37,7 +37,7 @@
   "american bank and trust company inc": "lender",
   "american bankers association": "industry",
   "american credit union mortgage association acuma": "industry",
-  "american federal mortgage corporation": "industry",
+  "american federal mortgage corporation": "lender",
   "american financial lending inc": "lender",
   "american financial network": "lender",
   "american land title association": "industry",
@@ -359,7 +359,7 @@
   "homeland bancshares inc": "lender",
   "homelight home loans inc": "lender",
   "homesale mortgage llc": "lender",
-  "homestead funding corp": "industry",
+  "homestead funding corp": "lender",
   "hometrust mortgage company home mortgage of america inc": "lender",
   "homevision inc": "industry",
   "homium": "lender",
