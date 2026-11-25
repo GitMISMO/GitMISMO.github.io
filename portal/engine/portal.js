@@ -60,6 +60,11 @@ function fieldStats(st) {
   }); });
   return { done: d, tot: tot };
 }
+function qItemById(id) {
+  var hit = null, p = String(id).split("-"), si = +p[0], num = p[1];
+  CFG.steps.forEach(function (st) { if (st.type !== "questionnaire" || hit) return; var sec = (st.form.sections || [])[si]; (sec && sec.items || []).forEach(function (it) { if (String(it.number) === num) hit = it; }); });
+  return hit;
+}
 function qItems(st) { var out = []; (st.form.sections || []).forEach(function (sec, si) { (sec.items || []).forEach(function (it) { if (it.number) out.push(si + "-" + it.number); }); (sec.blocks || []).forEach(function (b, bi) { out.push(si + "-b" + bi); }); }); return out; }
 function ansFilled(a) { if (a == null) return false; if (typeof a === "object" && !Array.isArray(a)) return Object.keys(a).some(function (k) { return filled(a[k]); }); return filled(a); }
 function qStats(st, si) { var ids = qItems(st).filter(function (id) { return si == null || id.split("-")[0] === String(si); }); return { done: ids.filter(function (id) { return ansFilled(S.answers[id]); }).length, tot: ids.length }; }
@@ -147,6 +152,37 @@ function stepFields(st) {
 }
 
 /* ---------- the questionnaire ---------- */
+/* Three shapes, from an applicant's notes on the FRAME portal (25 Nov 2026):
+   - a table of people (grid) is one card per row, labelled boxes that wrap so the answers can be read back on screen,
+     with Add Another and Remove (it had a fixed four rows of narrow one-line boxes). Answers keep their keys (row:column).
+   - a question the form marks "field_block: Name / Title / Email / Phone" asks for each detail in its own box, kept as
+     {Name, Title, ...} so it can be read out as data. A sentence typed before this is split into the boxes.
+   - a statement list with a recommended_fix (one proposition, four clauses) shows the clauses as a list and asks Yes or
+     No once. Saved as before: Yes ticks every clause and the "Yes" option, No ticks "No". */
+var GRID_N = {};
+function gridRows(it, gv) {
+  var g = (it.tables || []).filter(function (x) { return x.kind === "grid"; })[0] || {}, n = g.blank_rows || 3, id = it.__id;
+  Object.keys(gv || {}).forEach(function (k) { var r = parseInt(k, 10); if (!isNaN(r) && filled(gv[k]) && r + 1 > n) n = r + 1; });
+  return Math.max(n, GRID_N[id] || 0, 1);
+}
+function fieldBlockOf(it) { var m = /^field_block:\s*(.+)$/.exec(String(it.suggested_field || "")); return m ? m[1].split("/").map(function (x) { return x.trim(); }).filter(Boolean) : null; }
+function fieldBlockVal(a, fs) {
+  if (a && typeof a === "object" && !Array.isArray(a)) return a;
+  var o = {}, parts = String(a || "").split(/\s*[,;\n]\s*/).filter(Boolean);
+  if (!parts.length) return o;
+  if (parts.length === fs.length) { fs.forEach(function (f, i) { o[f] = parts[i]; }); return o; }
+  var rest = [];
+  parts.forEach(function (x) {
+    var fe = fs.filter(function (f) { return /mail/i.test(f); })[0], fp = fs.filter(function (f) { return /phone/i.test(f); })[0];
+    if (fe && !o[fe] && /@/.test(x)) o[fe] = x; else if (fp && !o[fp] && /\d{3}\D*\d{4}/.test(x)) o[fp] = x; else rest.push(x);
+  });
+  var empty = fs.filter(function (f) { return !o[f]; });
+  empty.forEach(function (f, i) { if (i < rest.length) o[f] = i === empty.length - 1 ? rest.slice(i).join(", ") : rest[i]; });
+  return o;
+}
+function clauseList(it) { var fx = it.recommended_fix; return fx && fx.bullets_not_checkboxes && fx.bullets_not_checkboxes.length && fx.answer ? fx.bullets_not_checkboxes : null; }
+function clauseYes(it) { return (it.options || []).filter(function (o) { return /^yes/i.test(o); })[0] || "Yes"; }
+function clauseState(a) { var sel = Array.isArray(a) ? a : []; return sel.some(function (x) { return /^yes/i.test(x); }) ? "Yes" : sel.indexOf("No") >= 0 ? "No" : ""; }
 function answerInput(it, id) {
   var a = S.answers[id], t = it.type, h = "";
   var tableOf = function (kind) { return (it.tables || []).filter(function (x) { return x.kind === kind; })[0]; };
@@ -155,6 +191,17 @@ function answerInput(it, id) {
     h += '<div class="opts">' + (it.options || []).map(function (o, i) { return '<label class="opt"><input type="radio" name="q' + id + '" data-q="' + id + '" data-part="pick" value="' + esc(o) + '"' + (cur === o ? " checked" : "") + "><span>" + esc(o) + "</span></label>"; }).join("") + "</div>";
     if (t === "single_select_explain") h += '<textarea class="in" rows="2" data-q="' + id + '" data-part="explain" placeholder="Explain">' + esc(a && a.explain) + "</textarea>";
     return h;
+  }
+  var cl = clauseList(it);
+  if (cl) {
+    var cs = clauseState(a);
+    return '<ul class="qbul">' + cl.map(function (c) { return "<li>" + esc(c) + "</li>"; }).join("") + '</ul><div class="yn"><button type="button" class="yes" data-ynlist="' + id + '|Yes" aria-pressed="' + (cs === "Yes") + '">Yes, the organization agrees</button><button type="button" class="no" data-ynlist="' + id + '|No" aria-pressed="' + (cs === "No") + '">No</button></div>';
+  }
+  var fbf = fieldBlockOf(it);
+  if (fbf && (t === "long_text" || t === "short_text")) {
+    var fbv = fieldBlockVal(a, fbf);
+    if (typeof a === "string" && a) S.answers[id] = fbv;   /* a sentence typed before: kept, now in its boxes */
+    return '<div class="fgrid" style="--cols:2">' + fbf.map(function (f) { return '<div class="fld"><label>' + esc(f) + '</label><input class="in" data-q="' + id + '" data-part="' + esc(f) + '" value="' + esc(fbv[f]) + '"' + (/mail/i.test(f) ? ' type="email"' : /phone/i.test(f) ? ' type="tel"' : "") + "></div>"; }).join("") + "</div>";
   }
   if (t === "multi_select" || t === "checkbox_unspecified") {
     var opts = (it.options && it.options.length) ? it.options : ((tableOf("checkbox_grid") || {}).options || []), sel = Array.isArray(a) ? a : [];
@@ -171,8 +218,13 @@ function answerInput(it, id) {
     return '<div class="tblwrap"><table class="docs mtx"><thead><tr><th></th>' + (m.levels || []).map(function (l) { return "<th>" + esc(l) + "</th>"; }).join("") + "</tr></thead><tbody>" + (m.subjects || []).map(function (sj, r) { return "<tr><td>" + esc(sj) + "</td>" + (m.levels || []).map(function (l) { return '<td class="c"><input type="radio" aria-label="' + esc(sj + ": " + l) + '" name="m' + id + "-" + r + '" data-q="' + id + '" data-part="' + esc(sj) + '" value="' + esc(l) + '"' + (v[sj] === l ? " checked" : "") + "></td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
   }
   if (t === "grid") {
-    var g = tableOf("grid") || {}, cols = g.columns || [], rows = Math.min(g.blank_rows || 3, 4), gv = a && typeof a === "object" ? a : {};
-    return '<div class="tblwrap"><table class="docs"><thead><tr>' + cols.map(function (c) { return "<th>" + esc(c) + "</th>"; }).join("") + "</tr></thead><tbody>" + Array.apply(null, Array(rows)).map(function (_, r) { return "<tr>" + cols.map(function (c) { var k = r + ":" + c; return '<td><input class="in" aria-label="' + esc(c) + '" data-q="' + id + '" data-part="' + esc(k) + '" value="' + esc(gv[k]) + '"></td>'; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>";
+    var g = tableOf("grid") || {}, cols = g.columns || [], gv = a && typeof a === "object" ? a : {};
+    it.__id = id;
+    var gn = gridRows(it, gv), lab = g.itemLabel || (/^name$/i.test(cols[0] || "") ? "Person" : "Entry");
+    return Array.apply(null, Array(gn)).map(function (_, r) {
+      return '<div class="rep"><div class="rephead"><b>' + esc(lab) + " " + (r + 1) + "</b>" + (gn > 1 ? '<button type="button" class="linkbtn" data-griddel="' + id + "|" + r + '">Remove</button>' : "") + '</div><div class="fgrid" style="--cols:2">'
+        + cols.map(function (c, ci) { var k = r + ":" + c; return '<div class="fld' + (ci >= 4 ? " wide" : "") + '"><label>' + esc(c) + '</label><textarea class="in grow" rows="1" data-q="' + id + '" data-part="' + esc(k) + '">' + esc(gv[k]) + "</textarea></div>"; }).join("") + "</div></div>";
+    }).join("") + '<button type="button" class="btn ghost sm" data-gridadd="' + id + '" style="margin:2px 0 4px">Add Another ' + esc(lab) + "</button>";
   }
   if (t === "repeating_block") {
     var rv = a && typeof a === "object" ? a : {};
@@ -387,7 +439,15 @@ var WordCopy = (function () {
           var id = si + "-" + it.number, a = A[id], t = it.type, tableOf = function (k) { return (it.tables || []).filter(function (x) { return x.kind === k; })[0]; };
           b += W.q("Question " + it.number, it.text);
           (it.guidance || []).forEach(function (g) { b += W.note(g); });
-          if (t === "single_select" || t === "single_select_explain") {
+          var wcl = clauseList(it), wfb = fieldBlockOf(it);
+          if (wcl) {
+            var wcs = clauseState(a);
+            wcl.forEach(function (c) { b += W.p("•  " + c, { ind: 240, after: 40 }); });
+            b += W.inline(["Yes, the organization agrees", "No"], function (o) { return (o === "No") === (wcs === "No") && wcs !== ""; });
+          } else if (wfb && (t === "long_text" || t === "short_text")) {
+            var wv = fieldBlockVal(a, wfb);
+            b += W.table(wfb.map(function (f) { return [f, W.str(wv[f])]; }), { firstCol: true, widths: [3400, 5960] });
+          } else if (t === "single_select" || t === "single_select_explain") {
             var cur = a && typeof a === "object" ? a.pick : a;
             b += W.opts(it.options, function (o) { return o === cur; });
             if (t === "single_select_explain") b += W.label("Explain") + W.box(a && a.explain, 2);
@@ -402,9 +462,11 @@ var WordCopy = (function () {
             var m = tableOf("matrix") || {}, mv = obj(a), lv = m.levels || [];
             b += W.table([[""].concat(lv)].concat((m.subjects || []).map(function (sj) { return [sj].concat(lv.map(function (l) { return mv[sj] === l ? W.ON : W.OFF; })); })), { head: true, firstCol: true, center: true, widths: [3360].concat(lv.map(function () { return Math.floor(6000 / Math.max(1, lv.length)); })) });
           } else if (t === "grid") {
-            var g = tableOf("grid") || {}, cols = g.columns || [], gv = obj(a), rows = Math.min(g.blank_rows || 3, 4);
+            var g = tableOf("grid") || {}, cols = g.columns || [], gv = obj(a), rows = g.blank_rows || 3;
             Object.keys(gv).forEach(function (k) { var r = parseInt(k, 10); if (r + 1 > rows && W.str(gv[k])) rows = r + 1; });
-            b += W.table([cols].concat(Array.apply(null, Array(rows)).map(function (_, r) { return cols.map(function (c) { return W.str(gv[r + ":" + c]); }); })), { head: true, minH: 360 });
+            /* one small table per person, like the cards on screen, so it can be read and proofed (25 Nov 2026) */
+            var glab = g.itemLabel || (/^name$/i.test(cols[0] || "") ? "Person" : "Entry");
+            for (var gr = 0; gr < rows; gr++) b += W.h3(glab + " " + (gr + 1)) + W.table(cols.map(function (c) { return [c, W.str(gv[gr + ":" + c])]; }), { firstCol: true, widths: [3400, 5960] });
           } else if (t === "repeating_block") {
             var rv = obj(a);
             (it.subparts || []).forEach(function (sp) { var fb = (sp.tables || [])[0] || {}; b += W.h3(sp.label) + W.table((fb.fields || []).map(function (f) { return [f, W.str(rv[sp.label + ":" + f])]; }), { firstCol: true, widths: [3400, 5960] }); });
@@ -508,6 +570,23 @@ document.addEventListener("click", function (e) {
   if (d.step) { go(+d.step); return; }
   if (d.qsec != null) { S.qsec = +d.qsec; try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} render(); var p = document.querySelector(".qlayout"); if (p) window.scrollTo({ top: p.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" }); return; }
   if (d.yn) { var y = d.yn.split("|"), cur = S.answers[y[0]], o = cur && typeof cur === "object" ? cur : {}; o.yn = o.yn === y[1] ? "" : y[1]; S.answers[y[0]] = o; save(); rerender(); return; }
+  if (d.ynlist) {
+    var yl = d.ynlist.split("|"), qit = qItemById(yl[0]);
+    if (qit) { var now = clauseState(S.answers[yl[0]]); S.answers[yl[0]] = now === yl[1] ? [] : yl[1] === "Yes" ? clauseList(qit).concat([clauseYes(qit)]) : ["No"]; save(); rerender(); }
+    return;
+  }
+  if (d.gridadd) { var ga = S.answers[d.gridadd] && typeof S.answers[d.gridadd] === "object" ? S.answers[d.gridadd] : {}, git = qItemById(d.gridadd); if (git) { git.__id = d.gridadd; GRID_N[d.gridadd] = gridRows(git, ga) + 1; } rerender(); return; }
+  if (d.griddel) {
+    var gd = d.griddel.split("|"), gid = gd[0], gr = +gd[1], gvv = S.answers[gid] && typeof S.answers[gid] === "object" ? S.answers[gid] : {}, gq = qItemById(gid);
+    if (gq) {
+      gq.__id = gid;
+      var gcount = gridRows(gq, gvv), gcols = ((gq.tables || []).filter(function (x) { return x.kind === "grid"; })[0] || {}).columns || [], nv = {};
+      if (gcols.some(function (c) { return filled(gvv[gr + ":" + c]); }) && !window.confirm("Remove " + (filled(gvv[gr + ":" + gcols[0]]) ? gvv[gr + ":" + gcols[0]] : "this one") + "?")) return;
+      Object.keys(gvv).forEach(function (k) { var r = parseInt(k, 10), c = k.slice(String(r).length + 1); if (isNaN(r) || r === gr) return; nv[(r > gr ? r - 1 : r) + ":" + c] = gvv[k]; });
+      S.answers[gid] = nv; GRID_N[gid] = Math.max(1, gcount - 1); save(); rerender();
+    }
+    return;
+  }
   if (d.repadd) { S.reps[d.repadd] = S.reps[d.repadd] || []; S.reps[d.repadd].push({}); save(); rerender(); return; }
   if (d.repdel) { var r = d.repdel.split("|"); S.reps[r[0]].splice(+r[1], 1); save(); rerender(); return; }
   if (d.docdel) { S.docs = S.docs.filter(function (x) { return x.id !== d.docdel; }); save(); rerender(); toast("File removed"); return; }
