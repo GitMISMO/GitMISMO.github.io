@@ -1,7 +1,7 @@
 {
   "source": "MMS",
   "note": "Announcement requests from the MMS for MISMO Media, with the facts to draft from. Public information only.",
-  "updated": "2026-11-25T17:47:37.075Z",
+  "updated": "2026-11-25T23:17:42.276Z",
   "announcements": [
     {
       "id": "WR2023_20_03-Candidate-Recommendation-Announcement",
@@ -525,8 +525,8 @@
       "nonMemberUrl": "",
       "websiteId": "",
       "version": "",
-      "commentOpens": "",
-      "commentCloses": "",
+      "commentOpens": "2026-11-25",
+      "commentCloses": "2026-12-25",
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2026_01",
       "shareUrl": "",
       "pressRelease": true,
