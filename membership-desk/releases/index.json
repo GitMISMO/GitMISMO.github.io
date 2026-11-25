@@ -69,6 +69,13 @@
       "by": "jycritchley",
       "note": "Aptify order shown for new members",
       "sha256": "94b4dd86b58c5669cf5413f3dcd5b85efd8b76d6e93a9506f4548fffa0bb1c8c"
+    },
+    {
+      "version": "20261125-0308",
+      "at": "2026-11-25T03:08:37.208Z",
+      "by": "jycritchley",
+      "note": "Shorter Payment in Process line",
+      "sha256": "1bf9cd8d4a081d07e7f30874c2d59df60090fb89f07eda5c21ad45f711cd0990"
     }
   ]
 }
