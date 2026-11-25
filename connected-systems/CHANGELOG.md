@@ -1,0 +1,3 @@
+# Connected Systems: Changes
+
+- **Nov 24, 2026** — Connected Systems is its own view-only app at resources.mismo.org/connected-systems/, like the Membership Desk and the MBA Accounting Desk: its own access (Connected Systems in People & Access) and its own storage, so giving someone access never opens Team HQ. Left menu: Overview (the headline numbers and the System Map), Follow the Work, Security, What Changed, On Its Own, To Rock Solid, Change Notices, Failures, Coverage and Help, with search, As Of and Dark Mode. Everything Team HQ's Connected Systems page shows; Jonna and Vanessa edit it in Team HQ (Edit in Team HQ, top right).

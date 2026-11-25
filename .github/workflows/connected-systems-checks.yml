@@ -1,0 +1,19 @@
+# Connected Systems Page Checks: on every change to connected-systems/, the page parses, keeps its safety list,
+# carries no keys, reads only its own relay key and never saves (connected-systems/tools/check.mjs).
+name: Connected Systems Page Checks
+on:
+  push:
+    paths: ['connected-systems/**', '.github/workflows/connected-systems-checks.yml']
+  pull_request:
+    paths: ['connected-systems/**', '.github/workflows/connected-systems-checks.yml']
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - name: Page checks
+        run: node connected-systems/tools/check.mjs
