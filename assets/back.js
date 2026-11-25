@@ -27,6 +27,9 @@
    unsaved changes). If the panel is still open afterwards, nothing is lost: the step comes
    back, and once it does close the history catches up.
 
+   An app whose left menu is built another way names its pages itself:
+     MismoBack.pages({ current: () => <name of the page showing>, go: name => <show that page as its menu button does> });
+
    MismoBack.check() can be called after an app changes page or opens a panel some other way.
    Owner: Forms and shared pages (GitMISMO.github.io). Change notices: GitMISMO/mismo-connections. */
 (function () {
@@ -44,8 +47,10 @@
   var ignore = 0;           /* popstates this file caused itself */
   var touched = 0;          /* when the person last clicked, tapped or pressed a key */
   var timer = null;
+  var custom = null;        /* an app whose menu is built another way: MismoBack.pages({ current, go }) */
 
   function section() {
+    if (custom) { try { return String(custom.current() || ''); } catch (e) { return ''; } }
     var b = document.querySelector(NAV + '[aria-current]');
     return b ? nameOf(b) : '';
   }
@@ -90,6 +95,7 @@
   }
   function goTo(s) {
     if (!s || s === section()) return;
+    if (custom) { try { custom.go(s); } catch (e) {} return; }
     var bs = document.querySelectorAll(NAV);
     for (var i = 0; i < bs.length; i++) {
       if (nameOf(bs[i]) === s && !bs[i].disabled && bs[i].offsetParent !== null) { bs[i].click(); return; }
@@ -136,7 +142,7 @@
   function watch() {
     try {
       new MutationObserver(soon).observe(document.documentElement,
-        { subtree: true, attributes: true, attributeFilter: ['aria-current'] });
+        { subtree: true, attributes: true, attributeFilter: ['aria-current', 'aria-selected'] });
       new MutationObserver(soon).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     } catch (e) {}
   }
@@ -145,7 +151,8 @@
     /* wait until the app has drawn its menu and settled on its opening page */
     var waited = 0;
     (function wait() {
-      if (!section() && waited < 30000) { waited += 250; setTimeout(wait, 250); return; }
+      /* some apps take a few minutes to open: keep looking, less often after the first half minute */
+      if (!section()) { var d = waited < 30000 ? 250 : 1000; waited += d; setTimeout(wait, d); return; }
       setTimeout(function () {
         ready = true;
         var cur = history.state;
@@ -158,7 +165,9 @@
 
   window.MismoBack = {
     layer: function (l) { if (l && typeof l.isOpen === 'function' && typeof l.close === 'function') layers.push(l); soon(); },
+    /* for an app whose left menu isn't nav button[data-hq]: current() names the page showing, go(name) shows it the way its menu button does */
+    pages: function (p) { if (p && typeof p.current === 'function' && typeof p.go === 'function') custom = p; soon(); },
     check: soon,
-    version: '2026-11-25b'
+    version: '2026-11-25c'
   };
 })();
