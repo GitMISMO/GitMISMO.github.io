@@ -719,6 +719,8 @@ window.__deskCU=async fn=>{for(let i=0;i<4;i++){const g=await get("contactupdate
 async function load(){say("Opening the Membership Desk…","Loading what's waiting and what's been set up.");
     const [T,S,C,Dn,I,AP,CUd,PPd]=await Promise.all(["todos","square","cases","done","invoices","applications","contactupdates","people"].map(p=>get(p).catch(e=>{console.error(e);return {data:null,err:e};})));
     if(!T.data&&!S.data&&T.err&&S.err){say("The Membership Desk couldn't load","Please refresh. If it keeps happening, email Jonna.");return;}
+    /* if the finished list does not load, stop rather than show finished set-ups as still to do (Doss Docs came back on the To Do this way; Jonna, Nov 25, 2026) */
+    if(!Dn||Dn.err||!Dn.data){say("The Membership Desk couldn't load","Please refresh. If it keeps happening, email Jonna.");return;}
     const t=T.data||{},s=S.data||{},items=((Dn.data&&Dn.data.items)||[]).filter(x=>!x.undone),doneIds=new Set(items.map(x=>x.id));
     /* a set-up marked done before it had an Aptify ID still counts once the ID arrives (Jonna, Nov 7, 2026) */
     const doneCid=new Set(items.filter(x=>x.cid).map(x=>String(x.id||"").split("-")[0]+"|"+x.cid));
