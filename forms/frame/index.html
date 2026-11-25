@@ -1730,7 +1730,7 @@ var WordCopy = (function () {
       var rows = (sec.fields || []).filter(shows).map(function(f){ return rowOf(f, get(f.key)); });
       if(rows.length) b += W.table(rows, {firstCol: true, widths: R});
     });
-    /* The application only (Erin, PhoenixTeam, 25 Nov 2026: the copy carried the whole questionnaire, which is now a
+    /* The application only (25 Nov 2026: the copy carried the whole questionnaire, which is now a
        later step, in the portal). */
     W.save("MISMO " + programSlug() + " Application" + (org ? " - " + org : "") + ".docx", b);
     toast("Your copy is downloading.");
