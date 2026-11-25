@@ -521,11 +521,11 @@
     "writable": []
   },
   "connected-systems": {
-    "repo": "GitMISMO/team-hq-data",
+    "repo": "GitMISMO/connected-systems-data",
     "branch": "main",
     "origin": "https://resources.mismo.org",
     "readable": [
-      "data/connected-systems/"
+      "data/"
     ],
     "writable": []
   },

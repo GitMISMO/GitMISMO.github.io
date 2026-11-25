@@ -185,7 +185,7 @@ const ENTRIES = {
   'summit-hq': [['Plan the summit', 'Summit HQ', 'summit', '/summit-hq/']],
   'website-migration': [['Check the migration', 'Website Migration HQ', 'website', '/website-migration/']],
   'team-hq': [['Open my board', 'Team HQ', 'team', '/team-hq/'], ['Jot it down', 'Team HQ', 'note', '/team-hq/']],
-  'connected-systems': [['See how the systems connect', 'Connected Systems', 'systems', '/team-hq/connected-systems/']],   /* CN-026, Nov 24, 2026 */
+  'connected-systems': [['See how the systems connect', 'Connected Systems', 'systems', '/connected-systems/']],   /* CN-026, Nov 24, 2026 */
   'meeting-trackers': [['Track meeting attendance', 'Meeting Trackers', 'tracker', '/meeting-trackers/']],
   'iif-hq': [['IIF Planning HQ', 'IIF Planning HQ', 'iif', '/iif-hq/']],   /* the main page only, named after the tool (Perry, 9 Oct 2026) */
   'elections-hq': [['Run the elections', 'Elections HQ', 'ballot', '/elections-hq/']],   /* Perry, 30 Oct 2026 */
@@ -201,7 +201,7 @@ const ENTRIES = {
    page in it. A tool's pages are its own entries that lead somewhere other than its main page, plus these pages that
    have their own address. */
 const TOOL_PATH = { hub:'/initiative-hub/', glossary:'/glossary/console/', qr:'/qr/', 'summit-hq':'/summit-hq/', 'website-migration':'/website-migration/', 'team-hq':'/team-hq/',
-  'connected-systems':'/team-hq/connected-systems/',
+  'connected-systems':'/connected-systems/',
   'meeting-trackers':'/meeting-trackers/', 'iif-hq':'/iif-hq/', 'member-360':'/member-360/', cms:'/cms/', sponsorship:'/sponsorship/', so:'/contractor-hq/',
   'mismo-link':'/mismo-link/', mms:'/mms/', financials:'/financials/', 'elections-hq':'/elections-hq/', 'marketing-hq':'/marketing-hq/', scheduler:'/scheduler/' };
 const MORE_PAGES = {
