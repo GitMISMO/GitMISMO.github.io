@@ -7,6 +7,7 @@
 <link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script src="/assets/session.js"></script>
+<script src="/assets/back.js"></script>
 <style>
 :root{--navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
   --ground:#f1f6fa;--surface:#fff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;--border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
@@ -1184,7 +1185,7 @@ const HELP=[
    ["Open It","The email button, or selecting it under Your To Do on Home, opens that exact item, with everything you need on the left: company, level, price, special rate and membership dates. Sign in with your own MISMO sign-in if asked."],
    ["Set It Up in Aptify","Add or find the company in Aptify and create the membership order with the level, price and dates shown. Put any special rate (TMC, Broker, ACUMA) in the order line's description. For Square set-ups and IIF lenders, update the IIF quotation already in Aptify to the amount paid and ship it instead."],
    ["Record the IDs and Mark Set Up","Back here, enter the Aptify Company ID (required), the Aptify order number and, if you added a person, the Aptify Person ID. Select Mark Set Up. It moves to Completed."]],
-  notes:["<b>Marked one by mistake?</b> Select Undo in the message at the bottom of the screen right after. Later than that, email Jonna and she'll reopen it.","<b>Nothing arrives by email?</b> Everything waiting is always on Home, under Your To Do, oldest first, so you can work straight from there.","<b>The boxes at the top of Home</b> show how things stand: what's left to set up, payments waiting, what's been completed and how many cases closed the same day. Select any box to go to it. The Set-Ups box shows how much of all the set-up work that has come in is done."]},
+  notes:["<b>Marked one by mistake?</b> Select Undo in the message at the bottom of the screen right after. Later than that, email Jonna and she'll reopen it.","<b>Nothing arrives by email?</b> Everything waiting is always on Home, under Your To Do, oldest first, so you can work straight from there.","<b>The browser's Back button</b> goes to the last page you were on, and closes an open panel first. It never undoes a change.","<b>The boxes at the top of Home</b> show how things stand: what's left to set up, payments waiting, what's been completed and how many cases closed the same day. Select any box to go to it. The Set-Ups box shows how much of all the set-up work that has come in is done."]},
  {id:"square",k:"#74bfeb",name:"Square Set-Ups",lead:"A company paid MISMO through Square for a special rate (TMC, Broker or ACUMA). MISMO Money sees the payment and sends the set-up here.",
   steps:[["Check the Details","The left side shows the company, the level, the special rate, what they paid and the membership dates."],
    ["Set Up in Aptify","Find the company's IIF quotation, which is already in Aptify. Update it to the amount paid, put the special rate in the order line's description, and ship it. If there's no quotation, add the membership order at the level and price shown."],
@@ -1557,6 +1558,15 @@ try{ (window.__desk.finished()||[]).forEach(r=>{ if(norm(r.nm+' '+r.wh).indexOf(
   btn.addEventListener("click", function(){ document.documentElement.setAttribute("data-theme", cur() === "dark" ? "light" : "dark"); paint(); try{ localStorage.setItem("mismo.portal.theme", cur()); }catch(e){} window.dispatchEvent(new Event("resize")); });
   try{ var saved = localStorage.getItem("mismo.portal.theme"); if(saved) document.documentElement.setAttribute("data-theme", saved); }catch(e){}
   paint();
+})();
+</script>
+<script>
+/* The browser's Back button (Jonna, Nov 25, 2026; CN-033): the shared /assets/back.js makes each change of page in the left
+   menu a Back step. Back first closes the right-hand panel (a set-up, an invoice or a contact update), exactly as its X does. */
+(function(){
+  if(!window.MismoBack) return;
+  const pane=()=>document.getElementById("pane");
+  MismoBack.layer({ isOpen:()=>{const p=pane();return !!p&&p.classList.contains("on");}, close:()=>{const x=document.getElementById("pane-x");if(x)x.click();} });
 })();
 </script>
 <script>(function(){/* Version stamp and update notice (Jonna, Nov 7, 2026): Help shows which version of the Desk is open; every 15 minutes the page checks for a newer one and asks to reload. */

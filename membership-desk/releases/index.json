@@ -111,6 +111,13 @@
       "by": "jycritchley",
       "note": "Case data date is the weekly email date",
       "sha256": "6da7bb6caa53fee7a971991245410357442a8fdfba632d86296689b6da72b9f8"
+    },
+    {
+      "version": "20261125-1859",
+      "at": "2026-11-25T18:59:20.234Z",
+      "by": "jycritchley",
+      "note": "The browser's Back button works (CN-033)",
+      "sha256": "d7b357f46828f8f0f9c7c537d61dde3b4b67ba4e09d3cc40e234df418deac310"
     }
   ]
 }
