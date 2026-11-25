@@ -642,6 +642,10 @@ function liveFresh(pg) {
   var c = pg.company || {}, k = pg.contact || {}, g = pg.signer || {};
   var v = { org: pg.org, website: c.website, street: c.street, city: c.city, state: c.state, zip: c.zip, contact: k.name, contactEmail: k.email, signer: g.name, signerTitle: g.title, signerEmail: g.email };
   Object.keys(v).forEach(function (x) { if (v[x]) s.values[x] = v[x]; });
+  /* Everything else the application already answered (years in business, employees, titles, phone and so on), so the
+     company is not asked twice (25 Nov 2026). What MISMO holds on the record above comes first. */
+  var a = pg.app || {};
+  Object.keys(a).forEach(function (x) { if (!filled(s.values[x]) && filled(a[x])) s.values[x] = a[x]; });
   if (pg.product) s.reps.products = [{ name: pg.product }];
   /* the questionnaire's own "about the provider" box, from the record */
   CFG.steps.forEach(function (st) {
@@ -680,7 +684,11 @@ function start() {
     CO = { org: PAGE.org, subject: PAGE.product || PAGE.org, contactName: PAGE.contact && PAGE.contact.name, contactEmail: PAGE.contact && PAGE.contact.email, signerName: PAGE.signer && PAGE.signer.name };
     var local = null; try { local = JSON.parse(localStorage.getItem(KEY) || "null"); } catch (e) {}
     if (r.draft && r.draft.draft) {
-      S = Object.assign(liveFresh(PAGE), r.draft.draft);
+      var fresh = liveFresh(PAGE);
+      S = Object.assign(fresh, r.draft.draft);
+      /* a box left empty in a saved draft takes what the application said */
+      S.values = S.values || {};
+      Object.keys(fresh.values || {}).forEach(function (x) { if (!filled(S.values[x])) S.values[x] = fresh.values[x]; });
       SRV = { savedAt: r.draft.savedAt || null, submittedAt: r.draft.submittedAt || null, submittedBy: r.draft.submittedBy || null };
       S.submitted = !!SRV.submittedAt;
       LAST = draftOf(S);
