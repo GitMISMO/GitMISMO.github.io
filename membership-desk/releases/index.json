@@ -76,6 +76,13 @@
       "by": "jycritchley",
       "note": "Shorter Payment in Process line",
       "sha256": "1bf9cd8d4a081d07e7f30874c2d59df60090fb89f07eda5c21ad45f711cd0990"
+    },
+    {
+      "version": "20261125-1449",
+      "at": "2026-11-25T14:49:12.191Z",
+      "by": "jycritchley",
+      "note": "Browser tab icon now matches mismo.org (CN-030)",
+      "sha256": "eec91c51e09eac89239bda29871a1de26cfe3c8aabad5ef245dd2b944af120a7"
     }
   ]
 }
