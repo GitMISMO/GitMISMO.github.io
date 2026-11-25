@@ -25,6 +25,8 @@ who fetches one URL.
 |---|---|
 | `index.html` | The home page, in the Summit HQ look the admin panel and the glossary console use. The wordmark is inline; the IBM Plex Sans font comes from Google Fonts with a system-font fallback, and the account bubble from `assets/session.js`. |
 | `assets/` | The two official wordmarks, colour and white, kept as files for use by other tools. |
+| `assets/favicon-48x48.png` | The browser tab icon for every MISMO system: the same picture as www.mismo.org's icon (the MISMO S mark on a navy square), saved unchanged. Every page's `<head>` has one icon line and no other: `<link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">` (CN-030, Nov 25, 2026). To change the icon everywhere, replace this file and `favicon.ico`. |
+| `favicon.ico` | The same icon at 16, 32 and 48 px, for any page on resources.mismo.org with no icon line. |
 | `_internal/ADDING-A-TOOL.md` | How to add a new tool to this domain, with and without saving. Start here. |
 | `_internal/relay-save.js` | Drop-in saving module for a tool that needs to write back to GitHub. |
 | `assets/tools.json` | Every tool with its own access. The admin panel's People & Access and every account menu read this one list, so a tool added here appears in both. |

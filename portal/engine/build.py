@@ -334,6 +334,7 @@ def page(slug, cfg):
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <link rel="stylesheet" href="../engine/portal.css?v=%(v)s">
 <style>[hidden]{display:none!important}body{margin:0}</style>
+<link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>%(logo)s</defs></svg>
