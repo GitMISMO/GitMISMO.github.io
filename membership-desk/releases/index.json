@@ -97,6 +97,13 @@
       "by": "jycritchley",
       "note": "Menu label: Case Management from Aptify Data Updated",
       "sha256": "109547c16972c57976b99a087133957dd41dcee9d4536b48202c13a540cce2de"
+    },
+    {
+      "version": "20261125-1751",
+      "at": "2026-11-25T17:51:26.027Z",
+      "by": "jycritchley",
+      "note": "Weekly cases read a workbook that comes in pieces",
+      "sha256": "2cb7d4240f1ecef135255b67d32de6160994ac428afc0e32df7607c39237fabd"
     }
   ]
 }
