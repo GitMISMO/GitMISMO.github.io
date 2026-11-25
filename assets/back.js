@@ -51,7 +51,7 @@
 
   function section() {
     if (custom) { try { return String(custom.current() || ''); } catch (e) { return ''; } }
-    var b = document.querySelector(NAV + '[aria-current]');
+    var b = document.querySelector('nav button[data-hq][aria-current], [data-back-page][aria-current]');
     return b ? nameOf(b) : '';
   }
   function opened() {
@@ -168,6 +168,6 @@
     /* for an app whose left menu isn't nav button[data-hq]: current() names the page showing, go(name) shows it the way its menu button does */
     pages: function (p) { if (p && typeof p.current === 'function' && typeof p.go === 'function') custom = p; soon(); },
     check: soon,
-    version: '2026-11-25c'
+    version: '2026-11-25d'
   };
 })();
