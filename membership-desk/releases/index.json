@@ -62,6 +62,13 @@
       "by": "jycritchley",
       "note": "Payment in Process: new members only, no renewals",
       "sha256": "cc65f4a115a1ae032ee423035e29cbad1ad833d2afd400e7748c5e7660fd46f7"
+    },
+    {
+      "version": "20261125-0258",
+      "at": "2026-11-25T02:58:57.945Z",
+      "by": "jycritchley",
+      "note": "Aptify order shown for new members",
+      "sha256": "94b4dd86b58c5669cf5413f3dcd5b85efd8b76d6e93a9506f4548fffa0bb1c8c"
     }
   ]
 }
