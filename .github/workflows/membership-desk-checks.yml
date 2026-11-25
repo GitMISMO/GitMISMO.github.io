@@ -23,3 +23,9 @@ jobs:
           node-version: "20"
       - name: Pages parse, no secrets, safety list, test copy can't save and can be published, live page is a published version
         run: node membership-desk/tools/desk.js check
+      - name: Browser checks on made-up records (the page opens; the Back button closes the panel, then returns to the last page)
+        working-directory: membership-desk/tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm test

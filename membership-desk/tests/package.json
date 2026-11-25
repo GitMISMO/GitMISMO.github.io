@@ -1,0 +1,11 @@
+{
+  "name": "membership-desk-tests",
+  "private": true,
+  "description": "Membership Desk browser checks (made-up data only)",
+  "scripts": {
+    "test": "node run.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

@@ -36,6 +36,13 @@ jobs:
           node-version: "20"
       - name: Checks before publishing
         run: node membership-desk/tools/desk.js check
+      - name: Browser checks before publishing (made-up records)
+        if: ${{ inputs.version == 'test copy' }}
+        working-directory: membership-desk/tests
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          npm test
       - name: Make the version live
         env:
           VERSION: ${{ inputs.version }}

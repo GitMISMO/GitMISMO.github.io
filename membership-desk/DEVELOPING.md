@@ -38,6 +38,9 @@ membership start and end dates.
   live page plus two test-only parts (`tools/test-copy-head.txt` right after the charset line, `tools/test-copy-tail.txt`
   right before the last `</body>`). It reads the real data but can't save, upload or send anything.
 - **Tools:** `membership-desk/tools/desk.js` (Page Checks and publishing, one script so both run the same checks).
+- **Browser checks:** `membership-desk/tests/` (`run.js` and `harness.js`; `npm test` there). They open the page the test
+  copy would publish in a headless browser with a pretend sign-in and a pretend relay holding made-up records (nothing
+  real is read or changed), and serve `/assets/back.js` from the live copy. Add a check there when you add a feature.
 - **Versions:** `membership-desk/releases/` keeps every version made live (never deleted), listed in
   `releases/index.json` with who published it, when, a note and its fingerprint.
 - **Automatic checks and publishing:** `.github/workflows/membership-desk-checks.yml` and
@@ -64,7 +67,8 @@ more). Stay inside `membership-desk/` and the two `membership-desk-*` workflows.
 Never upload `index.html` by hand: Page Checks fails when the live page isn't the last published version. Jonna has
 said the Claude working on the desk may publish once Page Checks pass, then tell her what went live.
 
-Page Checks fails when: a script on either page doesn't parse; something that looks like a key or token is in a page;
+Page Checks also runs the browser checks in `tests/` (Publish a Version runs them too before making the test copy live).
+Page Checks fails when: a browser check fails; a script on either page doesn't parse; something that looks like a key or token is in a page;
 the page safety list (Content-Security-Policy) is missing; the test copy could save, or the live page couldn't; the test
 copy is more than the live page plus its two test-only parts; or the live page isn't a published version.
 
@@ -99,6 +103,13 @@ The desk sends no email of its own.
 - Archive, never delete: done items are undone, invoices are marked Entered by Mistake.
 - Contacts who leave a company are handled in Member 360 only. There is no Aptify Updates tab: Jonna is moving MISMO
   away from Aptify upkeep (Nov 20, 2026).
+- The browser's Back button (Nov 25, 2026, CN-033): the shared `<script src="/assets/back.js"></script>` right after
+  `session.js` makes each change of page in the left menu a Back step (the menu button showing carries `aria-current`;
+  Help is in the menu, so it needs nothing more). The right-hand panel is registered with `MismoBack.layer` (the script
+  just before the version stamp), so Back closes it first, exactly as its X does. Only what a person does makes a step
+  and the address never changes. Never copy back.js here or add a `history.pushState` of our own. A new panel, pop-up
+  or drawer gets its own `MismoBack.layer` line (bottom layer first) and a step in the Back check in `tests/run.js`.
+  The narrow-screen menu drawer isn't registered (as on Summit HQ): choosing a page in it closes it.
 - The browser tab icon is the one shared MISMO icon, from https://resources.mismo.org/assets/favicon-48x48.png, and
   no other icon line (Nov 25, 2026). Never copy the image here.
 - Plain language and Title Case headings; squared-off buttons and tags, never pills; no big empty spaces.
