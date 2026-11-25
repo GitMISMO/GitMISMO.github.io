@@ -567,6 +567,13 @@
       "repo": "GitMISMO/summit-hq-data",
       "branch": "main",
       "path": "data/feed-mymismo-attendees.json"
+    },
+    "push": true,
+    "alertSenders": ["jcritchley@mismo.org"],
+    "slidesFeed": {
+      "repo": "GitMISMO/summit-hq-data",
+      "branch": "main",
+      "path": "data/feed-mymismo-slides.json"
     }
   }
 }

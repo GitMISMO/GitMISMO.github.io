@@ -106,3 +106,9 @@ staff pages save nothing there yet. `attendees: true` and `attendeeFeed` (Summit
 with the registration email and an emailed 6-digit code, an opt-in attendee directory and messages
 between attendees. The key does nothing until Perry deploys relay request 13. MyMISMO is public, so it
 has no People & Access entry.
+
+MyMISMO alerts and slides (CN-037, Nov 25, 2026): the `mymismo` key also has `push: true`, `alertSenders`
+(only jcritchley@mismo.org can press Send on an alert; nothing goes out automatically) and `slidesFeed`
+(Summit HQ's `data/feed-mymismo-slides.json` in GitMISMO/summit-hq-data: slides uploaded by the MISMO team,
+downloadable only by signed-in attendees). These do nothing until Perry deploys relay request 14, and push
+also needs the two VAPID keys set on the function.
