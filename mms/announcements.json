@@ -1,7 +1,7 @@
 {
   "source": "MMS",
   "note": "Announcement requests from the MMS for MISMO Media, with the facts to draft from. Public information only.",
-  "updated": "2026-11-25T14:47:36.551Z",
+  "updated": "2026-11-25T17:47:37.075Z",
   "announcements": [
     {
       "id": "WR2023_20_03-Candidate-Recommendation-Announcement",
@@ -386,7 +386,7 @@
       "classification": "Collateral",
       "releaseStatus": "Final",
       "facilitator": "Meghan Tidgewell",
-      "summary": "",
+      "summary": "The MISMO Artificial Intelligence (AI) Glossary Version 2.0 expands the collection of terms and definitions to reflect emerging AI technologies, governance, and risk management practices. It promotes a common understanding of AI terminology and supports responsible AI adoption across the mortgage industry.",
       "license": "Commercial Distributor",
       "availableTo": "Public",
       "memberUrl": "",
