@@ -38,7 +38,7 @@ __META__
      Systems Copy job brings over whenever it changes. Nothing on it saves, and the key reaches nothing else.
      The drawing is Team HQ's own code (/team-hq/src/systems.js), so it always shows exactly what Team HQ shows.
      Jonna and Vanessa edit Connected Systems in Team HQ (Edit in Team HQ, top right). Notes: DEVELOPING.md. -->
-<link rel="icon" href="/team-hq/hq-icon-192.png">
+<link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700;800&display=swap">
 <script src="/assets/session.js"></script>
 <style>
