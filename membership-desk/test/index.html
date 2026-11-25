@@ -1120,7 +1120,7 @@ async function caseAuto(){try{if(!(window.__deskAdmin&&window.__deskAdmin()))ret
   const X=await cdLib(),wb=X.read(u,{type:"array",cellDates:true}),ws=wb.Sheets["MISMO Cases"];if(!ws)return;
   const r=cdBuild(X.utils.sheet_to_json(ws,{defval:""}));
   r.data.writtenBy="the weekly Aptify email";r.data.fromEmail=d.receivedAt;r.data.source="Reporting Services report Member360_AptifyPull, sheet MISMO Cases (Case Category = MISMO)";
-  await window.__deskSaveCases(r.data);D.cases=r.data;
+  await window.__deskSaveCases(r.data);D.cases=r.data;/* the date at the foot of the menu follows straight away (Jonna, Nov 25, 2026) */try{window.__railApt&&window.__railApt();}catch(e){}
  }catch(e){console.error("weekly cases",e);}}
 setTimeout(caseAuto,8000);
 function caseDrop(){const box=$("case-drop");if(!box)return;box.hidden=!(window.__deskAdmin&&window.__deskAdmin());if(box.hidden||box.dataset.ready)return;box.dataset.ready="1";
@@ -1448,7 +1448,7 @@ function show(tab){document.querySelectorAll(".hq nav button[data-hq]").forEach(
 document.querySelectorAll(".hq nav button[data-hq]").forEach(b=>b.addEventListener("click",()=>show(b.dataset.hq)));
 document.querySelectorAll("[data-go]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.go)));
 function renderAll(){const t=(document.querySelector(".hq nav button[aria-current]")||{dataset:{hq:"home"}}).dataset.hq;renderHome();if(t!=="home")show(t);}
-$("asof").textContent=new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+" · Membership Desk";try{const c=(window.DESK&&window.DESK.cases)||{},d=String(c.asOf||"").slice(0,10),el=$("rail-apt-d");if(el)el.textContent=d?new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}):"Not yet";const r=$("rail-apt");if(r)r.title="The latest Case Management data from Aptify on the desk is from "+(d?fmt(d):"no report yet")+(c.fromEmail?", from the weekly Aptify email received "+new Date(c.fromEmail).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"")}catch(e){console.error("rail apt",e)}
+$("asof").textContent=new Date(TODAY+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric"})+" · Membership Desk";window.__railApt=()=>{try{const c=(window.DESK&&window.DESK.cases)||{},d=String(c.fromEmail||c.asOf||"").slice(0,10),el=$("rail-apt-d");if(el)el.textContent=d?new Date(d+"T12:00:00").toLocaleDateString("en-US",{weekday:"short",month:"short",day:"numeric",year:"numeric"}):"Not yet";const r=$("rail-apt");if(r)r.title="The latest Case Management data from Aptify on the desk is from "+(d?fmt(d):"no report yet")+(c.fromEmail?", from the weekly Aptify email received "+new Date(c.fromEmail).toLocaleString("en-US",{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"")}catch(e){console.error("rail apt",e)}};window.__railApt();
 window.__desk={todo:()=>TODO,finished,open:openPane,go,cu:()=>CU_ITEMS.map(u=>({u,company:u.company,what:cuWhat(u)})),openCU};
 renderHome();
 /* a link from an email opens the set-up straight away: #todo/<id> */
