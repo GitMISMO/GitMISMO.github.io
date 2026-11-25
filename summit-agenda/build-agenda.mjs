@@ -5,7 +5,10 @@
 // The Summit Agenda page reads agenda.json (Nav Behavior module __mmGS): the General Sessions day and the
 // Workshop are drawn from it; with no entry the page keeps what is typed on it.
 // Published per session: start, end, kind, title, description, sponsor, break flag, and per speaker: name,
-// title, company, role and headshot. Nothing else from Summit HQ (no emails, notes or contacts).
+// title, company, role, bio and headshot. Nothing else from Summit HQ (no emails, notes or contacts).
+// Nov 25, 2026 (CN-036, for MyMISMO's View Bio button): each speaker also carries "bio", plain text with paragraphs
+// separated by a blank line, up to 5,000 characters ("" when Summit HQ has none). Speakers send it through Summit
+// HQ's speaker bio and headshot form, which tells them it is used for the agenda and the event app.
 // Nov 18, 2026 (asked by the website's Claude): each summit can also carry "grid", the whole week from the
 // Summit HQ Schedule (every public session, all four days), once Show on the Website Agenda is on for it on
 // the Schedule: { updated, sessions: [{ id, day, date, start, end, type, title, room, desc, sponsor, status }] }.
@@ -66,7 +69,7 @@ async function block(b) {
     const people = [];
     for (const p of Array.isArray(s.people) ? s.people : []) {
       if (!p || !str(p.name)) continue;
-      people.push({ name: str(p.name, 120), title: str(p.title, 160), company: str(p.company, 160), role: str(p.role, 60), photo: await headshot(p) });
+      people.push({ name: str(p.name, 120), title: str(p.title, 160), company: str(p.company, 160), role: str(p.role, 60), bio: str(p.bio, 5000), photo: await headshot(p) });
     }
     sessions.push({ start: str(s.start, 20), end: str(s.end, 20), kind: str(s.kind, 60), title: str(s.title, 300), desc: str(s.desc), sponsor: str(s.sponsor, 160), brk: !!s.brk, people });
   }
