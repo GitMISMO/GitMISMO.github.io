@@ -2098,6 +2098,7 @@ p,.sub,.lede{text-wrap:pretty}
 .rv-oldbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-2);background:var(--surface-2);border:1px solid var(--border);border-radius:5px;padding:6px 10px;margin:0 0 8px}.rv-oldbar span{flex:1}
 </style>
 <script src="/assets/session.js"></script>
+<script src="/assets/back.js"></script>
 <script src="mms-door.js"></script>
 </head>
 <body>
@@ -2169,7 +2170,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-25T18:05:04Z',fp:'3ba2fc33'};
+window.__mmsBuild={at:'2026-11-25T19:53:13Z',fp:'40ed9237'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7427,7 +7428,7 @@ const HELP_TOPICS={
      'Click any work request to open its panel on the right. Press Esc or the X to close it.',
      'Use the moon or sun at the bottom of the rail for dark or light mode.',
      'Click your name at the top right to change your password or sign out.'],
-    ['IM Review and AWG Review open in their own tab, so the MMS stays where you left it.'],
+    ['IM Review and AWG Review open in their own tab, so the MMS stays where you left it.','The browser’s Back button goes to the last page you were on and closes an open panel or pop-up first. It never undoes a change.'],
     []],
   path:['How a Work Request Moves','*',
     'There are five phases and thirteen steps. Each step has an owner, and the MMS shows who that is on every card.',
@@ -9320,6 +9321,31 @@ const _writeSG=write;
 write=async function(coll,id,data,base){
   if(S._staleLocked){ if(typeof toast==='function') toast('This tab is an older version of the MMS and can’t save. Reload to keep working.'); return false; }
   return _writeSG(coll,id,data,base); };
+/* ---------- the browser's Back button (CN-033, Nov 25, 2026) ----------
+   The shared /assets/back.js (owned by Forms and shared pages, loaded in <head> right after session.js; never copied
+   here) makes each change of page in the left menu a step in the browser's history. It follows the menu button that
+   carries aria-current, which go() already sets. Here the MMS tells it what Back closes first, bottom layer first;
+   each close does exactly what that layer's own X or Escape does:
+   1. the Metrics drill-down (its X / Escape),
+   2. the right-hand panel: a work request or an Architecture Help task (closePanel, which asks about unsaved changes),
+   3. a pop-up (its Cancel / Keep Editing, as Escape does).
+   The MMS's own #view in the address is unchanged (go() keeps writing it); nothing here adds history steps.
+   In the test build (dist/mms.html) there is no back.js, so this does nothing. */
+(function(){
+  if(!window.MismoBack||typeof MismoBack.layer!=='function') return;
+  MismoBack.layer({
+    isOpen:()=>!!(S.view==='metrics'&&S.mx&&S.mx.drill&&document.querySelector('#main .mx-drill')),
+    close:()=>{ const x=document.getElementById('mxdx'); if(x) x.click(); else { S.mx.drill=null; renderAll(); } }
+  });
+  MismoBack.layer({
+    isOpen:()=>!!(S.panel&&$('#panel')&&$('#panel').classList.contains('on')),
+    close:()=>closePanel()
+  });
+  MismoBack.layer({
+    isOpen:()=>!!$('#modal-root .modal'),
+    close:()=>{ const m=$('#modal-root .modal'); if(!m) return; const c=$('[data-m=cancel],[data-m=keep]',m); if(c) c.click(); else $('#modal-root').innerHTML=''; }
+  });
+})();
 
 /* ---------- settings ---------- */
 let setTab='process';
