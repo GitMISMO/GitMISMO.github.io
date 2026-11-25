@@ -104,6 +104,13 @@
       "by": "jycritchley",
       "note": "Weekly cases read a workbook that comes in pieces",
       "sha256": "2cb7d4240f1ecef135255b67d32de6160994ac428afc0e32df7607c39237fabd"
+    },
+    {
+      "version": "20261125-1754",
+      "at": "2026-11-25T17:54:56.628Z",
+      "by": "jycritchley",
+      "note": "Case data date is the weekly email date",
+      "sha256": "6da7bb6caa53fee7a971991245410357442a8fdfba632d86296689b6da72b9f8"
     }
   ]
 }
