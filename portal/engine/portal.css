@@ -124,6 +124,9 @@ main{padding-block:22px 60px}
 .in:hover{border-color:var(--border-strong)}
 .in:focus{background:var(--surface);border-color:var(--focus);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--focus) 22%,transparent)}
 textarea.in{min-height:92px;resize:vertical;line-height:1.5}
+textarea.in.grow{min-height:40px;field-sizing:content;resize:vertical}
+.qbul{margin:4px 0 14px;padding-left:22px}
+.qbul li{margin:5px 0;line-height:1.5}
 .from{font-size:11px;font-weight:500;color:var(--good);background:var(--good-wash);padding:1px 6px;border-radius:3px;margin-left:6px;letter-spacing:.02em}
 
 .btn{display:inline-flex;align-items:center;gap:8px;border-radius:5px;border:1px solid var(--accent);background:var(--accent);color:var(--accent-ink);padding:9px 16px;font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap}
