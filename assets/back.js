@@ -6,6 +6,7 @@
 
    What it does, with nothing else to set up:
    - Moving to another page of the app from its left menu (nav button[data-hq]) is a step
+     (a page button outside the menu, such as Help, joins by carrying data-back-page="help"),
      in the browser's history, so Back returns to the page you were on and Forward goes
      again. It follows whichever menu button carries aria-current, so tiles, search results
      and links that change the page count too.
@@ -32,7 +33,10 @@
   'use strict';
   if (window.MismoBack) return;
 
-  var NAV = 'nav button[data-hq]';
+  /* a page of the app: a left-menu button, or any other button marked data-back-page="<name>"
+     (Help in the foot of the menu, say) that carries aria-current while its page shows */
+  var NAV = 'nav button[data-hq], [data-back-page]';
+  function nameOf(b) { return b.getAttribute('data-hq') || b.getAttribute('data-back-page') || ''; }
   var layers = [];
   var last = null;          /* the state the history entry we're on stands for */
   var ready = false;
@@ -43,7 +47,7 @@
 
   function section() {
     var b = document.querySelector(NAV + '[aria-current]');
-    return b ? b.getAttribute('data-hq') : '';
+    return b ? nameOf(b) : '';
   }
   function opened() {
     var n = 0;
@@ -88,9 +92,9 @@
     if (!s || s === section()) return;
     var bs = document.querySelectorAll(NAV);
     for (var i = 0; i < bs.length; i++) {
-      if (bs[i].getAttribute('data-hq') === s && !bs[i].disabled && bs[i].offsetParent !== null) { bs[i].click(); return; }
+      if (nameOf(bs[i]) === s && !bs[i].disabled && bs[i].offsetParent !== null) { bs[i].click(); return; }
     }
-    for (i = 0; i < bs.length; i++) { if (bs[i].getAttribute('data-hq') === s) { bs[i].click(); return; } }
+    for (i = 0; i < bs.length; i++) { if (nameOf(bs[i]) === s) { bs[i].click(); return; } }
   }
 
   /* Apps sometimes tidy the address with history.replaceState(null, '', url). Keep this file's
@@ -155,6 +159,6 @@
   window.MismoBack = {
     layer: function (l) { if (l && typeof l.isOpen === 'function' && typeof l.close === 'function') layers.push(l); soon(); },
     check: soon,
-    version: '2026-11-25'
+    version: '2026-11-25b'
   };
 })();
