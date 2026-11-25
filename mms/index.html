@@ -2179,7 +2179,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-25T23:13:54Z',fp:'ac9f018f'};
+window.__mmsBuild={at:'2026-11-25T23:38:19Z',fp:'7ce655a0'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2418,7 +2418,7 @@ function whoseMove(t){
       const ld=peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'License Designator';
       return {role:'vps',label:ld,text:t.designation&&(t.designation.auto||t.designation.recommended)?'Designate the license (the MMS has a recommendation)':'Designate the license'}; }
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
-    case 'comment': return sub==='setup'?(!(t.cpFile&&t.cpFile.url)?{role:'facilitator',label:'Facilitator',text:'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you)'}:{role:'website',label:'Website Admin',text:'Add the Resource Library link: the comment period starts that day'}):(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
+    case 'comment': return sub==='setup'?(!(t.cpFile&&t.cpFile.url)?{role:'facilitator',label:'Facilitator',text:'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)'}:{role:'website',label:'Website Admin',text:'Add the Resource Library link: the comment period starts that day'}):(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
     case 'post': return {role:'facilitator',label:'Facilitator',text:'Report what came back from comment'};
     case 'gc-publish': return {role:'gov',label:g,text:g+' approval to publish as '+(isStandard(t)?'Candidate Recommendation':'Final')};
     case 'release': return {role:'website',label:'Website Admin',text:'Publish the pages and announcement'};
@@ -3636,7 +3636,7 @@ function wireArch(m){
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
-      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
+      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
       case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
       case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
       case 'release': return { role: 'website', text: 'Publish the pages and announcement' };
@@ -7531,7 +7531,7 @@ const HELP_TOPICS={
     []],
   comments:['Comment Periods and Comments','facilitator staff website gov',
     'Comment Periods shows what is open for public comment, what just closed and what is approved but not posted yet.',
-    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Before the comment period, put the Comment Period (IPR) boilerplate language in the work product files and add them to the work request’s Files. Then Choose the Files for Comment: tick the files that go out for comment (several are zipped into one download, and the zip is saved to Files too). The MMS checks each Word, Excel and PDF file for the Comment Period language first and says which ones don’t have it. Leave the [INSERT DATE] in the Comment Period language as it is: the MMS fills in that day’s date in the Word and Excel files it posts (the files in Files stay as they are). It posts the file as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a brief description of what the work product is and that it’s in a 30-day comment period, from the work request, its reviews and its files; edit it or keep it. Saving the card is the approval: that text is what the website shows, and the website adds the member and non-member download. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
+    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Before the comment period, put the Comment Period (IPR) boilerplate language in the work product files and add them to the work request’s Files. Then Choose the Files for Comment: tick the files that go out for comment (several files that add up to 20 MB or less are zipped into one download, and the zip is saved to Files too; a bigger set, such as Reference Model artifacts, goes out as separate downloads listed on one download page, up to 95 MB a file). The MMS checks each Word, Excel and PDF file for the Comment Period language first and says which ones don’t have it. Leave the [INSERT DATE] in the Comment Period language as it is: the MMS fills in that day’s date in the Word and Excel files it posts (the files in Files stay as they are). Files over 15 MB, and .xlsb files, are too big for the MMS to open: it lists them so you can check their Comment Period language and type in the date yourself. Posting a big set takes a few minutes; keep the tab open until it says Posted. It posts the file as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a brief description of what the work product is and that it’s in a 30-day comment period, from the work request, its reviews and its files; edit it or keep it. Saving the card is the approval: that text is what the website shows, and the website adds the member and non-member download. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
      'Members click Member Access on the card and open the work product in the Resource Library. They do not use the MMS.',
      'Non-members click Non-Member Access, sign the Proposed (open for comment) license form, and then get the download.',
      'Still needed on the card lists anything missing: the card text, the Resource Library link or the non-member download.',
@@ -8388,7 +8388,7 @@ rvShow=function(rep){ _rvShowDec(rep); if(!rep||rep.kind==='im') return; const b
    (Vanessa) gets one email, copying Jonna: make the Resource Library entry with that file, then put its link in
    the MMS (Posted: Set Comment Dates, or the Links tab). It goes once; not again once the link is in. */
 const CPF_BASE='https://resources.mismo.org/work-products/comment/';
-const CPF_OK=/\.(docx|pdf|xlsx|xlsm|zip|pptx|xsd|json|txt)$/i;
+const CPF_OK=/\.(docx|pdf|xlsx|xlsm|xlsb|csv|zip|pptx|xsd|json|txt)$/i;
 function cpfUrl(t,name){ return CPF_BASE+encodeURIComponent(String(t.wr||t.id).replace(/[^A-Za-z0-9_.-]/g,'_'))+'/'+encodeURIComponent(name); }
 function cpfFiles(t){ ssEnsure(); const D=ssFor(t); return ((D&&D.files)||[]).filter(f=>f.p&&!f.gone&&CPF_OK.test(f.n||f.p)).slice().sort((a,b)=>String(b.u||'').localeCompare(String(a.u||''))).slice(0,40); }
 /* the posted file is the card's non-member download unless someone typed one */
@@ -8438,40 +8438,74 @@ async function cpfBoilerText(fname,u8){ await needLibs(); const z=await JSZip.lo
     const plain=x.replace(/<[^>]*>/g,' '); let m, last=-1, c=0; R.lastIndex=0; while((m=R.exec(plain))&&c<120){ if(m.index<last){ continue; } const a=Math.max(0,m.index-3000), b=Math.min(plain.length,m.index+6000); out+=' '+plain.slice(Math.max(a,last),b); last=b; R.lastIndex=b; c++; } }
   return out; }
 const cpfBreathe=()=>new Promise(r=>setTimeout(r,30));
-const CPF_MAX=20*1048576, CPF_SKIP=CPF_MAX; /* the website's comment-period download limit; files bigger than CPF_SKIP aren't opened to check */
+/* the download page for a comment period posted as separate files: MISMO-branded, light and dark, no scripts */
+function cpfPage(t,files){ const c=(typeof cpCardOf==='function'&&cpCardOf(t))||{}; const title=String(c.title||t.name||t.wr).trim(), end=t.dates&&t.dates.commentEnd;
+  const sym=document.getElementById('mismo-logo'), logo=sym?'<svg viewBox="0 0 708 108" role="img" aria-label="MISMO">'+sym.innerHTML.replace(/var\(--logo-body,\s*(#[0-9a-f]+)\)/gi,'$1')+'</svg>':'<b>MISMO</b>';
+  const h=x=>String(x).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+  const kind=n=>{ const e=(String(n).split('.').pop()||'').toUpperCase(); return e.length<=5?e:'FILE'; };
+  return '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+h(title)+': Comment Period Files</title>'+
+    '<link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">'+
+    '<style>:root{--navy:#0d314c;--sky:#74bfeb;--bg:#f4f7fa;--card:#fff;--ink:#0d314c;--muted:#5b7287;--line:#dbe5ee;--link:#1f5f94}'+
+    '@media (prefers-color-scheme:dark){:root{--bg:#0b1a26;--card:#11263a;--ink:#e6eef5;--muted:#9fb3c4;--line:#22405a;--link:#74bfeb}}'+
+    '*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}'+
+    'header{background:var(--navy);padding:18px 16px}header .in,main{max-width:760px;margin:0 auto}.plate{display:inline-block;background:#fff;padding:8px 12px;border-radius:6px}.plate svg{display:block;height:22px;width:auto}'+
+    'main{padding:24px 16px 40px}h1{font-size:24px;line-height:1.25;margin:0 0 6px}.sub{color:var(--muted);margin:0 0 18px}'+
+    'ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}li a{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--card);border:1px solid var(--line);border-radius:8px;color:inherit;text-decoration:none}'+
+    'li a:hover{border-color:var(--sky)}.k{flex:0 0 auto;min-width:46px;text-align:center;font-size:11px;font-weight:700;letter-spacing:.04em;color:#fff;background:var(--navy);border-radius:4px;padding:4px 6px}'+
+    '@media (prefers-color-scheme:dark){.k{background:#1f5a85}}.n{flex:1;min-width:0;overflow-wrap:anywhere}.n b{display:block}.n em{font-style:normal;color:var(--muted);font-size:13px}.d{flex:0 0 auto;font-weight:600;color:var(--link)}'+
+    'footer{color:var(--muted);font-size:13px;margin-top:18px}</style></head><body><header><div class="in"><span class="plate">'+logo+'</span></div></header><main>'+
+    '<h1>'+h(title)+'</h1><p class="sub">Comment Period files'+(end?' · open for comment until '+h(fmt(end)):'')+'. These are offered under the Proposed (open for comment) license.</p>'+
+    '<ul>'+files.map(f=>'<li><a href="'+h(encodeURIComponent(f.file))+'" download="'+h(f.name)+'"><span class="k">'+h(kind(f.file))+'</span><span class="n"><b>'+h(f.name)+'</b><em>'+h(cpfMB(f.bytes))+'</em></span><span class="d">Download</span></a></li>').join('')+'</ul>'+
+    '<footer>Mortgage Industry Standards Maintenance Organization, Inc. (MISMO)</footer></main></body></html>'; }
+const CPF_MAX=20*1048576, CPF_SKIP=15*1048576, CPF_EACH=95*1048576, CPF_ALL=400*1048576;
+/* CPF_MAX: up to this, several files are zipped into one download. Above it (Nov 25, Jonna, Erin's ~99 MB Reference Model
+   set), each file is posted as its own download, listed on one download page that is the non-member download.
+   CPF_EACH: the biggest single file (the MMS Robot saves big ones in parts; GitHub takes up to 100 MB a file).
+   CPF_SKIP: bigger files aren't opened in the browser to fill the IPR date or check the language (too big to open safely). */ /* the website's comment-period download limit; files bigger than CPF_SKIP aren't opened to check */
 function cpfBytes(f){ const m=/([\d.]+)\s*(KB|MB|GB)/i.exec(String(f&&f.sz||'')); return m?Math.round(+m[1]*({kb:1024,mb:1048576,gb:1073741824}[m[2].toLowerCase()])):0; }
 function cpfMB(n){ return n>=1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB'; }
 async function cpfChoose(t){
   const L=cpfFiles(t); if(!L.length) return toast('No files in this work request’s folder yet. Add the comment-period files on the Files tab first.');
   const v=await modal({title:'Files for Comment',text:esc(t.wr)+' · what non-members download after they sign the Proposed (open for comment) license form',ok:'Check and Post',
-    body:'<p class="muted" style="margin:0 0 8px;font-size:12.5px">Tick the work product files that go out for comment. One file is posted as it is; several are zipped into one download. Each file needs the Comment Period (IPR) boilerplate language; the MMS checks before posting and fills in its [INSERT DATE] with the day it posts.</p><div class="rv-src-l">'+L.map((f,i)=>'<label class="rv-src-f"><input type="checkbox" name="cpf_'+i+'"'+(i===0?' checked':'')+'><span class="ss-i ss-'+ssKind(f.n)+'">'+ssIc(ssKind(f.n))+'</span><span class="rv-src-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',ssTag(f.n)||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span></label>').join('')+'</div>'});
+    body:'<p class="muted" style="margin:0 0 8px;font-size:12.5px">Tick the work product files that go out for comment. One file is posted as it is; several are zipped into one download, or, over 20 MB, posted as separate downloads on one download page. Each file needs the Comment Period (IPR) boilerplate language; the MMS checks before posting and fills in its [INSERT DATE] with the day it posts.</p><div class="rv-src-l">'+L.map((f,i)=>'<label class="rv-src-f"><input type="checkbox" name="cpf_'+i+'"'+(i===0?' checked':'')+'><span class="ss-i ss-'+ssKind(f.n)+'">'+ssIc(ssKind(f.n))+'</span><span class="rv-src-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',ssTag(f.n)||'',f.sz||''].filter(Boolean).join(' · '))+'</em></span></label>').join('')+'</div>'});
   if(!v) return; const sel=L.filter((f,i)=>v['cpf_'+i]===true); if(!sel.length) return toast('Tick at least one file');
   /* Nov 25 (Erin, Reference Model artifacts): the sizes are known from the list, so a set too big to post says so before anything is fetched */
-  const tot=sel.reduce((a,f)=>a+cpfBytes(f),0); if(tot>CPF_MAX){ await modal({title:'Too Big to Post Here',text:esc(t.wr),ok:'OK',body:'<p style="margin:0 0 6px">These files add up to about '+esc(cpfMB(tot))+'. The comment-period download can be up to '+esc(cpfMB(CPF_MAX))+'.</p><ul style="margin:0 0 8px 18px">'+sel.slice().sort((a,b)=>cpfBytes(b)-cpfBytes(a)).map(f=>'<li>'+esc(f.n)+(cpfBytes(f)?' ('+esc(cpfMB(cpfBytes(f)))+')':'')+'</li>').join('')+'</ul><p class="muted" style="margin:0;font-size:12.5px">Choose fewer files, or ask MISMO staff to post the large ones.</p>'}); return; }
+  const tot=sel.reduce((a,f)=>a+cpfBytes(f),0), huge=sel.filter(f=>cpfBytes(f)>CPF_EACH); if(huge.length||tot>CPF_ALL){ await modal({title:'Too Big to Post Here',text:esc(t.wr),ok:'OK',body:'<p style="margin:0 0 6px">'+(huge.length?esc(huge.map(f=>f.n).join(', '))+(huge.length===1?' is':' are')+' over '+esc(cpfMB(CPF_EACH))+', the most the website takes in one file.':'These files add up to about '+esc(cpfMB(tot))+'; the most that can be posted at once is '+esc(cpfMB(CPF_ALL))+'.')+'</p><ul style="margin:0 0 8px 18px">'+sel.slice().sort((a,b)=>cpfBytes(b)-cpfBytes(a)).map(f=>'<li>'+esc(f.n)+(cpfBytes(f)?' ('+esc(cpfMB(cpfBytes(f)))+')':'')+'</li>').join('')+'</ul><p class="muted" style="margin:0;font-size:12.5px">Choose fewer files, or ask MISMO staff to post the large ones.</p>'}); return; }
   try{
     const got=[]; for(const f of sel){ wpSay('Getting '+f.n+' from the work request’s files…'); const file=await rvSrcGet(f); got.push({f,file,bytes:new Uint8Array(await file.arrayBuffer())}); }
     /* the Comment Period IPR date: "[INSERT DATE]" becomes today's date in every Word and Excel file posted (Nov 25,
        Meghan: MISMO staff used to type it when posting); the files in Files stay as they are */
     let dated=0; const day=cpfDateWords(); for(const g of got){ if(!/\.(docx|xlsx|xlsm)$/i.test(g.file.name)||g.bytes.length>CPF_SKIP) continue; wpSay('Filling in the IPR date in '+g.f.n+'…'); await cpfBreathe(); try{ const r=await cpfFillDate(g.file.name,g.bytes,day); if(r.n){ g.bytes=r.u8; g.file=new File([r.u8],g.file.name,{type:g.file.type}); dated+=r.n; } }catch(e){} }
     /* the Comment Period (IPR) language, checked in every file the review can read */
+    const skipped=got.filter(g=>/\.(docx|xlsx|xlsm|xlsb|pdf)$/i.test(g.file.name)&&(g.bytes.length>CPF_SKIP||/\.xlsb$/i.test(g.file.name))).map(g=>g.f.n);
     const off=[]; for(const g of got){ if(!/\.(docx|xlsx|xlsm|pdf)$/i.test(g.file.name)) continue; wpSay('Checking the boilerplate in '+g.f.n+'…'); await cpfBreathe();
       const big=g.bytes.length>CPF_BIG; if(g.bytes.length>CPF_SKIP||(big&&/\.pdf$/i.test(g.file.name))) continue; /* too big to read here; the date and language are the facilitator's to check */
       try{ const txt=big?await cpfBoilerText(g.file.name,g.bytes):((await rvReadFile(g.file)).text||''); const k=rvDetectBoiler(txt); if(k!=='comment') off.push(g.f.n+': '+(k?'has the '+RV_BP_LABEL[k]+' language':'no MISMO boilerplate found')); }catch(e){} }
     wpSay('',''); const pb=document.getElementById('wpprog'); if(pb) pb.className='wp-prog';
-    if(off.length){ const go=await modal({title:'Comment Period Language Missing',text:esc(t.wr),ok:'Post Anyway',body:'<p style="margin:0 0 6px">These files don’t have the IPR/COMMENT PERIOD boilerplate language yet:</p><ul style="margin:0 0 8px 18px">'+off.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul><p class="muted" style="margin:0;font-size:12.5px">Update them (How To - MISMO Work Product Boilerplate Language and Guidance), add them to Files again and choose them, or post as they are if this is intended.</p>'}); if(!go) return; }
-    let name, u8, label;
-    if(got.length===1){ const file=got[0].file; u8=got[0].bytes; name=wpFileName(file.name); label=got[0].f.n; }
-    else { await needLibs(); const z=new JSZip(); const used={}; for(const g of got){ let n=g.file.name; while(used[n.toLowerCase()]) n=n.replace(/(\.[^.]*)?$/,m=>' (2)'+m); used[n.toLowerCase()]=1; z.file(n,g.bytes); }
-      u8=await z.generateAsync({type:'uint8array',compression:'DEFLATE'}); label=(String(t.wr||t.id)+' '+String((typeof cpCardOf==='function'&&cpCardOf(t).title)||t.name||'')+' - Comment Period').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,120)+'.zip'; name=wpFileName(label);
-      try{ if(typeof ssUpload==='function') await ssUpload(t,[new File([u8],label,{type:'application/zip'})]); }catch(e){} }
-    if(u8.length>CPF_MAX) throw new Error('it’s over '+cpfMB(CPF_MAX)+'; choose fewer files, or ask MISMO staff to post it');
-    const zb=wpZipBad(name,u8); if(zb) throw new Error(name+' '+zb);
-    const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6), n=Math.max(1,Math.ceil(u8.length/WP_PIECE));
-    for(let i=0;i<n;i++){ wpSay('Posting '+label+': '+Math.round(i/n*100)+'%. Keep this tab open.'); await wpPut('wpup-'+key+'-0-'+i,{c:wpB64(u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); }
-    await write('wpqueue',key,{key,ticket:t.id,id:'comment',fileOnly:'comment/'+String(t.wr||t.id).replace(/[^A-Za-z0-9_.-]/g,'_'),product:{},files:[{name:label,file:name,bytes:u8.length,chunks:n}],status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''});
-    const x=clone(S.tickets[t.id]||t), b=clone(x); x.cpFile={name:label,file:name,path:got.length===1?got[0].f.p:'',parts:got.length>1?got.map(g=>g.f.n):undefined,url:cpfUrl(t,name),bytes:u8.length,at:new Date().toISOString(),by:(S.me&&S.me.name)||''};
-    hist(x,(got.length>1?'Files for comment zipped and chosen: '+got.map(g=>g.f.n).join(', '):'File for comment chosen: '+label)+' (posted as the non-member download)'+(off.length?'; posted without the Comment Period language in '+off.length+' file'+(off.length===1?'':'s'):'')+(dated?'; the IPR “published on” date filled in as '+day:'')); await saveTicket(x,'File posted',b);
-    wpSay('Posted. It’s the non-member download within half an hour.','ok');
+    if(off.length||skipped.length){ const go=await modal({title:off.length?'Comment Period Language Missing':'Check These Yourself',text:esc(t.wr),ok:off.length?'Post Anyway':'Post',body:
+      (off.length?'<p style="margin:0 0 6px">These files don’t have the IPR/COMMENT PERIOD boilerplate language yet:</p><ul style="margin:0 0 8px 18px">'+off.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')+
+      (skipped.length?'<p style="margin:0 0 6px">'+(skipped.length===1?'This file is':'These files are')+' too big for the MMS to open, so make sure the Comment Period language is in '+(skipped.length===1?'it':'them')+' and its [INSERT DATE] says '+esc(day)+':</p><ul style="margin:0 0 8px 18px">'+skipped.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')+
+      '<p class="muted" style="margin:0;font-size:12.5px">To fix a file, update it (How To - MISMO Work Product Boilerplate Language and Guidance), add it to Files again and choose it. Or post as they are if this is intended.</p>'}); if(!go) return; }
+    const wrDir=String(t.wr||t.id).replace(/[^A-Za-z0-9_.-]/g,'_'), sum=got.reduce((a,g)=>a+g.bytes.length,0), sep=got.length>1&&sum>CPF_MAX;
+    let name, label, url, posts;
+    if(sep){ /* each file its own download, listed on one download page (the non-member download) */
+      const used={}; posts=got.map(g=>{ let fn=wpFileName(g.file.name); while(used[fn]) fn=fn.replace(/(\.[^.]*)?$/,m=>'-2'+m); used[fn]=1; return {name:g.f.n,file:fn,u8:g.bytes}; });
+      label=String((typeof cpCardOf==='function'&&cpCardOf(t).title)||t.name||t.wr).trim()+': Comment Period Files'; name='index.html'; url=CPF_BASE+encodeURIComponent(wrDir)+'/';
+      posts.push({name:label,file:'index.html',u8:new TextEncoder().encode(cpfPage(t,posts.map(p=>({name:p.name,file:p.file,bytes:p.u8.length}))))}); }
+    else { let u8;
+      if(got.length===1){ const file=got[0].file; u8=got[0].bytes; name=wpFileName(file.name); label=got[0].f.n; }
+      else { await needLibs(); const z=new JSZip(); const used={}; for(const g of got){ let n=g.file.name; while(used[n.toLowerCase()]) n=n.replace(/(\.[^.]*)?$/,m=>' (2)'+m); used[n.toLowerCase()]=1; z.file(n,g.bytes); }
+        u8=await z.generateAsync({type:'uint8array',compression:'DEFLATE'}); label=(String(t.wr||t.id)+' '+String((typeof cpCardOf==='function'&&cpCardOf(t).title)||t.name||'')+' - Comment Period').replace(/[\\/:*?"<>|]+/g,' ').replace(/\s+/g,' ').trim().slice(0,120)+'.zip'; name=wpFileName(label);
+        try{ if(typeof ssUpload==='function') await ssUpload(t,[new File([u8],label,{type:'application/zip'})]); }catch(e){} }
+      posts=[{name:label,file:name,u8}]; url=cpfUrl(t,name); }
+    for(const p of posts){ if(p.u8.length>CPF_EACH) throw new Error(p.name+' is over '+cpfMB(CPF_EACH)); const zb=wpZipBad(p.file,p.u8); if(zb) throw new Error(p.name+' '+zb); }
+    const key=Date.now().toString(36)+Math.random().toString(36).slice(2,6), ns=posts.map(p=>Math.max(1,Math.ceil(p.u8.length/WP_PIECE))), all=ns.reduce((a,n)=>a+n,0); let sent=0;
+    for(const [fi,p] of posts.entries()) for(let i=0;i<ns[fi];i++){ wpSay('Posting '+(posts.length>1?p.name+' ('+(fi+1)+' of '+posts.length+')':label)+': '+Math.round(sent/all*100)+'%. Keep this tab open'+(all>60?'; this takes a few minutes.':'.')); await wpPut('wpup-'+key+'-'+fi+'-'+i,{c:wpB64(p.u8.subarray(i*WP_PIECE,(i+1)*WP_PIECE))}); sent++; }
+    await write('wpqueue',key,{key,ticket:t.id,id:'comment',fileOnly:'comment/'+wrDir,product:{},files:posts.map((p,fi)=>({name:p.name,file:p.file,bytes:p.u8.length,chunks:ns[fi]})),status:'ready',at:new Date().toISOString(),by:(S.me&&S.me.name)||''});
+    const x=clone(S.tickets[t.id]||t), b=clone(x); x.cpFile={name:label,file:name,path:got.length===1?got[0].f.p:'',parts:got.length>1?got.map(g=>g.f.n):undefined,url,bytes:sep?sum:posts[0].u8.length,
+      files:sep?posts.filter(p=>p.file!=='index.html').map(p=>({name:p.name,file:p.file,url:cpfUrl(t,p.file),bytes:p.u8.length})):undefined,at:new Date().toISOString(),by:(S.me&&S.me.name)||''};
+    hist(x,(sep?'Files for comment posted as '+got.length+' separate downloads ('+cpfMB(sum)+') on one download page: '+got.map(g=>g.f.n).join(', '):got.length>1?'Files for comment zipped and chosen: '+got.map(g=>g.f.n).join(', '):'File for comment chosen: '+label)+' (posted as the non-member download)'+(off.length?'; posted without the Comment Period language in '+off.length+' file'+(off.length===1?'':'s'):'')+(skipped.length?'; too big to check here: '+skipped.join(', '):'')+(dated?'; the IPR “published on” date filled in as '+day:'')); await saveTicket(x,'File posted',b);
+    wpSay(sep?'Posted. The download page with all '+got.length+' files is the non-member download within half an hour (the big files can take a little longer).':'Posted. It’s the non-member download within half an hour.','ok');
     try{ await cpfNotice(S.tickets[t.id]||x); }catch(e){}
     if(typeof publishFeed==='function') try{ publishFeed(); }catch(e){}
   }catch(e){ wpSay('The file didn’t post ('+e.message+').','bad'); }
