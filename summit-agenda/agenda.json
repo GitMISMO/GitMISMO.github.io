@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-25T01:08:07.016Z",
+ "updated": "2026-11-25T20:50:15.084Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-25T01:06:26.681Z",
+ "sourceUpdated": "2026-11-25T20:48:51.078Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -179,7 +179,7 @@
     ]
    },
    "grid": {
-    "updated": "2026-11-23T19:32:36.000Z",
+    "updated": "2026-11-25T20:48:51.078Z",
     "sessions": [
      {
       "id": "breakfast@mon",
@@ -338,6 +338,19 @@
       "status": "confirmed"
      },
      {
+      "id": "smuwq48q7@tue",
+      "day": "Tuesday",
+      "date": "2027-01-12",
+      "start": "08:00",
+      "end": "08:45",
+      "type": "Invite Only",
+      "title": "Speaker Breakfast",
+      "room": "Algiers C",
+      "desc": "",
+      "sponsor": "",
+      "status": "confirmed"
+     },
+     {
       "id": "smu5zk68e@tue",
       "day": "Tuesday",
       "date": "2027-01-12",
@@ -346,19 +359,6 @@
       "type": "Office Hours",
       "title": "MISMO Link Office Hours",
       "room": "Fulton Room",
-      "desc": "",
-      "sponsor": "",
-      "status": "confirmed"
-     },
-     {
-      "id": "smuwq48q7@tue",
-      "day": "Tuesday",
-      "date": "2027-01-12",
-      "start": "09:00",
-      "end": "10:20",
-      "type": "Invite Only",
-      "title": "Speaker Breakfast",
-      "room": "Algiers C",
       "desc": "",
       "sponsor": "",
       "status": "confirmed"
