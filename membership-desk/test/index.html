@@ -1115,8 +1115,8 @@ async function caseAuto(){try{if(!(window.__deskAdmin&&window.__deskAdmin()))ret
   const R="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws/member-360",H={headers:{Authorization:"Bearer "+tk},cache:"no-store"};
   const g=await fetch(R+"/data/aptifypull",H);if(!g.ok)return;const j=await g.json(),d=((((j&&j.data)||{}).docs)||{})["aptifypull/main"];
   if(!d||!d.ok||!d.path||!d.receivedAt)return;const c=D.cases||{};if(c.fromEmail===d.receivedAt||String(c.writtenAt||"")>=String(d.receivedAt))return;
-  const f=await fetch(R+"/file/"+d.path,H);if(!f.ok)return;const b=String(((await f.json())||{}).content||"").replace(/\s/g,"");if(!b)return;
-  const bin=atob(b),u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  /* a big weekly workbook comes in pieces; join them, the same way Member 360 does (the Nov 23 workbook was in three pieces, so its cases never reached the desk; Jonna, Nov 25, 2026) */const rd=async p=>{const f=await fetch(R+"/file/"+p,H);if(!f.ok)throw new Error(p+": HTTP "+f.status);const b=String(((await f.json())||{}).content||"").replace(/\s/g,"");if(!b)throw new Error("empty "+p);const bin=atob(b),x=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)x[i]=bin.charCodeAt(i);return x;};
+  let u;if(Array.isArray(d.parts)&&d.parts.length){const bufs=[];for(const p of d.parts)bufs.push(await rd(p));u=new Uint8Array(bufs.reduce((a,x)=>a+x.length,0));let o=0;bufs.forEach(x=>{u.set(x,o);o+=x.length;});}else u=await rd(d.path);
   const X=await cdLib(),wb=X.read(u,{type:"array",cellDates:true}),ws=wb.Sheets["MISMO Cases"];if(!ws)return;
   const r=cdBuild(X.utils.sheet_to_json(ws,{defval:""}));
   r.data.writtenBy="the weekly Aptify email";r.data.fromEmail=d.receivedAt;r.data.source="Reporting Services report Member360_AptifyPull, sheet MISMO Cases (Case Category = MISMO)";
