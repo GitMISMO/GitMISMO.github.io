@@ -111,7 +111,7 @@ __DEFS__
       <h2>The Pages</h2>
       <ul>
         <li><b>Overview</b>: the headline numbers and the System Map. Point at a box to see what it touches; select it for the full story. The area buttons and Find a System narrow the map.</li>
-        <li><b>Follow the Work</b>: step-by-step stories of how work moves between systems. Play one to watch it travel across the map.</li>
+        <li><b>Follow the Work</b>: step-by-step stories of how work moves between systems. Pick one and choose Play on the Map to watch it travel across the System Map.</li>
         <li><b>Security</b>: each layer that protects the data, and where it lives.</li>
         <li><b>What Changed</b>: what each system replaced.</li>
         <li><b>On Its Own</b>: the jobs that run on a schedule or the moment something changes.</li>
@@ -236,6 +236,12 @@ __DEFS__
   }
   document.getElementById('nav').addEventListener('click', function(e){ var b = e.target.closest('button[data-hq]'); if (b && !b.onclick && (b.dataset.hq === 'overview' || b.dataset.hq === 'help') && !built) show(b.dataset.hq); });
   window.addEventListener('hashchange', function(){ var k = fromHash(); if (k !== page) show(k); });
+  /* a story played from Follow the Work plays on the System Map, so go to the map to watch it (Jonna, Nov 24, 2026) */
+  wrap.addEventListener('click', function(e){
+    if (page.indexOf('s:') !== 0 || !e.target.closest('.cs-sb button')) return;
+    setTimeout(function(){ if (!wrap.querySelector('.cs-panel .cs-story')) return;
+      show('overview', true); var mw = wrap.querySelector('.cs-mapwrap'); if (mw) window.scrollTo(0, Math.max(0, mw.getBoundingClientRect().top + window.scrollY - 80)); }, 60);
+  });
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', boot) : boot();
 })();
 </script>
