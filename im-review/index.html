@@ -1274,6 +1274,9 @@ function wire(){ const m=$("#main"); tabRoles(m); $$(".chart",m).forEach(tipOn);
   $$("[data-icdate]",m).forEach(el=>el.onchange=()=>{ cc.date=el.value; cc.picked=true; render(); ccSave(); });
   $$("[data-dfinish]",m).forEach(b=>b.onclick=async()=>{ const box=b.closest(".edit"); const dec=$("[name=ddec]",box).value, com=$("[name=dcom]",box).value.trim(); if(!confirm("Finish the IM review of "+doc.wr+": "+dec+"? The facilitator gets the decision.")) return; b.disabled=true; try{ await finish(doc,{dec,com,by:S.me.name||S.me.email,at:new Date().toISOString()}); }catch(e){ return finErr(e,b); } celebrate(); render(); });
 }
+/* Back and Forward (CN-033, Nov 25, 2026): every page and every opened submission has its own address (#/decided, #/review/<id>),
+   so the browser already makes each one a history step and Back returns to it. Do NOT load /assets/back.js here: it would add a
+   second step per click and Back would need pressing twice. IM Review has no right-hand panels or drawers for Back to close. */
 document.addEventListener("click",e=>{ const b=e.target.closest(".hq nav button[data-hq]"); if(!b) return; const v=b.dataset.hq; location.hash=v==="waiting"?"#/":"#/"+v; });
 window.addEventListener("hashchange",()=>{ S.edit=null; S.focus=-1; const r=route(); if(r.view==="review") S.filter=String(r.rep||"").charAt(0)==="h"?"changed":"look"; window.scrollTo(0,0); render(); });
 setInterval(async()=>{ if(document.hidden||route().view==="review") return; await refreshQueue(); render(); },60000);
