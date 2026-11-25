@@ -30,6 +30,9 @@ for (const p of ['mms/index.html']) { const head = (read(p).match(/<head>([\s\S]
 const { chromium } = createRequire(process.cwd() + '/')('playwright');
 const RELAY = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws';
 const docs = { tickets: { 'tickets/WR2026_90': { id: 'WR2026_90', wr: 'WR2026_90', uid: 'WR2026_90', name: 'Sample Work Request', workgroup: 'Sample CoP', facilitator: 'Kellie Stoll', workType: 'Initiative', reqType: 'New', stage: 'work', state: 'active', stageSince: '2026-10-01', dates: { submitted: '2026-09-01' }, history: [] } } };
+/* the shared Back button (CN-033): served from the live copy, as the MMS loads it */
+let BACKJS = ''; try { const r = await fetch('https://resources.mismo.org/assets/back.js', { cache: 'no-store' }); if (r.ok) BACKJS = await r.text(); } catch (e) {}
+BACKJS ? pass('got the live /assets/back.js') : fail('could not get the live /assets/back.js');
 const browser = await chromium.launch(); const page = await browser.newPage(); const errs = [];
 page.on('pageerror', e => errs.push(e.message)); page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource/.test(m.text())) errs.push(m.text()); });
 await page.route('**/*', async r => { const u = new URL(r.request().url());
@@ -40,6 +43,7 @@ await page.route('**/*', async r => { const u = new URL(r.request().url());
   if (u.host === 'resources.mismo.org') {
     if (u.pathname === '/mms/' || u.pathname === '/mms/index.html') return r.fulfill({ contentType: 'text/html', body: read('mms/index.html') });
     if (u.pathname === '/mms/mms-door.js') return r.fulfill({ contentType: 'application/javascript', body: read('mms/mms-door.js') });
+    if (u.pathname === '/assets/back.js') return r.fulfill({ contentType: 'application/javascript', body: BACKJS });
     if (u.pathname === '/assets/session.js') return r.fulfill({ contentType: 'application/javascript', body: "window.ResourcesSession={token:()=>'t',current:()=>({name:'Sam Staff',email:'sam@mismo.org'}),role:()=>'admin',canEdit:()=>true,requireAccess:()=>Promise.resolve('admin'),signIn:()=>new Promise(()=>{}),signOut:()=>{},onChange:()=>{}};" });
     return r.fulfill({ status: 404, body: '' }); }
   return r.fulfill({ status: 200, contentType: 'text/plain', body: '' }); });
@@ -50,6 +54,30 @@ opened ? pass('the MMS opens') : fail('the MMS did not finish opening');
 const views = await page.evaluate(() => [...document.querySelectorAll('#nav button[data-hq]')].map(b => b.dataset.hq)).catch(() => []);
 for (const v of views) { await page.evaluate(v => document.querySelector('#nav button[data-hq="' + v + '"]').click(), v); await page.waitForTimeout(300); }
 views.length ? pass(`every screen opened (${views.length})`) : fail('no screens found');
+/* 5) the browser's Back button (CN-033): two menu pages and Back returns to the first, Forward goes again; Back closes an
+   open work request panel and stays on the page; a panel closed with its X leaves no step, so Back goes to the page before */
+if (BACKJS) { try {
+  await page.goto('https://resources.mismo.org/mms/');
+  let ok = false; for (let i = 0; i < 60 && !ok; i++) { ok = await page.evaluate(() => !!(window.__mms && window.__mms.ready && window.MismoBack)).catch(() => false); if (!ok) await page.waitForTimeout(500); }
+  await page.waitForTimeout(1200);
+  const cur = () => page.evaluate(() => { const b = document.querySelector('#nav button[data-hq][aria-current]'); return b ? b.dataset.hq : ''; });
+  const pane = () => page.evaluate(() => !!document.querySelector('#panel.on'));
+  const nav = async v => { await page.click('#nav button[data-hq="' + v + '"]'); await page.waitForTimeout(500); };
+  const back = async () => { await page.goBack({ waitUntil: 'commit' }).catch(() => {}); await page.waitForTimeout(700); };
+  const fwd = async () => { await page.goForward({ waitUntil: 'commit' }).catch(() => {}); await page.waitForTimeout(700); };
+  await nav('board'); await nav('all');
+  await back(); (await cur()) === 'board' ? pass('Back returns to the page before') : fail('Back after two pages shows ' + (await cur()) + ', not board');
+  await fwd(); (await cur()) === 'all' ? pass('Forward goes again') : fail('Forward shows ' + (await cur()) + ', not all');
+  const card = '#main [data-open]';
+  if (await page.$(card)) {
+    await page.click(card, { timeout: 5000 }); await page.waitForTimeout(600);
+    if (!(await pane())) fail('a work request panel did not open');
+    await back(); !(await pane()) && (await cur()) === 'all' ? pass('Back closes the open panel and stays on the page') : fail(`Back with a panel open: panel ${await pane() ? 'still open' : 'closed'}, page ${await cur()}`);
+    await page.click(card, { timeout: 5000 }); await page.waitForTimeout(600);
+    await page.click('#panel #pclose:visible, #panel #pclose2:visible', { timeout: 5000 }); await page.waitForTimeout(700);
+    await back(); !(await pane()) && (await cur()) === 'board' ? pass('a panel closed with its X leaves no step: Back goes to the page before') : fail(`Back after closing a panel with X: page ${await cur()}, panel ${await pane() ? 'open' : 'closed'}`);
+  } else fail('no work request card on All Work to open');
+} catch (e) { fail('the Back button check stopped: ' + e.message); } }
 const blocked = await page.evaluate(() => (window.__mmsErrs || []).map(e => e.msg)).catch(() => []);
 const all = [...new Set([...errs, ...blocked])].filter(m => !/Failed to fetch|NetworkError/.test(m));
 all.length ? fail('errors on the page: ' + all.slice(0, 5).join(' | ')) : pass('no errors on any screen');
