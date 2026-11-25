@@ -1,0 +1,27 @@
+# MBA Accounting Desk Checks (CN-033, Nov 25, 2026). Runs on every save under accounting-desk/ and fails (GitHub emails
+# the person who saved) when a page script doesn't parse or the browser's Back button stops working on the desk.
+# The checks are in accounting-desk/tests/run.js. Details: accounting-desk/DEVELOPING.md.
+name: Accounting Desk Checks
+on:
+  push:
+    paths:
+      - "accounting-desk/**"
+      - ".github/workflows/accounting-desk-checks.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: accounting-desk
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Page scripts parse, the Back button works
+        run: npm test

@@ -1,0 +1,11 @@
+{
+  "name": "accounting-desk",
+  "private": true,
+  "description": "MBA Accounting Desk: the checks that run on every save under accounting-desk/",
+  "scripts": {
+    "test": "node tests/run.js"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

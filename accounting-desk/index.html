@@ -13,6 +13,7 @@
      (relay key cert-completions). Nothing on it saves. -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script src="/assets/session.js"></script>
+<script src="/assets/back.js"></script>
 <style>
 :root{--navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb;
   --ground:#f1f6fa;--surface:#fff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;--border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
@@ -505,8 +506,11 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
   function pane(title, sub, html) {
     $("pane-t").textContent = title; $("pane-s").textContent = sub || ""; $("pane-b").innerHTML = html;
     $("pane").classList.add("on"); $("pane").setAttribute("aria-hidden", "false"); $("pane-x").focus();
+    if (window.MismoBack) MismoBack.check();
   }
-  function closePane() { $("pane").classList.remove("on"); $("pane").setAttribute("aria-hidden", "true"); }
+  function closePane() { $("pane").classList.remove("on"); $("pane").setAttribute("aria-hidden", "true"); if (window.MismoBack) MismoBack.check(); }
+  /* the browser's Back button (shared /assets/back.js, CN-033): Back closes the open details panel first, as its X does */
+  if (window.MismoBack) MismoBack.layer({ isOpen: function () { return $("pane").classList.contains("on"); }, close: function () { closePane(); } });
   function kv(pairs) { return '<div class="kv">' + pairs.filter(function (p) { return p[1] !== "" && p[1] != null; }).map(function (p) { return "<div>" + esc(p[0]) + "</div><div>" + esc(p[1]) + "</div>"; }).join("") + "</div>"; }
   function sect(t, inner) { return '<div class="sect"><h3>' + esc(t) + "</h3>" + inner + "</div>"; }
 
@@ -1232,6 +1236,7 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
       "<h2>New and Renewing Members</h2><p>New members and 2027 renewals from Member 360, by month, with the payments MISMO holds for each and its membership term (when it starts and ends, and whether it is a dues deal). Pick a month or a year, or choose All Time and search.</p>" +
       "<h2>Receivables</h2><p>Your AR aging as MISMO reads it. Each morning MISMO checks every item against the Aptify payments. An item paid since your report shows as Paid. When something is still owed, the list opens on the open items. Once Aptify's Monday workbook carries each order's status and balance, this becomes what is still owed on Aptify's own orders (every order Shipped with a balance over $0), and the AR aging is no longer needed. Pick the month or year an item was invoiced at the top, or All Time (the default); the tiles then add up only what was invoiced in it.</p>" +
       "<h2>Sponsorships</h2><p>Every summit, AI webinar and workgroup sponsorship MISMO has been paid for, for accrual: the sponsor, what it is, the Aptify order, what was paid and when, and when it is earned. A summit sponsorship is earned in the month the summit is held (the month it ends, if it runs into the next), and a series sponsorship is split evenly over that year&rsquo;s three summits. An AI webinar is earned in the month it is held, and MISMO keeps half (MBA gets the other half, as Accounting books it). A workgroup sponsorship is earned evenly over the months it runs (the last month takes any leftover cents). The tiles split what is still to earn in two: what is left on sponsorships that are running, and sponsorships paid ahead that have not started yet. Pick a type, or open one to see it month by month and by fiscal year. Workgroup sponsorships ordered in Aptify but not paid yet are listed apart. Summit dates come from MISMO Money&rsquo;s own summit records; a summit it does not have yet (such as next year&rsquo;s) takes the dates Summit HQ publishes with its agenda, read every morning, or failing that dates MISMO has confirmed. Until a summit&rsquo;s dates are published, its sponsorships say the date is not set yet and count as still to earn. Pick a month or a fiscal year at the top to see only the sponsorships earned in it and how much each earns there (the Earned In column and tile take the place of Earned Through); All Time (the default) shows every one.</p>" +
+      "<h2>The Back Button</h2><p>The browser&rsquo;s Back button goes to the last page you were on and closes an open panel first; it never undoes a change. Forward goes again.</p>" +
       "<h2>When It Is Brought Up to Date</h2><p>Every morning, from MISMO Money, Member 360 and the CMS. Each tab says when its copy was made, and Last Updated at the foot of the left menu, above Dark Mode, shows when the desk was last brought up to date. Download for Excel saves what the list shows, with every page, as a spreadsheet file.</p>";
   }
 

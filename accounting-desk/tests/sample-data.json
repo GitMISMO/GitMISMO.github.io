@@ -1,0 +1,15 @@
+{
+  "accounting-desk/close.json": {
+    "writtenAt": "2026-11-25T12:45:00Z",
+    "months": [
+      { "month": "2026-10", "label": "October 2026", "ended": true, "complete": false, "line": "October 2026: waiting on Accounting.",
+        "steps": [ { "label": "Monthly Summary", "who": "MISMO", "state": "done", "say": "Sent", "by": "Jonna", "note": "" },
+                   { "label": "Admin Expense", "who": "Accounting", "state": "waiting", "say": "Waiting", "by": "", "note": "" } ],
+        "summary": null },
+      { "month": "2026-09", "label": "September 2026", "ended": true, "complete": true, "line": "September 2026: closed.",
+        "steps": [ { "label": "Monthly Summary", "who": "MISMO", "state": "done", "say": "Sent", "by": "Jonna", "note": "" },
+                   { "label": "Admin Expense", "who": "Accounting", "state": "done", "say": "Sent", "by": "Kathryn", "note": "" } ],
+        "summary": null }
+    ]
+  }
+}
