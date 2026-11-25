@@ -40,7 +40,8 @@ see **Edit in Team HQ**, which opens /team-hq/?page=systems.
 Relay key `connected-systems` in `_internal/projects.json`: repo GitMISMO/connected-systems-data, `readable:
 ["data/"]`, `writable: []`. That repository holds nothing but the copy, so the key reaches nothing else. People &
 Access: the Connected Systems row in `assets/tools.json` (View is enough). It is not in Team HQ's `also` yet (CN-027:
-People & Access would take it from people who have it on its own), so Team HQ people are given it separately.
+People & Access would take it from people who have it on its own), so Team HQ people are given it separately. Jonna
+(Nov 24, 2026, CN-028): People & Access gives staff full access to every system, so this only matters for non-staff.
 
 ## Safety Net
 
