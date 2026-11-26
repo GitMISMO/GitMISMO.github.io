@@ -2184,7 +2184,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-26T01:09:54Z',fp:'4045e85d'};
+window.__mmsBuild={at:'2026-11-26T01:13:28Z',fp:'248c091e'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7431,7 +7431,9 @@ async function pqNote(t,text){ try{ const x=clone(S.tickets[t.id]||t); hist(x,te
 async function pqSweep(io){ io=io||{}; const AU=io.awgUpdate||awgUpdate, IU=io.imrUpdate||imrUpdate, RG=io.rGet||rGet; /* io: stand-ins for tests */
   const rep={awg:[],im:[],why:''};
   if(S.mode!=='relay'||!S.ready||!S.isStaff||!S.canWrite||S.viewAs||S.partial){ rep.why='not a staff page that can save'; return rep; }
-  if(!io.force&&Date.now()-pqSwept<10*60000){ rep.why='ran in the last 10 minutes'; return rep; } pqSwept=Date.now();
+  if(!io.force&&Date.now()-pqSwept<10*60000){ rep.why='ran in the last 10 minutes'; return rep; }
+  /* not until AWG Review's list has been read (a sync that returned early left it empty, and the sweep then waited 10 minutes) */
+  if(!Object.keys(S.awgPortalQ||{}).length){ rep.why='AWG Review not read yet'; return rep; } pqSwept=Date.now();
   const tk=it=>S.tickets[it.ticket]||allTickets().find(x=>x.wr===it.wr);
   /* AWG Review: on the agenda (waiting or carried) */
   try{ const Q=S.awgPortalQ||{}; const gone=Object.values(Q).filter(it=>it&&(it.status==='awaiting'||it.status==='carried')&&!it.hist&&!it.test&&pqGone(tk(it),'awg',it.at||it.sentAt));
