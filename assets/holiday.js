@@ -150,7 +150,11 @@
       });
     }
     requestAnimationFrame(function () { fit(h, found.logo, host); unclip(h); swing(h, first); });
-    window.addEventListener('resize', function () { fit(h, found.logo, host); });
+    /* mastheads can shift as fonts and pages finish loading: the hat follows the logo */
+    var refit = function () { fit(h, found.logo, host); };
+    window.addEventListener('resize', refit);
+    try { new ResizeObserver(refit).observe(found.logo); new ResizeObserver(refit).observe(host); } catch (e) {}
+    [400, 1200, 3000, 6000].forEach(function (ms) { setTimeout(refit, ms); });
     return true;
   }
 
@@ -198,7 +202,7 @@
     css();
     var tries = 0;
     /* apps draw their masthead after sign-in or after loading: keep looking for a little while */
-    (function place() { if (!hat(first) && tries++ < 60) setTimeout(place, 500); })();
+    (function place() { if (!hat(first) && tries++ < 360) setTimeout(place, 500); })();   /* up to 3 minutes */
     setTimeout(snow, 700);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
