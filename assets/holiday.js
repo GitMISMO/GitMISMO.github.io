@@ -55,7 +55,7 @@
       '.mismo-hat-host{position:relative!important;overflow:visible!important}' +
       '.mismo-hat-host .santa{display:none!important}' +
       '.mismo-hat-host .mismo-hat{position:absolute!important;display:block!important;pointer-events:none;' +
-      'right:auto!important;transform:rotate(20deg);transform-origin:32% 82%;z-index:2;overflow:visible;' +
+      'right:auto!important;transform:rotate(7deg);transform-origin:32.5% 80%;z-index:2;overflow:visible;' +
       'filter:drop-shadow(0 1px 1.5px rgba(13,49,76,.38))}' +
       /* the snow */
       '.mismo-snow{position:fixed;inset:0;pointer-events:none;z-index:2147483000;overflow:hidden}' +
@@ -74,18 +74,20 @@
   }
 
   /* the O is the last letter of the lockup: 556 to 708 across its 708 x 108 drawing. The hat is as
-     big as reads well (its brim about the width of the O), the brim on the O's top-right like a hat on
-     a head, the tail and bobble hanging off to the right. Its tip may run off the top of the window;
+     big as reads well: its brim a little wider than the O and resting over the O's top edge, like a
+     hat on a head, tipped slightly right, the tail and bobble draping down the right side. Its tip may run off the top of the window;
      that's fine (Jonna, Nov 26, 2026). */
   function fit(h, logo, host) {
     var L = logo.getBoundingClientRect(), P = host.getBoundingClientRect();
     if (!L.width) return;
     var oLeft = L.left + L.width * 556 / 708, oWidth = L.width * 152 / 708;
-    var hgt = Math.max(30, Math.min(78, oWidth * 1.6)), wid = hgt * 1.2;
+    /* brim (45% of the drawing's width) a little wider than the O */
+    var wid = Math.max(40, Math.min(110, oWidth * 1.12 / 0.45)), hgt = wid / 1.2;
     var set = function (k, v) { h.style.setProperty(k, v, 'important'); };
     set('width', wid + 'px'); set('height', hgt + 'px');
-    set('left', (oLeft - P.left + oWidth * 0.66 - wid * 0.325) + 'px');
-    set('top', (L.top - P.top + L.height * 0.30 - hgt * 0.82) + 'px');
+    /* brim centred just right of the O's middle, its lower edge resting over the top of the O */
+    set('left', (oLeft - P.left + oWidth * 0.56 - wid * 0.325) + 'px');
+    set('top', (L.top - P.top + L.height * 0.2 - hgt * 0.83) + 'px');
   }
 
   /* a container that would clip the hat inside the masthead lets it show (the window's top edge may
