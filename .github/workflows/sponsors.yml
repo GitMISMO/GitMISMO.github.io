@@ -3,13 +3,15 @@ name: Summit Sponsor Feed (Summit pages)
 # Reads the Sponsorship Portal records and updates sponsors/winter-2027.json, spring-2027.json and fall-2027.json.
 # The Summit home, Sponsors and Agenda pages read that file, so a sponsor approved
 # in the Portal shows up on the website within a couple of minutes once the Portal sends the
-# sponsor-data-changed signal (repository_dispatch); the hourly schedule stays as a backup.
+# sponsor-data-changed signal (repository_dispatch). Without that signal's key (CN-022), the schedule
+# below checks every 10 minutes through the working day on weekdays (Jonna, Nov 25, 2026), and the build
+# writes only when something changed, so a sponsor approved in the Portal shows within about 10 minutes.
 # Needs a token that can read GitMISMO/sponsorship-data: SPONSOR_DATA_TOKEN if set,
 # otherwise MMS_DATA_TOKEN.
 
 on:
   schedule:
-    - cron: '17 11-23 * * 1-5'   # weekdays, hourly about 7 AM to 7 PM ET
+    - cron: '*/10 11-23 * * 1-5'  # weekdays, every 10 minutes about 7 AM to 7 PM ET
     - cron: '17 11 * * 0,6'      # weekends, once in the morning
   workflow_dispatch:
   repository_dispatch:
