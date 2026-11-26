@@ -2105,6 +2105,11 @@ p,.sub,.lede{text-wrap:pretty}
 .ss-del[data-sswhy]{opacity:.45;cursor:not-allowed}
 .ss-del[data-sswhy]:hover{border-color:var(--line,#dbe5ee);color:var(--muted,#5b7287)}
 .ss-del:focus-visible{outline:2px solid var(--sky,#74bfeb);outline-offset:1px}
+
+/* Final Files (Nov 25, 2026) */
+.cr-sec .cr-note{margin:0 0 6px;font-size:13px;color:var(--muted,#5b7287)}
+.cr-sec .cr-note b{color:inherit}
+.cr-sec .cr-list{margin:0;padding:0 0 0 18px;font-size:13.5px;display:grid;gap:2px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="/assets/back.js"></script>
@@ -2179,7 +2184,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-25T23:51:43Z',fp:'2623ec39'};
+window.__mmsBuild={at:'2026-11-26T00:16:40Z',fp:'95fa7126'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2419,7 +2424,7 @@ function whoseMove(t){
       return {role:'vps',label:ld,text:t.designation&&(t.designation.auto||t.designation.recommended)?'Designate the license (the MMS has a recommendation)':'Designate the license'}; }
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
     case 'comment': return sub==='setup'?(!(t.cpFile&&t.cpFile.url)?{role:'facilitator',label:'Facilitator',text:'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)'}:{role:'website',label:'Website Admin',text:'Add the Resource Library link: the comment period starts that day'}):(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
-    case 'post': return {role:'facilitator',label:'Facilitator',text:'Report what came back from comment'};
+    case 'post': return {role:'facilitator',label:'Facilitator',text:t.finalFiles?'Report what came back from comment':'Put the license language in the files and Choose the Final Files, then report what came back from comment'};
     case 'gc-publish': return {role:'gov',label:g,text:g+' approval to publish as '+(isStandard(t)?'Candidate Recommendation':'Final')};
     case 'release': return {role:'website',label:'Website Admin',text:'Publish the pages and announcement'};
   }
@@ -3637,7 +3642,7 @@ function wireArch(m){
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
       case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
-      case 'post': return { role: 'facilitator', text: 'Report what came back from comment' };
+      case 'post': return { role: 'facilitator', text: t.finalFiles ? 'Report what came back from comment' : 'Put the license language in the files and Choose the Final Files, then report what came back from comment' };
       case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
       case 'release': return { role: 'website', text: 'Publish the pages and announcement' };
     }
@@ -7531,7 +7536,7 @@ const HELP_TOPICS={
     []],
   comments:['Comment Periods and Comments','facilitator staff website gov',
     'Comment Periods shows what is open for public comment, what just closed and what is approved but not posted yet.',
-    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Before the comment period, put the Comment Period (IPR) boilerplate language in the work product files and add them to the work request’s Files. Then Choose the Files for Comment: tick the files that go out for comment (several files that add up to 20 MB or less are zipped into one download, and the zip is saved to Files too; a bigger set, such as Reference Model artifacts, goes out as separate downloads listed on one download page, up to 95 MB a file). The MMS checks each Word, Excel and PDF file for the Comment Period language first and says which ones don’t have it. Leave the [INSERT DATE] in the Comment Period language as it is: the MMS fills in that day’s date in the Word and Excel files it posts (the files in Files stay as they are). Files over 15 MB, and .xlsb files, are too big for the MMS to open: it lists them so you can check their Comment Period language and type in the date yourself. Posting a big set takes a few minutes; keep the tab open until it says Posted. It posts the file as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a brief description of what the work product is and that it’s in a 30-day comment period, from the work request, its reviews and its files; edit it or keep it. Saving the card is the approval: that text is what the website shows, and the website adds the member and non-member download. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
+    ['Each work request gets a Comment Period Card, the card people see on mismo.org while it is open for comment. From License Designation on, it shows on the Overview. Click Write the Card (or Edit the Card), fill in the title and what the card says, add the non-member download link, then click Save the Card. Before the comment period, put the Comment Period (IPR) boilerplate language in the work product files and add them to the work request’s Files. Then Choose the Files for Comment: tick the files that go out for comment (several files that add up to 20 MB or less are zipped into one download, and the zip is saved to Files too; a bigger set, such as Reference Model artifacts, goes out as separate downloads listed on one download page, up to 95 MB a file). The MMS checks each Word, Excel and PDF file for the Comment Period language first and says which ones don’t have it. Leave the [INSERT DATE] in the Comment Period language as it is: the MMS fills in that day’s date in the Word and Excel files it posts (the files in Files stay as they are). Files over 15 MB, and .xlsb files, are too big for the MMS to open: it lists them so you can check their Comment Period language and type in the date yourself. Posting a big set takes a few minutes; keep the tab open until it says Posted. After the comment period, the Overview has a Final Files section: put the designated license’s boilerplate language in the files (in place of the Comment Period language), add them to Files, then Choose the Final Files. The MMS checks each Word, Excel and PDF file for that license language, marks them Final on the Files tab, and Mark Published posts them as the public files unless you choose other files there. It posts the file as the non-member download, and once Governance has approved it for comment, the Website Admin is emailed (Jonna copied) to make the Resource Library entry and put its link in. Draft with AI writes a brief description of what the work product is and that it’s in a 30-day comment period, from the work request, its reviews and its files; edit it or keep it. Saving the card is the approval: that text is what the website shows, and the website adds the member and non-member download. The Resource Library link and the non-member download fill in on their own when the MMS already has them.',
      'Members click Member Access on the card and open the work product in the Resource Library. They do not use the MMS.',
      'Non-members click Non-Member Access, sign the Proposed (open for comment) license form, and then get the download.',
      'Still needed on the card lists anything missing: the card text, the Resource Library link or the non-member download.',
@@ -8526,6 +8531,67 @@ async function cpfNotice(t){ if(!cpfNeedsNotice(t)||!S.canWrite||!S.isStaff&&!sa
 /* the automatic steps (staff tabs and the MMS Robot) pick up work that reached Comment Period after the file was chosen */
 const _runAutoCPF=runAutomations;
 runAutomations=async function(){ await _runAutoCPF(); try{ for(const t of allTickets()) if(cpfNeedsNotice(t)) await cpfNotice(t); }catch(e){} };
+/* ---------- Final Files: the license language after the comment period (Nov 25, 2026) ----------
+   Meghan was putting the CR IPR (the designated license's boilerplate) into the files after the comment period by
+   hand, adding them to Files and leaving notes to "catch up" (WR2024_19, WR2025_05, WR2026_04). Now, from
+   Post-Comment on, the work request has a Final Files section: the facilitator puts the license language in the
+   files, adds them to Files, then Chooses the Final Files. The MMS checks each Word, Excel and PDF file for the
+   language its license designation calls for (rvExpectedBoiler), says which don't have it, marks the chosen ones
+   Final on the Files tab, and Mark Published posts them as the public files unless other files are chosen there.
+   t.finalFiles = {files:[{n,p,sz}], boiler, at, by, off:[names], unchecked:[names]} */
+const CR_STAGES=['post','gc-publish','release'];
+function crBoiler(t){ const k=typeof rvExpectedBoiler==='function'?rvExpectedBoiler(t):''; return (k&&k!=='comment'&&k!=='draft')?k:''; }
+function crLabel(t){ const k=crBoiler(t); return k?RV_BP_LABEL[k]:'the license designation’s'; }
+function crSection(t){ const F=t.finalFiles, can=cpCanEdit(t), k=crBoiler(t);
+  const list=F&&F.files&&F.files.length?'<ul class="cr-list">'+F.files.map(f=>'<li>'+esc(f.n)+(f.sz?' <span class="muted">· '+esc(f.sz)+'</span>':'')+'</li>').join('')+'</ul>':'';
+  return '<div class="psec full cr-sec"><h4>Final Files<span class="sp muted" style="font-size:12px;font-weight:500">'+(k?esc(RV_BP_LABEL[k])+' license language':'The license language, after the comment period')+'</span>'+
+    (can?'<button type="button" class="btn sm'+(F?'':' pri')+'" data-crfile="'+esc(t.id)+'">'+(F?'Change the Final Files':'Choose the Final Files')+'</button>':'')+'</h4>'+
+    (F?'<p class="cr-note">Chosen '+esc(fmtS(String(F.at||'').slice(0,10)))+(F.by?' by '+esc(F.by):'')+'. Mark Published posts these as the public files.'+((F.off||[]).length?' <b>Without the license language:</b> '+esc(F.off.join(', '))+'.':'')+((F.unchecked||[]).length?' Too big to check here: '+esc(F.unchecked.join(', '))+'.':'')+'</p>'+list
+      :'<p class="cr-note">After the comment period, put the '+(k?esc(RV_BP_LABEL[k])+' ':'license ')+'boilerplate language in the work product files (in place of the Comment Period language), add them to Files, then Choose the Final Files. The MMS checks each file for that language, and Mark Published posts them.</p>')+'</div>'; }
+const _renderPanelFF=renderPanel;
+renderPanel=function(){ _renderPanelFF(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t||!CR_STAGES.includes(t.stage)||t.state==='published') return;
+  const pb=$('.pb',P); if(!pb||$('.cr-sec',pb)) return; const host=$('[data-wtab="over"]',pb); if(!host) return;
+  const w=document.createElement('div'); w.innerHTML=crSection(t); const sec=w.firstChild; const lead=$('.wh-lead-in',host); (lead&&lead.nextSibling)?host.insertBefore(sec,lead.nextSibling):host.appendChild(sec); };
+/* the Files tab marks the chosen ones Final */
+const _ssTagCR=ssTag;
+ssTag=function(n){ const t=S.panel&&S.tickets[S.panel], F=t&&t.finalFiles; if(F&&(F.files||[]).some(f=>f.n===n)) return 'Final'; return _ssTagCR(n); };
+async function crChoose(t){
+  const L=cpfFiles(t); if(!L.length) return toast('No files in this work request’s folder yet. Add the final files on the Files tab first.');
+  const k=crBoiler(t), F0=t.finalFiles, was=new Set(((F0&&F0.files)||[]).map(f=>f.p));
+  const v=await modal({title:'Final Files',text:esc(t.wr)+' · the files that are published, with the '+esc(crLabel(t))+' license language',ok:'Check and Save',
+    body:'<p class="muted" style="margin:0 0 8px;font-size:12.5px">Tick the work product files that will be published. The MMS checks each Word, Excel and PDF file for the '+esc(crLabel(t))+' boilerplate language'+(k?'':' (no license is designated yet, so it checks only that the Comment Period language is gone)')+'. The files stay in Files as they are.</p><div class="rv-src-l">'+L.map((f,i)=>'<label class="rv-src-f"><input type="checkbox" name="crf_'+i+'"'+(was.size?(was.has(f.p)?' checked':''):(i===0?' checked':''))+'><span class="ss-i ss-'+ssKind(f.n)+'">'+ssIc(ssKind(f.n))+'</span><span class="rv-src-n"><b>'+esc(f.n)+'</b><em>'+esc([f.u?fmtS(String(f.u).slice(0,10)):'',f.sz||''].filter(Boolean).join(' · '))+'</em></span></label>').join('')+'</div>'});
+  if(!v) return; const sel=L.filter((f,i)=>v['crf_'+i]===true); if(!sel.length) return toast('Tick at least one file');
+  const off=[], unchecked=[];
+  try{
+    for(const f of sel){ const readable=/\.(docx|xlsx|xlsm|pdf)$/i.test(f.n); if(!readable) continue; const sz=cpfBytes(f);
+      if(sz>CPF_SKIP||(sz>CPF_BIG&&/\.pdf$/i.test(f.n))){ unchecked.push(f.n); continue; }
+      wpSay('Checking the license language in '+f.n+'…'); await cpfBreathe();
+      try{ const file=await rvSrcGet(f), u8=new Uint8Array(await file.arrayBuffer()); const big=u8.length>CPF_BIG;
+        if(u8.length>CPF_SKIP){ unchecked.push(f.n); continue; }
+        const txt=big?await cpfBoilerText(file.name,u8):((await rvReadFile(file)).text||''); const got=rvDetectBoiler(txt);
+        if(k?got!==k:(got==='comment'||got==='draft')) off.push(f.n+': '+(got?'has the '+RV_BP_LABEL[got]+' language':'no MISMO boilerplate found')); }
+      catch(e){ unchecked.push(f.n); } }
+    wpSay('','');
+    sel.filter(f=>/\.xlsb$/i.test(f.n)).forEach(f=>unchecked.push(f.n));
+    if(off.length||unchecked.length){ const go=await modal({title:off.length?'License Language Missing':'Check These Yourself',text:esc(t.wr),ok:off.length?'Save Anyway':'Save',body:
+      (off.length?'<p style="margin:0 0 6px">These files don’t have the '+esc(crLabel(t))+' license language yet:</p><ul style="margin:0 0 8px 18px">'+off.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')+
+      (unchecked.length?'<p style="margin:0 0 6px">The MMS couldn’t open '+(unchecked.length===1?'this file':'these files')+', so make sure the '+esc(crLabel(t))+' language is in '+(unchecked.length===1?'it':'them')+':</p><ul style="margin:0 0 8px 18px">'+unchecked.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')+
+      '<p class="muted" style="margin:0;font-size:12.5px">To fix a file, update it (How To - MISMO Work Product Boilerplate Language and Guidance), add it to Files again and choose it.</p>'}); if(!go) return; }
+    const x=clone(S.tickets[t.id]||t), b=clone(x); x.finalFiles={files:sel.map(f=>({n:f.n,p:f.p,sz:f.sz||''})),boiler:k,at:new Date().toISOString(),by:(S.me&&S.me.name)||'',off:off.map(s=>s.split(':')[0]),unchecked};
+    hist(x,'Final files chosen ('+(k?RV_BP_LABEL[k]+' license language':'license language')+'): '+sel.map(f=>f.n).join(', ')+(off.length?'; without the license language: '+off.map(s=>s.split(':')[0]).join(', '):'')+(unchecked.length?'; too big to check here: '+unchecked.join(', '):''));
+    await saveTicket(x,'Final files saved',b);
+  }catch(e){ wpSay('The final files weren’t saved ('+e.message+').','bad'); } }
+document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-crfile]'); if(!b) return; e.preventDefault(); if(S.viewAs) return; const t=S.tickets[b.dataset.crfile]; if(t) crChoose(t); });
+/* Mark Published: the Final Files are the public files unless other files are chosen there */
+const _wpFormCR=wpForm;
+wpForm=function(t){ const h=_wpFormCR(t), F=t.finalFiles; if(!F||!(F.files||[]).length) return h;
+  return h.replace('Each 100 MB or less. Keep this tab open while they upload.','Leave this empty to post the Final Files ('+esc(F.files.map(f=>f.n).join(', '))+'), or choose other files. Each 100 MB or less. Keep this tab open while they upload.'); };
+const _wpQueueCR=wpQueue;
+wpQueue=async function(t,v,files){ const F=(S.tickets[t.id]||t).finalFiles;
+  if(!(files||[]).filter(Boolean).length&&F&&(F.files||[]).length&&!v.wpmo&&!t.practice){ const got=[];
+    for(const f of F.files){ wpSay('Getting '+f.n+' from the work request’s files…'); try{ const file=await rvSrcGet(f); got.push(new File([await file.arrayBuffer()],f.n,{type:file.type})); }catch(e){ toast('Couldn’t get '+f.n+' from Files ('+e.message+')'); } }
+    wpSay('',''); files=got; }
+  return _wpQueueCR(t,v,files); };
 /* ---------- The comment period starts when the Resource Library link is added (Nov 22, 2026) ----------
    Jonna: when the Website Admin (Vanessa) gives the work request its Resource Library link, the comment
    period opens that day on its own: the 30-day timer starts (the process's comment days), it goes on the
