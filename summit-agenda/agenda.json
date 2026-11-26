@@ -1,7 +1,7 @@
 {
- "updated": "2026-11-25T21:32:31.783Z",
+ "updated": "2026-11-26T16:14:58.038Z",
  "source": "Summit HQ",
- "sourceUpdated": "2026-11-25T21:31:01.796Z",
+ "sourceUpdated": "2026-11-26T16:13:18.229Z",
  "summits": {
   "nola": {
    "name": "2027 Winter Summit",
@@ -98,7 +98,7 @@
         "company": "Urban Institute",
         "role": "Speaker",
         "bio": "",
-        "photo": ""
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-linna-e7357c7a.webp"
        }
       ]
      },
@@ -176,7 +176,7 @@
         "company": "Fannie Mae",
         "role": "Speaker",
         "bio": "",
-        "photo": ""
+        "photo": "https://resources.mismo.org/summit-agenda/photos/photo-sandro-barchitta-d802498e.webp"
        }
       ]
      },
