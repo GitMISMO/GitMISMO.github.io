@@ -4,8 +4,8 @@
    <script src="/assets/holiday.js" defer></script>, where a page doesn't load session.js).
 
    December 1 to 31, on the person's own clock, with no upkeep:
-   - A big santa hat sits on the top-right of the O of MISMO in the masthead logo, like a hat on a
-     head. Pages that already carry the brand standard's hat (.santa) have it swapped for this one.
+   - A santa hat with a long tail sits on the top-right of the O of MISMO in the masthead logo, like
+     a hat on a head. Pages that already carry the brand standard's hat (.santa) have it swapped for this one.
      The logo itself is never touched.
    - The first time a tool is opened in a browser session, the bobble on the end of the hat swings and
      settles, and a handful of snowflakes drift gently down the page for a few seconds and are gone.
@@ -29,19 +29,20 @@
   if (!on) return;
 
   var NS = 'http://www.w3.org/2000/svg';
-  /* The hat: the brand standard's shape (#mismo-hat), dressed up for December: a deep red with a soft
-     highlight, a fluffy white brim and a fluffy bobble, which sits in a group of its own so it can swing. */
+  /* The hat, drawn for December: low and wide, with a long tail that droops to the right and a fluffy
+     bobble hanging off its end. The bobble sits in a group of its own so it can swing. Drawn on a
+     120 x 100 grid: brim 12 to 66 across, 70 to 88 down; the tail ends at 103,63. */
   var HAT = '<defs>' +
     '<linearGradient id="mh-red" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e5493d"/><stop offset=".55" stop-color="#c0392f"/><stop offset="1" stop-color="#8e2620"/></linearGradient>' +
     '<radialGradient id="mh-fur" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#f4f7fa"/><stop offset="1" stop-color="#d9e4ec"/></radialGradient>' +
     '</defs>' +
-    '<path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41 C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="url(#mh-red)"/>' +
-    '<path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z" fill="#0d314c" opacity=".14"/>' +
-    '<path d="M44,14 C58,9 70,13 77,23" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>' +
-    '<g fill="url(#mh-fur)"><rect x="10" y="64" width="56" height="22" rx="11"/><circle cx="15" cy="66" r="4.4"/><circle cx="22" cy="66" r="4.4"/><circle cx="29" cy="66" r="4.4"/><circle cx="36" cy="66" r="4.4"/><circle cx="43" cy="66" r="4.4"/><circle cx="50" cy="66" r="4.4"/><circle cx="57" cy="66" r="4.4"/><circle cx="62" cy="66" r="4.4"/><circle cx="15" cy="84" r="4.4"/><circle cx="22" cy="84" r="4.4"/><circle cx="29" cy="84" r="4.4"/><circle cx="36" cy="84" r="4.4"/><circle cx="43" cy="84" r="4.4"/><circle cx="50" cy="84" r="4.4"/><circle cx="57" cy="84" r="4.4"/><circle cx="62" cy="84" r="4.4"/></g>' +
-    '<rect x="12" y="76" width="52" height="9" rx="4.5" fill="#0d314c" opacity=".06"/>' +
-    '<g class="mismo-bobble" style="transform-box:view-box;transform-origin:80px 34px"><g fill="url(#mh-fur)"><circle cx="94.2" cy="47.0" r="4.6"/><circle cx="91.8" cy="52.8" r="4.6"/><circle cx="86.0" cy="55.2" r="4.6"/><circle cx="80.2" cy="52.8" r="4.6"/><circle cx="77.8" cy="47.0" r="4.6"/><circle cx="80.2" cy="41.2" r="4.6"/><circle cx="86.0" cy="38.8" r="4.6"/><circle cx="91.8" cy="41.2" r="4.6"/><circle cx="86" cy="47" r="10"/></g>' +
-    '<circle cx="82.5" cy="43" r="3" fill="#ffffff" opacity=".9"/></g>';
+    '<path d="M16,76 C12,58 22,42 44,36 C62,31 82,34 94,44 C100,49 104,56 103,63 C100,66 96,64 95,60 C92,52 84,47 74,47 C66,47 61,58 60,76 Z" fill="url(#mh-red)"/>' +
+    '<path d="M16,76 C12,58 22,42 44,36 C48,35 52,35 55,35 C38,44 30,58 30,76 Z" fill="#0d314c" opacity=".14"/>' +
+    '<path d="M42,40 C57,35 74,36 87,43" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="2.6" stroke-linecap="round"/>' +
+    '<g fill="url(#mh-fur)"><rect x="12" y="70" width="54" height="18" rx="9"/><circle cx="16" cy="71.5" r="4"/><circle cx="23" cy="71.5" r="4"/><circle cx="30" cy="71.5" r="4"/><circle cx="37" cy="71.5" r="4"/><circle cx="44" cy="71.5" r="4"/><circle cx="51" cy="71.5" r="4"/><circle cx="58" cy="71.5" r="4"/><circle cx="63" cy="71.5" r="4"/><circle cx="16" cy="86.5" r="4"/><circle cx="23" cy="86.5" r="4"/><circle cx="30" cy="86.5" r="4"/><circle cx="37" cy="86.5" r="4"/><circle cx="44" cy="86.5" r="4"/><circle cx="51" cy="86.5" r="4"/><circle cx="58" cy="86.5" r="4"/><circle cx="63" cy="86.5" r="4"/></g>' +
+    '<rect x="14" y="80" width="50" height="7" rx="3.5" fill="#0d314c" opacity=".06"/>' +
+    '<g class="mismo-bobble" style="transform-box:view-box;transform-origin:101px 61px"><g fill="url(#mh-fur)"><circle cx="111.0" cy="73.0" r="4"/><circle cx="108.9" cy="77.9" r="4"/><circle cx="104.0" cy="80.0" r="4"/><circle cx="99.1" cy="77.9" r="4"/><circle cx="97.0" cy="73.0" r="4"/><circle cx="99.1" cy="68.1" r="4"/><circle cx="104.0" cy="66.0" r="4"/><circle cx="108.9" cy="68.1" r="4"/><circle cx="104" cy="73" r="8.5"/></g>' +
+    '<circle cx="101" cy="70" r="2.4" fill="#ffffff" opacity=".9"/></g>';
 
   function css() {
     if (document.getElementById('mismo-holiday-css')) return;
@@ -53,7 +54,7 @@
       '.mismo-hat-host{position:relative!important;overflow:visible!important}' +
       '.mismo-hat-host .santa{display:none!important}' +
       '.mismo-hat-host .mismo-hat{position:absolute!important;display:block!important;pointer-events:none;' +
-      'right:auto!important;transform:rotate(18deg);transform-origin:38% 75%;z-index:2;overflow:visible;' +
+      'right:auto!important;transform:rotate(12deg);transform-origin:32% 80%;z-index:2;overflow:visible;' +
       'filter:drop-shadow(0 1px 1.5px rgba(13,49,76,.3))}' +
       /* the snow */
       '.mismo-snow{position:fixed;inset:0;pointer-events:none;z-index:2147483000;overflow:hidden}' +
@@ -72,17 +73,18 @@
   }
 
   /* the O is the last letter of the lockup: 556 to 708 across its 708 x 108 drawing. The hat is as
-     big as it can be (about one and a half O's), its brim on the O's top-right like a hat on a head.
-     Its tip may run off the top of the window; that's fine (Jonna, Nov 26, 2026). */
+     big as reads well (its brim about the width of the O), the brim on the O's top-right like a hat on
+     a head, the tail and bobble hanging off to the right. Its tip may run off the top of the window;
+     that's fine (Jonna, Nov 26, 2026). */
   function fit(h, logo, host) {
     var L = logo.getBoundingClientRect(), P = host.getBoundingClientRect();
     if (!L.width) return;
     var oLeft = L.left + L.width * 556 / 708, oWidth = L.width * 152 / 708;
-    var size = Math.max(30, Math.min(72, oWidth * 1.55));
+    var hgt = Math.max(26, Math.min(64, oWidth * 1.3)), wid = hgt * 1.2;
     var set = function (k, v) { h.style.setProperty(k, v, 'important'); };
-    set('width', size + 'px'); set('height', size + 'px');
-    set('left', (oLeft - P.left + oWidth * 0.62 - size * 0.38) + 'px');
-    set('top', (L.top - P.top + L.height * 0.22 - size * 0.80) + 'px');
+    set('width', wid + 'px'); set('height', hgt + 'px');
+    set('left', (oLeft - P.left + oWidth * 0.62 - wid * 0.325) + 'px');
+    set('top', (L.top - P.top + L.height * 0.24 - hgt * 0.84) + 'px');
   }
 
   /* a container that would clip the hat inside the masthead lets it show (the window's top edge may
@@ -119,7 +121,7 @@
     if (!h) {
       h = document.createElementNS(NS, 'svg');
       h.setAttribute('class', 'mismo-hat');
-      h.setAttribute('viewBox', '0 0 100 100');
+      h.setAttribute('viewBox', '0 0 120 100');
       h.setAttribute('aria-hidden', 'true');
       h.setAttribute('focusable', 'false');
       h.innerHTML = HAT;
