@@ -19,7 +19,7 @@
   --ground:#f1f6fa;--surface:#fff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;--border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
   --ink:#0d314c;--ink-2:#456179;--ink-3:#7794aa;--good:#0f7b5c;--bad:#b3372c;--warn:#a2701a;--accent-soft:#e4f2fb;--btn:#0d314c;--btn-ink:#fff;
   --display:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--ui:var(--display);--mono:var(--display);
-  --hq-h:64px;--rail-w:240px;--rail-mini:62px;color-scheme:light}
+  --hq-h:68px;--rail-w:240px;--rail-mini:62px;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#123143;--border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;--ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;--good:#4fc79b;--bad:#f08579;--warn:#e0a83c;--accent-soft:#173c52;--btn:#74bfeb;--btn-ink:#06202f;color-scheme:dark}}
 :root[data-theme="dark"]{--ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#123143;--border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;--ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;--good:#4fc79b;--bad:#f08579;--warn:#e0a83c;--accent-soft:#173c52;--btn:#74bfeb;--btn-ink:#06202f;color-scheme:dark}
 *{box-sizing:border-box}
@@ -28,17 +28,18 @@ body{background:var(--ground);color:var(--ink);font-family:var(--display);font-v
 button,input,select,textarea{font-family:inherit}
 
 /* ===== the masthead and rail, copied from Summit HQ (mismo-left-nav) ===== */
-.hqtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:97;height:var(--hq-h);background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;padding:0 22px;box-shadow:0 1px 0 rgba(80,164,219,.28);margin-left:calc(0px - var(--rail-w));width:calc(100% + var(--rail-w));transition:margin-left .2s cubic-bezier(.4,0,.2,1),width .2s cubic-bezier(.4,0,.2,1)}
+.hqtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:97;height:var(--hq-h);background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;padding:13px 22px;box-shadow:0 1px 0 rgba(80,164,219,.28);margin-left:calc(0px - var(--rail-w));width:calc(100% + var(--rail-w));transition:margin-left .2s cubic-bezier(.4,0,.2,1),width .2s cubic-bezier(.4,0,.2,1)}
 body.railmini .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}
-.hqtop .mastrule{display:block;width:2px;height:34px;flex:0 0 auto;margin-inline:20px;border-radius:1px;background:var(--sky)}
-.hqtop .hqname{font-family:var(--display);font-size:15.5px;font-weight:700;letter-spacing:-.005em;color:var(--sky);white-space:nowrap}
-.hqtop-r{margin-left:auto;display:flex;align-items:center;gap:13px}
+.hqtop .mastrule{display:block;width:1px;height:42px;flex:0 0 auto;margin-inline:14px;background:rgba(80,164,219,.4)}
+.hqtop .hqname{font-family:var(--display);font-size:16px;font-weight:500;color:#94c8e9;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.hqtop-r{margin-left:auto;padding-left:13px;flex:0 0 auto;display:flex;align-items:center;gap:13px}
 .hqtop .eyebrow-m{font-family:var(--display);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
 @media(max-width:700px){.hqtop .eyebrow-m{display:none}}
-.logoplate{background:#fff;border-radius:7px;padding:8px 14px;display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative}
+/* the masthead matches Certification Management's exactly (CN-053, Nov 26, 2026): 68px bar, logo box 9px 13px */
+.logoplate{background:#fff;border-radius:5px;padding:9px 13px;box-shadow:0 1px 0 rgba(80,164,219,.35);display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative}
 .logoplate .wordmark{height:24px;width:auto;display:block}
-.santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
-html[data-season="december"] .santa{display:block}
+/* on a phone, the same small masthead Certification Management uses (62px bar, logo 19px) */
+@media(max-width:560px){:root{--hq-h:62px}.hqtop{padding:11px 16px}.hqtop .mastrule{height:40px;margin-inline:11px}.logoplate{padding:7px 10px}.logoplate .wordmark{height:19px}.hqtop .hqname{font-size:13px}.hqtop-r{padding-left:11px;gap:10px}}
 #rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
 #rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
 /* stand-in for the shared sign-in chip in this preview only (session.js draws the real one) */
@@ -303,7 +304,7 @@ tfoot td{font-weight:700;background:var(--surface-2);border-top:2px solid var(--
 .split{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:24px;align-items:start}
 .ovcol{display:flex;flex-direction:column;gap:14px;min-width:0}
 @media(max-width:900px){.split{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:700px){.hqtop{padding:0 12px}.hqtop .mastrule{margin-inline:10px}.hqtop .hqname{overflow:hidden;text-overflow:ellipsis;min-width:0;flex:1 1 auto}.hero{padding:18px 16px}.find{width:100%}.bar .fld{flex:1 1 100%}}
+@media(max-width:700px){.hqtop .hqname{flex:1 1 auto}.hero{padding:18px 16px}.find{width:100%}.bar .fld{flex:1 1 100%}}
 /* an invoice's PDF, inside the panel */
 .btn.ghost{background:var(--surface);color:var(--navy);border-color:var(--border-strong,#adc4d6)}
 .pdfbar{display:flex;gap:12px;flex-wrap:wrap;padding:10px 14px 14px}
@@ -345,11 +346,10 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
 
-<symbol id="mismo-hat" viewBox="0 0 100 100"><path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41 C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/><path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z" fill="#0d314c" opacity=".17"/><rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/><rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/><circle cx="86" cy="45" r="11.5" fill="#ffffff"/></symbol>
 </defs></svg>
 
 <header class="hqtop">
-  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg><svg class="santa" viewBox="0 0 100 100" aria-hidden="true"><use href="#mismo-hat"/></svg></span>
+  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
   <span class="mastrule"></span>
   <span class="hqname">MBA Accounting Desk</span>
   <span class="hqtop-r"><span class="eyebrow-m">Programs &amp; Operations</span>
@@ -1274,7 +1274,6 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
     })["catch"](function (e) { console.error("desk", e); });
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();
-  if (new Date().getMonth() === 11) document.documentElement.setAttribute("data-season", "december");
 
   /* the rail search's sources (see gather below) */
   window.__deskFind = function (t, push, go) {

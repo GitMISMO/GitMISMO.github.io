@@ -36,3 +36,13 @@ panel (`#pane`) is registered with `MismoBack.layer`, so Back closes it first, e
 `closePane()` call `MismoBack.check()` so a panel opened from the search counts too. Never copy `back.js` here or add
 `history.pushState`. The desk's own `history.replaceState(null, "", "#tab")` stays (it keeps the page in the address so
 a reload reopens it); back.js keeps its note on the entry when it runs.
+
+## The Masthead (CN-053, Nov 26, 2026)
+
+The masthead (`.hqtop`) matches Certification Management's (resources.mismo.org/cms/) exactly, so the MISMO logo
+sits in the same spot in every tool: a 68px navy bar (`--hq-h`, padding 13px 22px, a 1px sky line along its foot),
+the white logo box at 9px 13px with 5px corners and a sky line under it, the logo 24px tall, 14px gaps, a 1px x 42px
+divider and the name at 16px/500 in #94c8e9. At 560px and narrower it uses CMS's phone size: a 62px bar (padding
+11px 16px), logo box 7px 10px, logo 19px, name 13px. The rail and the details panel take their top from `--hq-h`, so
+change the bar's height only there. The old December hat (`.santa`, `#mismo-hat`, `data-season`) is gone; don't add it
+back: the shared `/assets/holiday.js` does December for every tool.
