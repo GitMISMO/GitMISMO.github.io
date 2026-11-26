@@ -1067,7 +1067,7 @@
    ============================================================================ */
 (function () {
   try {
-    var preview = /[?&]holiday=preview\b/.test(location.search) || localStorage.getItem('mismo.holiday') === 'preview';
+    var preview = /[?&]holiday=(preview|sleigh)\b/.test(location.search) || localStorage.getItem('mismo.holiday') === 'preview';
     if (new Date().getMonth() !== 11 && !preview) return;
     var tries = 0;
     (function go() {
