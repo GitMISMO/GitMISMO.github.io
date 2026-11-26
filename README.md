@@ -34,6 +34,18 @@ who fetches one URL.
 | `assets/tools.json` | Every tool with its own access. The admin panel's People & Access and every account menu read this one list, so a tool added here appears in both. |
 | `_internal/projects.json` | The save relay's project list. The Lambda reads this file, so adding a tool that saves is a commit here rather than an AWS change. |
 
+## The masthead (CN-053, Nov 26, 2026)
+
+The internal pages here with the navy bar (the home page `index.html`, `help.html`, `signature.html` and
+`reset-password.html`) use Certification Management's masthead exactly, so the MISMO logo sits in the same spot in
+every tool: a 68px navy bar (#0d314c) with a 1px line along its foot (box-shadow 0 1px 0 rgba(80,164,219,.28)), 22px
+in from the left; the white logo box (9px 13px padding, 5px corners, box-shadow 0 1px 0 rgba(80,164,219,.35)) with the
+logo 24px tall and 157px wide; 14px gaps between the box, a 1px divider 42px tall in rgba(80,164,219,.4), and the page
+name at 16px, weight 500, #94c8e9. The right-hand group (Help, dark mode, sign-in chip) is unchanged. Public forms
+(`forms/`) and the applicant portal (`portal/`) keep the shared website header. The older December hat (`.santa`,
+`#mismo-hat`, `html[data-season="december"]` rules and the `season()` script) is retired everywhere here;
+`assets/holiday.js` does December now.
+
 ## Editing the home page
 
 Everything renders from the `APPS` array in `index.html`. Adding a tool is one object —

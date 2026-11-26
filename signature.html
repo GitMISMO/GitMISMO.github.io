@@ -42,10 +42,11 @@
   :focus-visible{ outline:2px solid var(--sky); outline-offset:2px; border-radius:6px }
   svg.i{ width:1em; height:1em; flex:0 0 auto; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round }
   .vh{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap }
-  .top{ position:sticky; top:0; z-index:20; height:64px; padding:0 22px; background:#0f314c; color:#fff; display:flex; align-items:center; box-shadow:0 1px 0 rgba(80,164,219,.28) }
-  .plate{ background:#fff; border-radius:5px; padding:9px 13px; line-height:0 } .plate svg{ height:24px; width:auto }
-  .rule{ width:2px; height:34px; margin:0 20px; border-radius:1px; background:#50a4db }
-  .brand{ font-size:15.5px; font-weight:700; color:#50a4db }
+  /* masthead: Certification Management's exactly, so the logo sits in the same spot in every tool (CN-053, Nov 26, 2026) */
+  .top{ position:sticky; top:0; z-index:20; height:68px; padding:0 22px; background:#0d314c; color:#fff; display:flex; align-items:center; gap:14px; box-shadow:0 1px 0 rgba(80,164,219,.28) }
+  .plate{ flex:none; background:#fff; border-radius:5px; padding:9px 13px; line-height:0; box-shadow:0 1px 0 rgba(80,164,219,.35) } .plate svg{ height:24px; width:157px }
+  .rule{ flex:none; width:1px; height:42px; background:rgba(80,164,219,.4) }
+  .brand{ font-size:16px; font-weight:500; color:#94c8e9 }
   .top-r{ margin-left:auto; display:flex; align-items:center; gap:10px; position:relative }
   .iconbtn{ width:40px; height:40px; border-radius:4px; border:1px solid rgba(255,255,255,.25); background:transparent; color:#fff; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px }  .toast{ position:fixed; left:50%; bottom:calc(24px + env(safe-area-inset-bottom,0px)); transform:translateX(-50%) translateY(20px); opacity:0; background:var(--ink); color:var(--paper); padding:10px 16px; border-radius:10px; font-size:13.5px; transition:all .2s; pointer-events:none; z-index:50 }
   .toast.on{ opacity:1; transform:translateX(-50%) translateY(0) }

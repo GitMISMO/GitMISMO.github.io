@@ -22,7 +22,6 @@ var DEMO = ((new URLSearchParams(location.search)).get("demo") || "").toLowerCas
 if (DEMO) { token = ""; KEY = "mismo.renewal.example-" + DEMO; }
 function demoSays(what){ toast("This is an example: " + what); }
 
-(function season(){ if (new Date().getMonth() === 11) document.documentElement.setAttribute("data-season","december"); })();
 (function theme(){
   /* The website build drops the tool masthead, and the toggle with it - the site has
      no dark mode. Without this guard the page would die here and never start. */

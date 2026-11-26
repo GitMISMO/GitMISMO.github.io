@@ -36,10 +36,11 @@
   .vh{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap }
 
   /* top bar: the Resources frame */
-  .top{ position:sticky; top:0; z-index:20; height:64px; padding:0 22px; background:#0f314c; color:#fff; display:flex; align-items:center; box-shadow:0 1px 0 rgba(80,164,219,.28) }
-  .plate{ background:#fff; border-radius:5px; padding:9px 13px; line-height:0 } .plate svg{ height:24px; width:auto }
-  .rule{ width:2px; height:34px; margin:0 20px; border-radius:1px; background:#50a4db }
-  .brand{ font-size:15.5px; font-weight:700; color:#50a4db }
+  /* masthead: Certification Management's exactly, so the logo sits in the same spot in every tool (CN-053, Nov 26, 2026) */
+  .top{ position:sticky; top:0; z-index:20; height:68px; padding:0 22px; background:#0d314c; color:#fff; display:flex; align-items:center; gap:14px; box-shadow:0 1px 0 rgba(80,164,219,.28) }
+  .plate{ flex:none; background:#fff; border-radius:5px; padding:9px 13px; line-height:0; box-shadow:0 1px 0 rgba(80,164,219,.35) } .plate svg{ height:24px; width:157px }
+  .rule{ flex:none; width:1px; height:42px; background:rgba(80,164,219,.4) }
+  .brand{ font-size:16px; font-weight:500; color:#94c8e9 }
   .top-r{ margin-left:auto; display:flex; align-items:center; gap:10px; position:relative }
   .helpbtn{ width:auto !important; padding:0 13px; gap:7px; font-size:14px; font-weight:700; text-decoration:none } .helpbtn[aria-current="page"]{ background:rgba(116,191,235,.2) }
 @media (max-width:600px){ .helpbtn{ width:40px !important; padding:0 } .helpbtn span{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap } }   /* a phone: the icon alone, its name still read out */
