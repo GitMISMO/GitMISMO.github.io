@@ -2,6 +2,7 @@
 
 One line per change people would notice, newest first.
 
+- 2026-11-26: Masthead matches the other MISMO tools.
 - 2026-11-25: The browser's Back button works: it goes to the last page you were on and closes an open panel first. It never undoes a change.
 - 2026-11-25: Browser tab icon now matches mismo.org.
 - 2026-11-24: Home redone in Member 360's style: the navy hero with On Your Plate, the dark Desk at a Glance boxes, the full width of the screen, and a set-up seen twice counted once. New Contact Updates page: send a change to a member's contacts straight into Member 360, with a record of every update, who sent it and where it stands.

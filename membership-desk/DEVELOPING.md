@@ -112,6 +112,13 @@ The desk sends no email of its own.
   The narrow-screen menu drawer isn't registered (as on Summit HQ): choosing a page in it closes it.
 - The browser tab icon is the one shared MISMO icon, from https://resources.mismo.org/assets/favicon-48x48.png, and
   no other icon line (Nov 25, 2026). Never copy the image here.
+- The masthead matches Certification Management's exactly, so the MISMO logo sits in the same spot in every tool
+  (Nov 26, 2026, CN-053): navy bar 68px tall (`--hq-h:68px`, padding 13px 22px), white logo box 9px 13px with 5px
+  corners and a sky line under it, logo 24px tall (157px wide), 14px gaps, a 1px divider 42px tall, the name at 16px
+  weight 500 in #94c8e9. It is the same on a phone (the name shortens with "..." if it can't fit). Everything that sits
+  below the bar (the left menu, the right-hand panel, `#work`'s scroll-margin) uses `--hq-h`, so change only that; the
+  newer-version notice sits at `top:80px` (bar + 12px). The December hat is the shared `/assets/holiday.js` (loaded
+  by session.js): never add a `.santa`, `#mismo-hat`, `data-season` rule or season script here.
 - Plain language and Title Case headings; squared-off buttons and tags, never pills; no big empty spaces.
 
 ## Safety Net
