@@ -140,7 +140,8 @@
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
-      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : (function () { var e = f(t.dates && t.dates.commentEnd), c = t.cpCard || {}, L = t.links || {};
+      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : (function () { var e = f(t.dates && t.dates.commentEnd), c = t.cpCard || {}, L = t.links || {}, td = new Date().toISOString().slice(0, 10);
+        if (t.dates && t.dates.commentStart && t.dates.commentStart > td) return { role: '', text: 'Opens for comment ' + f(t.dates.commentStart) };
         if (!(t.cpFile && t.cpFile.url) && !c.nonMember) return { role: 'facilitator', text: 'Open for comment until ' + e + ' with nothing for non-members to download: Choose the Files for Comment' };
         if (!L.resourceLibrary) return { role: 'website', text: 'Open for comment until ' + e + ': add the Resource Library link so members can open it' };
         if (!c.text) return { role: 'facilitator', text: 'Open for comment until ' + e + ': write the Comment Period Card (what the website says about it)' };

@@ -2184,7 +2184,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-26T01:13:28Z',fp:'248c091e'};
+window.__mmsBuild={at:'2026-11-26T01:47:44Z',fp:'902492a3'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -3648,7 +3648,8 @@ function wireArch(m){
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
-      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : (function () { var e = f(t.dates && t.dates.commentEnd), c = t.cpCard || {}, L = t.links || {};
+      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : (function () { var e = f(t.dates && t.dates.commentEnd), c = t.cpCard || {}, L = t.links || {}, td = new Date().toISOString().slice(0, 10);
+        if (t.dates && t.dates.commentStart && t.dates.commentStart > td) return { role: '', text: 'Opens for comment ' + f(t.dates.commentStart) };
         if (!(t.cpFile && t.cpFile.url) && !c.nonMember) return { role: 'facilitator', text: 'Open for comment until ' + e + ' with nothing for non-members to download: Choose the Files for Comment' };
         if (!L.resourceLibrary) return { role: 'website', text: 'Open for comment until ' + e + ': add the Resource Library link so members can open it' };
         if (!c.text) return { role: 'facilitator', text: 'Open for comment until ' + e + ': write the Comment Period Card (what the website says about it)' };
@@ -8329,7 +8330,7 @@ async function ssDelete(t,p){ const D0=ssFor(t); const f=D0&&(D0.files||[]).find
       const j=await r.json().catch(()=>({})); if(!r.ok||!j.deleted) throw new Error(j.error==='not found'?'SharePoint couldn’t find it (it may already be gone; the list updates the next time the folder is checked)':(j.error||'the flow answered '+r.status));
     }catch(e){ say('Couldn’t delete '+f.n+': '+e.message,'bad'); return false; } }
   const D=clone(ssFor(t)||D0); D.files=(D.files||[]).filter(x=>x.p!==p); S.ssfiles[t.id]=D; await write('ssfiles',t.id,D);
-  const x=clone(S.tickets[t.id]||t); hist(x,(gone?'File removed from the list (no longer in SharePoint): ':'File deleted from SharePoint: ')+f.n);
+  const x=clone(S.tickets[t.id]||t); if(x.finalFiles&&(x.finalFiles.files||[]).some(ff=>ff.p===p)){ x.finalFiles=Object.assign({},x.finalFiles,{files:x.finalFiles.files.filter(ff=>ff.p!==p)}); if(!x.finalFiles.files.length) delete x.finalFiles; } hist(x,(gone?'File removed from the list (no longer in SharePoint): ':'File deleted from SharePoint: ')+f.n);
   await saveTicket(x,gone?'Removed from the list':'File deleted'); /* no Undo here: the file itself comes back from the Recycle Bin */
   ssMsg[t.id]={text:gone?f.n+' came off the list.':f.n+' was deleted. It’s in the SharePoint Recycle Bin for 93 days if it’s needed back.',cls:'ok',at:Date.now()}; renderPanel();
   return true; }
@@ -8599,8 +8600,14 @@ renderPanel=function(){ _renderPanelFF(); const P=$('#panel'); if(!S.panel||Stri
   const pb=$('.pb',P); if(!pb||$('.cr-sec',pb)) return; const host=$('[data-wtab="over"]',pb); if(!host) return;
   const w=document.createElement('div'); w.innerHTML=crSection(t); const sec=w.firstChild; const lead=$('.wh-lead-in',host); (lead&&lead.nextSibling)?host.insertBefore(sec,lead.nextSibling):host.appendChild(sec); };
 /* the Files tab marks the chosen ones Final */
-const _ssTagCR=ssTag;
-ssTag=function(n){ const t=S.panel&&S.tickets[S.panel], F=t&&t.finalFiles; if(F&&(F.files||[]).some(f=>f.n===n)) return 'Final'; return _ssTagCR(n); };
+/* (only on the Files tab: ssTag itself also names the documents sent to IM and AWG Review, which must not change with
+   whichever work request happens to be open) */
+const _ssTabHtmlCR=ssTabHtml;
+ssTabHtml=function(t){ const h=_ssTabHtmlCR(t), F=t.finalFiles, D=ssFor(t); if(!F||!(F.files||[]).length||!D) return h;
+  const fin=new Set(F.files.map(f=>f.p)), byHref={}; (D.files||[]).forEach(f=>{ if(fin.has(f.p)) byHref[ssUrl(f)]=1; });
+  const host=document.createElement('div'); host.innerHTML=h;
+  host.querySelectorAll('a.ss-f').forEach(a=>{ if(!byHref[a.getAttribute('href')]) return; const c=a.querySelector('.ss-tag'); if(c) c.textContent='Final'; else { const g=a.querySelector('.ss-go'); const x=document.createElement('span'); x.className='chip ss-tag'; x.textContent='Final'; g?a.insertBefore(x,g):a.appendChild(x); } });
+  return host.innerHTML; };
 async function crChoose(t){
   const L=cpfFiles(t); if(!L.length) return toast('No files in this work request’s folder yet. Add the final files on the Files tab first.');
   const k=crBoiler(t), F0=t.finalFiles, was=new Set(((F0&&F0.files)||[]).map(f=>f.p));
