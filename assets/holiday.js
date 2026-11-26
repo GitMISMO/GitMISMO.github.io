@@ -300,8 +300,7 @@
       '<radialGradient id="ms-skin" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#ffe2cf"/><stop offset="1" stop-color="#eeb99b"/></radialGradient>' +
       '<linearGradient id="ms-sack" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8a6246"/><stop offset="1" stop-color="#4a3022"/></linearGradient>' +
       '<radialGradient id="ms-lamp"><stop offset="0" stop-color="#fff6d2" stop-opacity="1"/><stop offset=".35" stop-color="#ffd76a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd76a" stop-opacity="0"/></radialGradient>' +
-      '<filter id="ms-far" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur stdDeviation=".7"/></filter>' +
-      '<filter id="ms-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>' +
+      '<radialGradient id="ms-shadow"><stop offset="0" stop-color="#0d314c" stop-opacity=".16"/><stop offset="1" stop-color="#0d314c" stop-opacity="0"/></radialGradient>' +
       '<linearGradient id="ms-streak" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
       '<radialGradient id="ms-beam" cx="0" cy=".5" r="1"><stop offset="0" stop-color="#ff6b5e" stop-opacity=".35"/><stop offset="1" stop-color="#ff6b5e" stop-opacity="0"/></radialGradient>' +
       '<radialGradient id="ms-aura"><stop offset="0" stop-color="#bfe3f7" stop-opacity=".4"/><stop offset=".6" stop-color="#74bfeb" stop-opacity=".1"/><stop offset="1" stop-color="#74bfeb" stop-opacity="0"/></radialGradient>' +
@@ -316,9 +315,9 @@
       '<path d="M696,47 L770,30 L770,64 Z" fill="url(#ms-beam)" opacity=".7"/>' +
       /* reins */
       '<path d="M226,114 C280,92 300,70 330,64 M226,114 C300,98 350,80 450,64 M226,114 C330,104 420,88 470,72 M226,114 C380,104 520,80 590,64" fill="none" stroke="#f3c75a" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>' +
-      '<g filter="url(#ms-soft)" fill="#0d314c" opacity=".14"><ellipse cx="140" cy="214" rx="120" ry="8"/><ellipse cx="460" cy="128" rx="210" ry="7"/></g>' +
+      '<ellipse cx="140" cy="214" rx="124" ry="10" fill="url(#ms-shadow)"/><ellipse cx="460" cy="128" rx="214" ry="9" fill="url(#ms-shadow)"/>' +
       /* the team: two pairs, then Rudolph out front */
-      '<g filter="url(#ms-far)" opacity=".88">' + deer(318, 34, 1, false, true) + deer(448, 30, 3, false, true) + '</g>' +
+      '<g opacity=".82">' + deer(318, 34, 1, false, true) + deer(448, 30, 3, false, true) + '</g>' +
       deer(300, 52, 0, false, false) + deer(430, 48, 2, false, false) +
       deer(566, 34, 4, true, false) +
       /* the sack of presents, one wrapped in MISMO navy */
@@ -410,19 +409,22 @@
       '.ms-sky{position:fixed;inset:0;pointer-events:none;z-index:2147483001;overflow:hidden}' +
       '.ms-fly{position:absolute;left:0;top:0;will-change:transform;transform-origin:30% 50%}' +
       '.ms-bob{animation:msBob 1.3s ease-in-out infinite alternate}' +
-      '.ms-flight{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 12px rgba(13,49,76,.28))}' +
+      '.ms-flight{display:block;width:100%;height:auto;overflow:visible}' +
       '.ms-deer{animation:msDeer .52s ease-in-out infinite alternate}' +
                   '.ms-wave{transform-box:fill-box;transform-origin:82% 96%}.ms-bubble{transform-box:fill-box;transform-origin:50% 100%}' +
       '.ms-streaks{animation:msStreak .45s linear infinite}' +
       '@keyframes msStreak{from{transform:translateX(30px);opacity:.9}to{transform:translateX(-60px);opacity:.2}}' +
-      '.ms-aura{animation:msAura 1.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}' +
+      '.ms-aura{animation:msAura 1.6s ease-in-out infinite alternate}' +
       '.ms-glow{animation:msGlow 1s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}' +
       '.ms-bells{animation:msJingle .26s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:top center}' +
       '.ms-wave{transform:rotate(-140deg)}' +
-      '.ms-spark{position:absolute;left:0;top:0;pointer-events:none;will-change:transform,opacity}' +
+      '.ms-spark{position:absolute;left:0;top:0;pointer-events:none;will-change:transform,opacity;display:block}' +
+      '.ms-dot{border-radius:50%;background:radial-gradient(circle,currentColor 0 30%,transparent 72%)}' +
+      '.ms-orb{border-radius:50%;background:radial-gradient(circle,currentColor 0 18%,transparent 70%);opacity:.6}' +
+      '.ms-star{background:currentColor;clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%)}' +
       '@keyframes msBob{from{transform:translateY(-5px)}to{transform:translateY(6px)}}' +
       '@keyframes msDeer{from{transform:translateY(-2.5px)}to{transform:translateY(2.5px)}}' +
-      '@keyframes msAura{from{opacity:.7;transform:scale(.96)}to{opacity:1;transform:scale(1.04)}}' +
+      '@keyframes msAura{from{opacity:.7}to{opacity:1}}' +
       '@keyframes msGlow{from{opacity:.55;transform:scale(.8)}to{opacity:1;transform:scale(1.35)}}' +
       '@keyframes msJingle{from{transform:rotate(-8deg)}to{transform:rotate(8deg)}}';
     (document.head || document.documentElement).appendChild(s);
@@ -431,22 +433,17 @@
   /* a sparkle in the trail: gold, white or sky, a star or a twinkle, drifting down as it fades */
   function sparkle(sky, x, y) {
     var size = 5 + Math.random() * 11, c = ['#ffd76a', '#ffffff', '#74bfeb', '#ffe9a8', '#bfe3f7'][Math.floor(Math.random() * 5)];
-    var e = document.createElementNS(NS, 'svg');
-    e.setAttribute('viewBox', '-10 -10 20 20'); e.setAttribute('width', size); e.setAttribute('height', size);
-    e.setAttribute('class', 'ms-spark');
-    var r = Math.random();
-    if (r < 0.12) { size = 22 + Math.random() * 26; e.setAttribute('width', size); e.setAttribute('height', size); }
-    e.innerHTML = r < 0.12
-      ? '<circle r="9" fill="' + c + '" opacity=".35"/><circle r="4" fill="' + c + '" opacity=".5"/>'
-      : r < 0.6
-      ? '<path d="M0,-10 C1.2,-2 2,-1.2 10,0 C2,1.2 1.2,2 0,10 C-1.2,2 -2,1.2 -10,0 C-2,-1.2 -1.2,-2 0,-10 Z" fill="' + c + '"/>'
-      : '<circle r="4" fill="' + c + '"/><circle r="9" fill="' + c + '" opacity=".25"/>';
+    var e = document.createElement('i'), r = Math.random();
+    if (r < 0.12) size = 22 + Math.random() * 26;
+    e.className = 'ms-spark ' + (r < 0.12 ? 'ms-orb' : r < 0.6 ? 'ms-star' : 'ms-dot');
+    e.style.width = e.style.height = size + 'px';
+    e.style.color = c;
     sky.appendChild(e);
     var dx = -20 - Math.random() * 50, dy = 30 + Math.random() * 90, dur = 1100 + Math.random() * 1300;
     var a = e.animate([
-      { transform: 'translate(' + x + 'px,' + y + 'px) scale(.3) rotate(0deg)', opacity: 0 },
-      { transform: 'translate(' + (x + dx * 0.2) + 'px,' + (y + dy * 0.15) + 'px) scale(1) rotate(60deg)', opacity: 1, offset: 0.15 },
-      { transform: 'translate(' + (x + dx) + 'px,' + (y + dy) + 'px) scale(.2) rotate(200deg)', opacity: 0 }
+      { transform: 'translate(' + (x - size / 2) + 'px,' + (y - size / 2) + 'px) scale(.3) rotate(0deg)', opacity: 0 },
+      { transform: 'translate(' + (x - size / 2 + dx * 0.2) + 'px,' + (y - size / 2 + dy * 0.15) + 'px) scale(1) rotate(60deg)', opacity: 1, offset: 0.15 },
+      { transform: 'translate(' + (x - size / 2 + dx) + 'px,' + (y - size / 2 + dy) + 'px) scale(.2) rotate(200deg)', opacity: 0 }
     ], { duration: dur, easing: 'cubic-bezier(.2,.6,.4,1)', fill: 'forwards' });
     a.onfinish = function () { e.remove(); };
   }
@@ -496,11 +493,15 @@
     var anim = box.animate(frames, { duration: dur, easing: 'linear', fill: 'forwards' });
 
     /* sparkles stream from the back of the sleigh and the runner */
+    var at = function () {
+      var t = Math.min(1, (anim.currentTime || 0) / dur), p = pt(t), sc = 0.72 + 0.34 * Math.sin(Math.PI * Math.min(1, t * 1.1));
+      return { left: p.x + w * 0.3 * (1 - sc), top: p.y + h * 0.5 * (1 - sc), width: w * sc, height: h * sc };
+    };
     var trail = setInterval(function () {
-      var r = box.getBoundingClientRect();
-      for (var n = 0; n < 4; n++) sparkle(sky, r.left + r.width * (0.01 + Math.random() * 0.1), r.top + r.height * (0.5 + Math.random() * 0.38));
+      var r = at();
+      for (var n = 0; n < 3; n++) sparkle(sky, r.left + r.width * (0.01 + Math.random() * 0.1), r.top + r.height * (0.5 + Math.random() * 0.38));
       if (Math.random() < 0.4) sparkle(sky, r.left + r.width * (0.4 + Math.random() * 0.55), r.top + r.height * (0.25 + Math.random() * 0.3));
-    }, 45);
+    }, 55);
 
     /* he waves if you're watching: as he crosses the middle, if you've used the page in the last
        minute, and whenever your pointer comes near him */
@@ -527,7 +528,7 @@
       ], { duration: 2000, easing: 'ease-out' });
     }
     var watch = setInterval(function () {
-      var r = box.getBoundingClientRect(), cx = r.left + r.width * 0.25, cy = r.top + r.height * 0.35;
+      var r = at(), cx = r.left + r.width * 0.25, cy = r.top + r.height * 0.35;
       var mid = cx > W * 0.3 && cx < W * 0.62;
       var watching = Date.now() - lastActive < 60000;
       var near = pointer && Math.abs(pointer.x - cx) < w * 0.45 && Math.abs(pointer.y - cy) < h * 0.9;
