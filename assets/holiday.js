@@ -243,7 +243,7 @@
     var leg = function (cls, hx, hy, d) {
       return '<g class="' + cls + '" style="transform-origin:' + hx + 'px ' + hy + 'px">' +
         '<path d="' + d + '" fill="none" stroke="' + (back ? '#4a2c1a' : '#6b4329') + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
-        '<path d="' + d + '" fill="none" stroke="#24160d" stroke-width="5.4" stroke-linecap="round" stroke-dasharray="0 ' + hoof(d) + ' 3 40"/>' +
+        '<path d="' + d + '" fill="none" stroke="#24160d" stroke-width="5.4" stroke-linecap="round" stroke-dasharray="3 999" stroke-dashoffset="' + (-hoof(d)) + '"/>' +
         '</g>';
     };
     var nose = rudolph
