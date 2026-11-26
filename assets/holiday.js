@@ -32,18 +32,18 @@
   /* The hat, drawn for December: low, its brim curved as if round a head, and a long tail that
      drapes down the right side with a fluffy bobble hanging off the end. The bobble sits in a group
      of its own so it can swing. Drawn on a 120 x 100 grid: brim 12 to 66 across, about 70 to 88 down;
-     the tail ends at 104,73. */
+     the tail ends at about 100,77. */
   var HAT = '<defs>' +
     '<linearGradient id="mh-red" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e5493d"/><stop offset=".55" stop-color="#c0392f"/><stop offset="1" stop-color="#8e2620"/></linearGradient>' +
     '<radialGradient id="mh-fur" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#f4f7fa"/><stop offset="1" stop-color="#c9d7e2"/></radialGradient>' +
     '</defs>' +
-    '<path d="M16,76 C14,60 24,46 44,40 C60,35 78,37 90,46 C99,53 104,63 104,73 C101,76 97,75 96,71 C95,63 90,56 82,53 C74,51 66,58 62,76 Z" fill="url(#mh-red)"/>' +
+    '<path d="M16,76 C14,60 24,46 44,40 C60,35 80,36 93,46 C103,54 108,64 108,76 C104,80 95,79 93,74 C91,65 86,59 79,57 C71,55 65,61 63,76 Z" fill="url(#mh-red)"/>' +
     '<path d="M16,76 C14,60 24,46 44,40 C48,39 52,39 55,39 C38,48 30,60 30,76 Z" fill="#0d314c" opacity=".14"/>' +
     '<path d="M42,44 C57,39 74,40 86,47" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="2.6" stroke-linecap="round"/>' +
     '<g fill="url(#mh-fur)"><path d="M12,76 Q39,67 66,76 L66,88 Q39,79 12,88 Z"/><circle cx="12" cy="82" r="6"/><circle cx="66" cy="82" r="6"/><circle cx="12.0" cy="76.0" r="3.8"/><circle cx="19.7" cy="73.8" r="3.8"/><circle cx="27.4" cy="72.3" r="3.8"/><circle cx="35.1" cy="71.6" r="3.8"/><circle cx="42.9" cy="71.6" r="3.8"/><circle cx="50.6" cy="72.3" r="3.8"/><circle cx="58.3" cy="73.8" r="3.8"/><circle cx="66.0" cy="76.0" r="3.8"/><circle cx="12.0" cy="88.0" r="3.8"/><circle cx="19.7" cy="85.8" r="3.8"/><circle cx="27.4" cy="84.3" r="3.8"/><circle cx="35.1" cy="83.6" r="3.8"/><circle cx="42.9" cy="83.6" r="3.8"/><circle cx="50.6" cy="84.3" r="3.8"/><circle cx="58.3" cy="85.8" r="3.8"/><circle cx="66.0" cy="88.0" r="3.8"/></g>' +
     '<path d="M14,85 Q39,77 64,85" fill="none" stroke="#0d314c" stroke-opacity=".07" stroke-width="4" stroke-linecap="round"/>' +
-    '<g class="mismo-bobble" style="transform-box:view-box;transform-origin:102px 73px"><g fill="url(#mh-fur)"><circle cx="112.0" cy="83.0" r="3.9"/><circle cx="109.9" cy="87.9" r="3.9"/><circle cx="105.0" cy="90.0" r="3.9"/><circle cx="100.1" cy="87.9" r="3.9"/><circle cx="98.0" cy="83.0" r="3.9"/><circle cx="100.1" cy="78.1" r="3.9"/><circle cx="105.0" cy="76.0" r="3.9"/><circle cx="109.9" cy="78.1" r="3.9"/><circle cx="105" cy="83" r="8.5"/></g>' +
-    '<circle cx="102" cy="80" r="2.4" fill="#ffffff" opacity=".9"/></g>';
+    '<g class="mismo-bobble" style="transform-box:view-box;transform-origin:100px 77px"><g fill="url(#mh-fur)"><circle cx="108.5" cy="86.0" r="4.1"/><circle cx="106.3" cy="91.3" r="4.1"/><circle cx="101.0" cy="93.5" r="4.1"/><circle cx="95.7" cy="91.3" r="4.1"/><circle cx="93.5" cy="86.0" r="4.1"/><circle cx="95.7" cy="80.7" r="4.1"/><circle cx="101.0" cy="78.5" r="4.1"/><circle cx="106.3" cy="80.7" r="4.1"/><circle cx="101" cy="86" r="9"/></g>' +
+    '<circle cx="98" cy="83" r="2.5" fill="#ffffff" opacity=".9"/></g>';
 
   function css() {
     if (document.getElementById('mismo-holiday-css')) return;
