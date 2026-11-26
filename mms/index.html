@@ -18,25 +18,23 @@ a{color:var(--accent)}
 button{font-family:inherit}
 [hidden]{display:none!important}
 
-/* ── masthead + rail (Summit HQ pattern) ── */
+/* ── masthead + rail (masthead: Certification Management's, to the pixel, CN-053: 68px bar, 13px 22px around the logo box) ── */
 .hqtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:97;height:var(--hq-h);
   background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;
   padding:0 22px;box-shadow:0 1px 0 rgba(80,164,219,.28);
   margin-left:calc(0px - var(--rail-w));width:calc(100% + var(--rail-w));
   transition:margin-left .2s cubic-bezier(.4,0,.2,1), width .2s cubic-bezier(.4,0,.2,1)}
 body.railmini .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}
-.hqtop .mastrule{display:block;width:2px;height:34px;flex:0 0 auto;margin-inline:20px;border-radius:1px;background:var(--sky)}
+.hqtop .mastrule{display:block;width:1px;height:42px;flex:0 0 auto;margin-inline:14px;background:rgba(80,164,219,.4)}
 .hqtop .hqname .short{display:none}
 @media(max-width:700px){.hqtop .hqname .short{display:inline}}
-.hqtop .hqname{font-family:var(--display);font-size:15.5px;font-weight:700;letter-spacing:-.005em;color:var(--sky);white-space:nowrap}
-.hqtop-r{margin-left:auto;display:flex;align-items:center;gap:13px}
+.hqtop .hqname{font-family:var(--display);font-size:16px;font-weight:500;letter-spacing:0;color:#94c8e9;white-space:nowrap}
+.hqtop-r{margin-left:auto;padding-left:14px;display:flex;align-items:center;gap:13px}
 .hqtop .eyebrow-m{font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
-@media(max-width:700px){.hqtop .hqname .long{display:none}.hqtop .eyebrow-m{display:none}.figs{grid-template-columns:1fr 1fr}.fig .v{font-size:24px}.hqtop .mastrule{margin-inline:12px}.hqtop{padding:0 12px}}
+@media(max-width:700px){.hqtop .hqname .long{display:none}.hqtop .eyebrow-m{display:none}.figs{grid-template-columns:1fr 1fr}.fig .v{font-size:24px}}
 @media(max-width:900px){.hqtop .eyebrow-m{display:none}}
-.logoplate{background:#fff;border-radius:7px;padding:8px 14px;display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative}
+.logoplate{background:#fff;border-radius:5px;padding:9px 13px;display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative;box-shadow:0 1px 0 rgba(80,164,219,.35)}
 .logoplate .wordmark{height:24px;width:auto;display:block}
-.santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
-html[data-season="december"] .santa{display:block}
 #rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
 #rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
 .whochip{display:inline-flex;align-items:center;gap:8px;background:#fff;color:#101b33;border:1px solid #e1e4ec;border-radius:4px;height:40px;padding:0 12px 0 7px;font-size:13px;font-weight:600;white-space:nowrap}
@@ -1817,7 +1815,7 @@ p,.sub,.lede{text-wrap:pretty}
 .att-why{font-size:12px;color:var(--ink-3);padding:6px 14px 0}
 .pane.gov-log{min-height:376px}
 /* Help: Good to Know reads in dark mode; role tabs and topics show their whole name */
-:root{--navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb; --ground:#f1f6fa;--surface:#ffffff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd; --border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5; --ink:#0d314c;--ink-2:#456179;--ink-3:#5a7489; --good:#0f7b5c;--bad:#b3372c;--warn:#a2701a; --good-bg:#e3f4ed;--bad-bg:#fbe9e7;--warn-bg:#fbf1dc;--info-bg:#e4f2fb;--hold-bg:#efe9f7;--hold:#6b4fa0; --accent:#2477b8;--accent-soft:#e4f2fb; --c1:#2477b8;--c2:#eb6834;--c3:#1baf7a;--c4:#eda100;--c5:#e87ba4;--c6:#008300; --display:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; --ui:var(--display);--mono:var(--display); --hq-h:64px;--rail-w:240px;--rail-mini:62px; --shadow:0 1px 2px rgba(13,49,76,.06),0 4px 14px rgba(13,49,76,.06); --r:6px; color-scheme:light;--lt-board:318px;--lt-mine:250px;--lt-rev:206px;--lt-media:210px;--lt-arch:318px;--k1:#2477b8;--k2:#eb6834;--k3:#1baf7a;--k4:#6b4fa0;--k5:#eda100;--tips-bg:var(--sky-wash);--tips-k:var(--navy-mid)}
+:root{--navy:#0d314c;--sky:#74bfeb;--navy-deep:#06202f;--navy-mid:#14486e;--sky-soft:#a9d8f3;--sky-wash:#e4f2fb; --ground:#f1f6fa;--surface:#ffffff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd; --border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5; --ink:#0d314c;--ink-2:#456179;--ink-3:#5a7489; --good:#0f7b5c;--bad:#b3372c;--warn:#a2701a; --good-bg:#e3f4ed;--bad-bg:#fbe9e7;--warn-bg:#fbf1dc;--info-bg:#e4f2fb;--hold-bg:#efe9f7;--hold:#6b4fa0; --accent:#2477b8;--accent-soft:#e4f2fb; --c1:#2477b8;--c2:#eb6834;--c3:#1baf7a;--c4:#eda100;--c5:#e87ba4;--c6:#008300; --display:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; --ui:var(--display);--mono:var(--display); --hq-h:68px;--rail-w:240px;--rail-mini:62px; --shadow:0 1px 2px rgba(13,49,76,.06),0 4px 14px rgba(13,49,76,.06); --r:6px; color-scheme:light;--lt-board:318px;--lt-mine:250px;--lt-rev:206px;--lt-media:210px;--lt-arch:318px;--k1:#2477b8;--k2:#eb6834;--k3:#1baf7a;--k4:#6b4fa0;--k5:#eda100;--tips-bg:var(--sky-wash);--tips-k:var(--navy-mid)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#0a2130; --border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547; --ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4; --good:#4fc79b;--bad:#f08579;--warn:#e0a83c; --good-bg:#0f3a30;--bad-bg:#432423;--warn-bg:#3d3017;--info-bg:#123a55;--hold-bg:#2c2545;--hold:#b9a3e8; --accent:#3987e5;--accent-soft:#173c52; --c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#2f9e2f; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark;--k1:#3987e5;--k2:#d95926;--k3:#199e70;--k4:#8f74d6;--k5:#c98500;--tips-bg:var(--surface-2);--tips-k:var(--sky)}}
 :root[data-theme="dark"]{--ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#0a2130; --border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547; --ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4; --good:#4fc79b;--bad:#f08579;--warn:#e0a83c; --good-bg:#0f3a30;--bad-bg:#432423;--warn-bg:#3d3017;--info-bg:#123a55;--hold-bg:#2c2545;--hold:#b9a3e8; --accent:#3987e5;--accent-soft:#173c52; --c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#2f9e2f; --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 14px rgba(0,0,0,.25); color-scheme:dark;--k1:#3987e5;--k2:#d95926;--k3:#199e70;--k4:#8f74d6;--k5:#c98500;--tips-bg:var(--surface-2);--tips-k:var(--sky)}
 .hx-tips{border-left:3px solid var(--sky);background:var(--sky-wash);border-radius:0 7px 7px 0;padding:10px 14px;margin:0 0 16px;max-width:820px;background:var(--tips-bg)}.hx-tips b{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--navy-mid);color:var(--tips-k)}
@@ -2110,16 +2108,18 @@ p,.sub,.lede{text-wrap:pretty}
 .cr-sec .cr-note{margin:0 0 6px;font-size:13px;color:var(--muted,#5b7287)}
 .cr-sec .cr-note b{color:inherit}
 .cr-sec .cr-list{margin:0;padding:0 0 0 18px;font-size:13.5px;display:grid;gap:2px}
+/* CN-053: at phone width Certification Management's masthead shrinks (11px 16px, logo 19px, 62px with the sign-in chip); the same here, so the logo box sits in the same spot. Last in the file so it wins over :root and .logoplate above. */
+@media(max-width:560px){:root{--hq-h:62px}.hqtop{padding:0 16px}.hqtop .mastrule{height:40px;margin-inline:11px}.hqtop .hqname{font-size:13px}.hqtop-r{padding-left:11px;gap:10px}.logoplate{padding:7px 10px}.logoplate .wordmark{height:19px}}
 </style>
 <script src="/assets/session.js"></script>
 <script src="/assets/back.js"></script>
 <script src="mms-door.js"></script>
 </head>
 <body>
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320 c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20 -297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243 -4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198 0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3 -104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245 -337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17 246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49 203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12 26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57 187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44 -204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288 -20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92 -51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12 -24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297 3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146 -106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0 -356 -14z"></path></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263 13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19 -16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20 -222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0 46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"></path></g></symbol><symbol id="mismo-hat" viewBox="0 0 100 100"><path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41 C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/><path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z" fill="#0d314c" opacity=".17"/><rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/><rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/><circle cx="86" cy="45" r="11.5" fill="#ffffff"/></symbol></defs></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320 c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20 -297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243 -4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198 0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3 -104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245 -337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17 246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49 203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12 26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57 187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44 -204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288 -20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92 -51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12 -24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297 3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146 -106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0 -356 -14z"></path></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263 13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19 -16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20 -222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0 46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"></path></g></symbol></defs></svg>
 
 <header class="hqtop">
-  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg><svg class="santa" viewBox="0 0 100 100" aria-hidden="true"><use href="#mismo-hat"/></svg></span>
+  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
   <span class="mastrule"></span>
   <span class="hqname"><span class="long">MISMO Manufacturing System</span><span class="short">MMS</span></span>
   <span class="hqtop-r"><span class="eyebrow-m">Programs &amp; Operations</span>
@@ -2184,7 +2184,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-26T01:47:44Z',fp:'902492a3'};
+window.__mmsBuild={at:'2026-11-26T23:34:23Z',fp:'20477ce6'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -9764,7 +9764,6 @@ function wireMain(m){
   btn.addEventListener('click',()=>{ document.documentElement.setAttribute('data-theme',cur()==='dark'?'light':'dark'); paint(); try{ localStorage.setItem('mismo.portal.theme',cur()); }catch(e){} });
   try{ const s=localStorage.getItem('mismo.portal.theme'); if(s) document.documentElement.setAttribute('data-theme',s); }catch(e){}
   paint();
-  if(new Date().getMonth()===11) document.documentElement.setAttribute('data-season','december');
 })();
 
 /* ---------- start ---------- */
