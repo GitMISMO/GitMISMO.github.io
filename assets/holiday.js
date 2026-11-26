@@ -478,10 +478,12 @@
 
     /* the path: in from the left, a long climbing curve across the middle of the screen, out on the right */
     var dur = Math.max(9000, Math.min(14000, W * 8)), steps = 40, frames = [];
-    var y0 = H * (0.42 + Math.random() * 0.12), y1 = H * (0.12 + Math.random() * 0.08);
+    /* the whole sleigh always stays on screen: it never climbs past the top or dips past the bottom */
+    var top = h * 0.62 + 12, bottom = Math.max(top + 40, H - h * 0.6);
+    var y0 = Math.min(bottom, H * (0.5 + Math.random() * 0.12)), y1 = Math.max(top, Math.min(bottom, H * (0.28 + Math.random() * 0.08)));
     var pt = function (t) {
       var x = -w * 1.05 + (W + w * 1.15) * t;
-      var y = y0 + (y1 - y0) * (1 - Math.pow(1 - t, 1.6)) + Math.sin(t * Math.PI * 2.2) * H * 0.035;
+      var y = Math.max(top, Math.min(bottom, y0 + (y1 - y0) * (1 - Math.pow(1 - t, 1.6)) + Math.sin(t * Math.PI * 2.2) * H * 0.035));
       return { x: x, y: y - h / 2 };
     };
     for (var i = 0; i <= steps; i++) {
@@ -506,7 +508,7 @@
     var waves = 0;
     function wave() {
       if (Date.now() - waved < 2600) return;
-      waved = Date.now(); waves++;
+      waved = Date.now(); waves++; window.MismoHoliday.waves = waves;
       var txt = bubble.querySelector('.ms-bubble-text'), bx = bubble.querySelector('.ms-bubble-box');
       if (waves > 1) { txt.textContent = 'Merry Christmas!'; bx.setAttribute('width', '132'); bx.setAttribute('x', '55'); }
       setTimeout(function () {
