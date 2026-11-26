@@ -47,11 +47,29 @@ page name in the address (`#Security`, `#help`) with `history.replaceState`, as 
 entry when it does. Never add a `history.pushState` of our own. If Team HQ's systems.js renames those classes, the
 browser check fails.
 
+## The Masthead
+
+CN-053 (Jonna, Nov 26, 2026): the masthead is Certification Management's exactly, so the MISMO logo sits in the same
+spot in every tool. A 68px navy bar (#0d314c), 22px in from the left, with a 1px line along its foot (box-shadow 0 1px 0
+rgba(80,164,219,.28)); the white logo box 9px 13px with 5px corners and a sky line (box-shadow 0 1px 0
+rgba(80,164,219,.35)), the logo 24px tall and 157px wide; 14px gaps, a 1px divider 42px tall in rgba(80,164,219,.4),
+and the name at 16px, weight 500, #94c8e9. On a phone (560px or narrower), as Certification Management does: a 62px bar
+16px in, 11px gaps, the logo box 7px 10px, the logo 19px tall, the name 13px. The right-hand group (eyebrow, View Only,
+Edit in Team HQ, sign-in chip) is unchanged.
+
+`tools/build.py` sets these rules itself (the `MAST` block) over whatever the Accounting Desk's copy has, so the
+measurements here never depend on the Accounting Desk. The left menu and the map's stuck position go by `--hq-h`,
+and the page sets the map's sticky top and the scroll-margins of Team HQ's drawing to `--hq-h` + 8px (they were made for
+a shorter bar), so nothing slides under the bar. Checked side by side with resources.mismo.org/cms/ at 1440px and
+390px wide: the logo box is at the same spot to the pixel. The older December hat (`.santa`, `#mismo-hat`,
+`html[data-season="december"]`) is gone; the shared /assets/holiday.js (loaded by session.js) does December.
+
 ## Build Note
 
-`tools/build.py` copies the masthead, menu and Dark Mode from fixed line ranges of accounting-desk/index.html. It now
-moves every range by however far the Accounting Desk's CSS has moved (it had grown by its favicon line, CN-030), and
-its asserts stop the build if anything else shifted. Rebuilding with the same stamp must give the same page.
+`tools/build.py` copies the masthead, menu and Dark Mode from accounting-desk/index.html. It moves the CSS and defs
+ranges by however far the Accounting Desk's CSS has moved (it had grown by its favicon line, CN-030), finds the rail
+script by its opening comment (`/* the rail`) up to its `</script>` (the desk's own script grows above it), and its
+asserts stop the build if anything else shifted. Rebuilding with the same stamp must give the same page.
 
 ## Access
 

@@ -1,5 +1,6 @@
 # Connected Systems: Changes
 
+- **Nov 26, 2026** — Masthead matches the other MISMO tools (CN-053): Certification Management's measurements exactly (68px bar, the logo box and logo in the same spot, the thinner divider and the lighter name), with the left menu lined up under it. The older December hat is gone; the shared holiday look does December now.
 - **Nov 25, 2026** — The browser's Back button works (CN-033): it goes to the last page you were on and closes an open panel or list first; Forward goes again. It never undoes a change. Help says so too.
 - **Nov 25, 2026** — Browser tab icon now matches mismo.org (CN-030): the one shared icon at resources.mismo.org/assets/favicon-48x48.png instead of Team HQ's HQ icon.
 - **Nov 24, 2026** — Connected Systems is its own view-only app at resources.mismo.org/connected-systems/, like the Membership Desk and the MBA Accounting Desk: its own access (Connected Systems in People & Access) and its own storage, so giving someone access never opens Team HQ. Left menu: Overview (the headline numbers and the System Map), Follow the Work, Security, What Changed, On Its Own, To Rock Solid, Change Notices, Failures, Coverage and Help, with search, As Of and Dark Mode. Everything Team HQ's Connected Systems page shows; Jonna and Vanessa edit it in Team HQ (Edit in Team HQ, top right).

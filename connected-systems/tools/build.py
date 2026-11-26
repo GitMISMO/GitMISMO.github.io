@@ -6,11 +6,43 @@ head_meta=AD[3]  # <meta charset> + CSP line
 o=next(i for i,l in enumerate(AD) if l.startswith(':root{'))-15
 css_shell='\n'.join(AD[15+o:129+o])   # :root .. end of rail css
 defs='\n'.join(AD[316+o:347+o])       # svg defs
-rail_js='\n'.join(AD[1285+o:1441+o])  # the rail + theme scripts (without <script> tags)
+# The Accounting Desk's own script grows too (its data-season line, more search sources), so find the rail script by
+# its opening comment and take it up to its closing </script>.
+r0=next(i for i,l in enumerate(AD) if l.startswith('/* the rail'))
+rail_js='\n'.join(AD[r0:next(i for i in range(r0,len(AD)) if AD[i].startswith('</script>'))])  # the rail + theme scripts (without <script> tags)
 rail_js=rail_js.replace("const ORDER=['Receivables','Invoices','Certification Complete','New and Renewing Members','IIF Payments','Sponsorships'];","const ORDER=['Systems','Stories','Sections'];")
 assert "const ORDER=['Systems','Stories','Sections'];" in rail_js
 assert head_meta.startswith('<meta charset') and 'Content-Security-Policy' in head_meta
 assert css_shell.startswith(':root{') and defs.startswith('<svg') and rail_js.startswith('/* the rail')
+# CN-053 (Jonna, Nov 26, 2026): the masthead is Certification Management's exactly, so the MISMO logo sits in the same
+# spot in every tool: a 68px navy bar (13px above and below the logo box, 22px in), the logo box 9px 13px with 5px
+# corners and a sky line, the logo 24px x 157px, 14px gaps, a 1px x 42px divider and the name at 16px/500 #94c8e9.
+# The Accounting Desk's copy may still have the older measurements, so each rule is set here, whatever it was.
+# The rail and everything else below the bar go by --hq-h, so they line up to 68px with it (62px on a phone).
+# The older December hat (.santa, #mismo-hat, html[data-season="december"]) is retired: /assets/holiday.js does December.
+MAST={
+ '.hqtop{':None,  # kept, with gap 14px (below)
+ '.hqtop .mastrule{':'.hqtop .mastrule{display:block;width:1px;height:42px;flex:0 0 auto;background:rgba(80,164,219,.4)}',
+ '.hqtop .hqname{':'.hqtop .hqname{font-family:var(--display);font-size:16px;font-weight:500;color:#94c8e9;white-space:nowrap}',
+ '.logoplate{':'.logoplate{background:#fff;border-radius:5px;padding:9px 13px;display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative;box-shadow:0 1px 0 rgba(80,164,219,.35)}',
+ '.logoplate .wordmark{':'.logoplate .wordmark{height:24px;width:157px;display:block}'
+   # a phone, as Certification Management does it: a 62px bar 16px in, 11px gaps, the logo box 7px 10px, the logo 19px
+   '\n@media(max-width:560px){:root{--hq-h:62px}.hqtop{gap:11px;padding:0 16px}.logoplate{padding:7px 10px}.logoplate .wordmark{height:19px;width:auto}'
+   '.hqtop .hqname{font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis}.hqtop-r{gap:10px}}',
+}
+lines=[]
+for l in css_shell.split('\n'):
+  if l.startswith('.santa{') or 'data-season' in l: continue
+  k=next((k for k in MAST if l.startswith(k)),None)
+  if k=='.hqtop{':
+    l=re.sub(r'(?<=;)gap:[^;]*;','gap:14px;',l); l=re.sub(r'(?<=;)padding:[^;]*;','padding:0 22px;',l)
+    l=re.sub(r'(?<=;)background:[^;]*;','background:#0d314c;',l); l=re.sub(r'(?<=;)box-shadow:[^;]*;','box-shadow:0 1px 0 rgba(80,164,219,.28);',l)
+    assert 'gap:14px;' in l and 'height:var(--hq-h)' in l
+  elif k: l=MAST[k]
+  lines.append(l)
+css_shell=re.sub(r'--hq-h:\d+px','--hq-h:68px','\n'.join(lines),count=1)
+assert all(css_shell.count(k)>=1 for k in MAST) and '--hq-h:68px' in css_shell and 'santa' not in css_shell
+defs='\n'.join(l for l in defs.split('\n') if 'id="mismo-hat"' not in l)
 I=lambda d:'<svg viewBox="0 0 24 24" aria-hidden="true">'+d+'</svg>'
 ICONS={
  'overview':I('<circle cx="5" cy="6" r="2.2"/><circle cx="19" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M7 6.6h10M6.2 7.9l4.6 8.3M17.8 7.9l-4.6 8.3"/>'),
@@ -51,6 +83,11 @@ __CSS__
 :root{--c1:#2477b8;--c2:#eb6834;--c3:#1baf7a;--c4:#eda100;--c5:#e87ba4;--c6:#008300;--c7:#8a6fd4;--cn:#adc4d6;--good-soft:#e2f2ec;--bad-soft:#f9e6e4;--warn-soft:#f8efdc;--info-soft:#e4f2fb;--shadow:0 1px 2px rgba(13,49,76,.06),0 6px 18px rgba(13,49,76,.06)}
 :root[data-theme="dark"]{--c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#2f9e2f;--c7:#9b86e0;--cn:#2f6688;--good-soft:#123d33;--bad-soft:#43201f;--warn-soft:#3d3218;--info-soft:#123a52;--sky-wash:#123a52;--shadow:0 1px 2px rgba(0,0,0,.3),0 6px 18px rgba(0,0,0,.25)}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--c1:#3987e5;--c2:#d95926;--c3:#199e70;--c4:#c98500;--c5:#d55181;--c6:#2f9e2f;--c7:#9b86e0;--cn:#2f6688;--good-soft:#123d33;--bad-soft:#43201f;--warn-soft:#3d3218;--info-soft:#123a52;--sky-wash:#123a52}}
+/* Team HQ's drawing keeps the map and jump targets clear of a shorter bar (top:62px, scroll-margin 56-70px); here they
+   go by this page's own bar height (68px since CN-053), so nothing slides under it or leaves a gap */
+#csw .cs-mapwrap.cs-stick{top:calc(var(--hq-h) + env(safe-area-inset-top,0px) + 8px)}
+#csw .cs-band,#csw .cs-mapwrap,#csw .cs-panel,#csw .cs-sbd{scroll-margin-top:calc(var(--hq-h) + 8px)}
+#csw .cs-wk{scroll-margin-top:calc(var(--hq-h) + 14px)}
 #rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
 .vochip{font-size:11.5px;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.35);border-radius:4px;padding:4px 9px;white-space:nowrap}
 .edit-hq{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;color:var(--navy);background:var(--sky);border-radius:4px;padding:6px 11px;text-decoration:none;white-space:nowrap}
@@ -77,7 +114,7 @@ main{max-width:1360px;margin:0 auto;padding:22px 26px 48px}
 <body>
 __DEFS__
 <header class="hqtop">
-  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg><svg class="santa" viewBox="0 0 100 100" aria-hidden="true"><use href="#mismo-hat"/></svg></span>
+  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
   <span class="mastrule"></span>
   <span class="hqname">Connected Systems</span>
   <span class="hqtop-r"><span class="eyebrow-m">How MISMO’s Systems Fit Together</span><span class="vochip">View Only</span>
