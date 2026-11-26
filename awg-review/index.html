@@ -1058,7 +1058,9 @@ function home(){
   const st=(k,v,s,cls)=>'<div class="hs'+(cls?' '+cls:'')+'"><span>'+k+'</span><b'+(typeof v==="number"?' data-count="'+v+'"':'')+'>'+v+'</b><em>'+s+'</em></div>';
   const tiles=st("On the Agenda",aw.length,"submissions",aw.length?"amb":"grn")+st("Carried Over",carried,"from earlier calls",carried?"amb":"")+st("Next Call",fmtS(call),DAY[new Date(call+"T12:00:00").getDay()]+", 2–3 pm ET")+st("Decided in "+YR,dnY.length,(oY.Approved||0)+" approved");
   const recs={}; aw.forEach(q=>{ if(q.rec) recs[q.rec]=(recs[q.rec]||0)+1; });
-  const ringP=aw.length?REC.map(r=>({k:rlab(r).toLowerCase(),v:recs[r]||0,c:{"Approve":"#4fc79b","Approve With Conditions":"#74bfeb","Send Back":"#e0a83c"}[r]})):OUT_FINAL.map(o=>({k:o.toLowerCase(),v:oY[o]||0,c:OHEX[o]}));
+  /* submissions with no draft yet fill the rest of the ring (Nov 25 sweep: with no drafts the ring was an empty circle) */
+  const recN=REC.reduce((n,r)=>n+(recs[r]||0),0);
+  const ringP=aw.length?REC.map(r=>({k:rlab(r).toLowerCase(),v:recs[r]||0,c:{"Approve":"#4fc79b","Approve With Conditions":"#74bfeb","Send Back":"#e0a83c"}[r]})).concat(aw.length>recN?[{k:'no draft yet',v:aw.length-recN,c:'#7a9db4'}]:[]):OUT_FINAL.map(o=>({k:o.toLowerCase(),v:oY[o]||0,c:OHEX[o]}));
   const ringBox='<div class="hero-r">'+ring(ringP,String(aw.length?aw.length:dnY.length),aw.length?'on the agenda':'decided in '+YR)+'<div class="dn-key">'+ringP.filter(p=>p.v).slice(0,4).map(p=>'<span><i style="background:'+p.c+'"></i>'+esc(p.k)+' '+p.v+'</span>').join('')+'</div></div>';
   const Y=S.homeYears||4; const U=(S.up||[]); const upN=S.upAll?U.length:6;
   return '<div class="hero rise"><div class="hero-l"><div class="date">'+esc(new Date().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"}))+'</div><h2>'+g+(S.me.name?", "+esc(first(S.me.name)):"")+'</h2><p>'+line+'</p>'+
