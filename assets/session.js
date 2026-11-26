@@ -1059,8 +1059,10 @@
    December — the santa hat on the O and a little snow (/assets/holiday.js)
    ----------------------------------------------------------------------------
    Jonna, Nov 26, 2026: every internal tool wears the hat from December 1 to 31.
-   It loads only for people signed in with a MISMO or MBA address, so pages that
-   assessors, contractors, sponsors or the public see stay as they are. Nothing
+   It loads only on internal tool pages (they carry the sign-in chip, #rs-account)
+   for people signed in with a MISMO or MBA address. The website, forms,
+   applications and anything assessors, contractors, sponsors or the public see
+   stay as they are (MyMISMO loads it with its own line). Nothing
    happens outside December (preview any time with ?holiday=preview).
    ============================================================================ */
 (function () {
@@ -1072,7 +1074,12 @@
       var s = null;
       try { s = JSON.parse(localStorage.getItem('resources:session') || 'null'); } catch (e) {}
       var email = s && s.email ? String(s.email).toLowerCase() : '';
-      if (/@(mismo|mba)\.org$/.test(email)) {
+      /* internal tool pages only: they show the sign-in chip (#rs-account). Public forms, applications,
+         work-product downloads and anything reached from the website never get it. */
+      var publicPage = /^\/(forms|work-products|apply|join|renew|application)s?(\/|$)/i.test(location.pathname) ||
+        /\/(apply|application|join|renew|renewal|sign|beta|setup|form)[^\/]*(\/|\.html)?$/i.test(location.pathname);
+      if (publicPage) return;
+      if (/@(mismo|mba)\.org$/.test(email) && document.getElementById('rs-account')) {
         if (!document.querySelector('script[src*="/assets/holiday.js"]')) {
           var t = document.createElement('script');
           t.src = '/assets/holiday.js'; t.defer = true;

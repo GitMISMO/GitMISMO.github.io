@@ -13,8 +13,8 @@
      the swing back. Never for anyone whose computer asks for reduced motion.
    Outside December nothing happens at all.
 
-   Internal pages only: never the public site, forms, the prospectus, or anything a member or sponsor
-   sees (MyMISMO, which is MISMO's own app, opted in on Jonna's request, Nov 26, 2026).
+   Internal MISMO tools and MyMISMO only (Jonna, Nov 26, 2026): never the website or anything attached
+   to it, such as forms, applications, work-product downloads or the prospectus.
 
    Preview outside December: add ?holiday=preview to a page's address, or run
    localStorage.setItem('mismo.holiday','preview') in that browser (removeItem to stop).
@@ -25,7 +25,9 @@
   var preview = false;
   try { preview = /[?&]holiday=preview\b/.test(location.search) || localStorage.getItem('mismo.holiday') === 'preview'; } catch (e) {}
   var now = new Date();
-  var on = now.getMonth() === 11 || preview;
+  /* never on the website's side: public forms, applications and work-product downloads */
+  var publicPage = /^\/(forms|work-products)(\/|$)/i.test(location.pathname);
+  var on = (now.getMonth() === 11 || preview) && !publicPage;
   window.MismoHoliday = { on: on, version: '2026-11-26' };
   if (!on) return;
 
