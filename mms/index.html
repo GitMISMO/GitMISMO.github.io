@@ -2184,7 +2184,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-26T00:51:54Z',fp:'f4e14c1c'};
+window.__mmsBuild={at:'2026-11-26T01:09:54Z',fp:'4045e85d'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7429,23 +7429,29 @@ const pqLeft=(t,stage,since)=>(t.history||[]).some(h=>h&&h.from===stage&&String(
 function pqGone(t,stage,since){ return !!t&&t.stage!==stage&&(t.state!=='active'||pqLeft(t,stage,since)); }
 async function pqNote(t,text){ try{ const x=clone(S.tickets[t.id]||t); hist(x,text); await saveTicket(x); }catch(e){} }
 async function pqSweep(io){ io=io||{}; const AU=io.awgUpdate||awgUpdate, IU=io.imrUpdate||imrUpdate, RG=io.rGet||rGet; /* io: stand-ins for tests */
-  if(S.mode!=='relay'||!S.ready||!S.isStaff||!S.canWrite||S.viewAs||S.partial||Date.now()-pqSwept<10*60000) return; pqSwept=Date.now();
+  const rep={awg:[],im:[],why:''};
+  if(S.mode!=='relay'||!S.ready||!S.isStaff||!S.canWrite||S.viewAs||S.partial){ rep.why='not a staff page that can save'; return rep; }
+  if(!io.force&&Date.now()-pqSwept<10*60000){ rep.why='ran in the last 10 minutes'; return rep; } pqSwept=Date.now();
   const tk=it=>S.tickets[it.ticket]||allTickets().find(x=>x.wr===it.wr);
   /* AWG Review: on the agenda (waiting or carried) */
   try{ const Q=S.awgPortalQ||{}; const gone=Object.values(Q).filter(it=>it&&(it.status==='awaiting'||it.status==='carried')&&!it.hist&&!it.test&&pqGone(tk(it),'awg',it.at||it.sentAt));
     if(gone.length){ const reps=gone.map(g=>g.rep), now=new Date().toISOString();
       const o=await AU('queue',cur=>{ const c=cur||{items:{}}; reps.forEach(r=>{ const x=c.items&&c.items[r]; if(x&&(x.status==='awaiting'||x.status==='carried')&&!x.hist){ x.status='withdrawn'; x.hist=true; x.withdrawnAt=now; x.withdrawnBy=S.me.name||'MMS'; x.withdrawnWhy='Moved on in the MMS'; } }); return c; });
-      if(o&&o.items) S.awgPortalQ=o.items;
-      for(const g of gone){ const t=tk(g); if(t) await pqNote(t,'Taken off the AWG Review agenda: it had already moved on in the MMS'); } } }catch(e){ console.warn('awg sweep',e); }
+      if(o&&o.items) S.awgPortalQ=o.items; rep.awg=reps;
+      for(const g of gone){ const t=tk(g); if(t) await pqNote(t,'Taken off the AWG Review agenda: it had already moved on in the MMS'); } } }catch(e){ rep.why+='AWG: '+e.message+' '; console.warn('awg sweep',e); }
   /* IM Review: waiting for IM */
   try{ const q=await RG(IMR,'queue'); const items=(q&&q.data&&q.data.items)||{};
     const gone=Object.values(items).filter(it=>it&&it.status==='awaiting'&&!it.hist&&!it.test&&pqGone(tk(it),'im',it.sentAt||it.at));
     if(gone.length){ const reps=gone.map(g=>g.rep), now=new Date().toISOString();
-      await IU('queue',cur=>{ const c=cur||{items:{}}; reps.forEach(r=>{ const x=c.items&&c.items[r]; if(x&&x.status==='awaiting'&&!x.hist){ x.status='withdrawn'; x.hist=true; x.withdrawnAt=now; x.withdrawnBy=S.me.name||'MMS'; x.withdrawnWhy='Moved on in the MMS'; } }); return c; });
+      rep.im=reps; await IU('queue',cur=>{ const c=cur||{items:{}}; reps.forEach(r=>{ const x=c.items&&c.items[r]; if(x&&x.status==='awaiting'&&!x.hist){ x.status='withdrawn'; x.hist=true; x.withdrawnAt=now; x.withdrawnBy=S.me.name||'MMS'; x.withdrawnWhy='Moved on in the MMS'; } }); return c; });
       for(const g of gone){ const m=S.imq&&S.imq[g.rep]; if(m&&m.status==='awaiting'){ const x=Object.assign({},m,{status:'withdrawn',withdrawnAt:now,withdrawnBy:S.me.name||'MMS'}); S.imq[g.rep]=x; try{ await write('imqueue',g.rep,x); }catch(e){} }
-        const t=tk(g); if(t) await pqNote(t,'Taken off IM Review’s waiting list: it had already moved on in the MMS'); } } }catch(e){ console.warn('im sweep',e); } }
+        const t=tk(g); if(t) await pqNote(t,'Taken off IM Review’s waiting list: it had already moved on in the MMS'); } } }catch(e){ rep.why+='IM: '+e.message; console.warn('im sweep',e); }
+  return rep; }
 const _awgSyncPQ=awgSync;
-awgSync=async function(){ const r=await _awgSyncPQ.apply(this,arguments); try{ await pqSweep(); }catch(e){} return r; };
+awgSync=async function(){ let r; try{ r=await _awgSyncPQ.apply(this,arguments); }catch(e){ console.warn('awg sync',e); } try{ await pqSweep(); }catch(e){} return r; };
+/* also on its own, so a slow or failed AWG sync never holds it up; MISMO staff can run it from the console as __mmsPq({force:true}) */
+setInterval(()=>{ try{ if(!document.hidden) pqSweep(); }catch(e){} },11*60000);
+window.__mmsPq=o=>pqSweep(o);
 
 /* ================= Help (by role) and the Resource Center ================= */
 const HELP_ROLES=[
