@@ -303,8 +303,8 @@
       '<filter id="ms-far" x="-10%" y="-20%" width="120%" height="140%"><feGaussianBlur stdDeviation=".7"/></filter>' +
       '<filter id="ms-soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="3"/></filter>' +
       '<linearGradient id="ms-streak" x1="1" y1="0" x2="0" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>' +
-      '<radialGradient id="ms-beam" cx="0" cy=".5" r="1"><stop offset="0" stop-color="#ff6b5e" stop-opacity=".45"/><stop offset="1" stop-color="#ff6b5e" stop-opacity="0"/></radialGradient>' +
-      '<radialGradient id="ms-aura"><stop offset="0" stop-color="#bfe3f7" stop-opacity=".55"/><stop offset=".6" stop-color="#74bfeb" stop-opacity=".16"/><stop offset="1" stop-color="#74bfeb" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="ms-beam" cx="0" cy=".5" r="1"><stop offset="0" stop-color="#ff6b5e" stop-opacity=".35"/><stop offset="1" stop-color="#ff6b5e" stop-opacity="0"/></radialGradient>' +
+      '<radialGradient id="ms-aura"><stop offset="0" stop-color="#bfe3f7" stop-opacity=".4"/><stop offset=".6" stop-color="#74bfeb" stop-opacity=".1"/><stop offset="1" stop-color="#74bfeb" stop-opacity="0"/></radialGradient>' +
       '</defs>' +
       /* a soft magical glow around the whole team */
       '<ellipse cx="360" cy="120" rx="380" ry="120" fill="url(#ms-aura)" class="ms-aura"/>' +
@@ -313,7 +313,7 @@
       '<path d="M-60,96 L40,96" stroke-width="2.2"/><path d="M-90,150 L10,150" stroke-width="1.6"/><path d="M-40,206 L60,206" stroke-width="2"/>' +
       '<path d="M200,22 L290,22" stroke-width="1.4"/><path d="M380,128 L460,128" stroke-width="1.4"/><path d="M520,6 L600,6" stroke-width="1.2"/></g>' +
       /* Rudolph lights the way */
-      '<ellipse cx="700" cy="47" rx="80" ry="26" fill="url(#ms-beam)" class="ms-glow"/>' +
+      '<path d="M696,47 L770,30 L770,64 Z" fill="url(#ms-beam)" opacity=".7"/>' +
       /* reins */
       '<path d="M226,114 C280,92 300,70 330,64 M226,114 C300,98 350,80 450,64 M226,114 C330,104 420,88 470,72 M226,114 C380,104 520,80 590,64" fill="none" stroke="#f3c75a" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>' +
       '<g filter="url(#ms-soft)" fill="#0d314c" opacity=".14"><ellipse cx="140" cy="214" rx="120" ry="8"/><ellipse cx="460" cy="128" rx="210" ry="7"/></g>' +
@@ -333,9 +333,9 @@
       '<path d="M62,28 C56,20 52,25 60,28 M62,28 C68,20 72,25 64,28" fill="#e8483c"/></g>' +
       '<path d="M72,84 C80,90 90,88 96,82" fill="none" stroke="#d8b07a" stroke-width="3" stroke-linecap="round"/></g>' +
       /* Santa */
-      '<g class="ms-santa">' +
+      '<g class="ms-santa" transform="translate(-46,-58) scale(1.3)">' +
       /* the waving arm, behind him: down at his side until he waves */
-      '<g class="ms-wave" style="transform-origin:128px 104px">' +
+      '<g class="ms-wave">' +
       '<path d="M128,104 C122,90 118,76 117,62" stroke="url(#ms-red)" stroke-width="13" fill="none" stroke-linecap="round"/>' +
       '<g fill="url(#ms-white)">' + fluff([[117, 68, 7], [111, 67, 4], [123, 67, 4]]) + '</g>' +
       '<ellipse cx="116" cy="55" rx="8" ry="9" fill="#1f5a3c"/><path d="M109,55 C105,51 105,47 108,45" stroke="#1f5a3c" stroke-width="5" stroke-linecap="round" fill="none"/></g>' +
@@ -396,7 +396,7 @@
       '<path d="M272,88 L286,88 L279,81 Z M273,108 L285,108 L282,112 L276,112 Z" fill="url(#ms-gold)"/><path d="M279,92 C283,97 281,103 279,104 C277,103 275,97 279,92 Z" fill="#ff9d2e"/>' +
       '</g>' +
       /* the speech bubble when he waves */
-      '<g class="ms-bubble" style="opacity:0;transform-origin:120px 10px"><rect class="ms-bubble-box" x="76" y="-22" width="90" height="28" rx="4" fill="#fff" stroke="#74bfeb" stroke-width="1.6"/>' +
+      '<g class="ms-bubble" style="opacity:0" transform="translate(40,-26)"><rect class="ms-bubble-box" x="76" y="-22" width="90" height="28" rx="4" fill="#fff" stroke="#74bfeb" stroke-width="1.6"/>' +
       '<path d="M108,6 L116,16 L120,6 Z" fill="#fff"/><path d="M108,6 L116,16 L120,6" fill="none" stroke="#74bfeb" stroke-width="1.6"/><rect x="107" y="3" width="15" height="4" fill="#fff"/>' +
       '<text class="ms-bubble-text" x="121" y="-3" text-anchor="middle" font-family="IBM Plex Sans,-apple-system,Segoe UI,sans-serif" font-size="14" font-weight="700" fill="#0d314c">Ho ho ho!</text></g>' +
       '</svg>';
@@ -412,7 +412,7 @@
       '.ms-bob{animation:msBob 1.3s ease-in-out infinite alternate}' +
       '.ms-flight{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 12px rgba(13,49,76,.28))}' +
       '.ms-deer{animation:msDeer .52s ease-in-out infinite alternate}' +
-                  '.ms-wave,.ms-bubble{transform-box:view-box}' +
+                  '.ms-wave{transform-box:fill-box;transform-origin:82% 96%}.ms-bubble{transform-box:fill-box;transform-origin:50% 100%}' +
       '.ms-streaks{animation:msStreak .45s linear infinite}' +
       '@keyframes msStreak{from{transform:translateX(30px);opacity:.9}to{transform:translateX(-60px);opacity:.2}}' +
       '.ms-aura{animation:msAura 1.6s ease-in-out infinite alternate;transform-box:fill-box;transform-origin:center}' +
