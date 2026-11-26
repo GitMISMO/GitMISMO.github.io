@@ -55,7 +55,7 @@
       '.mismo-hat-host{position:relative!important;overflow:visible!important}' +
       '.mismo-hat-host .santa{display:none!important}' +
       '.mismo-hat-host .mismo-hat{position:absolute!important;display:block!important;pointer-events:none;' +
-      'right:auto!important;transform:rotate(7deg);transform-origin:32.5% 80%;z-index:2;overflow:visible;' +
+      'right:auto!important;transform:rotate(15deg);transform-origin:32.5% 80%;z-index:2;overflow:visible;' +
       'filter:drop-shadow(0 1px 1.5px rgba(13,49,76,.38))}' +
       /* the snow */
       '.mismo-snow{position:fixed;inset:0;pointer-events:none;z-index:2147483000;overflow:hidden}' +
