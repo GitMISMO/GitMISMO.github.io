@@ -35,7 +35,7 @@
      the tail ends at 104,73. */
   var HAT = '<defs>' +
     '<linearGradient id="mh-red" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e5493d"/><stop offset=".55" stop-color="#c0392f"/><stop offset="1" stop-color="#8e2620"/></linearGradient>' +
-    '<radialGradient id="mh-fur" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#f4f7fa"/><stop offset="1" stop-color="#d9e4ec"/></radialGradient>' +
+    '<radialGradient id="mh-fur" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#f4f7fa"/><stop offset="1" stop-color="#c9d7e2"/></radialGradient>' +
     '</defs>' +
     '<path d="M16,76 C14,60 24,46 44,40 C60,35 78,37 90,46 C99,53 104,63 104,73 C101,76 97,75 96,71 C95,63 90,56 82,53 C74,51 66,58 62,76 Z" fill="url(#mh-red)"/>' +
     '<path d="M16,76 C14,60 24,46 44,40 C48,39 52,39 55,39 C38,48 30,60 30,76 Z" fill="#0d314c" opacity=".14"/>' +
@@ -56,7 +56,7 @@
       '.mismo-hat-host .santa{display:none!important}' +
       '.mismo-hat-host .mismo-hat{position:absolute!important;display:block!important;pointer-events:none;' +
       'right:auto!important;transform:rotate(20deg);transform-origin:32% 82%;z-index:2;overflow:visible;' +
-      'filter:drop-shadow(0 1px 1.5px rgba(13,49,76,.3))}' +
+      'filter:drop-shadow(0 1px 1.5px rgba(13,49,76,.38))}' +
       /* the snow */
       '.mismo-snow{position:fixed;inset:0;pointer-events:none;z-index:2147483000;overflow:hidden}' +
       '.mismo-snow svg{position:absolute;top:-30px;will-change:transform,opacity}';
@@ -81,7 +81,7 @@
     var L = logo.getBoundingClientRect(), P = host.getBoundingClientRect();
     if (!L.width) return;
     var oLeft = L.left + L.width * 556 / 708, oWidth = L.width * 152 / 708;
-    var hgt = Math.max(26, Math.min(64, oWidth * 1.3)), wid = hgt * 1.2;
+    var hgt = Math.max(30, Math.min(78, oWidth * 1.6)), wid = hgt * 1.2;
     var set = function (k, v) { h.style.setProperty(k, v, 'important'); };
     set('width', wid + 'px'); set('height', hgt + 'px');
     set('left', (oLeft - P.left + oWidth * 0.66 - wid * 0.325) + 'px');
