@@ -29,20 +29,21 @@
   if (!on) return;
 
   var NS = 'http://www.w3.org/2000/svg';
-  /* The hat, drawn for December: low and wide, with a long tail that droops to the right and a fluffy
-     bobble hanging off its end. The bobble sits in a group of its own so it can swing. Drawn on a
-     120 x 100 grid: brim 12 to 66 across, 70 to 88 down; the tail ends at 103,63. */
+  /* The hat, drawn for December: low, its brim curved as if round a head, and a long tail that
+     drapes down the right side with a fluffy bobble hanging off the end. The bobble sits in a group
+     of its own so it can swing. Drawn on a 120 x 100 grid: brim 12 to 66 across, about 70 to 88 down;
+     the tail ends at 104,73. */
   var HAT = '<defs>' +
     '<linearGradient id="mh-red" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e5493d"/><stop offset=".55" stop-color="#c0392f"/><stop offset="1" stop-color="#8e2620"/></linearGradient>' +
     '<radialGradient id="mh-fur" cx=".38" cy=".32" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".7" stop-color="#f4f7fa"/><stop offset="1" stop-color="#d9e4ec"/></radialGradient>' +
     '</defs>' +
-    '<path d="M16,76 C12,58 22,42 44,36 C62,31 82,34 94,44 C100,49 104,56 103,63 C100,66 96,64 95,60 C92,52 84,47 74,47 C66,47 61,58 60,76 Z" fill="url(#mh-red)"/>' +
-    '<path d="M16,76 C12,58 22,42 44,36 C48,35 52,35 55,35 C38,44 30,58 30,76 Z" fill="#0d314c" opacity=".14"/>' +
-    '<path d="M42,40 C57,35 74,36 87,43" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="2.6" stroke-linecap="round"/>' +
-    '<g fill="url(#mh-fur)"><rect x="12" y="70" width="54" height="18" rx="9"/><circle cx="16" cy="71.5" r="4"/><circle cx="23" cy="71.5" r="4"/><circle cx="30" cy="71.5" r="4"/><circle cx="37" cy="71.5" r="4"/><circle cx="44" cy="71.5" r="4"/><circle cx="51" cy="71.5" r="4"/><circle cx="58" cy="71.5" r="4"/><circle cx="63" cy="71.5" r="4"/><circle cx="16" cy="86.5" r="4"/><circle cx="23" cy="86.5" r="4"/><circle cx="30" cy="86.5" r="4"/><circle cx="37" cy="86.5" r="4"/><circle cx="44" cy="86.5" r="4"/><circle cx="51" cy="86.5" r="4"/><circle cx="58" cy="86.5" r="4"/><circle cx="63" cy="86.5" r="4"/></g>' +
-    '<rect x="14" y="80" width="50" height="7" rx="3.5" fill="#0d314c" opacity=".06"/>' +
-    '<g class="mismo-bobble" style="transform-box:view-box;transform-origin:101px 61px"><g fill="url(#mh-fur)"><circle cx="111.0" cy="73.0" r="4"/><circle cx="108.9" cy="77.9" r="4"/><circle cx="104.0" cy="80.0" r="4"/><circle cx="99.1" cy="77.9" r="4"/><circle cx="97.0" cy="73.0" r="4"/><circle cx="99.1" cy="68.1" r="4"/><circle cx="104.0" cy="66.0" r="4"/><circle cx="108.9" cy="68.1" r="4"/><circle cx="104" cy="73" r="8.5"/></g>' +
-    '<circle cx="101" cy="70" r="2.4" fill="#ffffff" opacity=".9"/></g>';
+    '<path d="M16,76 C14,60 24,46 44,40 C60,35 78,37 90,46 C99,53 104,63 104,73 C101,76 97,75 96,71 C95,63 90,56 82,53 C74,51 66,58 62,76 Z" fill="url(#mh-red)"/>' +
+    '<path d="M16,76 C14,60 24,46 44,40 C48,39 52,39 55,39 C38,48 30,60 30,76 Z" fill="#0d314c" opacity=".14"/>' +
+    '<path d="M42,44 C57,39 74,40 86,47" fill="none" stroke="#ffffff" stroke-opacity=".35" stroke-width="2.6" stroke-linecap="round"/>' +
+    '<g fill="url(#mh-fur)"><path d="M12,76 Q39,67 66,76 L66,88 Q39,79 12,88 Z"/><circle cx="12" cy="82" r="6"/><circle cx="66" cy="82" r="6"/><circle cx="12.0" cy="76.0" r="3.8"/><circle cx="19.7" cy="73.8" r="3.8"/><circle cx="27.4" cy="72.3" r="3.8"/><circle cx="35.1" cy="71.6" r="3.8"/><circle cx="42.9" cy="71.6" r="3.8"/><circle cx="50.6" cy="72.3" r="3.8"/><circle cx="58.3" cy="73.8" r="3.8"/><circle cx="66.0" cy="76.0" r="3.8"/><circle cx="12.0" cy="88.0" r="3.8"/><circle cx="19.7" cy="85.8" r="3.8"/><circle cx="27.4" cy="84.3" r="3.8"/><circle cx="35.1" cy="83.6" r="3.8"/><circle cx="42.9" cy="83.6" r="3.8"/><circle cx="50.6" cy="84.3" r="3.8"/><circle cx="58.3" cy="85.8" r="3.8"/><circle cx="66.0" cy="88.0" r="3.8"/></g>' +
+    '<path d="M14,85 Q39,77 64,85" fill="none" stroke="#0d314c" stroke-opacity=".07" stroke-width="4" stroke-linecap="round"/>' +
+    '<g class="mismo-bobble" style="transform-box:view-box;transform-origin:102px 73px"><g fill="url(#mh-fur)"><circle cx="112.0" cy="83.0" r="3.9"/><circle cx="109.9" cy="87.9" r="3.9"/><circle cx="105.0" cy="90.0" r="3.9"/><circle cx="100.1" cy="87.9" r="3.9"/><circle cx="98.0" cy="83.0" r="3.9"/><circle cx="100.1" cy="78.1" r="3.9"/><circle cx="105.0" cy="76.0" r="3.9"/><circle cx="109.9" cy="78.1" r="3.9"/><circle cx="105" cy="83" r="8.5"/></g>' +
+    '<circle cx="102" cy="80" r="2.4" fill="#ffffff" opacity=".9"/></g>';
 
   function css() {
     if (document.getElementById('mismo-holiday-css')) return;
@@ -54,7 +55,7 @@
       '.mismo-hat-host{position:relative!important;overflow:visible!important}' +
       '.mismo-hat-host .santa{display:none!important}' +
       '.mismo-hat-host .mismo-hat{position:absolute!important;display:block!important;pointer-events:none;' +
-      'right:auto!important;transform:rotate(12deg);transform-origin:32% 80%;z-index:2;overflow:visible;' +
+      'right:auto!important;transform:rotate(20deg);transform-origin:32% 82%;z-index:2;overflow:visible;' +
       'filter:drop-shadow(0 1px 1.5px rgba(13,49,76,.3))}' +
       /* the snow */
       '.mismo-snow{position:fixed;inset:0;pointer-events:none;z-index:2147483000;overflow:hidden}' +
@@ -83,8 +84,8 @@
     var hgt = Math.max(26, Math.min(64, oWidth * 1.3)), wid = hgt * 1.2;
     var set = function (k, v) { h.style.setProperty(k, v, 'important'); };
     set('width', wid + 'px'); set('height', hgt + 'px');
-    set('left', (oLeft - P.left + oWidth * 0.62 - wid * 0.325) + 'px');
-    set('top', (L.top - P.top + L.height * 0.24 - hgt * 0.84) + 'px');
+    set('left', (oLeft - P.left + oWidth * 0.66 - wid * 0.325) + 'px');
+    set('top', (L.top - P.top + L.height * 0.30 - hgt * 0.82) + 'px');
   }
 
   /* a container that would clip the hat inside the masthead lets it show (the window's top edge may
