@@ -34,7 +34,7 @@
   /* never on the website's side: public forms, applications and work-product downloads */
   var publicPage = /^\/(forms|work-products)(\/|$)/i.test(location.pathname);
   var on = (now.getMonth() === 11 || preview) && !publicPage;
-  window.MismoHoliday = { on: on, version: '2026-11-27' };
+  window.MismoHoliday = { on: on, version: '2026-11-27b' };
   if (!on) return;
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -227,9 +227,9 @@
      on his sleigh behind his reindeer, Rudolph's nose glowing in front, a trail of gold and sky
      sparkles behind. If you're watching (you've used the page in the last minute, or your
      pointer comes near him) he turns and waves. The time is the same for everyone at MISMO, so
-     the whole team sees him go by together. Once a day per person, across every tool: if no
-     MISMO tool was open at that moment, he comes by once the next time one is, before 5 PM
-     Eastern. Not on weekends or Winter Break (December 25 to 31), and never for anyone whose
+     the whole team sees him go by together. A special easter egg (Jonna, Nov 26, 2026): only
+     those with a MISMO tool open and on screen at that moment see him; anyone who isn't misses
+     him that day, and he doesn't come back later. Once a day at most, in one tab. Not on weekends or Winter Break (December 25 to 31), and never for anyone whose
      computer asks for reduced motion. Preview any time: ?holiday=sleigh on a page's address.
      ------------------------------------------------------------------------------------------ */
   /* ---- the picture: drawn on a 720 x 270 grid, flying to the right ---- */
@@ -563,7 +563,8 @@
     var check = function () {
       var e = eastern();
       if (!e || e.month !== 12 || e.date >= 25 || e.wd === 'Sat' || e.wd === 'Sun') return;
-      if (e.mins < slot(e.day) || e.mins >= 17 * 60) return;
+      /* only at that moment: a two-minute window, never later in the day */
+      if (e.mins < slot(e.day) || e.mins > slot(e.day) + 1) return;
       if (document.visibilityState !== 'visible') return;
       var seen = null;
       try { seen = localStorage.getItem('mismo.sleigh'); } catch (x) {}
@@ -571,12 +572,9 @@
       try { localStorage.setItem('mismo.sleigh', e.day); } catch (x) {}   /* once a day, in one tab only */
       fly();
     };
-    /* checked every 20 seconds; after coming back to a tab, a short pause first so it's a surprise */
-    setInterval(check, 20000);
-    document.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'visible') setTimeout(check, 6000 + Math.random() * 20000);
-    });
-    setTimeout(check, 8000 + Math.random() * 12000);
+    /* checked every 15 seconds, so whoever is looking at that moment sees him */
+    setInterval(check, 15000);
+    setTimeout(check, 2000);
   }
   window.MismoHoliday.sleigh = fly;
 
