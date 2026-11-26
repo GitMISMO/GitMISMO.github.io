@@ -22,5 +22,9 @@
 <div id="mm-submit-idea"></div>
 <script src="embed.js"></script>
 <script>MISMO_SUBMIT_IDEA.mount(document.getElementById('mm-submit-idea'), {embedded: false});</script>
+<!-- Shared MISMO footer (Nov 25, 2026): the same footer as the MISMO forms, from site-chrome/mm-footer.js.
+     The form draws its own footer when it runs standalone, so that one is hidden here. -->
+<style>#mm-submit-idea footer.mm-footer{display:none!important}</style>
+<script src="https://resources.mismo.org/site-chrome/mm-footer.js"></script>
 </body>
 </html>
