@@ -31,7 +31,7 @@
   /* never on the website's side: public forms, applications and work-product downloads */
   var publicPage = /^\/(forms|work-products)(\/|$)/i.test(location.pathname);
   var on = (now.getMonth() === 11 || preview) && !publicPage;
-  window.MismoHoliday = { on: on, version: '2026-11-26b' };
+  window.MismoHoliday = { on: on, version: '2026-11-26c' };
   if (!on) return;
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -215,7 +215,14 @@
   }
 
   function start() {
-    document.documentElement.setAttribute('data-season', 'december');
+    /* The older brand standard dropped the whole masthead 20px in December (html[data-season="december"])
+       to make room for its small hat. This hat sits on the O and needs no room, so the masthead stays
+       exactly where it is the rest of the year (Jonna, Nov 26, 2026): the attribute is taken off,
+       and kept off if a page's own script puts it back. */
+    var root = document.documentElement;
+    var unseason = function () { if (root.hasAttribute('data-season')) root.removeAttribute('data-season'); };
+    unseason();
+    try { new MutationObserver(unseason).observe(root, { attributes: true, attributeFilter: ['data-season'] }); } catch (e) {}
     css();
     var tries = 0;
     /* apps draw their masthead after sign-in or after loading: keep looking for a little while */
