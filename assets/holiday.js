@@ -9,7 +9,8 @@
      The logo itself is never touched.
    - The first time a tool is opened in a browser session, the bobble on the end of the hat swings and
      settles, and a handful of snowflakes drift gently down the page for a few seconds and are gone.
-     Not again until the next session, and never for anyone whose computer asks for reduced motion.
+     Not again until the next session, unless someone hovers over the hat, which brings the snow and
+     the swing back. Never for anyone whose computer asks for reduced motion.
    Outside December nothing happens at all.
 
    Internal pages only: never the public site, forms, the prospectus, or anything a member or sponsor
@@ -54,7 +55,7 @@
          Hats built into a page from the older standard are hidden: this one replaces them. */
       '.mismo-hat-host{position:relative!important;overflow:visible!important}' +
       '.mismo-hat-host .santa{display:none!important}' +
-      '.mismo-hat-host .mismo-hat{position:absolute!important;display:block!important;pointer-events:none;' +
+      '.mismo-hat-host .mismo-hat{position:absolute!important;display:block!important;pointer-events:visiblePainted;cursor:default;' +
       'right:auto!important;transform:rotate(15deg);transform-origin:32.5% 80%;z-index:2;overflow:visible;' +
       'filter:drop-shadow(0 1px 1.5px rgba(13,49,76,.38))}' +
       /* the snow */
@@ -63,8 +64,11 @@
     (document.head || document.documentElement).appendChild(s);
   }
 
-  /* the white plate the masthead logo sits on */
+  /* the white plate the masthead logo sits on (a page whose logo isn't found can mark it with
+     data-mismo-logo on the logo's svg or img) */
   function plate() {
+    var marked = document.querySelector('[data-mismo-logo]');
+    if (marked) { var mh = marked.closest('.plate, .logoplate, .logo-plate, [class*="plate"]') || marked.parentElement; return { host: mh, logo: marked }; }
     var logo = document.querySelector('header use[href="#mismo-logo"], .mast use[href="#mismo-logo"], .masthead use[href="#mismo-logo"], use[href="#mismo-logo"]');
     var el = logo ? logo.closest('svg') : null;
     if (!el) el = document.querySelector('header svg[aria-label="MISMO"], header img[alt*="MISMO"], .mast svg[aria-label="MISMO"], .masthead svg[aria-label="MISMO"], .masthead img[alt*="MISMO"], .mast img[alt*="MISMO"], svg[aria-label="MISMO"], img[alt="MISMO"]');
@@ -130,6 +134,21 @@
       h.innerHTML = HAT;
       host.appendChild(h);
     }
+    if (!h.__mismoHover) {
+      h.__mismoHover = true;
+      /* hover over the hat: it snows again and the bobble swings (not more than every few seconds) */
+      var lastSnow = 0;
+      h.addEventListener('mouseenter', function () {
+        var t = Date.now();
+        if (t - lastSnow < 4000) return;
+        lastSnow = t; snow(true); swing(h, true);
+      });
+      /* the hat sits over part of the logo: a click on it does what a click on the logo does */
+      h.addEventListener('click', function () {
+        var a = host.closest('a') || host.querySelector('a');
+        if (a) a.click(); else if (typeof host.click === 'function') host.click();
+      });
+    }
     requestAnimationFrame(function () { fit(h, found.logo, host); unclip(h); swing(h, first); });
     window.addEventListener('resize', function () { fit(h, found.logo, host); });
     return true;
@@ -140,8 +159,8 @@
   var first = true;
   try { first = preview || !sessionStorage.getItem(KEY); sessionStorage.setItem(KEY, '1'); } catch (e) {}
 
-  function snow() {
-    if (!first) return;
+  function snow(again) {
+    if (!first && !again) return;
     try { if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return; } catch (e) {}
     var box = document.createElement('div');
     box.className = 'mismo-snow';

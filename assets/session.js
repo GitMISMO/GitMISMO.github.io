@@ -1054,3 +1054,33 @@
   }
   document.readyState === 'loading' ? document.addEventListener('DOMContentLoaded', start) : start();
 })();
+
+/* ============================================================================
+   December — the santa hat on the O and a little snow (/assets/holiday.js)
+   ----------------------------------------------------------------------------
+   Jonna, Nov 26, 2026: every internal tool wears the hat from December 1 to 31.
+   It loads only for people signed in with a MISMO or MBA address, so pages that
+   assessors, contractors, sponsors or the public see stay as they are. Nothing
+   happens outside December (preview any time with ?holiday=preview).
+   ============================================================================ */
+(function () {
+  try {
+    var preview = /[?&]holiday=preview\b/.test(location.search) || localStorage.getItem('mismo.holiday') === 'preview';
+    if (new Date().getMonth() !== 11 && !preview) return;
+    var tries = 0;
+    (function go() {
+      var s = null;
+      try { s = JSON.parse(localStorage.getItem('resources:session') || 'null'); } catch (e) {}
+      var email = s && s.email ? String(s.email).toLowerCase() : '';
+      if (/@(mismo|mba)\.org$/.test(email)) {
+        if (!document.querySelector('script[src*="/assets/holiday.js"]')) {
+          var t = document.createElement('script');
+          t.src = '/assets/holiday.js'; t.defer = true;
+          (document.head || document.documentElement).appendChild(t);
+        }
+        return;
+      }
+      if (tries++ < 180) setTimeout(go, 1000);   /* signing in on the page: keep watching for 3 minutes */
+    })();
+  } catch (e) {}
+})();
