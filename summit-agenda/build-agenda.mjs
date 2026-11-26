@@ -12,6 +12,10 @@
 // Nov 18, 2026 (asked by the website's Claude): each summit can also carry "grid", the whole week from the
 // Summit HQ Schedule (every public session, all four days), once Show on the Website Agenda is on for it on
 // the Schedule: { updated, sessions: [{ id, day, date, start, end, type, title, room, desc, sponsor, status }] }.
+// Nov 25, 2026 (CN-045, for MyMISMO's Summit Wi-Fi card): each summit can also carry "wifi":
+// { network, password, sponsor, note }, once Summit HQ has the network entered (left out until then). The Wi-Fi
+// is public on purpose: attendees need it. A summit with only wifi (no gs, wk or grid) is still published.
+// Published per summit: name, city, dates, gs, wk, grid and wifi.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -94,6 +98,11 @@ function grid(g) {
   return sessions.length ? { updated: str(g.updated, 40), sessions } : null;
 }
 
+function wifi(w) {
+  if (!w || !str(w.network)) return null;
+  return { network: str(w.network, 64), password: str(w.password, 64), sponsor: str(w.sponsor, 120), note: str(w.note, 160) };
+}
+
 async function main() {
   if (!TOKEN) {
     console.log('::warning::No token yet. The SUMMIT_DATA_TOKEN or SPONSOR_DATA_TOKEN secret needs read access to GitMISMO/summit-hq-data. The current agenda is unchanged.');
@@ -110,9 +119,9 @@ async function main() {
   const summits = {};
   for (const [id, s] of Object.entries(src)) {
     if (!/^[A-Za-z0-9_-]+$/.test(id) || !s) continue;
-    const gs = await block(s.gs), wk = await block(s.wk), gr = grid(s.grid);
-    if (!gs && !wk && !gr) continue;
-    summits[id] = { name: str(s.name, 160), city: str(s.city, 120), dates: str(s.dates, 80), ...(gs ? { gs } : {}), ...(wk ? { wk } : {}), ...(gr ? { grid: gr } : {}) };
+    const gs = await block(s.gs), wk = await block(s.wk), gr = grid(s.grid), wf = wifi(s.wifi);
+    if (!gs && !wk && !gr && !wf) continue;
+    summits[id] = { name: str(s.name, 160), city: str(s.city, 120), dates: str(s.dates, 80), ...(gs ? { gs } : {}), ...(wk ? { wk } : {}), ...(gr ? { grid: gr } : {}), ...(wf ? { wifi: wf } : {}) };
   }
   // headshots no longer on any agenda come down with it (Summit HQ keeps the originals)
   for (const f of fs.readdirSync(PHOTOS)) if (!wanted.has(f) && f !== '.gitkeep') fs.unlinkSync(path.join(PHOTOS, f));
@@ -123,7 +132,7 @@ async function main() {
   if (prev && same(prev, body)) { console.log('No change.'); return; }
   fs.writeFileSync(OUT, JSON.stringify({ updated: new Date().toISOString(), ...body }, null, 1) + '\n');
   const ids = Object.keys(summits);
-  console.log(ids.length ? ids.map((k) => `${k}: ${summits[k].gs ? summits[k].gs.sessions.length + ' General Sessions items' : 'no General Sessions'}, ${summits[k].wk ? summits[k].wk.sessions.length + ' Workshop items' : 'no Workshop'}, ${summits[k].grid ? summits[k].grid.sessions.length + ' Schedule sessions' : 'no Schedule'}`).join('\n') : 'No summit is on the website agenda yet (Show on the Website Agenda is off).');
+  console.log(ids.length ? ids.map((k) => `${k}: ${summits[k].gs ? summits[k].gs.sessions.length + ' General Sessions items' : 'no General Sessions'}, ${summits[k].wk ? summits[k].wk.sessions.length + ' Workshop items' : 'no Workshop'}, ${summits[k].grid ? summits[k].grid.sessions.length + ' Schedule sessions' : 'no Schedule'}, ${summits[k].wifi ? 'Wi-Fi ' + summits[k].wifi.network : 'no Wi-Fi'}`).join('\n') : 'No summit is on the website agenda yet (Show on the Website Agenda is off).');
 }
 
 main().catch((e) => { console.error(e.message); process.exit(1); });
