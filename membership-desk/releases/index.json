@@ -118,6 +118,13 @@
       "by": "jycritchley",
       "note": "The browser's Back button works (CN-033)",
       "sha256": "d7b357f46828f8f0f9c7c537d61dde3b4b67ba4e09d3cc40e234df418deac310"
+    },
+    {
+      "version": "20261126-2247",
+      "at": "2026-11-26T22:47:35.266Z",
+      "by": "jycritchley",
+      "note": "Masthead matches the other MISMO tools (CN-053)",
+      "sha256": "8d345c03a21c23ecafc4be654817bbda8e85690484fb791b41d34aad6f9d291f"
     }
   ]
 }

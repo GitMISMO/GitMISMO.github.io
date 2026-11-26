@@ -13,7 +13,7 @@
   --ground:#f1f6fa;--surface:#fff;--surface-2:#f6fafd;--surface-3:#e9f1f8;--sunk:#f6fafd;--border:#d5e2ed;--border-strong:#adc4d6;--rule:#e5eef5;--line:#e5eef5;
   --ink:#0d314c;--ink-2:#456179;--ink-3:#7794aa;--good:#0f7b5c;--bad:#b3372c;--warn:#a2701a;--accent-soft:#e4f2fb;--btn:#0d314c;--btn-ink:#fff;
   --display:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;--ui:var(--display);--mono:var(--display);
-  --hq-h:64px;--rail-w:240px;--rail-mini:62px;color-scheme:light}
+  --hq-h:68px;--rail-w:240px;--rail-mini:62px;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#123143;--border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;--ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;--good:#4fc79b;--bad:#f08579;--warn:#e0a83c;--accent-soft:#173c52;--btn:#74bfeb;--btn-ink:#06202f;color-scheme:dark}}
 :root[data-theme="dark"]{--ground:#061722;--surface:#0d2837;--surface-2:#123143;--surface-3:#173c52;--sunk:#123143;--border:#1f4a63;--border-strong:#2f6688;--rule:#173547;--line:#173547;--ink:#e9f4fb;--ink-2:#a6c5d9;--ink-3:#7a9db4;--good:#4fc79b;--bad:#f08579;--warn:#e0a83c;--accent-soft:#173c52;--btn:#74bfeb;--btn-ink:#06202f;color-scheme:dark}
 *{box-sizing:border-box}
@@ -22,17 +22,16 @@ body{background:var(--ground);color:var(--ink);font-family:var(--display);font-v
 button,input,select,textarea{font-family:inherit}
 
 /* ===== the masthead and rail, copied from Summit HQ (mismo-left-nav) ===== */
-.hqtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:97;height:var(--hq-h);background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;padding:0 22px;box-shadow:0 1px 0 rgba(80,164,219,.28);margin-left:calc(0px - var(--rail-w));width:calc(100% + var(--rail-w));transition:margin-left .2s cubic-bezier(.4,0,.2,1),width .2s cubic-bezier(.4,0,.2,1)}
+.hqtop{position:sticky;top:env(safe-area-inset-top,0px);z-index:97;height:var(--hq-h);background:var(--navy);color:#fff;display:flex;align-items:center;gap:0;padding:13px 22px;box-shadow:0 1px 0 rgba(80,164,219,.28);margin-left:calc(0px - var(--rail-w));width:calc(100% + var(--rail-w));transition:margin-left .2s cubic-bezier(.4,0,.2,1),width .2s cubic-bezier(.4,0,.2,1)}
 body.railmini .hqtop{margin-left:calc(0px - var(--rail-mini));width:calc(100% + var(--rail-mini))}
-.hqtop .mastrule{display:block;width:2px;height:34px;flex:0 0 auto;margin-inline:20px;border-radius:1px;background:var(--sky)}
-.hqtop .hqname{font-family:var(--display);font-size:15.5px;font-weight:700;letter-spacing:-.005em;color:var(--sky);white-space:nowrap}
-.hqtop-r{margin-left:auto;display:flex;align-items:center;gap:13px}
+.hqtop .mastrule{display:block;width:1px;height:42px;flex:0 0 auto;margin-inline:14px;background:rgba(80,164,219,.4)}
+.hqtop .hqname{font-family:var(--display);font-size:16px;font-weight:500;color:#94c8e9;white-space:nowrap;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.hqtop-r{margin-left:auto;padding-left:13px;flex:0 0 auto;display:flex;align-items:center;gap:13px}
 .hqtop .eyebrow-m{font-family:var(--display);font-size:10.5px;letter-spacing:.11em;text-transform:uppercase;color:rgba(255,255,255,.62);font-weight:600;white-space:nowrap}
 @media(max-width:700px){.hqtop .eyebrow-m{display:none}}
-.logoplate{background:#fff;border-radius:7px;padding:8px 14px;display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative}
+/* the masthead matches Certification Management's exactly (CN-053, Nov 26, 2026): 68px bar, logo box 9px 13px */
+.logoplate{background:#fff;border-radius:5px;padding:9px 13px;box-shadow:0 1px 0 rgba(80,164,219,.35);display:flex;align-items:center;line-height:0;flex:0 0 auto;position:relative}
 .logoplate .wordmark{height:24px;width:auto;display:block}
-.santa{position:absolute;display:none;pointer-events:none;left:-9px;top:-12px;width:31px;height:31px}
-html[data-season="december"] .santa{display:block}
 #rs-account{flex:0 0 auto;display:inline-flex;align-items:center}
 #rs-account .rs-who,#rs-account .rs-signin{border-radius:4px}
 /* stand-in for the shared sign-in chip in this preview only (session.js draws the real one) */
@@ -285,7 +284,7 @@ button.b:focus-visible{outline:2px solid var(--sky);outline-offset:1px}
 @media(max-width:1100px){.tiles{grid-template-columns:repeat(2,minmax(0,1fr))}.grid2{grid-template-columns:1fr}.pane{width:100vw}.pane-b{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}.cgrid{grid-template-columns:1fr}.cgrid .row{border-right:0}}
 html,body{overflow-x:clip}
 .pane:not(.on){visibility:hidden;transition:transform .22s cubic-bezier(.4,0,.2,1),visibility 0s .22s}
-@media(max-width:700px){.hqtop{padding:0 12px}.hqtop .mastrule{margin-inline:10px}.logoplate{padding:7px 10px}.logoplate .wordmark{height:19px}.hqtop .hqname{font-size:14px}.pv-who{font-size:0;gap:0;padding:4px}.pv-who em{display:none}.steps{grid-template-columns:1fr 1fr}.steps div:nth-child(2){border-right:0}.steps div{border-bottom:1px solid var(--rule)}main{padding:14px}.row{grid-template-columns:10px minmax(0,1fr) auto;gap:10px}.row .wh,.row .dt{display:none}.vsub{white-space:normal}.fr{grid-template-columns:120px minmax(0,1fr) 28px}.form{grid-template-columns:1fr}}
+@media(max-width:700px){.pv-who{font-size:0;gap:0;padding:4px}.pv-who em{display:none}.steps{grid-template-columns:1fr 1fr}.steps div:nth-child(2){border-right:0}.steps div{border-bottom:1px solid var(--rule)}main{padding:14px}.row{grid-template-columns:10px minmax(0,1fr) auto;gap:10px}.row .wh,.row .dt{display:none}.vsub{white-space:normal}.fr{grid-template-columns:120px minmax(0,1fr) 28px}.form{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 /* Payment in Process (Jonna, Nov 2, 2026) */
 .grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;align-items:stretch}
@@ -551,10 +550,9 @@ c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20
 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52
 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"/></g></symbol>
 
-<symbol id="mismo-hat" viewBox="0 0 100 100"><path d="M17,73 C9,44 20,17 42,9 C59,3 72,10 80,22 C85,30 86,38 81,41 C76,44 70,40 65,32 C60,46 57,60 57,73 Z" fill="#c0392f"/><path d="M17,73 C9,44 20,17 42,9 C48,7 53,6 58,7 C41,19 30,45 30,73 Z" fill="#0d314c" opacity=".17"/><rect x="10" y="65" width="56" height="20" rx="10" fill="#ffffff"/><rect x="10" y="75" width="56" height="10" rx="5" fill="#0d314c" opacity=".07"/><circle cx="86" cy="45" r="11.5" fill="#ffffff"/></symbol>
 </defs></svg>
 <header class="hqtop">
-  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg><svg class="santa" viewBox="0 0 100 100" aria-hidden="true"><use href="#mismo-hat"/></svg></span>
+  <span class="logoplate"><svg class="wordmark" role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></span>
   <span class="mastrule"></span>
   <span class="hqname">Membership Desk</span>
   <span class="hqtop-r"><span class="eyebrow-m">Programs &amp; Operations</span>
@@ -1467,7 +1465,6 @@ fromHash();window.addEventListener("hashchange",fromHash);
   const dt=HELP.find(tp=>tp.id==="dates");const st=dt&&dt.steps.find(x=>/Non-Lenders/.test(x[0]));
   if(st){st[0]="Non-Lenders: the "+ord(d)+" Rule";st[1]="Paid on the 1st through the "+ord(d)+", the membership starts that month. Paid on the "+ord(d+1)+" or later, it starts the next month. Paid October "+Math.max(1,d-5)+" starts October 1; paid October "+(d+5)+" starts November 1; paid December "+(d+1)+" starts January 1.";}
  }catch(e){console.error("shared rules",e);}})();
-if(new Date().getMonth()===11)document.documentElement.setAttribute("data-season","december");
 };
 </script>
 <script>
@@ -1574,7 +1571,7 @@ let fp="",at="",newer=false;
 async function rd(){const r=await fetch(location.pathname+"?ver="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error("HTTP "+r.status);const t=await r.text();const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return {fp:[...new Uint8Array(b)].slice(0,4).map(x=>x.toString(16).padStart(2,"0")).join(""),at:r.headers.get("last-modified")||""};}
 function txt(){const d=Date.parse(at);return "Version "+fp+(isNaN(d)?"":", published "+new Date(d).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"})+" at "+new Date(d).toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit"}))+(window.DESK_TEST?" (test copy)":"");}
 function paint(){const h=document.getElementById("v-help");if(h&&fp){let x=document.getElementById("ver-line");if(!x){x=document.createElement("div");x.id="ver-line";x.style.cssText="margin:18px 0 6px;font-size:12px;color:var(--ink-3,#5b7489)";h.appendChild(x);}if(x.textContent!==txt())x.textContent=txt();}
-  if(newer&&!document.getElementById("ver-bar")){const b=document.createElement("div");b.id="ver-bar";b.setAttribute("role","status");b.style.cssText="position:fixed;left:50%;top:76px;transform:translateX(-50%);z-index:9999;background:var(--surface,#fff);color:var(--ink,#0d314c);border:1px solid var(--border-strong,#adc4d6);border-left:4px solid var(--sky,#74bfeb);border-radius:6px;box-shadow:0 8px 24px rgba(6,32,47,.18);padding:9px 12px;display:flex;gap:12px;align-items:center;font-size:13px;max-width:calc(100vw - 32px)";
+  if(newer&&!document.getElementById("ver-bar")){const b=document.createElement("div");b.id="ver-bar";b.setAttribute("role","status");b.style.cssText="position:fixed;left:50%;top:80px;transform:translateX(-50%);z-index:9999;background:var(--surface,#fff);color:var(--ink,#0d314c);border:1px solid var(--border-strong,#adc4d6);border-left:4px solid var(--sky,#74bfeb);border-radius:6px;box-shadow:0 8px 24px rgba(6,32,47,.18);padding:9px 12px;display:flex;gap:12px;align-items:center;font-size:13px;max-width:calc(100vw - 32px)";
     const s=document.createElement("span");s.textContent="The Membership Desk has been updated. Reload to get the latest version.";const k=document.createElement("button");k.type="button";k.className="btn";k.textContent="Reload";k.addEventListener("click",()=>location.reload());b.appendChild(s);b.appendChild(k);document.body.appendChild(b);}}
 (async()=>{try{const v=await rd();fp=v.fp;at=v.at;paint();}catch(e){console.error("version",e);}
   const h=document.getElementById("v-help");if(h)new MutationObserver(()=>{if(fp&&!document.getElementById("ver-line"))paint();}).observe(h,{childList:true});
