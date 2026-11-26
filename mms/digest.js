@@ -140,7 +140,11 @@
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
-      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
+      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : (function () { var e = f(t.dates && t.dates.commentEnd), c = t.cpCard || {}, L = t.links || {};
+        if (!(t.cpFile && t.cpFile.url) && !c.nonMember) return { role: 'facilitator', text: 'Open for comment until ' + e + ' with nothing for non-members to download: Choose the Files for Comment' };
+        if (!L.resourceLibrary) return { role: 'website', text: 'Open for comment until ' + e + ': add the Resource Library link so members can open it' };
+        if (!c.text) return { role: 'facilitator', text: 'Open for comment until ' + e + ': write the Comment Period Card (what the website says about it)' };
+        return { role: '', text: 'Open for comment until ' + e }; })();
       case 'post': return { role: 'facilitator', text: t.finalFiles ? 'Report what came back from comment' : 'Put the license language in the files and Choose the Final Files, then report what came back from comment' };
       case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
       case 'release': return { role: 'website', text: 'Publish the pages and announcement' };

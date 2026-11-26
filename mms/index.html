@@ -2184,7 +2184,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-26T00:16:40Z',fp:'95fa7126'};
+window.__mmsBuild={at:'2026-11-26T00:51:54Z',fp:'f4e14c1c'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2396,6 +2396,13 @@ function personByName(n){ const all=[...(S.people.facilitators||[]),...Object.va
 function emailOf(n){ const p=personByName(n); return p?p.email:''; }
 
 /* whose move is it — the heart of every queue */
+/* an open comment period the website can't offer yet (Nov 25, 2026 sweep: all four open on mismo.org had no download,
+   no Resource Library link and no card): the next move goes back to whoever can fill it in */
+function cpOpenGap(t){ const c=typeof cpCardOf==='function'?cpCardOf(t):{}, end=fmtS(t.dates&&t.dates.commentEnd);
+  if(!c.nonMember) return {role:'facilitator',label:'Facilitator',text:'Open for comment until '+end+' with nothing for non-members to download: Choose the Files for Comment'};
+  if(!c.member) return {role:'website',label:'Website Admin',text:'Open for comment until '+end+': add the Resource Library link so members can open it'};
+  if(!c.text) return {role:'facilitator',label:'Facilitator',text:'Open for comment until '+end+': write the Comment Period Card (what the website says about it)'};
+  return null; }
 function whoseMove(t){
   if(t.request) return {role:'staff',label:'MISMO Staff',text:(t.request.by||'The facilitator')+' asked to '+({hold:'put this on hold',resume:'resume this',close:'close this',cancel:'cancel this'}[t.request.kind]||t.request.kind)};
   if(t.split){ const n=(t.deliverables||[]).length; return {role:'',label:'Split',text:'Split into '+n+' deliverable'+(n===1?'':'s')+'; each one moves on its own'}; }
@@ -2423,7 +2430,7 @@ function whoseMove(t){
       const ld=peopleFor('vps').map(p=>String(p.name).split(' ')[0]).join(', ')||'License Designator';
       return {role:'vps',label:ld,text:t.designation&&(t.designation.auto||t.designation.recommended)?'Designate the license (the MMS has a recommendation)':'Designate the license'}; }
     case 'gc-comment': return {role:'gov',label:g,text:g+' approval to go to comment'};
-    case 'comment': return sub==='setup'?(!(t.cpFile&&t.cpFile.url)?{role:'facilitator',label:'Facilitator',text:'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)'}:{role:'website',label:'Website Admin',text:'Add the Resource Library link: the comment period starts that day'}):(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)});
+    case 'comment': return sub==='setup'?(!(t.cpFile&&t.cpFile.url)?{role:'facilitator',label:'Facilitator',text:'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)'}:{role:'website',label:'Website Admin',text:'Add the Resource Library link: the comment period starts that day'}):(t.dates&&t.dates.commentStart>today()?{role:'',label:'Comment Period',text:'Opens for comment '+fmt(t.dates.commentStart)}:(cpOpenGap(t)||{role:'',label:'Comment Period',text:'Open for comment until '+fmtS(t.dates&&t.dates.commentEnd)}));
     case 'post': return {role:'facilitator',label:'Facilitator',text:t.finalFiles?'Report what came back from comment':'Put the license language in the files and Choose the Final Files, then report what came back from comment'};
     case 'gc-publish': return {role:'gov',label:g,text:g+' approval to publish as '+(isStandard(t)?'Candidate Recommendation':'Final')};
     case 'release': return {role:'website',label:'Website Admin',text:'Publish the pages and announcement'};
@@ -3641,7 +3648,11 @@ function wireArch(m){
       }
       case 'designation': return { role: 'vps', text: 'Designate the license' };
       case 'gc-comment': return { role: 'gov', text: g + ' approval to go to comment' };
-      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : { role: '', text: 'Open for comment until ' + f(t.dates && t.dates.commentEnd) };
+      case 'comment': return sub === 'setup' ? (!(t.cpFile && t.cpFile.url) ? { role: 'facilitator', text: 'Put the Comment Period (IPR) language in the files, add them to Files, then Choose the Files for Comment (several are zipped for you, or a big set goes out as separate downloads)' } : { role: 'website', text: 'Add the Resource Library link: the comment period starts that day' }) : (function () { var e = f(t.dates && t.dates.commentEnd), c = t.cpCard || {}, L = t.links || {};
+        if (!(t.cpFile && t.cpFile.url) && !c.nonMember) return { role: 'facilitator', text: 'Open for comment until ' + e + ' with nothing for non-members to download: Choose the Files for Comment' };
+        if (!L.resourceLibrary) return { role: 'website', text: 'Open for comment until ' + e + ': add the Resource Library link so members can open it' };
+        if (!c.text) return { role: 'facilitator', text: 'Open for comment until ' + e + ': write the Comment Period Card (what the website says about it)' };
+        return { role: '', text: 'Open for comment until ' + e }; })();
       case 'post': return { role: 'facilitator', text: t.finalFiles ? 'Report what came back from comment' : 'Put the license language in the files and Choose the Final Files, then report what came back from comment' };
       case 'gc-publish': return { role: 'gov', text: g + ' approval to publish as ' + (/standard/i.test(t.classification || '') ? 'Candidate Recommendation' : 'Final') };
       case 'release': return { role: 'website', text: 'Publish the pages and announcement' };
@@ -7408,6 +7419,33 @@ async function imSendDocsOnly(t){ if(S.viewAs||!S.canWrite) return false;
   const r=await imSend(t,rep); if(r===false) return false; toast(t.wr+' sent to IM (no Reference Model changes)'); if(S.panel) renderPanel(); return true; }
 const _renderPanelDO=renderPanel;
 renderPanel=function(){ _renderPanelDO(); $$('#panel [data-imdocsonly]').forEach(b=>b.onclick=e=>{ e.preventDefault(); const t=S.tickets[b.dataset.imdocsonly]; if(t) imSendDocsOnly(t); }); };
+/* ---------- A submission moved on by hand leaves the review portal (Nov 25, 2026 bug sweep) ----------
+   WR2025_23 was moved by hand from AWG Review to License Designation on Nov 21, but it stayed on AWG Review's
+   agenda as waiting. Now a MISMO staff page takes a waiting IM or AWG submission off its portal (status withdrawn,
+   so it leaves the agenda and stays in the record) once its work request has left that stage after it was sent,
+   and the work request's history says so. A decision already made is never touched. */
+let pqSwept=0;
+const pqLeft=(t,stage,since)=>(t.history||[]).some(h=>h&&h.from===stage&&String(h.at||'')>=String(since||''));
+function pqGone(t,stage,since){ return !!t&&t.stage!==stage&&(t.state!=='active'||pqLeft(t,stage,since)); }
+async function pqNote(t,text){ try{ const x=clone(S.tickets[t.id]||t); hist(x,text); await saveTicket(x); }catch(e){} }
+async function pqSweep(io){ io=io||{}; const AU=io.awgUpdate||awgUpdate, IU=io.imrUpdate||imrUpdate, RG=io.rGet||rGet; /* io: stand-ins for tests */
+  if(S.mode!=='relay'||!S.ready||!S.isStaff||!S.canWrite||S.viewAs||S.partial||Date.now()-pqSwept<10*60000) return; pqSwept=Date.now();
+  const tk=it=>S.tickets[it.ticket]||allTickets().find(x=>x.wr===it.wr);
+  /* AWG Review: on the agenda (waiting or carried) */
+  try{ const Q=S.awgPortalQ||{}; const gone=Object.values(Q).filter(it=>it&&(it.status==='awaiting'||it.status==='carried')&&!it.hist&&!it.test&&pqGone(tk(it),'awg',it.at||it.sentAt));
+    if(gone.length){ const reps=gone.map(g=>g.rep), now=new Date().toISOString();
+      const o=await AU('queue',cur=>{ const c=cur||{items:{}}; reps.forEach(r=>{ const x=c.items&&c.items[r]; if(x&&(x.status==='awaiting'||x.status==='carried')&&!x.hist){ x.status='withdrawn'; x.hist=true; x.withdrawnAt=now; x.withdrawnBy=S.me.name||'MMS'; x.withdrawnWhy='Moved on in the MMS'; } }); return c; });
+      if(o&&o.items) S.awgPortalQ=o.items;
+      for(const g of gone){ const t=tk(g); if(t) await pqNote(t,'Taken off the AWG Review agenda: it had already moved on in the MMS'); } } }catch(e){ console.warn('awg sweep',e); }
+  /* IM Review: waiting for IM */
+  try{ const q=await RG(IMR,'queue'); const items=(q&&q.data&&q.data.items)||{};
+    const gone=Object.values(items).filter(it=>it&&it.status==='awaiting'&&!it.hist&&!it.test&&pqGone(tk(it),'im',it.sentAt||it.at));
+    if(gone.length){ const reps=gone.map(g=>g.rep), now=new Date().toISOString();
+      await IU('queue',cur=>{ const c=cur||{items:{}}; reps.forEach(r=>{ const x=c.items&&c.items[r]; if(x&&x.status==='awaiting'&&!x.hist){ x.status='withdrawn'; x.hist=true; x.withdrawnAt=now; x.withdrawnBy=S.me.name||'MMS'; x.withdrawnWhy='Moved on in the MMS'; } }); return c; });
+      for(const g of gone){ const m=S.imq&&S.imq[g.rep]; if(m&&m.status==='awaiting'){ const x=Object.assign({},m,{status:'withdrawn',withdrawnAt:now,withdrawnBy:S.me.name||'MMS'}); S.imq[g.rep]=x; try{ await write('imqueue',g.rep,x); }catch(e){} }
+        const t=tk(g); if(t) await pqNote(t,'Taken off IM Review’s waiting list: it had already moved on in the MMS'); } } }catch(e){ console.warn('im sweep',e); } }
+const _awgSyncPQ=awgSync;
+awgSync=async function(){ const r=await _awgSyncPQ.apply(this,arguments); try{ await pqSweep(); }catch(e){} return r; };
 
 /* ================= Help (by role) and the Resource Center ================= */
 const HELP_ROLES=[
