@@ -31,7 +31,7 @@
   /* never on the website's side: public forms, applications and work-product downloads */
   var publicPage = /^\/(forms|work-products)(\/|$)/i.test(location.pathname);
   var on = (now.getMonth() === 11 || preview) && !publicPage;
-  window.MismoHoliday = { on: on, version: '2026-11-26c' };
+  window.MismoHoliday = { on: on, version: '2026-11-26d' };
   if (!on) return;
 
   var NS = 'http://www.w3.org/2000/svg';
@@ -131,6 +131,7 @@
     ], { duration: 3200, delay: 400, easing: 'ease-in-out' });
   }
 
+  var hatCount = 0;
   function hatOn(found, first) {
     var host = found.host;
     host.classList.add('mismo-hat-host');
@@ -141,7 +142,10 @@
     h.setAttribute('viewBox', '0 0 120 100');
     h.setAttribute('aria-hidden', 'true');
     h.setAttribute('focusable', 'false');
-    h.innerHTML = HAT;
+    /* each hat carries its own colors: when a loading screen and its hat are hidden, the hat in the
+       masthead must not lose the red and the fur along with it */
+    var k = ++hatCount;
+    h.innerHTML = HAT.replace(/mh-(red|fur)/g, 'mh-$1-' + k);
     host.appendChild(h);
     /* hover over the hat: it snows again and the bobble swings (not more than every few seconds) */
     var lastSnow = 0;
