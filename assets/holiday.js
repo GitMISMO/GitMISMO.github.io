@@ -232,11 +232,18 @@
      computer asks for reduced motion. Preview any time: ?holiday=sleigh on a page's address.
      ------------------------------------------------------------------------------------------ */
   var DEER_BODY = 'M12,34 C10,26 18,21 32,21 L52,21 C60,21 65,24 67,29 L63,39 C59,43 51,43 45,43 L26,43 C17,43 13,40 12,34 Z';
+  /* how far along a leg its hoof starts (the dark tip) */
+  function hoof(d) {
+    var n = d.match(/-?\d+(\.\d+)?/g).map(Number), len = 0;
+    for (var i = 2; i < n.length; i += 2) len += Math.hypot(n[i] - n[i - 2], n[i + 1] - n[i - 1]);
+    return Math.max(0, len - 3);
+  }
   function deer(x, y, k, rudolph, back) {
     var fur = back ? 'url(#ms-fur-b)' : 'url(#ms-fur)';
     var leg = function (cls, hx, hy, d) {
       return '<g class="' + cls + '" style="transform-origin:' + hx + 'px ' + hy + 'px">' +
-        '<path d="' + d + '" fill="none" stroke="' + (back ? '#4a2c1a' : '#5e3a24') + '" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="' + d + '" fill="none" stroke="' + (back ? '#4a2c1a' : '#6b4329') + '" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>' +
+        '<path d="' + d + '" fill="none" stroke="#24160d" stroke-width="5.4" stroke-linecap="round" stroke-dasharray="0 ' + hoof(d) + ' 3 40"/>' +
         '</g>';
     };
     var nose = rudolph
@@ -270,6 +277,7 @@
       '<radialGradient id="ms-glow"><stop offset="0" stop-color="#ff6b5e" stop-opacity=".95"/><stop offset=".45" stop-color="#ff3b30" stop-opacity=".45"/><stop offset="1" stop-color="#ff3b30" stop-opacity="0"/></radialGradient>' +
       '<linearGradient id="ms-red" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8483c"/><stop offset=".6" stop-color="#c0392f"/><stop offset="1" stop-color="#8e2620"/></linearGradient>' +
       '<linearGradient id="ms-gold" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#b8872c"/><stop offset=".5" stop-color="#ffe08a"/><stop offset="1" stop-color="#c99a3a"/></linearGradient>' +
+      '<radialGradient id="ms-lamp"><stop offset="0" stop-color="#fff3c4" stop-opacity=".95"/><stop offset=".4" stop-color="#ffd76a" stop-opacity=".5"/><stop offset="1" stop-color="#ffd76a" stop-opacity="0"/></radialGradient>' +
       '<radialGradient id="ms-white" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#d7e3ec"/></radialGradient>' +
       '</defs>' +
       /* reins, from Santa's hand to the team */
@@ -283,7 +291,9 @@
       '<rect x="22" y="30" width="16" height="16" rx="2" fill="#74bfeb" transform="rotate(-12 30 38)"/><path d="M30,30 L30,46 M22,38 L38,38" stroke="#fff" stroke-width="2.2" transform="rotate(-12 30 38)"/>' +
       '<rect x="36" y="24" width="14" height="18" rx="2" fill="#2f8f5b" transform="rotate(8 43 33)"/><path d="M43,24 L43,42" stroke="#f3c75a" stroke-width="2.2" transform="rotate(8 43 33)"/>' +
       '<rect x="27" y="18" width="12" height="12" rx="2" fill="#f3c75a" transform="rotate(-4 33 24)"/><path d="M33,18 L33,30 M27,24 L39,24" stroke="#c0392f" stroke-width="2" transform="rotate(-4 33 24)"/>' +
-      '<path d="M22,50 C30,46 44,46 52,52" fill="none" stroke="#3e2619" stroke-width="2"/></g>' +
+      '<path d="M22,50 C30,46 44,46 52,52" fill="none" stroke="#3e2619" stroke-width="2"/>' +
+      '<path d="M24,48 C22,58 22,70 26,80" fill="none" stroke="#7a5641" stroke-width="3" stroke-linecap="round" opacity=".55"/>' +
+      '<path d="M40,50 C46,54 50,52 52,48 M40,50 C44,56 42,60 38,62" fill="none" stroke="#f3c75a" stroke-width="1.8" stroke-linecap="round"/></g>' +
       /* Santa */
       '<g class="ms-santa">' +
       '<path d="M66,92 C62,72 72,58 90,56 C106,55 116,64 116,80 L116,94 Z" fill="url(#ms-red)"/>' +
@@ -313,10 +323,15 @@
       '<path d="M36,104 C44,96 54,96 58,104 C62,112 72,112 78,104 C84,96 94,96 98,104" fill="none" stroke="url(#ms-gold)" stroke-width="2" stroke-linecap="round" opacity=".9"/>' +
       '<path d="M40,120 L36,132 M108,120 L112,132" stroke="url(#ms-gold)" stroke-width="2.6" stroke-linecap="round"/>' +
       '<path d="M8,132 L138,132 C156,132 162,118 152,110 C146,106 138,110 142,116" fill="none" stroke="url(#ms-gold)" stroke-width="3.4" stroke-linecap="round"/>' +
+      '<path d="M22,98 C26,108 40,114 60,114" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="3" stroke-linecap="round"/>' +
+      /* the lantern on the front of the sleigh, glowing */
+      '<path d="M144,74 C150,66 154,62 158,62" fill="none" stroke="url(#ms-gold)" stroke-width="2" stroke-linecap="round"/>' +
+      '<circle cx="158" cy="72" r="14" fill="url(#ms-lamp)" class="ms-glow"/>' +
+      '<rect x="154" y="64" width="8" height="12" rx="1.5" fill="#ffe9a8" stroke="url(#ms-gold)" stroke-width="1.4"/><path d="M155,64 L161,64 L158,60 Z" fill="url(#ms-gold)"/>' +
       '</g>' +
       /* "Ho ho ho!" when he waves */
-      '<g class="ms-bubble" style="opacity:0;transform-origin:70px 14px"><rect x="34" y="0" width="70" height="22" rx="4" fill="#fff" stroke="#74bfeb" stroke-width="1.4"/>' +
-      '<path d="M60,22 L66,30 L70,22 Z" fill="#fff"/><text x="69" y="15.5" text-anchor="middle" font-family="IBM Plex Sans,-apple-system,Segoe UI,sans-serif" font-size="11" font-weight="700" fill="#0d314c">Ho ho ho!</text></g>' +
+      '<g class="ms-bubble" style="opacity:0;transform-origin:70px 14px"><rect class="ms-bubble-box" x="34" y="0" width="70" height="22" rx="4" fill="#fff" stroke="#74bfeb" stroke-width="1.4"/>' +
+      '<path d="M60,22 L66,30 L70,22 Z" fill="#fff"/><text x="69" y="15.5" text-anchor="middle" font-family="IBM Plex Sans,-apple-system,Segoe UI,sans-serif" font-size="11" font-weight="700" fill="#0d314c" class="ms-bubble-text">Ho ho ho!</text></g>' +
       '</svg>';
   }
 
@@ -326,7 +341,7 @@
     s.id = 'mismo-sleigh-css';
     s.textContent =
       '.ms-sky{position:fixed;inset:0;pointer-events:none;z-index:2147483001;overflow:hidden}' +
-      '.ms-fly{position:absolute;left:0;top:0;will-change:transform}' +
+      '.ms-fly{position:absolute;left:0;top:0;will-change:transform;transform-origin:30% 50%}' +
       '.ms-bob{animation:msBob 1.3s ease-in-out infinite alternate}' +
       '.ms-flight{display:block;width:100%;height:auto;overflow:visible;filter:drop-shadow(0 8px 12px rgba(13,49,76,.28))}' +
       '.ms-deer{animation:msDeer .52s ease-in-out infinite alternate}' +
@@ -352,7 +367,11 @@
     var e = document.createElementNS(NS, 'svg');
     e.setAttribute('viewBox', '-10 -10 20 20'); e.setAttribute('width', size); e.setAttribute('height', size);
     e.setAttribute('class', 'ms-spark');
-    e.innerHTML = Math.random() < 0.55
+    var r = Math.random();
+    if (r < 0.12) { size = 22 + Math.random() * 26; e.setAttribute('width', size); e.setAttribute('height', size); }
+    e.innerHTML = r < 0.12
+      ? '<circle r="9" fill="' + c + '" opacity=".35"/><circle r="4" fill="' + c + '" opacity=".5"/>'
+      : r < 0.6
       ? '<path d="M0,-10 C1.2,-2 2,-1.2 10,0 C2,1.2 1.2,2 0,10 C-1.2,2 -2,1.2 -10,0 C-2,-1.2 -1.2,-2 0,-10 Z" fill="' + c + '"/>'
       : '<circle r="4" fill="' + c + '"/><circle r="9" fill="' + c + '" opacity=".25"/>';
     sky.appendChild(e);
@@ -380,7 +399,7 @@
     flying = true;
     sleighCss();
     var W = window.innerWidth, H = window.innerHeight;
-    var w = Math.max(250, Math.min(520, W * 0.36)), h = w * 160 / 440;
+    var w = Math.max(260, Math.min(640, W * 0.42)), h = w * 160 / 440;
     var sky = document.createElement('div');
     sky.className = 'ms-sky'; sky.setAttribute('aria-hidden', 'true');
     var box = document.createElement('div');
@@ -401,7 +420,9 @@
     for (var i = 0; i <= steps; i++) {
       var t = i / steps, p = pt(t), q = pt(Math.min(1, t + 0.02));
       var ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI * 0.55;
-      frames.push({ transform: 'translate(' + p.x + 'px,' + p.y + 'px) rotate(' + ang + 'deg)', offset: t });
+      /* swoops toward you as he passes the middle, then away */
+      var sc = 0.72 + 0.34 * Math.sin(Math.PI * Math.min(1, t * 1.1));
+      frames.push({ transform: 'translate(' + p.x + 'px,' + p.y + 'px) rotate(' + ang + 'deg) scale(' + sc.toFixed(3) + ')', offset: t });
     }
     var anim = box.animate(frames, { duration: dur, easing: 'linear', fill: 'forwards' });
 
@@ -415,9 +436,17 @@
     /* he waves if you're watching: as he crosses the middle, if you've used the page in the last
        minute, and whenever your pointer comes near him */
     var waved = 0, svg = bob.querySelector('svg'), arm = svg.querySelector('.ms-wave'), bubble = svg.querySelector('.ms-bubble');
+    var waves = 0;
     function wave() {
       if (Date.now() - waved < 2600) return;
-      waved = Date.now();
+      waved = Date.now(); waves++;
+      var txt = bubble.querySelector('.ms-bubble-text'), bx = bubble.querySelector('.ms-bubble-box');
+      if (waves > 1) { txt.textContent = 'Merry Christmas!'; bx.setAttribute('width', '96'); bx.setAttribute('x', '21'); }
+      setTimeout(function () {
+        var m = svg.querySelector('.ms-wave circle'), r = m ? m.getBoundingClientRect() : null;
+        if (r) for (var n = 0; n < 16; n++) sparkle(sky, r.left + r.width / 2 + (Math.random() - 0.5) * 30, r.top + (Math.random() - 0.5) * 30);
+      }, 380);
+      if (waves === 1) snow(true);
       arm.animate([
         { transform: 'rotate(-150deg)' }, { transform: 'rotate(-10deg)', offset: 0.16 }, { transform: 'rotate(22deg)', offset: 0.27 },
         { transform: 'rotate(-14deg)', offset: 0.38 }, { transform: 'rotate(22deg)', offset: 0.49 }, { transform: 'rotate(-14deg)', offset: 0.6 },
