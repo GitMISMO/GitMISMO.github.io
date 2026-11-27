@@ -5,7 +5,7 @@
    - New Year's: the first time each person opens any tool in January, fireworks, confetti and the new year in gold,
      and a party hat on the O for that day. Once per person per year.
    - Groundhog Day: a groundhog pops up out of his burrow in the corner, looks around and ducks back in.
-   - Valentine's Day: shiny heart balloons float up the page; then an arrow streaks in and lands in the O, and
+   - Valentine's Day: hearts float up the page. Hover over the logo and an arrow streaks in, lands in the O, and
      hearts burst out of it.
    - Pi Day: a lattice cherry pie is set down at the bottom with the digits of pi streaming up from it.
    - St. Patrick's Day: a leprechaun hat on the O, a rainbow across the top into a pot of gold, shamrocks drifting.
@@ -521,11 +521,11 @@
     },
     valentine: {
       open: function () {
-        var L = sky(), r = balloons(L, 16);
-        setTimeout(function () { var b = visibleLogo(); if (b) arrowInto(L, b); }, 4600);
-        done(L, Math.max(r, 7600));
+        var L = sky();
+        var r = drift(L, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffc2d1'][i % 4])); }, 24, { dir: 'up', size: [16, 34], dur: [5600, 8600], spread: 2600, spin: 40, reach: [0.6, 1] });
+        done(L, r);
       },
-      hover: function (b) { var L = sky(); done(L, burst(L, b.cx, b.cy, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffffff'][i % 4])); }, 16, { size: [14, 26], dist: [40, 120] })); }
+      hover: function (b) { var L = sky(); arrowInto(L, b); done(L, 2400); }
     },
     piday: {
       open: function () { pie(); },
@@ -600,29 +600,6 @@
     })(i);
     done(L, longest + 200);
   }
-  /* Valentine's: shiny heart balloons on strings float up the page, swaying */
-  function balloonHeart(c, d) {
-    return '<defs><radialGradient id="I-bh" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".22" stop-color="' + c + '"/><stop offset="1" stop-color="' + d + '"/></radialGradient></defs>' +
-      '<path d="M0,22 C0,30 -4,34 1.5,40 C6.5,45 -2.5,50 1,56" stroke="#b9a2ab" stroke-width=".9" fill="none"/>' +
-      '<path d="M-1.8,23.6 L1.8,23.6 L0,20.4 Z" fill="' + d + '"/>' +
-      '<path d="M0,21 C-21,7 -16,-12 -7.5,-13 C-3.4,-13.5 -1,-11 0,-8 C1,-11 3.4,-13.5 7.5,-13 C16,-12 21,7 0,21 Z" fill="url(#I-bh)"/>' +
-      '<ellipse cx="-7.5" cy="-5" rx="2.8" ry="4.6" fill="#fff" opacity=".5" transform="rotate(-28 -7.5 -5)"/>';
-  }
-  function balloons(layer, n) {
-    var W = innerWidth, Hh = innerHeight, longest = 0, cols = [['#ff4d6d', '#a8102f'], ['#ff8fab', '#cf4470'], ['#e8483c', '#8e1520'], ['#ffb3c6', '#d9688f'], ['#ff6b8b', '#b8173f']];
-    for (var i = 0; i < n; i++) {
-      var c = cols[i % cols.length], w = rnd(48, 96), h = w * 56 / 32, e = art('-16 -15 32 56', balloonHeart(c[0], c[1]));
-      e.style.width = w + 'px'; e.style.height = h + 'px'; layer.appendChild(e);
-      var x0 = W * (i + R()) / n - w / 2, dur = rnd(9000, 12500), delay = rnd(0, 2600), sway = rnd(14, 34), f1 = rnd(0.8, 1.6), ph = R() * 6, fr = [];
-      for (var k = 0; k <= 20; k++) {
-        var t = k / 20, y = Hh + 20 - (Hh + h + 60) * t, x = x0 + Math.sin(t * Math.PI * 2 * f1 + ph) * sway;
-        fr.push({ transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + (Math.sin(t * Math.PI * 2 * f1 + ph + 1) * 7).toFixed(1) + 'deg)', opacity: t < 0.05 ? t / 0.05 : 1 });
-      }
-      anim(e, fr, { duration: dur, delay: delay, easing: 'linear', fill: 'both' });
-      longest = Math.max(longest, dur + delay);
-    }
-    return longest + 200;
-  }
   /* Valentine's: an arrow streaks in from the top right, trailing glitter, and lands in the O; hearts burst out */
   function arrowInto(L, b) {
     var W = innerWidth, sx = W + 60, sy = -40, tx = b.cx, ty = b.cy, dur = 900;
@@ -671,7 +648,7 @@
       for (var i = 1; i < tr.length; i++) if (t <= tr[i][0]) { var a = tr[i - 1], c = tr[i], u = (t - a[0]) / Math.max(1, c[0] - a[0]); u = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; return a[1] + (c[1] - a[1]) * u; }
       return tr[tr.length - 1][1];
     };
-    (function f(n) { var t = n - t0, v = {}; for (var k in tracks) v[k] = val(tracks[k], t); apply(v); if (t < total) requestAnimationFrame(f); else if (end) end(); })(t0);
+    (function f(n) { var t = n - t0, v = {}; for (var k in tracks) v[k] = val(tracks[k], t); apply(v, t); if (t < total) requestAnimationFrame(f); else if (end) end(); })(t0);
   }
   /* Easter: someone in a bunny costume hops in, with a basket on their back that has no bottom. Spots an egg and is
      thrilled, picks it up and tosses it over the shoulder into the basket; it drops straight out the bottom, behind
@@ -691,16 +668,11 @@
     eggEl.style.transform = at(px(FRONT, 1), py(EGGY));
     var T = { x: [[0, start]], y: [[0, 0]], torso: [[0, 0]], arm: [[0, 0]], ears: [[0, 0]], dir: [[0, 1]], sq: [[0, 1]] };
     var key = function (tr, t, v) { T[tr].push([t, v]); }, ev = [];
-    /* hop in: crouch, spring up and stretch, sail, land with a squash */
-    var hops = 5;
-    for (var i = 0; i < hops; i++) {
-      var ta = 150 + i * 520;
-      key('x', ta, start + (X0 - start) * i / hops); key('x', ta + 340, start + (X0 - start) * (i + 1) / hops);
-      key('y', ta, 0); key('y', ta + 170, -34); key('y', ta + 340, 0);
-      key('sq', ta, 0.92); key('sq', ta + 90, 1.07); key('sq', ta + 250, 1.02); key('sq', ta + 340, 0.88); key('sq', ta + 460, 1);
-      key('ears', ta + 90, -14); key('ears', ta + 340, 7); key('ears', ta + 460, 0);
-    }
-    var t = 150 + hops * 520 + 150, dir = 1;
+    /* hop in: one smooth glide in from the left, slowing to a stop, with even bouncy hops along the way
+       (worked out frame by frame below, so nothing stops and starts) */
+    var HOPS = 5, ENTER = 2600;
+    key('x', ENTER, X0);
+    var t = ENTER + 250, dir = 1;
     /* sees the egg: thrilled, two little jumps, ears wiggle */
     ev.push([t, function () { bubble(L, 'Ooh, an egg!', px(66, 1), ground - 228 * s, 1500); }]);
     key('y', t + 160, -14); key('y', t + 320, 0); key('y', t + 480, -14); key('y', t + 640, 0);
@@ -740,7 +712,14 @@
       anim(eggEl, [{ opacity: 1 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 2600, fill: 'forwards' });
     }]);
     ev.forEach(function (e) { setTimeout(e[1], e[0]); });
-    play(T, t, function (v) {
+    play(T, t, function (v, now) {
+      if (now < ENTER) {
+        var p = Math.max(0, now) / ENTER, ph = p * HOPS, f = ph - Math.floor(ph), arc = Math.sin(Math.PI * f);
+        v.x = start + (X0 - start) * Math.sin(p * Math.PI / 2);
+        v.y = -28 * arc * (1 - 0.35 * p);
+        v.sq = 1 + 0.04 * arc - 0.07 * Math.pow(Math.cos(Math.PI * f), 12);
+        v.ears = -9 * Math.sin(Math.PI * 2 * f);
+      }
       var sx = v.dir * (1 + (1 - v.sq) * 0.8);
       kid.style.transform = 'translate(' + v.x + 'px,' + (ground - 228 * s + v.y * s) + 'px) scale(' + sx.toFixed(3) + ',' + v.sq.toFixed(3) + ')';
       torso.setAttribute('transform', 'rotate(' + v.torso.toFixed(2) + ' 60 140)');
