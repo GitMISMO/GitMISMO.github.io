@@ -104,6 +104,12 @@ button{font-family:inherit}
 .filter select{min-width:0;font:inherit;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);max-width:100%}
 .prog{height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
 .prog i{display:block;height:100%;background:var(--sky);transition:width .25s}
+.listen{display:inline-flex;align-items:center;gap:6px}
+.listen svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.listen[aria-pressed="true"]{border-color:var(--hit);color:var(--hit)}
+.speaking .story{box-shadow:0 0 0 2px color-mix(in srgb,var(--hit) 35%,transparent)}
+.voicef select{max-width:240px}
+.nosay{font-size:12px;color:var(--ink-3)}
 /* the step */
 .step{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;align-items:start}
 @media (max-width:1000px){ .step{grid-template-columns:1fr} }
@@ -243,6 +249,8 @@ s{color:var(--ink-3)}
       <button class="btn" id="prev" type="button">← Back</button>
       <button class="btn pri" id="next" type="button">Next →</button>
       <button class="btn play" id="play" type="button" aria-pressed="false">▶ Play</button>
+      <button class="btn listen" id="listen" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zM16 8.5a4.5 4.5 0 010 7M18.5 6a8 8 0 010 12"/></svg><span>Listen</span></button>
+      <label class="filter voicef" for="voice" hidden>Voice <select id="voice"></select></label>
       <span class="count" id="count"></span>
       <span class="sp"></span>
       <label class="filter" for="only">Follow <select id="only"></select></label>
@@ -416,6 +424,13 @@ const STEPS=[
  notes:[['mail','Meghan: “WR2027_07-A …: IM updates needed”','with IM’s comments'],['mail','AWG reviewers and Meghan: “WR2027_07-C …: AWG Review”'],['queue','Meghan’s My Queue: “Resubmit to IM”']],
  screens:[S_('IM Review','imr','im-review › IM call May 11','<div class="p-head"><h3>IM Call · May 11, 2027</h3>'+tag('Quorum: 8 of 11 voting members','good')+'</div>'+tbl(['Submission','Decision'],[['WR2027_07-C Escrow Reference Model Changes · 24 rows',tag('Approved','good')+' <span class="small muted">20 as submitted · 3 with modification · 1 withdrawn</span>'],['WR2027_07-A Escrow Servicing Dataset and iGuide · documents',tag('Returned for Updates','bad')+'<div class="small muted">Fields 12 and 19 map to the wrong data points; the iGuide sample doesn’t match</div>']])+acts([['Returned for Updates','pri hit']])),
   S_('Email','mail','Meghan’s inbox',mmsMail('Meghan Tidgewell','WR2027_07-A Escrow Servicing Dataset and iGuide: IM updates needed',['IM asked for updates to Escrow Servicing Dataset and iGuide.','Fields 12 and 19 map to the wrong existing data points; update the iGuide’s sample message to match.','Resubmit in the MMS when ready.']))]},
+{at:'2027-05-24',ch:'review',lanes:['A'],stage:'im',title:'The task force updates the dataset and resubmits',
+ lede:'The fixes go back through the AI Review before IM sees them again.',
+ who:['TF','MT','SY'],
+ does:['The task force remaps the two fields and fixes the iGuide’s sample; Meghan adds the new files to Files and runs the AI Review again.','She clicks <b>Resubmit to IM</b>.'],
+ auto:['Counts the resubmission and puts A back on IM’s agenda.','Compare Drafts on the Reviews tab shows exactly what changed between the two versions.'],
+ notes:[['web','IM Review: WR2027_07-A back on the agenda (resubmitted)']],
+ screens:[S_('MMS','mms','#wr=WR2027_07-A',head(WA,NA,'im','resubmitted')+tabs('Reviews')+tbl(['Review','When','Result'],[['AI Review',mono('Apr 26'),tag('Ready With Minor Edits','warn')],['Documents Only to IM',mono('May 3'),tag('Sent to IM','info')],['IM decision',mono('May 11'),tag('Returned for Updates','bad')],['AI Review',mono('May 24'),tag('Ready','good')]])+acts([['Resubmit to IM','pri hit']]))]},
 {at:'2027-05-27',ch:'review',lanes:['C'],stage:'designation',title:'AWG approves the Reference Model changes; now they wait for the release',
  lede:'This is where the hold starts.',
  who:['AW','SY'],
@@ -424,13 +439,6 @@ const STEPS=[
  notes:[['web','AWG Review: WR2027_07-C approved']],
  tip:'Had the release already been past License Designation, C would not be held; it would move on by itself, and the history would say so.',
  screens:[S_('MMS','mms','#wr=WR2027_07-C',head(WC,NC,'designation','','<span class="tag t-info">Moves With WR2027_01</span>')+'<div class="tip"><b>Held for WR2027_01 v3.6.5 Minor Reference Model Release</b> and moves with it.</div>'+tabs('History')+tbl(['Date','What happened'],[[mono('May 11'),'IM decision: approved (20 as submitted, 3 with modification, 1 withdrawn)'],[mono('May 27'),'AWG approved; now held for WR2027_01 v3.6.5 Minor Reference Model Release and moves with it (it waits here until the release reaches License Designation)']]))]},
-{at:'2027-05-24',ch:'review',lanes:['A'],stage:'im',title:'The task force updates the dataset and resubmits',
- lede:'The fixes go back through the AI Review before IM sees them again.',
- who:['TF','MT','SY'],
- does:['The task force remaps the two fields and fixes the iGuide’s sample; Meghan adds the new files to Files and runs the AI Review again.','She clicks <b>Resubmit to IM</b>.'],
- auto:['Counts the resubmission and puts A back on IM’s agenda.','Compare Drafts on the Reviews tab shows exactly what changed between the two versions.'],
- notes:[['web','IM Review: WR2027_07-A back on the agenda (resubmitted)']],
- screens:[S_('MMS','mms','#wr=WR2027_07-A',head(WA,NA,'im','resubmitted')+tabs('Reviews')+tbl(['Review','When','Result'],[['AI Review',mono('Apr 26'),tag('Ready With Minor Edits','warn')],['Documents Only to IM',mono('May 3'),tag('Sent to IM','info')],['IM decision',mono('May 11'),tag('Returned for Updates','bad')],['AI Review',mono('May 24'),tag('Ready','good')]])+acts([['Resubmit to IM','pri hit']]))]},
 {at:'2027-05-24',ch:'review',lanes:['B'],stage:'im',title:'The white paper: AI Review, then to IM as documents only',
  lede:'Past white papers (Fee Modernization, eClosing ROI, eHELOC Adoption Support) went through IM and AWG as documents, were designated Collateral, and published as Final.',
  who:['MT','SY'],
@@ -621,8 +629,53 @@ const STEPS=[
 ];
 </script>
 <script>
+/* what the narrator says at each step, in step order */
+const SAY=[
+"It starts in the Initiative Hub. A servicer has asked for a standard way to share escrow analysis data, and the executive team approves it. You don't have to re-enter anything: the MMS picks the request up on its own, gives it a work request number, and starts it. It's a medium-sized piece of work, so the target to submit to I M is set at the halfway point. Meghan, the facilitator, gets an email and sees it in her queue.",
+"This is a brand-new group, so first it needs people. MISMO staff click Ask for a Call for Participation and add a short note. The work request moves into the Call for Participation stage and waits there. At the same time, a request lands on MISMO Media's board, and the MMS feed hands MISMO Media the facts it needs to write the announcement.",
+"Over in MISMO Media, Claude writes a first draft, using only the facts from the MMS. Anything missing shows up in square brackets rather than being made up. Perry edits it and sets the date. He picks who to quote, and Amy approves that by simply replying to an email. Perry then sends the quote request as himself, pastes in the approved quote, and gives final approval.",
+"Once it's approved, Perry sends it out channel by channel: MISMO Connect, which Vanessa posts, a copy for the M B A newsroom, MISMO Matters, and a LinkedIn request. Back in the MMS, staff click Call for Participation Published and paste in the link. That marks the media request done and moves the work on to Kickoff Approval.",
+"A few weeks later, fourteen companies have signed up. The Governance Committee agrees the task force can start, and staff record that decision. The work moves into In Work, the start date is stamped, and the facilitator will get a reminder a week before the target date.",
+"Now the task force needs a home. Staff set it up in Meeting Trackers: every other Tuesday at one o'clock Eastern, on Zoom account MISMO two, with Meghan as facilitator. A flow puts the meetings straight onto the MISMO Meetings Schedule calendar in Outlook. The MMS reads the next meeting from Meeting Trackers, and after each call the daily digest reminds people if attendance hasn't been logged.",
+"At the first meeting, the task force ratifies its lead and co-lead. Staff record them in Leadership HQ, under the Servicing domain. The MMS brings those names across, so everyone sees the same leaders, and MISMO Media checks every name in a press release against this list.",
+"The task force will deliver three things on different timelines, so Meghan splits the work request. One: the dataset with its implementation guide, which travel together but are licensed separately. Two: an adoption white paper. Three: the Reference Model changes. Those go through I M and A W G on their own, and once A W G approves them they're held for the version three point six point five release.",
+"The dataset's structure has to fit the Reference Model, so Meghan asks for architecture help. She describes what's needed, what done looks like, and whether Mark should join a call. Perry approves the request, and it goes into Mark's queue. Until it's finished, the dataset can't go to A I Review.",
+"Mark joins two task force calls, agrees the structure, writes up what was done, and marks the task done. Meghan's notified. The dataset and the implementation guide are finished and added to the work request's files, which go straight into its SharePoint folder.",
+"Now the A I Review. Each file gets the review that suits it: the dataset is looked at as a whole, and the guide gets an editor's read, part by part. The report lists what must be fixed and what's recommended. Meghan ticks Update, Do Not Update, Unsure or Pass on each note, makes her fixes, and runs it again.",
+"Two submissions go to I M. The dataset goes as documents only, because its new data points are in the Reference Model changes. Those changes go through the Reference Model Q C. It checks every row against the current model and lists the formatting fixes the vendor would otherwise make. Fixes of the same kind are grouped, so Meghan can accept them all at once before she sends it to I M.",
+"On the I M call, the reviewers go through the Reference Model rows one by one, with the drafted decisions to help. Most are approved, a few with small changes, and one is withdrawn in favour of an existing data point. The dataset, though, goes back: two fields point at the wrong data points, and the guide's sample doesn't match. Meghan gets an email with I M's comments.",
+"The task force remaps the two fields and fixes the sample. Meghan adds the new files, runs the A I Review again, and resubmits. It goes back on I M's agenda, and Compare Drafts shows exactly what changed.",
+"A W G approves the Reference Model changes, and this is where the hold begins. The changes move to License Designation and are held for the release. From now on, they wait for the release and move with it.",
+"Meanwhile, the white paper has its own A I Review. The editor's read catches a line saying MISMO recommends something, because MISMO describes rather than directs, as well as two acronyms used before they're spelt out. It has no Reference Model changes, so Meghan sends it to I M as documents only, the same way past white papers have gone.",
+"I M approves the resubmitted dataset and the white paper, each with a single decision. Erin adds I M's approved submission form, which is saved to the work request's files. Both move on to A W G Review.",
+"On the A W G call, both are approved. They move to License Designation, and the MMS recommends a designation for each, based on similar work in the past.",
+"Jonna designates them. The dataset and the guide are each designated as a standard. The white paper is collateral, like the recent white papers. Once she designates, there's no further approval: both go straight to Governance.",
+"The Governance Committee approves both to go out for thirty days of public comment, and staff record it. Two things happen on their own: both move to Comment Period, and MISMO Media starts drafting the publication press releases now, so they're ready when the time comes.",
+"Meghan gets the comment-period files ready. She puts the comment period language into each file and chooses the files in the MMS. The MMS checks the language, fills in the date, and bundles the download. She writes the short card for the website, and the next move becomes Vanessa's.",
+"Vanessa creates the Resource Library entries and saves each link on the work request. Saving the link is what starts the clock: thirty days of comment, starting that day. The cards appear on the website's Open for Comment list, members open the files in the Resource Library, and non-members sign the comment licence to download.",
+"While both are out for comment, Perry takes the press releases through review, quotes and final approval. They're marked Draft Now and Out for Comment, and once approved they're held. They must never mention the comment period, and Distribution stays closed until the work is approved to publish.",
+"Three days before the end, Meghan gets a reminder for each comment period, and the daily digest lists them too. Nothing to do unless comments have come in.",
+"The dataset's comment period ends on its own. Two small editorial comments came in, nothing that changes the standard. Meghan reports that, and the dataset goes to Governance for approval to publish.",
+"The white paper isn't so lucky. A commenter spots a statistic that isn't credited to its source. That has to be fixed and shown to the public again, so Meghan reports changes needed. The paper goes back to In Work for a second comment period, and the old target date is cleared.",
+"Meghan adds the citation and runs the A I Review again. I M looks at the change and decides it doesn't need a review: Erin clicks Skip, and says why. A W G makes the same call. Both decisions, and the reasons, are recorded in the history. Jonna designates it as before, and it goes back to Governance.",
+"Governance approves the second comment period. Vanessa updates the Resource Library entry with the corrected file and saves the new link. The old link from the first round doesn't count, so it's the new link that starts another thirty days.",
+"Back to the dataset. Governance approves it to publish as a Candidate Recommendation. It moves to Release, and in MISMO Media the same press release turns green: Ready to Post. Distribution opens.",
+"Meghan chooses the final files, with the published licence language in them, and staff click Mark Published. The dataset and guide appear on the website's Find a Work Product, and Perry sends the announcement out. The first deliverable is done.",
+"The white paper's second comment period closes with no comments. Governance approves it to publish as Final, its press release turns Ready to Post, and it's published and announced. Two down, one to go.",
+"Now, the release. It's been In Work all year, collecting Reference Model changes. Staff download the Master Change List: every approved row from every work request in version three point six point five, already in the vendor's format. That goes off to the MISMO Link vendor.",
+"When the vendor's build comes back, staff add the files and click Check the Build. The MMS checks that every row on the list made it into the build, word for word, and that nothing extra was added. Here, everything matches.",
+"The release goes through its own reviews and reaches License Designation, where the escrow changes have been waiting since May. From here on, every move the release makes, the escrow changes make too.",
+"Jonna designates the release the same way as the last two: one designation, published as a Candidate Recommendation. Non-members get a public package with the data dictionary, the release notes and the schemas. Members get the full package in the Resource Library.",
+"Governance approves it for comment. The files come to about a hundred megabytes, so each one is posted as its own download, with a MISMO download page. Vanessa saves the Resource Library link, and one comment period covers the release and everything riding with it.",
+"Comments come in, but nothing significant. The facilitator reports that, Governance approves publishing as a Candidate Recommendation, and the release press release turns Ready to Post.",
+"Version three point six point five is published, with the escrow changes in it. The public package is posted for everyone, members get the full package, and Perry sends out the announcement.",
+"And that's the last of them. With all three deliverables published, the MMS closes the work request by itself. It comes off everyone's queue and moves to Published on the board. Every piece keeps its full history: the reviews, the decisions, the comment periods, and who did what."
+];
+</script>
+<script>
 /* ---------- engine ---------- */
 const $=id=>document.getElementById(id);
+STEPS.forEach((s,i)=>{ s.say=SAY[i]||''; });
 const Y0=Date.parse('2027-01-01'), Y1=Date.parse('2028-01-01');
 const pos=d=>Math.max(0,Math.min(100,(Date.parse(d)-Y0)/(Y1-Y0)*100));
 const fmt=d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
@@ -641,10 +694,10 @@ let cur=0, scr=0, timer=null;
     STEPS.forEach((s,i)=>{ if(s.lanes[0]!==l.k&&s.lanes.includes(l.k)) dots+='<span class="ghost" data-g="'+i+'" style="left:'+pos(s.at)+'%"></span>'; });
     h+='<div class="ln-name'+(l.media?' media':'')+'"><b>'+E(l.wr)+'</b><span title="'+E(l.name)+'">'+E(l.name)+'</span></div><div class="track">'+segs+dots+'<span class="nowline" data-now></span></div>'; });
   $('lanes').innerHTML=h;
-  $('lanes').addEventListener('click',e=>{ const d=e.target.closest('.dot'); if(d){ stop(); go(+d.dataset.i); } });
+  $('lanes').addEventListener('click',e=>{ const d=e.target.closest('.dot'); if(d){ stop(); go(+d.dataset.i); speak(); } });
   $('legend').innerHTML=['cfp','kickoff','work','aireview','im','awg','designation','gc-comment','comment','post','gc-publish','release'].map(k=>'<span><i style="background:'+ST[k][1]+'"></i>'+E(ST[k][0])+'</span>').join('');
   $('chapters').innerHTML=CHAPTERS.map(([k,n],i)=>'<button class="chap" type="button" data-ch="'+k+'"><b>'+(i+1)+'</b>'+E(n)+'</button>').join('');
-  $('chapters').addEventListener('click',e=>{ const b=e.target.closest('[data-ch]'); if(!b) return; stop(); const i=STEPS.findIndex(s=>s.ch===b.dataset.ch); if(i>=0) go(i); });
+  $('chapters').addEventListener('click',e=>{ const b=e.target.closest('[data-ch]'); if(!b) return; stop(); const i=STEPS.findIndex(s=>s.ch===b.dataset.ch); if(i>=0){ go(i); speak(); } });
   $('only').innerHTML='<option value="">every step</option>'+LANES.map(l=>'<option value="'+l.k+'">'+E(l.wr)+(l.media?'':' · '+E(l.name))+'</option>').join('');
   $('cast').innerHTML=Object.entries(CAST).map(([k,v])=>'<span class="who-chip" data-who="'+k+'"><i>'+E(v[0])+'</i>'+E(v[1])+'</span>').join('');
 })();
@@ -680,19 +733,44 @@ function render(){
   drawDrawer();
   try{ if(location.hash!=='#step-'+(cur+1)) history.replaceState(null,'','#step-'+(cur+1)); }catch(e){}
 }
+
+/* ---------- the narrator: a British English voice from the browser ---------- */
+const SY=window.speechSynthesis||null; let talk=false, voices=[], voice=null, sayId=0;
+/* the most natural British women's voices first: Edge's neural voices, then Apple's and Google's */
+const PREF=[/Sonia.*Natural|Libby.*Natural|Maisie.*Natural|Bella.*Natural|Hollie.*Natural|Olivia.*Natural|Abbi.*Natural/i,/Serena.*(Premium|Enhanced)|Kate.*(Premium|Enhanced)|Stephanie.*(Premium|Enhanced)|Martha.*(Premium|Enhanced)/i,/Google UK English Female/i,/Serena|Kate|Stephanie|Martha|Hazel|Susan|Libby|Sonia|Maisie/i];
+function gbVoices(){ return (SY?SY.getVoices():[]).filter(v=>/^en[-_]GB/i.test(v.lang)); }
+function pickVoice(){ voices=gbVoices(); let saved=''; try{ saved=localStorage.getItem('mismo.journey.voice')||''; }catch(e){}
+  voice=voices.find(v=>v.name===saved)||null; if(!voice) for(const re of PREF){ voice=voices.find(v=>re.test(v.name)); if(voice) break; }
+  if(!voice) voice=voices.find(v=>!/male/i.test(v.name)||/female/i.test(v.name))||voices[0]||null;
+  const s=$('voice'); s.innerHTML=voices.map(v=>'<option'+(voice&&v.name===voice.name?' selected':'')+'>'+E(v.name)+'</option>').join('');
+  document.querySelector('.voicef').hidden=!(talk&&voices.length>1); }
+if(SY){ pickVoice(); SY.onvoiceschanged=pickVoice; }
+$('voice').onchange=e=>{ voice=voices.find(v=>v.name===e.target.value)||voice; try{ localStorage.setItem('mismo.journey.voice',voice.name); }catch(x){} if(talk) speak(); };
+/* one sentence at a time: Chrome stops long utterances part way through */
+function speak(after){ if(!SY||!talk) return; SY.cancel(); const id=++sayId; const parts=(STEPS[cur].say||STEPS[cur].title).replace(/\bMISMO\b/g,'Mismo').match(/[^.!?:]+[.!?:]+|[^.!?:]+$/g)||[];
+  document.body.classList.add('speaking'); let i=0;
+  const next=()=>{ if(id!==sayId) return; if(i>=parts.length){ document.body.classList.remove('speaking'); if(after) setTimeout(()=>{ if(id===sayId) after(); },900); return; }
+    const u=new SpeechSynthesisUtterance(parts[i++].trim()); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-GB'; u.rate=0.97; u.pitch=1;
+    u.onend=next; u.onerror=e=>{ if(e.error!=='interrupted'&&e.error!=='canceled') next(); }; SY.speak(u); };
+  next(); }
+function hush(){ sayId++; if(SY) SY.cancel(); document.body.classList.remove('speaking'); }
+$('listen').onclick=()=>{ if(!SY){ $('listen').querySelector('span').textContent='No voice in this browser'; return; }
+  talk=!talk; if(!talk&&timer===true) stop(); $('listen').setAttribute('aria-pressed',String(talk)); $('listen').querySelector('span').textContent=talk?'Listening':'Listen'; pickVoice();
+  if(talk) speak(timer?autoNext:null); else hush(); };
+function autoNext(){ if(!timer) return; if(step(1)) speak(autoNext); else stop(); }
 function go(i){ cur=i; scr=0; const f=$('only'); if(f.value&&!STEPS[i].lanes.includes(f.value)) f.value=''; render(); }
 function step(d){ const idx=list(), n=idx.indexOf(cur), m=idx[n+d]; if(m==null) return false; cur=m; scr=0; render(); return true; }
 /* Play: shows each screen of a step, then moves on */
 function tick(){ const sc=STEPS[cur].screens||[]; if(scr<sc.length-1){ scr++; render(); } else if(!step(1)) stop(); }
-function stop(){ if(timer){ clearInterval(timer); timer=null; } $('play').setAttribute('aria-pressed','false'); $('play').textContent='▶ Play'; }
-$('play').onclick=()=>{ if(timer){ stop(); return; } timer=setInterval(tick,6500); $('play').setAttribute('aria-pressed','true'); $('play').textContent='❚❚ Pause'; };
-$('prev').onclick=()=>{ stop(); step(-1); };
-$('next').onclick=()=>{ stop(); step(1); };
+function stop(){ if(timer){ if(timer!==true) clearInterval(timer); timer=null; } $('play').setAttribute('aria-pressed','false'); $('play').textContent='▶ Play'; }
+$('play').onclick=()=>{ if(timer){ stop(); hush(); return; } $('play').setAttribute('aria-pressed','true'); $('play').textContent='❚❚ Pause'; if(talk){ timer=true; speak(autoNext); } else timer=setInterval(tick,6500); };
+$('prev').onclick=()=>{ stop(); if(step(-1)) speak(); };
+$('next').onclick=()=>{ stop(); if(step(1)) speak(); };
 $('only').onchange=()=>{ const idx=list(); if(!idx.includes(cur)) cur=idx[0]; scr=0; render(); };
 $('step').addEventListener('click',e=>{ const b=e.target.closest('[data-scr]'); if(b){ stop(); scr=+b.dataset.scr; render(); } });
 $('nbtn').onclick=()=>{ $('drawer').classList.add('open'); };
 $('dclose').onclick=()=>{ $('drawer').classList.remove('open'); };
-document.addEventListener('keydown',e=>{ if(e.target.closest('select,input,textarea')) return; if(e.key==='ArrowRight'){ stop(); step(1); } if(e.key==='ArrowLeft'){ stop(); step(-1); } if(e.key==='Escape') $('drawer').classList.remove('open'); });
+document.addEventListener('keydown',e=>{ if(e.target.closest('select,input,textarea')) return; if(e.key==='ArrowRight'){ stop(); if(step(1)) speak(); } if(e.key==='ArrowLeft'){ stop(); if(step(-1)) speak(); } if(e.key==='Escape') $('drawer').classList.remove('open'); });
 const m0=/^#step-(\d+)$/.exec(location.hash||''); if(m0&&STEPS[+m0[1]-1]) cur=+m0[1]-1;
 render();
 window.addEventListener('hashchange',()=>{ const m=/^#step-(\d+)$/.exec(location.hash||''); if(m&&STEPS[+m[1]-1]&&+m[1]-1!==cur){ cur=+m[1]-1; scr=0; render(); } });
