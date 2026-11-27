@@ -2115,6 +2115,7 @@ p,.sub,.lede{text-wrap:pretty}
 .cr-sec .cr-list{margin:0;padding:0 0 0 18px;font-size:13.5px;display:grid;gap:2px}
 /* CN-053: at phone width Certification Management's masthead shrinks (11px 16px, logo 19px, 62px with the sign-in chip); the same here, so the logo box sits in the same spot. Last in the file so it wins over :root and .logoplate above. */
 @media(max-width:560px){:root{--hq-h:62px}.hqtop{padding:0 16px}.hqtop .mastrule{height:40px;margin-inline:11px}.hqtop .hqname{font-size:13px}.hqtop-r{padding-left:11px;gap:10px}.logoplate{padding:7px 10px}.logoplate .wordmark{height:19px}}
+.rc-sum{margin:0 0 6px;font-size:13px}
 </style>
 <script src="/assets/session.js"></script>
 <script src="/assets/back.js"></script>
@@ -2189,7 +2190,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-27T16:01:34Z',fp:'8295694a'};
+window.__mmsBuild={at:'2026-11-27T17:20:46Z',fp:'3150be13'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -7573,6 +7574,13 @@ const HELP_TOPICS={
      'Click Send to IM. IM gets the form with a draft decision for every row, and the IM reviewers are told it’s ready.'],
     ['What it checks: the Face Page; every Reference Model row’s required columns for its action, class words and definition templates, names, abbreviations and XPATHs; the Proposed Structure tab; and, against the current MISMO Reference Model, whether a name already exists, a parent container is real and an XPATH matches.','Claude flags the rows IM is likely to question, based on 3,709 rows IM has decided since 2021, with each row’s likely outcome, what IM would say and a suggested name or definition.','Draft IM Decisions counts how many rows look Approved as Submitted, Approved with Modification and so on. IM reviewers agree with or correct each one.','Ran it on a form with no Reference Model changes? The report says Documents only and Send to IM still works: IM makes one decision on the whole submission.','If IM already has an earlier Reference Model QC of this work request, Send to IM asks before replacing it.','A pre-review sent to IM can’t be deleted; older runs that weren’t sent can (Delete This Review, or Keep Only the Latest on the Reviews tab).'],
     [['Open the Review Desk','reviews']]],
+  relcheck:['Release Check: The Build Against the Master Change List','staff imawg',
+    'When MISMO Link’s build of a Reference Model release comes back, the release work request checks it against the Master Change List that was sent.',
+    ['Add the Master Change List (the one sent to the vendor), the Version Comparison Report and the Logical Data Dictionary to the release’s Files.',
+     'On the release’s Overview, click Check the Build. The MMS picks the newest of each (a Corrected list first); change them if needed and click Check.',
+     'It lists rows not in the build, anything the build added or took out that the list didn’t ask for, and definitions that don’t match word for word. Ask the vendor or IM about each one.'],
+    ['The result stays on the work request (See What It Found) and in its history. The files aren’t changed.','Changes to things already in the model (Modify Definition, Deprecate, Rename, Move) are listed as not checked.'],
+    [['Open the Pipeline Board','board']]],
   mislink:['MISMO Link Format: Fixes Before IM','*',
     'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The Reference Model QC lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
     ['Run the Reference Model QC on the work request. The report opens with MISMO Link Format.',
@@ -7825,8 +7833,8 @@ const HELP_TOPICS={
 };
 const HELP_ORDER={
   facilitator:['start','hub','queue','panel','docs','arch','aireview','impre','mislink','drafts','handoff','parts','asks','comments','dprec','invites','digest','mymail','mediareq','metrics','path','find','words'],
-  staff:['start','hub','queue','board','metrics','approvals','impre','mislink','handoff','parts','govrec','dprec','settings','health','mt','notif','digest','mymail','panel','docs','drafts','arch','comments','invites','path','find'],
-  imawg:['start','imrun','mislink','awgrun','invites','mt','handoff','docs','drafts','digest','mymail','path','find'],
+  staff:['start','hub','queue','board','metrics','approvals','impre','mislink','relcheck','handoff','parts','govrec','dprec','settings','health','mt','notif','digest','mymail','panel','docs','drafts','arch','comments','invites','path','find'],
+  imawg:['start','imrun','mislink','relcheck','awgrun','invites','mt','handoff','docs','drafts','digest','mymail','path','find'],
   member:['start','member','invites','docs','path','find'],
   approver:['start','approve','parts','queue','handoff','dprec','metrics','digest','mymail','path','find'],
   gov:['start','govmem','comments','dprec','metrics','path','digest','mymail','find'],
@@ -9585,6 +9593,106 @@ function rvLinkDedupe(findings,ctx){ const L=(ctx&&ctx.link)||[]; if(!L.length) 
     if(f.rule==='rm-parent') return !has.has('lk-parent|'+it+'|pc');
     return true; }); }
 window.__mmsLink={check:rlCheck,plain:rlPlain,corrected:rlCorrected,state:rlState,master:rlMaster,rows:rlMasterRows};
+/* ---------- Release check: the build against the Master Change List (Nov 27, 2026, Jonna yes) ----------
+   The deep dive compared the v3.6.4 list sent to MISMO Link (Corrected Draft v5) with what came back in B380: every one of
+   the 148 rows landed, word for word, but the build also added ObjectURL to MI_RATE_QUOTE_PRODUCT_DETAIL, which no list or
+   submission asked for. Nobody would have seen that by eye. Now a Reference Model release work request has Check the Build:
+   it reads the Master Change List, the Version Comparison Report and (if there) the Logical Data Dictionary from Files and says
+     · rows on the list that aren't in the build,
+     · anything the build added that isn't on the list,
+     · anything the build took out (the report's previous version has it, the new one doesn't),
+     · definitions in the dictionary that don't match the list.
+   The result is kept on the work request (t.relCheck) with a history line. Nothing is changed in the files. */
+const RC_K=s=>String(s==null?'':s).toLowerCase().replace(/&/g,'and').replace(/[^a-z0-9]/g,'');
+const RC_ND=s=>String(s||'').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/\s+/g,' ').trim().replace(/\.$/,'').toLowerCase();
+/* the Master Change List (the vendor's 27 columns): rows by header name */
+function rcRows(x){ const sh=((x&&x.sheets)||[]).find(s=>(s.rows||[]).some(r=>Object.values(r.c||{}).some(v=>/^change type/i.test(String(v).trim())))); if(!sh) return null;
+  const h=sh.rows.find(r=>Object.values(r.c).some(v=>/^change type/i.test(String(v).trim()))); const M={};
+  const map={item:/^item/i,ct:/^change type/i,tt:/^change target/i,xp:/xpath/i,pc:/^parent container/i,cn:/^container name/i,alias:/^alias/i,dp:/^data point name/i,en:/^enumeration name/i,def:/^definition\s*$/i,wr:/^wr\s*#/i};
+  for(const c in h.c){ const v=String(h.c[c]).replace(/\s+/g,' ').trim(); for(const f in map){ if(M[f]==null&&map[f].test(v)) M[f]=c; } }
+  return sh.rows.filter(r=>r.n>h.n).map(r=>{ const o={_row:r.n}; for(const f in M){ const v=r.c[M[f]]; if(v!=null&&String(v).trim()!=='') o[f]=String(v).trim(); } return o; }).filter(o=>o.ct&&o.tt); }
+/* the Version Comparison Report: what is new or gone between its last two versions */
+function rcVcr(x){ const out={}; let vers=null;
+  const one=(name,cols)=>{ const s=((x&&x.sheets)||[]).find(z=>String(z.name).trim().toLowerCase()===name); if(!s||!s.rows.length) return null;
+    const h=s.rows[0].c, vc=Object.keys(h).filter(c=>/^version\s*\d/i.test(String(h[c]).trim())).sort((a,b)=>a.length-b.length||a.localeCompare(b)); if(vc.length<2) return null;
+    const c3=vc[vc.length-2], c4=vc[vc.length-1]; vers=vers||[String(h[c3]).replace(/^version\s*/i,'v'),String(h[c4]).replace(/^version\s*/i,'v')];
+    const add=[], rem=[]; s.rows.slice(1).forEach(r=>{ const a=r.c[c3], b=r.c[c4]; if(!a===!b) return; const v=cols.map(c=>String(r.c[c]||'')); (b?add:rem).push(v); }); return {add,rem}; };
+  out.dp=one('data point usages',['A','B']); out.cu=one('container usages',['A','B','C']); out.en=one('enumerations',['A','B']); out.vers=vers||[]; return out; }
+/* the Logical Data Dictionary: definitions */
+function rcLdd(x){ if(!x) return null; const sh=n=>((x.sheets)||[]).find(s=>String(s.name).trim().toLowerCase()===n); const dp=new Map(), cn=new Map();
+  (sh('datapoints')||{rows:[]}).rows.forEach(r=>{ if(r.c.A&&r.n>1) dp.set(RC_K(r.c.A),{def:String(r.c.B||''),en:String(r.c.C||'')}); });
+  (sh('containers')||{rows:[]}).rows.forEach(r=>{ if(r.c.A&&r.n>1) cn.set(RC_K(r.c.A),{def:String(r.c.B||'')}); });
+  return dp.size?{dp,cn}:null; }
+function rcCompare(rows,V,L){
+  const res={rows:rows.length,inBuild:0,missing:[],extra:[],removed:[],defs:[],defsChecked:0,unchecked:[],vers:V.vers||[]};
+  const key=(a,b)=>RC_K(a)+'|'+RC_K(b);
+  const dpOut=new Map(((V.dp&&V.dp.add)||[]).map(v=>[key(v[0],v[1]),v])), enOut=new Map(((V.en&&V.en.add)||[]).map(v=>[key(v[0],v[1]),v])), cuOut=new Map(((V.cu&&V.cu.add)||[]).map(v=>[key(v[1]||v[0],v[2]),v]));
+  const used=new Set(), seg=xp=>String(xp||'').replace(/\s+/g,'').replace(/^\/+|\/+$/g,'').split('/');
+  rows.forEach(r=>{ const ct=String(r.ct).toLowerCase(), tt=String(r.tt).toLowerCase(), it=String(r.item||('row '+r._row));
+    if(!/add|reuse/.test(ct)){ if(!/modify|deprecate|rename|move/.test(ct)) return; res.unchecked.push(it+' · '+r.ct+' '+r.tt+(r.dp||r.cn||r.en?' · '+(r.en||r.dp||r.cn):'')); return; }
+    let k=null, M=null, what='';
+    if(/data point/.test(tt)){ k=key(r.dp,r.pc); M=dpOut; what=(r.dp||'')+' in '+(r.pc||'?'); }
+    else if(/enumeration/.test(tt)){ k=key(r.dp,r.en); M=enOut; what=(r.en||'')+' for '+(r.dp||'?'); }
+    else if(/container/.test(tt)){ const s=seg(r.xp); k=key(r.alias||r.cn||r.pc,s.length>1?s[s.length-2]:''); M=cuOut; what=(r.alias||r.cn||r.pc||'')+(s.length>1?' in '+s[s.length-2]:''); }
+    else return;
+    if(M&&M.has(k)){ res.inBuild++; used.add((M===dpOut?'d':M===enOut?'e':'c')+k); }
+    else res.missing.push({item:it,wr:r.wr||'',what:r.ct+' '+r.tt+': '+what});
+    /* definitions as they came out */
+    if(L&&/add/.test(ct)&&r.def){ let got=null;
+      if(/data point/.test(tt)) got=(L.dp.get(RC_K(r.dp))||{}).def;
+      else if(/container/.test(tt)) got=(L.cn.get(RC_K(r.alias||r.cn||r.pc))||{}).def;
+      else if(/enumeration/.test(tt)){ const e=L.dp.get(RC_K(r.dp)); const line=e&&String(e.en).split(/\n/).find(l=>RC_K(l.split(' : ')[0])===RC_K(r.en)); got=line?line.split(' : ').slice(1).join(' : '):null; }
+      if(got!=null){ res.defsChecked++; if(RC_ND(got)!==RC_ND(r.def)) res.defs.push({item:it,name:r.en||r.dp||r.alias||r.cn||'',list:r.def,build:got}); } } });
+  dpOut.forEach((v,k)=>{ if(!used.has('d'+k)) res.extra.push('Data point '+v[0]+' in '+v[1]); });
+  enOut.forEach((v,k)=>{ if(!used.has('e'+k)) res.extra.push('Enumeration '+v[1]+' for '+v[0]); });
+  cuOut.forEach((v,k)=>{ if(!used.has('c'+k)) res.extra.push('Container '+(v[1]?v[1]+' (alias of '+v[0]+')':v[0])+' in '+v[2]); });
+  [['dp','Data point',v=>v[0]+' in '+v[1]],['cu','Container',v=>(v[1]||v[0])+' in '+v[2]],['en','Enumeration',v=>v[1]+' for '+v[0]]].forEach(([f,l,s])=>((V[f]&&V[f].rem)||[]).forEach(v=>res.removed.push(l+' '+s(v))));
+  return res; }
+/* ---------- the section on a release work request ---------- */
+function rcSec(t){ if(typeof rlIsRelease!=='function'||!rlIsRelease(t)||!(S.isStaff||isRole('imawg',S.me))) return ''; const R=t.relCheck;
+  const sum=R?('<p class="rc-sum"><b>'+esc(fmtS(String(R.at||'').slice(0,10)))+'</b>'+(R.by?' by '+esc(R.by):'')+': '+esc(rcLine(R))+'</p>'+
+    ((R.extra||[]).length||(R.missing||[]).length||(R.removed||[]).length||(R.defs||[]).length?'<button type="button" class="btn sm ghost" data-rcshow="'+esc(t.id)+'">See What It Found</button>':'')):'<p class="muted" style="font-size:12.5px;margin:0">Not run yet.</p>';
+  return '<div class="psec full rc-sec"><h4>Release Check<span class="sp muted" style="font-size:12px;font-weight:500">the build against the Master Change List</span>'+(S.canWrite&&!S.viewAs?'<button type="button" class="btn sm'+(R?'':' pri')+'" data-rcrun="'+esc(t.id)+'">Check the Build</button>':'')+'</h4>'+
+    '<p class="muted" style="font-size:12.5px;margin:0 0 6px">When MISMO Link’s build comes back, add the Version Comparison Report (and the Logical Data Dictionary) to Files with the Master Change List that was sent. The check says whether every row is in the build, word for word, and whether the build added or took out anything the list didn’t ask for.</p>'+sum+'</div>'; }
+function rcLine(R){ const p=[]; p.push((R.inBuild||0)+' of '+(R.checked||0)+' rows in the build');
+  if(R.defsChecked) p.push((R.defsChecked-(R.defs||[]).length)+' of '+R.defsChecked+' definitions word for word');
+  if((R.missing||[]).length) p.push(R.missing.length+' not in the build');
+  if((R.extra||[]).length) p.push(R.extra.length+' added that the list didn’t ask for');
+  if((R.removed||[]).length) p.push(R.removed.length+' taken out');
+  return p.join('; ')+'.'; }
+function rcHtml(R){ const li=a=>'<ul style="margin:4px 0 10px 18px">'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>';
+  return '<p class="muted" style="margin:0 0 8px;font-size:12.5px">'+esc([R.list,R.vcr,R.ldd].filter(Boolean).join(' · '))+(R.vers&&R.vers.length?' · '+esc(R.vers.join(' → ')):'')+'</p>'+
+    ((R.extra||[]).length?'<p style="margin:0"><b>In the build but not on the list</b> (ask the vendor or IM whether it belongs):</p>'+li(R.extra.slice(0,60).map(esc)):'')+
+    ((R.missing||[]).length?'<p style="margin:0"><b>On the list but not in the build:</b></p>'+li(R.missing.slice(0,60).map(m=>'Item '+esc(m.item)+(m.wr?' ('+esc(m.wr)+')':'')+': '+esc(m.what))):'')+
+    ((R.removed||[]).length?'<p style="margin:0"><b>Taken out of the build</b> (in '+esc((R.vers||[])[0]||'the previous version')+', not in '+esc((R.vers||[])[1]||'this one')+'):</p>'+li(R.removed.slice(0,60).map(esc)):'')+
+    ((R.defs||[]).length?'<p style="margin:0"><b>Definitions that don’t match the list:</b></p>'+li(R.defs.slice(0,40).map(d=>'Item '+esc(d.item)+' · '+esc(d.name)+'<br><span class="muted">List:</span> '+esc(rvTrim(d.list,240))+'<br><span class="muted">Build:</span> '+esc(rvTrim(d.build,240)))):'')+
+    ((R.unchecked||[]).length?'<p class="muted" style="margin:0;font-size:12.5px">Not checked here (changes to what is already in the model): '+esc(R.unchecked.slice(0,12).join('; '))+(R.unchecked.length>12?' and '+(R.unchecked.length-12)+' more':'')+'.</p>':'')+
+    (!(R.extra||[]).length&&!(R.missing||[]).length&&!(R.removed||[]).length&&!(R.defs||[]).length?'<p style="margin:0">Everything on the list is in the build, and the build added nothing else.</p>':''); }
+async function rcRun(t){
+  const L=cpfFiles(t).filter(f=>/\.xlsx$/i.test(f.n)); if(!L.length) return toast('Add the Master Change List and the Version Comparison Report to Files first.');
+  const pick=re=>L.filter(f=>re.test(f.n));
+  const lists=pick(/master change list|reference model changes/i), vcrs=pick(/version ?comparison/i), ldds=pick(/^logicaldatadictionary|logical ?data ?dictionary/i).filter(f=>!/enhanced/i.test(f.n));
+  const def=l=>(l.find(f=>/correct/i.test(f.n))||l[0]||{}).p||'';
+  const opt=(nm,l,sel,none)=>'<select name="'+nm+'" style="width:100%">'+(none?'<option value="">'+esc(none)+'</option>':'')+L.map(f=>'<option value="'+esc(f.p)+'"'+(f.p===sel?' selected':'')+'>'+esc(f.n)+(f.sz?' · '+esc(f.sz):'')+'</option>').join('')+'</select>';
+  const v=await modal({title:'Check the Build',text:esc(t.wr)+' '+esc(t.name),ok:'Check',body:fld('Master Change List sent to MISMO Link',opt('l',lists,def(lists)))+fld('Version Comparison Report from the build',opt('v',vcrs,def(vcrs)))+fld('Logical Data Dictionary (for the definitions)',opt('d',ldds,def(ldds),'Skip the definitions'))});
+  if(!v) return; const fl=p=>L.find(f=>f.p===p);
+  const fL=fl(v.l), fV=fl(v.v), fD=v.d?fl(v.d):null; if(!fL||!fV) return toast('Choose the list and the report.'); if(fL===fV) return toast('The list and the report are the same file.');
+  for(const f of [fL,fV,fD].filter(Boolean)) if(cpfBytes(f)>CPF_SKIP) return toast(f.n+' is too big to open here.');
+  try{ const read=async f=>{ wpSay('Reading '+f.n+'…'); await cpfBreathe(); return rvReadFile(await rvSrcGet(f)); };
+    const xl=await read(fL), xv=await read(fV), xd=fD?await read(fD):null; wpSay('','');
+    const rows=rcRows(xl); if(!rows||!rows.length) return toast(fL.n+' doesn’t have a Change Type column.');
+    const V=rcVcr(xv); if(!V.dp&&!V.en&&!V.cu) return toast(fV.n+' doesn’t look like a Version Comparison Report.');
+    const r=rcCompare(rows,V,rcLdd(xd));
+    const R={at:new Date().toISOString(),by:(S.me&&S.me.name)||'',list:fL.n,vcr:fV.n,ldd:fD?fD.n:'',vers:r.vers,checked:r.rows-r.unchecked.length,inBuild:r.inBuild,missing:r.missing.slice(0,200),extra:r.extra.slice(0,200),removed:r.removed.slice(0,200),defs:r.defs.slice(0,100).map(d=>Object.assign({},d,{list:rvTrim(d.list,400),build:rvTrim(d.build,400)})),defsChecked:r.defsChecked,unchecked:r.unchecked.slice(0,100)};
+    if(S.canWrite&&!S.viewAs){ const x=clone(S.tickets[t.id]||t), b=clone(x); x.relCheck=R; hist(x,'Release check ('+fV.n+' against '+fL.n+'): '+rcLine(R)+(R.extra.length?' Added but not on the list: '+R.extra.slice(0,5).join('; ')+(R.extra.length>5?'…':''):'')); await saveTicket(x,'Release check saved',b); }
+    await modal({title:'Release Check',text:esc(rcLine(R)),ok:'Close',body:rcHtml(R)});
+  }catch(e){ wpSay('The check didn’t finish ('+e.message+').','bad'); } }
+const _renderPanelRC=renderPanel;
+renderPanel=function(){ _renderPanelRC(); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const h=rcSec(t); if(!h) return;
+  const P=$('#panel'), pb=P&&$('.pb',P); if(!pb||$('.rc-sec',pb)) return; const host=$('[data-wtab="over"]',pb)||pb; const w=document.createElement('div'); w.innerHTML=h; const m=$('.rl-master',host); m&&m.nextSibling?host.insertBefore(w.firstChild,m.nextSibling):host.appendChild(w.firstChild); };
+document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-rcrun],[data-rcshow]'); if(!b) return; e.preventDefault(); const t=S.tickets[b.dataset.rcrun||b.dataset.rcshow]; if(!t) return;
+  if(b.dataset.rcrun){ if(!S.viewAs) rcRun(t); } else { const R=t.relCheck; if(R) modal({title:'Release Check',text:esc(rcLine(R)),ok:'Close',body:rcHtml(R)}); } });
+window.__mmsRc={rows:rcRows,vcr:rcVcr,ldd:rcLdd,compare:rcCompare};
 /* ---------- Out-of-date tabs can't save (Nov 21, 2026) ----------
    When a newer version of the MMS is published, an older open tab stops saving: it lets the person finish what they
    are typing (unsaved work-request changes or an open window), then goes read-only and asks them to reload. Any save
