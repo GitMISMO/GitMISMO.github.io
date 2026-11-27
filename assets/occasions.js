@@ -712,19 +712,22 @@
       anim(eggEl, [{ opacity: 1 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 2600, fill: 'forwards' });
     }]);
     ev.forEach(function (e) { setTimeout(e[1], e[0]); });
+    /* the hop-in runs as one browser animation, so it stays smooth even while the page underneath is still loading */
+    var pose = function (x, y, sq, d) { var sx = d * (1 + (1 - sq) * 0.8); return 'translate(' + x.toFixed(1) + 'px,' + (ground - 228 * s + y * s).toFixed(1) + 'px) scale(' + sx.toFixed(3) + ',' + sq.toFixed(3) + ')'; };
+    var fr = [], N = 120;
+    for (var q = 0; q <= N; q++) {
+      var p = q / N, ph = p * HOPS, f = ph - Math.floor(ph), arc = Math.sin(Math.PI * f);
+      if (q === N) { f = 0; arc = 0; }
+      fr.push({ transform: pose(start + (X0 - start) * Math.sin(p * Math.PI / 2), -26 * arc * (1 - 0.35 * p), 1 + 0.03 * arc - 0.04 * Math.pow(Math.cos(Math.PI * f), 8), 1) });
+    }
+    kid.style.transform = fr[N].transform;
+    anim(kid, fr, { duration: ENTER, easing: 'linear' });
+    var last = {};
+    var setRot = function (el, k, a, cx, cy) { var r = a.toFixed(1); if (last[k] === r) return; last[k] = r; el.setAttribute('transform', 'rotate(' + r + ' ' + cx + ' ' + cy + ')'); };
     play(T, t, function (v, now) {
-      if (now < ENTER) {
-        var p = Math.max(0, now) / ENTER, ph = p * HOPS, f = ph - Math.floor(ph), arc = Math.sin(Math.PI * f);
-        v.x = start + (X0 - start) * Math.sin(p * Math.PI / 2);
-        v.y = -28 * arc * (1 - 0.35 * p);
-        v.sq = 1 + 0.04 * arc - 0.07 * Math.pow(Math.cos(Math.PI * f), 12);
-        v.ears = -9 * Math.sin(Math.PI * 2 * f);
-      }
-      var sx = v.dir * (1 + (1 - v.sq) * 0.8);
-      kid.style.transform = 'translate(' + v.x + 'px,' + (ground - 228 * s + v.y * s) + 'px) scale(' + sx.toFixed(3) + ',' + v.sq.toFixed(3) + ')';
-      torso.setAttribute('transform', 'rotate(' + v.torso.toFixed(2) + ' 60 140)');
-      arm.setAttribute('transform', 'rotate(' + v.arm.toFixed(2) + ' 62 96)');
-      ears.setAttribute('transform', 'rotate(' + v.ears.toFixed(2) + ' 66 40)');
+      if (now < ENTER) return;
+      kid.style.transform = pose(v.x, v.y, v.sq, v.dir);
+      setRot(torso, 't', v.torso, 60, 140); setRot(arm, 'a', v.arm, 62, 96); setRot(ears, 'e', v.ears, 66, 40);
     });
     done(L, t + 2800);
   }
