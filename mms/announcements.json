@@ -1,7 +1,7 @@
 {
   "source": "MMS",
   "note": "Announcement requests from the MMS for MISMO Media, with the facts to draft from. Public information only.",
-  "updated": "2026-11-27T15:18:13.422Z",
+  "updated": "2026-11-27T15:48:15.008Z",
   "announcements": [
     {
       "id": "WR2023_20_03-Candidate-Recommendation-Announcement",
@@ -474,11 +474,11 @@
       "mmsUrl": "https://resources.mismo.org/mms/#wr=WR2025_27",
       "shareUrl": "",
       "pressRelease": true,
-      "stage": "Governance Approval to Publish",
+      "stage": "Release",
       "inComment": false,
-      "draftNow": true,
-      "readyToPost": false,
-      "readyAt": "",
+      "draftNow": false,
+      "readyToPost": true,
+      "readyAt": "2026-11-27",
       "leaders": [
         {
           "name": "Tammy Pegg Kienlen",
