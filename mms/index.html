@@ -2190,7 +2190,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-27T17:20:46Z',fp:'3150be13'};
+window.__mmsBuild={at:'2026-11-27T17:28:40Z',fp:'1e5d91b9'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -9624,7 +9624,7 @@ function rcLdd(x){ if(!x) return null; const sh=n=>((x.sheets)||[]).find(s=>Stri
   (sh('containers')||{rows:[]}).rows.forEach(r=>{ if(r.c.A&&r.n>1) cn.set(RC_K(r.c.A),{def:String(r.c.B||'')}); });
   return dp.size?{dp,cn}:null; }
 function rcCompare(rows,V,L){
-  const res={rows:rows.length,inBuild:0,missing:[],extra:[],removed:[],defs:[],defsChecked:0,unchecked:[],vers:V.vers||[]};
+  const res={rows:rows.length,checked:0,inBuild:0,missing:[],extra:[],removed:[],defs:[],defsChecked:0,unchecked:[],vers:V.vers||[]};
   const key=(a,b)=>RC_K(a)+'|'+RC_K(b);
   const dpOut=new Map(((V.dp&&V.dp.add)||[]).map(v=>[key(v[0],v[1]),v])), enOut=new Map(((V.en&&V.en.add)||[]).map(v=>[key(v[0],v[1]),v])), cuOut=new Map(((V.cu&&V.cu.add)||[]).map(v=>[key(v[1]||v[0],v[2]),v]));
   const used=new Set(), seg=xp=>String(xp||'').replace(/\s+/g,'').replace(/^\/+|\/+$/g,'').split('/');
@@ -9634,7 +9634,8 @@ function rcCompare(rows,V,L){
     if(/data point/.test(tt)){ k=key(r.dp,r.pc); M=dpOut; what=(r.dp||'')+' in '+(r.pc||'?'); }
     else if(/enumeration/.test(tt)){ k=key(r.dp,r.en); M=enOut; what=(r.en||'')+' for '+(r.dp||'?'); }
     else if(/container/.test(tt)){ const s=seg(r.xp); k=key(r.alias||r.cn||r.pc,s.length>1?s[s.length-2]:''); M=cuOut; what=(r.alias||r.cn||r.pc||'')+(s.length>1?' in '+s[s.length-2]:''); }
-    else return;
+    else return;   /* acronyms and relationships aren't in the report */
+    res.checked++;
     if(M&&M.has(k)){ res.inBuild++; used.add((M===dpOut?'d':M===enOut?'e':'c')+k); }
     else res.missing.push({item:it,wr:r.wr||'',what:r.ct+' '+r.tt+': '+what});
     /* definitions as they came out */
@@ -9683,7 +9684,7 @@ async function rcRun(t){
     const rows=rcRows(xl); if(!rows||!rows.length) return toast(fL.n+' doesn’t have a Change Type column.');
     const V=rcVcr(xv); if(!V.dp&&!V.en&&!V.cu) return toast(fV.n+' doesn’t look like a Version Comparison Report.');
     const r=rcCompare(rows,V,rcLdd(xd));
-    const R={at:new Date().toISOString(),by:(S.me&&S.me.name)||'',list:fL.n,vcr:fV.n,ldd:fD?fD.n:'',vers:r.vers,checked:r.rows-r.unchecked.length,inBuild:r.inBuild,missing:r.missing.slice(0,200),extra:r.extra.slice(0,200),removed:r.removed.slice(0,200),defs:r.defs.slice(0,100).map(d=>Object.assign({},d,{list:rvTrim(d.list,400),build:rvTrim(d.build,400)})),defsChecked:r.defsChecked,unchecked:r.unchecked.slice(0,100)};
+    const R={at:new Date().toISOString(),by:(S.me&&S.me.name)||'',list:fL.n,vcr:fV.n,ldd:fD?fD.n:'',vers:r.vers,checked:r.checked,inBuild:r.inBuild,missing:r.missing.slice(0,200),extra:r.extra.slice(0,200),removed:r.removed.slice(0,200),defs:r.defs.slice(0,100).map(d=>Object.assign({},d,{list:rvTrim(d.list,400),build:rvTrim(d.build,400)})),defsChecked:r.defsChecked,unchecked:r.unchecked.slice(0,100)};
     if(S.canWrite&&!S.viewAs){ const x=clone(S.tickets[t.id]||t), b=clone(x); x.relCheck=R; hist(x,'Release check ('+fV.n+' against '+fL.n+'): '+rcLine(R)+(R.extra.length?' Added but not on the list: '+R.extra.slice(0,5).join('; ')+(R.extra.length>5?'…':''):'')); await saveTicket(x,'Release check saved',b); }
     await modal({title:'Release Check',text:esc(rcLine(R)),ok:'Close',body:rcHtml(R)});
   }catch(e){ wpSay('The check didn’t finish ('+e.message+').','bad'); } }
