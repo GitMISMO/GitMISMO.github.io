@@ -2184,7 +2184,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-27T15:20:16Z',fp:'24fbaa05'};
+window.__mmsBuild={at:'2026-11-27T15:26:47Z',fp:'f7ed6e2b'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2573,7 +2573,10 @@ function notifyEnter(t,to){
   const w=whoseMove(t);
   queueMail({to:ppl.map(p=>p.email),subject:t.wr+' '+t.name+': '+stageDef(to).name,
     body:t.name+' ('+t.wr+') is now at '+stageDef(to).name+'.\n\nNext: '+(w.text||'')+(w.label?' ('+w.label+')':'')+'\n\nOpen it in the MISMO Manufacturing System: https://resources.mismo.org/mms/#wr='+encodeURIComponent(t.id),
-    html:(typeof stageMailHtml==='function'?stageMailHtml(t,to,ppl):''),ticket:t.id,kind:'stage',key:t.id+'-'+to+'-'+new Date().toISOString().slice(0,16)});
+    html:(typeof stageMailHtml==='function'?stageMailHtml(t,to,ppl):''),ticket:t.id,kind:'stage',key:t.id+'-'+to+'-'+new Date().toISOString().slice(0,16),
+    /* MISMO Media's own stage emails (Call for Participation, Comment Period, Release) reach Amy and Perry even when they
+       take the digest instead of single emails (Jonna, Nov 27, 2026): Release is when a press release is ready to post */
+    keep:roles.includes('media')?peopleFor('media',t).map(p=>String(p.email||'').trim().toLowerCase()).filter(Boolean):[]});
 }
 /* until the system goes live, nothing sends: every email waits in Notifications as a preview */
 /* Notifications groups: Held, To Send (queued or being sent), Didn’t Send (failed or nobody to send to), Sent */
@@ -7619,7 +7622,7 @@ const HELP_TOPICS={
      'Each list shows the top few, with a link to the rest in the MMS.',
      'On days with nothing in Needs You, you get no email. The Friday wrap-up always comes, with the week’s moves, what was published, comment periods and what is coming up.'],
     ['It goes at 4:30 PM Eastern on weekdays (Settings › Daily Digest sets the time, and Skip Today’s Email skips one day).',
-     'MISMO staff on the Digest Instead of Individual Emails list get their own digest with every facilitator’s digest summarized in it (The Facilitators’ Digests; on Fridays, The Facilitators’ Week), and no single MMS emails. The Website Admin’s digest also lists the Resource Library entries to make.',
+     'MISMO staff on the Digest Instead of Individual Emails list get their own digest with every facilitator’s digest summarized in it (The Facilitators’ Digests; on Fridays, The Facilitators’ Week), and no single MMS emails, except that MISMO Media’s people (Amy and Perry) still get the Call for Participation, Comment Period and Release emails. The Website Admin’s digest also lists the Resource Library entries to make.',
      'Anyone on the Access Only list can use the MMS but gets no MMS emails, not even a copy.',
      'MISMO staff choose who gets it, which days, and who is copied in Settings › Daily Digest.'],
     []],
@@ -9255,7 +9258,9 @@ trRestore=async function(k){ const t=S.trash[k]; const ok=await _trRestoreDel(k)
 /* ---------- Digest instead of individual emails; access without emails (Nov 20, 2026) ----------
    Settings › Daily Digest › Who Gets It has two more lists:
    - Digest Instead of Individual Emails (Jonna, Perry, Vanessa): they get the daily digest and the Friday wrap-up,
-     and no single emails from the MMS; what used to come as an email is in their digest's Needs You.
+     and no single emails from the MMS; what used to come as an email is in their digest's Needs You. One exception
+     (Jonna, Nov 27, 2026): MISMO Media's stage emails (Call for Participation, Comment Period, Release) still reach the
+     MISMO Media people (Amy and Perry), because Release is when a press release is ready to post.
    - Access Only, No MMS Emails (Jonathan): they can open and use the MMS but get no MMS emails, not even a copy.
    Every email the MMS files is checked here; the GitHub digest sender reads the same lists. */
 function dgoCfg(){ return (typeof MMSDigest!=='undefined'&&MMSDigest.settings)?MMSDigest.settings(S.digestCfg):(S.digestCfg||{}); }
@@ -9265,10 +9270,14 @@ function dgoNamesFor(email){ const e=String(email||'').trim().toLowerCase(); if(
   return all.filter(p=>p&&String(p.email||'').toLowerCase()===e).map(p=>p.name); }
 function dgoListed(L,email){ return dgoNamesFor(email).some(n=>(L||[]).some(x=>sameName(x,n))); }
 const DGO_KEEP={digest:1,health:1};
-function dgoDrop(email,kind){ if(!email) return false; const c=dgoCfg(); return dgoListed(c.noMail,email)||(!DGO_KEEP[kind]&&dgoListed(c.digestOnly,email)); }
+/* keep: addresses that get this email even if they take the digest instead (MISMO Media's stage emails, Jonna Nov 27, 2026);
+   Access Only, No MMS Emails still wins */
+function dgoDrop(email,kind,keep){ if(!email) return false; const c=dgoCfg(), e=String(email).trim().toLowerCase();
+  return dgoListed(c.noMail,email)||(!DGO_KEEP[kind]&&!(keep||[]).includes(e)&&dgoListed(c.digestOnly,email)); }
 const _queueMailDGO=queueMail;
 queueMail=async function(m){
-  const to0=(m.to||[]).filter(Boolean), to=(m.to||[]).filter(e=>!dgoDrop(e,m.kind)), cc=(m.cc||[]).filter(e=>!dgoDrop(e,m.kind));
+  const keep=m.keep||[]; m=Object.assign({},m); delete m.keep;
+  const to0=(m.to||[]).filter(Boolean), to=(m.to||[]).filter(e=>!dgoDrop(e,m.kind,keep)), cc=(m.cc||[]).filter(e=>!dgoDrop(e,m.kind,keep));
   if(to0.length&&!to.filter(Boolean).length){ if(!cc.filter(Boolean).length) return false; return _queueMailDGO(Object.assign({},m,{to:cc,cc:[]})); }
   return _queueMailDGO(Object.assign({},m,{to,cc})); };
 
@@ -9277,7 +9286,7 @@ const _digestSettingsHtmlDGO=digestSettingsHtml;
 digestSettingsHtml=function(){ const h=_digestSettingsHtmlDGO(), c=dgoCfg(), fac=(S.people.facilitators||[]).map(p=>String(p.name).toLowerCase());
   const others=dgoAll().filter(p=>!fac.includes(String(p.name).toLowerCase())).sort((a,b)=>a.name.localeCompare(b.name)), everyone=dgoAll().slice().sort((a,b)=>a.name.localeCompare(b.name));
   const ck=(attr,L,p)=>'<label class="dg-ck"><input type="checkbox" '+attr+'="'+esc(p.name)+'"'+((L||[]).some(x=>sameName(x,p.name))?' checked':'')+'><span><b>'+esc(p.name)+'</b><em>'+esc(p.email||'No email on file')+'</em></span></label>';
-  const add='<div class="dg-g"><div class="dg-gh">Digest Instead of Individual Emails</div><div class="muted" style="font-size:12px;margin:0 0 6px">They get the daily digest and the Friday wrap-up, and no single emails from the MMS.</div>'+others.map(p=>ck('data-dgonly',c.digestOnly,p)).join('')+'</div>'+
+  const add='<div class="dg-g"><div class="dg-gh">Digest Instead of Individual Emails</div><div class="muted" style="font-size:12px;margin:0 0 6px">They get the daily digest and the Friday wrap-up, and no single emails from the MMS, except that MISMO Media&rsquo;s people still get the Call for Participation, Comment Period and Release emails.</div>'+others.map(p=>ck('data-dgonly',c.digestOnly,p)).join('')+'</div>'+
     '<div class="dg-g"><div class="dg-gh">Access Only, No MMS Emails</div><div class="muted" style="font-size:12px;margin:0 0 6px">They can open and use the MMS but get no MMS emails, not even a copy.</div>'+everyone.map(p=>ck('data-dgnomail',c.noMail,p)).join('')+'</div>';
   const i=h.indexOf('<div class="card dg-prev">'); if(i<0) return h; const j=h.lastIndexOf('</div>',i); return h.slice(0,j)+add+h.slice(j); };
 const _wireDigestDGO=wireDigest;
