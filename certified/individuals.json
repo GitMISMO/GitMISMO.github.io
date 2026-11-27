@@ -1,6 +1,6 @@
 {
  "note": "Current CMSPs and AMSPs, name and company only. Written by the Individual certifications job in cms-data; not edited by hand.",
- "updated": "2026-11-16",
+ "updated": "2026-11-27",
  "programs": {
   "CMSP": {
    "title": "Current CMSPs",
@@ -166,7 +166,7 @@
   },
   "AMSP": {
    "title": "Current AMSPs",
-   "count": 106,
+   "count": 105,
    "people": [
     {
      "name": "Arvind Kumar Akula",
@@ -343,10 +343,6 @@
     {
      "name": "Bonnie Kidwell",
      "company": "Accenture"
-    },
-    {
-     "name": "Tyler King",
-     "company": "Wolters Kluwer"
     },
     {
      "name": "Laurinne Krentz",
