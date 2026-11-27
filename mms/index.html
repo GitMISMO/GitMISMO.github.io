@@ -2054,6 +2054,11 @@ p,.sub,.lede{text-wrap:pretty}
 .rl-by{font-size:12px;margin-right:6px}
 .rl-j{display:inline-block;margin-left:4px;padding:1px 6px;border-radius:4px;font-size:11.5px;font-weight:600;background:rgba(116,191,235,.18);color:#14486e}
 .rl-mrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.rl-g td{background:var(--surface-2)}
+.rl-gd>td{padding:0 8px 8px!important;border-top:0!important}
+.rl-gd summary{cursor:pointer;font-size:12.5px;color:var(--ink-3);padding:4px 0}
+.rl-in{margin:4px 0 0;width:100%}
+.rl-in td:nth-child(1){width:52px}.rl-in td:nth-child(2){width:19%}.rl-in td:nth-child(4){width:30%}.rl-in td:nth-child(5){width:170px}
 .rl-mrow select{min-width:110px}
 @media (max-width:700px){.rl-act{white-space:normal}}
 
@@ -2184,7 +2189,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-27T15:26:47Z',fp:'f7ed6e2b'};
+window.__mmsBuild={at:'2026-11-27T16:01:34Z',fp:'8295694a'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -5534,6 +5539,9 @@ function rvEditorChecks(files,ctx){
       const ph=(bodyT.match(/\b(TBD|TODO|TK|XXX+|lorem ipsum)\b|\[insert[^\]]*\]/gi)||[]).filter(x=>!/^\[insert date\]$/i.test(x)); /* the Comment Period IPR date: the MMS fills it in when the files are posted (Nov 25) */
       if(ph.length) add('fix','Readiness','Placeholders are still in the text: '+[...new Set(ph)].slice(0,6).join(', ')+'.','Fill in or remove every placeholder before submitting.',W,'placeholder');
       if(/ {2,}\S/.test(bodyT)) add('recommend','Formatting','Some sentences have double spaces.','Use single spaces between words and sentences.',W,'dbl-space');
+      /* Nov 27 (deep dive): what Erin fixed by hand that the checks didn't name: bullets typed as “- ”, and % mixed with “percent” */
+      const typed=nb.filter(p=>/^\s*([-–•*]|o)\s+\S/.test(p.t)).length; if(typed>=2) add('recommend','Formatting',typed+' list items are typed with a dash or symbol instead of a Word list.','Apply Word’s bulleted or numbered list (Home → Bullets) so the lists match and screen readers announce them.',W,'typed-bullets');
+      if(/\d\s?%/.test(bodyT)&&/\d\s+percent\b/i.test(bodyT)) add('recommend','Consistency','Numbers use both “%” and “percent”.','Use one form throughout (MISMO’s editor uses %, for example 10%).',W,'pct-mix');
     }
     if(f.kind==='excel'&&f.subForm){
       /* the IM/AWG Submission Form (Nov 20, per Erin): only the Face Page, Reference Model Changes and Proposed Structure tabs are read;
@@ -5589,6 +5597,10 @@ function rvParseForm(x){
   const psFilled=ps?ps.rows.filter(r=>Object.values(r.c).some(v=>/^[A-Z][A-Z0-9_]{3,}$/.test(String(v).trim()))).length:0;
   return {F,rows,hasFace:!!face,hasRM:!!rm,psFilled,hasPS:!!ps};
 }
+/* Nov 27 (deep dive): the LDD spells out only about 1 in 10 of the acronyms in its own list (VA, FHA, HUD, MI…),
+   so a definition using one of those isn't flagged; a new acronym still is, unless this submission adds it */
+function rvKnownAcr(a,P){ a=String(a).toUpperCase(); if(typeof RM!=='undefined'&&RM&&RM.ac&&RM.ac.has(a)) return true;
+  return !!(P&&(P.rows||[]).some(r=>/acronym/i.test(r.tt||'')&&String(r.ac||'').toUpperCase()===a)); }
 function rvImChecks(file,ctx){
   const out=[]; const add=(sev,area,issue,suggestion,where,rule,item)=>out.push({sev,area,issue,suggestion:suggestion||'',where:where||'',rule:rule||'',item:item||'',src:'check'});
   const P=rvParseForm(file), W=file.name;
@@ -5614,7 +5626,7 @@ function rvImChecks(file,ctx){
     const def=String(r.def||'');
     if(def){ if(!/[.)]\s*$/.test(def)) add('recommend','Definitions','The definition doesn’t end with a period.','End the definition with a period.',where,'def-period',it);
       if(/\b(must|shall|should)\b|\bsystem will\b|\bscreen\b|\bdrop-?down\b|\bfield on\b/i.test(def)) add('recommend','Definitions','The definition reads like implementation guidance ('+rvQ((def.match(/\b(must|shall|should)\b|\bsystem will\b|\bscreen\b|\bdrop-?down\b|\bfield on\b/i)||[''])[0])+').','IM removes process and implementation language from definitions; say what the data is, not how a system uses it.',where,'def-impl',it);
-      (def.match(/\b[A-Z]{2,6}\b/g)||[]).filter(a=>!/^(MISMO|LDD|ID|US|LLC|UPB)$/.test(a)&&!new RegExp('\\('+a+'\\)').test(def)).slice(0,1).forEach(a=>add('recommend','Definitions','The acronym '+a+' isn’t spelled out in the definition.','Spell it out, then give the acronym in parentheses.',where,'def-acr',it));
+      (def.match(/\b[A-Z]{2,6}\b/g)||[]).filter(a=>!/^(MISMO|LDD|ID|US|LLC|UPB)$/.test(a)&&!rvKnownAcr(a,P)&&!new RegExp('\\('+a+'\\)').test(def)).slice(0,1).forEach(a=>add('recommend','Definitions','The acronym '+a+' isn’t spelled out in the definition.','Spell it out, then give the acronym in parentheses.',where,'def-acr',it));
       if(tt==='data point'&&rvNorm(def).replace(/[.]/g,'')===rvNorm(nm)) add('recommend','Definitions','The definition only repeats the name.','Describe what the data means.',where,'def-repeat',it); }
     else if(/add|modify/.test(ct)&&tt!=='relationship') add('recommend','Definitions','No definition.','Every added or modified '+r.tt+' needs a definition (IM approves fewer rows that arrive without one).',where,'def-missing',it);
     // class word templates
@@ -5706,12 +5718,12 @@ async function rvAiEditor(files,ctx,progress,start){ start=start||0;
 }
 async function rvAiIm(P,ctx,progress){
   if(!S.sample) return {skipped:'Claude isn’t reachable from here, so only the software checks ran.'};
-  const rows=P.rows.filter(r=>/add|modify|rename/i.test(r.ct||'')).map(r=>[String(r.item||r._row),(r.ct||'')+' '+(r.tt||''),r.cn||r.pc||'',r.dp||r.en||r.at||r.ac||r.cn||'',r.def||'',(typeof rmFactsFor==='function'?rmFactsFor(r):'')]);
+  const rows=P.rows.filter(r=>/add|modify|rename/i.test(r.ct||'')).map(r=>[String(r.item||r._row),(r.ct||'')+' '+(r.tt||''),r.cn||r.pc||'',(/enum/i.test(r.tt||'')?(r.dp?r.dp+' = ':'')+(r.en||'(no value given)'):(r.dp||r.at||r.ac||r.alias||r.cn||'')),r.def||'',(typeof rmFactsFor==='function'?rmFactsFor(r):'')]);
   if(!rows.length) return {rows:[]};
   const L=RV_IM_LEARNED; const guide='What IM has done with '+L.decided.toLocaleString()+' decided rows (2021–2026): '+Math.round(L.asSubmitted/L.decided*100)+'% approved as submitted, '+Math.round(L.withMod/L.decided*100)+'% approved with modification, '+Math.round(L.withdrawn/L.decided*100)+'% withdrawn, the rest returned or denied. Most common reasons: '+L.themes.map(t=>t[0]).join('; ')+'.\nTypical IM edits (before → after, why):\n'+L.examples.map(e=>'- ['+e[0]+'] '+e[1]+' → '+e[2]+' ('+e[3]+')').join('\n')+'\nTypical IM comments: '+L.comments.join(' | ')+'\nDefinition templates: '+Object.entries(RV_TEMPLATE_TEXT).map(([k,v])=>k+': '+v).join('; ')+'.';
   const parts=[]; for(let i=0;i<rows.length;i+=12) parts.push(rows.slice(i,i+12)); let done=0;
   const got=await rvPool(parts,4,async part=>{
-    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM checks proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if something may already exist, say “may already exist; check the Reference Model for …”. List only rows IM would likely question. Plain, short notes in IM’s voice. IM edits lightly: a suggested definition keeps the submitter’s own wording and fixes only what is wrong (in 2025–2026, three in four of IM’s definition edits were punctuation, capitals, three words or fewer, or a qualifier added at the end); rewrite only when the definition is wrong or missing.'+(typeof imLessons==='function'&&imLessons(10).length?' What IM reviewers corrected in recent drafts (follow their lead): '+imLessons(10).join(' | ')+'.':'')+(typeof rvFbAvoid==='function'&&rvFbAvoid('im').length?' MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('im').join(' | ')+'.':'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows as [item, change, container, name, definition, facts from the '+(ctx.rm||'Reference Model (not loaded)')+']. When facts say EXISTS, the item is already in the model: IM would deny the add and ask to reuse it. When facts list similar items, judge whether one could be reused. Existing values are the Type’s current enumerations: '+JSON.stringify(part)+'\n\nAnswer in this compact JSON only: {"s":"one sentence","r":[["item","as submitted|with modification|returned|denied","what IM would say","suggested definition or empty","suggested name or empty"]]}. At most 6 rows; each string under 25 words. Answer right away.';
+    const prompt='You are pre-reviewing a MISMO Information Management (IM) submission the way the IM workgroup reviews it, so the facilitator can fix rows before IM sees them. IM checks proposed Reference Model changes for uniqueness, MISMO Engineering Guidelines (MEG 0007 class words), clear well-formed definitions, consistency with existing enumerations, and correct structure.\n\n'+guide+'\n\nRules: never change the submission; suggest. Don’t invent facts about the existing Reference Model: if something may already exist, say “may already exist; check the Reference Model for …”. List only rows IM would likely question. Plain, short notes in IM’s voice. IM edits lightly: a suggested definition keeps the submitter’s own wording and fixes only what is wrong (in 2025–2026, three in four of IM’s definition edits were punctuation, capitals, three words or fewer, or a qualifier added at the end); rewrite only when the definition is wrong or missing.'+(typeof imLessons==='function'&&imLessons(10).length?' What IM reviewers corrected in recent drafts (follow their lead): '+imLessons(10).join(' | ')+'.':'')+(typeof rvFbAvoid==='function'&&rvFbAvoid('im').length?' MISMO staff marked these past notes wrong; don’t make notes like them: '+rvFbAvoid('im').join(' | ')+'.':'')+'\n\nWork request: '+ctx.t.wr+' '+ctx.t.name+'\nRows as [item, change, container, name (for an enumeration: Type = value), definition, facts from the '+(ctx.rm||'Reference Model (not loaded)')+']. When facts say EXISTS, the item is already in the model: IM would deny the add and ask to reuse it. When facts list similar items, judge whether one could be reused. Existing values are the Type’s current enumerations: '+JSON.stringify(part)+'\n\nAnswer in this compact JSON only: {"s":"one sentence","r":[["item","as submitted|with modification|returned|denied","what IM would say","suggested definition or empty","suggested name or empty"]]}. At most 6 rows; each string under 25 words. Answer right away.';
     const r=await rvAsk(prompt); done++; progress&&progress('Claude has read '+Math.min(rows.length,done*12)+' of '+rows.length+' rows…'); return r; });
   const out=[], sums=[]; let errs=0;
   got.forEach(r=>{ if(!r||r.__err){ errs++; return; } (r.r||[]).forEach(x=>Array.isArray(x)?out.push({item:x[0],likely:x[1],note:x[2],suggestedDefinition:x[3],suggestedName:x[4]}):out.push(x)); if(r.s) sums.push(r.s); });
@@ -5728,9 +5740,12 @@ function rvShown(rep){ if(rvPassAll(rep)) return {k:'ready',l:'Pass',fx:'to fix'
 function rvReadiness(findings,ai){
   if(AI_PASS_ALL) return ['ready','Pass'];
   const fix=findings.filter(f=>f.sev==='fix').length, ai3=(ai&&ai.readiness)||[];
-  if(fix>=5||ai3.includes('needs-updates')) return ['needs','Needs Updates'];
+  /* Nov 27 (deep dive): one part of 30 marked “needs” used to make the whole document Needs Updates, so every document
+     tested (6 that Erin edited, light and heavy) read Needs Updates. Now it takes over a third of the parts. */
+  const nNeed=ai3.filter(x=>x==='needs-updates').length;
+  if(fix>=5||(ai3.length&&nNeed*3>ai3.length)) return ['needs','Needs Updates'];
   if(fix>0) return ['minor','A Few Fixes Before IM'];
-  if(ai3.includes('minor')||((ai&&ai.corrections)||[]).length>3) return ['minor','Ready With Minor Edits'];
+  if(nNeed||ai3.includes('minor')||((ai&&ai.corrections)||[]).length>3) return ['minor','Ready With Minor Edits'];
   return ['ready','Ready'];
 }
 function rvImReadiness(findings,ai){ const fix=findings.filter(f=>f.sev==='fix').length; const risky=((ai&&ai.rows)||[]).filter(r=>/returned|denied/.test(r.likely||'')).length;
@@ -6136,7 +6151,7 @@ function rvRun(t,kind){
       const ctx={t,boiler:kind==='editor'?$('#rvbp',box).value:exp,note:kind==='editor'?$('#rvnote',box).value.trim():''};
       let findings, ai; rvFbEnsure();
       if(kind==='editor'){ say('Checking boilerplate, copyright, layout and setup…'); findings=rvEditorChecks(read,ctx); ai=await rvAiEditor(read,ctx,m=>say(esc(m))); }
-      else { const x=read[0]; if(x.kind!=='excel') throw new Error('Choose the IM Submission Form (an Excel file).'); say('Loading the current MISMO Reference Model…'); const R=await rmLoad(); say('Checking the Face Page and '+'Reference Model rows'+(R?' against the '+esc(R.label):'')+'…'); const r=rvImChecks(x,ctx); findings=r.out.concat(rvRmChecks(r.P)); ctx.P=r.P; ctx.formStats={rows:r.P.rows.length}; ctx.rm=R?R.label:''; ai=await rvAiIm(r.P,ctx,m=>say(esc(m))); }
+      else { const x=read[0]; if(x.kind!=='excel') throw new Error('Choose the IM Submission Form (an Excel file).'); say('Loading the current MISMO Reference Model…'); const R=await rmLoad(); say('Checking the Face Page and '+'Reference Model rows'+(R?' against the '+esc(R.label):'')+'…'); const r=rvImChecks(x,ctx); findings=r.out.concat(rvRmChecks(r.P)); if(typeof rvLinkDedupe==='function') findings=rvLinkDedupe(findings,ctx); ctx.P=r.P; ctx.formStats={rows:r.P.rows.length}; ctx.rm=R?R.label:''; ai=await rvAiIm(r.P,ctx,m=>say(esc(m))); }
       findings=rvApplyFeedback(findings);
       const rep=rvBuildReport(kind,t,read,findings,ai,ctx);
       if(kind==='im'&&typeof rvSpRead==='function'){ const sp=rvSpRead(box,t); if(sp) rep.sp=sp; }
@@ -7561,7 +7576,7 @@ const HELP_TOPICS={
   mislink:['MISMO Link Format: Fixes Before IM','*',
     'MISMO Link builds each Reference Model release from the Reference Model Changes tab exactly as it is typed. The Reference Model QC lists the fixes MISMO Link’s vendor would otherwise make, so the submission arrives clean.',
     ['Run the Reference Model QC on the work request. The report opens with MISMO Link Format.',
-     'Each row shows the change (old value crossed out, new value in bold) and why. Click Accept or Decline. Accept All Remaining takes the rest.',
+     'Each row shows the change (old value crossed out, new value in bold) and why. Click Accept or Decline. Three or more fixes of the same kind are one line: Accept All or Decline All takes them together, and Each of the … lists them one by one if you want to decide some separately. Accept All Remaining takes the rest.',
      '“Check this one” means the fix is a best guess (a parent container name, spelling, a second XPATH): look before you accept.',
      'Download the Corrected Form, or Save It to This Work Request’s Files. It is your form with the accepted fixes written into the Reference Model Changes tab.',
      'Click Send to IM. Accepted fixes are in the rows IM sees; declined ones go with a note, so IM knows you kept the original.'],
@@ -7945,7 +7960,7 @@ wireMain=function(m){ _wireMainMail(m);
 window.__mmsMail={queue:m=>queueMail(m),held:()=>mailHeld()};
 window.__mmsRv={readFile:f=>rvReadFile(f),editorChecks:(r,c)=>rvEditorChecks(r,c),aiEditor:(r,c)=>rvAiEditor(r,c,()=>{}),build:(k,t,r,f,a,c)=>rvBuildReport(k,t,r,f,a,c),show:r=>rvShow(r),html:(r,w)=>rvReportHtml(r,w),expected:t=>rvExpectedBoiler(t),
   /* the Reference Model QC end to end, for checking it against past IM decisions (Nov 27, 2026): nothing is saved */
-  im:async(x,t)=>{ const R=await rmLoad(); const ctx={t:t||{wr:''}}; const r=rvImChecks(x,ctx); const sw=rvApplyFeedback(r.out.concat(rvRmChecks(r.P))); ctx.P=r.P; ctx.rm=R?R.label:''; const ai=await rvAiIm(r.P,ctx,()=>{}); return {P:r.P,sw,ai,rm:ctx.rm}; }};
+  im:async(x,t)=>{ const R=await rmLoad(); const ctx={t:t||{wr:''}}; const r=rvImChecks(x,ctx); const sw=rvApplyFeedback(rvLinkDedupe(r.out.concat(rvRmChecks(r.P)),ctx)); ctx.P=r.P; ctx.rm=R?R.label:''; const ai=await rvAiIm(r.P,ctx,()=>{}); return {P:r.P,sw,ai,rm:ctx.rm,link:ctx.link||[]}; }};
 
 /* ================= Metrics: how the line is running ================= */
 const MX_K=['var(--k1)','var(--k2)','var(--k3)','var(--k4)','var(--k5)'];
@@ -9377,7 +9392,7 @@ function rlCheck(rows){
     else if(tt==='data point'&&typeof RM!=='undefined'&&RM&&RM.dp&&RM.dp.has(rmKey(r.dp))&&!RM.depDp.has(rmKey(r.dp))) sug(r,'lk-reuse','Already in the '+RM.label+'; reuse it, with no new definition.',[set(r,'ct','Reuse'),set(r,'dt',''),set(r,'def','')],true);
     else seen[k]=r.item||('row '+r._row); });
   // 7) XPATH: the full path from MESSAGE, one path per row, ending at the container itself
-  W.forEach(r=>{ if(!r.xp) return; const tt=rlTt(r); let x=String(r.xp);
+  W.forEach(r=>{ if(!r.xp) return; const tt=rlTt(r); let x=String(r.xp); const use=(RL_COLS[rlCt(r)]||{})[tt]; if(use&&!use.includes('xp')) return;   /* this row doesn't use an XPATH: rule 10 blanks it, so don't also correct it */
     const paths=x.split(/\n+|\s{2,}|;/).map(s=>s.trim()).filter(Boolean); if(paths.length>1){ sug(r,'lk-xpath','One XPATH per row. Keep the first; add a Reuse row for the other location.',[set(r,'xp',paths[0])],true); x=paths[0]; }
     let y=x.replace(/\s+/g,''); if(/^\/\//.test(y)){ const seg=y.replace(/^\/+/,'').split('/'); const i=RL_ROOT.indexOf(seg[0]); if(i>=0) y=RL_ROOT.slice(0,i).concat(seg).join('/'); }
     y=y.replace(/^\/(?!\/)/,'').replace(/\/+$/,'');
@@ -9486,10 +9501,24 @@ async function rlMakeFile(rep){ const f=await rlOriginal(rep); if(!f) return nul
 function rlSaveAs(file){ const a=document.createElement('a'); a.href=URL.createObjectURL(file); a.download=file.name; document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },500); }
 
 /* ---------- in the Reference Model QC report ---------- */
+const rlOpenG=new Set();
+document.addEventListener('toggle',e=>{ const d=e.target; if(d&&d.dataset&&d.dataset.rlgo){ d.open?rlOpenG.add(d.dataset.rlgo):rlOpenG.delete(d.dataset.rlgo); } },true);
 function rlSecHtml(rep,forWord){ if(!rep||!rep.link) return ''; const st=rlState(rep), e=esc; const can=!forWord&&rlCanDecide(rep);
   const cell=c=>e(RL_FIELD[c.f]||c.f)+': '+(c.from?'<s>'+e(rvTrim(c.from,140))+'</s> ':'')+'<b>'+(c.to?e(rvTrim(c.to,140)):'(blank)')+'</b>';
   const decided=s=>{ const x=st.D[s.id]; return x?'<span class="rl-d rl-'+e(x.d)+'">'+(x.d==='accept'?'Accepted':'Declined')+'</span>'+(forWord?'':'<span class="muted rl-by">'+e(firstName(x.by||''))+'</span>'):''; };
-  const rows=st.L.map(s=>'<tr data-rls="'+e(s.id)+'"><td>'+e(s.item||'')+'</td><td>'+e(rvTrim(s.name,60))+'</td><td>'+(s.ch.length?s.ch.map(cell).join('<br>'):'<i>Needs a person to fix</i>')+'</td><td>'+e(s.why)+(s.judge?' <span class="rl-j">Check this one</span>':'')+'</td><td class="rl-act">'+(st.D[s.id]?decided(s)+(can?'<button type="button" class="btn sm ghost" data-rlx="'+e(s.id)+'">Undo</button>':''):(s.ch.length&&can?'<button type="button" class="btn sm" data-rld="'+e(s.id)+'">Decline</button><button type="button" class="btn sm pri" data-rla="'+e(s.id)+'">Accept</button>':(s.ch.length?'<span class="muted">Not decided</span>':'')))+'</td></tr>').join('');
+  const one=s=>'<tr data-rls="'+e(s.id)+'"><td>'+e(s.item||'')+'</td><td>'+e(rvTrim(s.name,60))+'</td><td>'+(s.ch.length?s.ch.map(cell).join('<br>'):'<i>Needs a person to fix</i>')+'</td><td>'+e(s.why)+(s.judge?' <span class="rl-j">Check this one</span>':'')+'</td><td class="rl-act">'+(st.D[s.id]?decided(s)+(can?'<button type="button" class="btn sm ghost" data-rlx="'+e(s.id)+'">Undo</button>':''):(s.ch.length&&can?'<button type="button" class="btn sm" data-rld="'+e(s.id)+'">Decline</button><button type="button" class="btn sm pri" data-rla="'+e(s.id)+'">Accept</button>':(s.ch.length?'<span class="muted">Not decided</span>':'')))+'</td></tr>';
+  /* Nov 27 (deep dive): 664 rows in 2025–26 forms drew 1,757 MISMO Link suggestions, nearly all the same few mechanical fixes
+     (an XPATH a data point row doesn't use, a name in capitals, a container on an enumeration row). Three or more of the same
+     kind are one line with Accept All / Decline All; each one is still listed underneath. Ones a person must check stay single. */
+  const gk=s=>s.rule+'|'+s.ch.map(c=>c.f).join('+')+'|'+String(s.why).replace(/“[^”]*”/g,'').replace(/\b[A-Z][A-Z0-9_]{3,}\b/g,'').replace(/item \S+/g,'');
+  const G=new Map(); st.L.forEach(s=>{ const k=(s.judge||!s.ch.length)?'j'+s.id:gk(s); if(!G.has(k)) G.set(k,[]); G.get(k).push(s); });
+  const grp=g=>{ const ids=g.map(s=>s.id).join(','), op=g.filter(s=>!st.D[s.id]), na=g.filter(s=>(st.D[s.id]||{}).d==='accept').length, nd=g.filter(s=>(st.D[s.id]||{}).d==='decline').length;
+    const nm=[...new Set(g.map(s=>s.name).filter(Boolean))]; const c0=g[0].ch;
+    return '<tr class="rl-g" data-rlgk="'+e(g[0].id)+'"><td><b>'+g.length+'</b> <span class="muted">rows</span></td><td>'+e(nm.slice(0,3).map(x=>rvTrim(x,40)).join(', '))+(nm.length>3?' <span class="muted">and '+(nm.length-3)+' more</span>':'')+'</td><td>'+c0.map(cell).join('<br>')+'<br><span class="muted">and the same kind of fix on '+(g.length-1)+' more row'+(g.length===2?'':'s')+'</span></td><td>'+e(g[0].why)+(g.length>1?' <span class="muted">(item '+e(g[0].item)+')</span>':'')+'</td><td class="rl-act">'+
+      (can&&op.length?'<button type="button" class="btn sm" data-rlgd="'+e(op.map(s=>s.id).join(','))+'">Decline All</button><button type="button" class="btn sm pri" data-rlga="'+e(op.map(s=>s.id).join(','))+'">Accept All '+op.length+'</button>':'')+
+      ((na||nd)?'<span class="muted rl-by">'+[na?na+' accepted':'',nd?nd+' declined':''].filter(Boolean).join(' · ')+'</span>':'')+'</td></tr>'+
+      (forWord?'':'<tr class="rl-gd"><td colspan="5"><details data-rlgo="'+e(g[0].id)+'"'+(rlOpenG.has(g[0].id)?' open':'')+'><summary>Each of the '+g.length+'</summary><table class="rvt rl-t rl-in"><tbody>'+g.map(one).join('')+'</tbody></table></details></td></tr>'); };
+  const rows=[...G.values()].map(g=>g.length>=3?grp(g):g.map(one).join('')).join('');
   const head='<h3>MISMO Link Format<span class="rl-cnt">'+st.L.length+' suggestion'+(st.L.length===1?'':'s')+' · '+st.acc.length+' accepted · '+st.dec.length+' declined'+(st.open.length?' · '+st.open.length+' to decide':'')+'</span></h3>';
   const intro='<p class="rvr-note">MISMO Link builds the Reference Model from this tab exactly as typed. These are the fixes its vendor makes when it can’t read a row. Accept the ones that are right; declined ones go to IM with a note.'+(rlLocked(rep)?' This form has gone to IM, so the decisions are final.':'')+'</p>';
   if(!st.L.length) return head+'<p>Nothing to fix: the Reference Model Changes tab is in the format MISMO Link reads.</p>';
@@ -9497,7 +9526,7 @@ function rlSecHtml(rep,forWord){ if(!rep||!rep.link) return ''; const st=rlState
   return '<div class="rl-sec" data-rlrep="'+e(rep.id)+'">'+head+intro+bar+'<table class="rvt rl-t"><thead><tr><th>Item</th><th>Name</th><th>Change</th><th>Why</th><th>'+(forWord?'Decision':'')+'</th></tr></thead><tbody>'+rows+'</tbody></table></div>'; }
 const _rvReportHtmlRL=rvReportHtml;
 rvReportHtml=function(rep,forWord){ const h=_rvReportHtmlRL(rep,forWord); if(!rep||rep.kind!=='im'||!rep.link) return h; const sec=rlSecHtml(rep,forWord); const i=h.indexOf('<h3>'); return i<0?h.replace(/<\/div>\s*$/,sec+'</div>'):h.slice(0,i)+sec+h.slice(i); };
-document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-rla],[data-rld],[data-rlx],[data-rlall],[data-rlget]'); if(!b) return; const sec=b.closest('[data-rlrep]'); if(!sec) return; e.preventDefault();
+document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-rla],[data-rld],[data-rlx],[data-rlall],[data-rlget],[data-rlga],[data-rlgd]'); if(!b) return; const sec=b.closest('[data-rlrep]'); if(!sec) return; e.preventDefault();
   const rep=S.reviews[sec.dataset.rlrep]; if(!rep||!rep.link) return; const msg=$('.rl-msg',sec); const re=()=>{ const w=document.createElement('div'); w.innerHTML=rlSecHtml(rep,false); sec.replaceWith(w.firstChild); };
   try{ if(b.dataset.rlget){ b.disabled=true; if(msg) msg.textContent='Writing the corrected form…'; const r=await rlMakeFile(rep); if(!r){ if(msg) msg.textContent=''; b.disabled=false; return; }
       if(b.dataset.rlget==='dl'){ rlSaveAs(r.file); toast(r.cells+' cell'+(r.cells===1?'':'s')+' corrected'); }
@@ -9505,6 +9534,7 @@ document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&
       if(msg) msg.textContent=''; b.disabled=false; return; }
     b.disabled=true; const st=rlState(rep);
     if(b.dataset.rlall) await rlDecide(rep,st.open.map(s=>s.id),'accept');
+    else if(b.dataset.rlga||b.dataset.rlgd) await rlDecide(rep,String(b.dataset.rlga||b.dataset.rlgd).split(',').filter(Boolean),b.dataset.rlga?'accept':'decline');
     else await rlDecide(rep,[b.dataset.rla||b.dataset.rld||b.dataset.rlx],b.dataset.rla?'accept':b.dataset.rld?'decline':'');
     re(); }catch(err){ b.disabled=false; toast((err&&err.message)||'That didn’t save. Try again.'); } });
 const _rvCardRL=rvCard;
@@ -9544,6 +9574,16 @@ document.addEventListener('change',e=>{ const s=e.target&&e.target.closest&&e.ta
 document.addEventListener('click',async e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-rlmaster]'); if(!b) return; e.preventDefault(); const sec=b.closest('.rl-master'), rel=$('[data-rlrel]',sec).value; b.disabled=true; const old=b.textContent; b.textContent='Building…';
   try{ const r=await rlMaster(rel); toast(r.rows+' rows from '+r.wrs+' work request'+(r.wrs===1?'':'s')+(r.miss?'; '+r.miss+' not included yet':'')+(r.check?'; '+r.check+' format notes on the second tab':'')); }catch(err){ toast((err&&err.message)||'The list didn’t build. Try again.'); }
   b.disabled=false; b.textContent=old; });
+/* Nov 27 (deep dive): a name in capitals or a parent container that isn't defined was reported twice, once as a
+   Must Fix and once as a MISMO Link fix (a 17-row VA submission: 31 + 29 notes for the same names). The MISMO Link fix
+   can be accepted with one click, so the Must Fix copy is dropped when a Link fix covers the same item and column. */
+function rvLinkDedupe(findings,ctx){ const L=(ctx&&ctx.link)||[]; if(!L.length) return findings;
+  const has=new Set(); L.forEach(s=>{ (s.ch||[]).forEach(c=>has.add(s.rule+'|'+s.item+'|'+c.f)); if(s.rule==='lk-parent') has.add('lk-parent|'+s.item+'|pc'); });
+  const col=t=>/^Parent CONTAINER Name/.test(t)?'pc':/^CONTAINER Name/.test(t)?'cn':/^Data Point Name/.test(t)?'dp':/^Enumeration Name/.test(t)?'en':'';
+  return findings.filter(f=>{ const it=String(f.item||''); if(!it) return true;
+    if(f.rule==='normal-english'){ const c=col(f.issue); return !(c&&has.has('lk-name|'+it+'|'+c)); }
+    if(f.rule==='rm-parent') return !has.has('lk-parent|'+it+'|pc');
+    return true; }); }
 window.__mmsLink={check:rlCheck,plain:rlPlain,corrected:rlCorrected,state:rlState,master:rlMaster,rows:rlMasterRows};
 /* ---------- Out-of-date tabs can't save (Nov 21, 2026) ----------
    When a newer version of the MMS is published, an older open tab stops saving: it lets the person finish what they
