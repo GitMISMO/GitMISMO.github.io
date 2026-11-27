@@ -48,12 +48,15 @@
       '.mo-glow{border-radius:50%;background:radial-gradient(circle,currentColor 0 12%,transparent 68%)}' +
       '.mo-star{background:currentColor;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}' +
       '.mo-conf{border-radius:1.5px}' +
+      '.mo-fw{border-radius:50%;background:radial-gradient(circle,#fff 0 16%,currentColor 30%,transparent 70%)}' +
       '.mo-big{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;font-family:"IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;white-space:nowrap}' +
       '.mo-big b{display:block;font-weight:800;line-height:1;letter-spacing:.02em;' +
       'background:linear-gradient(180deg,#fff6cf 0%,#ffd76a 35%,#e2a73b 62%,#fff0b8 80%,#c98d23 100%);-webkit-background-clip:text;background-clip:text;color:transparent;' +
       'filter:drop-shadow(0 4px 14px rgba(13,49,76,.45))}' +
-      '.mo-big span{display:block;font-weight:700;letter-spacing:.32em;text-transform:uppercase;color:#0d314c;' +
-      'text-shadow:0 0 12px #fff,0 0 4px #fff}' +
+      '.mo-big span{display:block;font-weight:800;letter-spacing:.32em;text-transform:uppercase;color:#fff;' +
+      'text-shadow:0 2px 10px rgba(13,49,76,.9),0 0 3px rgba(13,49,76,.8)}' +
+      '.mo-big:before{content:"";position:absolute;left:50%;top:50%;width:150%;height:190%;transform:translate(-50%,-50%);z-index:-1;' +
+      'background:radial-gradient(closest-side,rgba(13,49,76,.55),rgba(13,49,76,.25) 55%,transparent)}' +
       '.mo-bubble{position:absolute;background:#fff;border:1.5px solid #74bfeb;border-radius:4px;padding:5px 10px;' +
       'font:700 14px/1.2 "IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;color:#0d314c;white-space:nowrap;box-shadow:0 4px 14px rgba(13,49,76,.18)}' +
       '.mo-digit{position:absolute;left:0;top:0;font:800 22px/1 "IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;will-change:transform,opacity}';
@@ -149,18 +152,18 @@
 
   /* fireworks: a rocket climbs from the bottom and bursts into a ring of sparks that sag and fade */
   function firework(layer, x, y, colors) {
-    var Hh = innerHeight, rocket = piece('mo-glow', '#fff6d2');
-    rocket.style.width = '10px'; rocket.style.height = '26px'; layer.appendChild(rocket);
-    anim(rocket, [{ transform: 'translate(' + (x - 5) + 'px,' + Hh + 'px)', opacity: 0.2 }, { transform: 'translate(' + (x - 5) + 'px,' + (y - 13) + 'px)', opacity: 1 }],
+    var Hh = innerHeight, rocket = piece('mo-fw', pick(colors));
+    rocket.style.width = '14px'; rocket.style.height = '30px'; layer.appendChild(rocket);
+    anim(rocket, [{ transform: 'translate(' + (x - 7) + 'px,' + Hh + 'px)', opacity: 0.3 }, { transform: 'translate(' + (x - 7) + 'px,' + (y - 15) + 'px)', opacity: 1 }],
       { duration: 650, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' });
     setTimeout(function () {
       rocket.remove();
-      var flash = piece('mo-glow', pick(colors)); flash.style.width = flash.style.height = '130px'; layer.appendChild(flash);
-      anim(flash, [{ transform: 'translate(' + (x - 65) + 'px,' + (y - 65) + 'px) scale(.2)', opacity: 0.9 }, { transform: 'translate(' + (x - 65) + 'px,' + (y - 65) + 'px) scale(1.2)', opacity: 0 }], { duration: 600, fill: 'forwards' });
+      var flash = piece('mo-glow', pick(colors)); flash.style.width = flash.style.height = '220px'; layer.appendChild(flash);
+      anim(flash, [{ transform: 'translate(' + (x - 110) + 'px,' + (y - 110) + 'px) scale(.2)', opacity: 0.95 }, { transform: 'translate(' + (x - 110) + 'px,' + (y - 110) + 'px) scale(1.2)', opacity: 0 }], { duration: 600, fill: 'forwards' });
       setTimeout(function () { flash.remove(); }, 650);
-      var c1 = pick(colors), c2 = pick(colors), n = 30, rad = rnd(70, 130);
+      var c1 = pick(colors), c2 = pick(colors), n = 38, rad = rnd(95, 165);
       for (var i = 0; i < n; i++) {
-        var p = piece(i % 5 === 0 ? 'mo-star' : 'mo-dot', i % 2 ? c1 : c2), s = i % 5 === 0 ? 9 : rnd(5, 8);
+        var p = piece(i % 6 === 0 ? 'mo-star' : 'mo-fw', i % 2 ? c1 : c2), s = i % 6 === 0 ? 12 : rnd(14, 20);
         p.style.width = p.style.height = s + 'px'; layer.appendChild(p);
         var a = i / n * Math.PI * 2 + rnd(-0.08, 0.08), d = rad * rnd(0.8, 1.05), dx = Math.cos(a) * d, dy = Math.sin(a) * d, dur = rnd(1300, 1800);
         var pa = anim(p, [
@@ -216,18 +219,18 @@
 
   /* hats: drawn on 100 x 100 with the brim centred at (bx, by), brimW units wide; scale = how much wider than the O */
   var HATS = {
-    party: { bx: 50, by: 88, brimW: 44, scale: 1.05, tilt: 14, inner:
-      '<defs>' + GOLD + '<linearGradient id="I-cone" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#1d5b88"/><stop offset=".55" stop-color="#0d314c"/><stop offset="1" stop-color="#071f31"/></linearGradient>' +
+    party: { bx: 50, by: 88, brimW: 44, scale: 1.5, tilt: 14, inner:
+      '<defs>' + GOLD + '<linearGradient id="I-cone" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bfe3f7"/><stop offset=".5" stop-color="#74bfeb"/><stop offset="1" stop-color="#2b7fbf"/></linearGradient>' +
       '<clipPath id="I-k"><path d="M28,88 L57,14 L72,88 Z"/></clipPath></defs>' +
       '<path d="M28,88 L57,14 L72,88 Z" fill="url(#I-cone)"/>' +
       '<g clip-path="url(#I-k)"><path d="M10,78 L90,52 L90,60 L10,86 Z" fill="url(#I-gold)"/><path d="M10,52 L90,26 L90,33 L10,59 Z" fill="url(#I-gold)"/>' +
-      '<circle cx="46" cy="70" r="2.3" fill="#74bfeb"/><circle cx="61" cy="76" r="2.3" fill="#74bfeb"/><circle cx="54" cy="46" r="2.1" fill="#74bfeb"/><circle cx="40" cy="83" r="2" fill="#74bfeb"/><circle cx="62" cy="58" r="1.8" fill="#fff"/>' +
-      '<path d="M28,88 L57,14 L45,88 Z" fill="#fff" opacity=".1"/></g>' +
+      '<path d="M10,65 L90,39 L90,43 L10,69 Z" fill="#fff"/><circle cx="46" cy="76" r="2.3" fill="#0d314c"/><circle cx="61" cy="80" r="2.3" fill="#fff"/><circle cx="54" cy="52" r="2.1" fill="#0d314c"/><circle cx="58" cy="34" r="1.9" fill="#fff"/><circle cx="62" cy="62" r="1.8" fill="#0d314c"/>' +
+      '<path d="M28,88 L57,14 L45,88 Z" fill="#fff" opacity=".18"/><path d="M57,14 L72,88 L64,88 Z" fill="#0d314c" opacity=".22"/></g>' +
       '<ellipse cx="50" cy="88" rx="23" ry="4.6" fill="url(#I-gold)"/>' +
       '<g stroke-width="2.4" stroke-linecap="round">' + [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(function (a, i) {
         var r = a * Math.PI / 180; return '<path d="M57,13 L' + (57 + Math.cos(r) * 9).toFixed(1) + ',' + (13 + Math.sin(r) * 9).toFixed(1) + '" stroke="' + (i % 2 ? '#74bfeb' : '#ffd76a') + '"/>'; }).join('') + '</g>' +
       '<circle cx="57" cy="13" r="5.4" fill="url(#I-gold)"/><circle cx="55.4" cy="11.4" r="1.6" fill="#fff" opacity=".85"/>' },
-    leprechaun: { bx: 50, by: 86, brimW: 76, scale: 1.4, tilt: 10, inner:
+    leprechaun: { bx: 50, by: 86, brimW: 76, scale: 1.95, tilt: 10, inner:
       '<defs>' + GOLD + '<linearGradient id="I-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#43b065"/><stop offset=".5" stop-color="#2a8a49"/><stop offset="1" stop-color="#16592d"/></linearGradient></defs>' +
       '<ellipse cx="50" cy="86" rx="38" ry="7.5" fill="#145a2c"/><ellipse cx="50" cy="84.5" rx="36.5" ry="5.6" fill="url(#I-g)"/>' +
       '<path d="M27,84 L30.5,36 C31,31.5 69,31.5 69.5,36 L73,84 Z" fill="url(#I-g)"/><ellipse cx="50" cy="34.5" rx="19.5" ry="4.4" fill="#36a058"/>' +
@@ -235,12 +238,12 @@
       '<path d="M28.4,67 L71.6,67 L72.5,80 L27.5,80 Z" fill="#1d1d24"/>' +
       '<rect x="43" y="65.4" width="14" height="16.2" rx="1.6" fill="none" stroke="url(#I-gold)" stroke-width="3.2"/>' +
       '<g transform="translate(65 64) scale(.62)">' + shamrock('#5cd07f') + '</g>' },
-    bunny: { bx: 50, by: 92, brimW: 46, scale: 1.15, tilt: 4, inner:
+    bunny: { bx: 50, by: 92, brimW: 46, scale: 1.45, tilt: 4, inner:
       '<defs><linearGradient id="I-w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d3dbe4"/></linearGradient></defs>' +
       '<g transform="rotate(-14 38 88)"><ellipse cx="38" cy="50" rx="11.5" ry="40" fill="url(#I-w)"/><ellipse cx="38" cy="54" rx="5.6" ry="29" fill="#f7b6c8"/></g>' +
       '<g transform="rotate(16 62 88)"><path d="M50.5,88 C48,62 52,30 62,16 C70,8 76,14 74,26 C72,46 72,70 73.5,88 Z" fill="url(#I-w)"/><path d="M57,86 C56,64 58,38 64,26 C67,22 69,25 68.5,31 C67,48 67,68 68,86 Z" fill="#f7b6c8"/></g>' +
       '<path d="M24,93 Q50,79 76,93" stroke="#f49ab0" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M27,90.5 Q50,78.5 73,90.5" stroke="#fff" stroke-width="1.4" fill="none" opacity=".6" stroke-linecap="round"/>' },
-    unclesam: { bx: 50, by: 86, brimW: 76, scale: 1.4, tilt: 10, inner:
+    unclesam: { bx: 50, by: 86, brimW: 76, scale: 1.95, tilt: 10, inner:
       '<defs><clipPath id="I-c"><path d="M28,84 L31,26 C31,21.5 69,21.5 69,26 L72,84 Z"/></clipPath></defs>' +
       '<ellipse cx="50" cy="86" rx="38" ry="7.5" fill="#16306e"/><ellipse cx="50" cy="84.6" rx="36.5" ry="5.4" fill="#22408f"/>' +
       '<path d="M28,84 L31,26 C31,21.5 69,21.5 69,26 L72,84 Z" fill="#f6f8fb"/>' +
@@ -249,7 +252,7 @@
       '<ellipse cx="50" cy="25" rx="19" ry="4.2" fill="#e3e8ef"/>' +
       '<path d="M29.2,65 L70.8,65 L71.7,79 L28.3,79 Z" fill="#22408f"/>' +
       [35, 44.5, 54, 63.5].map(function (x) { return '<path transform="translate(' + x + ' 72) scale(.42)" d="M0,-10 L2.9,-3.1 L9.5,-3.1 L4.3,1.2 L5.9,8.1 L0,4.2 L-5.9,8.1 L-4.3,1.2 L-9.5,-3.1 L-2.9,-3.1 Z" fill="#fff"/>'; }).join('') },
-    witch: { bx: 50, by: 86, brimW: 88, scale: 1.55, tilt: 8, inner:
+    witch: { bx: 50, by: 86, brimW: 88, scale: 2.15, tilt: 8, inner:
       '<defs>' + GOLD + '<linearGradient id="I-p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b3484"/><stop offset=".6" stop-color="#32194d"/><stop offset="1" stop-color="#180c27"/></linearGradient></defs>' +
       '<ellipse cx="50" cy="86" rx="44" ry="8.2" fill="#140a21"/><ellipse cx="50" cy="84.4" rx="42.5" ry="6.2" fill="url(#I-p)"/>' +
       '<path d="M30,84 C34,64 41,46 49,29 C53,20 62,11 78,13 C71,17 65,23 62.5,31 C60,48 64,68 70,84 Z" fill="url(#I-p)"/>' +
@@ -257,7 +260,7 @@
       '<path d="M31.4,75 C44,78.5 57,78.5 68.6,75 L70,84 C57,87.5 43,87.5 30,84 Z" fill="#f08a24"/>' +
       '<rect x="45" y="73.2" width="10" height="12" rx="1.4" fill="none" stroke="url(#I-gold)" stroke-width="2.6"/>' +
       '<path d="M70,22 l1.2,2.6 2.8,.3 -2.1,1.9 .6,2.8 -2.5,-1.4 -2.5,1.4 .6,-2.8 -2.1,-1.9 2.8,-.3 Z" fill="#ffd76a"/>' },
-    pilgrim: { bx: 50, by: 86, brimW: 80, scale: 1.45, tilt: 9, inner:
+    pilgrim: { bx: 50, by: 86, brimW: 80, scale: 1.95, tilt: 9, inner:
       '<defs>' + GOLD + '<linearGradient id="I-b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a4a56"/><stop offset=".55" stop-color="#26262e"/><stop offset="1" stop-color="#111116"/></linearGradient></defs>' +
       '<ellipse cx="50" cy="86" rx="40" ry="7.4" fill="#111116"/><ellipse cx="50" cy="84.6" rx="38.5" ry="5.4" fill="url(#I-b)"/>' +
       '<path d="M29,84 L33.5,34 C34,30 66,30 66.5,34 L71,84 Z" fill="url(#I-b)"/><ellipse cx="50" cy="33" rx="16.5" ry="3.8" fill="#3a3a44"/>' +
@@ -278,7 +281,7 @@
     if (!b) return;
     var set = function (k, v) { h.style.setProperty(k, v, 'important'); };
     if (spec.glasses) {
-      var gw = b.w * 1.62, gh = gw * 44 / 120;
+      var gw = b.w * 1.8, gh = gw * 44 / 120;
       set('width', gw + 'px'); set('height', gh + 'px');
       set('left', (b.cx - P.left - gw / 2) + 'px'); set('top', (b.cy - P.top - gh * 0.52) + 'px');
       return;
@@ -325,7 +328,7 @@
     '<g fill="#f3c75a"><circle cx="45" cy="22" r="6"/><circle cx="54" cy="19" r="6.4"/><circle cx="63" cy="23" r="5.8"/><circle cx="66" cy="31" r="5"/><circle cx="40" cy="28" r="4.4"/></g>' +
     '<path d="M44,34 C46,31.5 49,31.5 50.5,34" stroke="#3a2416" stroke-width="1.8" fill="none" stroke-linecap="round"/>' +
     '<circle cx="45" cy="39.5" r="3.6" fill="#f4927e" opacity=".55"/><path d="M41,42 C43,44.5 46.5,44.5 48,42.5" stroke="#b0503c" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
-  var BAT = '<g fill="#2b1f3d"><g><animateTransform attributeName="transform" type="scale" values="1 1;1 -.45;1 1" dur=".26s" repeatCount="indefinite"/>' +
+  var BAT = '<g fill="#2b1f3d" stroke="#8e6bd1" stroke-width=".7" stroke-opacity=".8"><g><animateTransform attributeName="transform" type="scale" values="1 1;1 -.45;1 1" dur=".26s" repeatCount="indefinite"/>' +
     '<path d="M-3,0 C-10,-11 -21,-11 -29,-4 C-25,-2.4 -23,1.4 -23,4 C-20,1 -16,1 -14,5 C-11,2 -7.5,3 -5.5,6.5 Z"/></g>' +
     '<g><animateTransform attributeName="transform" type="scale" values="1 1;1 -.45;1 1" dur=".26s" repeatCount="indefinite"/>' +
     '<path d="M3,0 C10,-11 21,-11 29,-4 C25,-2.4 23,1.4 23,4 C20,1 16,1 14,5 C11,2 7.5,3 5.5,6.5 Z"/></g>' +
@@ -509,12 +512,16 @@
       hat: 'witch',
       open: function () {
         var L = sky(), W = innerWidth, Hh = innerHeight, longest = 0;
-        for (var i = 0; i < 6; i++) (function (i) {
-          var w = rnd(46, 84), dur = rnd(5200, 7800), delay = i * 520 + rnd(0, 300), y = Hh * rnd(0.12, 0.55), amp = rnd(14, 40), ph = R() * 6;
+        var ms = Math.max(160, Math.min(280, W * 0.18)), moon = art('0 0 100 100', '<defs><radialGradient id="I-m" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset=".7" stop-color="#ffe7a0"/><stop offset="1" stop-color="#f2c457"/></radialGradient><radialGradient id="I-mg"><stop offset=".55" stop-color="#ffe7a0" stop-opacity=".55"/><stop offset="1" stop-color="#ffe7a0" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#I-mg)"/><circle cx="50" cy="50" r="30" fill="url(#I-m)"/><g fill="#e3b54a" opacity=".45"><circle cx="40" cy="42" r="5"/><circle cx="58" cy="58" r="7"/><circle cx="60" cy="38" r="3"/><circle cx="44" cy="62" r="3.4"/></g>');
+        moon.style.width = moon.style.height = ms + 'px'; L.appendChild(moon);
+        var mx = W * 0.72 - ms / 2, my = Hh * 0.08;
+        anim(moon, [{ transform: 'translate(' + mx + 'px,' + (my + 40) + 'px)', opacity: 0 }, { transform: 'translate(' + mx + 'px,' + my + 'px)', opacity: 1, offset: 0.15 }, { transform: 'translate(' + mx + 'px,' + my + 'px)', opacity: 1, offset: 0.85 }, { transform: 'translate(' + mx + 'px,' + (my - 10) + 'px)', opacity: 0 }], { duration: 8600, fill: 'both' });
+        for (var i = 0; i < 7; i++) (function (i) {
+          var w = rnd(70, 120), dur = rnd(5200, 7800), delay = 500 + i * 480 + rnd(0, 300), y = Hh * rnd(0.1, 0.5), amp = rnd(14, 40), ph = R() * 6;
           longest = Math.max(longest, dur + delay);
           setTimeout(function () { cross(L, art('-30 -15 60 30', BAT), w, dur, function (t) { return { x: W + 30 - (W + w + 60) * t, y: y + Math.sin(t * Math.PI * 4 + ph) * amp, r: Math.sin(t * Math.PI * 4 + ph) * 8 }; }); }, delay);
         })(i);
-        done(L, longest + 500);
+        done(L, Math.max(longest + 500, 8800));
       },
       hover: function (b) { spider(b); }
     },
@@ -539,7 +546,7 @@
   var ghBusy = false;
   function groundhog(say) {
     if (ghBusy) return; ghBusy = true;
-    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(110, Math.min(170, W * 0.11)), h = w * 1.18;
+    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(130, Math.min(200, W * 0.13)), h = w * 1.18;
     var g = art('-6 0 112 118', GROUNDHOG); g.style.width = w + 'px'; g.style.height = h + 'px';
     var box = document.createElement('div'); box.className = 'mo-p'; box.style.width = w + 'px'; box.style.height = h + 'px'; box.appendChild(g); L.appendChild(box);
     var x = W - w - Math.max(24, W * 0.04), y = Hh - h + 2;
@@ -554,19 +561,19 @@
   /* Pi Day: a warm pie rises at the bottom, and the digits of pi stream up out of it */
   var PI = '3.14159265358979323846264338327950288419716939937510';
   function digits(L, x, y, n, quick) {
-    var cols = ['#0d314c', '#74bfeb', '#e2a73b', '#14486e'], longest = 0;
+    var cols = ['#0d314c', '#1a8fe3', '#c98d23', '#14486e'], longest = 0;
     for (var i = 0; i < n; i++) (function (i) {
       var d = document.createElement('span'); d.className = 'mo-digit'; d.textContent = PI.charAt(i % PI.length); d.style.color = cols[i % 4];
-      d.style.fontSize = rnd(18, 30) + 'px'; d.style.textShadow = '0 0 6px #fff,0 0 2px #fff';
+      d.style.fontSize = rnd(26, 42) + 'px'; d.style.textShadow = '0 0 10px #fff,0 0 3px #fff,0 0 1px #fff';
       L.appendChild(d);
       var dx = rnd(-90, 90), up = rnd(160, 300), dur = rnd(2200, 3200), delay = i * (quick ? 90 : 160);
       longest = Math.max(longest, dur + delay);
-      anim(d, [{ transform: 'translate(' + x + 'px,' + y + 'px) scale(.4)', opacity: 0 }, { transform: 'translate(' + (x + dx * 0.3) + 'px,' + (y - up * 0.25) + 'px) scale(1)', opacity: 1, offset: 0.2 }, { transform: 'translate(' + (x + dx) + 'px,' + (y - up) + 'px) scale(.9) rotate(' + rnd(-30, 30) + 'deg)', opacity: 0 }], { duration: dur, delay: delay, easing: 'ease-out', fill: 'both' });
+      anim(d, [{ transform: 'translate(' + x + 'px,' + y + 'px) scale(.4)', opacity: 0 }, { transform: 'translate(' + (x + dx * 0.3) + 'px,' + (y - up * 0.25) + 'px) scale(1)', opacity: 1, offset: 0.15 }, { transform: 'translate(' + (x + dx * 0.7) + 'px,' + (y - up * 0.7) + 'px) scale(1)', opacity: 1, offset: 0.7 }, { transform: 'translate(' + (x + dx) + 'px,' + (y - up) + 'px) scale(.9) rotate(' + rnd(-30, 30) + 'deg)', opacity: 0 }], { duration: dur, delay: delay, easing: 'ease-out', fill: 'both' });
     })(i);
     done(L, longest + 200);
   }
   function pie() {
-    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(150, Math.min(240, W * 0.16)), h = w * 90 / 140;
+    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(170, Math.min(270, W * 0.18)), h = w * 90 / 140;
     var p = art('0 0 140 90', PIE); p.style.width = w + 'px'; p.style.height = h + 'px'; L.appendChild(p);
     var x = W / 2 - w / 2, y = Hh - h - 18;
     anim(p, [{ transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px)', opacity: 0 }, { transform: 'translate(' + x + 'px,' + (y - 6) + 'px)', opacity: 1, offset: 0.1 }, { transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1, offset: 0.14 }, { transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1, offset: 0.86 }, { transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px)', opacity: 0 }], { duration: 7400, easing: 'ease-in-out', fill: 'forwards' });
