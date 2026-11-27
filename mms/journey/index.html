@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en" data-rs-gate>
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<link rel="icon" type="image/png" sizes="48x48" href="https://resources.mismo.org/assets/favicon-48x48.png">
+<title>Work Request Journey</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: navy masthead; chapter strip; a year-long swimlane (work requests + MISMO Media) with a dot per step;
+   then the step: who moves, what people do, what happens on its own, the notifications, beside the screens it touches
+   (MMS, MISMO Media, IM/AWG Review, Meeting Trackers, Leadership HQ, the website, email), one tab each. */
+:root{
+  --navy:#0d314c; --navy-mid:#14486e; --sky:#74bfeb; --sky-soft:#a9d8f3; --sky-wash:#e4f2fb;
+  --ground:#f1f6fa; --surface:#ffffff; --surface-2:#f6fafd; --surface-3:#e9f1f8;
+  --border:#d5e2ed; --border-strong:#adc4d6; --rule:#e5eef5;
+  --ink:#0d314c; --ink-2:#456179; --ink-3:#7794aa;
+  --good:#0f7b5c; --good-bg:#e3f3ec; --bad:#b3372c; --bad-bg:#fbeae8; --warn:#a2701a; --warn-bg:#fbf1de; --info-ink:#14486e;
+  --hit:#d95926; --pri:#0d314c; --pri-ink:#ffffff; --dot:#14486e; --media:#eb6834; --purple:#6b4fa8; --purple-bg:#efeaf8;
+  --sans:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52; --sky-wash:#123143;
+  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
+  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#7a9db4;
+  --good:#4fc79b; --good-bg:#103a30; --bad:#f08579; --bad-bg:#3a1c1a; --warn:#e0a83c; --warn-bg:#3a2d12; --info-ink:#a9d8f3;
+  --hit:#f08a5d; --pri:#74bfeb; --pri-ink:#06202f; --dot:#2f6688; --media:#f08a5d; --purple:#b9a3ec; --purple-bg:#2a2245; color-scheme:dark } }
+:root[data-theme="dark"]{
+  --ground:#061722; --surface:#0d2837; --surface-2:#123143; --surface-3:#173c52; --sky-wash:#123143;
+  --border:#1f4a63; --border-strong:#2f6688; --rule:#173547;
+  --ink:#e9f4fb; --ink-2:#a6c5d9; --ink-3:#7a9db4;
+  --good:#4fc79b; --good-bg:#103a30; --bad:#f08579; --bad-bg:#3a1c1a; --warn:#e0a83c; --warn-bg:#3a2d12; --info-ink:#a9d8f3;
+  --hit:#f08a5d; --pri:#74bfeb; --pri-ink:#06202f; --dot:#2f6688; --media:#f08a5d; --purple:#b9a3ec; --purple-bg:#2a2245; color-scheme:dark }
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:#0d314c}
+h1,h2,h3,h4,h5{letter-spacing:-.012em;margin:0;text-wrap:balance}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--sky);outline-offset:2px}
+.mast{background:#0d314c;color:#fff;position:sticky;top:env(safe-area-inset-top,0px);z-index:9}
+.mast-in{display:flex;align-items:center;gap:14px;min-height:60px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1360px;margin:0 auto}
+.plate{background:#fff;border-radius:5px;padding:9px 13px;display:flex;align-items:center;line-height:0}
+.plate svg{height:22px;width:auto}
+.mast .div{width:1px;align-self:stretch;margin-block:6px;background:rgba(116,191,235,.4)}
+.mast .nm{color:#a9d8f3;font-weight:500;font-size:15px}
+.mast .rt{margin-left:auto;display:flex;align-items:center;gap:14px}
+.eyebrow{text-transform:uppercase;letter-spacing:.11em;font-size:11px;color:rgba(255,255,255,.62)}
+.theme-btn{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:5px;padding:5px 10px;font-size:11.5px;cursor:pointer}
+.theme-btn:hover{background:rgba(255,255,255,.18)}
+@media (max-width:560px){ .eyebrow,.mast .div{display:none} }
+.wrap{max-width:1360px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+.intro{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.intro h1{font-size:24px;font-weight:600}
+.intro p{margin:6px 0 0;color:var(--ink-2);max-width:86ch}
+.cast{display:flex;flex-wrap:wrap;gap:6px}
+.who-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);border-radius:5px;padding:3px 8px 3px 4px;font-size:12px;color:var(--ink-2);transition:background .2s,border-color .2s}
+.who-chip i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:600 9.5px/1 var(--mono);color:#fff;background:var(--navy-mid);font-style:normal}
+.who-chip.on{border-color:var(--hit);background:color-mix(in srgb,var(--hit) 12%,var(--surface));color:var(--ink)}
+.who-chip.on i{background:var(--hit)}
+/* chapters */
+.chapters{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.chap{flex:0 0 auto;border:1px solid var(--border);background:var(--surface);color:var(--ink-2);border-radius:6px;padding:6px 10px;font-size:12.5px;cursor:pointer;display:flex;gap:6px;align-items:baseline}
+.chap b{font-family:var(--mono);font-size:11px;color:var(--ink-3)}
+.chap.on{border-color:var(--navy-mid);background:var(--sky-wash);color:var(--ink);font-weight:600}
+.chap.done{color:var(--ink-3)}
+/* swimlane */
+.lane-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px 8px}
+.lane-scroll{overflow-x:auto}
+.lanes{min-width:900px;display:grid;grid-template-columns:196px minmax(0,1fr);row-gap:2px}
+.months{grid-column:2;display:grid;grid-template-columns:repeat(12,1fr);font-size:11px;color:var(--ink-3);font-family:var(--mono);border-bottom:1px solid var(--rule);padding-bottom:4px}
+.months span{padding-left:4px;border-left:1px solid var(--rule)}
+.ln-name{font-size:12.5px;line-height:1.25;padding:4px 8px 4px 0;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.ln-name b{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--ink-2)}
+.ln-name span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ln-name.media b{color:var(--media)}
+.track{position:relative;height:42px;background:repeating-linear-gradient(90deg,transparent 0,transparent calc(100%/12 - 1px),var(--rule) calc(100%/12 - 1px),var(--rule) calc(100%/12))}
+.seg{position:absolute;top:16px;height:10px;border-radius:2px}
+.seg.held{background-image:repeating-linear-gradient(135deg,rgba(255,255,255,.55) 0 3px,transparent 3px 7px)!important}
+.rail{position:absolute;left:0;right:0;top:20px;height:2px;background:var(--rule)}
+.dot{position:absolute;top:10px;width:22px;height:22px;margin-left:-11px;border-radius:50%;border:2px solid var(--surface);background:var(--dot);color:#fff;font:600 9.5px/18px var(--mono);text-align:center;cursor:pointer;padding:0;box-shadow:0 0 0 1px var(--border-strong);transition:transform .15s}
+.dot.m{background:var(--media)}
+.dot:hover{transform:scale(1.15);z-index:3}
+.dot.up{top:0}.dot.dn{top:20px}
+.dot.on{background:var(--hit);box-shadow:0 0 0 4px color-mix(in srgb,var(--hit) 35%,transparent);z-index:4;transform:scale(1.15)}
+.dot.past{opacity:.5}
+.ghost{position:absolute;top:15px;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:var(--hit);opacity:0;pointer-events:none;transition:opacity .2s}
+.ghost.show{opacity:.85}
+.nowline{position:absolute;top:0;bottom:0;width:2px;background:var(--hit);opacity:.55;pointer-events:none;transition:left .3s}
+.lane-foot{display:flex;flex-wrap:wrap;gap:6px 14px;justify-content:space-between;font-size:12px;color:var(--ink-3);margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:4px 12px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+/* stepper */
+.stepbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.btn{border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:6px;padding:7px 14px;font-size:13px;font-weight:500;cursor:pointer}
+.btn:hover{background:var(--surface-3)}
+.btn.pri{background:var(--pri);color:var(--pri-ink);border-color:var(--pri)}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.play[aria-pressed="true"]{border-color:var(--hit);color:var(--hit)}
+.count{font-family:var(--mono);font-size:12.5px;color:var(--ink-2)}
+.sp{flex:1}
+.filter{display:flex;gap:6px;align-items:center;font-size:12.5px;color:var(--ink-2)}
+.filter{min-width:0;max-width:100%}
+@media (max-width:640px){ .filter{flex:1 1 100%} .filter select{flex:1;width:0} }
+.filter select{min-width:0;font:inherit;font-size:13px;padding:6px 8px;border-radius:6px;border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);max-width:100%}
+.prog{height:4px;background:var(--rule);border-radius:2px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--sky);transition:width .25s}
+/* the step */
+.step{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:18px;align-items:start}
+@media (max-width:1000px){ .step{grid-template-columns:1fr} }
+.story{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 20px;display:grid;gap:12px;min-width:0;animation:in .25s ease}
+@keyframes in{from{opacity:.4;transform:translateY(4px)}to{opacity:1;transform:none}}
+.meta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12.5px}
+.date{font-family:var(--mono);font-weight:600;color:var(--ink-2)}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:4px;padding:2px 8px;font-size:12px;font-weight:600;border:1px solid var(--border);background:var(--surface-2);color:var(--ink)}
+.chip .sw{width:9px;height:9px;border-radius:2px}
+.chip.wr{font-family:var(--mono);font-weight:500}
+.chip.media{border-color:var(--media);color:var(--media)}
+.story h2{font-size:20px;font-weight:600;line-height:1.25}
+.lede{color:var(--ink-2);margin:-4px 0 0}
+.sec h4{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:var(--ink-3);font-weight:600;margin-bottom:6px}
+.sec ol,.sec ul{margin:0;padding-left:20px;display:grid;gap:5px}
+.sec.auto ul{list-style:none;padding:0}
+.sec.auto li{position:relative;padding-left:22px}
+.sec.auto li::before{content:"";position:absolute;left:2px;top:7px;width:10px;height:10px;border-radius:50%;border:2px solid var(--sky)}
+.notes{display:grid;gap:5px}
+.nt{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:baseline;font-size:12.5px;border:1px solid var(--border);border-radius:6px;padding:6px 9px;background:var(--surface-2)}
+.nt .k{font:600 10.5px/1.6 var(--mono);text-transform:uppercase;letter-spacing:.05em;border-radius:3px;padding:0 5px}
+.k-mail{background:var(--sky-wash);color:var(--info-ink)}.k-queue{background:var(--warn-bg);color:var(--warn)}.k-digest{background:var(--surface-3);color:var(--ink-2)}.k-media{background:color-mix(in srgb,var(--media) 15%,transparent);color:var(--media)}.k-web{background:var(--good-bg);color:var(--good)}
+.nt small{display:block;color:var(--ink-3)}
+.tip{font-size:12.5px;color:var(--ink-2);background:var(--sky-wash);border-radius:6px;padding:8px 12px}
+.tip b{color:var(--ink)}
+/* screens */
+.screens{display:grid;gap:0;min-width:0}
+.stabs{display:flex;gap:2px;overflow-x:auto}
+.stab{flex:0 0 auto;border:1px solid var(--border);border-bottom:0;background:var(--surface-3);color:var(--ink-2);border-radius:6px 6px 0 0;padding:6px 12px;font-size:12.5px;cursor:pointer}
+.stab.on{background:#0d314c;color:#fff;border-color:#0d314c}
+.screen{background:var(--surface);border:1px solid var(--border);border-radius:0 8px 8px 8px;overflow:hidden;min-width:0}
+.scr-bar{display:flex;align-items:center;gap:8px;background:#0d314c;color:#a9d8f3;font-size:12px;padding:7px 12px}
+.scr-bar .dots{display:flex;gap:4px}.scr-bar .dots i{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.25)}
+.scr-bar .loc{font-family:var(--mono);color:rgba(255,255,255,.75);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scr-bar .app{margin-left:auto;color:#fff;font-weight:600;white-space:nowrap}
+.scr{padding:14px;display:grid;gap:10px;font-size:13px;animation:in .2s ease}
+.p-head{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.p-head .wrn{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.p-head h3{font-size:16px;font-weight:600;flex:1 1 200px;min-width:0}
+.stg{display:inline-block;border-radius:4px;padding:2px 8px;font-size:11.5px;font-weight:600;color:#fff}
+.sub{font-size:11.5px;color:var(--ink-2);border:1px solid var(--border);border-radius:4px;padding:1px 7px}
+.acts{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.a{border:1px solid var(--border-strong);background:var(--surface);color:var(--ink);border-radius:6px;padding:5px 11px;font-size:12px;font-weight:500;position:relative}
+.a.pri{background:var(--pri);color:var(--pri-ink);border-color:var(--pri)}
+.a.ghost{border-style:dashed;color:var(--ink-2)}
+.a.off{opacity:.45}
+.a.hit{outline:2px solid var(--hit);outline-offset:2px;animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{outline-offset:4px}}
+.a.hit::after{content:"click";position:absolute;right:-4px;top:-17px;font:600 10px/1 var(--mono);color:var(--hit);text-transform:uppercase;letter-spacing:.06em}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--rule);font-size:12px;overflow-x:auto}
+.tabs span{padding:5px 10px;color:var(--ink-2);white-space:nowrap}
+.tabs span.on{color:var(--ink);font-weight:600;box-shadow:inset 0 -3px 0 var(--sky)}
+.box{border:1px solid var(--border);border-radius:6px;background:var(--surface-2);padding:10px 12px;display:grid;gap:6px;min-width:0}
+.box h5{font-size:12.5px;font-weight:600}
+.box h5 span{font-weight:400;color:var(--ink-3)}
+.kv{display:grid;grid-template-columns:auto minmax(0,1fr);gap:3px 12px;font-size:12.5px;margin:0}
+.kv dt{color:var(--ink-3)}.kv dd{margin:0;min-width:0}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.tbl-x{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;font-weight:600;color:var(--ink-3);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:4px 6px;border-bottom:1px solid var(--border)}
+.tbl td{padding:5px 6px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tag{display:inline-block;border-radius:3px;padding:0 6px;font-size:11px;font-weight:600;white-space:nowrap}
+.t-good{background:var(--good-bg);color:var(--good)}.t-bad{background:var(--bad-bg);color:var(--bad)}.t-warn{background:var(--warn-bg);color:var(--warn)}.t-info{background:var(--sky-wash);color:var(--info-ink)}.t-purple{background:var(--purple-bg);color:var(--purple)}.t-media{background:color-mix(in srgb,var(--media) 15%,transparent);color:var(--media)}
+s{color:var(--ink-3)}
+.muted{color:var(--ink-3)}
+.small{font-size:12px}
+.mail{border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.mail .mh{background:var(--surface-3);padding:7px 10px;font-size:12px;display:grid;gap:1px}
+.mail .mb{padding:10px 12px;font-size:12.5px;display:grid;gap:6px}
+.mail .cta{justify-self:start;background:#0d314c;color:#fff;border-radius:5px;padding:5px 12px;font-size:12px;font-weight:600}
+.cpc{border:1px solid var(--border);border-left:4px solid #008300;border-radius:6px;padding:10px 12px;display:grid;gap:4px;background:var(--surface)}
+.cpc .eb{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--good);font-weight:600}
+.board{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px;overflow-x:auto}
+.col{background:var(--surface-2);border:1px solid var(--border);border-radius:6px;padding:6px;display:grid;gap:6px;align-content:start;min-height:100px}
+.col h6{margin:0;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-3)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:6px 8px;font-size:12px;display:grid;gap:2px}
+.card.hl{border-color:var(--hit);box-shadow:0 0 0 2px color-mix(in srgb,var(--hit) 25%,transparent)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(92px,1fr));gap:6px}
+.stat{border:1px solid var(--border);border-radius:6px;padding:6px 8px;background:var(--surface)}
+.stat b{display:block;font:600 18px/1.2 var(--mono)}
+.stat span{font-size:11px;color:var(--ink-3)}
+.stat.blue{border-top:3px solid #2477b8}.stat.green{border-top:3px solid #0f7b5c}.stat.purple{border-top:3px solid var(--purple)}
+.checks{display:grid;gap:3px;font-size:12.5px}
+.checks span::before{content:"✓ ";color:var(--good);font-weight:700}
+.checks span.no::before{content:"○ ";color:var(--ink-3)}
+.steps{display:flex;flex-wrap:wrap;gap:4px;font-size:11.5px}
+.steps span{border:1px solid var(--border);border-radius:4px;padding:1px 7px;color:var(--ink-3)}
+.steps span.done{background:var(--good-bg);color:var(--good);border-color:transparent}
+.steps span.cur{border-color:var(--hit);color:var(--hit);font-weight:600}
+.split{display:grid;gap:8px}
+.dv{border:1px solid var(--border);border-radius:6px;padding:8px 10px;display:grid;gap:4px;background:var(--surface-2)}
+.dv.held{border-color:var(--sky)}
+.dv-top{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+.dv-top b{font-family:var(--mono);font-size:12px}
+.wp{border:1px solid var(--border);border-radius:6px;padding:10px 12px;display:grid;gap:4px;background:var(--surface)}
+.wp .t{font-weight:600}
+/* notifications drawer */
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100%);background:var(--surface);border-left:1px solid var(--border);box-shadow:-8px 0 24px rgba(6,32,47,.18);z-index:20;display:grid;grid-template-rows:auto 1fr;padding-top:env(safe-area-inset-top,0px);padding-right:env(safe-area-inset-right,0px);transform:translateX(105%);transition:transform .25s}
+.drawer.open{transform:none}
+.drawer header{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--border)}
+.drawer header h3{font-size:15px;flex:1}
+.drawer .list{overflow:auto;padding:10px 16px 24px;display:grid;gap:6px;align-content:start}
+.drawer .day{font:600 11px/1 var(--mono);color:var(--ink-3);margin-top:8px}
+.notif-btn .n{font-family:var(--mono);background:var(--hit);color:#fff;border-radius:9px;padding:0 6px;margin-left:6px;font-size:11px}
+.end-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.end-grid div{border-top:3px solid var(--sky);padding-top:6px;font-size:12.5px;color:var(--ink-2)}
+.end-grid b{display:block;color:var(--ink)}
+@media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+</style>
+<style>html,body{margin:0}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}img{max-width:100%}[hidden]{display:none!important}</style>
+<script src="/assets/session.js"></script>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="mismo-logo" viewBox="0 0 708 108"><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-body, #0f314c)"><path d="M5917 1065 c-169 -46 -279 -153 -335 -323 -21 -65 -25 -96 -25 -197 0 -101 4 -132 25 -197 57 -172 168 -280 335 -323 84 -22 723 -22 808 0 222 58 355 253 355 520 0 270 -132 459 -361 520 -74 20 -730 20 -802 0z m692 -320 c57 -33 76 -84 76 -200 0 -116 -19 -167 -76 -200 -32 -19 -52 -20 -294 -20 -297 0 -307 2 -346 83 -30 61 -31 198 -2 262 41 93 68 100 368 97 219 -2 243 -4 274 -22z M0 545 l0 -515 225 0 225 0 2 296 3 296 116 -294 116 -293 197 0 198 0 119 295 118 295 1 -297 0 -298 225 0 225 0 0 515 0 515 -337 -2 -338 -3 -104 -264 c-80 -204 -107 -260 -113 -245 -5 10 -52 129 -106 264 l-98 245 -337 3 -337 2 0 -515z M1892 1044 l-22 -15 0 -483 c0 -455 1 -484 18 -499 16 -15 48 -17 246 -17 128 0 235 4 246 10 32 17 34 57 4 95 -33 44 -64 143 -64 206 l0 49 203 0 c191 0 205 -1 222 -20 10 -11 34 -24 54 -30 49 -13 586 -13 612 0 22 12 26 62 7 78 -8 6 -174 15 -413 21 -502 15 -549 23 -628 110 -43 48 -57 93 -57 187 0 82 19 156 55 208 30 44 32 77 7 99 -27 25 -456 25 -490 1z M3716 1044 c-23 -22 -20 -31 19 -77 43 -49 78 -155 73 -218 l-3 -44 -204 -3 c-194 -2 -205 -1 -218 17 -24 35 -78 41 -355 41 -255 0 -269 -1 -288 -20 -27 -27 -26 -58 3 -70 12 -5 202 -14 422 -19 421 -12 476 -18 555 -62 92 -51 132 -159 111 -299 -12 -77 -34 -129 -77 -179 -23 -28 -25 -36 -16 -57 l12 -24 215 0 215 0 2 306 3 306 120 -303 120 -304 197 -3 196 -2 118 296 119 297 3 -296 2 -297 225 0 225 0 0 515 0 515 -338 0 -337 0 -104 -265 c-58 -146 -106 -263 -108 -261 -2 2 -50 120 -107 262 l-104 259 -340 3 c-300 2 -342 0 -356 -14z"></path></g><g transform="translate(0.000000,108.000000) scale(0.100000,-0.100000)" fill="var(--logo-s, #50a4db)"><path d="M2485 1046 c-44 -20 -111 -94 -136 -151 -27 -60 -37 -198 -20 -263 13 -48 68 -115 114 -138 64 -34 162 -43 562 -55 239 -6 405 -15 413 -21 19 -16 15 -66 -7 -78 -26 -13 -563 -13 -612 0 -20 6 -44 19 -54 30 -17 19 -31 20 -222 20 l-203 0 0 -49 c0 -81 34 -172 86 -230 78 -87 31 -81 672 -81 l568 0 46 29 c79 50 122 121 139 231 21 140 -19 248 -111 299 -79 44 -134 50 -555 62 -220 5 -410 14 -422 19 -29 12 -30 43 -3 70 19 19 33 20 288 20 277 0 331 -6 355 -41 13 -18 24 -19 218 -17 l204 3 3 44 c4 60 -31 168 -70 215 -17 21 -52 52 -77 67 l-45 29 -550 0 c-440 -1 -557 -3 -581 -14z"></path></g></symbol></defs></svg>
+<header class="mast"><div class="mast-in">
+  <div class="plate"><svg role="img" aria-label="MISMO" viewBox="0 0 708 108"><use href="#mismo-logo"/></svg></div>
+  <span class="div"></span><span class="nm">Work Request Journey</span>
+  <div class="rt"><span class="eyebrow">Programs &amp; Operations</span><a class="theme-btn" href="/mms/" style="text-decoration:none">Open the MMS</a><button class="theme-btn" id="theme-btn" type="button">Dark</button></div>
+</div></header>
+<main class="wrap">
+  <section class="intro">
+    <div>
+      <h1>From Approved Idea to Published Standard</h1>
+      <p>A made-up work request, followed through every MISMO system from the day it is approved to the day it closes. A new Escrow Servicing Task Force builds three deliverables that move at their own pace: a dataset with its iGuide (a Candidate Recommendation), an adoption white paper (Final, with a second comment period), and Reference Model changes that publish with the v3.6.5 release. The people, companies and dates are examples.</p>
+    </div>
+    <div class="cast" id="cast" aria-label="Who acts in this step"></div>
+  </section>
+  <nav class="chapters" id="chapters" aria-label="Chapters"></nav>
+  <section class="lane-card" aria-label="Timeline">
+    <div class="lane-scroll"><div class="lanes" id="lanes"></div></div>
+    <div class="lane-foot"><div class="legend" id="legend"></div><span>Striped: held, moving with the release. Click any dot to go to that step.</span></div>
+  </section>
+  <section style="display:grid;gap:8px">
+    <div class="stepbar">
+      <button class="btn" id="prev" type="button">← Back</button>
+      <button class="btn pri" id="next" type="button">Next →</button>
+      <button class="btn play" id="play" type="button" aria-pressed="false">▶ Play</button>
+      <span class="count" id="count"></span>
+      <span class="sp"></span>
+      <label class="filter" for="only">Follow <select id="only"></select></label>
+      <button class="btn notif-btn" id="nbtn" type="button">Notifications<span class="n" id="ncount">0</span></button>
+    </div>
+    <div class="prog"><i id="prog"></i></div>
+  </section>
+  <section class="step" id="step" aria-live="polite"></section>
+</main>
+<aside class="drawer" id="drawer" aria-label="Notifications so far"><header><h3>Notifications So Far</h3><span class="count" id="dcount"></span><button class="btn" id="dclose" type="button">Close</button></header><div class="list" id="dlist"></div></aside>
+<script>
+(function theme(){
+  var btn=document.getElementById("theme-btn");
+  function cur(){ var t=document.documentElement.getAttribute("data-theme"); if(t) return t; return window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"; }
+  function paint(){ btn.textContent=cur()==="dark"?"Light":"Dark"; }
+  btn.addEventListener("click",function(){ document.documentElement.setAttribute("data-theme",cur()==="dark"?"light":"dark"); paint(); try{ localStorage.setItem("mismo.portal.theme",cur()); }catch(e){} });
+  try{ var saved=localStorage.getItem("mismo.portal.theme"); if(saved) document.documentElement.setAttribute("data-theme",saved); }catch(e){}
+  paint();
+})();
+</script>
+<script>
+/* ---------- the cast, the stages and the lanes ---------- */
+const CAST={EX:['EX','Executive Team'],JC:['JC','Jonna · License Designator'],MT:['MT','Meghan · Facilitator'],PW:['PW','Perry · Program Manager'],AM:['AM','Amy · Quotes'],VR:['VR','Vanessa · Website Admin'],MK:['MK','Mark · Architect'],EB:['EB','Erin · IM'],IM:['IM','IM Reviewers'],AW:['AW','AWG Reviewers'],GC:['GC','Governance Committee'],TF:['TF','Task Force'],ST:['ST','MISMO Staff'],SY:['⚙','The MMS, on its own']};
+const ST={approved:['Approved – Set Up','#7794aa'],cfp:['Call for Participation','#eb6834'],kickoff:['Kickoff Approval','#e87ba4'],work:['In Work','#2477b8'],aireview:['AI Review','#1baf7a'],im:['IM Review','#14486e'],awg:['AWG Review','#2f6688'],designation:['License Designation','#eda100'],'gc-comment':['Governance Approval to Comment','#d55181'],comment:['Comment Period','#008300'],post:['Post-Comment','#456179'],'gc-publish':['Governance Approval to Publish','#b3372c'],release:['Release','#0f7b5c'],published:['Published','#06202f'],split:['Split into Deliverables','#7794aa'],media:['MISMO Media','#eb6834']};
+const LANES=[
+  {k:'P',wr:'WR2027_07',name:'Escrow Servicing Data Exchange'},
+  {k:'A',wr:'WR2027_07-A',name:'Escrow Servicing Dataset and iGuide'},
+  {k:'B',wr:'WR2027_07-B',name:'Escrow Analysis Adoption White Paper'},
+  {k:'C',wr:'WR2027_07-C',name:'Escrow Reference Model Changes'},
+  {k:'R',wr:'WR2027_01',name:'v3.6.5 Minor Reference Model Release'},
+  {k:'M',wr:'MISMO Media',name:'Call for Participation and press releases',media:true}];
+const SPANS={
+  P:[['2027-01-12','cfp'],['2027-01-26','kickoff'],['2027-02-16','work'],['2027-03-02','split'],['2027-12-09','published']],
+  A:[['2027-03-02','work'],['2027-04-26','aireview'],['2027-05-03','im'],['2027-06-08','awg'],['2027-06-24','designation'],['2027-06-25','gc-comment'],['2027-07-07','comment'],['2027-08-12','post'],['2027-08-13','gc-publish'],['2027-08-24','release'],['2027-08-26','published']],
+  B:[['2027-03-02','work'],['2027-05-17','aireview'],['2027-05-24','im'],['2027-06-08','awg'],['2027-06-24','designation'],['2027-06-25','gc-comment'],['2027-07-07','comment'],['2027-08-12','work'],['2027-08-16','aireview'],['2027-08-17','designation'],['2027-08-18','gc-comment'],['2027-08-24','comment'],['2027-09-27','post'],['2027-09-28','gc-publish'],['2027-10-05','release'],['2027-10-07','published']],
+  C:[['2027-03-02','work'],['2027-04-30','aireview'],['2027-05-03','im'],['2027-05-11','awg'],['2027-05-27','designation',1],['2027-10-18','gc-comment',1],['2027-10-19','comment',1],['2027-11-25','post',1],['2027-11-26','gc-publish',1],['2027-12-07','release',1],['2027-12-09','published']],
+  R:[['2027-01-04','work'],['2027-10-11','aireview'],['2027-10-12','im'],['2027-10-13','awg'],['2027-10-15','designation'],['2027-10-18','gc-comment'],['2027-10-19','comment'],['2027-11-25','post'],['2027-11-26','gc-publish'],['2027-12-07','release'],['2027-12-09','published']],
+  M:[]};
+const CHAPTERS=[['approve','Approval and Call for Participation'],['setup','Setting Up the Task Force'],['build','Building the Work'],['review','Reviews'],['designate','Designation and Governance'],['comment','Comment Period'],['off','Coming Off Comment'],['publish','Publishing'],['release','The Reference Model Release'],['close','Closing Out']];
+
+/* ---------- mock pieces ---------- */
+const E=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const stg=k=>'<span class="stg" style="background:'+ST[k][1]+'">'+E(ST[k][0])+'</span>';
+const act=(l,c)=>'<span class="a'+(c?' '+c:'')+'">'+E(l)+'</span>';
+const acts=a=>'<div class="acts">'+a.map(x=>act(x[0],x[1])).join('')+'</div>';
+const tabs=on=>'<div class="tabs">'+['Overview','Files','Reviews','Architecture','History'].map(t=>'<span'+(t===on?' class="on"':'')+'>'+t+'</span>').join('')+'</div>';
+const head=(wr,name,k,sub,extra)=>'<div class="p-head"><span class="wrn">'+E(wr)+'</span><h3>'+E(name)+'</h3>'+(k?stg(k):'')+(sub?'<span class="sub">'+E(sub)+'</span>':'')+(extra||'')+'</div>';
+const box=(h,inner,note)=>'<div class="box">'+(h?'<h5>'+E(h)+(note?' <span>'+E(note)+'</span>':'')+'</h5>':'')+inner+'</div>';
+const kv=rows=>'<dl class="kv">'+rows.map(r=>'<dt>'+E(r[0])+'</dt><dd>'+r[1]+'</dd>').join('')+'</dl>';
+const tbl=(h,rows)=>'<div class="tbl-x"><table class="tbl"><thead><tr>'+h.map(x=>'<th>'+E(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(r=>'<tr>'+r.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</tbody></table></div>';
+const tag=(t,c)=>'<span class="tag t-'+c+'">'+E(t)+'</span>';
+const mono=t=>'<span class="mono">'+E(t)+'</span>';
+const p=t=>'<div class="small">'+t+'</div>';
+const mail=(from,to,subj,lines,cta)=>'<div class="mail"><div class="mh"><span><b>From</b> '+E(from)+'</span><span><b>To</b> '+E(to)+'</span><span><b>Subject</b> '+E(subj)+'</span></div><div class="mb">'+lines.map(l=>'<div>'+l+'</div>').join('')+(cta?'<span class="cta">'+E(cta)+'</span>':'')+'</div></div>';
+const mmsMail=(to,subj,lines,cta)=>mail('workrequests@mismo.org',to,subj,lines,cta||'Open in the MMS');
+const stepsBar=(list,cur)=>'<div class="steps">'+list.map((s,i)=>'<span class="'+(i<cur?'done':i===cur?'cur':'')+'">'+E(s)+'</span>').join('')+'</div>';
+const PR_STEPS=['First draft','Perry’s review','Who to quote','Quote request','Quote in','Final approval','Distribution'];
+const board=(cols,hl)=>'<div class="board">'+['New','In Review','Approved & In Progress','Done'].map((c,i)=>'<div class="col"><h6>'+c+'</h6>'+(cols[i]||[]).map(x=>'<div class="card'+(x[2]?' hl':'')+'"><b>'+E(x[0])+'</b><span class="muted">'+E(x[1])+'</span></div>').join('')+'</div>').join('')+'</div>';
+const SCR={mms:['MISMO Manufacturing System','resources.mismo.org/mms/'],media:['MISMO Media','resources.mismo.org/media/'],hub:['Initiative Hub','resources.mismo.org/hub/'],mt:['Meeting Trackers','resources.mismo.org/meeting-trackers/'],lhq:['Leadership HQ','resources.mismo.org/leadership-hq/'],imr:['IM Review','resources.mismo.org/im-review/'],awg:['AWG Review','resources.mismo.org/awg-review/'],web:['mismo.org','www.mismo.org'],rl:['Resource Library','mismo.org Resource Library'],mail:['Email','Outlook'],out:['Outlook Calendar','MISMO Meetings Schedule'],connect:['MISMO Connect','MISMO Connect']};
+/* a screen: [tab label, system key, location, html] */
+const S_=(label,sys,loc,html)=>({label,sys,loc,html});
+</script>
+<script>
+const W7='WR2027_07', NM7='Escrow Servicing Data Exchange', WA='WR2027_07-A', NA='Escrow Servicing Dataset and iGuide', WB='WR2027_07-B', NB='Escrow Analysis Adoption White Paper', WC='WR2027_07-C', NC='Escrow Reference Model Changes', WR1='WR2027_01', NR='v3.6.5 Minor Reference Model Release';
+const STEPS=[
+/* ===== 1. Approval and Call for Participation ===== */
+{at:'2027-01-12',ch:'approve',lanes:['P'],stage:'approved',title:'Approved in the Initiative Hub, and in the MMS the same day',
+ lede:'A servicer member asked for a standard way to exchange escrow analysis data. The executive team approved it in the Initiative Hub.',
+ who:['EX','SY'],
+ does:['The executive team approves the request in the Initiative Hub, with its size (Medium), its CoP and a facilitator (Meghan).'],
+ auto:['The MMS checks the Hub for approved requests and brings this one in as WR2027_07, with “Approved in the Initiative Hub and brought into the MMS” in its history.','Hub work starts on its own: Medium is 9 months, so Target to Submit to IM is the halfway point.','It shows on Meghan’s My Queue and on the Pipeline Board.'],
+ notes:[['mail','Meghan: “WR2027_07 Escrow Servicing Data Exchange: In Work”','the stage email, with the next move and a link'],['queue','Meghan’s My Queue: WR2027_07']],
+ screens:[S_('Initiative Hub','hub','hub › requests › HUB-2027-004',head('HUB-2027-004','Escrow Servicing Data Exchange','','',tag('Approved','good'))+box('Request',kv([['Requested by','Lakeside Servicing (member)'],['CoP','Servicing'],['Size','Medium'],['Facilitator','Meghan Tidgewell'],['WR #',mono('WR2027_07')]]))),
+  S_('MMS','mms','#wr=WR2027_07',head(W7,NM7,'work')+tabs('Overview')+box('Dates',kv([['Approved',mono('Jan 12, 2027')+' (Initiative Hub)'],['Target to Submit to IM',mono('Jun 1, 2027')],['Target done',mono('Oct 12, 2027')]]))+acts([['Submit for AI Review →','pri off'],['Ask for a Call for Participation','ghost hit'],['Split into Deliverables','ghost']]))]},
+{at:'2027-01-12',ch:'approve',lanes:['P','M'],stage:'cfp',title:'A new workgroup needs people: ask MISMO Media for a Call for Participation',
+ lede:'This is a new task force, so it starts by asking the industry to join.',
+ who:['ST','SY'],
+ does:['MISMO staff click <b>Ask for a Call for Participation</b> on the work request and add a note (who should join, the kickoff date).'],
+ auto:['The work request moves to Call for Participation and waits there until it is published.','A Call for Participation request lands on MISMO Media’s Requests board, filled in from the MMS.','The MMS announcement feed adds the call, so MISMO Media starts a release for it within five minutes.'],
+ notes:[['mail','Amy and Perry (MISMO Media): “WR2027_07 Escrow Servicing Data Exchange: Call for Participation”','MISMO Media’s stage emails reach them even when they take the digest'],['mail','Meghan: the same stage email'],['media','MISMO Media › Requests: Call for Participation (New)']],
+ screens:[S_('MMS','mms','#wr=WR2027_07','<div class="box"><h5>Ask for a Call for Participation</h5>'+p('Escrow Servicing Data Exchange. MISMO Media drafts and publishes it; the work request waits in Call for Participation until it is published.')+box('Note',p('Servicers, escrow analysis vendors and investors. Kickoff call Feb 23.'))+acts([['Cancel'],['Ask MISMO Media','pri hit']])+'</div>'),
+  S_('MISMO Media','media','media › Requests',board([[['Call for Participation','WR2027_07 · from the MMS',1]],[['LinkedIn post','New member: Northwind']],[['MISMO Matters','February edition']],[]]))]},
+{at:'2027-01-19',ch:'approve',lanes:['M'],stage:'media',title:'MISMO Media writes the Call for Participation release',
+ lede:'The release is written only from facts the MMS gives it: the work, the workgroup, the dates and the leaders.',
+ who:['PW','AM','SY'],
+ does:['Perry reads Claude’s first draft, edits the headline, and sets the release date.','Perry picks who to quote from 2 or 3 suggestions and clicks <b>Send to Amy for Approval</b>; Amy approves by replying to the email.','Perry sends the quote request as himself, pastes the approved quote with the approval email, and gives final approval.'],
+ auto:['Claude writes the draft in MISMO’s house style (headline, WASHINGTON, D.C. dateline, what it is, why it matters, [QUOTE], who should participate, the kickoff and the sponsor ask). Gaps show in [SQUARE BRACKETS] instead of being made up.','Every name and company is checked against the leaders list from the MMS; British spellings and gaps are listed until fixed.','A quote request with no reply after 3 business days turns red on Perry’s plate.'],
+ notes:[['mail','Amy: “Approve the quote: Escrow Servicing Call for Participation”','she replies Approve or Choose Someone Else'],['mail','The person quoted: quote request, sent as Perry with Amy copied','only when Perry presses Send as Perry']],
+ screens:[S_('MISMO Media','media','media › Press Releases','<div class="stats"><div class="stat blue"><b>2</b><span>Draft Now</span></div><div class="stat green"><b>0</b><span>Ready to Post</span></div><div class="stat"><b>1</b><span>Perry’s Review</span></div><div class="stat"><b>1</b><span>Waiting on a Quote</span></div></div>'+
+  box('MISMO Seeks Participants for New Escrow Servicing Task Force',stepsBar(PR_STEPS,3)+p('WASHINGTON, D.C. (February 1, 2027) — MISMO®, the real estate finance industry’s standards organization, is seeking participants for a new Escrow Servicing Task Force… <b>[QUOTE]</b>'),'Call for Participation · WR2027_07')+acts([['Put the Quote In'],['Send as Perry','pri hit']])),
+  S_('Email','mail','Amy’s inbox',mail('MISMO Media','Amy Moses','[MM:CFP-0207] Approve the quote: Escrow Servicing Call for Participation',['Perry would like to quote <b>Dana Ortiz</b>, Lakeside Servicing (requested the work).','Reply <b>Approve</b>, or <b>Choose Someone Else</b> with a name.'],'Approve'))]},
+{at:'2027-01-26',ch:'approve',lanes:['M','P'],stage:'kickoff',title:'The call goes out, and the MMS moves on to Kickoff Approval',
+ lede:'Distribution opens after final approval. Each channel is its own button, marked done with its date.',
+ who:['PW','VR','ST','SY'],
+ does:['Perry clicks <b>MISMO Connect</b> (a branded post sent as Perry to Vanessa to post), <b>MBA newsroom</b> (a copy to Brittney), <b>Offer to MISMO Matters</b> and <b>Request a LinkedIn Post</b>.','Vanessa posts it on MISMO Connect.','MISMO staff click <b>Call for Participation Published</b> in the MMS with the date and the announcement link.'],
+ auto:['MISMO Media marks the request Done and tells the requester.','The MMS saves the link on the work request, marks the media request Done, and moves the work to Kickoff Approval.'],
+ notes:[['mail','MISMO staff: “WR2027_07 Escrow Servicing Data Exchange: Kickoff Approval”'],['web','MISMO Connect and LinkedIn: the call for participation'],['media','MISMO Matters February: In the News']],
+ screens:[S_('MISMO Media','media','media › Press Releases › CFP-0207',box('Distribution',tbl(['Channel','Done'],[['MISMO Connect (to Vanessa to post)',tag('Jan 26','good')],['MBA newsroom (copy to Brittney)',tag('Jan 26','good')],['Offer to MISMO Matters',tag('Jan 26','good')],['Request a LinkedIn Post',tag('Jan 26','good')]]))),
+  S_('MMS','mms','#wr=WR2027_07','<div class="box"><h5>Call for Participation Published</h5>'+kv([['Published',mono('Jan 26, 2027')],['Announcement Link',mono('connect.mismo.org/…/escrow-servicing-cfp')]])+acts([['Save and Move On','pri hit']])+'</div>')]},
+{at:'2027-02-16',ch:'approve',lanes:['P'],stage:'kickoff',title:'Enough people signed up: Governance approves the kickoff',
+ lede:'Kickoff Approval waits for the Governance Committee to agree the task force can start.',
+ who:['GC','ST','SY'],
+ does:['The Governance Committee approves kicking off the Escrow Servicing Task Force (14 companies signed up).','MISMO staff click <b>Record GC Decision</b>: Approved.'],
+ auto:['The work moves to In Work and its work start date is stamped.','The Target to Submit to IM date stays on Key Dates; the facilitator gets a reminder 7 days before it.'],
+ notes:[['mail','Meghan: “WR2027_07 Escrow Servicing Data Exchange: In Work”']],
+ screens:[S_('MMS','mms','#wr=WR2027_07',head(W7,NM7,'kickoff')+'<div class="box"><h5>Record GC Decision</h5>'+kv([['Decision',tag('Approved to kick off','good')],['Date',mono('Feb 16, 2027')],['Note','14 companies signed up after the call for participation']])+acts([['Save','pri hit']])+'</div>')]},
+/* ===== 2. Setting up the task force ===== */
+{at:'2027-02-17',ch:'setup',lanes:['P'],stage:'work',title:'Meeting Trackers: the new task force, its cadence and its calendar',
+ lede:'Meeting Trackers is where workgroup meetings are kept current. Everything else reads it from there.',
+ who:['ST','MT','SY'],
+ does:['MISMO staff add the Escrow Servicing Task Force in Meeting Trackers: every other Tuesday, 1:00 pm ET, Zoom account MISMO 2, facilitator Meghan.','Meghan adds the roster from the call for participation sign-ups.'],
+ auto:['A Power Automate flow puts the meetings on the MISMO Meetings Schedule calendar in Outlook: title is the workgroup, location is the Zoom link, Eastern time, with the cadence, Zoom account, facilitator and last-updated date in the body.','The MMS shows “Next meeting” on the work request, read from Meeting Trackers.','After each meeting, the Daily Digest lists meetings with no attendance logged yet.'],
+ notes:[['web','MISMO Meetings Schedule (Outlook): Escrow Servicing Task Force, every other Tuesday'],['digest','Daily Digest: “Attendance still to log” after each meeting']],
+ screens:[S_('Meeting Trackers','mt','meeting-trackers › Escrow Servicing Task Force',head('','Escrow Servicing Task Force','','',tag('New','info'))+box('Schedule',kv([['Cadence','Every other Tuesday (2nd and 4th)'],['Time','1:00 pm ET'],['Zoom','MISMO 2'],['Facilitator','Meghan Tidgewell'],['First meeting',mono('Feb 23, 2027')]]))+box('Roster',tbl(['Name','Company','Category'],[['Dana Ortiz','Lakeside Servicing','Member'],['Sam Whitfield','Northwind Mortgage','Member'],['Priya Raman','Ledgerline Escrow','Member'],['+ 18 more','','']]))),
+  S_('Outlook Calendar','out','MISMO Meetings Schedule','<div class="box"><h5>Escrow Servicing Task Force</h5>'+kv([['When','Tue Feb 23, 2027 · 1:00–2:00 pm ET · every 2nd and 4th Tuesday'],['Where','MISMO 2 Zoom link'],['Facilitator','Meghan Tidgewell'],['Last reviewed','Feb 17, 2027']])+'</div>'),
+  S_('MMS','mms','#wr=WR2027_07',head(W7,NM7,'work')+box('Next Meeting',p('Tue Feb 23 · 1:00 pm ET · Escrow Servicing Task Force <span class="muted">(from Meeting Trackers)</span>')))]},
+{at:'2027-02-23',ch:'setup',lanes:['P'],stage:'work',title:'Leadership HQ: the task force’s leaders are recorded',
+ lede:'Task force leads are named by the Servicing domain’s chairs and ratified by the group at the first meeting.',
+ who:['TF','ST','SY'],
+ does:['At the kickoff meeting the task force ratifies its Lead and Co-Lead; Lakeside Servicing is the Requestor Sponsor.','MISMO staff record them in Leadership HQ under the Servicing domain, with Meghan as staff facilitator.','Meghan logs attendance in Meeting Trackers.'],
+ auto:['The MMS brings the current leaders in from Leadership HQ and shows them on the work request, so every facilitator sees the same names.','MISMO Media checks every name and company in a release against this leaders list.','Attendance builds each leader’s meeting record for the year.'],
+ notes:[['web','Leadership HQ: 3 leaders added to the Escrow Servicing Task Force']],
+ screens:[S_('Leadership HQ','lhq','leadership-hq › Servicing › Escrow Servicing Task Force',tbl(['Position','Name','Company','Since'],[['Lead','Dana Ortiz','Lakeside Servicing',mono('Feb 23, 2027')],['Co-Lead','Sam Whitfield','Northwind Mortgage',mono('Feb 23, 2027')],['Requestor Sponsor','Lakeside Servicing','',mono('Feb 23, 2027')],['Staff Facilitator','Meghan Tidgewell','MISMO','']])),
+  S_('MMS','mms','#wr=WR2027_07',head(W7,NM7,'work')+box('Leaders',p('Dana Ortiz (Lead, Lakeside Servicing) · Sam Whitfield (Co-Lead, Northwind Mortgage)')+'<span class="muted small">From Leadership HQ</span>')),
+  S_('Meeting Trackers','mt','meeting-trackers › Feb 23 attendance',tbl(['Name','Company','Present'],[['Dana Ortiz','Lakeside Servicing',tag('✓','good')],['Sam Whitfield','Northwind Mortgage',tag('✓','good')],['Priya Raman','Ledgerline Escrow',tag('✓','good')],['18 more','','16 present']]))]},
+{at:'2027-03-02',ch:'setup',lanes:['P','A','B','C'],stage:'split',title:'Split into three deliverables',
+ lede:'The task force will deliver three things on different schedules, so each gets its own work request.',
+ who:['MT','SY'],
+ does:['Meghan clicks <b>Split into Deliverables</b>.','A: Escrow Servicing Dataset and iGuide (Dataset). It has two parts, the dataset and the iGuide, that move together but are each designated on their own.','B: Escrow Analysis Adoption White Paper (White Paper / Guidance).','C: Escrow Reference Model Changes (Reference Model Change), for WR2027_01, the v3.6.5 release.'],
+ auto:['Creates WR2027_07-A, -B and -C, each with its own stage, dates, files, reviews and license designation.','C goes through AI Review, IM and AWG on its own. Once AWG approves, it is held for WR2027_01 and moves and publishes with the release.','C’s Reference Model release is set to v3.6.5, so its IM-approved rows go into that Master Change List.','WR2027_07 now reads “Split into 3 deliverables; each one moves on its own”.'],
+ notes:[['queue','Meghan’s My Queue: three deliverables instead of one']],
+ tip:'A deliverable with parts (the dataset and its iGuide) goes through every review once, then gets a license designation per part.',
+ screens:[S_('MMS','mms','Split into Deliverables','<div class="split"><div class="dv"><div class="dv-top"><b>WR2027_07-A</b> Escrow Servicing Dataset and iGuide '+tag('Dataset','info')+'</div><span class="muted small">Parts: Escrow Servicing Dataset · Escrow Servicing iGuide</span></div><div class="dv"><div class="dv-top"><b>WR2027_07-B</b> Escrow Analysis Adoption White Paper '+tag('White Paper','info')+'</div></div><div class="dv held"><div class="dv-top"><b>WR2027_07-C</b> Escrow Reference Model Changes '+tag('RM Change','info')+'</div><span class="muted small">Reference Model changes go through IM and AWG on their own, then are held for the RM release and publish with it</span></div>'+box('Which Reference Model release do these ride with?','<div><b class="mono">WR2027_01</b> v3.6.5 Minor Reference Model Release '+stg('work')+'</div>')+acts([['Cancel'],['Create Deliverables','pri hit']])+'</div>')]},
+/* ===== 3. Building the work ===== */
+{at:'2027-03-09',ch:'build',lanes:['A'],stage:'work',title:'The dataset needs the architect: Ask for Architecture Help',
+ lede:'The escrow disbursement structure has to fit the Reference Model, so Meghan asks Mark for help.',
+ who:['MT','PW','SY'],
+ does:['On WR2027_07-A, Meghan clicks <b>Ask for Architecture Help</b>: the request, the type of help, what done looks like, the MISMO version (3.6.4), priority, a target date and whether Mark should join a task force call.','Perry (Program Manager) reviews and approves it.'],
+ auto:['The task shows on A’s Architecture tab: Requested, Approved, In Progress, Done.','Once Perry approves, it goes to Mark’s queue.','Submit for AI Review stays closed on A while the task is open.'],
+ notes:[['mail','Perry: “AH-2027-011 architecture help requested: Escrow disbursement containers and XPaths”'],['mail','Mark, once Perry approves: “New architecture task AH-2027-011”'],['mail','Meghan: “AH-2027-011 …: approved”']],
+ screens:[S_('MMS','mms','Ask for Architecture Help','<div class="box"><h5>Ask for Architecture Help</h5>'+kv([['Request','Escrow disbursement containers and XPaths'],['Type of Help','Reference Model structure'],['Description','Where do escrow item disbursements sit? Reuse ESCROW_ITEM or add a detail container? Done = an agreed structure the dataset can use.'],['MISMO Version','3.6.4'],['Priority','High'],['Target Date',mono('Apr 23, 2027')],['Workgroup Meeting Needed?','Yes, join a workgroup call']])+acts([['Cancel'],['Send to the Program Manager','pri hit']])+'</div>')]},
+{at:'2027-04-20',ch:'build',lanes:['A'],stage:'work',title:'Architecture help done; the dataset is finished first',
+ lede:'Mark joins two task force calls, agrees the structure, and closes the task.',
+ who:['MK','TF','SY'],
+ does:['Mark moves the task to In Progress, joins the calls on Mar 23 and Apr 13, adds his notes and what was done, and marks it <b>Done</b>.','The task force finishes the dataset, then the iGuide, and adds both to A’s Files with the IM/AWG Submission Form.'],
+ auto:['A’s Architecture tab shows the finished task with Mark’s notes.','Submit for AI Review opens.','Files go to A’s SharePoint folder; whoever added a file (and MISMO staff) can delete it.'],
+ notes:[['mail','Meghan: “AH-2027-011 Escrow disbursement containers and XPaths: done”'],['queue','Meghan’s My Queue: “Submit for AI Review”']],
+ screens:[S_('MMS','mms','#wr=WR2027_07-A',head(WA,NA,'work')+tabs('Architecture')+box('AH-2027-011 Escrow disbursement containers and XPaths','<div class="steps"><span class="done">Requested Mar 9</span><span class="done">Approved Mar 10</span><span class="done">In Progress Mar 15</span><span class="done">Done Apr 20</span></div>'+p('<b>What was done:</b> reuse ESCROW_ITEM; add ESCROW_ITEM_DISBURSEMENTS / ESCROW_ITEM_DISBURSEMENT under it. 6 new data points, 1 reused.'))),
+  S_('Files','mms','#wr=WR2027_07-A › Files',tbl(['File','Added by'],[['Escrow Servicing Dataset v1.0.xlsx','Meghan'],['Escrow Servicing iGuide v1.0.docx','Meghan'],['IMSub_WR2027.07_Escrow Servicing_042027.xlsx','Meghan']]))]},
+{at:'2027-04-26',ch:'review',lanes:['A'],stage:'aireview',title:'AI Review of the dataset and the iGuide',
+ lede:'Each file gets the review that fits it.',
+ who:['MT','SY'],
+ does:['Meghan clicks <b>Submit for AI Review</b>, then <b>Run AI Review</b> and picks the files from A’s Files tab.','She ticks a choice on each note (Update, Do Not Update, Unsure, Pass), clicks <b>Submit Choices</b>, fixes the files, and resubmits.'],
+ auto:['The dataset is looked over as a whole; the iGuide gets the editor’s read part by part; the software checks cover the Draft boilerplate, copyright, page numbers, table of contents, acronyms, MISMO® and other trademarks, MISMO voice, accessibility and typed bullets.','A progress bar shows each step; the report saves to the Reviews tab with a readiness.','Update and Do Not Update teach the review what to flag next time.'],
+ notes:[['mail','Meghan: “WR2027_07-A Escrow Servicing Dataset and iGuide: AI Review”']],
+ screens:[S_('MMS','mms','AI Review · WR2027_07-A',head(WA,NA,'aireview','reviewed')+'<div class="acts"><b style="font:600 20px var(--mono)">11</b> notes '+tag('Ready With Minor Edits','warn')+'</div>'+tbl(['','Note','Your Choice'],[[tag('Must Fix','bad'),'iGuide: the table of contents is out of date (2 headings).','Update'],[tag('Correction','warn'),'“escrow analysis statement” → “Escrow Analysis Statement”, as defined in section 2','Update'],[tag('Recommended','warn'),'Dataset: tabs aren’t numbered.','Update'],[tag('Recommended','warn'),'iGuide: 4 list items typed with a dash.','Update'],[tag('Question','info'),'Is Projected Disbursement Date required?','Unsure']])+acts([['Submit Choices','pri hit'],['Make Updates First'],['Send to IM Review →']]))]},
+/* ===== 4. Reviews ===== */
+{at:'2027-05-03',ch:'review',lanes:['A','C'],stage:'im',title:'Two submissions go to IM: the dataset as documents, the Reference Model changes through the QC',
+ lede:'The new data points and containers the architect helped shape are on C’s Submission Form. The dataset and iGuide (A) use them, so A goes to IM with no Reference Model rows of its own.',
+ who:['MT','SY'],
+ does:['On A, Meghan clicks <b>Send to IM Review</b>, then <b>No Reference Model Changes: Send to IM</b>.','On C (after its AI Review), she clicks <b>Run Reference Model QC</b> with the Submission Form.','MISMO Link Format: fixes of the same kind are one line; she clicks <b>Accept All</b> on each and checks the one marked “Check this one”.','She reads the Must Fix notes and the drafted IM decision for each row, then clicks <b>Send to IM</b>.'],
+ auto:['A gets a Documents Only entry on its Reviews tab; IM makes one decision on it.','The QC checks C’s Face Page and each of its 24 rows against the current Reference Model (v3.6.4): already there, similar data points, existing enumerations, parent containers and XPaths.','It lists the fixes MISMO Link’s vendor would otherwise make and checks the spelling of new names; Claude drafts IM’s likely decision for each row.','Both go on IM Review’s agenda for the next IM call.'],
+ notes:[['mail','IM reviewers and Meghan: “WR2027_07-A …: IM Review”'],['mail','IM reviewers and Meghan: “WR2027_07-C …: IM Review”'],['web','IM Review: WR2027_07-A (documents) and WR2027_07-C (24 rows) waiting']],
+ screens:[S_('MMS (C)','mms','Reference Model QC · WR2027_07-C','<div class="p-head"><h3>MISMO Link Format</h3><span class="muted small">19 suggestions</span></div>'+tbl(['Rows','Change',''],[['<b>8</b>','Parent CONTAINER Name: <s>ESCROW_ITEM_DISBURSEMENT</s> <b>Escrow Item Disbursement</b>',act('Accept All 8','pri hit')],['<b>6</b>','XPATH: <s>//ESCROW/ESCROW_ITEMS</s> <b>MESSAGE/…/ESCROW_ITEMS</b>',act('Accept All 6','pri')],['<b>4</b>','Parent CONTAINER Name: <s>Escrow Item</s> <b>(blank)</b> on enumeration rows',act('Accept All 4','pri')],['1','Data Point Name: <s>Disbursment</s> <b>Disbursement</b> '+tag('Check this one','info'),act('Accept')]])+box('Must Fix and drafted decisions',p(tag('Must Fix','bad')+' Item 9: “Escrow Item Type” is already in the Reference Model: reuse it.<br>'+tag('Likely with modification','warn')+' Item 14: Amount definitions start “The dollar amount of”.'))+acts([['Send to IM','pri']])),
+  S_('MMS (A)','mms','#wr=WR2027_07-A',head(WA,NA,'im')+tabs('Reviews')+acts([['Run Reference Model QC →'],['No Reference Model Changes: Send to IM','pri hit']]))]},
+{at:'2027-05-11',ch:'review',lanes:['A','C'],stage:'im',title:'IM decides C’s rows, and sends the dataset back for more work',
+ lede:'On the IM call, the Reference Model changes are decided row by row. The dataset needs more work first.',
+ who:['IM','EB','SY'],
+ does:['IM goes through C’s rows with the drafted decisions: 20 approved as submitted, 3 approved with modification, 1 withdrawn to reuse Escrow Item Type.','For A, IM records <b>Returned for Updates</b>: two dataset fields map to the wrong existing data points, and the iGuide’s sample message doesn’t match the dataset.'],
+ auto:['Shows the quorum line from the call’s attendance in Meeting Trackers.','Saves C’s decided rows (what goes into the v3.6.5 Master Change List) and moves C on to AWG Review.','Moves A to IM Review › Making Updates with IM’s comments, and puts Resubmit to IM on Meghan’s My Queue.'],
+ notes:[['mail','Meghan: “WR2027_07-A …: IM updates needed”','with IM’s comments'],['mail','AWG reviewers and Meghan: “WR2027_07-C …: AWG Review”'],['queue','Meghan’s My Queue: “Resubmit to IM”']],
+ screens:[S_('IM Review','imr','im-review › IM call May 11','<div class="p-head"><h3>IM Call · May 11, 2027</h3>'+tag('Quorum: 8 of 11 voting members','good')+'</div>'+tbl(['Submission','Decision'],[['WR2027_07-C Escrow Reference Model Changes · 24 rows',tag('Approved','good')+' <span class="small muted">20 as submitted · 3 with modification · 1 withdrawn</span>'],['WR2027_07-A Escrow Servicing Dataset and iGuide · documents',tag('Returned for Updates','bad')+'<div class="small muted">Fields 12 and 19 map to the wrong data points; the iGuide sample doesn’t match</div>']])+acts([['Returned for Updates','pri hit']])),
+  S_('Email','mail','Meghan’s inbox',mmsMail('Meghan Tidgewell','WR2027_07-A Escrow Servicing Dataset and iGuide: IM updates needed',['IM asked for updates to Escrow Servicing Dataset and iGuide.','Fields 12 and 19 map to the wrong existing data points; update the iGuide’s sample message to match.','Resubmit in the MMS when ready.']))]},
+{at:'2027-05-27',ch:'review',lanes:['C'],stage:'designation',title:'AWG approves the Reference Model changes; now they wait for the release',
+ lede:'This is where the hold starts.',
+ who:['AW','SY'],
+ does:['On the AWG call, the reviewers approve WR2027_07-C.'],
+ auto:['Moves C to License Designation and holds it for WR2027_01: “AWG approved; now held for WR2027_01 v3.6.5 Minor Reference Model Release and moves with it (it waits here until the release reaches License Designation).”','C now shows “Moves With WR2027_01”. Its next steps (designation, Governance, comment, publishing) happen with the release.'],
+ notes:[['web','AWG Review: WR2027_07-C approved']],
+ tip:'Had the release already been past License Designation, C would not be held; it would move on by itself, and the history would say so.',
+ screens:[S_('MMS','mms','#wr=WR2027_07-C',head(WC,NC,'designation','','<span class="tag t-info">Moves With WR2027_01</span>')+'<div class="tip"><b>Held for WR2027_01 v3.6.5 Minor Reference Model Release</b> and moves with it.</div>'+tabs('History')+tbl(['Date','What happened'],[[mono('May 11'),'IM decision: approved (20 as submitted, 3 with modification, 1 withdrawn)'],[mono('May 27'),'AWG approved; now held for WR2027_01 v3.6.5 Minor Reference Model Release and moves with it (it waits here until the release reaches License Designation)']]))]},
+{at:'2027-05-24',ch:'review',lanes:['A'],stage:'im',title:'The task force updates the dataset and resubmits',
+ lede:'The fixes go back through the AI Review before IM sees them again.',
+ who:['TF','MT','SY'],
+ does:['The task force remaps the two fields and fixes the iGuide’s sample; Meghan adds the new files to Files and runs the AI Review again.','She clicks <b>Resubmit to IM</b>.'],
+ auto:['Counts the resubmission and puts A back on IM’s agenda.','Compare Drafts on the Reviews tab shows exactly what changed between the two versions.'],
+ notes:[['web','IM Review: WR2027_07-A back on the agenda (resubmitted)']],
+ screens:[S_('MMS','mms','#wr=WR2027_07-A',head(WA,NA,'im','resubmitted')+tabs('Reviews')+tbl(['Review','When','Result'],[['AI Review',mono('Apr 26'),tag('Ready With Minor Edits','warn')],['Documents Only to IM',mono('May 3'),tag('Sent to IM','info')],['IM decision',mono('May 11'),tag('Returned for Updates','bad')],['AI Review',mono('May 24'),tag('Ready','good')]])+acts([['Resubmit to IM','pri hit']]))]},
+{at:'2027-05-24',ch:'review',lanes:['B'],stage:'im',title:'The white paper: AI Review, then to IM as documents only',
+ lede:'Past white papers (Fee Modernization, eClosing ROI, eHELOC Adoption Support) went through IM and AWG as documents, were designated Collateral, and published as Final.',
+ who:['MT','SY'],
+ does:['On WR2027_07-B, Meghan submits the white paper for AI Review (May 17), chooses on each note and makes the updates.','It has no Reference Model changes, so she clicks <b>No Reference Model Changes: Send to IM</b>.'],
+ auto:['The editor’s read flagged “MISMO recommends that servicers adopt…” (MISMO doesn’t mandate or advocate), two acronyms used before they’re spelled out, and MISMO without ®.','Files a Documents Only entry on the Reviews tab and sends it to IM; IM makes one decision on the whole paper.'],
+ notes:[['mail','Meghan: “WR2027_07-B …: AI Review”'],['mail','IM reviewers and Meghan: “WR2027_07-B …: IM Review”']],
+ screens:[S_('MMS','mms','AI Review · WR2027_07-B',head(WB,NB,'aireview','reviewed')+tbl(['','Note','Your Choice'],[[tag('Recommended','warn'),'MISMO doesn’t mandate or advocate: “MISMO recommends that servicers adopt”','Update'],[tag('Must Fix','bad'),'Acronyms defined after first use: RESPA, PITI.','Update'],[tag('Recommended','warn'),'“MISMO” never appears with ®.','Update']])+acts([['Run Reference Model QC →','off'],['No Reference Model Changes: Send to IM','pri hit']]))]},
+{at:'2027-06-08',ch:'review',lanes:['A','B'],stage:'awg',title:'IM approves the dataset and the white paper; on to AWG Review',
+ lede:'Both were sent as documents, so each gets one decision.',
+ who:['IM','EB','SY'],
+ does:['IM approves A (resubmitted) and B.','Erin adds IM’s approved Submission Form with <b>Add Documents</b>.'],
+ auto:['Moves A and B to AWG Review and puts them on AWG Review’s agenda.','The added documents are saved to A’s SharePoint folder and listed on its Files tab.'],
+ notes:[['mail','AWG reviewers and Meghan: “WR2027_07-A …: AWG Review”'],['mail','AWG reviewers and Meghan: “WR2027_07-B …: AWG Review”']],
+ screens:[S_('IM Review','imr','im-review › IM call Jun 8',tbl(['Submission','Decision'],[['WR2027_07-A Escrow Servicing Dataset and iGuide · documents (resubmitted)',tag('Approved','good')],['WR2027_07-B Escrow Analysis Adoption White Paper · documents',tag('Approved','good')]])+acts([['Add Documents','hit']]))]},
+{at:'2027-06-24',ch:'review',lanes:['A','B'],stage:'designation',title:'AWG approves both',
+ lede:'AWG Review runs the same way: the agenda, the quorum from Meeting Trackers, and a decision on the call.',
+ who:['AW','SY'],
+ does:['On the AWG call, the reviewers approve A and B.'],
+ auto:['Moves both to License Designation.','Recommends each one’s designation from past designations of similar work.'],
+ notes:[['mail','Jonna: “WR2027_07-A …: ready for License Designation”'],['mail','Jonna: “WR2027_07-B …: ready for License Designation”']],
+ screens:[S_('AWG Review','awg','awg-review › AWG call Jun 24','<div class="p-head"><h3>AWG Call · Jun 24, 2027</h3>'+tag('Quorum: 9 of 13','good')+'</div>'+tbl(['Submission','Decision'],[['WR2027_07-A Escrow Servicing Dataset and iGuide',tag('Approved','good')],['WR2027_07-B Escrow Analysis Adoption White Paper',tag('Approved','good')]]))]},
+/* ===== 5. Designation and governance ===== */
+{at:'2027-06-25',ch:'designate',lanes:['A','B'],stage:'gc-comment',title:'License Designation: a standard with two parts, and a collateral paper',
+ lede:'Jonna is the License Designator. Once she designates, it goes straight to Governance.',
+ who:['JC','SY'],
+ does:['A: each part is designated on its own. The dataset and the iGuide are both Standard, Public, Commercial Distributor.','B: Collateral, Public, Commercial Distributor, like the recent white papers.','Jonna clicks <b>Designate as Recommended</b> on each.'],
+ auto:['Shows which boilerplate each file must carry once it is published, from the Boilerplate Guidance.','Moves both to Governance Approval to Comment.'],
+ notes:[['mail','MISMO staff: “WR2027_07-A …: Governance Approval to Comment”'],['mail','MISMO staff: “WR2027_07-B …: Governance Approval to Comment”']],
+ screens:[S_('MMS','mms','#wr=WR2027_07-A',head(WA,NA,'designation')+tbl(['Part','Classification','Type','License'],[['Escrow Servicing Dataset','Standard','Public','Commercial Distributor'],['Escrow Servicing iGuide','Standard','Public','Commercial Distributor']])+p('<span class="muted">At publication:</span> Commercial Distributor · Standard boilerplate')+acts([['Designate as Recommended →','pri hit'],['Change the Designation']])),
+  S_('MMS (B)','mms','#wr=WR2027_07-B',head(WB,NB,'designation')+kv([['Classification','Collateral'],['Type','Public'],['License','Commercial Distributor'],['At publication','Commercial Distributor · Collateral boilerplate'],['Publishes as','Final']])+acts([['Designate as Recommended →','pri hit']]))]},
+{at:'2027-07-07',ch:'designate',lanes:['A','B'],stage:'comment',title:'Governance approves both for comment',
+ lede:'The Governance Committee approves the work products to go out for 30 days of public comment.',
+ who:['GC','ST','SY'],
+ does:['MISMO staff click <b>Record GC Decision</b> on A and B: Approved for comment.'],
+ auto:['Moves both to Comment Period, waiting for their files.','Starts the Candidate Recommendation and Final press releases in MISMO Media now, so they’re ready when the work is approved to publish (no press release for a comment period).','The next move is Meghan’s: choose the files for comment.'],
+ notes:[['mail','Meghan, Vanessa, Amy and Perry: “WR2027_07-A …: Comment Period”'],['mail','The same for WR2027_07-B'],['media','MISMO Media › Requests: Candidate Recommendation Announcement (A) and Final Release Announcement (B)']],
+ screens:[S_('MMS','mms','Record GC Decision',head(WA,NA,'gc-comment')+kv([['Decision',tag('Approved for comment','good')],['Date',mono('Jul 7, 2027')],['Also approve publishing if no material changes','Not this time']])+acts([['Save','pri hit']]))]},
+/* ===== 6. Comment period ===== */
+{at:'2027-07-08',ch:'comment',lanes:['A','B'],stage:'comment',title:'Getting the comment period ready: files and card',
+ lede:'The facilitator gets the comment-period files into the MMS; that is what Vanessa needs for the Resource Library.',
+ who:['MT','SY'],
+ does:['Meghan puts the Comment Period (IPR) language in each file and adds them to Files.','She clicks <b>Choose the Files for Comment</b> on A (the dataset, the iGuide) and on B (the white paper).','She writes each Open for Comment card: a title and a few lines (up to 320 characters).'],
+ auto:['Checks each Word, Excel and PDF file for the Comment Period language and lists any without it.','Fills in [INSERT DATE] with the posting date, everywhere it appears.','Zips several files into one non-member download (also saved to Files); over 20 MB, each file is its own download with a MISMO download page.','The next move becomes Vanessa’s: the Resource Library link.'],
+ notes:[['mail','Vanessa: the comment period for WR2027_07-A is ready for the Resource Library'],['queue','Vanessa’s My Queue: Resource Library link for A and B']],
+ screens:[S_('MMS','mms','Choose the Files for Comment · WR2027_07-A',tbl(['File','Check'],[['Escrow Servicing Dataset v1.1.xlsx',tag('Comment Period language ✓','good')],['Escrow Servicing iGuide v1.1.docx',tag('Comment Period language ✓','good')]])+p('[INSERT DATE] filled in: <b>Jul 8, 2027</b> · one zip, 2.4 MB')+'<div class="cpc"><span class="eb">Open for Comment</span><b>Escrow Servicing Dataset and iGuide</b><span class="small muted">A standard dataset for exchanging escrow analysis results, with an implementation guide. Members open it in the Resource Library; others sign the comment license to download.</span></div>'+acts([['Post the Files','pri hit']]))]},
+{at:'2027-07-12',ch:'comment',lanes:['A','B'],stage:'comment',title:'Vanessa adds the Resource Library entries; the comment periods open',
+ lede:'Saving the Resource Library link is what starts the clock.',
+ who:['VR','SY'],
+ does:['Vanessa creates the Resource Library entries from the files in the MMS and saves each entry’s link on the work request.'],
+ auto:['The 30-day comment period starts the day the link is saved (Jul 12 to Aug 11).','The card goes on mismo.org’s Open for Comment list; members open it in the Resource Library, non-members sign the Proposed (comment) license and download.','The press releases in MISMO Media get a purple Out for Comment tag with the closing date.'],
+ notes:[['mail','Meghan: “WR2027_07-A … is open for comment”'],['mail','Meghan: “WR2027_07-B … is open for comment”'],['web','mismo.org › Open for Comment: 2 new cards']],
+ screens:[S_('Resource Library','rl','Resource Library › new entry',kv([['Title','Escrow Servicing Dataset and iGuide (Comment Period)'],['Files','Escrow Servicing Dataset v1.1.xlsx · Escrow Servicing iGuide v1.1.docx'],['Access','Members; non-members via the comment license']])+acts([['Save Entry','pri']])),
+  S_('MMS','mms','#wr=WR2027_07-A',head(WA,NA,'comment','open')+box('Links',kv([['Resource Library',mono('mismo.org/resource-library/…/escrow-servicing')+' '+tag('saved Jul 12','good')]]))+box('Comment Period',kv([['Opened',mono('Jul 12, 2027')],['Closes',mono('Aug 11, 2027')]]))),
+  S_('mismo.org','web','mismo.org › Open for Comment','<div class="cpc"><span class="eb">Open for Comment · closes Aug 11, 2027</span><b>Escrow Servicing Dataset and iGuide</b><span class="small muted">A standard dataset for exchanging escrow analysis results, with an implementation guide.</span><span class="acts"><span class="a">Members: Resource Library</span><span class="a">Non-members: Download</span></span></div><div class="cpc"><span class="eb">Open for Comment · closes Aug 11, 2027</span><b>Escrow Analysis Adoption White Paper</b><span class="small muted">Why servicers and investors gain from adopting the Escrow Servicing Dataset.</span></div>')]},
+{at:'2027-07-26',ch:'comment',lanes:['M'],stage:'media',title:'While it’s out for comment, MISMO Media writes the publication releases',
+ lede:'The releases announce the Candidate Recommendation and the Final paper. They must never say the work is in comment.',
+ who:['PW','AM','SY'],
+ does:['Perry takes each release through his review, who to quote (Amy approves), the quote request and the approved quote, then gives final approval.'],
+ auto:['Each release shows Draft Now (blue) with an Out for Comment tag (purple) until the comment period ends.','After final approval each is held: the row says Finished, Held, and Distribution stays closed until the MMS reaches Release.','A release that mentions comments can’t get final approval.'],
+ notes:[['mail','Amy: approve who is quoted (one per release)'],['media','MISMO Media: 2 releases Finished, Held']],
+ screens:[S_('MISMO Media','media','media › Press Releases','<div class="stats"><div class="stat blue"><b>2</b><span>Draft Now</span></div><div class="stat green"><b>0</b><span>Ready to Post</span></div><div class="stat purple"><b>2</b><span>Out for Comment</span></div></div>'+tbl(['Release','Status'],[['MISMO Releases Escrow Servicing Dataset and iGuide as a Candidate Recommendation',tag('Draft Now','info')+' '+tag('Out for Comment · Aug 11','purple')+' '+tag('Finished, Held','good')],['MISMO Publishes Escrow Analysis Adoption White Paper',tag('Draft Now','info')+' '+tag('Out for Comment · Aug 11','purple')+' '+tag('Waiting on a Quote','warn')]]))]},
+{at:'2027-08-08',ch:'comment',lanes:['A','B'],stage:'comment',title:'Three days left',
+ lede:'Reminders go out before the period ends.',
+ who:['SY'],
+ does:['Nothing to do unless comments have come in that need a look.'],
+ auto:['Emails Meghan that each comment period ends Aug 11, and that she’ll be asked what came back the day after.','The Daily Digest lists comment periods ending soon.'],
+ notes:[['mail','Meghan: “WR2027_07-A …: comment period ends Aug 11”'],['mail','Meghan: “WR2027_07-B …: comment period ends Aug 11”'],['digest','Daily Digest: 2 comment periods ending this week']],
+ screens:[S_('Email','mail','Meghan’s inbox',mmsMail('Meghan Tidgewell','WR2027_07-B Escrow Analysis Adoption White Paper: comment period ends Aug 11, 2027',['The comment period for Escrow Analysis Adoption White Paper ends Aug 11, 2027. You will be asked what came back the day after.']))]},
+/* ===== 7. Coming off comment ===== */
+{at:'2027-08-12',ch:'off',lanes:['A'],stage:'post',title:'The dataset comes off comment clean',
+ lede:'Two editorial comments; nothing that changes the standard.',
+ who:['MT','SY'],
+ does:['Meghan clicks <b>Report What Came Back</b>: Received Comments/No Changes Needed, with a note on the two comments.'],
+ auto:['The comment period ended on its own and the work moved to Post-Comment; the card came off the Open for Comment list.','With no material changes, A goes to Governance Approval to Publish.','The press release’s Out for Comment tag goes by itself.'],
+ notes:[['mail','Meghan: “WR2027_07-A …: Post-Comment”'],['mail','MISMO staff: “WR2027_07-A …: Governance Approval to Publish”']],
+ screens:[S_('MMS','mms','What Came Back from Comment',head(WA,NA,'post')+box('Comment Results','<div class="small" style="display:grid;gap:3px"><span>○ Received No Comments</span><b>● Received Comments/No Changes Needed</b><span>○ Received Comments/Changes Needed (back to In Work for a second comment period)</span></div>')+acts([['Save','pri hit']]))]},
+{at:'2027-08-12',ch:'off',lanes:['B'],stage:'work',title:'The white paper didn’t credit a source: back for a second comment period',
+ lede:'A commenter points out that a servicing cost statistic is quoted without its source. That has to be fixed and shown to the public again.',
+ who:['MT','SY'],
+ does:['Meghan clicks <b>Report What Came Back</b>: Received Comments/Changes Needed, with the comment.'],
+ auto:['B goes back to In Work for a second comment period (round 2); the old comment dates are cleared.','The old Target to Submit to IM no longer applies; Key Dates asks for a new one.','The Final press release stays as it is in MISMO Media, waiting.'],
+ notes:[['mail','Meghan: “WR2027_07-B …: In Work”'],['queue','Meghan’s My Queue: B back in work, set a new target']],
+ screens:[S_('MMS','mms','What Came Back from Comment',head(WB,NB,'post')+box('Comment Results','<div class="small" style="display:grid;gap:3px"><span>○ Received No Comments</span><span>○ Received Comments/No Changes Needed</span><b>● Received Comments/Changes Needed (back to In Work for a second comment period)</b></div>')+box('Note',p('Section 3 quotes the average escrow shortage cost without crediting the source study. Add the citation.'))+acts([['Save','pri hit']])),
+  S_('History','mms','#wr=WR2027_07-B › History',tbl(['Date','What happened'],[[mono('Aug 12'),'Material changes from comment; back to In Work for a second comment period'],[mono('Aug 12'),'Target to Submit to IM cleared (was Jun 1, 2027); set a new one on Key Dates']]))]},
+{at:'2027-08-18',ch:'off',lanes:['B'],stage:'gc-comment',title:'The citation is added; IM and AWG decide they don’t need to review it again',
+ lede:'IM and AWG decide whether a change needs their review. A citation doesn’t.',
+ who:['MT','EB','AW','JC','SY'],
+ does:['Meghan adds the citation, puts the new file in Files and runs the AI Review again, then sends it to IM Review.','IM (Erin) looks at the change and clicks <b>Not Required: Skip IM Review</b>, with why: only a source citation was added after comment.','AWG does the same with <b>Not Required: Skip AWG Review</b>.','Jonna designates it as before.'],
+ auto:['Each skip asks why first; the reason and who decided go in the history.','Moves B to Governance Approval to Comment for round 2.'],
+ notes:[['mail','MISMO staff: “WR2027_07-B …: Governance Approval to Comment”']],
+ tip:'If the change touched the substance, IM or AWG would review it as usual. It’s their call.',
+ screens:[S_('MMS','mms','#wr=WR2027_07-B','<div class="box"><h5>Skip IM Review?</h5>'+p('WR2027_07-B goes straight to AWG Review without IM reviewing it. IM decides whether it needs a review.')+box('Why IM doesn’t need to review it',p('Only a source citation was added after comment (section 3).'))+acts([['Cancel'],['Skip IM Review','pri hit']])+'</div>'),
+  S_('History','mms','#wr=WR2027_07-B › History',tbl(['Date','What happened'],[[mono('Aug 16'),'AI Review: Ready'],[mono('Aug 17'),'IM decided no review is needed; skipped · Erin Bittenbender: only a source citation was added after comment'],[mono('Aug 17'),'AWG decided no review is needed; skipped'],[mono('Aug 18'),'Designated as recommended']]))]},
+{at:'2027-08-26',ch:'off',lanes:['B'],stage:'comment',title:'Second comment period: a new Resource Library link starts it',
+ lede:'The link from round 1 doesn’t start round 2. Vanessa updates the entry with the corrected file and saves the new link.',
+ who:['GC','ST','MT','VR','SY'],
+ does:['MISMO staff record GC’s approval for the second comment period (Aug 23).','Meghan chooses the corrected file for comment and updates the card.','Vanessa updates the Resource Library entry and saves its new link (Aug 26).'],
+ auto:['The second 30-day period starts the day the new link is saved (Aug 26 to Sep 25).','The card goes back on the Open for Comment list.','The Final press release is tagged Out for Comment again.'],
+ notes:[['mail','Meghan, Vanessa, Amy and Perry: “WR2027_07-B …: Comment Period”'],['mail','Meghan: “WR2027_07-B … is open for comment”']],
+ screens:[S_('MMS','mms','#wr=WR2027_07-B',head(WB,NB,'comment','open','<span class="chip">Round 2</span>')+box('Comment Period',kv([['Round 1',mono('Jul 12 – Aug 11, 2027')+' · changes needed'],['Round 2',mono('Aug 26 – Sep 25, 2027')+' '+tag('open','good')]])))]},
+/* ===== 8. Publishing ===== */
+{at:'2027-08-24',ch:'publish',lanes:['A','M'],stage:'release',title:'The dataset is approved to publish; its press release turns Ready to Post',
+ lede:'A standard publishes as a Candidate Recommendation.',
+ who:['GC','ST','SY'],
+ does:['MISMO staff click <b>Record GC Decision</b>: Approved to publish as a Candidate Recommendation.'],
+ auto:['Moves A to Release and shows Final Files on its Overview.','In MISMO Media, the same release turns Ready to Post (green): the finished draft moves to Distribution and its history says when.'],
+ notes:[['mail','Meghan, Vanessa, Amy and Perry: “WR2027_07-A …: Release”','MISMO Media’s Release email is when a press release is ready to post'],['media','MISMO Media: Ready to Post (1)']],
+ screens:[S_('MISMO Media','media','media › Press Releases','<div class="stats"><div class="stat blue"><b>1</b><span>Draft Now</span></div><div class="stat green"><b>1</b><span>Ready to Post</span></div><div class="stat purple"><b>0</b><span>Out for Comment</span></div></div>'+box('MISMO Releases Escrow Servicing Dataset and iGuide as a Candidate Recommendation',stepsBar(PR_STEPS,6)+p(tag('Ready to Post','good')+' Distribution is open.'))),
+  S_('MMS','mms','#wr=WR2027_07-A',head(WA,NA,'release','','<span class="chip">Candidate Recommendation</span>')+box('Final Files',p('After the comment period, put the Commercial Distributor boilerplate language in the work product files (in place of the Comment Period language), add them to Files, then Choose the Final Files.'))+acts([['Choose the Final Files','pri hit'],['Mark Published →']]))]},
+{at:'2027-08-26',ch:'publish',lanes:['A','M'],stage:'published',title:'Published as a Candidate Recommendation, and announced',
+ lede:'The first deliverable is out.',
+ who:['MT','ST','PW','VR','SY'],
+ does:['Meghan chooses the Final Files; MISMO staff click <b>Mark Published</b>.','Perry runs Distribution: MISMO Connect (Vanessa posts), MBA newsroom, MISMO Matters, LinkedIn post request.'],
+ auto:['Checks each Final File for the Commercial Distributor language and marks them Final on the Files tab.','Lists A on Find a Work Product with its public files (within about half an hour) and updates the Resource Library entry.','A is Published; WR2027_07 stays open with two deliverables to go.'],
+ notes:[['web','mismo.org › Find a Work Product: Escrow Servicing Dataset and iGuide'],['web','MISMO Connect: the Candidate Recommendation announcement'],['media','LinkedIn post request on MISMO Media’s board']],
+ screens:[S_('mismo.org','web','mismo.org › Find a Work Product','<div class="wp"><span class="t">Escrow Servicing Dataset and iGuide</span><span class="small muted">Candidate Recommendation · Servicing · Commercial Distributor</span><div class="acts"><span class="a">Escrow Servicing Dataset v1.1.xlsx</span><span class="a">Escrow Servicing iGuide v1.1.pdf</span></div></div>'),
+  S_('MMS','mms','#wr=WR2027_07',head(W7,NM7,'split','3 deliverables')+tbl(['WR#','Deliverable','Stage'],[[mono('-A'),NA,stg('published')],[mono('-B'),NB,stg('comment')+' <span class="sub">round 2</span>'],[mono('-C'),NC,stg('work')+' '+tag('Moves With WR2027_01','info')]]))]},
+{at:'2027-10-07',ch:'publish',lanes:['B','M'],stage:'published',title:'The white paper comes off its second comment period and is published as Final',
+ lede:'No comments in round 2.',
+ who:['MT','GC','ST','PW','SY'],
+ does:['Meghan reports <b>Received No Comments</b> (Sep 27).','MISMO staff record GC’s approval to publish as Final (Oct 5).','Meghan chooses the Final Files; MISMO staff click <b>Mark Published</b> (Oct 7). Perry runs Distribution.'],
+ auto:['The Final press release turns Ready to Post at Release.','Lists B on Find a Work Product as Final, with its public file.','Two of three deliverables are published.'],
+ notes:[['mail','MISMO staff: “WR2027_07-B …: Governance Approval to Publish”'],['mail','Meghan, Vanessa, Amy and Perry: “WR2027_07-B …: Release”'],['web','mismo.org › Find a Work Product: the white paper (Final)']],
+ screens:[S_('MMS','mms','#wr=WR2027_07-B › History',tbl(['Date','What happened'],[[mono('Sep 25'),'Comment period ended; moved to Post-Comment'],[mono('Sep 27'),'Received No Comments; ready for Governance approval to publish as Final'],[mono('Oct 5'),'Governance approved to publish as Final'],[mono('Oct 6'),'Final files chosen (Commercial Distributor license language)'],[mono('Oct 7'),'Published; listed on Find a Work Product']])),
+  S_('MISMO Media','media','media › Press Releases',box('MISMO Publishes Escrow Analysis Adoption White Paper',stepsBar(PR_STEPS,7)+p(tag('Ready to Post','good')+' Distributed Oct 7: MISMO Connect, MBA newsroom, MISMO Matters, LinkedIn.')))]},
+/* ===== 9. The Reference Model release ===== */
+{at:'2027-07-30',ch:'release',lanes:['R','C'],stage:'work',title:'The release builds its Master Change List',
+ lede:'WR2027_01 has been In Work all year, collecting the Reference Model changes for v3.6.5. C has been held with it since AWG approved it.',
+ who:['ST','EB','SY'],
+ does:['On WR2027_01’s Overview, MISMO staff click <b>Download the Master Change List</b> for v3.6.5.','They send it to the MISMO Link vendor (outside the MMS).'],
+ auto:['Gathers every approved row from the IM-decided Submission Forms of the work in v3.6.5: C’s 23 approved rows plus the other work in the release.','Writes them in the vendor’s 27 columns, with WR # and Originating Work Group, and the MISMO Link fixes already applied.'],
+ notes:[],
+ screens:[S_('MMS','mms','#wr=WR2027_01',head(WR1,NR,'work','','<span class="chip">1 Riding</span>')+box('Master Change List for MISMO Link',kv([['Release','v3.6.5'],['Work requests','WR2027_07-C · WR2026_33 · WR2026_19'],['Approved rows',mono('96')]])+acts([['Download the Master Change List','pri hit']]))+box('Riding with This Release',tbl(['WR#','Deliverable','Stage'],[[mono(WC),NC,stg('designation')+' <span class="muted small">waiting</span>']])))]},
+{at:'2027-10-08',ch:'release',lanes:['R'],stage:'work',title:'The build comes back: Release Check',
+ lede:'New: the MMS checks MISMO Link’s build against the list that was sent.',
+ who:['ST','SY'],
+ does:['MISMO staff add the vendor’s files to WR2027_01’s Files: the corrected Master Change List, the Logical Data Dictionary, the Enhanced LDD, the schemas (XSD, JSON, YAML), the Version Comparison Report and the UniqueID Matrix.','They click <b>Check the Build</b>.'],
+ auto:['Reads the list, the Version Comparison Report and the dictionary, and says whether every row is in the build, whether the definitions match word for word, and whether the build added or took out anything the list didn’t ask for.','Keeps the result on the release with a history line.'],
+ notes:[],
+ tip:'On the real v3.6.4 build this found every row in place and one addition no one asked for (ObjectURL in MI_RATE_QUOTE_PRODUCT_DETAIL).',
+ screens:[S_('MMS','mms','#wr=WR2027_01',head(WR1,NR,'work')+box('Release Check',p('<b>Oct 8</b> by MISMO staff: 96 of 96 rows in the build; 71 of 71 definitions word for word.')+'<span class="muted small">Everything on the list is in the build, and the build added nothing else.</span>'+acts([['Check the Build','hit']])))]},
+{at:'2027-10-15',ch:'release',lanes:['R','C'],stage:'designation',title:'The release goes through its reviews and catches up with C',
+ lede:'C has waited at License Designation since May 27. From here every move of the release moves C too.',
+ who:['ST','IM','AW','SY'],
+ does:['AI Review of the release documents (Oct 11), IM approves the release (Oct 12), AWG approves (Oct 13).'],
+ auto:['When the release reaches License Designation it is level with C; each later move of WR2027_01 moves WR2027_07-C with it, and both histories say so.','A rider that is already further along never moves back; it waits for the release.'],
+ notes:[['mail','IM reviewers, AWG reviewers and the facilitator: the release’s stage emails'],['mail','Jonna: “WR2027_01 …: ready for License Designation”']],
+ screens:[S_('MMS','mms','#wr=WR2027_01',head(WR1,NR,'designation','','<span class="chip">1 Riding</span>')+box('Riding with This Release',tbl(['WR#','Deliverable','Stage'],[[mono(WC),NC,stg('designation')]])))]},
+{at:'2027-10-18',ch:'release',lanes:['R','C'],stage:'gc-comment',title:'One designation, a public package and a members package',
+ lede:'Done the way v3.6.2 and v3.6.3 were: one designation for the release, a non-member download, and the full package for members.',
+ who:['JC','SY'],
+ does:['Jonna designates the release as recommended (Standard, Public, Commercial Distributor, Royalty Temp Waived, as for v3.6.2 and v3.6.3) and designates C with it.'],
+ auto:['Moves the release and C to Governance Approval to Comment.'],
+ notes:[['mail','MISMO staff: “WR2027_01 …: Governance Approval to Comment”']],
+ tip:'Non-members get the Logical Data Dictionary, the release notes and the XSD schemas. Members get the full Reference Model package in the Resource Library, with the Enhanced LDD, UniqueID Matrix, Version Comparison Report and the JSON and YAML files too.',
+ screens:[S_('MMS','mms','#wr=WR2027_01',head(WR1,NR,'designation')+kv([['Classification','Standard'],['Type','Public'],['License','Commercial Distributor'],['Royalty','Royalty Temp Waived'],['Publishes as','Candidate Recommendation']])+tbl(['Package','Who','What’s in it'],[['v3.6.5 Reference Model Non-Members (ZIP)',tag('Public','good'),'Logical Data Dictionary · Release Notes · XML XSD files'],['MISMO v3.6.5 Reference Model (ZIP)',tag('Members','info'),'All of the above, plus the Enhanced LDD, UniqueID Matrix, Version Comparison Report, JSON and YAML files']])+acts([['Designate as Recommended →','pri hit']]))]},
+{at:'2027-10-25',ch:'release',lanes:['R','C','M'],stage:'comment',title:'Approved for comment; about 100 MB of files go out',
+ lede:'One comment period covers the release and everything riding with it.',
+ who:['GC','ST','EB','VR','SY'],
+ does:['MISMO staff record GC’s approval to comment (Oct 19).','The release facilitator chooses the files for comment and writes the card.','Vanessa adds the Resource Library entry with the full package for members and saves the link (Oct 25).'],
+ auto:['Over 20 MB, so each file is posted as its own download (up to 95 MB each) with a MISMO download page for non-members.','Files over 15 MB (and the .xlsb) aren’t opened in the browser; the MMS lists them so the facilitator checks their Comment Period language.','The comment period starts with the link (Oct 25 to Nov 24), and C gets the same dates.','MISMO Media starts the release’s Candidate Recommendation press release (the release’s request covers C).'],
+ notes:[['mail','Vanessa, Amy, Perry and the facilitator: “WR2027_01 …: Comment Period”'],['web','mismo.org › Open for Comment: MISMO v3.6.5 Reference Model'],['media','MISMO Media: Candidate Recommendation Announcement for v3.6.5 (Draft Now)']],
+ screens:[S_('MMS','mms','Choose the Files for Comment · WR2027_01',box('Check These Yourself',p('The MMS couldn’t open these files, so make sure the Comment Period language and date are in them: Enhanced_LDD_v3.6.5_B391.xlsx (52.4 MB) · UniqueID_Matrix_v3.6.5_B391.xlsb (37.6 MB)'))+box('Posting',p('7 files, 98.1 MB: each its own download, with a MISMO download page as the non-member download.'))),
+  S_('mismo.org','web','mismo.org › Open for Comment','<div class="cpc"><span class="eb">Open for Comment · closes Nov 24, 2027</span><b>MISMO v3.6.5 Reference Model</b><span class="small muted">Adds escrow servicing data and the other changes approved in 2027. Members open every part in the Resource Library.</span></div>')]},
+{at:'2027-12-07',ch:'release',lanes:['R','C','M'],stage:'release',title:'No material changes: approved to publish as a Candidate Recommendation',
+ lede:'Comments came in, none significant.',
+ who:['EB','GC','ST','SY'],
+ does:['The release facilitator reports Received Comments/No Changes Needed (Nov 26).','MISMO staff record GC’s approval to publish as a Candidate Recommendation (Dec 7).'],
+ auto:['Moves the release and C to Release.','The v3.6.5 press release turns Ready to Post.'],
+ notes:[['mail','MISMO staff: “WR2027_01 …: Governance Approval to Publish”'],['mail','Vanessa, Amy, Perry and the facilitator: “WR2027_01 …: Release”'],['media','MISMO Media: Ready to Post (1)']],
+ screens:[S_('MISMO Media','media','media › Press Releases',box('MISMO Releases Version 3.6.5 of the MISMO Reference Model',stepsBar(PR_STEPS,6)+p(tag('Ready to Post','good')+' Distribution is open.')))]},
+{at:'2027-12-09',ch:'release',lanes:['R','C','M'],stage:'published',title:'v3.6.5 is published, with the escrow changes in it',
+ lede:'The non-member package is posted for everyone; members get the full package from the Resource Library.',
+ who:['ST','PW','VR','SY'],
+ does:['The Final Files are chosen (the Non-Members ZIP is the public file); MISMO staff click <b>Mark Published</b>.','Perry runs Distribution for the v3.6.5 release.'],
+ auto:['Lists v3.6.5 on Find a Work Product with the Non-Members ZIP as its public file, and a link to the Resource Library for members.','Publishes WR2027_07-C with the release.'],
+ notes:[['web','mismo.org › Find a Work Product: MISMO v3.6.5 Reference Model'],['web','MISMO Connect: the v3.6.5 announcement']],
+ screens:[S_('mismo.org','web','mismo.org › Find a Work Product','<div class="wp"><span class="t">MISMO v3.6.5 Reference Model</span><span class="small muted">Candidate Recommendation · Reference Model</span><div class="acts"><span class="a">MISMO v3.6.5 B391 Reference Model Non-Members (ZIP)</span><span class="a">Members: Resource Library</span></div><span class="small muted">The ZIP holds the Logical Data Dictionary, the release notes and the XML XSD files.</span></div>')]},
+/* ===== 10. Closing out ===== */
+{at:'2027-12-09',ch:'close',lanes:['P','C'],stage:'published',title:'All three are out: the work request closes on its own',
+ lede:'No one has to close WR2027_07.',
+ who:['SY'],
+ does:['Nothing.'],
+ auto:['When the last deliverable is published, the MMS marks WR2027_07 Published: “All 3 deliverables are finished, so this work request is published.”','It comes off every My Queue and moves to Published on the Pipeline Board; Metrics counts it.','Each deliverable keeps its whole record: files, reviews, IM and AWG decisions, designation, comment rounds and history.'],
+ notes:[['queue','Meghan’s My Queue: nothing left for WR2027_07']],
+ screens:[S_('MMS','mms','#wr=WR2027_07',head(W7,NM7,'published')+tbl(['WR#','Deliverable','Published As','Date'],[[mono('-A'),NA,'Candidate Recommendation',mono('Aug 26, 2027')],[mono('-B'),NB,'Final',mono('Oct 7, 2027')],[mono('-C'),NC,'Candidate Recommendation (v3.6.5)',mono('Dec 9, 2027')]])+box('History',p(mono('Dec 9')+' All 3 deliverables are finished (WR2027_07-A published, WR2027_07-B published, WR2027_07-C published), so this work request is published.'))),
+  S_('My Queue','mms','#mine',box('Your Move',p(tag('All caught up','good')+' Nothing is waiting on you.'))+'<div class="end-grid"><div><b>10 months</b>Approval to the last publication</div><div><b>3 deliverables</b>Candidate Recommendation, Final, and the v3.6.5 release</div><div><b>4 comment periods</b>One with a second round</div><div><b>1 return from IM</b>Fixed and approved on resubmission</div></div>')]}
+];
+</script>
+<script>
+/* ---------- engine ---------- */
+const $=id=>document.getElementById(id);
+const Y0=Date.parse('2027-01-01'), Y1=Date.parse('2028-01-01');
+const pos=d=>Math.max(0,Math.min(100,(Date.parse(d)-Y0)/(Y1-Y0)*100));
+const fmt=d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+const fmtS=d=>new Date(d+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric'});
+let cur=0, scr=0, timer=null;
+/* lanes */
+(function drawLanes(){
+  let h='<div></div><div class="months">'+['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map(m=>'<span>'+m+'</span>').join('')+'</div>';
+  LANES.forEach(l=>{ const sp=SPANS[l.k]; let segs='';
+    if(l.media) segs+='<span class="rail"></span>';
+    sp.forEach((s,i)=>{ if(s[1]==='published') return; const a=pos(s[0]), b=i+1<sp.length?pos(sp[i+1][0]):100; segs+='<span class="seg'+(s[2]?' held':'')+'" style="left:'+a+'%;width:'+Math.max(.5,b-a)+'%;background:'+ST[s[1]][1]+'" title="'+E(ST[s[1]][0])+' from '+E(fmt(s[0]))+'"></span>'; });
+    const pub=sp.find(s=>s[1]==='published'); if(pub) segs+='<span class="seg" style="left:'+pos(pub[0])+'%;width:1.4%;background:'+ST.published[1]+'" title="Published '+E(fmt(pub[0]))+'"></span>';
+    let dots='', last=-99, alt=0;
+    STEPS.map((s,i)=>[s,i]).filter(([s])=>s.lanes[0]===l.k).sort((a,b)=>a[0].at.localeCompare(b[0].at)).forEach(([s,i])=>{ const x=pos(s.at); let c=''; if(x-last<2.4){ alt=1-alt; c=alt?' up':' dn'; } else alt=0; last=x;
+      dots+='<button class="dot'+(l.media?' m':'')+c+'" data-i="'+i+'" style="left:'+x+'%" title="'+E(fmt(s.at)+': '+s.title)+'" aria-label="Step '+(i+1)+': '+E(s.title)+'">'+(i+1)+'</button>'; });
+    STEPS.forEach((s,i)=>{ if(s.lanes[0]!==l.k&&s.lanes.includes(l.k)) dots+='<span class="ghost" data-g="'+i+'" style="left:'+pos(s.at)+'%"></span>'; });
+    h+='<div class="ln-name'+(l.media?' media':'')+'"><b>'+E(l.wr)+'</b><span title="'+E(l.name)+'">'+E(l.name)+'</span></div><div class="track">'+segs+dots+'<span class="nowline" data-now></span></div>'; });
+  $('lanes').innerHTML=h;
+  $('lanes').addEventListener('click',e=>{ const d=e.target.closest('.dot'); if(d){ stop(); go(+d.dataset.i); } });
+  $('legend').innerHTML=['cfp','kickoff','work','aireview','im','awg','designation','gc-comment','comment','post','gc-publish','release'].map(k=>'<span><i style="background:'+ST[k][1]+'"></i>'+E(ST[k][0])+'</span>').join('');
+  $('chapters').innerHTML=CHAPTERS.map(([k,n],i)=>'<button class="chap" type="button" data-ch="'+k+'"><b>'+(i+1)+'</b>'+E(n)+'</button>').join('');
+  $('chapters').addEventListener('click',e=>{ const b=e.target.closest('[data-ch]'); if(!b) return; stop(); const i=STEPS.findIndex(s=>s.ch===b.dataset.ch); if(i>=0) go(i); });
+  $('only').innerHTML='<option value="">every step</option>'+LANES.map(l=>'<option value="'+l.k+'">'+E(l.wr)+(l.media?'':' · '+E(l.name))+'</option>').join('');
+  $('cast').innerHTML=Object.entries(CAST).map(([k,v])=>'<span class="who-chip" data-who="'+k+'"><i>'+E(v[0])+'</i>'+E(v[1])+'</span>').join('');
+})();
+/* notifications so far */
+const NK={mail:'Email',queue:'My Queue',digest:'Digest',media:'MISMO Media',web:'Posted'};
+function notesUpTo(i){ const out=[]; for(let j=0;j<=i;j++) (STEPS[j].notes||[]).forEach(n=>out.push({at:STEPS[j].at,step:j,n})); return out; }
+function drawDrawer(){ const L=notesUpTo(cur); $('ncount').textContent=L.length; $('dcount').textContent=L.length+' through step '+(cur+1);
+  let h='', day=''; L.slice().sort((x,y)=>y.at.localeCompare(x.at)||y.step-x.step).forEach(x=>{ if(x.at!==day){ day=x.at; h+='<div class="day">'+E(fmt(x.at))+'</div>'; } h+=noteHtml(x.n,x.step===cur); }); $('dlist').innerHTML=h; }
+function noteHtml(n,now){ return '<div class="nt"'+(now?' style="border-color:var(--hit)"':'')+'><span class="k k-'+n[0]+'">'+E(NK[n[0]])+'</span><span>'+E(n[1])+(n[2]?'<small>'+E(n[2])+'</small>':'')+'</span></div>'; }
+/* one step */
+function list(){ const f=$('only').value; return STEPS.map((s,i)=>i).filter(i=>!f||STEPS[i].lanes.includes(f)); }
+function render(){
+  const s=STEPS[cur], idx=list(), n=idx.indexOf(cur);
+  const lanes=s.lanes.map(k=>LANES.find(l=>l.k===k));
+  const sc=s.screens||[]; if(scr>=sc.length) scr=0;
+  $('step').innerHTML='<article class="story"><div class="meta"><span class="date">'+E(fmt(s.at))+'</span>'+lanes.map(l=>'<span class="chip wr'+(l.media?' media':'')+'">'+E(l.wr)+'</span>').join('')+(ST[s.stage]?'<span class="chip"><span class="sw" style="background:'+ST[s.stage][1]+'"></span>'+E(ST[s.stage][0])+'</span>':'')+'</div>'+
+    '<h2>'+E(s.title)+'</h2>'+(s.lede?'<p class="lede">'+E(s.lede)+'</p>':'')+
+    '<div class="sec"><h4>What people do</h4><ol>'+s.does.map(x=>'<li>'+x+'</li>').join('')+'</ol></div>'+
+    '<div class="sec auto"><h4>What happens on its own</h4><ul>'+s.auto.map(x=>'<li>'+E(x)+'</li>').join('')+'</ul></div>'+
+    ((s.notes||[]).length?'<div class="sec"><h4>Notifications</h4><div class="notes">'+s.notes.map(x=>noteHtml(x)).join('')+'</div></div>':'')+
+    (s.tip?'<div class="tip">'+E(s.tip)+'</div>':'')+'</article>'+
+    '<div class="screens"><div class="stabs" role="tablist">'+sc.map((x,i)=>'<button type="button" role="tab" class="stab'+(i===scr?' on':'')+'" data-scr="'+i+'" aria-selected="'+(i===scr)+'">'+E(x.label)+'</button>').join('')+'</div>'+
+    (sc[scr]?'<div class="screen"><div class="scr-bar"><span class="dots"><i></i><i></i><i></i></span><span class="loc">'+E(sc[scr].loc)+'</span><span class="app">'+E(SCR[sc[scr].sys][0])+'</span></div><div class="scr">'+sc[scr].html+'</div></div>':'')+'</div>';
+  document.querySelectorAll('.dot').forEach(d=>{ const i=+d.dataset.i; d.classList.toggle('on',i===cur); d.classList.toggle('past',i!==cur&&STEPS[i].at<s.at); });
+  document.querySelectorAll('.ghost').forEach(g=>g.classList.toggle('show',+g.dataset.g===cur));
+  document.querySelectorAll('[data-now]').forEach(x=>x.style.left=pos(s.at)+'%');
+  document.querySelectorAll('.who-chip').forEach(c=>c.classList.toggle('on',(s.who||[]).includes(c.dataset.who)));
+  const ci=CHAPTERS.findIndex(c=>c[0]===s.ch); document.querySelectorAll('.chap').forEach((c,i)=>{ c.classList.toggle('on',i===ci); c.classList.toggle('done',i<ci); });
+  const on=document.querySelector('.chap.on'); if(on&&on.scrollIntoView) on.scrollIntoView({block:'nearest',inline:'nearest'});
+  $('count').textContent='Step '+(n+1)+' of '+idx.length;
+  $('prev').disabled=n<=0; $('next').disabled=n>=idx.length-1; $('next').textContent=n>=idx.length-1?'The End':'Next →';
+  $('prog').style.width=((n+1)/idx.length*100)+'%';
+  drawDrawer();
+  try{ if(location.hash!=='#step-'+(cur+1)) history.replaceState(null,'','#step-'+(cur+1)); }catch(e){}
+}
+function go(i){ cur=i; scr=0; const f=$('only'); if(f.value&&!STEPS[i].lanes.includes(f.value)) f.value=''; render(); }
+function step(d){ const idx=list(), n=idx.indexOf(cur), m=idx[n+d]; if(m==null) return false; cur=m; scr=0; render(); return true; }
+/* Play: shows each screen of a step, then moves on */
+function tick(){ const sc=STEPS[cur].screens||[]; if(scr<sc.length-1){ scr++; render(); } else if(!step(1)) stop(); }
+function stop(){ if(timer){ clearInterval(timer); timer=null; } $('play').setAttribute('aria-pressed','false'); $('play').textContent='▶ Play'; }
+$('play').onclick=()=>{ if(timer){ stop(); return; } timer=setInterval(tick,6500); $('play').setAttribute('aria-pressed','true'); $('play').textContent='❚❚ Pause'; };
+$('prev').onclick=()=>{ stop(); step(-1); };
+$('next').onclick=()=>{ stop(); step(1); };
+$('only').onchange=()=>{ const idx=list(); if(!idx.includes(cur)) cur=idx[0]; scr=0; render(); };
+$('step').addEventListener('click',e=>{ const b=e.target.closest('[data-scr]'); if(b){ stop(); scr=+b.dataset.scr; render(); } });
+$('nbtn').onclick=()=>{ $('drawer').classList.add('open'); };
+$('dclose').onclick=()=>{ $('drawer').classList.remove('open'); };
+document.addEventListener('keydown',e=>{ if(e.target.closest('select,input,textarea')) return; if(e.key==='ArrowRight'){ stop(); step(1); } if(e.key==='ArrowLeft'){ stop(); step(-1); } if(e.key==='Escape') $('drawer').classList.remove('open'); });
+const m0=/^#step-(\d+)$/.exec(location.hash||''); if(m0&&STEPS[+m0[1]-1]) cur=+m0[1]-1;
+render();
+window.addEventListener('hashchange',()=>{ const m=/^#step-(\d+)$/.exec(location.hash||''); if(m&&STEPS[+m[1]-1]&&+m[1]-1!==cur){ cur=+m[1]-1; scr=0; render(); } });
+</script>
+
+<script>try{ if(window.ResourcesSession&&ResourcesSession.requireAccess) ResourcesSession.requireAccess('mms',{toolName:'the Work Request Journey'}); else document.documentElement.removeAttribute('data-rs-gate'); }catch(e){ document.documentElement.removeAttribute('data-rs-gate'); }</script>
+</body>
+</html>
