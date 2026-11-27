@@ -2191,7 +2191,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-27T21:05:24Z',fp:'b7c54600'};
+window.__mmsBuild={at:'2026-11-27T22:58:52Z',fp:'fc526ef2'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -8643,7 +8643,12 @@ runAutomations=async function(){ await _runAutoCPF(); try{ for(const t of allTic
    t.finalFiles = {files:[{n,p,sz}], boiler, at, by, off:[names], unchecked:[names]} */
 const CR_STAGES=['post','gc-publish','release'];
 function crBoiler(t){ const k=typeof rvExpectedBoiler==='function'?rvExpectedBoiler(t):''; return (k&&k!=='comment'&&k!=='draft')?k:''; }
-function crLabel(t){ const k=crBoiler(t); return k?RV_BP_LABEL[k]:'the license designation’s'; }
+/* a work request with parts (a dataset and its iGuide) has a license per part, so a file is right if it carries any of
+   the parts' language (Nov 27: the iGuide part is Collateral while the work request is Standard) */
+function crBoilers(t){ const k=crBoiler(t); if(!(typeof hasParts==='function'&&hasParts(t))) return k?[k]:[];
+  const L=t.parts.map(p=>{ const d=(typeof partDs==='function'?partDs(t,p):p.ds)||{}; return crBoiler(Object.assign({},t,{classification:d.classification||t.classification,designation:Object.assign({},t.designation,{license:d.license||(t.designation||{}).license})})); }).filter(Boolean);
+  return [...new Set(k?[k,...L]:L)]; }
+function crLabel(t){ const L=crBoilers(t).map(k=>RV_BP_LABEL[k]).filter(Boolean); return L.length?L.join(' or '):'the license designation’s'; }
 function crSection(t){ const F=t.finalFiles, can=cpCanEdit(t), k=crBoiler(t);
   const list=F&&F.files&&F.files.length?'<ul class="cr-list">'+F.files.map(f=>'<li>'+esc(f.n)+(f.sz?' <span class="muted">· '+esc(f.sz)+'</span>':'')+'</li>').join('')+'</ul>':'';
   return '<div class="psec full cr-sec"><h4>Final Files<span class="sp muted" style="font-size:12px;font-weight:500">'+(k?esc(RV_BP_LABEL[k])+' license language':'The license language, after the comment period')+'</span>'+
@@ -8677,7 +8682,7 @@ async function crChoose(t){
       try{ const file=await rvSrcGet(f), u8=new Uint8Array(await file.arrayBuffer()); const big=u8.length>CPF_BIG;
         if(u8.length>CPF_SKIP){ unchecked.push(f.n); continue; }
         const txt=big?await cpfBoilerText(file.name,u8):((await rvReadFile(file)).text||''); const got=rvDetectBoiler(txt);
-        if(k?got!==k:(got==='comment'||got==='draft')) off.push(f.n+': '+(got?'has the '+RV_BP_LABEL[got]+' language':'no MISMO boilerplate found')); }
+        const ks=crBoilers(t); if(k?!ks.includes(got):(got==='comment'||got==='draft')) off.push(f.n+': '+(got?'has the '+RV_BP_LABEL[got]+' language':'no MISMO boilerplate found')); }
       catch(e){ unchecked.push(f.n); } }
     wpSay('','');
     sel.filter(f=>/\.xlsb$/i.test(f.n)).forEach(f=>unchecked.push(f.n));
@@ -8686,7 +8691,7 @@ async function crChoose(t){
       (unchecked.length?'<p style="margin:0 0 6px">The MMS couldn’t open '+(unchecked.length===1?'this file':'these files')+', so make sure the '+esc(crLabel(t))+' language is in '+(unchecked.length===1?'it':'them')+':</p><ul style="margin:0 0 8px 18px">'+unchecked.map(x=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')+
       '<p class="muted" style="margin:0;font-size:12.5px">To fix a file, update it (How To - MISMO Work Product Boilerplate Language and Guidance), add it to Files again and choose it.</p>'}); if(!go) return; }
     const x=clone(S.tickets[t.id]||t), b=clone(x); x.finalFiles={files:sel.map(f=>({n:f.n,p:f.p,sz:f.sz||''})),boiler:k,at:new Date().toISOString(),by:(S.me&&S.me.name)||'',off:off.map(s=>s.split(':')[0]),unchecked};
-    hist(x,'Final files chosen ('+(k?RV_BP_LABEL[k]+' license language':'license language')+'): '+sel.map(f=>f.n).join(', ')+(off.length?'; without the license language: '+off.map(s=>s.split(':')[0]).join(', '):'')+(unchecked.length?'; too big to check here: '+unchecked.join(', '):''));
+    hist(x,'Final files chosen ('+(k?crLabel(t)+' license language':'license language')+'): '+sel.map(f=>f.n).join(', ')+(off.length?'; without the license language: '+off.map(s=>s.split(':')[0]).join(', '):'')+(unchecked.length?'; too big to check here: '+unchecked.join(', '):''));
     await saveTicket(x,'Final files saved',b);
   }catch(e){ wpSay('The final files weren’t saved ('+e.message+').','bad'); } }
 document.addEventListener('click',e=>{ const b=e.target&&e.target.closest&&e.target.closest('[data-crfile]'); if(!b) return; e.preventDefault(); if(S.viewAs) return; const t=S.tickets[b.dataset.crfile]; if(t) crChoose(t); });
@@ -9773,12 +9778,15 @@ write=async function(coll,id,data,base){
    carries __portal: what the IM Review and AWG Review portals hold (other systems), so the MMS shows Open in IM Review. */
 if(S.tour){
   const fire=()=>Object.keys(Store.subs).forEach(c=>(Store.subs[c]||[]).forEach(cb=>{ try{ cb(clone(Store.mem[c]||{}),{}); }catch(e){} }));
+  /* the journey's keys work while the MMS has the focus (opening a panel moves the focus into it) */
+  document.addEventListener('keydown',e=>{ if(!['ArrowLeft','ArrowRight'].includes(e.key)||(e.target&&e.target.closest&&e.target.closest('input,textarea,select,[contenteditable]'))) return;
+    try{ if(window.parent&&window.parent.__tourKey){ e.preventDefault(); window.parent.__tourKey(e.key); } }catch(x){} });
   window.__mmsTour={
     S,
     ready:()=>!!S.ready,
     /* one step's world: every collection, who is looking, and where */
     load(o){ o=o||{}; if(o.today) window.__mmsTourToday=o.today; if(o.mem){ Store.mem=clone(o.mem); const P=Store.mem.__portal||{}; S.imPortalQ=P.im||{}; S.awgPortalQ=P.awg||{}; fire(); }
-      if(o.me) S.me=Object.assign({},o.me); S.viewAs=''; computeRole();
+      if(o.me) S.me=Object.assign({},o.me); S.viewAs=''; computeRole(); try{ renderWho(); }catch(e){}   /* the name in the top right is the step's person */
       const mr=$('#modal-root'); if(mr) mr.innerHTML='';
       if(S.panel) closePanel();
       if(o.view) go(o.view); else renderAll();
