@@ -4,21 +4,22 @@
    before when it falls on a weekend or a MISMO day off). One look per holiday:
    - New Year's: the first time each person opens any tool in January, fireworks, confetti and the new year in gold,
      and a party hat on the O for that day. Once per person per year.
-   - Groundhog Day: a groundhog pops up from its burrow in the corner, looks around and ducks back down.
-   - Valentine's Day: a cupid flies across and shoots an arrow into the O; hearts float up.
-   - Pi Day: a pie rises at the bottom with the digits of pi streaming up from it.
+   - Groundhog Day: a groundhog pops up out of his burrow in the corner, looks around and ducks back in.
+   - Valentine's Day: an arrow streaks in and lands in the O, hearts burst out of it, and hearts float up the page.
+   - Pi Day: a lattice cherry pie rises at the bottom with the digits of pi streaming up from it.
    - St. Patrick's Day: a leprechaun hat on the O, a rainbow across the top into a pot of gold, shamrocks drifting.
-   - Easter (shows on Good Friday): bunny ears on the O; a bunny hops along the bottom, stops for a look, leaves eggs.
-   - Earth Day: a spinning globe rises at the bottom with leaves swirling.
-   - First day of summer: sunglasses slide onto the O, with a warm glow.
+   - Easter (shows on Good Friday): the O is a bunny. Someone in a bunny costume hops in with a basket that has no
+     bottom, finds an egg, pops it in, it drops out, finds it again (surprised every time), three times, then poof.
    - 4th of July: an Uncle Sam hat on the O and red, white and blue fireworks.
-   - Halloween: a witch hat on the O and bats flying across; hover and a spider drops down on its thread.
-   - Thanksgiving (shows on the Wednesday): a pilgrim hat on the O, autumn leaves falling and a turkey waddling by.
+   - Halloween: the O is a jack-o'-lantern; a big moon rises in the top right and bats flap out of it. Hover over the
+     logo and a spider drops down on its thread.
+   - Thanksgiving (shows on the Wednesday): the O is a turkey, and autumn leaves drift gently down the page.
+   (Earth Day and the first day of summer were tried and dropped, Jonna, Nov 27, 2026.)
    The show plays the first time a tool is opened that day (per browser session); hovering over the logo brings a
-   little of it back. Never for anyone whose computer asks for reduced motion (hats still show). Nothing is ever
-   clickable: everything lets clicks through, and a click on a hat does what a click on the logo does.
-   Preview: ?holiday=<name> (newyear, groundhog, valentine, piday, stpatrick, easter, earthday, summer, july4,
-   halloween, thanksgiving) plays it on every load.
+   little of it back. Never for anyone whose computer asks for reduced motion (hats and costumes still show).
+   Nothing is ever clickable: everything lets clicks through, and a click on a hat does what a click on the logo does.
+   Preview: ?holiday=<name> (newyear, groundhog, valentine, piday, stpatrick, easter, july4, halloween,
+   thanksgiving) plays it on every load.
    Owner: Forms and shared pages (GitMISMO.github.io). */
 (function () {
   'use strict';
@@ -48,6 +49,7 @@
       '.mo-glow{border-radius:50%;background:radial-gradient(circle,currentColor 0 12%,transparent 68%)}' +
       '.mo-star{background:currentColor;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%)}' +
       '.mo-conf{border-radius:1.5px}' +
+      '.mo-flick{animation:moFlick 2.2s infinite}@keyframes moFlick{0%,100%{opacity:1}18%{opacity:.78}22%{opacity:.95}48%{opacity:.82}55%{opacity:1}77%{opacity:.86}}' +
       '.mo-fw{border-radius:50%;background:radial-gradient(circle,#fff 0 16%,currentColor 30%,transparent 70%)}' +
       '.mo-big{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);text-align:center;font-family:"IBM Plex Sans",-apple-system,"Segoe UI",sans-serif;white-space:nowrap}' +
       '.mo-big b{display:block;font-weight:800;line-height:1;letter-spacing:.02em;' +
@@ -151,36 +153,53 @@
   function art(vb, inner) { var e = svg(vb, ids(inner)); e.setAttribute('class', 'mo-p'); return e; }
 
   /* fireworks: a rocket climbs from the bottom and bursts into a ring of sparks that sag and fade */
+
+  /* fireworks, the way real ones go: a rocket climbs, slowing as it rises, and bursts just as it tops out; the
+     sparks fly out fast, slow down in the air, droop as they fall and fade. No stop-and-go. */
   function firework(layer, x, y, colors) {
-    var Hh = innerHeight, rocket = piece('mo-fw', pick(colors));
-    rocket.style.width = '14px'; rocket.style.height = '30px'; layer.appendChild(rocket);
-    anim(rocket, [{ transform: 'translate(' + (x - 7) + 'px,' + Hh + 'px)', opacity: 0.3 }, { transform: 'translate(' + (x - 7) + 'px,' + (y - 15) + 'px)', opacity: 1 }],
-      { duration: 650, easing: 'cubic-bezier(.2,.7,.4,1)', fill: 'forwards' });
+    var Hh = innerHeight, rise = rnd(900, 1150), c1 = pick(colors), c2 = pick(colors), x0 = x + rnd(-40, 40);
+    var rocket = piece('mo-fw', '#fff1c2'); rocket.style.width = rocket.style.height = '9px'; layer.appendChild(rocket);
+    var ease = function (t) { return 1 - Math.pow(1 - t, 2.4); }, rf = [];
+    for (var k = 0; k <= 12; k++) { var t = k / 12, e = ease(t); rf.push({ transform: 'translate(' + (x0 + (x - x0) * e - 4.5) + 'px,' + (Hh + 10 + (y - Hh - 10) * e - 4.5) + 'px)', opacity: t > 0.92 ? 0 : 1 }); }
+    anim(rocket, rf, { duration: rise, easing: 'linear', fill: 'forwards' });
+    /* a little trail of embers behind the rocket */
+    var t0 = performance.now(), trail = setInterval(function () {
+      var t = Math.min(1, (performance.now() - t0) / rise), e = ease(t);
+      if (t > 0.9) { clearInterval(trail); return; }
+      var em = piece('mo-dot', '#ffe9a8'); em.style.width = em.style.height = '5px'; layer.appendChild(em);
+      var ex = x0 + (x - x0) * e, ey = Hh + 10 + (y - Hh - 10) * e;
+      anim(em, [{ transform: 'translate(' + (ex - 2.5) + 'px,' + (ey - 2.5) + 'px)', opacity: 0.9 }, { transform: 'translate(' + (ex - 2.5 + rnd(-4, 4)) + 'px,' + (ey + 14) + 'px)', opacity: 0 }], { duration: 420, fill: 'forwards' });
+      setTimeout(function () { em.remove(); }, 440);
+    }, 45);
     setTimeout(function () {
       rocket.remove();
-      var flash = piece('mo-glow', pick(colors)); flash.style.width = flash.style.height = '220px'; layer.appendChild(flash);
-      anim(flash, [{ transform: 'translate(' + (x - 110) + 'px,' + (y - 110) + 'px) scale(.2)', opacity: 0.95 }, { transform: 'translate(' + (x - 110) + 'px,' + (y - 110) + 'px) scale(1.2)', opacity: 0 }], { duration: 600, fill: 'forwards' });
-      setTimeout(function () { flash.remove(); }, 650);
-      var c1 = pick(colors), c2 = pick(colors), n = 38, rad = rnd(95, 165);
+      var flash = piece('mo-glow', c1); flash.style.width = flash.style.height = '240px'; layer.appendChild(flash);
+      anim(flash, [{ transform: 'translate(' + (x - 120) + 'px,' + (y - 120) + 'px) scale(.3)', opacity: 0.9 }, { transform: 'translate(' + (x - 120) + 'px,' + (y - 120) + 'px) scale(1.1)', opacity: 0 }], { duration: 420, easing: 'ease-out', fill: 'forwards' });
+      setTimeout(function () { flash.remove(); }, 440);
+      var n = 46, R0 = rnd(110, 175), dur = rnd(1700, 2200);
       for (var i = 0; i < n; i++) {
-        var p = piece(i % 6 === 0 ? 'mo-star' : 'mo-fw', i % 2 ? c1 : c2), s = i % 6 === 0 ? 12 : rnd(14, 20);
+        var inner = i % 3 === 0, p = piece(i % 7 === 0 ? 'mo-star' : 'mo-fw', inner ? c2 : c1), s = i % 7 === 0 ? 11 : rnd(13, 19);
         p.style.width = p.style.height = s + 'px'; layer.appendChild(p);
-        var a = i / n * Math.PI * 2 + rnd(-0.08, 0.08), d = rad * rnd(0.8, 1.05), dx = Math.cos(a) * d, dy = Math.sin(a) * d, dur = rnd(1300, 1800);
-        var pa = anim(p, [
-          { transform: 'translate(' + (x - s / 2) + 'px,' + (y - s / 2) + 'px)', opacity: 1 },
-          { transform: 'translate(' + (x - s / 2 + dx) + 'px,' + (y - s / 2 + dy) + 'px)', opacity: 1, offset: 0.55 },
-          { transform: 'translate(' + (x - s / 2 + dx * 1.08) + 'px,' + (y - s / 2 + dy + 46) + 'px)', opacity: 0 }
-        ], { duration: dur, easing: 'cubic-bezier(.1,.8,.3,1)', fill: 'forwards' });
-        (function (el) { setTimeout(function () { el.remove(); }, dur + 50); })(p);
+        var a = i / n * Math.PI * 2 + rnd(-0.07, 0.07), sp = R0 * (inner ? 0.55 : 1) * rnd(0.88, 1.04), fr = [], tw = R() < 0.35;
+        for (var k2 = 0; k2 <= 14; k2++) {
+          var u = k2 / 14, r = sp * (1 - Math.exp(-4.6 * u)) / (1 - Math.exp(-4.6)), drop = 85 * u * u;
+          var op = u < 0.5 ? 1 : Math.max(0, 1 - (u - 0.5) / 0.5); if (tw && u > 0.45 && k2 % 2) op *= 0.35;
+          fr.push({ transform: 'translate(' + (x + Math.cos(a) * r - s / 2) + 'px,' + (y + Math.sin(a) * r + drop - s / 2) + 'px) scale(' + (1 - 0.55 * u).toFixed(2) + ')', opacity: op });
+        }
+        anim(p, fr, { duration: dur, easing: 'linear', fill: 'forwards' });
+        (function (el) { setTimeout(function () { el.remove(); }, dur + 40); })(p);
       }
-    }, 660);
+    }, rise * 0.9);
+    return rise + 2300;
   }
-  function fireworks(layer, colors, n, spread) {
-    var W = innerWidth, Hh = innerHeight;
-    for (var i = 0; i < n; i++) (function (i) {
-      setTimeout(function () { firework(layer, W * (0.1 + 0.8 * (i + R()) / n), Hh * rnd(0.14, 0.4), colors); }, i * (spread || 520) + rnd(0, 200));
-    })(i);
-    return n * (spread || 520) + 2800;
+  /* a show: bursts at uneven moments and heights, like the real thing */
+  function fireworks(layer, colors, n) {
+    var W = innerWidth, Hh = innerHeight, t = 0, longest = 0;
+    for (var i = 0; i < n; i++) (function (i, at) {
+      setTimeout(function () { firework(layer, W * (0.1 + 0.8 * (i + R()) / n), Hh * rnd(0.12, 0.38), colors); }, at);
+      longest = Math.max(longest, at + 3600);
+    })(i, t), t += rnd(320, 900);
+    return longest;
   }
   function confettiPiece(colors) {
     var e = piece('mo-conf', ''), c = pick(colors);
@@ -216,20 +235,48 @@
   function coin() { return '<circle r="9" fill="#d69e2e"/><circle r="7.2" fill="#f7cf5c" stroke="#c48a22" stroke-width="1"/><path d="M-2.6,-4.4 C-1,-5.6 2.8,-5.2 2.8,-3 C2.8,-.4 -2.6,.2 -2.6,2.8 C-2.6,5 1.6,5.4 3,4" stroke="#b07a1c" stroke-width="1.5" fill="none" stroke-linecap="round"/><ellipse cx="-3.8" cy="-4.4" rx="2" ry="1.2" fill="#fff6c8" opacity=".8" transform="rotate(-35 -3.8 -4.4)"/>'; }
   var EGGS = [['#f7b6c8', '#ffffff', '#e8799a'], ['#bfe3f7', '#ffffff', '#5aa9dc'], ['#fff0a8', '#f3a623', '#ffffff'], ['#c9f2d2', '#4caf6a', '#ffffff'], ['#dccbf5', '#8e6bd1', '#ffffff']];
   function egg(k) { var c = EGGS[k % EGGS.length]; return '<ellipse rx="6.8" ry="8.8" fill="' + c[0] + '"/><path d="M-6.6,-1 L-4.2,-3.2 L-1.6,-1 L1,-3.2 L3.6,-1 L6.6,-3.2" stroke="' + c[1] + '" stroke-width="1.7" fill="none" stroke-linejoin="round"/><path d="M-6.4,3 L6.4,3" stroke="' + c[2] + '" stroke-width="1.5"/><circle cx="-2.5" cy="6" r=".9" fill="' + c[2] + '"/><circle cx="2.5" cy="6" r=".9" fill="' + c[2] + '"/><ellipse cx="-2.8" cy="-4.6" rx="1.5" ry="2.6" fill="#fff" opacity=".55"/>'; }
+  var LEAVES = [
+    'M0,-10 L2,-5.5 L6.5,-7.5 L5.2,-2.4 L10,-1.2 L6.2,2 L7.6,5.6 L2.4,4.4 L1,9.6 L0,10 L-1,9.6 L-2.4,4.4 L-7.6,5.6 L-6.2,2 L-10,-1.2 L-5.2,-2.4 L-6.5,-7.5 L-2,-5.5 Z',
+    'M0,11 L0,7 C-2,8 -4.4,7.2 -4,5 C-7,6 -8.4,3 -6,1.6 C-9,0 -8.4,-3.4 -5,-3 C-7,-6 -5,-8.4 -2.8,-7 C-3,-10 0,-11 0,-11 C0,-11 3,-10 2.8,-7 C5,-8.4 7,-6 5,-3 C8.4,-3.4 9,0 6,1.6 C8.4,3 7,6 4,5 C4.4,7.2 2,8 0,7 Z',
+    'M0,-11 C3,-9 6.5,-5 7,0 C7.4,4 4,8.6 0,11 C-4,8.6 -7.4,4 -7,0 C-6.5,-5 -3,-9 0,-11 Z',
+    'M0,10 C-1,6 -9,4 -9,-2 C-9,-7 -4,-9 0,-5 C4,-9 9,-7 9,-2 C9,4 1,6 0,10 Z'
+  ];
+  var FALL = [['#d9701f', '#8a3d0c'], ['#b8322a', '#6b1610'], ['#e9b02f', '#8a6210'], ['#a5683a', '#4e2e14'], ['#8e2a2a', '#4a1010'], ['#c9a227', '#6b5a10'], ['#e2852b', '#7a3a0a'], ['#9a8a2a', '#4e4410']];
+  function fallLeaf(i) {
+    var c = FALL[Math.floor(R() * FALL.length)], d = LEAVES[i % LEAVES.length];
+    return '<path d="' + d + '" fill="' + c[0] + '" stroke="' + c[0] + '" stroke-width="1" stroke-linejoin="round"/>' +
+      '<path d="M0,10 L0,-8 M0,2 L5,-3 M0,2 L-5,-3 M0,-3 L3.4,-6 M0,-3 L-3.4,-6" stroke="' + c[1] + '" stroke-width=".8" fill="none" opacity=".55"/>' +
+      '<path d="M0,10 L0,13" stroke="' + c[1] + '" stroke-width="1.2" stroke-linecap="round"/>';
+  }
+  /* leaves that drift down slowly, swaying and tumbling, spread across the page and over a few seconds */
+  function leafFall(layer, n) {
+    var W = innerWidth, Hh = innerHeight, longest = 0;
+    for (var i = 0; i < n; i++) {
+      var e = art('-14 -14 28 28', fallLeaf(i)), s = rnd(28, 58); e.style.width = e.style.height = s + 'px'; layer.appendChild(e);
+      var x0 = W * (i + R()) / n, dur = rnd(10000, 15000), delay = rnd(0, 6500), sw = rnd(30, 90), f1 = rnd(1.2, 2.2), ph = R() * 6, drift = rnd(-60, 60), r0 = rnd(0, 360), spin = rnd(-220, 220), flip = rnd(2, 4), fr = [];
+      for (var k = 0; k <= 16; k++) {
+        var t = k / 16, y = -70 + (Hh + 140) * t, x = x0 + Math.sin(t * Math.PI * 2 * f1 + ph) * sw + drift * t;
+        fr.push({ transform: 'translate(' + (x - s / 2) + 'px,' + (y - s / 2) + 'px) rotate(' + (r0 + spin * t).toFixed(1) + 'deg) scaleX(' + Math.cos(t * Math.PI * flip).toFixed(2) + ')', opacity: t < 0.06 ? t / 0.06 : t > 0.92 ? (1 - t) / 0.08 : 1 });
+      }
+      anim(e, fr, { duration: dur, delay: delay, easing: 'linear', fill: 'both' });
+      longest = Math.max(longest, dur + delay);
+    }
+    return longest + 200;
+  }
 
   /* hats: drawn on 100 x 100 with the brim centred at (bx, by), brimW units wide; scale = how much wider than the O */
   var HATS = {
-    party: { bx: 50, by: 88, brimW: 44, scale: 1.5, tilt: 14, inner:
+    party: { bx: 50, by: 88, brimW: 40, scale: 1.0, tilt: 24, inner:
       '<defs>' + GOLD + '<linearGradient id="I-cone" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#bfe3f7"/><stop offset=".5" stop-color="#74bfeb"/><stop offset="1" stop-color="#2b7fbf"/></linearGradient>' +
-      '<clipPath id="I-k"><path d="M28,88 L57,14 L72,88 Z"/></clipPath></defs>' +
-      '<path d="M28,88 L57,14 L72,88 Z" fill="url(#I-cone)"/>' +
-      '<g clip-path="url(#I-k)"><path d="M10,78 L90,52 L90,60 L10,86 Z" fill="url(#I-gold)"/><path d="M10,52 L90,26 L90,33 L10,59 Z" fill="url(#I-gold)"/>' +
-      '<path d="M10,65 L90,39 L90,43 L10,69 Z" fill="#fff"/><circle cx="46" cy="76" r="2.3" fill="#0d314c"/><circle cx="61" cy="80" r="2.3" fill="#fff"/><circle cx="54" cy="52" r="2.1" fill="#0d314c"/><circle cx="58" cy="34" r="1.9" fill="#fff"/><circle cx="62" cy="62" r="1.8" fill="#0d314c"/>' +
-      '<path d="M28,88 L57,14 L45,88 Z" fill="#fff" opacity=".18"/><path d="M57,14 L72,88 L64,88 Z" fill="#0d314c" opacity=".22"/></g>' +
-      '<ellipse cx="50" cy="88" rx="23" ry="4.6" fill="url(#I-gold)"/>' +
-      '<g stroke-width="2.4" stroke-linecap="round">' + [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(function (a, i) {
-        var r = a * Math.PI / 180; return '<path d="M57,13 L' + (57 + Math.cos(r) * 9).toFixed(1) + ',' + (13 + Math.sin(r) * 9).toFixed(1) + '" stroke="' + (i % 2 ? '#74bfeb' : '#ffd76a') + '"/>'; }).join('') + '</g>' +
-      '<circle cx="57" cy="13" r="5.4" fill="url(#I-gold)"/><circle cx="55.4" cy="11.4" r="1.6" fill="#fff" opacity=".85"/>' },
+      '<clipPath id="I-k"><path d="M30,88 L58,44 L70,88 Z"/></clipPath></defs>' +
+      '<path d="M30,88 L58,44 L70,88 Z" fill="url(#I-cone)"/>' +
+      '<g clip-path="url(#I-k)"><path d="M10,82 L90,62 L90,69 L10,89 Z" fill="url(#I-gold)"/><path d="M10,68 L90,48 L90,52 L10,72 Z" fill="#fff"/><path d="M10,58 L90,38 L90,44 L10,64 Z" fill="url(#I-gold)"/>' +
+      '<circle cx="48" cy="78" r="2.2" fill="#0d314c"/><circle cx="60" cy="81" r="2.2" fill="#fff"/><circle cx="56" cy="62" r="2" fill="#0d314c"/>' +
+      '<path d="M30,88 L58,44 L46,88 Z" fill="#fff" opacity=".2"/><path d="M58,44 L70,88 L63,88 Z" fill="#0d314c" opacity=".22"/></g>' +
+      '<ellipse cx="50" cy="88" rx="21" ry="4.4" fill="url(#I-gold)"/>' +
+      '<g stroke-width="2.6" stroke-linecap="round">' + [0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map(function (a, i) {
+        var r = a * Math.PI / 180; return '<path d="M58,43 L' + (58 + Math.cos(r) * 9).toFixed(1) + ',' + (43 + Math.sin(r) * 9).toFixed(1) + '" stroke="' + (i % 2 ? '#74bfeb' : '#ffd76a') + '"/>'; }).join('') + '</g>' +
+      '<circle cx="58" cy="43" r="5.6" fill="url(#I-gold)"/><circle cx="56.4" cy="41.4" r="1.7" fill="#fff" opacity=".85"/>' },
     leprechaun: { bx: 50, by: 86, brimW: 76, scale: 1.95, tilt: 10, inner:
       '<defs>' + GOLD + '<linearGradient id="I-g" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#43b065"/><stop offset=".5" stop-color="#2a8a49"/><stop offset="1" stop-color="#16592d"/></linearGradient></defs>' +
       '<ellipse cx="50" cy="86" rx="38" ry="7.5" fill="#145a2c"/><ellipse cx="50" cy="84.5" rx="36.5" ry="5.6" fill="url(#I-g)"/>' +
@@ -238,11 +285,6 @@
       '<path d="M28.4,67 L71.6,67 L72.5,80 L27.5,80 Z" fill="#1d1d24"/>' +
       '<rect x="43" y="65.4" width="14" height="16.2" rx="1.6" fill="none" stroke="url(#I-gold)" stroke-width="3.2"/>' +
       '<g transform="translate(65 64) scale(.62)">' + shamrock('#5cd07f') + '</g>' },
-    bunny: { bx: 50, by: 92, brimW: 46, scale: 1.45, tilt: 4, inner:
-      '<defs><linearGradient id="I-w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d3dbe4"/></linearGradient></defs>' +
-      '<g transform="rotate(-14 38 88)"><ellipse cx="38" cy="50" rx="11.5" ry="40" fill="url(#I-w)"/><ellipse cx="38" cy="54" rx="5.6" ry="29" fill="#f7b6c8"/></g>' +
-      '<g transform="rotate(16 62 88)"><path d="M50.5,88 C48,62 52,30 62,16 C70,8 76,14 74,26 C72,46 72,70 73.5,88 Z" fill="url(#I-w)"/><path d="M57,86 C56,64 58,38 64,26 C67,22 69,25 68.5,31 C67,48 67,68 68,86 Z" fill="#f7b6c8"/></g>' +
-      '<path d="M24,93 Q50,79 76,93" stroke="#f49ab0" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M27,90.5 Q50,78.5 73,90.5" stroke="#fff" stroke-width="1.4" fill="none" opacity=".6" stroke-linecap="round"/>' },
     unclesam: { bx: 50, by: 86, brimW: 76, scale: 1.95, tilt: 10, inner:
       '<defs><clipPath id="I-c"><path d="M28,84 L31,26 C31,21.5 69,21.5 69,26 L72,84 Z"/></clipPath></defs>' +
       '<ellipse cx="50" cy="86" rx="38" ry="7.5" fill="#16306e"/><ellipse cx="50" cy="84.6" rx="36.5" ry="5.4" fill="#22408f"/>' +
@@ -251,39 +293,61 @@
       '<path d="M28,84 L31,26 L38,26 L35,84 Z" fill="#fff" opacity=".18"/><path d="M62,26 L69,26 L72,84 L66,84 Z" fill="#000" opacity=".12"/></g>' +
       '<ellipse cx="50" cy="25" rx="19" ry="4.2" fill="#e3e8ef"/>' +
       '<path d="M29.2,65 L70.8,65 L71.7,79 L28.3,79 Z" fill="#22408f"/>' +
-      [35, 44.5, 54, 63.5].map(function (x) { return '<path transform="translate(' + x + ' 72) scale(.42)" d="M0,-10 L2.9,-3.1 L9.5,-3.1 L4.3,1.2 L5.9,8.1 L0,4.2 L-5.9,8.1 L-4.3,1.2 L-9.5,-3.1 L-2.9,-3.1 Z" fill="#fff"/>'; }).join('') },
-    witch: { bx: 50, by: 86, brimW: 88, scale: 2.15, tilt: 8, inner:
-      '<defs>' + GOLD + '<linearGradient id="I-p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5b3484"/><stop offset=".6" stop-color="#32194d"/><stop offset="1" stop-color="#180c27"/></linearGradient></defs>' +
-      '<ellipse cx="50" cy="86" rx="44" ry="8.2" fill="#140a21"/><ellipse cx="50" cy="84.4" rx="42.5" ry="6.2" fill="url(#I-p)"/>' +
-      '<path d="M30,84 C34,64 41,46 49,29 C53,20 62,11 78,13 C71,17 65,23 62.5,31 C60,48 64,68 70,84 Z" fill="url(#I-p)"/>' +
-      '<path d="M36,78 C39,62 45,46 52,32" stroke="#fff" stroke-opacity=".14" stroke-width="3" fill="none" stroke-linecap="round"/>' +
-      '<path d="M31.4,75 C44,78.5 57,78.5 68.6,75 L70,84 C57,87.5 43,87.5 30,84 Z" fill="#f08a24"/>' +
-      '<rect x="45" y="73.2" width="10" height="12" rx="1.4" fill="none" stroke="url(#I-gold)" stroke-width="2.6"/>' +
-      '<path d="M70,22 l1.2,2.6 2.8,.3 -2.1,1.9 .6,2.8 -2.5,-1.4 -2.5,1.4 .6,-2.8 -2.1,-1.9 2.8,-.3 Z" fill="#ffd76a"/>' },
-    pilgrim: { bx: 50, by: 86, brimW: 80, scale: 1.95, tilt: 9, inner:
-      '<defs>' + GOLD + '<linearGradient id="I-b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#4a4a56"/><stop offset=".55" stop-color="#26262e"/><stop offset="1" stop-color="#111116"/></linearGradient></defs>' +
-      '<ellipse cx="50" cy="86" rx="40" ry="7.4" fill="#111116"/><ellipse cx="50" cy="84.6" rx="38.5" ry="5.4" fill="url(#I-b)"/>' +
-      '<path d="M29,84 L33.5,34 C34,30 66,30 66.5,34 L71,84 Z" fill="url(#I-b)"/><ellipse cx="50" cy="33" rx="16.5" ry="3.8" fill="#3a3a44"/>' +
-      '<path d="M35,80 L38,38 L42,37.6 L39.6,80 Z" fill="#fff" opacity=".12"/>' +
-      '<path d="M30.4,66 L69.6,66 L70.6,79 L29.4,79 Z" fill="#6b5236"/>' +
-      '<rect x="42.6" y="63.8" width="14.8" height="17.4" rx="1" fill="none" stroke="url(#I-gold)" stroke-width="3.4"/>' }
+      [35, 44.5, 54, 63.5].map(function (x) { return '<path transform="translate(' + x + ' 72) scale(.42)" d="M0,-10 L2.9,-3.1 L9.5,-3.1 L4.3,1.2 L5.9,8.1 L0,4.2 L-5.9,8.1 L-4.3,1.2 L-9.5,-3.1 L-2.9,-3.1 Z" fill="#fff"/>'; }).join('') }
   };
-  var GLASSES = '<defs><linearGradient id="I-l" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d314c"/><stop offset=".6" stop-color="#14486e"/><stop offset="1" stop-color="#74bfeb"/></linearGradient></defs>' +
-    '<g stroke="#0b0f14" stroke-width="2.6" stroke-linejoin="round">' +
-    '<path d="M5,10 C5,7 8,5 13,5 L50,5 C54,5 56,8 55.4,12 L52.4,29 C50.6,37 45,40 36.5,40 L22.5,40 C12.5,40 8,34 6.8,26 Z" fill="url(#I-l)"/>' +
-    '<path transform="translate(120 0) scale(-1 1)" d="M5,10 C5,7 8,5 13,5 L50,5 C54,5 56,8 55.4,12 L52.4,29 C50.6,37 45,40 36.5,40 L22.5,40 C12.5,40 8,34 6.8,26 Z" fill="url(#I-l)"/></g>' +
-    '<path d="M55.4,11 C58,7.6 62,7.6 64.6,11" stroke="#0b0f14" stroke-width="3.2" fill="none"/>' +
-    '<path d="M14,9 L24,9 L15,26 L9.6,26 Z M76,9 L86,9 L77,26 L71.6,26 Z" fill="#fff" opacity=".38"/>' +
-    '<path d="M28,9 L32,9 L24.6,23 L21.6,23 Z M90,9 L94,9 L86.6,23 L83.6,23 Z" fill="#fff" opacity=".26"/>';
+
+  /* costumes: the O itself becomes something. Drawn over the O's own footprint (0 to 152 across, 0 to 108 down,
+     the O of the 708 x 108 lockup), with room around it for ears, a stem or feathers: viewBox -50 -80 252 210 */
+  var COSTUMES = {
+    bunny: '<defs><radialGradient id="I-w" cx=".42" cy=".38" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".8" stop-color="#f1f4f8"/><stop offset="1" stop-color="#d6dde6"/></radialGradient></defs>' +
+      '<g class="mo-ears">' +
+      '<path d="M34,16 C22,-24 24,-62 38,-74 C52,-66 56,-28 54,12 Z" fill="url(#I-w)"/><path d="M38,8 C30,-22 32,-52 40,-62 C48,-54 49,-24 48,6 Z" fill="#f7b6c8"/>' +
+      '<path d="M100,12 C100,-28 108,-62 124,-68 C136,-60 128,-26 118,16 Z" fill="url(#I-w)"/><path d="M106,6 C107,-22 112,-50 122,-56 C128,-48 122,-22 114,8 Z" fill="#f7b6c8"/></g>' +
+      '<rect x="-4" y="-2" width="160" height="112" rx="56" fill="url(#I-w)"/>' +
+      '<g fill="#fff"><circle cx="40" cy="2" r="9"/><circle cx="58" cy="-3" r="10"/><circle cx="76" cy="-4" r="10"/><circle cx="94" cy="-3" r="10"/><circle cx="112" cy="2" r="9"/></g>' +
+      '<ellipse cx="34" cy="72" rx="15" ry="9" fill="#f7b6c8" opacity=".6"/><ellipse cx="118" cy="72" rx="15" ry="9" fill="#f7b6c8" opacity=".6"/>' +
+      '<ellipse cx="52" cy="48" rx="9.5" ry="11.5" fill="#2a1d18"/><ellipse cx="100" cy="48" rx="9.5" ry="11.5" fill="#2a1d18"/>' +
+      '<circle cx="55" cy="44" r="3.6" fill="#fff"/><circle cx="103" cy="44" r="3.6" fill="#fff"/><circle cx="49" cy="53" r="1.6" fill="#fff" opacity=".8"/><circle cx="97" cy="53" r="1.6" fill="#fff" opacity=".8"/>' +
+      '<path d="M68,62 C70,59 82,59 84,62 C83,66 79,69 76,70 C73,69 69,66 68,62 Z" fill="#f49ab0"/>' +
+      '<path d="M76,70 L76,74 M76,74 C74,80 66,82 62,78 M76,74 C78,80 86,82 90,78" stroke="#b06a7a" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+      '<rect x="70.5" y="76" width="11" height="11" rx="2.2" fill="#fff" stroke="#dfe5ec" stroke-width="1"/><path d="M76,76 L76,87" stroke="#dfe5ec" stroke-width="1"/>' +
+      '<g stroke="#9aa6b2" stroke-width="1.3" stroke-linecap="round"><path d="M58,68 L22,60 M58,72 L20,72 M58,76 L24,84 M94,68 L130,60 M94,72 L132,72 M94,76 L128,84"/></g>',
+    pumpkin: '<defs><radialGradient id="I-pk" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#ffb24d"/><stop offset=".6" stop-color="#f27d1b"/><stop offset="1" stop-color="#b24f0a"/></radialGradient>' +
+      '<radialGradient id="I-pk2" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#f59a3a"/><stop offset="1" stop-color="#a5460a"/></radialGradient>' +
+      '<radialGradient id="I-fl" cx=".5" cy=".55" r=".65"><stop offset="0" stop-color="#fff7c2"/><stop offset=".45" stop-color="#ffd23a"/><stop offset="1" stop-color="#f08a24"/></radialGradient></defs>' +
+      '<path d="M72,0 C70,-14 74,-26 86,-32 C89,-28 87,-23 84,-19 C81,-12 82,-6 84,2 Z" fill="#5b7a2e"/><path d="M76,-4 C75,-14 78,-22 84,-27" stroke="#8fb14f" stroke-width="2" fill="none" stroke-linecap="round"/>' +
+      '<path d="M86,-10 C98,-18 108,-10 103,-2 C99,4 92,1 95,-4" stroke="#4e6b26" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
+      '<ellipse cx="18" cy="56" rx="28" ry="50" fill="url(#I-pk2)"/><ellipse cx="134" cy="56" rx="28" ry="50" fill="url(#I-pk2)"/>' +
+      '<ellipse cx="44" cy="55" rx="32" ry="56" fill="url(#I-pk)"/><ellipse cx="108" cy="55" rx="32" ry="56" fill="url(#I-pk)"/>' +
+      '<ellipse cx="76" cy="54" rx="34" ry="58" fill="url(#I-pk)"/>' +
+      '<path d="M44,0 C36,30 36,80 44,110 M108,0 C116,30 116,80 108,110 M62,-3 C58,30 58,80 62,112 M90,-3 C94,30 94,80 90,112" stroke="#b24f0a" stroke-width="2" fill="none" opacity=".45"/>' +
+      '<ellipse cx="34" cy="30" rx="10" ry="18" fill="#fff" opacity=".2" transform="rotate(-20 34 30)"/>' +
+      '<g class="mo-flick" fill="url(#I-fl)" stroke="#7a3606" stroke-width="1.6" stroke-linejoin="round">' +
+      '<path d="M38,30 L60,48 L32,50 Z"/><path d="M114,30 L120,50 L92,48 Z"/><path d="M76,52 L85,65 L67,65 Z"/>' +
+      '<path d="M28,70 C48,88 104,88 124,70 L118,82 L107,78 L101,90 L91,84 L84,96 L76,88 L68,96 L61,84 L51,90 L45,78 L34,82 Z"/></g>',
+    turkey: (function () {
+      var cols = [['#b8322a', '#e8483c'], ['#d9701f', '#f39a3c'], ['#e9b02f', '#ffd76a'], ['#7a4a22', '#a5683a']], f = '';
+      for (var i = -5; i <= 5; i++) { var c = cols[(i + 10) % 4]; f += '<g transform="rotate(' + i * 15 + ' 76 74)"><ellipse cx="76" cy="-6" rx="15" ry="52" fill="' + c[0] + '"/><ellipse cx="76" cy="-44" rx="11" ry="13" fill="' + c[1] + '"/><path d="M76,40 L76,-50" stroke="#3a2210" stroke-opacity=".35" stroke-width="1.4"/></g>'; }
+      return '<defs><radialGradient id="I-tb" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#a06a3a"/><stop offset="1" stop-color="#4e2e14"/></radialGradient></defs>' + f +
+        '<rect x="-4" y="-2" width="160" height="112" rx="56" fill="url(#I-tb)"/>' +
+        '<ellipse cx="76" cy="80" rx="46" ry="26" fill="#b07a48" opacity=".55"/>' +
+        '<path d="M2,44 C14,30 30,34 34,52 C30,72 20,86 6,84 C0,70 -2,56 2,44 Z M150,44 C138,30 122,34 118,52 C122,72 132,86 146,84 C152,70 154,56 150,44 Z" fill="#6b3f1c"/>' +
+        '<path d="M8,58 C16,54 24,56 28,62 M8,70 C14,66 22,68 26,72 M144,58 C136,54 128,56 124,62 M144,70 C138,66 130,68 126,72" stroke="#3a2210" stroke-opacity=".5" stroke-width="1.6" fill="none"/>' +
+        '<circle cx="60" cy="40" r="10" fill="#fff"/><circle cx="92" cy="40" r="10" fill="#fff"/><circle cx="62" cy="42" r="5" fill="#1b120c"/><circle cx="94" cy="42" r="5" fill="#1b120c"/><circle cx="63.6" cy="40.4" r="1.6" fill="#fff"/><circle cx="95.6" cy="40.4" r="1.6" fill="#fff"/>' +
+        '<path d="M68,54 L84,54 L76,68 Z" fill="#f3a623" stroke="#c97f12" stroke-width="1.2" stroke-linejoin="round"/>' +
+        '<path d="M80,62 C90,68 90,84 80,90 C75,82 75,70 80,62 Z" fill="#d23a2c"/>' +
+        '<path d="M52,108 L52,122 M44,128 L52,122 L60,128 M52,122 L52,130 M100,108 L100,122 M92,128 L100,122 L108,128 M100,122 L100,130" stroke="#f3a623" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+    })()
+  };
 
   function fitHat(h, logo, host, spec) {
     var b = oBox(logo), P = host.getBoundingClientRect();
     if (!b) return;
     var set = function (k, v) { h.style.setProperty(k, v, 'important'); };
-    if (spec.glasses) {
-      var gw = b.w * 1.8, gh = gw * 44 / 120;
-      set('width', gw + 'px'); set('height', gh + 'px');
-      set('left', (b.cx - P.left - gw / 2) + 'px'); set('top', (b.cy - P.top - gh * 0.52) + 'px');
+    if (spec.costume) {
+      var u0 = b.w / 152;
+      set('width', 252 * u0 + 'px'); set('height', 210 * u0 + 'px');
+      set('left', (b.x - 50 * u0 - P.left) + 'px'); set('top', (b.top - 80 * u0 - P.top) + 'px');
       return;
     }
     var u = b.w * spec.scale / spec.brimW, size = 100 * u;   /* pixels per drawing unit */
@@ -297,8 +361,8 @@
     var host = found.host;
     if (host.querySelector('.mo-hat')) return;
     host.classList.add('mismo-hat-host');
-    var h = svg(spec.glasses ? '0 0 120 44' : '0 0 100 100', ids(spec.glasses ? GLASSES : spec.inner));
-    h.setAttribute('class', 'mo-hat');
+    var h = svg(spec.costume ? '-50 -80 252 210' : '0 0 100 100', ids(spec.costume ? COSTUMES[spec.costume] : spec.inner));
+    h.setAttribute('class', 'mo-hat' + (spec.costume ? ' mo-costume' : ''));
     host.appendChild(h);
     hats.push({ el: h, logo: found.logo, host: host });
     h.addEventListener('click', function () { var a = host.closest('a') || host.querySelector('a'); if (a) a.click(); else if (typeof host.click === 'function') host.click(); });
@@ -307,88 +371,99 @@
     addEventListener('resize', refit);
     try { new ResizeObserver(refit).observe(found.logo); new ResizeObserver(refit).observe(host); } catch (e) {}
     [400, 1200, 3000, 6000].forEach(function (ms) { setTimeout(refit, ms); });
-    if (spec.glasses && FIRST && !still && h.animate) anim(h, [{ transform: 'translateY(-60px) rotate(-12deg)', opacity: 0 }, { transform: 'translateY(4px) rotate(3deg)', opacity: 1, offset: 0.75 }, { transform: 'translateY(0) rotate(0)', opacity: 1 }], { duration: 1100, delay: 600, easing: 'cubic-bezier(.3,1.4,.5,1)', fill: 'backwards' });
+    /* the costume pops on the first time the tool opens today */
+    if (spec.costume && FIRST && !still) anim(h, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1.12)', opacity: 1, offset: 0.6 }, { transform: 'scale(.96)', offset: 0.8 }, { transform: 'scale(1)', opacity: 1 }], { duration: 900, delay: 500, easing: 'ease-out', fill: 'backwards' });
   }
 
   /* ---------------- sprites ---------------- */
-  var CUPID = '<defs><radialGradient id="I-s" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#ffe6d6"/><stop offset="1" stop-color="#f2b99b"/></radialGradient>' +
-    '<linearGradient id="I-wg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cfe6f5"/></linearGradient></defs>' +
-    '<g class="mo-wing"><animateTransform attributeName="transform" type="rotate" values="12 72 44;-22 72 44;12 72 44" dur=".34s" repeatCount="indefinite"/>' +
-    '<path d="M70,42 C82,18 108,12 116,26 C104,27 101,34 107,42 C96,40 92,47 96,55 C86,52 77,50 70,48 Z" fill="url(#I-wg)" stroke="#b9d8ee" stroke-width="1.4"/>' +
-    '<path d="M80,36 C90,26 102,22 110,26 M80,42 C90,36 98,36 104,40" stroke="#b9d8ee" stroke-width="1.2" fill="none"/></g>' +
-    '<ellipse cx="62" cy="76" rx="6" ry="9" fill="url(#I-s)" transform="rotate(25 62 76)"/><ellipse cx="54" cy="78" rx="6" ry="9" fill="url(#I-s)" transform="rotate(-10 54 78)"/>' +
-    '<ellipse cx="60" cy="57" rx="16" ry="18" fill="url(#I-s)"/>' +
-    '<path d="M44.5,61 C50,72 69,74 76,62 C73,75 67,79 60,79 C51,79 46,72 44.5,61 Z" fill="#fff"/>' +
-    '<path d="M50,42 L74,66" stroke="#e8483c" stroke-width="4" stroke-linecap="round"/>' +
-    '<path d="M18,28 C6,44 6,62 18,78" stroke="#a8693a" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M18,28 L31,53 L18,78" stroke="#f3e2c6" stroke-width="1.1" fill="none"/>' +
-    '<g class="mo-arrow"><path d="M33,53 L5,53" stroke="#8a5a32" stroke-width="2.4"/><path d="M34,53 l5,-4 M34,53 l5,4" stroke="#e8483c" stroke-width="2"/>' +
-    '<path transform="translate(2 53) rotate(90) scale(.5)" d="' + heartP + '" fill="#e8483c"/></g>' +
-    '<path d="M54,50 C46,53 38,54 31,53" stroke="url(#I-s)" stroke-width="7" stroke-linecap="round" fill="none"/>' +
-    '<circle cx="52" cy="34" r="14.5" fill="url(#I-s)"/>' +
-    '<g fill="#f3c75a"><circle cx="45" cy="22" r="6"/><circle cx="54" cy="19" r="6.4"/><circle cx="63" cy="23" r="5.8"/><circle cx="66" cy="31" r="5"/><circle cx="40" cy="28" r="4.4"/></g>' +
-    '<path d="M44,34 C46,31.5 49,31.5 50.5,34" stroke="#3a2416" stroke-width="1.8" fill="none" stroke-linecap="round"/>' +
-    '<circle cx="45" cy="39.5" r="3.6" fill="#f4927e" opacity=".55"/><path d="M41,42 C43,44.5 46.5,44.5 48,42.5" stroke="#b0503c" stroke-width="1.5" fill="none" stroke-linecap="round"/>';
-  var BAT = '<g fill="#2b1f3d" stroke="#8e6bd1" stroke-width=".7" stroke-opacity=".8"><g><animateTransform attributeName="transform" type="scale" values="1 1;1 -.45;1 1" dur=".26s" repeatCount="indefinite"/>' +
-    '<path d="M-3,0 C-10,-11 -21,-11 -29,-4 C-25,-2.4 -23,1.4 -23,4 C-20,1 -16,1 -14,5 C-11,2 -7.5,3 -5.5,6.5 Z"/></g>' +
-    '<g><animateTransform attributeName="transform" type="scale" values="1 1;1 -.45;1 1" dur=".26s" repeatCount="indefinite"/>' +
-    '<path d="M3,0 C10,-11 21,-11 29,-4 C25,-2.4 23,1.4 23,4 C20,1 16,1 14,5 C11,2 7.5,3 5.5,6.5 Z"/></g>' +
-    '<ellipse cx="0" cy="2" rx="5" ry="7"/><circle cx="0" cy="-5" r="4.6"/><path d="M-3.6,-7 L-4.6,-12 L-1.4,-8.4 Z M3.6,-7 L4.6,-12 L1.4,-8.4 Z"/></g>' +
-    '<circle cx="-1.7" cy="-5.4" r=".95" fill="#ffd76a"/><circle cx="1.7" cy="-5.4" r=".95" fill="#ffd76a"/>';
-  var BUNNY = '<defs><radialGradient id="I-f" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#cfd7e1"/></radialGradient></defs>' +
-    '<g class="mo-ears"><g transform="rotate(8 64 34)"><ellipse cx="62" cy="18" rx="5.5" ry="17" fill="#d6dde6"/></g>' +
-    '<g transform="rotate(-14 70 34)"><ellipse cx="70" cy="16" rx="6.4" ry="19" fill="url(#I-f)"/><ellipse cx="70" cy="18" rx="3" ry="13" fill="#f7b6c8"/></g></g>' +
-    '<ellipse cx="46" cy="66" rx="27" ry="22" fill="url(#I-f)"/><ellipse cx="36" cy="74" rx="16" ry="14" fill="#eef2f6"/>' +
-    '<circle cx="19" cy="62" r="8" fill="#fff"/><circle cx="17" cy="60" r="3" fill="#eef2f6"/>' +
-    '<ellipse cx="72" cy="46" rx="16" ry="14" fill="url(#I-f)"/>' +
-    '<circle cx="77.5" cy="42.5" r="2.6" fill="#2a1d18"/><circle cx="78.3" cy="41.6" r=".9" fill="#fff"/>' +
-    '<ellipse cx="87" cy="48" rx="2.4" ry="2" fill="#f49ab0"/><path d="M84,51 C85,53 87,53 88,51" stroke="#b77" stroke-width="1" fill="none"/>' +
-    '<path d="M86,50 L97,47 M86,51 L97,52 M86,52 L96,56" stroke="#b9c2cc" stroke-width=".7"/>' +
-    '<circle cx="80" cy="50" r="3.2" fill="#f7b6c8" opacity=".5"/>' +
-    '<ellipse cx="64" cy="86" rx="7.5" ry="4" fill="#eef2f6"/><ellipse cx="32" cy="87" rx="13" ry="4.6" fill="#e2e8ef"/>';
-  var TURKEY = (function () {
-    var cols = [['#b8322a', '#e8483c'], ['#d9701f', '#f39a3c'], ['#e9b02f', '#ffd76a'], ['#7a4a22', '#a5683a']], f = '';
-    for (var i = -4; i <= 4; i++) { var c = cols[(i + 8) % 4]; f += '<g transform="rotate(' + i * 19 + ' 46 70)"><ellipse cx="46" cy="34" rx="9.5" ry="35" fill="' + c[0] + '"/><ellipse cx="46" cy="10" rx="7" ry="9" fill="' + c[1] + '"/><path d="M46,64 L46,6" stroke="#3a2210" stroke-opacity=".35" stroke-width="1"/></g>'; }
-    return '<defs><radialGradient id="I-t" cx=".4" cy=".35" r=".8"><stop offset="0" stop-color="#9a6234"/><stop offset="1" stop-color="#4e2e14"/></radialGradient></defs>' + f +
-      '<path d="M56,96 L53,110 L47,112 M53,110 L56,113 M70,96 L72,110 L66,112 M72,110 L76,112" stroke="#f3a623" stroke-width="3" stroke-linecap="round" fill="none"/>' +
-      '<ellipse cx="62" cy="74" rx="29" ry="25" fill="url(#I-t)"/>' +
-      '<path d="M46,68 C55,58 73,60 80,72 C72,84 57,87 47,78 Z" fill="#6b3f1c"/><path d="M52,72 C60,68 70,70 76,74 M51,77 C59,74 68,76 73,79" stroke="#3a2210" stroke-opacity=".45" stroke-width="1.2" fill="none"/>' +
-      '<path d="M81,66 C85,52 87,42 93,36 C99,31 106,35 106,42 C106,48 100,50 98,56 C96,64 94,70 90,76 Z" fill="#7a4a22"/>' +
-      '<circle cx="100" cy="37" r="8.6" fill="#c98a5f"/>' +
-      '<path d="M107,38 L115,40 L107,42.4 Z" fill="#f3a623"/>' +
-      '<path d="M106,42 C109,45 109,52 104,55" stroke="#d23a2c" stroke-width="4.2" fill="none" stroke-linecap="round"/>' +
-      '<circle cx="101.5" cy="34" r="2" fill="#1b120c"/><circle cx="102.1" cy="33.4" r=".7" fill="#fff"/>';
-  })();
+  /* a bat whose wings really flap (the wing shape morphs up and down), dark with a faint violet edge */
+  var WUP = 'M2,-1 C7,-10 15,-16 27,-15 C25,-11 26,-7 29,-4 C25,-4.5 22,-2 22,1 C19,-1.5 15,-1 13,2 C10,0 6,1 3,3 Z';
+  var WDN = 'M2,-1 C8,2 16,7 25,14 C22,11 21,8 22,5 C19,6.5 16,6 14,4 C12,6 9,6.5 6,5.5 C5,4.5 4,3.5 3,3 Z';
+  function bat(speed) {
+    var flap = '<animate attributeName="d" values="' + WUP + ';' + WDN + ';' + WUP + '" keyTimes="0;.5;1" calcMode="spline" keySplines=".45 0 .55 1;.45 0 .55 1" dur="' + speed + 's" repeatCount="indefinite"/>';
+    return '<g fill="#1a1224" stroke="#7a5aa6" stroke-width=".6" stroke-opacity=".9">' +
+      '<path d="' + WUP + '">' + flap + '</path><g transform="scale(-1 1)"><path d="' + WUP + '">' + flap + '</path></g>' +
+      '<ellipse cx="0" cy="3" rx="4.6" ry="7.4"/><circle cx="0" cy="-5" r="4.4"/><path d="M-3.4,-7 L-4.6,-12.6 L-1.2,-8.6 Z M3.4,-7 L4.6,-12.6 L1.2,-8.6 Z"/>' +
+      '<path d="M-1.6,10 L-2.4,12.4 M1.6,10 L2.4,12.4" stroke="#1a1224" stroke-width="1"/></g>' +
+      '<circle cx="-1.7" cy="-5.4" r=".95" fill="#ff9d2e"/><circle cx="1.7" cy="-5.4" r=".95" fill="#ff9d2e"/>';
+  }
+  /* the groundhog stays inside his burrow until he pops up: everything below the hole is hidden */
   var GROUNDHOG = '<defs><radialGradient id="I-h" cx=".4" cy=".3" r=".8"><stop offset="0" stop-color="#b07a48"/><stop offset="1" stop-color="#6a4224"/></radialGradient>' +
-    '<linearGradient id="I-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7a5232"/><stop offset="1" stop-color="#4a301c"/></linearGradient></defs>' +
-    '<g class="mo-gh"><path d="M27,112 C22,78 30,46 50,42 C70,46 78,78 73,112 Z" fill="url(#I-h)"/><ellipse cx="50" cy="84" rx="14" ry="19" fill="#d1a676"/>' +
-    '<g class="mo-face"><ellipse cx="50" cy="38" rx="18" ry="15.5" fill="url(#I-h)"/><circle cx="36" cy="26" r="4.4" fill="#5a381e"/><circle cx="64" cy="26" r="4.4" fill="#5a381e"/>' +
-    '<circle cx="43.5" cy="35" r="2.7" fill="#1b120c"/><circle cx="44.3" cy="34.1" r=".9" fill="#fff"/><circle cx="56.5" cy="35" r="2.7" fill="#1b120c"/><circle cx="57.3" cy="34.1" r=".9" fill="#fff"/>' +
+    '<linearGradient id="I-d" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a5e3a"/><stop offset="1" stop-color="#4a301c"/></linearGradient>' +
+    '<clipPath id="I-hole"><rect x="-20" y="-40" width="140" height="130"/></clipPath></defs>' +
+    '<ellipse cx="50" cy="90" rx="30" ry="8" fill="#2a1a0e"/>' +
+    '<g clip-path="url(#I-hole)"><g class="mo-gh"><path d="M27,128 C22,88 30,46 50,42 C70,46 78,88 73,128 Z" fill="url(#I-h)"/><ellipse cx="50" cy="86" rx="14" ry="19" fill="#d1a676"/>' +
+    '<g class="mo-face"><ellipse cx="50" cy="38" rx="18" ry="15.5" fill="url(#I-h)"/><circle cx="36" cy="26" r="4.4" fill="#5a381e"/><circle cx="64" cy="26" r="4.4" fill="#5a381e"/><circle cx="36" cy="26" r="2" fill="#c99a6a"/><circle cx="64" cy="26" r="2" fill="#c99a6a"/>' +
+    '<circle cx="43.5" cy="35" r="2.8" fill="#1b120c"/><circle cx="44.4" cy="34" r="1" fill="#fff"/><circle cx="56.5" cy="35" r="2.8" fill="#1b120c"/><circle cx="57.4" cy="34" r="1" fill="#fff"/>' +
     '<ellipse cx="50" cy="45" rx="9" ry="6.6" fill="#e3c294"/><ellipse cx="50" cy="41.4" rx="3.4" ry="2.4" fill="#3a2516"/>' +
-    '<rect x="47.4" y="47.8" width="5.2" height="5.2" rx="1" fill="#fff"/><path d="M50,47.8 L50,53" stroke="#d9d9d9" stroke-width=".6"/></g>' +
-    '<ellipse cx="39" cy="66" rx="5.6" ry="4.4" fill="#7a4e2c"/><ellipse cx="61" cy="66" rx="5.6" ry="4.4" fill="#7a4e2c"/></g>' +
-    '<path d="M-6,118 C6,92 28,84 50,84 C72,84 94,92 106,118 Z" fill="url(#I-d)"/>' +
-    '<g fill="#3b2614"><circle cx="24" cy="102" r="2.2"/><circle cx="40" cy="95" r="1.6"/><circle cx="62" cy="98" r="2"/><circle cx="78" cy="104" r="1.8"/><circle cx="52" cy="108" r="2.2"/></g>' +
-    '<g fill="#5fae5e"><path d="M8,104 l2,-9 2,9 Z"/><path d="M90,104 l2,-10 2,10 Z"/><path d="M94,106 l2,-7 2,7 Z"/></g>';
-  var PIE = '<defs><linearGradient id="I-tin" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d7e0e7"/><stop offset="1" stop-color="#8a97a3"/></linearGradient>' +
-    '<radialGradient id="I-cr" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#f7cf8c"/><stop offset="1" stop-color="#cf8a3b"/></radialGradient></defs>' +
-    '<path d="M12,52 L128,52 L117,80 C111,87 29,87 23,80 Z" fill="url(#I-tin)"/><path d="M18,60 L122,60" stroke="#fff" stroke-opacity=".4" stroke-width="1.4"/>' +
-    '<ellipse cx="70" cy="50" rx="59" ry="16.5" fill="url(#I-cr)"/>' +
-    (function () { var s = ''; for (var k = 0; k < 26; k++) { var a = k / 26 * Math.PI * 2; s += '<circle cx="' + (70 + 58 * Math.cos(a)).toFixed(1) + '" cy="' + (50 + 16 * Math.sin(a)).toFixed(1) + '" r="4.4" fill="#e6ac62"/>'; } return s; })() +
-    '<ellipse cx="70" cy="49" rx="48" ry="11.5" fill="url(#I-cr)"/>' +
-    '<path d="M54,43.5 L86,43.5 M62,43.5 C62,49 61,53 58.5,56 M78,43.5 C78,49 79,53 82.5,55" stroke="#9a5a22" stroke-width="3.6" fill="none" stroke-linecap="round"/>' +
-    '<path d="M54,43 L86,43" stroke="#ffe2ad" stroke-width="1" opacity=".6"/>' +
-    '<g stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".7">' +
-    '<path d="M54,30 C50,24 58,20 54,12"><animate attributeName="opacity" values="0;.8;0" dur="2.4s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -6" dur="2.4s" repeatCount="indefinite"/></path>' +
-    '<path d="M70,28 C66,22 74,18 70,8"><animate attributeName="opacity" values="0;.8;0" dur="2.4s" begin=".8s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -6" dur="2.4s" begin=".8s" repeatCount="indefinite"/></path>' +
-    '<path d="M86,30 C82,24 90,20 86,12"><animate attributeName="opacity" values="0;.8;0" dur="2.4s" begin="1.6s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -6" dur="2.4s" begin="1.6s" repeatCount="indefinite"/></path></g>';
-  var GLOBE = '<defs><radialGradient id="I-o" cx=".4" cy=".35" r=".75"><stop offset="0" stop-color="#7cc6f0"/><stop offset=".7" stop-color="#2b7fbf"/><stop offset="1" stop-color="#155985"/></radialGradient>' +
-    '<radialGradient id="I-a"><stop offset=".72" stop-color="#bfe3f7" stop-opacity=".0"/><stop offset=".8" stop-color="#bfe3f7" stop-opacity=".55"/><stop offset="1" stop-color="#bfe3f7" stop-opacity="0"/></radialGradient>' +
-    '<radialGradient id="I-sh" cx=".3" cy=".25" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".35"/><stop offset=".45" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#06202f" stop-opacity=".45"/></radialGradient>' +
-    '<clipPath id="I-gc"><circle cx="50" cy="50" r="38"/></clipPath></defs>' +
-    '<circle cx="50" cy="50" r="49" fill="url(#I-a)"/><circle cx="50" cy="50" r="38" fill="url(#I-o)"/>' +
-    '<g clip-path="url(#I-gc)"><g fill="#4caf6a"><animateTransform attributeName="transform" type="translate" values="0 0;-152 0" dur="10s" repeatCount="indefinite"/>' +
-    (function () { var c = '<path d="M20,30 C28,22 40,24 44,32 C48,40 40,46 42,54 C44,62 36,68 30,62 C24,56 26,48 20,44 C14,40 14,34 20,30 Z"/><path d="M58,22 C68,18 80,22 84,30 C80,34 72,32 68,38 C64,44 56,40 54,32 C53,27 54,24 58,22 Z"/><path d="M62,52 C70,48 82,52 84,62 C86,72 78,82 68,80 C60,78 62,68 58,62 C56,58 58,54 62,52 Z"/><path d="M100,40 C108,36 118,40 118,48 C118,56 110,58 104,56 C98,54 96,44 100,40 Z"/><path d="M128,26 C136,22 146,28 144,36 C142,42 134,42 130,38 C126,34 124,30 128,26 Z"/>'; return c + '<g transform="translate(152 0)">' + c + '</g>'; })() +
-    '</g></g><circle cx="50" cy="50" r="38" fill="url(#I-sh)"/><ellipse cx="38" cy="32" rx="10" ry="6" fill="#fff" opacity=".28" transform="rotate(-30 38 32)"/>';
+    '<rect x="47.4" y="47.8" width="5.2" height="5.2" rx="1" fill="#fff"/><path d="M50,47.8 L50,53" stroke="#d9d9d9" stroke-width=".6"/>' +
+    '<path d="M40,46 L30,44 M40,48 L30,49 M60,46 L70,44 M60,48 L70,49" stroke="#5a381e" stroke-width=".7"/></g>' +
+    '<ellipse cx="39" cy="66" rx="5.6" ry="4.4" fill="#7a4e2c"/><ellipse cx="61" cy="66" rx="5.6" ry="4.4" fill="#7a4e2c"/></g></g>' +
+    '<path d="M-8,120 C0,102 14,93 22,91 C32,97 68,97 78,91 C86,93 100,102 108,120 Z" fill="url(#I-d)"/>' +
+    '<path d="M22,91 C32,97 68,97 78,91" stroke="#a8784e" stroke-width="2" fill="none"/>' +
+    '<g fill="#3b2614"><circle cx="14" cy="108" r="2.2"/><circle cx="34" cy="102" r="1.6"/><circle cx="62" cy="104" r="2"/><circle cx="84" cy="110" r="1.8"/><circle cx="50" cy="113" r="2.2"/></g>' +
+    '<g fill="#5fae5e"><path d="M4,112 l2,-9 2,9 Z"/><path d="M92,110 l2,-10 2,10 Z"/><path d="M97,113 l2,-7 2,7 Z"/></g>';
+  /* a lattice cherry pie, golden and glossy, in a blue dish, with a pastry pi on top */
+  var PIE = (function () {
+    var crimp = '', strips = '', cherries = '';
+    for (var k = 0; k < 30; k++) { var a = k / 30 * Math.PI * 2, x = 80 + 64 * Math.cos(a), y = 53 + 16.5 * Math.sin(a); crimp += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="5.4" fill="#e9ac58"/><circle cx="' + (x - 1.4).toFixed(1) + '" cy="' + (y - 1.6).toFixed(1) + '" r="2" fill="#fbe0a8" opacity=".8"/>'; }
+    for (var s = -4; s <= 4; s++) { var xa = 80 + s * 15; strips += '<path d="M' + (xa - 22) + ',30 L' + (xa + 22) + ',76" stroke="#b9732a" stroke-width="9.6" stroke-linecap="round"/><path d="M' + (xa - 22) + ',30 L' + (xa + 22) + ',76" stroke="url(#I-st)" stroke-width="7.4" stroke-linecap="round"/>'; }
+    for (var s2 = -4; s2 <= 4; s2++) { var xb = 80 + s2 * 15; strips += '<path d="M' + (xb + 22) + ',30 L' + (xb - 22) + ',76" stroke="#b9732a" stroke-width="9.6" stroke-linecap="round"/><path d="M' + (xb + 22) + ',30 L' + (xb - 22) + ',76" stroke="url(#I-st)" stroke-width="7.4" stroke-linecap="round"/>'; }
+    [[46, 50], [62, 60], [100, 46], [114, 56], [74, 44], [90, 62], [56, 44], [106, 62]].forEach(function (p) { cherries += '<circle cx="' + p[0] + '" cy="' + p[1] + '" r="4.2" fill="#9e0d16"/><circle cx="' + (p[0] - 1.4) + '" cy="' + (p[1] - 1.4) + '" r="1.3" fill="#ff9a8f"/>'; });
+    return '<defs><linearGradient id="I-dish" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d7ecf8"/><stop offset="1" stop-color="#3d8fd6"/></linearGradient>' +
+      '<radialGradient id="I-cr" cx=".45" cy=".35" r=".85"><stop offset="0" stop-color="#fde2a8"/><stop offset=".55" stop-color="#e9a94e"/><stop offset="1" stop-color="#b8742a"/></radialGradient>' +
+      '<radialGradient id="I-ch" cx=".45" cy=".4" r=".75"><stop offset="0" stop-color="#ff5a4e"/><stop offset=".55" stop-color="#c4161c"/><stop offset="1" stop-color="#6e0b12"/></radialGradient>' +
+      '<linearGradient id="I-st" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fde4ad"/><stop offset=".5" stop-color="#eeb15d"/><stop offset="1" stop-color="#cf8a3a"/></linearGradient>' +
+      '<clipPath id="I-fc"><ellipse cx="80" cy="52" rx="56" ry="15"/></clipPath></defs>' +
+      '<ellipse cx="80" cy="94" rx="66" ry="7" fill="#0d314c" opacity=".14"/>' +
+      '<path d="M8,56 L152,56 L142,84 C136,92 24,92 18,84 Z" fill="url(#I-dish)"/>' +
+      '<g stroke="#fff" stroke-opacity=".4" stroke-width="2">' + [24, 38, 52, 66, 80, 94, 108, 122, 136].map(function (x) { return '<path d="M' + x + ',60 L' + (x + (x - 80) * -0.06) + ',86"/>'; }).join('') + '</g>' +
+      '<ellipse cx="80" cy="56" rx="72" ry="20" fill="#e6f3fb"/>' +
+      '<ellipse cx="80" cy="53" rx="68" ry="18.5" fill="url(#I-cr)"/>' + crimp +
+      '<ellipse cx="80" cy="52" rx="56" ry="15" fill="url(#I-ch)"/>' +
+      '<g clip-path="url(#I-fc)">' + cherries + strips + '<ellipse cx="62" cy="44" rx="14" ry="3" fill="#fff" opacity=".22"/></g>' +
+      '<g fill="#fff" opacity=".85"><circle cx="40" cy="47" r=".9"/><circle cx="122" cy="51" r=".9"/><circle cx="70" cy="64" r=".8"/><circle cx="98" cy="40" r=".8"/><circle cx="110" cy="64" r=".9"/></g>' +
+      '<g transform="translate(80 49)"><path d="M-15,-6 L15,-6 M-7.5,-6 C-7.5,2 -8.5,7 -11.5,10.5 M7.5,-6 C7.5,2 8,7 11.5,9.5" stroke="#8a4f17" stroke-width="7.6" stroke-linecap="round" fill="none"/>' +
+      '<path d="M-15,-6 L15,-6 M-7.5,-6 C-7.5,2 -8.5,7 -11.5,10.5 M7.5,-6 C7.5,2 8,7 11.5,9.5" stroke="url(#I-st)" stroke-width="5" stroke-linecap="round" fill="none"/>' +
+      '<path d="M-13,-7.4 L13,-7.4" stroke="#fff3d6" stroke-width="1.2" stroke-linecap="round" opacity=".8"/></g>' +
+      '<g stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round" opacity=".75">' +
+      '<path d="M60,30 C56,24 64,20 60,12"><animate attributeName="opacity" values="0;.8;0" dur="2.4s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -6" dur="2.4s" repeatCount="indefinite"/></path>' +
+      '<path d="M80,28 C76,22 84,18 80,8"><animate attributeName="opacity" values="0;.8;0" dur="2.4s" begin=".8s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -6" dur="2.4s" begin=".8s" repeatCount="indefinite"/></path>' +
+      '<path d="M100,30 C96,24 104,20 100,12"><animate attributeName="opacity" values="0;.8;0" dur="2.4s" begin="1.6s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -6" dur="2.4s" begin="1.6s" repeatCount="indefinite"/></path></g>';
+  })();
+  /* Easter: a person in a bunny costume, carrying a basket with no bottom. Drawn on 140 x 200, facing right;
+     feet on the ground at y 198. Torso turns at the hips (60,140); the reaching arm at the shoulder (62,96). */
+  var KID = '<defs><radialGradient id="I-su" cx=".4" cy=".3" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9dfe8"/></radialGradient>' +
+    '<radialGradient id="I-sk" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#ffe3d2"/><stop offset="1" stop-color="#f0b796"/></radialGradient>' +
+    '<linearGradient id="I-bk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dcab62"/><stop offset="1" stop-color="#9c6a2e"/></linearGradient></defs>' +
+    '<path d="M54,140 C52,160 52,176 54,188" stroke="#dfe5ec" stroke-width="16" stroke-linecap="round" fill="none"/><ellipse cx="60" cy="192" rx="16" ry="6.5" fill="#e3e8ef"/>' +
+    '<path d="M66,140 C66,160 66,176 68,188" stroke="#f4f6f9" stroke-width="17" stroke-linecap="round" fill="none"/><ellipse cx="76" cy="192.5" rx="17" ry="7" fill="#fff"/><ellipse cx="88" cy="194" rx="5" ry="2.6" fill="#f7b6c8"/>' +
+    '<g class="kb-torso">' +
+    '<circle cx="35" cy="128" r="10.5" fill="#fff"/><circle cx="32" cy="125" r="4" fill="#eef1f5"/>' +
+    '<path d="M38,146 C33,118 40,92 60,86 C82,90 88,118 84,146 C70,152 50,152 38,146 Z" fill="url(#I-su)"/>' +
+    '<ellipse cx="67" cy="120" rx="12" ry="18" fill="#ffe3ec"/>' +
+    '<path d="M56,98 C64,108 80,108 98,104" stroke="#dfe5ec" stroke-width="11" stroke-linecap="round" fill="none"/>' +
+    '<path d="M88,120 C88,100 116,100 116,120" stroke="#9c6a2e" stroke-width="3.2" fill="none"/>' +
+    '<circle cx="101" cy="103" r="6.2" fill="#eef1f5"/>' +
+    '<path d="M86,120 L118,120 L113.5,142 L90.5,142 Z" fill="url(#I-bk)"/>' +
+    '<path d="M87.4,127 L116.6,127 M88.8,134.5 L115.2,134.5" stroke="#7a4f1e" stroke-opacity=".6" stroke-width="1.4"/>' +
+    '<path d="M94,120 L95,142 M102,120 L102,142 M110,120 L109,142" stroke="#7a4f1e" stroke-opacity=".45" stroke-width="1.2"/>' +
+    '<ellipse cx="102" cy="120" rx="16" ry="4.2" fill="#c08a44" stroke="#7a4f1e" stroke-width="1"/><ellipse cx="102" cy="120" rx="12.6" ry="2.6" fill="#5a3a16"/>' +
+    '<ellipse cx="102" cy="142" rx="11.5" ry="2.2" fill="#3a240c" opacity=".75"/>' +
+    '<g class="kb-ears"><path d="M52,42 C42,10 44,-14 53,-22 C62,-16 64,8 60,42 Z" fill="#e3e8ef"/>' +
+    '<path d="M66,40 C66,4 72,-18 83,-22 C89,-14 85,10 75,42 Z" fill="url(#I-su)"/><path d="M70,34 C70,8 74,-10 81,-14 C84,-8 80,10 74,34 Z" fill="#f7b6c8"/></g>' +
+    '<circle cx="64" cy="60" r="25.5" fill="url(#I-su)"/>' +
+    '<ellipse cx="71" cy="64" rx="16.5" ry="17.5" fill="url(#I-sk)"/>' +
+    '<path d="M56,54 C59,45 72,43 86,50 C81,52 75,50 71,53 C66,50 61,52 56,54 Z" fill="#7a4a28"/>' +
+    '<g class="kb-eyes"><ellipse cx="67" cy="62" rx="2.3" ry="2.9" fill="#2a1d18"/><ellipse cx="79" cy="62" rx="2.3" ry="2.9" fill="#2a1d18"/><circle cx="67.8" cy="61" r=".8" fill="#fff"/><circle cx="79.8" cy="61" r=".8" fill="#fff"/></g>' +
+    '<ellipse cx="76" cy="68" rx="2.7" ry="2" fill="#f49ab0"/>' +
+    '<path d="M81,70 L91,67 M81,72 L91,73 M68,70 L59,68 M68,72 L59,73" stroke="#8a6a5a" stroke-width=".8"/>' +
+    '<circle cx="63" cy="70" r="3.4" fill="#f49ab0" opacity=".5"/><circle cx="85" cy="70" r="3" fill="#f49ab0" opacity=".5"/>' +
+    '<path class="kb-smile" d="M70,74 C73,78.5 79,78.5 82,74" stroke="#9a4a3a" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
+    '<ellipse class="kb-oh" cx="76" cy="76" rx="2.8" ry="3.4" fill="#9a4a3a" opacity="0"/>' +
+    '<g class="kb-arm"><path d="M62,96 L62,134" stroke="#f4f6f9" stroke-width="11" stroke-linecap="round"/><circle cx="62" cy="140" r="6.6" fill="#fff"/>' +
+    '<g class="kb-hand-egg" opacity="0" transform="translate(62 146)">EGG</g></g>' +
+    '</g>';
   var SPIDER = '<g stroke="#1b1424" stroke-width="1.6" stroke-linecap="round" fill="none">' +
     '<path d="M-3,-1 C-8,-6 -11,-5 -14,-1 M-3,1 C-8,-1 -12,1 -15,5 M-3,2 C-7,4 -10,8 -11,12 M-2,3 C-4,7 -6,11 -6,14"/>' +
     '<path d="M3,-1 C8,-6 11,-5 14,-1 M3,1 C8,-1 12,1 15,5 M3,2 C7,4 10,8 11,12 M2,3 C4,7 6,11 6,14"/></g>' +
@@ -399,7 +474,6 @@
     '<path d="M14,36 C14,66 30,80 48,80 C66,80 82,66 82,36 Z" fill="url(#I-pt)"/><ellipse cx="48" cy="36" rx="35" ry="7" fill="#26262e" stroke="#4a4a56" stroke-width="2.4"/>' +
     '<ellipse cx="48" cy="35" rx="31" ry="5" fill="url(#I-gold)"/><path d="M24,46 C24,60 32,70 40,72" stroke="#fff" stroke-opacity=".18" stroke-width="3" fill="none" stroke-linecap="round"/>' +
     '<path d="M26,80 L22,88 M70,80 L74,88" stroke="#0e0e12" stroke-width="4" stroke-linecap="round"/>';
-
   /* ---------------- the shows ---------------- */
   /* a sprite that crosses the screen along a path; returns the moving element */
   function cross(layer, el, w, dur, path, flip) {
@@ -420,19 +494,20 @@
     anim(b, [{ opacity: 0, transform: 'translateY(8px) scale(.6)' }, { opacity: 1, transform: 'translateY(0) scale(1.05)', offset: 0.12 }, { opacity: 1, transform: 'scale(1)', offset: 0.85 }, { opacity: 0, transform: 'translateY(-6px)' }], { duration: ms || 2200, fill: 'forwards' });
     setTimeout(function () { b.remove(); }, (ms || 2200) + 50);
   }
+  function nextYear() { var n = new Date(); return String(n.getMonth() >= 6 ? n.getFullYear() + 1 : n.getFullYear()); }
   var SHOW = {
     newyear: {
       hat: 'party',
       open: function () {
-        var L = sky(), yr = String(new Date().getFullYear() + (new Date().getMonth() === 11 ? 1 : 0));
+        var L = sky();
         var big = document.createElement('div'); big.className = 'mo-big';
-        big.innerHTML = '<span style="font-size:' + Math.max(14, Math.min(26, innerWidth * 0.02)) + 'px">Happy New Year</span><b style="font-size:' + Math.max(84, Math.min(190, innerWidth * 0.15)) + 'px">' + yr + '</b>';
+        big.innerHTML = '<span style="font-size:' + Math.max(14, Math.min(26, innerWidth * 0.02)) + 'px">Happy New Year</span><b style="font-size:' + Math.max(84, Math.min(190, innerWidth * 0.15)) + 'px">' + nextYear() + '</b>';
         L.appendChild(big);
         anim(big, [{ opacity: 0, transform: 'translate(-50%,-50%) scale(.6)' }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1.04)', offset: 0.12 }, { opacity: 1, transform: 'translate(-50%,-50%) scale(1)', offset: 0.8 }, { opacity: 0, transform: 'translate(-50%,-56%) scale(.98)' }], { duration: 4800, delay: 900, fill: 'both' });
-        var t = Math.max(fireworks(L, ['#ffd76a', '#74bfeb', '#ffffff', '#ffe9a8'], 8, 560), confetti(L, 70), 6000);
+        var t = Math.max(fireworks(L, ['#ffd76a', '#74bfeb', '#ffffff', '#ffe9a8'], 8), confetti(L, 70), 6000);
         done(L, t);
       },
-      hover: function (b) { var L = sky(); done(L, Math.max(burst(L, b.cx, b.cy, function () { return confettiPiece(['#ffd76a', '#74bfeb', '#ffffff', '#e2a73b']); }, 26, { size: [7, 11], dist: [50, 140], up: true, fall: 90 }), 2200)); firework(L, b.cx + rnd(60, 220), b.cy + rnd(80, 160), ['#ffd76a', '#74bfeb', '#ffffff']); }
+      hover: function (b) { var L = sky(); done(L, Math.max(burst(L, b.cx, b.cy, function () { return confettiPiece(['#ffd76a', '#74bfeb', '#ffffff', '#e2a73b']); }, 26, { size: [7, 11], dist: [50, 140], up: true, fall: 90 }), firework(L, b.cx + rnd(80, 240), b.cy + rnd(90, 170), ['#ffd76a', '#74bfeb', '#ffffff']))); }
     },
     groundhog: {
       open: function () { groundhog('Happy Groundhog Day!'); },
@@ -440,23 +515,10 @@
     },
     valentine: {
       open: function () {
-        var L = sky(), W = innerWidth, Hh = innerHeight, b = visibleLogo();
-        var w = Math.max(110, Math.min(190, W * 0.13)), h = w * 100 / 120, dur = 7600, y0 = Hh * 0.2;
-        var c = art('0 0 120 100', CUPID);
-        var box = cross(L, c, w, dur, function (t) { return { x: W + 20 - (W + w + 40) * t, y: y0 + Math.sin(t * Math.PI * 3) * 22 - h / 2, r: Math.sin(t * Math.PI * 3) * 4 }; });
-        /* half way across, the arrow flies into the O and hearts pop there */
-        setTimeout(function () {
-          var bb = visibleLogo() || b, arrowEl = c.querySelector('.mo-arrow'); if (arrowEl) arrowEl.style.opacity = '0';
-          var t = 0.5, p = box.__path(t), sx = p.x + w * 0.05, sy = p.y + h * 0.53;
-          var tx = bb ? bb.cx : 60, ty = bb ? bb.cy : 40;
-          var ar = art('-36 -8 44 16', '<path d="M-30,0 L6,0" stroke="#8a5a32" stroke-width="2.6"/><path d="M-30,0 l-5,-4 M-30,0 l-5,4" stroke="#e8483c" stroke-width="2.2"/><path transform="translate(6 0) rotate(-90) scale(.55)" d="' + heartP + '" fill="#e8483c"/>');
-          ar.style.width = '70px'; ar.style.height = '26px'; L.appendChild(ar);
-          var ang = Math.atan2(ty - sy, tx - sx) * 180 / Math.PI + 180;
-          anim(ar, [{ transform: 'translate(' + (sx - 35) + 'px,' + (sy - 13) + 'px) rotate(' + ang + 'deg)' }, { transform: 'translate(' + (tx - 35) + 'px,' + (ty - 13) + 'px) rotate(' + ang + 'deg)' }], { duration: 650, easing: 'cubic-bezier(.4,.1,.6,1)', fill: 'forwards' });
-          setTimeout(function () { ar.remove(); burst(L, tx, ty, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffffff'][i % 4])); }, 18, { size: [14, 26], dist: [40, 120] }); }, 660);
-        }, dur * 0.5);
-        var r = drift(L, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffc2d1'][i % 4])); }, 22, { dir: 'up', size: [14, 30], dur: [5200, 8200], spread: 2400, spin: 40, reach: [0.6, 1] });
-        done(L, Math.max(dur + 400, r, dur * 0.5 + 2600));
+        var L = sky();
+        setTimeout(function () { var b = visibleLogo(); if (b) arrowInto(L, b); }, 600);
+        var r = drift(L, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffc2d1'][i % 4])); }, 24, { dir: 'up', size: [16, 34], dur: [5600, 8600], spread: 2600, spin: 40, reach: [0.6, 1] });
+        done(L, Math.max(r, 4200));
       },
       hover: function (b) { var L = sky(); done(L, burst(L, b.cx, b.cy, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffffff'][i % 4])); }, 16, { size: [14, 26], dist: [40, 120] })); }
     },
@@ -484,76 +546,37 @@
       hover: function (b) { var L = sky(); done(L, burst(L, b.cx + b.w * 0.5, b.top, function () { return art('-10 -10 20 20', coin()); }, 14, { size: [14, 22], dist: [40, 110], up: true, fall: 80 })); }
     },
     easter: {
-      hat: 'bunny',
-      open: function () { bunny(); },
-      hover: function (b) { var L = sky(); done(L, burst(L, b.cx, b.cy, function (i) { return art('-10 -10 20 20', egg(i)); }, 12, { size: [16, 24], dist: [40, 110], up: true, fall: 70 })); }
-    },
-    earthday: {
-      open: function () { globe(); },
-      hover: function (b) { var L = sky(); done(L, burst(L, b.cx, b.cy, function (i) { return art('-12 -12 24 24', greenLeaf(['#4caf6a', '#7cc47a', '#2e8a4a'][i % 3])); }, 14, { size: [14, 24], dist: [40, 120] })); }
-    },
-    summer: {
-      hat: 'glasses',
-      open: function () {
-        var L = sky(), b = visibleLogo(); if (!b) { done(L, 10); return; }
-        var g = piece('mo-glow', '#ffd76a'), s = b.w * 6; g.style.width = g.style.height = s + 'px'; L.appendChild(g);
-        anim(g, [{ transform: 'translate(' + (b.cx - s / 2) + 'px,' + (b.cy - s / 2) + 'px) scale(.3)', opacity: 0 }, { transform: 'translate(' + (b.cx - s / 2) + 'px,' + (b.cy - s / 2) + 'px) scale(1)', opacity: 0.7, offset: 0.4 }, { transform: 'translate(' + (b.cx - s / 2) + 'px,' + (b.cy - s / 2) + 'px) scale(1.15)', opacity: 0 }], { duration: 3600, delay: 1500, fill: 'both' });
-        setTimeout(function () { var bb = visibleLogo() || b; for (var i = 0; i < 3; i++) (function (i) { setTimeout(function () { var st = piece('mo-star', '#fff'); st.style.width = st.style.height = '16px'; L.appendChild(st); var x = bb.cx - bb.w * 0.55 + i * bb.w * 0.5, y = bb.cy - bb.w * 0.2; anim(st, [{ transform: 'translate(' + x + 'px,' + y + 'px) scale(0) rotate(0)', opacity: 1 }, { transform: 'translate(' + x + 'px,' + y + 'px) scale(1.2) rotate(90deg)', opacity: 1, offset: 0.5 }, { transform: 'translate(' + x + 'px,' + y + 'px) scale(0) rotate(180deg)', opacity: 0 }], { duration: 700, fill: 'forwards' }); }, i * 260); })(i); }, 1750);
-        done(L, 5400);
-      },
-      hover: function () { hats.forEach(function (h) { anim(h.el, [{ transform: 'translateY(0)' }, { transform: 'translateY(' + (h.el.getBoundingClientRect().height * 0.55) + 'px)', offset: 0.3 }, { transform: 'translateY(' + (h.el.getBoundingClientRect().height * 0.55) + 'px)', offset: 0.7 }, { transform: 'translateY(0)' }], { duration: 1400, easing: 'ease-in-out' }); }); }
+      costume: 'bunny',
+      open: function () { eggStory(); },
+      hover: function (b) { wiggleEars(); var L = sky(); done(L, burst(L, b.cx, b.cy, function (i) { return art('-10 -10 20 20', egg(i)); }, 12, { size: [16, 24], dist: [40, 110], up: true, fall: 70 })); }
     },
     july4: {
       hat: 'unclesam',
-      open: function () { var L = sky(); done(L, fireworks(L, ['#e8483c', '#ffffff', '#3d6fd6', '#74bfeb'], 9, 520)); },
-      hover: function () { var L = sky(); done(L, fireworks(L, ['#e8483c', '#ffffff', '#3d6fd6'], 2, 380)); }
+      open: function () { var L = sky(); done(L, fireworks(L, ['#e8483c', '#ffffff', '#3d6fd6', '#74bfeb'], 9)); },
+      hover: function () { var L = sky(); done(L, fireworks(L, ['#e8483c', '#ffffff', '#3d6fd6'], 2)); }
     },
     halloween: {
-      hat: 'witch',
-      open: function () {
-        var L = sky(), W = innerWidth, Hh = innerHeight, longest = 0;
-        var ms = Math.max(160, Math.min(280, W * 0.18)), moon = art('0 0 100 100', '<defs><radialGradient id="I-m" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset=".7" stop-color="#ffe7a0"/><stop offset="1" stop-color="#f2c457"/></radialGradient><radialGradient id="I-mg"><stop offset=".55" stop-color="#ffe7a0" stop-opacity=".55"/><stop offset="1" stop-color="#ffe7a0" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#I-mg)"/><circle cx="50" cy="50" r="30" fill="url(#I-m)"/><g fill="#e3b54a" opacity=".45"><circle cx="40" cy="42" r="5"/><circle cx="58" cy="58" r="7"/><circle cx="60" cy="38" r="3"/><circle cx="44" cy="62" r="3.4"/></g>');
-        moon.style.width = moon.style.height = ms + 'px'; L.appendChild(moon);
-        var mx = W * 0.72 - ms / 2, my = Hh * 0.08;
-        anim(moon, [{ transform: 'translate(' + mx + 'px,' + (my + 40) + 'px)', opacity: 0 }, { transform: 'translate(' + mx + 'px,' + my + 'px)', opacity: 1, offset: 0.15 }, { transform: 'translate(' + mx + 'px,' + my + 'px)', opacity: 1, offset: 0.85 }, { transform: 'translate(' + mx + 'px,' + (my - 10) + 'px)', opacity: 0 }], { duration: 8600, fill: 'both' });
-        for (var i = 0; i < 7; i++) (function (i) {
-          var w = rnd(70, 120), dur = rnd(5200, 7800), delay = 500 + i * 480 + rnd(0, 300), y = Hh * rnd(0.1, 0.5), amp = rnd(14, 40), ph = R() * 6;
-          longest = Math.max(longest, dur + delay);
-          setTimeout(function () { cross(L, art('-30 -15 60 30', BAT), w, dur, function (t) { return { x: W + 30 - (W + w + 60) * t, y: y + Math.sin(t * Math.PI * 4 + ph) * amp, r: Math.sin(t * Math.PI * 4 + ph) * 8 }; }); }, delay);
-        })(i);
-        done(L, Math.max(longest + 500, 8800));
-      },
+      costume: 'pumpkin',
+      open: function () { batNight(); },
       hover: function (b) { spider(b); }
     },
     thanksgiving: {
-      hat: 'pilgrim',
-      open: function () {
-        var L = sky(), W = innerWidth, Hh = innerHeight;
-        var r = drift(L, function (i) { var c = [['#d9701f', '#8a3d0c'], ['#b8322a', '#6b1610'], ['#e9b02f', '#8a6210'], ['#a5683a', '#4e2e14']][i % 4]; return art('-12 -12 24 24', leaf(c[0], c[1])); }, 26, { dir: 'down', size: [18, 34], dur: [5600, 9000], spread: 2800, spin: 320, sway: 60 });
-        var w = Math.max(110, Math.min(170, W * 0.11)), h = w * 120 / 130, dur = Math.max(8000, W * 6), base = Hh - h - 8;
-        setTimeout(function () {
-          var t = art('0 0 130 120', TURKEY);
-          var box = cross(L, t, w, dur, function (u) { var step = Math.sin(u * Math.PI * 22); return { x: -w - 10 + (W + w + 20) * u, y: base - Math.abs(step) * 5, r: step * 5 }; });
-          setTimeout(function () { var p = box.__path(0.5); bubble(L, 'Gobble gobble!', p.x + w * 0.65, p.y - 4, 2000); }, dur * 0.48);
-        }, 600);
-        done(L, Math.max(r, dur + 1200));
-      },
-      hover: function (b) { var L = sky(); done(L, burst(L, b.cx, b.cy, function (i) { var c = [['#d9701f', '#8a3d0c'], ['#b8322a', '#6b1610'], ['#e9b02f', '#8a6210']][i % 3]; return art('-12 -12 24 24', leaf(c[0], c[1])); }, 14, { size: [16, 28], dist: [40, 120], fall: 120 })); }
+      costume: 'turkey',
+      open: function () { var L = sky(); done(L, leafFall(L, 24)); },
+      hover: function (b) { var L = sky(); bubble(L, 'Gobble gobble!', b.cx, b.top - 4, 1800); done(L, Math.max(2000, burst(L, b.cx, b.cy, function (i) { var e = art('-14 -14 28 28', fallLeaf(i)); return e; }, 10, { size: [22, 34], dist: [50, 130], fall: 140 }))); }
     }
   };
-
-  /* Groundhog Day: up from the burrow in the bottom-right corner, a look each way, back down */
   var ghBusy = false;
   function groundhog(say) {
     if (ghBusy) return; ghBusy = true;
-    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(130, Math.min(200, W * 0.13)), h = w * 1.18;
-    var g = art('-6 0 112 118', GROUNDHOG); g.style.width = w + 'px'; g.style.height = h + 'px';
+    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(130, Math.min(200, W * 0.13)), h = w * 122 / 120;
+    var g = art('-10 0 120 122', GROUNDHOG); g.style.width = w + 'px'; g.style.height = h + 'px';
     var box = document.createElement('div'); box.className = 'mo-p'; box.style.width = w + 'px'; box.style.height = h + 'px'; box.appendChild(g); L.appendChild(box);
     var x = W - w - Math.max(24, W * 0.04), y = Hh - h + 2;
     box.style.transform = 'translate(' + x + 'px,' + y + 'px)';
     anim(box, [{ opacity: 0 }, { opacity: 1, offset: 0.06 }, { opacity: 1, offset: 0.94 }, { opacity: 0 }], { duration: 5400, fill: 'forwards' });
     var body = g.querySelector('.mo-gh'), face = g.querySelector('.mo-face');
-    anim(body, [{ transform: 'translateY(70px)' }, { transform: 'translateY(-4px)', offset: 0.12 }, { transform: 'translateY(0)', offset: 0.16 }, { transform: 'translateY(0)', offset: 0.82 }, { transform: 'translateY(-3px)', offset: 0.86 }, { transform: 'translateY(74px)' }], { duration: 5400, easing: 'ease-in-out', fill: 'forwards' });
+    anim(body, [{ transform: 'translateY(80px)' }, { transform: 'translateY(-4px)', offset: 0.12 }, { transform: 'translateY(0)', offset: 0.16 }, { transform: 'translateY(0)', offset: 0.82 }, { transform: 'translateY(-3px)', offset: 0.86 }, { transform: 'translateY(84px)' }], { duration: 5400, easing: 'ease-in-out', fill: 'forwards' });
     anim(face, [{ transform: 'translateX(0)' }, { transform: 'translateX(0)', offset: 0.22 }, { transform: 'translateX(-4px)', offset: 0.3 }, { transform: 'translateX(-4px)', offset: 0.42 }, { transform: 'translateX(4px)', offset: 0.5 }, { transform: 'translateX(4px)', offset: 0.62 }, { transform: 'translateX(0)', offset: 0.7 }, { transform: 'translateX(0)' }], { duration: 5400, fill: 'forwards' });
     if (say) setTimeout(function () { bubble(L, say, x + w * 0.4, y + h * 0.1, 2000); }, 2300);
     done(L, 5600); setTimeout(function () { box.remove(); ghBusy = false; }, 5600);
@@ -572,61 +595,136 @@
     })(i);
     done(L, longest + 200);
   }
+  /* Valentine's: an arrow streaks in from the top right, trailing glitter, and lands in the O; hearts burst out */
+  function arrowInto(L, b) {
+    var W = innerWidth, sx = W + 60, sy = -40, tx = b.cx, ty = b.cy, dur = 900;
+    var ang = Math.atan2(ty - sy, tx - sx) * 180 / Math.PI;
+    var ar = art('-44 -9 52 18', '<path d="M-40,0 L4,0" stroke="#8a5a32" stroke-width="2.8" stroke-linecap="round"/><path d="M-40,0 l-4,-5 M-36,0 l-4,-5 M-40,0 l-4,5 M-36,0 l-4,5" stroke="#e8483c" stroke-width="2.2" stroke-linecap="round"/>' +
+      '<path transform="translate(5 0) rotate(-90) scale(.62)" d="' + heartP + '" fill="#e8483c"/>');
+    ar.style.width = '88px'; ar.style.height = '30px'; L.appendChild(ar);
+    var pos = function (u) { return { x: sx + (tx - sx) * u, y: sy + (ty - sy) * u }; };
+    anim(ar, [{ transform: 'translate(' + (sx - 80) + 'px,' + (sy - 15) + 'px) rotate(' + ang + 'deg)', opacity: 1 }, { transform: 'translate(' + (tx - 80) + 'px,' + (ty - 15) + 'px) rotate(' + ang + 'deg)', opacity: 1, offset: 0.5 },
+      { transform: 'translate(' + (tx - 80) + 'px,' + (ty - 15) + 'px) rotate(' + (ang + 4) + 'deg)', offset: 0.56 }, { transform: 'translate(' + (tx - 80) + 'px,' + (ty - 15) + 'px) rotate(' + (ang - 3) + 'deg)', offset: 0.62 },
+      { transform: 'translate(' + (tx - 80) + 'px,' + (ty - 15) + 'px) rotate(' + ang + 'deg)', opacity: 1, offset: 0.85 }, { transform: 'translate(' + (tx - 80) + 'px,' + (ty - 15) + 'px) rotate(' + ang + 'deg)', opacity: 0 }],
+      { duration: dur * 2, easing: 'linear', fill: 'forwards' });
+    ar.style.transformOrigin = '80px 15px';
+    var t0 = performance.now(), glitter = setInterval(function () {
+      var u = (performance.now() - t0) / dur; if (u >= 1) { clearInterval(glitter); return; }
+      var p = pos(u), g = piece(R() < 0.5 ? 'mo-star' : 'mo-dot', pick(['#ff6b8b', '#ffc2d1', '#ffffff', '#ffd76a'])), s = rnd(6, 12);
+      g.style.width = g.style.height = s + 'px'; L.appendChild(g);
+      anim(g, [{ transform: 'translate(' + (p.x - s / 2) + 'px,' + (p.y - s / 2) + 'px) scale(1)', opacity: 1 }, { transform: 'translate(' + (p.x - s / 2 + rnd(-10, 10)) + 'px,' + (p.y - s / 2 + rnd(10, 30)) + 'px) scale(.2)', opacity: 0 }], { duration: 700, fill: 'forwards' });
+      setTimeout(function () { g.remove(); }, 720);
+    }, 30);
+    setTimeout(function () { burst(L, tx, ty, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffffff'][i % 4])); }, 20, { size: [14, 28], dist: [50, 140] }); }, dur);
+    setTimeout(function () { ar.remove(); }, dur * 2 + 50);
+  }
+  /* Pi Day: a warm lattice cherry pie rises at the bottom, and the digits of pi stream up out of it */
   function pie() {
-    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(170, Math.min(270, W * 0.18)), h = w * 90 / 140;
-    var p = art('0 0 140 90', PIE); p.style.width = w + 'px'; p.style.height = h + 'px'; L.appendChild(p);
-    var x = W / 2 - w / 2, y = Hh - h - 18;
-    anim(p, [{ transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px)', opacity: 0 }, { transform: 'translate(' + x + 'px,' + (y - 6) + 'px)', opacity: 1, offset: 0.1 }, { transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1, offset: 0.14 }, { transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1, offset: 0.86 }, { transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px)', opacity: 0 }], { duration: 7400, easing: 'ease-in-out', fill: 'forwards' });
-    setTimeout(function () { digits(L, W / 2 - 8, y + h * 0.2, 34); bubble(L, 'Happy Pi Day!', W / 2, y - 10, 2400); }, 1100);
-    done(L, 7600);
-  }
-  /* Easter: the bunny hops in along the bottom, stops for a look (ears twitch), hops on, leaving eggs */
-  function bunny() {
-    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(90, Math.min(140, W * 0.09)), h = w, base = Hh - h - 6;
-    var b = art('0 0 100 100', BUNNY); b.style.width = w + 'px'; b.style.height = h + 'px';
-    var box = document.createElement('div'); box.className = 'mo-p'; box.appendChild(b); L.appendChild(box);
-    var hops = Math.max(8, Math.round(W / (w * 1.05))), stop = Math.floor(hops / 2), frames = [], tot = hops + 2, x0 = -w, x1 = W + w, stepX = (x1 - x0) / hops;
-    /* time: each hop one share, plus two shares paused in the middle */
-    for (var i = 0, t = 0; i <= hops; i++) {
-      var x = x0 + stepX * i, at = (i + (i > stop ? 2 : 0)) / tot;
-      frames.push({ transform: 'translate(' + x + 'px,' + base + 'px) scale(1.04,.94)', offset: Math.min(1, at) });
-      if (i === stop) frames.push({ transform: 'translate(' + x + 'px,' + base + 'px) scale(1,1)', offset: Math.min(1, (i + 2) / tot - 0.001) });
-      if (i < hops) frames.push({ transform: 'translate(' + (x + stepX / 2) + 'px,' + (base - h * 0.55) + 'px) scale(.96,1.06)', offset: Math.min(1, ((i + (i >= stop ? 2 : 0)) + 0.5) / tot) });
-    }
-    frames.sort(function (a, c) { return a.offset - c.offset; });
-    var dur = tot * 560;
-    anim(box, frames, { duration: dur, easing: 'ease-in-out', fill: 'forwards' });
-    var ears = b.querySelector('.mo-ears');
-    setTimeout(function () { anim(ears, [{ transform: 'rotate(0)' }, { transform: 'rotate(-8deg)' }, { transform: 'rotate(5deg)' }, { transform: 'rotate(-6deg)' }, { transform: 'rotate(0)' }], { duration: 900 }); bubble(L, 'Happy Easter!', x0 + stepX * stop + w / 2, base - 4, 1500); }, (stop + 0.3) / tot * dur);
-    /* eggs left behind on some of the landings */
-    for (var k = 1; k < hops; k += 2) (function (k) {
-      setTimeout(function () {
-        var e = art('-10 -10 20 20', egg(k)), s = w * 0.24; e.style.width = s + 'px'; e.style.height = (s * 1.25) + 'px'; L.appendChild(e);
-        var ex = x0 + stepX * k + w * 0.15, ey = Hh - s * 1.25 - 4;
-        anim(e, [{ transform: 'translate(' + ex + 'px,' + ey + 'px) scale(0)', opacity: 1 }, { transform: 'translate(' + ex + 'px,' + ey + 'px) scale(1.15)', opacity: 1, offset: 0.08 }, { transform: 'translate(' + ex + 'px,' + ey + 'px) scale(1)', opacity: 1, offset: 0.7 }, { transform: 'translate(' + ex + 'px,' + ey + 'px) scale(.9)', opacity: 0 }], { duration: 4200, fill: 'forwards' });
-      }, (k + (k > stop ? 2 : 0)) / tot * dur);
-    })(k);
-    done(L, dur + 4400);
-  }
-  /* Earth Day: the globe rises at the bottom, turning, with leaves swirling round it */
-  function globe() {
-    var L = sky(), W = innerWidth, Hh = innerHeight, s = Math.max(120, Math.min(200, W * 0.13));
-    var g = art('0 0 100 100', GLOBE); g.style.width = g.style.height = s + 'px'; L.appendChild(g);
-    var x = W / 2 - s / 2, y = Hh - s - 24;
-    anim(g, [{ transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px) scale(.8)', opacity: 0 }, { transform: 'translate(' + x + 'px,' + (y - 8) + 'px) scale(1.04)', opacity: 1, offset: 0.12 }, { transform: 'translate(' + x + 'px,' + y + 'px) scale(1)', opacity: 1, offset: 0.18 }, { transform: 'translate(' + x + 'px,' + (y - 10) + 'px) scale(1)', opacity: 1, offset: 0.5 }, { transform: 'translate(' + x + 'px,' + y + 'px) scale(1)', opacity: 1, offset: 0.84 }, { transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px) scale(.8)', opacity: 0 }], { duration: 7600, easing: 'ease-in-out', fill: 'forwards' });
-    setTimeout(function () {
-      var cx = W / 2, cy = y + s / 2;
-      for (var i = 0; i < 12; i++) (function (i) {
-        var e = art('-12 -12 24 24', greenLeaf(['#4caf6a', '#7cc47a', '#2e8a4a'][i % 3])), sz = rnd(14, 24); e.style.width = e.style.height = sz + 'px'; L.appendChild(e);
-        var r0 = s * 0.75, a0 = i / 12 * Math.PI * 2, fr = [];
-        for (var k = 0; k <= 12; k++) { var a = a0 + k / 12 * Math.PI * 1.6, r = r0 + Math.sin(k / 12 * Math.PI) * 20; fr.push({ transform: 'translate(' + (cx + Math.cos(a) * r - sz / 2) + 'px,' + (cy + Math.sin(a) * r * 0.55 - sz / 2) + 'px) rotate(' + (k * 40) + 'deg)', opacity: k === 0 || k === 12 ? 0 : 1, offset: k / 12 }); }
-        anim(e, fr, { duration: 4200, delay: i * 90, fill: 'both' });
-      })(i);
-      bubble(L, 'Happy Earth Day!', W / 2, y - 12, 2400);
-    }, 1200);
+    var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(190, Math.min(300, W * 0.2)), h = w * 100 / 160;
+    var p = art('0 0 160 100', PIE); p.style.width = w + 'px'; p.style.height = h + 'px'; L.appendChild(p);
+    var x = W / 2 - w / 2, y = Hh - h - 14;
+    anim(p, [{ transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px)', opacity: 0 }, { transform: 'translate(' + x + 'px,' + (y - 6) + 'px)', opacity: 1, offset: 0.1 }, { transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1, offset: 0.14 }, { transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1, offset: 0.86 }, { transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px)', opacity: 0 }], { duration: 7600, easing: 'ease-in-out', fill: 'forwards' });
+    setTimeout(function () { digits(L, W / 2 - 8, y + h * 0.25, 34); bubble(L, 'Happy Pi Day!', W / 2, y - 8, 2400); }, 1100);
     done(L, 7800);
   }
-  /* Halloween hover: a spider drops from the masthead on its thread, bobs, and climbs back */
+  /* Easter: the O's bunny ears give a wiggle */
+  function wiggleEars() {
+    hats.forEach(function (h) { var e = h.el.querySelector('.mo-ears'); if (e) anim(e, [{ transform: 'rotate(0)' }, { transform: 'rotate(-5deg)' }, { transform: 'rotate(4deg)' }, { transform: 'rotate(-3deg)' }, { transform: 'rotate(0)' }], { duration: 800 }); });
+  }
+  /* a tiny timeline: tracks of [ms, value] eased between, applied every frame */
+  function play(tracks, total, apply, end) {
+    var t0 = performance.now();
+    var val = function (tr, t) {
+      if (t <= tr[0][0]) return tr[0][1];
+      for (var i = 1; i < tr.length; i++) if (t <= tr[i][0]) { var a = tr[i - 1], c = tr[i], u = (t - a[0]) / Math.max(1, c[0] - a[0]); u = u < 0.5 ? 2 * u * u : 1 - Math.pow(-2 * u + 2, 2) / 2; return a[1] + (c[1] - a[1]) * u; }
+      return tr[tr.length - 1][1];
+    };
+    (function f(n) { var t = n - t0, v = {}; for (var k in tracks) v[k] = val(tracks[k], t); apply(v); if (t < total) requestAnimationFrame(f); else if (end) end(); })(t0);
+  }
+  /* Easter: someone in a bunny costume hops in with a basket that has no bottom. Spots an egg, is thrilled, picks it
+     up and pops it in the basket; it drops straight out the bottom. A new egg! Surprised every time. Three times,
+     then poof. */
+  function eggStory() {
+    var L = sky(), W = innerWidth, Hh = innerHeight, hp = Math.max(150, Math.min(230, Hh * 0.27)), s = hp / 200, ground = Hh - 8, k = Math.floor(R() * EGGS.length);
+    var X0 = W * 0.5 - 70 * s, start = -150 * s;
+    var kid = art('0 -30 140 230', KID.replace('EGG', egg(k)));
+    kid.style.width = (140 * s) + 'px'; kid.style.height = (230 * s) + 'px';
+    var eggEl = art('-10 -10 20 20', egg(k)), ew = 14 * s, eh = 18 * s; eggEl.style.width = (20 * s) + 'px'; eggEl.style.height = (20 * s) + 'px';
+    L.appendChild(eggEl); L.appendChild(kid);
+    var torso = kid.querySelector('.kb-torso'), arm = kid.querySelector('.kb-arm'), ears = kid.querySelector('.kb-ears'), handEgg = kid.querySelector('.kb-hand-egg'), oh = kid.querySelector('.kb-oh'), smile = kid.querySelector('.kb-smile');
+    /* stage spots, in page pixels */
+    var gx = X0 + 102 * s, gy = ground - 9 * s, bx = X0 + 102 * s, by = ground - (198 - 124) * s;
+    var placeEgg = function (x, y) { eggEl.style.transform = 'translate(' + (x - 10 * s) + 'px,' + (y - 10 * s) + 'px)'; };
+    placeEgg(gx, gy); eggEl.style.opacity = '1';
+    var T = { x: [[0, start]], y: [[0, 0]], torso: [[0, 0]], arm: [[0, 0]], ears: [[0, 0]] };
+    var key = function (tr, t, v) { T[tr].push([t, v]); };
+    /* hop in */
+    var hops = 6, hopT = 380;
+    for (var i = 1; i <= hops; i++) { key('x', i * hopT, start + (X0 - start) * i / hops); key('y', i * hopT - hopT / 2, -16); key('y', i * hopT, 0); }
+    var t = hops * hopT + 150, ev = [];
+    /* sees the egg: thrilled, two little jumps, ears wiggle */
+    ev.push([t, function () { bubble(L, 'Ooh, an egg!', X0 + 74 * s, ground - 228 * s, 1500); }]);
+    key('y', t + 160, -14); key('y', t + 320, 0); key('y', t + 480, -14); key('y', t + 640, 0);
+    key('ears', t, 0); key('ears', t + 160, -10); key('ears', t + 320, 8); key('ears', t + 480, -8); key('ears', t + 640, 0);
+    t += 900;
+    var lines = ['Another egg!', 'Another one?!', 'So many eggs!'];
+    for (var c = 0; c < 3; c++) {
+      /* bend down and pick it up */
+      key('torso', t, 0); key('arm', t, 0); key('y', t, 0);
+      key('torso', t + 600, 80); key('arm', t + 600, -80); key('y', t + 600, 5);
+      ev.push([t + 600, function () { eggEl.style.opacity = '0'; handEgg.setAttribute('opacity', '1'); }]);
+      /* stand up and pop it in the basket */
+      key('torso', t + 1200, 0); key('arm', t + 1200, -67); key('y', t + 1200, 0);
+      ev.push([t + 1260, function () {
+        handEgg.setAttribute('opacity', '0'); eggEl.style.opacity = '1';
+        anim(eggEl, [{ transform: 'translate(' + (bx - 10 * s) + 'px,' + (by - 10 * s) + 'px)' }, { transform: 'translate(' + (gx - 10 * s) + 'px,' + (gy - 10 * s) + 'px)', offset: 0.7, easing: 'ease-out' },
+          { transform: 'translate(' + (gx - 10 * s) + 'px,' + (gy - 18 * s) + 'px)', offset: 0.85, easing: 'ease-in' }, { transform: 'translate(' + (gx - 10 * s) + 'px,' + (gy - 10 * s) + 'px)' }], { duration: 560, easing: 'ease-in', fill: 'forwards' });
+      }]);
+      key('arm', t + 1700, 0);
+      /* surprised: a new egg! */
+      (function (line, at) {
+        ev.push([at, function () { oh.setAttribute('opacity', '1'); smile.setAttribute('opacity', '0'); bubble(L, line, X0 + 74 * s, ground - 228 * s, 1300); }]);
+        ev.push([at + 900, function () { oh.setAttribute('opacity', '0'); smile.setAttribute('opacity', '1'); }]);
+      })(lines[c], t + 1850);
+      key('y', t + 1850, 0); key('y', t + 2000, -18); key('y', t + 2180, 0);
+      key('ears', t + 1850, 0); key('ears', t + 2000, -12); key('ears', t + 2180, 6); key('ears', t + 2350, 0);
+      t += 2900;
+    }
+    /* poof */
+    ev.push([t, function () {
+      burst(L, X0 + 70 * s, ground - 110 * s, function (i) { return piece(i % 3 ? 'mo-dot' : 'mo-star', pick(['#f7b6c8', '#bfe3f7', '#fff0a8', '#c9f2d2', '#dccbf5', '#ffffff'])); }, 26, { size: [10, 22], dist: [40, 130], fall: 30 });
+      anim(kid, [{ opacity: 1, transform: kid.style.transform + ' scale(1)' }, { opacity: 0, transform: kid.style.transform + ' scale(.2)' }], { duration: 380, fill: 'forwards' });
+      anim(eggEl, [{ opacity: 1 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 2600, fill: 'forwards' });
+    }]);
+    ev.forEach(function (e) { setTimeout(e[1], e[0]); });
+    play(T, t, function (v) {
+      kid.style.transform = 'translate(' + v.x + 'px,' + (ground - 228 * s + v.y * s) + 'px)';
+      kid.style.transformOrigin = '50% 85%';
+      torso.setAttribute('transform', 'rotate(' + v.torso.toFixed(2) + ' 60 140)');
+      arm.setAttribute('transform', 'rotate(' + v.arm.toFixed(2) + ' 62 96)');
+      ears.setAttribute('transform', 'rotate(' + v.ears.toFixed(2) + ' 66 40)');
+    });
+    done(L, t + 2800);
+  }
+  /* Halloween: a big moon rises in the top right, and bats come flapping out of it toward you, across the page */
+  function batNight() {
+    var L = sky(), W = innerWidth, Hh = innerHeight, longest = 0;
+    var ms = Math.max(170, Math.min(300, W * 0.19)), moon = art('0 0 100 100', '<defs><radialGradient id="I-m" cx=".42" cy=".38" r=".7"><stop offset="0" stop-color="#fffbe6"/><stop offset=".7" stop-color="#ffe7a0"/><stop offset="1" stop-color="#f2c457"/></radialGradient><radialGradient id="I-mg"><stop offset=".55" stop-color="#ffe7a0" stop-opacity=".55"/><stop offset="1" stop-color="#ffe7a0" stop-opacity="0"/></radialGradient></defs><circle cx="50" cy="50" r="50" fill="url(#I-mg)"/><circle cx="50" cy="50" r="30" fill="url(#I-m)"/><g fill="#e3b54a" opacity=".45"><circle cx="40" cy="42" r="5"/><circle cx="58" cy="58" r="7"/><circle cx="60" cy="38" r="3"/><circle cx="44" cy="62" r="3.4"/></g>');
+    moon.style.width = moon.style.height = ms + 'px'; L.appendChild(moon);
+    var mx = W - ms * 0.82, my = -ms * 0.12, mcx = mx + ms / 2, mcy = my + ms / 2;
+    anim(moon, [{ transform: 'translate(' + mx + 'px,' + (my + 40) + 'px)', opacity: 0 }, { transform: 'translate(' + mx + 'px,' + my + 'px)', opacity: 1, offset: 0.14 }, { transform: 'translate(' + mx + 'px,' + my + 'px)', opacity: 1, offset: 0.86 }, { transform: 'translate(' + mx + 'px,' + (my - 10) + 'px)', opacity: 0 }], { duration: 9800, fill: 'both' });
+    for (var i = 0; i < 8; i++) (function (i) {
+      var w = rnd(60, 95), dur = rnd(5200, 7600), delay = 900 + i * 520 + rnd(0, 260), ex = rnd(-0.15, 0.25) * W - w, ey = Hh * rnd(0.15, 0.75), wob = rnd(16, 40), f1 = rnd(2.5, 4.5), ph = R() * 6, fr = [];
+      longest = Math.max(longest, dur + delay);
+      var b = art('-30 -18 60 36', bat(rnd(0.24, 0.34).toFixed(2))); b.style.width = w + 'px'; b.style.height = (w * 0.6) + 'px';
+      for (var k = 0; k <= 30; k++) {
+        var t = k / 30, e = t * t * (3 - 2 * t), x = mcx + (ex - mcx) * e, y = mcy + (ey - mcy) * e + Math.sin(t * Math.PI * f1 + ph) * wob * t, sc = 0.25 + 0.95 * t;
+        fr.push({ transform: 'translate(' + (x - w / 2) + 'px,' + (y - w * 0.3) + 'px) scale(' + sc.toFixed(2) + ') rotate(' + (Math.sin(t * Math.PI * f1 + ph) * 10).toFixed(1) + 'deg)', opacity: t < 0.08 ? t / 0.08 : 1 });
+      }
+      setTimeout(function () { L.appendChild(b); anim(b, fr, { duration: dur, easing: 'linear', fill: 'forwards' }); setTimeout(function () { b.remove(); }, dur + 50); }, delay);
+    })(i);
+    done(L, Math.max(longest + 400, 10000));
+  }
   var spBusy = false;
   function spider(b) {
     if (spBusy) return; spBusy = true;
@@ -639,7 +737,6 @@
     setTimeout(function () { bubble(L, 'Boo!', x, top + drop - 16, 1200); }, 1300);
     done(L, 3500); setTimeout(function () { sp.remove(); line.remove(); spBusy = false; }, 3500);
   }
-
   /* ---------------- when it plays ---------------- */
   var spec = SHOW[OCC];
   if (!spec) return;
@@ -661,7 +758,7 @@
 
   function start() {
     css();
-    var hatSpec = spec.hat === 'glasses' ? { glasses: true } : spec.hat ? HATS[spec.hat] : null, tries = 0, wired = {};
+    var hatSpec = spec.costume ? { costume: spec.costume } : spec.hat ? HATS[spec.hat] : null, tries = 0;
     /* hats on every logo (apps draw their masthead late: keep looking for a while), and hover on each */
     (function place() {
       plates().forEach(function (f) {

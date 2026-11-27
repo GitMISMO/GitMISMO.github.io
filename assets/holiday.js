@@ -35,12 +35,12 @@
 
   /* ---------- the holiday calendar (Jonna, Nov 27, 2026) ----------
      Besides December, a little something on: Groundhog Day, Valentine's Day, Pi Day, St. Patrick's Day,
-     Easter, Earth Day, the first day of summer, the 4th of July, Halloween and Thanksgiving, on the day
+     Easter, the 4th of July, Halloween and Thanksgiving, on the day
      itself, or on the business day before when the day falls on a weekend or a MISMO day off (so the team
      sees it: Easter shows on Good Friday, Thanksgiving on the Wednesday, the 4th on the day before). New
      Year's is the first time each person opens any tool in January. All of it lives in /assets/occasions.js,
      loaded only on those days. Preview any of them with ?holiday=<name> on a page's address:
-     newyear, groundhog, valentine, piday, stpatrick, easter, earthday, summer, july4, halloween, thanksgiving.
+     newyear, groundhog, valentine, piday, stpatrick, easter, july4, halloween, thanksgiving.
      Dates are worked out on Eastern time, MISMO's working clock. */
   function U(y, m, d) { return new Date(Date.UTC(y, m - 1, d)); }
   function key(d) { return d.toISOString().slice(0, 10); }
@@ -66,16 +66,12 @@
       l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
     return U(y, Math.floor((h + l - 7 * m + 114) / 31), ((h + l - 7 * m + 114) % 31) + 1);
   }
-  /* the June solstice on Eastern time (June 20 in 2028 and 2032, June 21 the other years to 2035) */
-  function summer(y) { return U(y, 6, ({ 2028: 20, 2032: 20 })[y] || 21); }
   var DAYS = [
     ['groundhog', function (y) { return U(y, 2, 2); }],
     ['valentine', function (y) { return U(y, 2, 14); }],
     ['piday', function (y) { return U(y, 3, 14); }],
     ['stpatrick', function (y) { return U(y, 3, 17); }],
     ['easter', easter],
-    ['earthday', function (y) { return U(y, 4, 22); }],
-    ['summer', summer],
     ['july4', function (y) { return U(y, 7, 4); }],
     ['halloween', function (y) { return U(y, 10, 31); }],
     ['thanksgiving', function (y) { return nth(y, 11, 4, 4); }]
@@ -102,7 +98,7 @@
   var stored = ''; try { stored = localStorage.getItem('mismo.holiday') || ''; } catch (e) {}
   var preview = ask === 'preview' || ask === 'sleigh' || (!ask && stored === 'preview');
   var occ = preview ? 'christmas' : (ask && ask !== 'christmas' ? ask : (ask === 'christmas' ? 'christmas' : occasionOn(etToday())));
-  window.MismoHoliday = { on: !!occ, occasion: occ || '', preview: !!ask || preview, version: '2026-11-27c', calendar: { occasionOn: occasionOn, U: U } };
+  window.MismoHoliday = { on: !!occ, occasion: occ || '', preview: !!ask || preview, version: '2026-11-27d', calendar: { occasionOn: occasionOn, U: U } };
   if (!occ) return;
   if (occ !== 'christmas') {
     /* the other holidays: their own file, loaded only today */
