@@ -5,11 +5,15 @@
    - New Year's: the first time each person opens any tool in January, fireworks, confetti and the new year in gold,
      and a party hat on the O for that day. Once per person per year.
    - Groundhog Day: a groundhog pops up out of his burrow in the corner, looks around and ducks back in.
-   - Valentine's Day: an arrow streaks in and lands in the O, hearts burst out of it, and hearts float up the page.
-   - Pi Day: a lattice cherry pie rises at the bottom with the digits of pi streaming up from it.
+   - Valentine's Day: shiny heart balloons float up the page; then an arrow streaks in and lands in the O, and
+     hearts burst out of it.
+   - Pi Day: a lattice cherry pie is set down at the bottom with the digits of pi streaming up from it.
    - St. Patrick's Day: a leprechaun hat on the O, a rainbow across the top into a pot of gold, shamrocks drifting.
-   - Easter (shows on Good Friday): the O is a bunny. Someone in a bunny costume hops in with a basket that has no
-     bottom, finds an egg, pops it in, it drops out, finds it again (surprised every time), three times, then poof.
+   - Easter (shows on Good Friday): the O gets floppy bunny ears and a bunny face. Someone in a bunny costume hops in
+     with a bottomless basket on their back, finds an egg, tosses it over the shoulder into the basket, it drops out
+     behind them, they turn around and find it again (surprised every time), three times, then poof.
+   - The costumes (bunny, jack-o'-lantern, turkey) keep the O an O: they add ears, a stem or feathers around it and a
+     face in its middle; the jack-o'-lantern turns it orange.
    - 4th of July: an Uncle Sam hat on the O and red, white and blue fireworks.
    - Halloween: the O is a jack-o'-lantern; a big moon rises in the top right and bats flap out of it. Hover over the
      logo and a spider drops down on its thread.
@@ -296,47 +300,51 @@
       [35, 44.5, 54, 63.5].map(function (x) { return '<path transform="translate(' + x + ' 72) scale(.42)" d="M0,-10 L2.9,-3.1 L9.5,-3.1 L4.3,1.2 L5.9,8.1 L0,4.2 L-5.9,8.1 L-4.3,1.2 L-9.5,-3.1 L-2.9,-3.1 Z" fill="#fff"/>'; }).join('') }
   };
 
-  /* costumes: the O itself becomes something. Drawn over the O's own footprint (0 to 152 across, 0 to 108 down,
-     the O of the 708 x 108 lockup), with room around it for ears, a stem or feathers: viewBox -50 -80 252 210 */
+  /* costumes: the O itself becomes something, and stays an O. Drawn over the O's own footprint (0 to 152 across,
+     0 to 108 down, the O of the 708 x 108 lockup), with room around it for ears, a stem or feathers: viewBox
+     -50 -80 252 210. OPATH is the logo's own O (ring); OOUT is just its outside edge. */
+  var OOUT = 'M35.7,1.5C18.8,6.1 7.8,16.8 2.2,33.8C0.1,40.3 -0.3,43.4 -0.3,53.5C-0.3,63.6 0.1,66.7 2.2,73.2C7.9,90.4 19.0,101.2 35.7,105.5C44.1,107.7 108.0,107.7 116.5,105.5C138.7,99.7 152.0,80.2 152.0,53.5C152.0,26.5 138.8,7.6 115.9,1.5C108.5,-0.5 42.9,-0.5 35.7,1.5Z';
+  var OPATH = OOUT + 'M104.9,33.5C110.6,36.8 112.5,41.9 112.5,53.5C112.5,65.1 110.6,70.2 104.9,73.5C101.7,75.4 99.7,75.5 75.5,75.5C45.8,75.5 44.8,75.3 40.9,67.2C37.9,61.1 37.8,47.4 40.7,41.0C44.8,31.7 47.5,31.0 77.5,31.3C99.4,31.5 101.8,31.7 104.9,33.5Z';
   var COSTUMES = {
-    bunny: '<defs><radialGradient id="I-w" cx=".42" cy=".38" r=".75"><stop offset="0" stop-color="#ffffff"/><stop offset=".8" stop-color="#f1f4f8"/><stop offset="1" stop-color="#d6dde6"/></radialGradient></defs>' +
+    /* Easter: big floppy ears on top of the O (one up, one flopped over), and a little bunny face in its middle */
+    bunny: '<defs><linearGradient id="I-w" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#dfe6ee"/></linearGradient></defs>' +
       '<g class="mo-ears">' +
-      '<path d="M34,16 C22,-24 24,-62 38,-74 C52,-66 56,-28 54,12 Z" fill="url(#I-w)"/><path d="M38,8 C30,-22 32,-52 40,-62 C48,-54 49,-24 48,6 Z" fill="#f7b6c8"/>' +
-      '<path d="M100,12 C100,-28 108,-62 124,-68 C136,-60 128,-26 118,16 Z" fill="url(#I-w)"/><path d="M106,6 C107,-22 112,-50 122,-56 C128,-48 122,-22 114,8 Z" fill="#f7b6c8"/></g>' +
-      '<rect x="-4" y="-2" width="160" height="112" rx="56" fill="url(#I-w)"/>' +
-      '<g fill="#fff"><circle cx="40" cy="2" r="9"/><circle cx="58" cy="-3" r="10"/><circle cx="76" cy="-4" r="10"/><circle cx="94" cy="-3" r="10"/><circle cx="112" cy="2" r="9"/></g>' +
-      '<ellipse cx="34" cy="72" rx="15" ry="9" fill="#f7b6c8" opacity=".6"/><ellipse cx="118" cy="72" rx="15" ry="9" fill="#f7b6c8" opacity=".6"/>' +
-      '<ellipse cx="52" cy="48" rx="9.5" ry="11.5" fill="#2a1d18"/><ellipse cx="100" cy="48" rx="9.5" ry="11.5" fill="#2a1d18"/>' +
-      '<circle cx="55" cy="44" r="3.6" fill="#fff"/><circle cx="103" cy="44" r="3.6" fill="#fff"/><circle cx="49" cy="53" r="1.6" fill="#fff" opacity=".8"/><circle cx="97" cy="53" r="1.6" fill="#fff" opacity=".8"/>' +
-      '<path d="M68,62 C70,59 82,59 84,62 C83,66 79,69 76,70 C73,69 69,66 68,62 Z" fill="#f49ab0"/>' +
-      '<path d="M76,70 L76,74 M76,74 C74,80 66,82 62,78 M76,74 C78,80 86,82 90,78" stroke="#b06a7a" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
-      '<rect x="70.5" y="76" width="11" height="11" rx="2.2" fill="#fff" stroke="#dfe5ec" stroke-width="1"/><path d="M76,76 L76,87" stroke="#dfe5ec" stroke-width="1"/>' +
-      '<g stroke="#9aa6b2" stroke-width="1.3" stroke-linecap="round"><path d="M58,68 L22,60 M58,72 L20,72 M58,76 L24,84 M94,68 L130,60 M94,72 L132,72 M94,76 L128,84"/></g>',
-    pumpkin: '<defs><radialGradient id="I-pk" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#ffb24d"/><stop offset=".6" stop-color="#f27d1b"/><stop offset="1" stop-color="#b24f0a"/></radialGradient>' +
-      '<radialGradient id="I-pk2" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#f59a3a"/><stop offset="1" stop-color="#a5460a"/></radialGradient>' +
-      '<radialGradient id="I-fl" cx=".5" cy=".55" r=".65"><stop offset="0" stop-color="#fff7c2"/><stop offset=".45" stop-color="#ffd23a"/><stop offset="1" stop-color="#f08a24"/></radialGradient></defs>' +
-      '<path d="M72,0 C70,-14 74,-26 86,-32 C89,-28 87,-23 84,-19 C81,-12 82,-6 84,2 Z" fill="#5b7a2e"/><path d="M76,-4 C75,-14 78,-22 84,-27" stroke="#8fb14f" stroke-width="2" fill="none" stroke-linecap="round"/>' +
-      '<path d="M86,-10 C98,-18 108,-10 103,-2 C99,4 92,1 95,-4" stroke="#4e6b26" stroke-width="2.6" fill="none" stroke-linecap="round"/>' +
-      '<ellipse cx="18" cy="56" rx="28" ry="50" fill="url(#I-pk2)"/><ellipse cx="134" cy="56" rx="28" ry="50" fill="url(#I-pk2)"/>' +
-      '<ellipse cx="44" cy="55" rx="32" ry="56" fill="url(#I-pk)"/><ellipse cx="108" cy="55" rx="32" ry="56" fill="url(#I-pk)"/>' +
-      '<ellipse cx="76" cy="54" rx="34" ry="58" fill="url(#I-pk)"/>' +
-      '<path d="M44,0 C36,30 36,80 44,110 M108,0 C116,30 116,80 108,110 M62,-3 C58,30 58,80 62,112 M90,-3 C94,30 94,80 90,112" stroke="#b24f0a" stroke-width="2" fill="none" opacity=".45"/>' +
-      '<ellipse cx="34" cy="30" rx="10" ry="18" fill="#fff" opacity=".2" transform="rotate(-20 34 30)"/>' +
-      '<g class="mo-flick" fill="url(#I-fl)" stroke="#7a3606" stroke-width="1.6" stroke-linejoin="round">' +
-      '<path d="M38,30 L60,48 L32,50 Z"/><path d="M114,30 L120,50 L92,48 Z"/><path d="M76,52 L85,65 L67,65 Z"/>' +
-      '<path d="M28,70 C48,88 104,88 124,70 L118,82 L107,78 L101,90 L91,84 L84,96 L76,88 L68,96 L61,84 L51,90 L45,78 L34,82 Z"/></g>',
+      '<path d="M30,8 C18,-30 16,-66 32,-78 C50,-72 62,-36 62,6 Z" fill="url(#I-w)" stroke="#0f314c" stroke-width="3" stroke-linejoin="round"/>' +
+      '<path d="M37,-1 C30,-30 29,-58 35,-67 C46,-59 52,-32 53,-1 Z" fill="#f7b6c8"/>' +
+      '<path d="M90,6 C89,-20 94,-42 108,-52 C126,-62 156,-48 174,-20 C180,-10 172,-2 163,-7 C150,-24 134,-32 124,-28 C120,-16 120,-6 121,6 Z" fill="url(#I-w)" stroke="#0f314c" stroke-width="3" stroke-linejoin="round"/>' +
+      '<path d="M98,-1 C98,-22 102,-38 112,-44 C126,-50 146,-40 159,-21 C146,-29 132,-36 120,-33 C113,-22 111,-11 111,-1 Z" fill="#f7b6c8"/></g>' +
+      '<ellipse cx="52" cy="62" rx="7" ry="4.4" fill="#f7b6c8" opacity=".7"/><ellipse cx="100" cy="62" rx="7" ry="4.4" fill="#f7b6c8" opacity=".7"/>' +
+      '<ellipse cx="61" cy="47" rx="4.6" ry="5.6" fill="#0f314c"/><ellipse cx="91" cy="47" rx="4.6" ry="5.6" fill="#0f314c"/><circle cx="62.6" cy="45" r="1.7" fill="#fff"/><circle cx="92.6" cy="45" r="1.7" fill="#fff"/>' +
+      '<g stroke="#9aa6b2" stroke-width="1.6" stroke-linecap="round"><path d="M68,58 L26,52 M68,61 L24,63 M84,58 L126,52 M84,61 L128,63"/></g>' +
+      '<path d="M71,54 C72,52 80,52 81,54 C80.4,57 78,59 76,59.6 C74,59 71.6,57 71,54 Z" fill="#f49ab0"/>' +
+      '<path d="M76,59.6 L76,62 M76,62 C74.6,65.6 70.4,66.4 68.4,64.2 M76,62 C77.4,65.6 81.6,66.4 83.6,64.2" stroke="#0f314c" stroke-width="1.9" fill="none" stroke-linecap="round"/>' +
+      '<rect x="72.6" y="63.6" width="6.8" height="6" rx="1.4" fill="#fff" stroke="#0f314c" stroke-width="1.1"/><path d="M76,63.6 L76,69.6" stroke="#0f314c" stroke-width=".9"/>',
+    /* Halloween: the O turns pumpkin orange with a stem and vine on top, and a carved face in its middle */
+    pumpkin: '<defs><linearGradient id="I-pk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffab42"/><stop offset=".55" stop-color="#f27d1b"/><stop offset="1" stop-color="#bf560b"/></linearGradient>' +
+      '<radialGradient id="I-gl" cx=".5" cy=".5" r=".6"><stop offset="0" stop-color="#ffd23a" stop-opacity=".55"/><stop offset="1" stop-color="#ffd23a" stop-opacity="0"/></radialGradient>' +
+      '<clipPath id="I-oc"><path d="' + OPATH + '" clip-rule="evenodd"/></clipPath></defs>' +
+      '<path d="M82,-11 C93,-19 106,-12 101,-3 C97,3 89,0 92,-6" stroke="#4e6b26" stroke-width="2.8" fill="none" stroke-linecap="round"/>' +
+      '<path d="M92,-14 C100,-26 114,-24 116,-16 C108,-12 99,-11 92,-14 Z" fill="#6f9a37"/>' +
+      '<path d="M68,6 C66,-8 70,-20 81,-27 C85,-24 84,-18 81,-14 C78,-7 79,-1 82,6 Z" fill="#5b7a2e" stroke="#3e5a1c" stroke-width="1.4" stroke-linejoin="round"/>' +
+      '<path d="' + OPATH + '" fill="url(#I-pk)" fill-rule="evenodd"/>' +
+      '<g clip-path="url(#I-oc)" fill="none" stroke-linecap="round"><g stroke="#a8480a" stroke-opacity=".5" stroke-width="2.6">' +
+      '<path d="M20,4 C6,30 6,78 20,104 M132,4 C146,30 146,78 132,104 M52,-2 C46,8 44,20 46,32 M100,-2 C106,8 108,20 106,32 M52,110 C46,100 44,88 46,76 M100,110 C106,100 108,88 106,76"/></g>' +
+      '<path d="M12,34 C16,20 24,11 36,7" stroke="#fff" stroke-opacity=".45" stroke-width="5"/></g>' +
+      '<ellipse class="mo-flick" cx="76" cy="54" rx="40" ry="26" fill="url(#I-gl)"/>' +
+      '<g fill="#3b1a06" stroke="#f08a24" stroke-width="1.4" stroke-linejoin="round">' +
+      '<path d="M50,50 L61,36 L67,51 Z"/><path d="M102,50 L91,36 L85,51 Z"/><path d="M76,49 L80,56 L72,56 Z"/>' +
+      '<path d="M47,59 C58,72 94,72 105,59 L101,67 L94,64 L90,71 L83,67 L76,73 L69,67 L62,71 L58,64 L51,67 Z"/></g>',
+    /* Thanksgiving: tail feathers fan out behind the O, and a turkey face (eyes, beak, wattle) sits in its middle */
     turkey: (function () {
       var cols = [['#b8322a', '#e8483c'], ['#d9701f', '#f39a3c'], ['#e9b02f', '#ffd76a'], ['#7a4a22', '#a5683a']], f = '';
-      for (var i = -5; i <= 5; i++) { var c = cols[(i + 10) % 4]; f += '<g transform="rotate(' + i * 15 + ' 76 74)"><ellipse cx="76" cy="-6" rx="15" ry="52" fill="' + c[0] + '"/><ellipse cx="76" cy="-44" rx="11" ry="13" fill="' + c[1] + '"/><path d="M76,40 L76,-50" stroke="#3a2210" stroke-opacity=".35" stroke-width="1.4"/></g>'; }
-      return '<defs><radialGradient id="I-tb" cx=".45" cy=".35" r=".8"><stop offset="0" stop-color="#a06a3a"/><stop offset="1" stop-color="#4e2e14"/></radialGradient></defs>' + f +
-        '<rect x="-4" y="-2" width="160" height="112" rx="56" fill="url(#I-tb)"/>' +
-        '<ellipse cx="76" cy="80" rx="46" ry="26" fill="#b07a48" opacity=".55"/>' +
-        '<path d="M2,44 C14,30 30,34 34,52 C30,72 20,86 6,84 C0,70 -2,56 2,44 Z M150,44 C138,30 122,34 118,52 C122,72 132,86 146,84 C152,70 154,56 150,44 Z" fill="#6b3f1c"/>' +
-        '<path d="M8,58 C16,54 24,56 28,62 M8,70 C14,66 22,68 26,72 M144,58 C136,54 128,56 124,62 M144,70 C138,66 130,68 126,72" stroke="#3a2210" stroke-opacity=".5" stroke-width="1.6" fill="none"/>' +
-        '<circle cx="60" cy="40" r="10" fill="#fff"/><circle cx="92" cy="40" r="10" fill="#fff"/><circle cx="62" cy="42" r="5" fill="#1b120c"/><circle cx="94" cy="42" r="5" fill="#1b120c"/><circle cx="63.6" cy="40.4" r="1.6" fill="#fff"/><circle cx="95.6" cy="40.4" r="1.6" fill="#fff"/>' +
-        '<path d="M68,54 L84,54 L76,68 Z" fill="#f3a623" stroke="#c97f12" stroke-width="1.2" stroke-linejoin="round"/>' +
-        '<path d="M80,62 C90,68 90,84 80,90 C75,82 75,70 80,62 Z" fill="#d23a2c"/>' +
-        '<path d="M52,108 L52,122 M44,128 L52,122 L60,128 M52,122 L52,130 M100,108 L100,122 M92,128 L100,122 L108,128 M100,122 L100,130" stroke="#f3a623" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
+      for (var i = -5; i <= 5; i++) { var c = cols[(i + 10) % 4]; f += '<g transform="rotate(' + i * 15 + ' 76 62)"><ellipse cx="76" cy="-12" rx="14" ry="50" fill="' + c[0] + '"/><ellipse cx="76" cy="-50" rx="10" ry="12" fill="' + c[1] + '"/><circle cx="76" cy="-52" r="4" fill="#3a2210" opacity=".35"/><path d="M76,40 L76,-58" stroke="#3a2210" stroke-opacity=".35" stroke-width="1.4"/></g>'; }
+      return '<defs><mask id="I-tm" maskUnits="userSpaceOnUse" x="-50" y="-80" width="252" height="210"><rect x="-50" y="-80" width="252" height="210" fill="#fff"/><path d="' + OOUT + '" fill="#000" stroke="#000" stroke-width="3"/></mask></defs>' +
+        '<g mask="url(#I-tm)">' + f + '</g>' +
+        '<circle cx="64" cy="46" r="6.6" fill="#fff" stroke="#0f314c" stroke-width="1.2"/><circle cx="88" cy="46" r="6.6" fill="#fff" stroke="#0f314c" stroke-width="1.2"/>' +
+        '<circle cx="65.4" cy="47" r="3.4" fill="#1b120c"/><circle cx="89.4" cy="47" r="3.4" fill="#1b120c"/><circle cx="66.4" cy="45.8" r="1.1" fill="#fff"/><circle cx="90.4" cy="45.8" r="1.1" fill="#fff"/>' +
+        '<path d="M69,54 L83,54 L76,64 Z" fill="#f3a623" stroke="#c97f12" stroke-width="1.2" stroke-linejoin="round"/>' +
+        '<path d="M79,59 C87,63 87,72 81,75 C77,70 76,64 79,59 Z" fill="#d23a2c"/>' +
+        '<path d="M56,106 L56,118 M49,124 L56,118 L63,124 M56,118 L56,126 M96,106 L96,118 M89,124 L96,118 L103,124 M96,118 L96,126" stroke="#f3a623" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>';
     })()
   };
 
@@ -431,7 +439,7 @@
       '<path d="M80,28 C76,22 84,18 80,8"><animate attributeName="opacity" values="0;.8;0" dur="2.4s" begin=".8s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -6" dur="2.4s" begin=".8s" repeatCount="indefinite"/></path>' +
       '<path d="M100,30 C96,24 104,20 100,12"><animate attributeName="opacity" values="0;.8;0" dur="2.4s" begin="1.6s" repeatCount="indefinite"/><animateTransform attributeName="transform" type="translate" values="0 6;0 -6" dur="2.4s" begin="1.6s" repeatCount="indefinite"/></path></g>';
   })();
-  /* Easter: a person in a bunny costume, carrying a basket with no bottom. Drawn on 140 x 200, facing right;
+  /* Easter: a person in a bunny costume, carrying a basket with no bottom on their back. Drawn on 140 x 200, facing right;
      feet on the ground at y 198. Torso turns at the hips (60,140); the reaching arm at the shoulder (62,96). */
   var KID = '<defs><radialGradient id="I-su" cx=".4" cy=".3" r=".85"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d9dfe8"/></radialGradient>' +
     '<radialGradient id="I-sk" cx=".45" cy=".4" r=".7"><stop offset="0" stop-color="#ffe3d2"/><stop offset="1" stop-color="#f0b796"/></radialGradient>' +
@@ -440,16 +448,14 @@
     '<path d="M66,140 C66,160 66,176 68,188" stroke="#f4f6f9" stroke-width="17" stroke-linecap="round" fill="none"/><ellipse cx="76" cy="192.5" rx="17" ry="7" fill="#fff"/><ellipse cx="88" cy="194" rx="5" ry="2.6" fill="#f7b6c8"/>' +
     '<g class="kb-torso">' +
     '<circle cx="35" cy="128" r="10.5" fill="#fff"/><circle cx="32" cy="125" r="4" fill="#eef1f5"/>' +
+    '<path d="M6,102 L34,102 L30.5,126 L9.5,126 Z" fill="url(#I-bk)"/>' +
+    '<path d="M6.8,110 L33.2,110 M7.9,118 L32.1,118" stroke="#7a4f1e" stroke-opacity=".6" stroke-width="1.4"/>' +
+    '<path d="M13,102 L14,126 M20,102 L20,126 M27,102 L26,126" stroke="#7a4f1e" stroke-opacity=".45" stroke-width="1.2"/>' +
+    '<ellipse cx="20" cy="102" rx="14.5" ry="3.8" fill="#c08a44" stroke="#7a4f1e" stroke-width="1"/><ellipse cx="20" cy="102" rx="11.5" ry="2.4" fill="#5a3a16"/>' +
+    '<ellipse cx="20" cy="126" rx="10.5" ry="2" fill="#3a240c" opacity=".8"/>' +
     '<path d="M38,146 C33,118 40,92 60,86 C82,90 88,118 84,146 C70,152 50,152 38,146 Z" fill="url(#I-su)"/>' +
     '<ellipse cx="67" cy="120" rx="12" ry="18" fill="#ffe3ec"/>' +
-    '<path d="M56,98 C64,108 80,108 98,104" stroke="#dfe5ec" stroke-width="11" stroke-linecap="round" fill="none"/>' +
-    '<path d="M88,120 C88,100 116,100 116,120" stroke="#9c6a2e" stroke-width="3.2" fill="none"/>' +
-    '<circle cx="101" cy="103" r="6.2" fill="#eef1f5"/>' +
-    '<path d="M86,120 L118,120 L113.5,142 L90.5,142 Z" fill="url(#I-bk)"/>' +
-    '<path d="M87.4,127 L116.6,127 M88.8,134.5 L115.2,134.5" stroke="#7a4f1e" stroke-opacity=".6" stroke-width="1.4"/>' +
-    '<path d="M94,120 L95,142 M102,120 L102,142 M110,120 L109,142" stroke="#7a4f1e" stroke-opacity=".45" stroke-width="1.2"/>' +
-    '<ellipse cx="102" cy="120" rx="16" ry="4.2" fill="#c08a44" stroke="#7a4f1e" stroke-width="1"/><ellipse cx="102" cy="120" rx="12.6" ry="2.6" fill="#5a3a16"/>' +
-    '<ellipse cx="102" cy="142" rx="11.5" ry="2.2" fill="#3a240c" opacity=".75"/>' +
+    '<path d="M30,103 C40,94 52,90 64,92" stroke="#9c6a2e" stroke-width="3.2" fill="none" stroke-linecap="round"/>' +
     '<g class="kb-ears"><path d="M52,42 C42,10 44,-14 53,-22 C62,-16 64,8 60,42 Z" fill="#e3e8ef"/>' +
     '<path d="M66,40 C66,4 72,-18 83,-22 C89,-14 85,10 75,42 Z" fill="url(#I-su)"/><path d="M70,34 C70,8 74,-10 81,-14 C84,-8 80,10 74,34 Z" fill="#f7b6c8"/></g>' +
     '<circle cx="64" cy="60" r="25.5" fill="url(#I-su)"/>' +
@@ -515,10 +521,9 @@
     },
     valentine: {
       open: function () {
-        var L = sky();
-        setTimeout(function () { var b = visibleLogo(); if (b) arrowInto(L, b); }, 600);
-        var r = drift(L, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffc2d1'][i % 4])); }, 24, { dir: 'up', size: [16, 34], dur: [5600, 8600], spread: 2600, spin: 40, reach: [0.6, 1] });
-        done(L, Math.max(r, 4200));
+        var L = sky(), r = balloons(L, 16);
+        setTimeout(function () { var b = visibleLogo(); if (b) arrowInto(L, b); }, 4600);
+        done(L, Math.max(r, 7600));
       },
       hover: function (b) { var L = sky(); done(L, burst(L, b.cx, b.cy, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffffff'][i % 4])); }, 16, { size: [14, 26], dist: [40, 120] })); }
     },
@@ -595,6 +600,29 @@
     })(i);
     done(L, longest + 200);
   }
+  /* Valentine's: shiny heart balloons on strings float up the page, swaying */
+  function balloonHeart(c, d) {
+    return '<defs><radialGradient id="I-bh" cx=".34" cy=".28" r=".85"><stop offset="0" stop-color="#ffffff" stop-opacity=".95"/><stop offset=".22" stop-color="' + c + '"/><stop offset="1" stop-color="' + d + '"/></radialGradient></defs>' +
+      '<path d="M0,22 C0,30 -4,34 1.5,40 C6.5,45 -2.5,50 1,56" stroke="#b9a2ab" stroke-width=".9" fill="none"/>' +
+      '<path d="M-1.8,23.6 L1.8,23.6 L0,20.4 Z" fill="' + d + '"/>' +
+      '<path d="M0,21 C-21,7 -16,-12 -7.5,-13 C-3.4,-13.5 -1,-11 0,-8 C1,-11 3.4,-13.5 7.5,-13 C16,-12 21,7 0,21 Z" fill="url(#I-bh)"/>' +
+      '<ellipse cx="-7.5" cy="-5" rx="2.8" ry="4.6" fill="#fff" opacity=".5" transform="rotate(-28 -7.5 -5)"/>';
+  }
+  function balloons(layer, n) {
+    var W = innerWidth, Hh = innerHeight, longest = 0, cols = [['#ff4d6d', '#a8102f'], ['#ff8fab', '#cf4470'], ['#e8483c', '#8e1520'], ['#ffb3c6', '#d9688f'], ['#ff6b8b', '#b8173f']];
+    for (var i = 0; i < n; i++) {
+      var c = cols[i % cols.length], w = rnd(48, 96), h = w * 56 / 32, e = art('-16 -15 32 56', balloonHeart(c[0], c[1]));
+      e.style.width = w + 'px'; e.style.height = h + 'px'; layer.appendChild(e);
+      var x0 = W * (i + R()) / n - w / 2, dur = rnd(9000, 12500), delay = rnd(0, 2600), sway = rnd(14, 34), f1 = rnd(0.8, 1.6), ph = R() * 6, fr = [];
+      for (var k = 0; k <= 20; k++) {
+        var t = k / 20, y = Hh + 20 - (Hh + h + 60) * t, x = x0 + Math.sin(t * Math.PI * 2 * f1 + ph) * sway;
+        fr.push({ transform: 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + (Math.sin(t * Math.PI * 2 * f1 + ph + 1) * 7).toFixed(1) + 'deg)', opacity: t < 0.05 ? t / 0.05 : 1 });
+      }
+      anim(e, fr, { duration: dur, delay: delay, easing: 'linear', fill: 'both' });
+      longest = Math.max(longest, dur + delay);
+    }
+    return longest + 200;
+  }
   /* Valentine's: an arrow streaks in from the top right, trailing glitter, and lands in the O; hearts burst out */
   function arrowInto(L, b) {
     var W = innerWidth, sx = W + 60, sy = -40, tx = b.cx, ty = b.cy, dur = 900;
@@ -618,12 +646,16 @@
     setTimeout(function () { burst(L, tx, ty, function (i) { return art('-12 -12 24 24', heart(['#e8483c', '#f49ab0', '#ff6b8b', '#ffffff'][i % 4])); }, 20, { size: [14, 28], dist: [50, 140] }); }, dur);
     setTimeout(function () { ar.remove(); }, dur * 2 + 50);
   }
-  /* Pi Day: a warm lattice cherry pie rises at the bottom, and the digits of pi stream up out of it */
+  /* Pi Day: a warm lattice cherry pie is set down at the bottom with a little bounce and a twinkle, and the digits of pi stream up out of it */
   function pie() {
     var L = sky(), W = innerWidth, Hh = innerHeight, w = Math.max(190, Math.min(300, W * 0.2)), h = w * 100 / 160;
     var p = art('0 0 160 100', PIE); p.style.width = w + 'px'; p.style.height = h + 'px'; L.appendChild(p);
     var x = W / 2 - w / 2, y = Hh - h - 14;
-    anim(p, [{ transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px)', opacity: 0 }, { transform: 'translate(' + x + 'px,' + (y - 6) + 'px)', opacity: 1, offset: 0.1 }, { transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1, offset: 0.14 }, { transform: 'translate(' + x + 'px,' + y + 'px)', opacity: 1, offset: 0.86 }, { transform: 'translate(' + x + 'px,' + (Hh + 10) + 'px)', opacity: 0 }], { duration: 7600, easing: 'ease-in-out', fill: 'forwards' });
+    var tr = function (dy, sx, sy) { return 'translate(' + x + 'px,' + (y + dy) + 'px) scale(' + sx + ',' + sy + ')'; };
+    p.style.transformOrigin = '50% 92%';
+    anim(p, [{ transform: tr(-46, 1, 1), opacity: 0 }, { transform: tr(-8, 1, 1), opacity: 1, offset: 0.06, easing: 'ease-in' }, { transform: tr(0, 1.05, 0.93), offset: 0.08 },
+      { transform: tr(0, 0.985, 1.02), offset: 0.1 }, { transform: tr(0, 1, 1), opacity: 1, offset: 0.12 }, { transform: tr(0, 1, 1), opacity: 1, offset: 0.88 }, { transform: tr(6, 0.96, 0.96), opacity: 0 }], { duration: 7600, easing: 'ease-out', fill: 'forwards' });
+    setTimeout(function () { burst(L, W / 2, y + h * 0.55, function (i) { return piece(i % 2 ? 'mo-star' : 'mo-dot', pick(['#ffd76a', '#ffffff', '#ffe9a8'])); }, 12, { size: [6, 12], dist: [30, 90], up: true, fall: 20 }); }, 620);
     setTimeout(function () { digits(L, W / 2 - 8, y + h * 0.25, 34); bubble(L, 'Happy Pi Day!', W / 2, y - 8, 2400); }, 1100);
     done(L, 7800);
   }
@@ -641,65 +673,76 @@
     };
     (function f(n) { var t = n - t0, v = {}; for (var k in tracks) v[k] = val(tracks[k], t); apply(v); if (t < total) requestAnimationFrame(f); else if (end) end(); })(t0);
   }
-  /* Easter: someone in a bunny costume hops in with a basket that has no bottom. Spots an egg, is thrilled, picks it
-     up and pops it in the basket; it drops straight out the bottom. A new egg! Surprised every time. Three times,
-     then poof. */
+  /* Easter: someone in a bunny costume hops in, with a basket on their back that has no bottom. Spots an egg and is
+     thrilled, picks it up and tosses it over the shoulder into the basket; it drops straight out the bottom, behind
+     them. Pleased, they turn around... a new egg! Surprised every time. Three times, then poof. */
   function eggStory() {
     var L = sky(), W = innerWidth, Hh = innerHeight, hp = Math.max(150, Math.min(230, Hh * 0.27)), s = hp / 200, ground = Hh - 8, k = Math.floor(R() * EGGS.length);
-    var X0 = W * 0.5 - 70 * s, start = -150 * s;
+    var X0 = W * 0.5 - 70 * s, start = -170 * s;
     var kid = art('0 -30 140 230', KID.replace('EGG', egg(k)));
-    kid.style.width = (140 * s) + 'px'; kid.style.height = (230 * s) + 'px';
-    var eggEl = art('-10 -10 20 20', egg(k)), ew = 14 * s, eh = 18 * s; eggEl.style.width = (20 * s) + 'px'; eggEl.style.height = (20 * s) + 'px';
+    kid.style.width = (140 * s) + 'px'; kid.style.height = (230 * s) + 'px'; kid.style.transformOrigin = '50% 99%';
+    var eggEl = art('-10 -10 20 20', egg(k)); eggEl.style.width = (20 * s) + 'px'; eggEl.style.height = (20 * s) + 'px';
     L.appendChild(eggEl); L.appendChild(kid);
     var torso = kid.querySelector('.kb-torso'), arm = kid.querySelector('.kb-arm'), ears = kid.querySelector('.kb-ears'), handEgg = kid.querySelector('.kb-hand-egg'), oh = kid.querySelector('.kb-oh'), smile = kid.querySelector('.kb-smile');
-    /* stage spots, in page pixels */
-    var gx = X0 + 102 * s, gy = ground - 9 * s, bx = X0 + 102 * s, by = ground - (198 - 124) * s;
-    var placeEgg = function (x, y) { eggEl.style.transform = 'translate(' + (x - 10 * s) + 'px,' + (y - 10 * s) + 'px)'; };
-    placeEgg(gx, gy); eggEl.style.opacity = '1';
-    var T = { x: [[0, start]], y: [[0, 0]], torso: [[0, 0]], arm: [[0, 0]], ears: [[0, 0]] };
-    var key = function (tr, t, v) { T[tr].push([t, v]); };
-    /* hop in */
-    var hops = 6, hopT = 380;
-    for (var i = 1; i <= hops; i++) { key('x', i * hopT, start + (X0 - start) * i / hops); key('y', i * hopT - hopT / 2, -16); key('y', i * hopT, 0); }
-    var t = hops * hopT + 150, ev = [];
+    /* drawing spots to page pixels; dir 1 faces right, -1 faces left (the drawing flips about its middle, x 70) */
+    var px = function (xd, dir) { return X0 + (70 + dir * (xd - 70)) * s; }, py = function (yd) { return ground - (198 - yd) * s; };
+    var FRONT = 120, BACK = 20, EGGY = 189;
+    var at = function (x, y) { return 'translate(' + (x - 10 * s) + 'px,' + (y - 10 * s) + 'px)'; };
+    eggEl.style.transform = at(px(FRONT, 1), py(EGGY));
+    var T = { x: [[0, start]], y: [[0, 0]], torso: [[0, 0]], arm: [[0, 0]], ears: [[0, 0]], dir: [[0, 1]], sq: [[0, 1]] };
+    var key = function (tr, t, v) { T[tr].push([t, v]); }, ev = [];
+    /* hop in: crouch, spring up and stretch, sail, land with a squash */
+    var hops = 5;
+    for (var i = 0; i < hops; i++) {
+      var ta = 150 + i * 520;
+      key('x', ta, start + (X0 - start) * i / hops); key('x', ta + 340, start + (X0 - start) * (i + 1) / hops);
+      key('y', ta, 0); key('y', ta + 170, -34); key('y', ta + 340, 0);
+      key('sq', ta, 0.92); key('sq', ta + 90, 1.07); key('sq', ta + 250, 1.02); key('sq', ta + 340, 0.88); key('sq', ta + 460, 1);
+      key('ears', ta + 90, -14); key('ears', ta + 340, 7); key('ears', ta + 460, 0);
+    }
+    var t = 150 + hops * 520 + 150, dir = 1;
     /* sees the egg: thrilled, two little jumps, ears wiggle */
-    ev.push([t, function () { bubble(L, 'Ooh, an egg!', X0 + 74 * s, ground - 228 * s, 1500); }]);
+    ev.push([t, function () { bubble(L, 'Ooh, an egg!', px(66, 1), ground - 228 * s, 1500); }]);
     key('y', t + 160, -14); key('y', t + 320, 0); key('y', t + 480, -14); key('y', t + 640, 0);
-    key('ears', t, 0); key('ears', t + 160, -10); key('ears', t + 320, 8); key('ears', t + 480, -8); key('ears', t + 640, 0);
+    key('ears', t + 160, -10); key('ears', t + 320, 8); key('ears', t + 480, -8); key('ears', t + 640, 0);
     t += 900;
     var lines = ['Another egg!', 'Another one?!', 'So many eggs!'];
-    for (var c = 0; c < 3; c++) {
+    for (var c = 0; c < 3; c++) (function (c, t, d) {
       /* bend down and pick it up */
       key('torso', t, 0); key('arm', t, 0); key('y', t, 0);
-      key('torso', t + 600, 80); key('arm', t + 600, -80); key('y', t + 600, 5);
+      key('torso', t + 600, 80); key('arm', t + 600, -100); key('y', t + 600, 5);
       ev.push([t + 600, function () { eggEl.style.opacity = '0'; handEgg.setAttribute('opacity', '1'); }]);
-      /* stand up and pop it in the basket */
-      key('torso', t + 1200, 0); key('arm', t + 1200, -67); key('y', t + 1200, 0);
-      ev.push([t + 1260, function () {
+      /* stand up holding it, then toss it back over the shoulder into the basket */
+      key('torso', t + 1150, 0); key('arm', t + 1150, -40); key('y', t + 1150, 0);
+      key('arm', t + 1650, 105);
+      ev.push([t + 1650, function () {
         handEgg.setAttribute('opacity', '0'); eggEl.style.opacity = '1';
-        anim(eggEl, [{ transform: 'translate(' + (bx - 10 * s) + 'px,' + (by - 10 * s) + 'px)' }, { transform: 'translate(' + (gx - 10 * s) + 'px,' + (gy - 10 * s) + 'px)', offset: 0.7, easing: 'ease-out' },
-          { transform: 'translate(' + (gx - 10 * s) + 'px,' + (gy - 18 * s) + 'px)', offset: 0.85, easing: 'ease-in' }, { transform: 'translate(' + (gx - 10 * s) + 'px,' + (gy - 10 * s) + 'px)' }], { duration: 560, easing: 'ease-in', fill: 'forwards' });
+        var hx = px(13.7, d), hy = py(83), bx = px(BACK, d);
+        anim(eggEl, [{ transform: at(hx, hy) }, { transform: at(bx, py(124)), offset: 0.35 }, { transform: at(bx, py(EGGY)), offset: 0.72, easing: 'ease-out' },
+          { transform: at(bx, py(EGGY - 9)), offset: 0.86, easing: 'ease-in' }, { transform: at(bx, py(EGGY)) }], { duration: 720, easing: 'ease-in', fill: 'forwards' });
       }]);
-      key('arm', t + 1700, 0);
-      /* surprised: a new egg! */
-      (function (line, at) {
-        ev.push([at, function () { oh.setAttribute('opacity', '1'); smile.setAttribute('opacity', '0'); bubble(L, line, X0 + 74 * s, ground - 228 * s, 1300); }]);
-        ev.push([at + 900, function () { oh.setAttribute('opacity', '0'); smile.setAttribute('opacity', '1'); }]);
-      })(lines[c], t + 1850);
-      key('y', t + 1850, 0); key('y', t + 2000, -18); key('y', t + 2180, 0);
-      key('ears', t + 1850, 0); key('ears', t + 2000, -12); key('ears', t + 2180, 6); key('ears', t + 2350, 0);
-      t += 2900;
-    }
+      key('arm', t + 2100, 0);
+      /* pleased with that, a little bounce, without noticing */
+      ev.push([t + 2150, function () { bubble(L, 'Got it!', px(66, d), ground - 228 * s, 900); }]);
+      key('y', t + 2100, 0); key('y', t + 2250, -8); key('y', t + 2400, 0);
+      /* turns around... and there's an egg! */
+      key('dir', t + 2750, d); key('dir', t + 3100, -d);
+      ev.push([t + 3150, function () { oh.setAttribute('opacity', '1'); smile.setAttribute('opacity', '0'); bubble(L, lines[c], px(66, -d), ground - 228 * s, 1300); }]);
+      ev.push([t + 4050, function () { oh.setAttribute('opacity', '0'); smile.setAttribute('opacity', '1'); }]);
+      key('y', t + 3150, 0); key('y', t + 3300, -18); key('y', t + 3480, 0);
+      key('ears', t + 3150, 0); key('ears', t + 3300, -12); key('ears', t + 3480, 6); key('ears', t + 3650, 0);
+    })(c, t + c * 4200, c % 2 ? -1 : 1);
+    t += 3 * 4200;
     /* poof */
     ev.push([t, function () {
       burst(L, X0 + 70 * s, ground - 110 * s, function (i) { return piece(i % 3 ? 'mo-dot' : 'mo-star', pick(['#f7b6c8', '#bfe3f7', '#fff0a8', '#c9f2d2', '#dccbf5', '#ffffff'])); }, 26, { size: [10, 22], dist: [40, 130], fall: 30 });
-      anim(kid, [{ opacity: 1, transform: kid.style.transform + ' scale(1)' }, { opacity: 0, transform: kid.style.transform + ' scale(.2)' }], { duration: 380, fill: 'forwards' });
+      anim(kid, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, fill: 'forwards' });
       anim(eggEl, [{ opacity: 1 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: 2600, fill: 'forwards' });
     }]);
     ev.forEach(function (e) { setTimeout(e[1], e[0]); });
     play(T, t, function (v) {
-      kid.style.transform = 'translate(' + v.x + 'px,' + (ground - 228 * s + v.y * s) + 'px)';
-      kid.style.transformOrigin = '50% 85%';
+      var sx = v.dir * (1 + (1 - v.sq) * 0.8);
+      kid.style.transform = 'translate(' + v.x + 'px,' + (ground - 228 * s + v.y * s) + 'px) scale(' + sx.toFixed(3) + ',' + v.sq.toFixed(3) + ')';
       torso.setAttribute('transform', 'rotate(' + v.torso.toFixed(2) + ' 60 140)');
       arm.setAttribute('transform', 'rotate(' + v.arm.toFixed(2) + ' 62 96)');
       ears.setAttribute('transform', 'rotate(' + v.ears.toFixed(2) + ' 66 40)');

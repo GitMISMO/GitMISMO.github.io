@@ -98,7 +98,7 @@
   var stored = ''; try { stored = localStorage.getItem('mismo.holiday') || ''; } catch (e) {}
   var preview = ask === 'preview' || ask === 'sleigh' || (!ask && stored === 'preview');
   var occ = preview ? 'christmas' : (ask && ask !== 'christmas' ? ask : (ask === 'christmas' ? 'christmas' : occasionOn(etToday())));
-  window.MismoHoliday = { on: !!occ, occasion: occ || '', preview: !!ask || preview, version: '2026-11-27d', calendar: { occasionOn: occasionOn, U: U } };
+  window.MismoHoliday = { on: !!occ, occasion: occ || '', preview: !!ask || preview, version: '2026-11-27e', calendar: { occasionOn: occasionOn, U: U } };
   if (!occ) return;
   if (occ !== 'christmas') {
     /* the other holidays: their own file, loaded only today */
