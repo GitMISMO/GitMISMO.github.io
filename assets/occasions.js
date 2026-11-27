@@ -326,7 +326,7 @@
       '<path d="M82,-11 C93,-19 106,-12 101,-3 C97,3 89,0 92,-6" stroke="#4e6b26" stroke-width="2.8" fill="none" stroke-linecap="round"/>' +
       '<path d="M92,-14 C100,-26 114,-24 116,-16 C108,-12 99,-11 92,-14 Z" fill="#6f9a37"/>' +
       '<path d="M68,6 C66,-8 70,-20 81,-27 C85,-24 84,-18 81,-14 C78,-7 79,-1 82,6 Z" fill="#5b7a2e" stroke="#3e5a1c" stroke-width="1.4" stroke-linejoin="round"/>' +
-      '<path d="' + OPATH + '" fill="url(#I-pk)" fill-rule="evenodd"/>' +
+      '<path d="' + OPATH + '" fill="url(#I-pk)" fill-rule="evenodd" stroke="#e8741a" stroke-width="2.4"/>' +
       '<g clip-path="url(#I-oc)" fill="none" stroke-linecap="round"><g stroke="#a8480a" stroke-opacity=".5" stroke-width="2.6">' +
       '<path d="M20,4 C6,30 6,78 20,104 M132,4 C146,30 146,78 132,104 M52,-2 C46,8 44,20 46,32 M100,-2 C106,8 108,20 106,32 M52,110 C46,100 44,88 46,76 M100,110 C106,100 108,88 106,76"/></g>' +
       '<path d="M12,34 C16,20 24,11 36,7" stroke="#fff" stroke-opacity=".45" stroke-width="5"/></g>' +
