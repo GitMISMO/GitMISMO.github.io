@@ -689,7 +689,7 @@ const $=id=>document.getElementById(id);
 const VW=1280, VH=760;                      /* the size the MMS is shown at, scaled to fit */
 const STEPS=TOUR_STEPS, CH=TOUR_CHAPTERS;
 const CAST={meghan:['MT','Meghan · Facilitator'],perry:['PW','Perry · Program Manager'],jonna:['JC','Jonna · License Designator'],vanessa:['VR','Vanessa · Website Admin'],erin:['EB','Erin · IM'],mark:['MK','Mark · Architect'],amy:['AM','Amy · Quotes'],staff:['ST','MISMO Staff'],im:['IM','IM Reviewers'],awg:['AW','AWG Reviewers'],gc:['GC','Governance Committee'],tf:['TF','Task Force'],exec:['EX','Executive Team'],mms:['⚙','The MMS, on its own'],media:['MM','MISMO Media']};
-let si=0, bi=0, k=1, playing=false, talk=false, busy=false, token=0, curSys='mms', mmsWin=null;
+let si=0, bi=0, k=1, playing=false, talk=false, busy=false, token=0, curSys='mms', mmsWin=null, booting=null;
 const frame=$('mms');
 /* ---------- what the MMS holds: day one plus every recorded change (states.json, from record.js) ---------- */
 const ST=TOUR_STATES, memCache=[];
@@ -773,6 +773,7 @@ async function setScreen(b,quickly){ const st=STEPS[si]; let after=false; STEPS[
   if(b.card){ cardView(b.card); return; }
   if(b.mail){ mailView(mailOf(b.mail,worldAt(si,'after').mem)); return; }
   if(b.shot){ shotView(b.shot); return; }
+  if(!mmsWin&&booting) await booting; if(!mmsWin) return;
   const fresh=curSys!=='mms'||b.after||b.mid||b.as||b.reload||loaded!==si+':'+after+':'+(b.as||st.as);
   showMms(); clockAt(w.today);
   if(fresh){ T().load({mem:w.mem,me,today:w.today,view:b.view||st.view||'home',open:b.open!==undefined?b.open:(b.view?'':st.open),tab:b.tab||st.tab||'over'}); loaded=si+':'+after+':'+(b.as||st.as); await sleep(quickly?150:420); }
@@ -834,7 +835,10 @@ $('stepsel').innerHTML=STEPS.map((s,i)=>'<option value="'+i+'">'+(i+1)+'. '+esc(
 $('strip').innerHTML=CH.map(([kk,n],i)=>'<button class="ch" type="button" data-ch="'+kk+'"><div class="bar2"><i></i></div>'+(i+1)+'. '+esc(n)+'</button>').join('');
 $('strip').addEventListener('click',e=>{ const b=e.target.closest('[data-ch]'); if(!b) return; stopPlay(); const i=STEPS.findIndex(s=>s.ch===b.dataset.ch); if(i>=0) enter(i); });
 window.__tourPlayer={enter,next,find,steps:STEPS,world:worldAt,state:()=>({si,bi})};
-(async()=>{ fit(); if(window.innerWidth<700) note('The journey reads best on a computer or a tablet.'); const ok=await bootMms(); if(!ok) return; fit(); const m=/^#step-(\d+)$/.exec(location.hash||''); await enter(m&&STEPS[+m[1]-1]?+m[1]-1:0); })();
+/* the page opens behind the resources.mismo.org sign-in: once it's showing, measure again and point again */
+try{ new MutationObserver(()=>{ if(!document.documentElement.hasAttribute('data-rs-gate')&&mmsWin){ fit(); if(!busy){ token++; beat(bi,true); } } }).observe(document.documentElement,{attributes:true,attributeFilter:['data-rs-gate']}); }catch(e){}
+document.addEventListener('visibilitychange',()=>{ if(!document.hidden){ fit(); place(); } });
+(async()=>{ fit(); if(window.innerWidth<700) note('The journey reads best on a computer or a tablet.'); booting=bootMms(); const ok=await booting; if(!ok) return; fit(); const m=/^#step-(\d+)$/.exec(location.hash||''); await enter(m&&STEPS[+m[1]-1]?+m[1]-1:0); })();
 })();
 
 </script>
