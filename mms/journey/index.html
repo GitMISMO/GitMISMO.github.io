@@ -34,6 +34,8 @@ button,select{font-family:inherit}
 .bb:hover{background:rgba(255,255,255,.18)}
 .bb.pri{background:#74bfeb;color:#06202f;border-color:#74bfeb;font-weight:600}
 .bb[aria-pressed="true"]{border-color:#f08a5d;color:#f9c3a8}
+#listen[aria-pressed]{border-color:rgba(255,255,255,.25);color:#fff}
+#listen[aria-pressed="false"]{color:rgba(255,255,255,.7)}
 .bb:disabled{opacity:.4;cursor:default}
 .bb svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .count{font-family:var(--mono);font-size:12px;color:#a9d8f3;white-space:nowrap}
@@ -122,9 +124,9 @@ button,select{font-family:inherit}
   <span class="count" id="count"></span>
   <span class="sp"></span>
   <button class="bb" id="prev" type="button" aria-label="Back"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg>Back</button>
-  <button class="bb" id="play" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg><span>Play</span></button>
+  <button class="bb" id="play" type="button" aria-pressed="false" title="Let the journey run by itself, reading each bubble aloud"><svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg><span>Play</span></button>
   <button class="bb pri" id="next" type="button">Next<svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg></button>
-  <button class="bb" id="listen" type="button" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zM16 8.5a4.5 4.5 0 010 7"/></svg><span>Listen</span></button>
+  <button class="bb" id="listen" type="button" aria-pressed="true"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4zM16 8.5a4.5 4.5 0 010 7M18.5 6a8 8 0 010 12"/></svg><span>Sound On</span></button>
   <select id="voice" aria-label="Voice" hidden></select>
   <a class="bb" href="/mms/" title="Open the MMS">MMS</a>
 </header>
@@ -306,7 +308,7 @@ const TOUR_STEPS=[
    hist(t,'Approved in the Initiative Hub (HUB-2027-004) and brought into the MMS'); await Store.create('tickets',id,t); S.tickets[id]=t;
    const on=S.autoOn; S.autoOn=true; try{ await hubAutoStart(); } finally{ S.autoOn=on; }`); },
  beats:[
- {who:'mms',card:{eyebrow:'The Work Request Journey',title:'One work request, from approval to publication',text:'WR2027_07 Escrow Servicing Data Exchange is made-up practice work. Every MMS screen here is the real MMS, and every email is the one the MMS really sends. The other systems are shown as they look on the day.'},say:'This journey follows one practice work request from approval to publication: three deliverables, each moving through the process at its own pace. Use Next, or Play to let it run.'},
+ {who:'mms',card:{eyebrow:'The Work Request Journey',title:'One work request, from approval to publication',text:'WR2027_07 Escrow Servicing Data Exchange is made-up practice work. Every MMS screen here is the real MMS, and every email is the one the MMS really sends. The other systems are shown as they look on the day.'},say:'This journey follows one practice work request from approval to publication: three deliverables, each moving through the process at its own pace. Press Play and it runs by itself, reading each bubble aloud. Or use Next and Back to go at your own pace. Sound Off turns the voice off.'},
  {who:'exec',shot:{src:'hub.jpg',url:'resources.mismo.org/initiative-hub/work-requests.html',who:'',alt:'The Initiative Hub’s work requests, step by step'},spot:[353,160,126,45],say:'It starts in the Initiative Hub. A servicer member asked for a standard way to exchange escrow analysis results; MISMO confirms the request, and it waits in the executive team’s Approval Queue.'},
  {who:'exec',shot:{src:'hub.jpg',url:'resources.mismo.org/initiative-hub/work-requests.html',who:'',alt:'The Initiative Hub’s work requests, step by step'},spot:[216,274,924,82],say:'The executive team approves it, with its size (Medium), its community of practice (Servicing) and a facilitator (Meghan Tidgewell).'},
  {who:'mms',view:'board',at:'text:Approved – Set Up',say:'The MMS checks the Hub every five minutes. This is the Pipeline Board that morning: other live work, nothing from the Hub yet.'},
@@ -704,7 +706,7 @@ const $=id=>document.getElementById(id);
 const VW=1280, VH=760;                      /* the size the MMS is shown at, scaled to fit */
 const STEPS=TOUR_STEPS, CH=TOUR_CHAPTERS;
 const CAST={meghan:['MT','Meghan · Facilitator'],perry:['PW','Perry · Program Manager'],jonna:['JC','Jonna · License Designator'],vanessa:['VR','Vanessa · Website Admin'],erin:['EB','Erin · IM'],mark:['MK','Mark · Architect'],amy:['AM','Amy · Quotes'],staff:['ST','MISMO Staff'],im:['IM','IM Reviewers'],awg:['AW','AWG Reviewers'],gc:['GC','Governance Committee'],tf:['TF','Task Force'],exec:['EX','Executive Team'],mms:['⚙','The MMS, on its own'],media:['MM','MISMO Media']};
-let si=0, bi=0, k=1, playing=false, talk=false, busy=false, token=0, curSys='mms', mmsWin=null, booting=null;
+let si=0, bi=0, k=1, playing=false, talk=true, heard='', run=0, busy=false, token=0, curSys='mms', mmsWin=null, booting=null;
 const frame=$('mms');
 /* ---------- what the MMS holds: day one plus every recorded change (states.json, from record.js) ---------- */
 const ST=TOUR_STATES, memCache=[];
@@ -817,8 +819,15 @@ async function beat(j,quickly){ const my=token; const st=STEPS[si], b=st.beats[j
   lastEl=b.at?find(b.at):null; showAt(box,b); paintNav();
   if(quickly) return;
   if(b.click&&box){ await sleep(950); if(my!==token) return; clickFx(box); }
-  if(talk) speak(strip(b.say),()=>{ if(playing&&my===token) setTimeout(()=>{ if(playing&&my===token) next(); },700); });
-  else if(playing){ const ms=Math.max(3400,strip(b.say).split(/\s+/).length*330); setTimeout(()=>{ if(playing&&my===token) next(); },ms); } }
+  readThen(); }
+/* with the sound on, the bubble is read aloud; while playing, the journey moves on once it has been read
+   (or, with the sound off or no voice in the browser, after time to read it). A bubble read to the end is
+   remembered, so Play after it goes straight on rather than reading it again. */
+function readThen(){ const my=token, r=++run, key=si+':'+bi, b=STEPS[si].beats[bi]; if(!b) return;
+  const onward=ms=>{ if(playing) setTimeout(()=>{ if(playing&&my===token&&r===run) next(); },ms); };
+  const quiet=()=>{ if(my===token&&r===run) onward(Math.max(3400,strip(b.say).split(/\s+/).length*330)); };
+  if(talk&&SY) speak(strip(b.say),()=>{ if(my!==token||r!==run) return; heard=key; onward(700); },quiet);
+  else quiet(); }
 const strip=s=>String(s||'').replace(/<[^>]+>/g,'').replace(/&amp;/g,'&').replace(/&nbsp;/g,' ');
 /* clicks while a screen is still loading wait their turn (two quick Backs go back two beats) */
 let queue=[]; const drain=()=>{ const f=queue.shift(); if(f) setTimeout(f,0); };
@@ -832,9 +841,11 @@ async function prev(){ if(busy){ if(queue.length<6) queue.push(prev); return; } 
 function paintNav(){ $('count').textContent='Step '+(si+1)+' of '+STEPS.length; $('stepsel').value=String(si); $('prev').disabled=si===0&&bi===0;
   const ci=CH.findIndex(c=>c[0]===STEPS[si].ch); document.querySelectorAll('.ch').forEach((c,i)=>{ c.classList.toggle('on',i===ci); const inCh=STEPS.map((s,x)=>[s,x]).filter(([s])=>s.ch===CH[i][0]); const done=inCh.filter(([,x])=>x<si||(x===si)).length; c.querySelector('i').style.width=(inCh.length?Math.round(done/inCh.length*100):0)+'%'; });
   try{ history.replaceState(null,'','#step-'+(si+1)); }catch(e){} }
-function stopPlay(){ playing=false; $('play').setAttribute('aria-pressed','false'); $('play').querySelector('span').textContent='Play'; }
+const PLAY_ICON='<path d="M7 5l12 7-12 7z"/>', PAUSE_ICON='<path d="M8 5v14M16 5v14"/>';
+function playUi(on){ $('play').setAttribute('aria-pressed',String(on)); $('play').querySelector('span').textContent=on?'Pause':'Play'; $('play').querySelector('svg').innerHTML=on?PAUSE_ICON:PLAY_ICON; $('play').title=on?'Stop where you are':'Let the journey run by itself'+(talk?', reading each bubble aloud':''); }
+function stopPlay(){ playing=false; playUi(false); }
 $('next').onclick=()=>{ stopPlay(); next(); }; $('bnext').onclick=()=>{ next(); }; $('prev').onclick=()=>{ stopPlay(); prev(); };
-$('play').onclick=()=>{ if(playing){ stopPlay(); hush(); return; } playing=true; $('play').setAttribute('aria-pressed','true'); $('play').querySelector('span').textContent='Pause'; token++; beat(bi); };
+$('play').onclick=()=>{ if(playing){ stopPlay(); hush(); return; } playing=true; playUi(true); if(heard===si+':'+bi&&!busy) next(); else if(!busy) readThen(); };
 $('stepsel').onchange=e=>{ stopPlay(); jump(+e.target.value); };
 window.__tourKey=k=>{ stopPlay(); if(k==='ArrowRight') next(); else prev(); };
 document.addEventListener('keydown',e=>{ if(e.target.closest('select,input,textarea')) return; if(e.key==='ArrowRight'){ stopPlay(); next(); } if(e.key==='ArrowLeft'){ stopPlay(); prev(); } if(e.key===' '&&!e.target.closest('button')){ e.preventDefault(); $('play').click(); } });
@@ -846,12 +857,16 @@ function pickVoice(){ voices=(SY?SY.getVoices():[]).filter(v=>/^en[-_]GB/i.test(
   $('voice').innerHTML=voices.map(v=>'<option'+(voice&&v.name===voice.name?' selected':'')+'>'+esc(v.name)+'</option>').join(''); $('voice').hidden=!(talk&&voices.length>1); }
 if(SY){ pickVoice(); SY.onvoiceschanged=pickVoice; }
 $('voice').onchange=e=>{ voice=voices.find(v=>v.name===e.target.value)||voice; try{ localStorage.setItem('mismo.journey.voice',voice.name); }catch(x){} };
-function speak(text,after){ if(!SY) return after&&after(); SY.cancel(); const id=++sayId; const parts=String(text).replace(/\bMISMO\b/g,'Mismo').replace(/\bMMS\b/g,'M M S').replace(/\bAWG\b/g,'A W G').replace(/\bIM\b/g,'I M').match(/[^.!?:]+[.!?:]+|[^.!?:]+$/g)||[]; let i=0;
-  const go=()=>{ if(id!==sayId) return; if(i>=parts.length){ after&&after(); return; } const u=new SpeechSynthesisUtterance(parts[i++].trim()); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-GB'; u.rate=.97; u.onend=go; u.onerror=e=>{ if(e.error!=='interrupted'&&e.error!=='canceled') go(); }; SY.speak(u); };
-  go(); }
+function speak(text,after,fail){ if(!SY) return fail?fail():after&&after(); SY.cancel(); const id=++sayId; let started=false; const failed=()=>{ if(id!==sayId) return; sayId++; try{ SY.cancel(); }catch(e){} if(fail) fail(); }; const parts=String(text).replace(/\bMISMO\b/g,'Mismo').replace(/\bMMS\b/g,'M M S').replace(/\bAWG\b/g,'A W G').replace(/\bIM\b/g,'I M').match(/[^.!?:]+[.!?:]+|[^.!?:]+$/g)||[]; let i=0;
+  const go=()=>{ if(id!==sayId) return; if(i>=parts.length){ after&&after(); return; } const u=new SpeechSynthesisUtterance(parts[i++].trim()); if(voice){ u.voice=voice; u.lang=voice.lang; } else u.lang='en-GB'; u.rate=.97; u.onstart=()=>{ started=true; }; u.onend=()=>{ started=true; go(); }; u.onerror=e=>{ if(e.error==='interrupted'||e.error==='canceled') return; if(!started) failed(); else go(); }; SY.speak(u); };
+  go(); setTimeout(()=>{ if(!started) failed(); },5000); }
 function hush(){ sayId++; if(SY) SY.cancel(); }
-$('listen').onclick=()=>{ if(!SY){ note('This browser has no voice.'); return; } talk=!talk; $('listen').setAttribute('aria-pressed',String(talk)); $('listen').querySelector('span').textContent=talk?'Listening':'Listen'; pickVoice();
-  if(talk){ const b=STEPS[si].beats[bi]; speak(strip(b&&b.say),()=>{ if(playing) next(); }); } else hush(); };
+const SOUND_ON='<path d="M4 9v6h4l5 4V5L8 9H4zM16 8.5a4.5 4.5 0 010 7M18.5 6a8 8 0 010 12"/>', SOUND_OFF='<path d="M4 9v6h4l5 4V5L8 9H4zM16 9.5l5 5M21 9.5l-5 5"/>';
+function soundUi(){ const L=$('listen'); L.setAttribute('aria-pressed',String(talk)); L.querySelector('span').textContent=talk?'Sound On':'Sound Off'; L.querySelector('svg').innerHTML=talk?SOUND_ON:SOUND_OFF; L.title=talk?'Each bubble is read aloud. Click to turn the voice off.':'The voice is off. Click to hear each bubble read aloud.'; if(!playing) playUi(false); }
+try{ if(localStorage.getItem('mismo.journey.sound')==='off') talk=false; }catch(e){}
+if(!SY) talk=false; soundUi();
+$('listen').onclick=()=>{ if(!SY){ note('This browser has no voice.'); return; } talk=!talk; try{ localStorage.setItem('mismo.journey.sound',talk?'on':'off'); }catch(e){} soundUi(); pickVoice();
+  hush(); if(!busy) readThen(); };
 /* ---------- start ---------- */
 $('stepsel').innerHTML=STEPS.map((s,i)=>'<option value="'+i+'">'+(i+1)+'. '+esc(s.title)+'</option>').join('');
 $('strip').innerHTML=CH.map(([kk,n],i)=>'<button class="ch" type="button" data-ch="'+kk+'"><div class="bar2"><i></i></div>'+(i+1)+'. '+esc(n)+'</button>').join('');
