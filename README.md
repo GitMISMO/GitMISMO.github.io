@@ -123,6 +123,7 @@ has no People & Access entry.
 
 MyMISMO alerts and slides (CN-037, Nov 25, 2026): the `mymismo` key also has `push: true`, `alertSenders`
 (only jcritchley@mismo.org can press Send on an alert; nothing goes out automatically) and `slidesFeed`
-(Summit HQ's `data/feed-mymismo-slides.json` in GitMISMO/summit-hq-data: slides uploaded by the MISMO team,
+(MISMO Media's `data/feed-mymismo-slides.json` in the private GitMISMO/marketing-hq-data, branch main, since
+CN-064 on Nov 27, 2026; it was Summit HQ's GitMISMO/summit-hq-data before: slides uploaded by the MISMO team,
 downloadable only by signed-in attendees). These do nothing until Perry deploys relay request 14, and push
 also needs the two VAPID keys set on the function.

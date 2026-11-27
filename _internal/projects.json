@@ -571,7 +571,7 @@
     "push": true,
     "alertSenders": ["jcritchley@mismo.org"],
     "slidesFeed": {
-      "repo": "GitMISMO/summit-hq-data",
+      "repo": "GitMISMO/marketing-hq-data",
       "branch": "main",
       "path": "data/feed-mymismo-slides.json"
     }
