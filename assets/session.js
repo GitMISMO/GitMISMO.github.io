@@ -1062,13 +1062,14 @@
    It loads only on internal tool pages (they carry the sign-in chip, #rs-account)
    for people signed in with a MISMO or MBA address. The website, forms,
    applications and anything assessors, contractors, sponsors or the public see
-   stay as they are (MyMISMO loads it with its own line). Nothing
-   happens outside December (preview any time with ?holiday=preview).
+   stay as they are (MyMISMO loads it with its own line). Since Nov 27, 2026
+   it also carries the other holidays (see holiday.js); on an ordinary day it
+   does nothing. Preview with ?holiday=preview, or ?holiday=<holiday name>.
    ============================================================================ */
 (function () {
   try {
-    var preview = /[?&]holiday=(preview|sleigh)\b/.test(location.search) || localStorage.getItem('mismo.holiday') === 'preview';
-    if (new Date().getMonth() !== 11 && !preview) return;
+    /* holiday.js works out the day itself (December, and the other holidays in its calendar) and does
+       nothing on an ordinary day, so it loads on every internal page (Jonna, Nov 27, 2026) */
     var tries = 0;
     (function go() {
       var s = null;

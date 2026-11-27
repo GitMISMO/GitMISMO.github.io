@@ -1,4 +1,5 @@
-/* MISMO December — the santa hat and a little snow, for every internal tool on resources.mismo.org.
+/* MISMO holidays: December's santa hat, snow and Santa, and the calendar for the other holidays (occasions.js),
+   for every internal tool on resources.mismo.org and MyMISMO.
    ----------------------------------------------------------------------------------------------
    One shared copy. Every internal page loads it through /assets/session.js (or with its own line,
    <script src="/assets/holiday.js" defer></script>, where a page doesn't load session.js).
@@ -28,14 +29,91 @@
 (function () {
   'use strict';
   if (window.MismoHoliday) return;
-  var preview = false;
-  try { preview = /[?&]holiday=(preview|sleigh)\b/.test(location.search) || localStorage.getItem('mismo.holiday') === 'preview'; } catch (e) {}
-  var now = new Date();
   /* never on the website's side: public forms, applications and work-product downloads */
   var publicPage = /^\/(forms|work-products)(\/|$)/i.test(location.pathname);
-  var on = (now.getMonth() === 11 || preview) && !publicPage;
-  window.MismoHoliday = { on: on, version: '2026-11-27b' };
-  if (!on) return;
+  if (publicPage) { window.MismoHoliday = { on: false }; return; }
+
+  /* ---------- the holiday calendar (Jonna, Nov 27, 2026) ----------
+     Besides December, a little something on: Groundhog Day, Valentine's Day, Pi Day, St. Patrick's Day,
+     Easter, Earth Day, the first day of summer, the 4th of July, Halloween and Thanksgiving, on the day
+     itself, or on the business day before when the day falls on a weekend or a MISMO day off (so the team
+     sees it: Easter shows on Good Friday, Thanksgiving on the Wednesday, the 4th on the day before). New
+     Year's is the first time each person opens any tool in January. All of it lives in /assets/occasions.js,
+     loaded only on those days. Preview any of them with ?holiday=<name> on a page's address:
+     newyear, groundhog, valentine, piday, stpatrick, easter, earthday, summer, july4, halloween, thanksgiving.
+     Dates are worked out on Eastern time, MISMO's working clock. */
+  function U(y, m, d) { return new Date(Date.UTC(y, m - 1, d)); }
+  function key(d) { return d.toISOString().slice(0, 10); }
+  function addDays(d, n) { return new Date(d.getTime() + n * 864e5); }
+  function nth(y, m, wd, n) { var d = U(y, m, 1); while (d.getUTCDay() !== wd) d = addDays(d, 1); return addDays(d, 7 * (n - 1)); }
+  function lastWd(y, m, wd) { var d = U(y, m + 1, 1); d = addDays(d, -1); while (d.getUTCDay() !== wd) d = addDays(d, -1); return d; }
+  function observed(d) { var w = d.getUTCDay(); return w === 6 ? addDays(d, -1) : w === 0 ? addDays(d, 1) : d; }
+  /* MISMO's days off: the holidays the team is out, and Winter Break (December 25 to January 1) */
+  var offCache = {};
+  function daysOff(y) {
+    if (offCache[y]) return offCache[y];
+    var o = {}, add = function (d) { o[key(d)] = 1; };
+    add(observed(U(y, 1, 1))); add(nth(y, 1, 1, 3)); add(nth(y, 2, 1, 3)); add(lastWd(y, 5, 1)); add(observed(U(y, 6, 19)));
+    add(observed(U(y, 7, 4))); add(nth(y, 9, 1, 1)); add(observed(U(y, 11, 11)));
+    var tg = nth(y, 11, 4, 4); add(tg); add(addDays(tg, 1));
+    for (var d = 24; d <= 31; d++) add(U(y, 12, d));
+    return (offCache[y] = o);
+  }
+  function biz(d) { var w = d.getUTCDay(); return w !== 0 && w !== 6 && !daysOff(d.getUTCFullYear())[key(d)]; }
+  function easter(y) {   /* Easter Sunday (Anonymous Gregorian algorithm) */
+    var a = y % 19, b = Math.floor(y / 100), c = y % 100, d = Math.floor(b / 4), e = b % 4, f = Math.floor((b + 8) / 25),
+      g = Math.floor((b - f + 1) / 3), h = (19 * a + b - d - g + 15) % 30, i = Math.floor(c / 4), k = c % 4,
+      l = (32 + 2 * e + 2 * i - h - k) % 7, m = Math.floor((a + 11 * h + 22 * l) / 451);
+    return U(y, Math.floor((h + l - 7 * m + 114) / 31), ((h + l - 7 * m + 114) % 31) + 1);
+  }
+  /* the June solstice on Eastern time (June 20 in 2028 and 2032, June 21 the other years to 2035) */
+  function summer(y) { return U(y, 6, ({ 2028: 20, 2032: 20 })[y] || 21); }
+  var DAYS = [
+    ['groundhog', function (y) { return U(y, 2, 2); }],
+    ['valentine', function (y) { return U(y, 2, 14); }],
+    ['piday', function (y) { return U(y, 3, 14); }],
+    ['stpatrick', function (y) { return U(y, 3, 17); }],
+    ['easter', easter],
+    ['earthday', function (y) { return U(y, 4, 22); }],
+    ['summer', summer],
+    ['july4', function (y) { return U(y, 7, 4); }],
+    ['halloween', function (y) { return U(y, 10, 31); }],
+    ['thanksgiving', function (y) { return nth(y, 11, 4, 4); }]
+  ];
+  function etToday() {
+    var p = {};
+    try { new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' })
+      .formatToParts(new Date()).forEach(function (x) { p[x.type] = x.value; }); } catch (e) { var n = new Date(); return U(n.getFullYear(), n.getMonth() + 1, n.getDate()); }
+    return U(+p.year, +p.month, +p.day);
+  }
+  function occasionOn(t) {
+    var y = t.getUTCFullYear(), k = key(t);
+    if (t.getUTCMonth() === 11) return 'christmas';
+    for (var i = 0; i < DAYS.length; i++) {
+      var hd = DAYS[i][1](y), show = hd;
+      while (!biz(show)) show = addDays(show, -1);
+      if (k === key(show) || k === key(hd)) return DAYS[i][0];
+    }
+    if (t.getUTCMonth() === 0) return 'newyear';
+    return null;
+  }
+  var ask = (location.search.match(/[?&]holiday=([a-z0-9]+)/i) || [])[1] || '';
+  ask = ask.toLowerCase();
+  var stored = ''; try { stored = localStorage.getItem('mismo.holiday') || ''; } catch (e) {}
+  var preview = ask === 'preview' || ask === 'sleigh' || (!ask && stored === 'preview');
+  var occ = preview ? 'christmas' : (ask && ask !== 'christmas' ? ask : (ask === 'christmas' ? 'christmas' : occasionOn(etToday())));
+  window.MismoHoliday = { on: !!occ, occasion: occ || '', preview: !!ask || preview, version: '2026-11-27c', calendar: { occasionOn: occasionOn, U: U } };
+  if (!occ) return;
+  if (occ !== 'christmas') {
+    /* the other holidays: their own file, loaded only today */
+    if (!document.querySelector('script[src*="/assets/occasions.js"]')) {
+      var s0 = document.createElement('script'); s0.src = '/assets/occasions.js?v=' + window.MismoHoliday.version; s0.defer = true;
+      (document.head || document.documentElement).appendChild(s0);
+    }
+    return;
+  }
+  if (ask === 'christmas') preview = true;
+  var on = true;
 
   var NS = 'http://www.w3.org/2000/svg';
   /* The hat, drawn for December: low, its brim curved as if round a head, and a long tail that
