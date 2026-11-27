@@ -35,6 +35,9 @@
   try {
     if (/[?&]tour=1(&|$)/.test(location.search) && window.parent !== window && window.parent.__tourSeed) {
       window.__mmsSeed = JSON.parse(JSON.stringify(window.parent.__tourSeed)); window.__mmsTourMode = true;
+      /* the tour never writes browser storage: the shared sign-in (session.js) also loads in here, and on the tour's 2027
+         clock it would think the person's sign-in had run out and remove it, signing them out of every tab (Nov 27, Jonna) */
+      try { var SP = Storage.prototype; SP.setItem = function () {}; SP.removeItem = function () {}; SP.clear = function () {}; } catch (e) {}
       /* the tour's clock: each step happens on its own day, so "2 days ago" and new history lines read right */
       (function () { var RD = Date, P = window.parent;
         function now() { var c = P.__tourClock; return c ? c.base + (RD.now() - c.at) : RD.now(); }
