@@ -2116,6 +2116,7 @@ p,.sub,.lede{text-wrap:pretty}
 /* CN-053: at phone width Certification Management's masthead shrinks (11px 16px, logo 19px, 62px with the sign-in chip); the same here, so the logo box sits in the same spot. Last in the file so it wins over :root and .logoplate above. */
 @media(max-width:560px){:root{--hq-h:62px}.hqtop{padding:0 16px}.hqtop .mastrule{height:40px;margin-inline:11px}.hqtop .hqname{font-size:13px}.hqtop-r{padding-left:11px;gap:10px}.logoplate{padding:7px 10px}.logoplate .wordmark{height:19px}}
 .rc-sum{margin:0 0 6px;font-size:13px}
+.rc2-demo{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;padding:8px 12px;margin:0 0 12px;border:1px solid var(--border);border-left:4px solid #2477b8;border-radius:6px;background:var(--surface-2);font-size:13px;color:var(--ink-2)}
 </style>
 <script src="/assets/session.js"></script>
 <script src="/assets/back.js"></script>
@@ -2190,7 +2191,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-27T17:28:40Z',fp:'1e5d91b9'};
+window.__mmsBuild={at:'2026-11-27T18:09:28Z',fp:'aaf0620b'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2874,7 +2875,9 @@ function stageActions(t){
         else if(k==='im'){ add('Run Reference Model QC →',()=>{ S.ptab='reviews'; rvRun(t,'im'); },'pri'); if(typeof imSendDocsOnly==='function') add('No Reference Model Changes: Send to IM',()=>imSendDocsOnly(t)); }
         else add('Open AWG Review ↗',()=>portalOpen('awg',''),'pri'); }
       /* skipping a review is MISMO staff's call, and it asks first (Nov 23: a facilitator clicked it thinking it skipped the Reference Model QC) */
-      if(S.isStaff) add('Not Required: Skip '+nm+' Review',async()=>{ const ok=await modal({title:'Skip '+nm+' Review?',body:'<p style="margin:0">'+esc(t.wr)+' goes straight to '+esc(stageDef(nextStage(t)).name)+' without '+esc(nm)+' reviewing it. Only do this when '+esc(nm)+' review isn’t required. (This isn’t the Reference Model QC.)</p>',ok:'Skip '+nm+' Review'}); if(ok) return move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)'})},text:nm+' review not required; skipped'}); },'ghost');
+      /* Nov 27 (Jonna): IM and AWG decide whether a submission needs their review (for example a source credited after
+         comment); MISMO staff can still record it for them */
+      if(S.isStaff||isRole('imawg',S.me)) add('Not Required: Skip '+nm+' Review',async()=>{ const v=await modal({title:'Skip '+nm+' Review?',body:'<p style="margin:0 0 8px">'+esc(t.wr)+' goes straight to '+esc(stageDef(nextStage(t)).name)+' without '+esc(nm)+' reviewing it. '+esc(nm)+' decides whether it needs a review. (This isn’t the Reference Model QC.)</p>'+fld('Why '+nm+' doesn’t need to review it',ta('why','','For example: only a source citation was added after comment')),ok:'Skip '+nm+' Review',validate:x=>x.why&&x.why.trim()?'':'Say why '+nm+' doesn’t need to review it'}); if(v) return move(t,nextStage(t),{patch:{[k]:Object.assign({},t[k],{status:'Passed (not required)',skipWhy:v.why.trim(),skipBy:S.me.name||''})},text:nm+' decided no review is needed; skipped',note:v.why.trim()}); },'ghost');
       break; }
     case 'designation':
       if(S.isStaff||isRole('vps',S.me)||isRole('director',S.me)){ add('Designate as Recommended →',()=>approveRec(t),'pri'); add('Change the Designation',()=>directorRec(t)); }
@@ -3243,7 +3246,7 @@ function splitT(t){
       rows.map((r,i)=>{ const isRM=r.kind==='Reference Model Change', held=isRM||r.hold;
         return '<div class="dv'+(held?' held':'')+'" data-i="'+i+'"><div class="dv-top"><span class="dv-id">'+esc(base.wr)+'-'+letter(i)+'</span><input class="dv-name" data-f="name" value="'+esc(r.name)+'" placeholder="Name this deliverable">'+(rows.length>1?'<button class="dv-x" type="button" data-rm="'+i+'" aria-label="Remove">×</button>':'')+'</div>'+
           '<div class="dv-kinds">'+KINDS.map(k=>'<button type="button" class="dv-k'+(r.kind===k?' on':'')+'" data-k="'+esc(k)+'"><svg viewBox="0 0 24 24"><path d="'+KIND_ICON[k]+'"/></svg>'+esc(KIND_SHORT[k]||k)+'</button>').join('')+'</div>'+
-          '<label class="dv-hold'+(isRM?' locked':'')+'"><span class="sw'+(held?' on':'')+'"><input type="checkbox" data-f="hold"'+(held?' checked':'')+(isRM?' disabled':'')+'><i></i></span><span>'+(isRM?'Reference Model changes are always held for the RM release and publish with it':'Needs the Reference Model change published first: hold it and move it with the RM release')+'</span></label></div>'; }).join('')+
+          '<label class="dv-hold'+(isRM?' locked':'')+'"><span class="sw'+(held?' on':'')+'"><input type="checkbox" data-f="hold"'+(held?' checked':'')+(isRM?' disabled':'')+'><i></i></span><span>'+(isRM?'Reference Model changes go through IM and AWG on their own, then are held for the RM release and publish with it':'Needs the Reference Model change published first: after AWG approves, hold it and move it with the RM release')+'</span></label></div>'; }).join('')+
       '<button type="button" class="dv-add" id="dvadd">+ Add Another Deliverable</button>'+
       (need?'<div class="dv-rm"><div class="dv-rm-h"><svg viewBox="0 0 24 24"><path d="'+KIND_ICON['Reference Model Change']+'"/></svg><b>Which Reference Model release do these ride with?</b></div>'+(rms.length?'<div class="dv-rms">'+rms.map(x=>'<button type="button" class="dv-r'+(rm===x.id?' on':'')+'" data-rmid="'+esc(x.id)+'"><b>'+esc(x.wr)+'</b><span>'+esc(x.name)+'</span>'+stageChip(x)+'</button>').join('')+'</div>':'<div class="lead-empty">No live Reference Model work request yet. Add it first (Pipeline Board → New Work Request), then come back.</div>')+'</div>':'')+
       '</div><footer><span class="dv-sum">'+rows.filter(r=>r.name.trim()).length+' deliverable'+(rows.filter(r=>r.name.trim()).length===1?'':'s')+(need&&rm?' · '+rows.filter(r=>r.name.trim()&&(r.kind==='Reference Model Change'||r.hold)).length+' riding with '+esc((S.tickets[rm]||{}).wr||''):'')+'</span><button class="btn" data-m="cancel" type="button">Cancel</button><button class="btn pri" id="dvgo" type="button">Create Deliverables</button></footer></div></div>';
@@ -3271,15 +3274,18 @@ async function createDeliverables(t,list,rmId){
   let n=p.deliverables.length; const made=[];
   for(const r of list){
     n++; const letter=String.fromCharCode(64+n), id=(p.id+'-'+letter).slice(0,190);
-    const rides=(r.kind==='Reference Model Change'||r.hold)?rmId:''; const rm=rides?S.tickets[rides]:null;
+    /* Nov 27 (Jonna): the hold starts after AWG approves. Until then it goes through AI Review, IM and AWG on its own
+       (a deliverable riding a release can't go to IM); rmHold names the release, and rmRelease puts its IM-approved rows
+       in that release's Master Change List. */
+    const hold=(r.kind==='Reference Model Change'||r.hold)?rmId:''; const rm=hold?S.tickets[hold]:null;
     const c={id,wr:p.wr+'-'+letter,uid:p.wr+'-'+letter,name:r.name.trim(),kind:r.kind,parent:p.id,workgroup:p.workgroup,groupType:p.groupType,facilitator:p.facilitator,workType:p.workType,reqType:p.reqType,segment:p.segment,size:p.size,
-      stage:rm?rm.stage:(p.stage==='published'?'work':p.stage),sub:'',state:'active',stageSince:today(),dates:clone(p.dates||{}),links:clone(p.links||{}),rides:rides||'',history:[],createdAt:new Date().toISOString(),source:'mms'};
-    hist(c,'Split from '+p.wr+' '+p.name+' as a '+c.kind+(rm?'; held for '+rm.wr+' and moves with it':''));
+      stage:(p.stage==='published'?'work':p.stage),sub:'',state:'active',stageSince:today(),dates:clone(p.dates||{}),links:clone(p.links||{}),rides:'',rmHold:hold||'',rmRelease:(hold&&typeof rlRelOf==='function'?rlRelOf(rm)||'':''),history:[],createdAt:new Date().toISOString(),source:'mms'};
+    hist(c,'Split from '+p.wr+' '+p.name+' as a '+c.kind+(rm?'; goes through IM and AWG on its own, then is held for '+rm.wr+' and moves with it':''));
     S.tickets[id]=c; await write('tickets',id,c); p.deliverables.push(id); made.push(c.wr);
   }
   hist(p,'Split into deliverables: '+made.join(', ')); await saveTicket(p,p.wr+' split into '+made.length+' deliverable'+(made.length===1?'':'s'));
 }
-async function unride(t){ const x=clone(t), b=clone(t); const was=S.tickets[t.rides]; x.rides=''; hist(x,'No longer held for '+(was?was.wr:'the RM release')+'; moves on its own'); await saveTicket(x,t.wr+' moves on its own now',b); }
+async function unride(t){ const x=clone(t), b=clone(t); const was=S.tickets[t.rides||t.rmHold]; x.rides=''; x.rmHold=''; hist(x,'No longer held for '+(was?was.wr:'the RM release')+'; moves on its own'); await saveTicket(x,t.wr+' moves on its own now',b); }
 function relPanel(t){
   let out='';
   const kids=(t.deliverables||[]).map(id=>S.tickets[id]).filter(Boolean);
@@ -3287,7 +3293,7 @@ function relPanel(t){
   if(kids.length) out+='<div class="psec full"><h4>Deliverables<span class="sp">'+(S.canWrite?'<button class="btn sm" data-x2="split" type="button">+ Add a Deliverable</button>':'')+'</span></h4><table class="tbl"><thead><tr><th>WR#</th><th>Deliverable</th><th>Stage</th><th>Designation</th><th></th></tr></thead><tbody>'+kids.map(row).join('')+'</tbody></table></div>';
   const riders=ridersOf(t.id);
   if(riders.length) out+='<div class="psec full"><h4>Riding with This Release<span class="sp chip info">'+riders.length+'</span></h4><div class="muted" style="font-size:12.5px;margin:-4px 0 8px">These move with '+esc(t.wr)+' through every stage and publish with it.</div><table class="tbl"><thead><tr><th>WR#</th><th>Deliverable</th><th>Stage</th><th>Designation</th><th></th></tr></thead><tbody>'+riders.map(row).join('')+'</tbody></table></div>';
-  if(t.parent&&S.tickets[t.parent]){ const p=S.tickets[t.parent]; out='<div class="psec full"><h4>Part Of</h4><div class="rowlink" data-open="'+esc(p.id)+'" style="cursor:pointer"><b>'+esc(p.wr)+'</b> '+esc(p.name)+' <span class="muted">· '+(p.deliverables||[]).length+' deliverables</span></div>'+(t.rides?'<div class="banner info" style="margin:10px 0 0">Held for '+esc((S.tickets[t.rides]||{}).wr||t.rides)+' '+esc((S.tickets[t.rides]||{}).name||'')+'. It moves with that release and publishes with it.</div>':'')+'</div>'+out; }
+  if(t.parent&&S.tickets[t.parent]){ const p=S.tickets[t.parent]; out='<div class="psec full"><h4>Part Of</h4><div class="rowlink" data-open="'+esc(p.id)+'" style="cursor:pointer"><b>'+esc(p.wr)+'</b> '+esc(p.name)+' <span class="muted">· '+(p.deliverables||[]).length+' deliverables</span></div>'+(!t.rides&&t.rmHold&&S.tickets[t.rmHold]?'<div class="banner info" style="margin:10px 0 0">Goes through AI Review, IM and AWG on its own. Once AWG approves, it is held for '+esc(S.tickets[t.rmHold].wr)+' '+esc(S.tickets[t.rmHold].name||'')+' and moves with that release.</div>':'')+(t.rides?'<div class="banner info" style="margin:10px 0 0">Held for '+esc((S.tickets[t.rides]||{}).wr||t.rides)+' '+esc((S.tickets[t.rides]||{}).name||'')+'. It moves with that release and publishes with it.</div>':'')+'</div>'+out; }
   return out;
 }
 
@@ -3393,6 +3399,14 @@ saveTicket=async function(t,msg,before){ const ok=await _saveTicketSplit(t,msg,b
       const x=clone(p), anyPub=kids.some(k=>k.state==='published'); x.state=anyPub?'published':'closed'; if(anyPub){ x.stage='published'; x.dates=Object.assign({},x.dates,{published:x.dates&&x.dates.published||today()}); } else x.dates=Object.assign({},x.dates,{closed:today()});
       hist(x,'All '+kids.length+' deliverable'+(kids.length===1?' is':'s are')+' finished ('+kids.map(k=>k.wr+' '+k.state).join(', ')+'), so this work request is '+(anyPub?'published':'closed')); await _saveTicketSplit(x); } } } }catch(e){}
   return ok; };
+
+/* the hold starts when AWG approves: the deliverable joins its release on entering License Designation */
+const _onEnterHold=onEnter;
+onEnter=function(t,to){ _onEnterHold.apply(this,arguments);
+  if(to!=='designation'||!t||t.rides||!t.rmHold) return; const r=S.tickets[t.rmHold];
+  if(!r||['published','closed','canceled'].includes(r.state)){ hist(t,'Not held: '+((r&&r.wr)||t.rmHold)+' is no longer live, so it moves on its own'); t.rmHold=''; return; }
+  if(ordOf(r.stage)>ordOf('designation')){ hist(t,'Not held: '+r.wr+' is already at '+stageDef(r.stage).name+', past License Designation, so it moves on its own.'); return; }
+  t.rides=t.rmHold; hist(t,'AWG approved; now held for '+r.wr+' '+(r.name||'')+' and moves with it'+(r.stage!=='designation'?' (it waits here until the release reaches License Designation)':'')); };
 
 /* ---------- who holds a role ---------- */
 function isRole(role,who){ who=who||viewer(); return (S.people.roles&&S.people.roles[role]||[]).some(p=>sameName(p.name,who.name)||(who.email&&p.email&&p.email.toLowerCase()===String(who.email).toLowerCase())); }
@@ -7596,6 +7610,8 @@ const HELP_TOPICS={
      'IM returns it: it goes back to the facilitator as Updates Needed, with IM’s notes.',
      'AWG approves: the MMS recommends a comment type, classification and license from past designations of the same kind, and sends it to Jonna. If the work request has parts, each part gets its own recommendation.',
      'AWG returns it: it goes back to the facilitator, or back to IM if AWG asks for that.',
+     'A Reference Model change deliverable (or one held for the Reference Model release) goes through AI Review, IM and AWG on its own. When AWG approves, it is held for its release: it waits at License Designation until the release gets there, then moves with it and publishes with it.',
+     'IM or AWG decides whether a submission needs their review. If not (for example, only a source citation was added after comment), IM or AWG clicks Not Required: Skip IM Review (or Skip AWG Review) and says why; it moves on, and the history says who decided and why.',
      'Jonna designates it (Designate as Recommended, or Change the Designation): it goes straight to Governance for approval to comment, with no second approval. The recommendation goes away, and the License Designation section shows what was chosen.'],
     ['The facilitator hears about each of these in the daily digest.','The Review Desk shows all four review steps side by side.'],
     [['Open the Review Desk','reviews']]],
@@ -7901,7 +7917,10 @@ const RC2_STAGE_HOW={
 const GOV_DESC={'Business Executive Team (BET)':'Approves new work and sets priorities.','Residential Standards Governance Committee':'Governs residential standards.','Commercial Standards Governance Committee':'Governs commercial standards.','Council of Chairs':'Workgroup and community chairs.','Education Council':'Guides MISMO education.'};
 function rc2Tile(x,c){ const [n,d,u,ic]=x, int=/^go:/.test(u);
   return (int?'<button type="button" class="rc2-t" data-hgo="'+esc(u.slice(3))+'"':'<a class="rc2-t" href="'+esc(u)+'" target="_blank" rel="noopener"')+' style="--tc:'+c+'"><span class="rc2-ic"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg></span><span class="rc2-tx"><b>'+esc(n)+'</b><span>'+esc(d)+'</span></span><span class="rc2-go">'+(int?'→':'↗')+'</span>'+(int?'</button>':'</a>'); }
+/* Nov 27 (Jonna): the Work Request Journey demo, one made-up work request through every step and system */
+const RC2_JOURNEY=['Work Request Journey','Every step, start to finish, with one example','https://resources.mismo.org/mms/journey/','M5 4l14 8-14 8z'];
 function rc2Search(q){ const out=[]; q=q.toLowerCase();
+  if((RC2_JOURNEY[0]+' '+RC2_JOURNEY[1]+' demo process walkthrough').toLowerCase().includes(q)) out.push(['Tool',rc2Tile(RC2_JOURNEY,'#2477b8')]);
   RC2_GROUPS.forEach(([g,c,L])=>L.forEach(x=>{ if((x[0]+' '+x[1]).toLowerCase().includes(q)) out.push(['Tool',rc2Tile(x,c)]); }));
   stages().forEach(s=>{ if((s.name+' '+(s.desc||'')).toLowerCase().includes(q)) out.push(['Step','<button type="button" class="rc2-t" data-rcs2="'+s.key+'" style="--tc:'+s.color+'"><span class="rc2-ic n">'+(stageIndex(s.key)+1)+'</span><span class="rc2-tx"><b>'+esc(s.name)+'</b><span>'+esc(s.desc||'')+'</span></span><span class="rc2-go">→</span></button>']); });
   Object.keys(HELP_TOPICS).forEach(k=>{ const T=HELP_TOPICS[k]; if(JSON.stringify(T).toLowerCase().includes(q)) out.push(['Help','<button type="button" class="rc2-t" data-hq2="'+k+'" style="--tc:#456179"><span class="rc2-ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01"/></svg></span><span class="rc2-tx"><b>'+esc(T[0])+'</b><span>'+esc(T[2].slice(0,90))+'…</span></span><span class="rc2-go">→</span></button>']); });
@@ -7913,7 +7932,7 @@ VIEWS.resources=function(){
   const TABS=[['tools','Tools and Links'],['flow','How Work Moves'],['gov','Governance'],['roles','Who Does What'],['terms','MISMO Terms']];
   const hero='<div class="hero rc2-hero"><div class="rc2-hl"><div class="date">Facilitator Resource Center</div><h2>Everything You Need to Run Your Workgroup</h2><p><b>'+live.length+'</b> work requests live · <b>'+rv+'</b> in review · <b>'+cp+'</b> open for comment · <b>'+gv+'</b> with Governance</p>'+
     '<div class="hx-find rc2-find"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg><input type="search" id="rcq" placeholder="Search tools, steps, help and terms" value="'+esc(S.rcQ||'')+'" aria-label="Search the Resource Center"></div></div>'+
-    '<div class="rc2-quick">'+[['Meeting Trackers','https://resources.mismo.org/meeting-trackers/','M4 4h16v16H4zM4 9h16M9 4v16'],['New Work Request','https://resources.mismo.org/initiative-hub/work-requests.html#new','M12 5v14M5 12h14'],['Handbook',RC2_GROUPS[3][2][0][2],'M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z'],['Help','go:help','M12 3a9 9 0 100 18 9 9 0 000-18zM9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01']].map(([n,u,ic])=>/^go:/.test(u)?'<button type="button" class="rc2-q" data-hgo="'+u.slice(3)+'"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg>'+esc(n)+'</button>':'<a class="rc2-q" href="'+esc(u)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg>'+esc(n)+'</a>').join('')+'</div></div>';
+    '<div class="rc2-quick">'+[['Meeting Trackers','https://resources.mismo.org/meeting-trackers/','M4 4h16v16H4zM4 9h16M9 4v16'],['New Work Request','https://resources.mismo.org/initiative-hub/work-requests.html#new','M12 5v14M5 12h14'],['Handbook',RC2_GROUPS[3][2][0][2],'M4 19.5A2.5 2.5 0 016.5 17H20V3H6.5A2.5 2.5 0 004 5.5z'],['Process Demo','https://resources.mismo.org/mms/journey/','M5 4l14 8-14 8z'],['Help','go:help','M12 3a9 9 0 100 18 9 9 0 000-18zM9.5 9a2.5 2.5 0 015 .5c0 1.5-2.5 2-2.5 3.5M12 17h.01']].map(([n,u,ic])=>/^go:/.test(u)?'<button type="button" class="rc2-q" data-hgo="'+u.slice(3)+'"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg>'+esc(n)+'</button>':'<a class="rc2-q" href="'+esc(u)+'" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg>'+esc(n)+'</a>').join('')+'</div></div>';
   if(q){ const R=rc2Search(q); const kinds=['Tool','Step','Help','Term'];
     return hero+'<div class="card rc2-res"><h3>'+R.length+' result'+(R.length===1?'':'s')+' for “'+esc(q)+'”<span class="sp"><button type="button" class="btn sm" id="rcclear">Clear</button></span></h3>'+(R.length?kinds.filter(k=>R.some(r=>r[0]===k)).map(k=>'<h4 class="rc2-gh">'+k+(k==='Help'?' Topics':k==='Step'?'s':'s')+'</h4><div class="rc2-grid">'+R.filter(r=>r[0]===k).slice(0,12).map(r=>r[1]).join('')+'</div>').join(''):'<div class="lead-empty">Nothing matches. Try a shorter word.</div>')+'</div>'; }
   const seg='<div class="seg rc2-tabs" role="tablist">'+TABS.map(([k,l])=>'<button type="button" role="tab" data-rctab="'+k+'" aria-pressed="'+(k===tab)+'">'+l+'</button>').join('')+'</div>';
@@ -7927,7 +7946,7 @@ VIEWS.resources=function(){
   else if(tab==='flow'){ const sel=S.rcStage&&stageDef(S.rcStage)&&stages().some(s=>s.key===S.rcStage)?S.rcStage:stages()[0].key, sd=stageDef(sel), idx=stageIndex(sel), n=act.filter(t=>t.stage===sel), how=RC2_STAGE_HOW[sel]||['',''];
     const flow='<div class="flow">'+PHASES.filter(ph=>phaseStages(ph).length).map(ph=>'<div class="fl-ph" style="--lc:'+ph.c+'"><div class="fl-pn">'+esc(ph.name)+'</div><div class="fl-st">'+phaseStages(ph).map(s=>'<button type="button" class="fl-s'+(s.key===sel?' on':'')+'" data-rcs="'+s.key+'" style="--sc:'+s.color+'"><span class="fl-n">'+(stageIndex(s.key)+1)+'</span>'+esc(s.name)+'</button>').join('')+'</div></div>').join('<span class="fl-a">›</span>')+'</div>';
     const own=sd.owner==='gov'?govName():(ROLE_LABEL[sd.owner]||'');
-    body='<div class="card rc2-flow">'+flow+'<div class="rc2-sd" style="--sc:'+sd.color+'"><div class="rc2-sdh"><div><div class="fl-dk">Step '+(idx+1)+' of '+stages().length+' · '+esc(own)+'</div><h3>'+esc(sd.name)+'</h3><p>'+esc(sd.desc||'')+'</p></div><div class="rc2-now"><b>'+n.length+'</b><span>here now</span></div></div>'+
+    body='<div class="card rc2-flow"><div class="rc2-demo"><span>See every step with one made-up work request: three deliverables, IM, AWG, comment, MISMO Media and publishing.</span><a class="btn sm" href="https://resources.mismo.org/mms/journey/" target="_blank" rel="noopener">Open the Work Request Journey ↗</a></div>'+flow+'<div class="rc2-sd" style="--sc:'+sd.color+'"><div class="rc2-sdh"><div><div class="fl-dk">Step '+(idx+1)+' of '+stages().length+' · '+esc(own)+'</div><h3>'+esc(sd.name)+'</h3><p>'+esc(sd.desc||'')+'</p></div><div class="rc2-now"><b>'+n.length+'</b><span>here now</span></div></div>'+
       '<div class="rc2-how"><div><b>What People Do</b><p>'+esc(how[0])+'</p></div><div><b>What Happens on Its Own</b><p>'+esc(how[1])+'</p></div></div>'+
       (n.length?'<div class="rc2-here">'+n.slice(0,6).map(t=>'<button type="button" class="rc2-wr" data-open="'+esc(t.id)+'"><b>'+esc(t.wr||'')+'</b> '+esc(t.name||'')+'</button>').join('')+(n.length>6?'<button type="button" class="rc2-wr more" data-hgo="board">+'+(n.length-6)+' more on the board</button>':'')+'</div>':'')+
       '<div class="rc2-pn">'+(idx>0?'<button type="button" class="btn sm" data-rcs="'+stages()[idx-1].key+'">← '+esc(stages()[idx-1].name)+'</button>':'<span></span>')+(idx<stages().length-1?'<button type="button" class="btn sm pri" data-rcs="'+stages()[idx+1].key+'">'+esc(stages()[idx+1].name)+' →</button>':'')+'</div></div></div>'; }
