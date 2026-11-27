@@ -29,6 +29,24 @@
 (function () {
   'use strict';
   if (window.__hqRelay) return;
+  /* Tour mode (Nov 27, 2026): the Work Request Journey (resources.mismo.org/mms/journey/) shows this MMS inside its own
+     page with made-up practice data it hands over. Only when this page is framed by a resources.mismo.org page that
+     offers that data: then no door to the relay is opened, so nothing real is read and nothing is saved or sent. */
+  try {
+    if (/[?&]tour=1(&|$)/.test(location.search) && window.parent !== window && window.parent.__tourSeed) {
+      window.__mmsSeed = JSON.parse(JSON.stringify(window.parent.__tourSeed)); window.__mmsTourMode = true;
+      /* the tour's clock: each step happens on its own day, so "2 days ago" and new history lines read right */
+      (function () { var RD = Date, P = window.parent;
+        function now() { var c = P.__tourClock; return c ? c.base + (RD.now() - c.at) : RD.now(); }
+        function FD() { if (!new.target) return new RD(now()).toString(); var a = [].slice.call(arguments); return a.length ? new (Function.prototype.bind.apply(RD, [null].concat(a)))() : new RD(now()); }
+        FD.now = now; FD.parse = RD.parse; FD.UTC = RD.UTC; FD.prototype = RD.prototype; window.Date = FD; })();
+      /* the tour page owns the browser's history: the shared Back helper (assets/back.js) can't step the page behind it back */
+      try { ['pushState', 'replaceState', 'back', 'forward', 'go'].forEach(function (k) { history[k] = function () {}; }); } catch (e) {}
+      /* nothing in the tour reaches the network: every fetch (the files flow, the relay, the website) gets an empty answer */
+      window.fetch = function () { return Promise.resolve(new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } })); };
+      document.documentElement.removeAttribute('data-rs-gate'); return;
+    }
+  } catch (e) { /* a page from elsewhere can't be read: not a tour */ }
 
   var RELAY_URL = 'https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws';
   var PROJECT = 'mms', TOOL = 'the MISMO Manufacturing System';

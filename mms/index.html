@@ -2191,7 +2191,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-27T18:09:28Z',fp:'aaf0620b'};
+window.__mmsBuild={at:'2026-11-27T20:37:37Z',fp:'1de7f36d'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -2247,7 +2247,7 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
 /* ---------- dates (local calendar days, stored as YYYY-MM-DD) ---------- */
 const pad=n=>String(n).padStart(2,'0');
 const ymd=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
-const today=()=>ymd(new Date());
+const today=()=>window.__mmsTourToday||ymd(new Date());   /* the Work Request Journey sets its story's date (tour mode only) */
 const toD=s=>{ if(!s) return null; const m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})/); return m?new Date(+m[1],+m[2]-1,+m[3]):null; };
 const addDays=(s,n)=>{ const d=toD(s)||new Date(); d.setDate(d.getDate()+n); return ymd(d); };
 const daysBetween=(a,b)=>{ const x=toD(a), y=toD(b); if(!x||!y) return null; return Math.round((y-x)/864e5); };
@@ -2328,6 +2328,7 @@ const SIZES=[['S','Small'],['M','Medium'],['L','Large'],['XL','X-Large']];
 const S={ready:false,tickets:{},process:clone(DEFAULT_PROCESS),people:clone(DEFAULT_PEOPLE),notify:clone(DEFAULT_NOTIFY),
   outbox:{},media:{},arch:{},me:{name:'',email:''},canWrite:true,isStaff:false,viewAs:'',view:'home',panel:null,
   filters:{fac:'',wg:'',size:'',type:'',q:'',state:'live',sort:'stage',dir:1,stage:''},sample:null,mode:'claude',loaded:{}};
+S.tour=!!window.__mmsTourMode;
 window.__mms=S;
 
 /* ---------- store: claude db, or memory when no store is reachable ---------- */
@@ -2656,7 +2657,8 @@ async function runAutomations(){
   for(const t of liveTickets()){
     if(t.state!=='active') continue;
     const d=t.dates||{};
-    if(t.stage==='comment' && t.sub!=='setup' && d.commentEnd && d.commentEnd<td){
+    /* work riding with a release ends its comment period with the release, which moves it (Nov 27: it used to move on its own first and send its own email) */
+    if(t.stage==='comment' && t.sub!=='setup' && d.commentEnd && d.commentEnd<td && !t.rides){
       await move(t,'post',{text:'Comment period ended '+fmt(d.commentEnd)+'; moved to Post-Comment automatically',toast:t.wr+': comment period ended'});
       continue;
     }
@@ -2772,7 +2774,7 @@ function renderAll(){
   const now=Date.now(); if(!S._readyAt) S._readyAt=now; if(!S._enter&&now-S._readyAt<10000&&now-renderAt<250){ clearTimeout(renderT); renderT=setTimeout(renderAll,250-(now-renderAt)); return; }
   clearTimeout(renderT); renderAt=now;
   const v=VIEWS[S.view]||VIEWS.home; const m=$('#main'); const y=window.scrollY;
-  const html=(S.mode==='memory'?'<div class="banner">This copy isn\u2019t connected to the MMS records, so nothing here is saved. Open the published MMS to work for real.</div>':'')+(S.canWrite?'':'<div class="banner info">You can look at everything here; ask MISMO staff if you need to make changes.</div>')+v();
+  const html=(S.mode==='memory'&&!S.tour?'<div class="banner">This copy isn\u2019t connected to the MMS records, so nothing here is saved. Open the published MMS to work for real.</div>':'')+(S.canWrite?'':'<div class="banner info">You can look at everything here; ask MISMO staff if you need to make changes.</div>')+v();
   const same=!S._enter&&S._lastView===S.view;
   if(same&&html===S._lastHtml){ counts(); if(S.panel) renderPanel(); return; }
   S._lastHtml=html; S._lastView=S.view;
@@ -2872,7 +2874,7 @@ function stageActions(t){
       /* the review itself happens in IM Review / AWG Review; its decision moves the work request */
       if(sub!=='updates'&&sub!=='prep'){ const pq=typeof portalItemFor==='function'?portalItemFor(t,k):null;
         if(pq) add('Open in '+nm+' Review ↗',()=>portalOpen(k,pq.rep),'pri');
-        else if(k==='im'){ add('Run Reference Model QC →',()=>{ S.ptab='reviews'; rvRun(t,'im'); },'pri'); if(typeof imSendDocsOnly==='function') add('No Reference Model Changes: Send to IM',()=>imSendDocsOnly(t)); }
+        else if(k==='im'){ add('Run Reference Model QC →',()=>{ S.ptab='rev'; rvRun(t,'im'); },'pri'); if(typeof imSendDocsOnly==='function') add('No Reference Model Changes: Send to IM',()=>imSendDocsOnly(t)); }
         else add('Open AWG Review ↗',()=>portalOpen('awg',''),'pri'); }
       /* skipping a review is MISMO staff's call, and it asks first (Nov 23: a facilitator clicked it thinking it skipped the Reference Model QC) */
       /* Nov 27 (Jonna): IM and AWG decide whether a submission needs their review (for example a source credited after
@@ -2902,7 +2904,8 @@ function renderPanel(){
   const stageDates={approved:d.bet,cfp:d.cfpPublished,kickoff:d.kickoffGc,work:d.workStart,aireview:d.aiSubmitted,im:d.imSubmitted,awg:d.awgSubmitted,designation:d.designation,'gc-comment':d.gcComment,comment:d.commentStart,post:d.commentEnd,'gc-publish':d.postGc,release:d.published};
   const track=list.map((s,j)=>'<div class="tst '+(t.state==='published'||j<ci?'done':(j===ci?'cur':''))+'" title="'+esc(s.desc||'')+'"><i></i>'+keepLast(s.name)+(stageDates[s.key]?'<small>'+esc(fmtS(stageDates[s.key]))+'</small>':'')+'</div>').join('');
   const own=sameName(t.facilitator,viewer().name), edit=S.canWrite&&(S.isStaff||own);
-  const acts=canAct(t)?stageActions(t):(edit&&t.state==='active'&&t.stage==='work'?stageActions(t).filter(a=>/^Change Target/.test(a.label)):[]);
+  /* IM and AWG decide whether a submission needs their review (Nov 27), so their chair sees Skip even when the next move is the facilitator's */
+  const acts=canAct(t)?stageActions(t):(edit&&t.state==='active'&&t.stage==='work'?stageActions(t).filter(a=>/^Change Target/.test(a.label)):(S.canWrite&&!S.viewAs&&t.state==='active'&&['im','awg'].includes(t.stage)&&isRole('imawg',S.me)?stageActions(t).filter(a=>/^Not Required: Skip/.test(a.label)):[]));
   const live=t.state==='active'||t.state==='hold';
   const more=!S.canWrite?'':(S.isStaff?['<button class="btn sm" data-x="moveto" type="button">Move to…</button>',
     t.state==='active'?'<button class="btn sm" data-x="hold" type="button">Put on Hold</button>':'',
@@ -5218,7 +5221,7 @@ function wrHub(P,t){
   const filledLinks=Object.values(t.links||{}).filter(Boolean).length;
   const TABS=[['over','Overview','over',''],['det','Details','det',''],['dates','Key Dates','cal',''],['links','Links','link',filledLinks||''],['hist','History','hist',(t.history||[]).length||'']];
   if(secs.cmts) TABS.splice(1,0,['cmts','Comments','cmt',nCm||'0']);
-  if(!TABS.some(x=>x[0]===S.ptab)&&!['files','reviews','arch'].includes(S.ptab)) S.ptab='over';
+  if(!TABS.some(x=>x[0]===S.ptab)&&!['files','rev','reviews','arch'].includes(S.ptab)) S.ptab='over';   /* Nov 27: 'rev' is the Reviews tab's key (a refresh used to drop people back on the Overview) */
   const hero='<div class="wh"><div class="wh-wave" aria-hidden="true"></div>'+
     '<div class="wh-top"><span class="wh-eb">'+esc(t.wr)+(t.workgroup?' · '+esc(t.workgroup):'')+'</span>'+chips+'</div>'+
     '<h2>'+esc(t.name)+(t.size?' <span class="wh-acr" title="Size: '+esc(typeof sizeLabel==='function'?sizeLabel(t):t.size)+'">'+esc(t.size)+'</span>':'')+'</h2>'+
@@ -5621,7 +5624,7 @@ function rvImChecks(file,ctx){
   const P=rvParseForm(file), W=file.name;
   if(!P.hasFace||!P.hasRM){ add('fix','Submission Form','This doesn’t look like the IM/AWG Submission Form (no '+(!P.hasFace?'Face Page':'Reference Model Changes')+' tab).','Use the current MISMO Submission Review Form (July 2026) from the IM community page.',W,'form'); return {out,P}; }
   // file name
-  if(!/^(IM|AWG)Sub\d*_WR\d{4}[._]\d{1,2}_.+_\d{6}/i.test(W.replace(/\.xls[xm]$/i,''))) add('recommend','Submission Form','The file name doesn’t follow the IM naming convention.','Name it IMSub_WR#_SubmissionName_MMDDYY (IMSub2_… for a resubmission). Example: IMSub_WR2024.99_iLAD v3.01_052324.',W,'filename');
+  if(!/^(IM|AWG)Sub\d*_WR\d{4}[._]\d{1,2}(-[A-Z])?_.+_\d{6}/i.test(W.replace(/\.xls[xm]$/i,''))) add('recommend','Submission Form','The file name doesn’t follow the IM naming convention.','Name it IMSub_WR#_SubmissionName_MMDDYY (IMSub2_… for a resubmission). Example: IMSub_WR2024.99_iLAD v3.01_052324 (a deliverable keeps its letter: IMSub_WR2024.99-C_…).',W,'filename');
   // face page
   const miss=RV_FACE.filter(([k])=>!P.F[k]).map(([,l])=>l); if(miss.length) add('fix','Face Page','Required fields are empty: '+miss.join('; ')+'.','Fill in every yellow field on the Face Page.','Face Page','face');
   if(P.F.wr&&ctx.t&&!new RegExp(String(ctx.t.wr||'').replace(/^WR/,'').replace(/[_.]/,'[_.]')).test(P.F.wr)) add('fix','Face Page','The Work Request ID says '+rvQ(P.F.wr)+', but this is '+ctx.t.wr+'.','Correct the Work Request ID.','Face Page','face-wr');
@@ -7317,6 +7320,12 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
       let it=null; try{ const o=await awgUpdate('queue',cur=>{ it=null; const x=cur&&cur.items&&cur.items[it0.rep]; if(!x||x.home||x.status!=='decided') return cur; x.home=true; x.homeBy=S.me.name||'MMS'; x.homeAt=new Date().toISOString(); it=Object.assign({},x); return cur; }); S.awgPortalQ=(o&&o.items)||S.awgPortalQ; }catch(e){ it=null; }
       if(!it) continue; let t=await freshTicket(t0.id)||t0;
       try{
+      await awgHome(t,it);
+      }catch(e){ console.warn('awg decision',e); try{ S.awgPortalQ=(await awgUpdate('queue',cur=>{ if(cur&&cur.items&&cur.items[it.rep]) delete cur.items[it.rep].home; return cur; })).items; }catch(e2){} } }
+  }catch(e){ console.warn('awg sync',e); } finally{ awgSyncing=false; } }
+/* AWG's decision, brought home: the email to the facilitator and the move (Nov 27, 2026: its own function so the
+   Work Request Journey's recorder plays the real thing) */
+async function awgHome(t,it){
       const d=atDay(it.decidedAt)||today(), who=(it.decidedBy||'AWG')+' in AWG Review', out=it.outcome||'';
       /* what AWG asked for when it sent it back is on the call record */
       let why=String(it.conds||'').trim(); if(!why&&/^Returned/.test(out)) try{ const rv=await rGet(AWGR,'rev-'+imrSafe(it.rep)); const c=rv&&rv.data&&((rv.data.calls||[]).slice(-1)[0]||rv.data.call); why=String((c&&c.conditions)||'').trim(); }catch(e){}
@@ -7328,8 +7337,7 @@ async function awgSync(){ if(awgSyncing||S.mode!=='relay'||Date.now()-awgSynced<
         else if(/^Returned to IM/.test(out)){ const x=clone(t); x.awg=Object.assign({},x.awg,{status:out}); await move(x,'im',{sub:'updates',text:'AWG returned it to IM '+fmt(d)+(why?': '+why:'')+'. Recorded by '+who+'.'}); }
         else if(/^Returned/.test(out)) await setSub(t,'updates','AWG returned it to the workgroup '+fmt(d)+(why?': '+why:'')+'. Recorded by '+who+'.',{awg:Object.assign({},t.awg,{status:out}),dates:Object.assign({},t.dates,{awgDecision:d})}); }
       else { const x=clone(t); hist(x,'AWG decision ('+fmt(d)+'): '+out+'. Recorded by '+who+'.'); await saveTicket(x,'AWG decision brought in'); }
-      }catch(e){ console.warn('awg decision',e); try{ S.awgPortalQ=(await awgUpdate('queue',cur=>{ if(cur&&cur.items&&cur.items[it.rep]) delete cur.items[it.rep].home; return cur; })).items; }catch(e2){} } }
-  }catch(e){ console.warn('awg sync',e); } finally{ awgSyncing=false; } }
+}
 const _imEnsureQ1=imEnsureQ; imEnsureQ=function(){ _imEnsureQ1(); setTimeout(awgSync,2500); };
 
 /* ---------- after approval: the designation is recommended automatically and goes to the License Designator ---------- */
@@ -7918,7 +7926,7 @@ const GOV_DESC={'Business Executive Team (BET)':'Approves new work and sets prio
 function rc2Tile(x,c){ const [n,d,u,ic]=x, int=/^go:/.test(u);
   return (int?'<button type="button" class="rc2-t" data-hgo="'+esc(u.slice(3))+'"':'<a class="rc2-t" href="'+esc(u)+'" target="_blank" rel="noopener"')+' style="--tc:'+c+'"><span class="rc2-ic"><svg viewBox="0 0 24 24"><path d="'+ic+'"/></svg></span><span class="rc2-tx"><b>'+esc(n)+'</b><span>'+esc(d)+'</span></span><span class="rc2-go">'+(int?'→':'↗')+'</span>'+(int?'</button>':'</a>'); }
 /* Nov 27 (Jonna): the Work Request Journey demo, one made-up work request through every step and system */
-const RC2_JOURNEY=['Work Request Journey','Every step, start to finish, with one example','https://resources.mismo.org/mms/journey/','M5 4l14 8-14 8z'];
+const RC2_JOURNEY=['Work Request Journey','The training tour: the real MMS, step by step, with one practice work request','https://resources.mismo.org/mms/journey/','M5 4l14 8-14 8z'];
 function rc2Search(q){ const out=[]; q=q.toLowerCase();
   if((RC2_JOURNEY[0]+' '+RC2_JOURNEY[1]+' demo process walkthrough').toLowerCase().includes(q)) out.push(['Tool',rc2Tile(RC2_JOURNEY,'#2477b8')]);
   RC2_GROUPS.forEach(([g,c,L])=>L.forEach(x=>{ if((x[0]+' '+x[1]).toLowerCase().includes(q)) out.push(['Tool',rc2Tile(x,c)]); }));
@@ -7946,7 +7954,7 @@ VIEWS.resources=function(){
   else if(tab==='flow'){ const sel=S.rcStage&&stageDef(S.rcStage)&&stages().some(s=>s.key===S.rcStage)?S.rcStage:stages()[0].key, sd=stageDef(sel), idx=stageIndex(sel), n=act.filter(t=>t.stage===sel), how=RC2_STAGE_HOW[sel]||['',''];
     const flow='<div class="flow">'+PHASES.filter(ph=>phaseStages(ph).length).map(ph=>'<div class="fl-ph" style="--lc:'+ph.c+'"><div class="fl-pn">'+esc(ph.name)+'</div><div class="fl-st">'+phaseStages(ph).map(s=>'<button type="button" class="fl-s'+(s.key===sel?' on':'')+'" data-rcs="'+s.key+'" style="--sc:'+s.color+'"><span class="fl-n">'+(stageIndex(s.key)+1)+'</span>'+esc(s.name)+'</button>').join('')+'</div></div>').join('<span class="fl-a">›</span>')+'</div>';
     const own=sd.owner==='gov'?govName():(ROLE_LABEL[sd.owner]||'');
-    body='<div class="card rc2-flow"><div class="rc2-demo"><span>See every step with one made-up work request: three deliverables, IM, AWG, comment, MISMO Media and publishing.</span><a class="btn sm" href="https://resources.mismo.org/mms/journey/" target="_blank" rel="noopener">Open the Work Request Journey ↗</a></div>'+flow+'<div class="rc2-sd" style="--sc:'+sd.color+'"><div class="rc2-sdh"><div><div class="fl-dk">Step '+(idx+1)+' of '+stages().length+' · '+esc(own)+'</div><h3>'+esc(sd.name)+'</h3><p>'+esc(sd.desc||'')+'</p></div><div class="rc2-now"><b>'+n.length+'</b><span>here now</span></div></div>'+
+    body='<div class="card rc2-flow"><div class="rc2-demo"><span>The training tour: the real MMS with one practice work request, from the Initiative Hub to publication. A pointer shows each button and a bubble says what happens, with the emails the MMS sends.</span><a class="btn sm" href="https://resources.mismo.org/mms/journey/" target="_blank" rel="noopener">Open the Work Request Journey ↗</a></div>'+flow+'<div class="rc2-sd" style="--sc:'+sd.color+'"><div class="rc2-sdh"><div><div class="fl-dk">Step '+(idx+1)+' of '+stages().length+' · '+esc(own)+'</div><h3>'+esc(sd.name)+'</h3><p>'+esc(sd.desc||'')+'</p></div><div class="rc2-now"><b>'+n.length+'</b><span>here now</span></div></div>'+
       '<div class="rc2-how"><div><b>What People Do</b><p>'+esc(how[0])+'</p></div><div><b>What Happens on Its Own</b><p>'+esc(how[1])+'</p></div></div>'+
       (n.length?'<div class="rc2-here">'+n.slice(0,6).map(t=>'<button type="button" class="rc2-wr" data-open="'+esc(t.id)+'"><b>'+esc(t.wr||'')+'</b> '+esc(t.name||'')+'</button>').join('')+(n.length>6?'<button type="button" class="rc2-wr more" data-hgo="board">+'+(n.length-6)+' more on the board</button>':'')+'</div>':'')+
       '<div class="rc2-pn">'+(idx>0?'<button type="button" class="btn sm" data-rcs="'+stages()[idx-1].key+'">← '+esc(stages()[idx-1].name)+'</button>':'<span></span>')+(idx<stages().length-1?'<button type="button" class="btn sm pri" data-rcs="'+stages()[idx+1].key+'">'+esc(stages()[idx+1].name)+' →</button>':'')+'</div></div></div>'; }
@@ -9691,7 +9699,7 @@ function rcHtml(R){ const li=a=>'<ul style="margin:4px 0 10px 18px">'+a.map(x=>'
 async function rcRun(t){
   const L=cpfFiles(t).filter(f=>/\.xlsx$/i.test(f.n)); if(!L.length) return toast('Add the Master Change List and the Version Comparison Report to Files first.');
   const pick=re=>L.filter(f=>re.test(f.n));
-  const lists=pick(/master change list|reference model changes/i), vcrs=pick(/version ?comparison/i), ldds=pick(/^logicaldatadictionary|logical ?data ?dictionary/i).filter(f=>!/enhanced/i.test(f.n));
+  const lists=pick(/master change list|reference model changes/i), vcrs=pick(/version[ _-]?comparison/i), ldds=pick(/^logicaldatadictionary|logical[ _-]?data[ _-]?dictionary/i).filter(f=>!/enhanced/i.test(f.n));
   const def=l=>(l.find(f=>/correct/i.test(f.n))||l[0]||{}).p||'';
   const opt=(nm,l,sel,none)=>'<select name="'+nm+'" style="width:100%">'+(none?'<option value="">'+esc(none)+'</option>':'')+L.map(f=>'<option value="'+esc(f.p)+'"'+(f.p===sel?' selected':'')+'>'+esc(f.n)+(f.sz?' · '+esc(f.sz):'')+'</option>').join('')+'</select>';
   const v=await modal({title:'Check the Build',text:esc(t.wr)+' '+esc(t.name),ok:'Check',body:fld('Master Change List sent to MISMO Link',opt('l',lists,def(lists)))+fld('Version Comparison Report from the build',opt('v',vcrs,def(vcrs)))+fld('Logical Data Dictionary (for the definitions)',opt('d',ldds,def(ldds),'Skip the definitions'))});
@@ -9758,6 +9766,44 @@ write=async function(coll,id,data,base){
     close:()=>{ const m=$('#modal-root .modal'); if(!m) return; const c=$('[data-m=cancel],[data-m=keep]',m); if(c) c.click(); else $('#modal-root').innerHTML=''; }
   });
 })();
+/* ---------- Tour mode: what the Work Request Journey drives (Nov 27, 2026) ----------
+   resources.mismo.org/mms/journey/ frames this MMS with made-up practice data (mms-door.js opens no door to the relay,
+   so nothing real is read, saved or sent). The journey page loads each step's data and person here, moves to the view,
+   panel and tab the step needs, and points at the real buttons. Only defined in tour mode. Its practice data also
+   carries __portal: what the IM Review and AWG Review portals hold (other systems), so the MMS shows Open in IM Review. */
+if(S.tour){
+  const fire=()=>Object.keys(Store.subs).forEach(c=>(Store.subs[c]||[]).forEach(cb=>{ try{ cb(clone(Store.mem[c]||{}),{}); }catch(e){} }));
+  window.__mmsTour={
+    S,
+    ready:()=>!!S.ready,
+    /* one step's world: every collection, who is looking, and where */
+    load(o){ o=o||{}; if(o.today) window.__mmsTourToday=o.today; if(o.mem){ Store.mem=clone(o.mem); const P=Store.mem.__portal||{}; S.imPortalQ=P.im||{}; S.awgPortalQ=P.awg||{}; fire(); }
+      if(o.me) S.me=Object.assign({},o.me); S.viewAs=''; computeRole();
+      const mr=$('#modal-root'); if(mr) mr.innerHTML='';
+      if(S.panel) closePanel();
+      if(o.view) go(o.view); else renderAll();
+      if(o.open){ if(o.tab) S.ptab=o.tab; openPanel(o.open); if(o.tab){ S.ptab=o.tab; renderPanel(); } }
+      return true; },
+    go:v=>go(v),
+    open:(id,tab)=>{ if(tab) S.ptab=tab; openPanel(id); if(tab){ S.ptab=tab; renderPanel(); } },
+    tab:k=>{ S.ptab=k; renderPanel(); },
+    close:()=>{ const mr=$('#modal-root'); if(mr) mr.innerHTML=''; if(S.panel) closePanel(); },
+    /* a stage action by its label (opens the real dialog the person would see) */
+    act(id,label){ const t=S.tickets[id]; if(!t) return false; const a=stageActions(t).find(x=>x.label===label||x.label.replace(/\s*[→↗]$/,'')===label); if(!a) return false; try{ a.fn(); }catch(e){ return false; } return true; },
+    actions:id=>{ const t=S.tickets[id]; return t?stageActions(t).map(a=>a.label):[]; },
+    /* the stage email exactly as the MMS writes it */
+    stageMail(id,to,roles){ const t=S.tickets[id]; if(!t) return null; const ppl=[]; (roles||(S.notify.onEnter&&S.notify.onEnter[to])||[]).forEach(r=>peopleFor(r,t).forEach(p=>{ if(p.email&&!ppl.some(x=>x.email===p.email)) ppl.push(p); }));
+      const w=whoseMove(Object.assign({},t,{stage:to}));
+      return {to:ppl.map(p=>p.name+' <'+p.email+'>'),subject:t.wr+' '+t.name+': '+stageDef(to).name,html:typeof stageMailHtml==='function'?stageMailHtml(Object.assign({},t,{stage:to}),to,ppl):'',
+        text:t.name+' ('+t.wr+') is now at '+stageDef(to).name+'.\n\nNext: '+(w.text||'')+(w.label?' ('+w.label+')':'')}; },
+    whose:id=>{ const t=S.tickets[id]; return t?whoseMove(t):null; },
+    /* a work request's newest review report (AI Review or Reference Model QC), as the Reviews tab opens it */
+    report(id,kind){ const L=Object.values(S.reviews||{}).filter(r=>r&&r.ticket===id&&(!kind||r.kind===kind)).sort((a,b)=>String(b.at).localeCompare(String(a.at))); if(!L[0]) return false; rvShow(L[0]); return true; },
+    /* the open dialog's fields, filled in for show (nothing is saved: the tour never presses Save) */
+    fill(vals){ const box=$('#modal-root .modal'); if(!box) return false; Object.entries(vals||{}).forEach(([k,v])=>{ const el=box.querySelector('[name="'+k+'"]')||box.querySelector('[data-date="'+k+'"]'); if(!el) return;
+      if(el.type==='radio'){ const r=box.querySelector('[name="'+k+'"][value="'+v+'"]'); if(r) r.checked=true; } else if(el.type==='checkbox') el.checked=!!v; else el.value=v; }); return true; }
+  };
+}
 
 /* ---------- settings ---------- */
 let setTab='process';
@@ -9951,13 +9997,13 @@ async function boot(){
   const h=(location.hash||'').slice(1); if(VIEWS[h]) S.view=h;
   const ok=await Store.init();
   try{ const u=window.claude&&await window.claude.use('user'); if(u){ const m=await u.me(); S.me={name:(m&&(m.name||m.displayName))||'',email:(m&&m.email)||''}; try{ const c=await u.can('data.write'); S.canWrite=c!==false; }catch(e){} try{ S.isOwnerish=await u.canEdit(); }catch(e){} } }catch(e){}
-  try{ const rs=window.ResourcesSession&&window.ResourcesSession.current(); if(rs){ S.me.name=S.me.name||rs.name||''; S.me.email=S.me.email||rs.email||''; S.relayRole=window.ResourcesSession.role&&window.ResourcesSession.role('mms'); if(S.relayRole==='view') S.canWrite=false; } }catch(e){}
-  if(!ok && window.__mmsSeed){ const sd=window.__mmsSeed; Store.mem={tickets:sd.tickets||{},config:{},outbox:sd.outbox||{},media:sd.media||{},arch:sd.arch||{}}; if(sd.me) S.me=sd.me; }
+  if(!S.tour) try{ const rs=window.ResourcesSession&&window.ResourcesSession.current(); if(rs){ S.me.name=S.me.name||rs.name||''; S.me.email=S.me.email||rs.email||''; S.relayRole=window.ResourcesSession.role&&window.ResourcesSession.role('mms'); if(S.relayRole==='view') S.canWrite=false; } }catch(e){}
+  if(!ok && window.__mmsSeed){ const sd=window.__mmsSeed; Store.mem=sd.mem?clone(sd.mem):{tickets:sd.tickets||{},config:{},outbox:sd.outbox||{},media:sd.media||{},arch:sd.arch||{}}; if(sd.me) S.me=sd.me; }
   try{ S.sample=window.claude&&await window.claude.use('sample'); }catch(e){ S.sample=null; }
   const done=()=>{ if(S.loaded.tickets&&S.loaded.config&&!S.ready){ S.ready=true; computeRole(); setupViewAs(); if(!location.hash&&!S.isStaff&&(S.people.facilitators||[]).some(f=>sameName(f.name,S.me.name))) S.view='mine'; go(S.view); startAuto(); } else if(S.ready){ computeRole(); renderAll(); } };
   /* the automations (reminders, Hub import, website feed, digest) only ever run on the whole list of work
      requests: with part of it missing they would re-create real work requests and empty the website list */
-  const startAuto=()=>{ if(S.autoOn||S.partial||!S.ready) return; S.autoOn=true; runAutomations(); setInterval(runAutomations,5*60000); hubSync(); setInterval(hubSync,5*60000); electionsSync(); };
+  const startAuto=()=>{ if(S.autoOn||S.partial||!S.ready||S.tour) return;   /* the tour shows practice data: nothing runs on its own */ S.autoOn=true; runAutomations(); setInterval(runAutomations,5*60000); hubSync(); setInterval(hubSync,5*60000); electionsSync(); };
   const timer=setTimeout(()=>{ if(!S.ready){ S.partial=!S.loaded.tickets; S.loaded.tickets=S.loaded.config=true; done(); partialBanner(); } },12000);
   Store.sub('tickets',o=>{ noteVersions(o); S.tickets=tidyImported(o); S.loaded.tickets=true; clearTimeout(timer); if(S.partial){ S.partial=false; partialBanner(); } done(); startAuto(); });
   Store.sub('config',o=>{ if(o.process&&o.process.presets){ S.process=o.process; Object.values(o.process.presets).forEach(pr=>(pr.stages||[]).forEach(s=>{ if(/^(gc-comment|gc-publish)$/.test(s.key)&&/^\S+ Approval to (Comment|Publish)$/.test(s.name||'')) s.name=s.name.replace(/^\S+ /,'Governance '); })); } if(o.people&&o.people.roles) S.people=o.people; if(o.notify) S.notify=Object.assign(clone(DEFAULT_NOTIFY),o.notify); if(o.leaders&&o.leaders.list&&(!S.leaderSnap||(o.leaders.at||'')>=(S.leaderSnap.at||''))) S.leaderSnap=o.leaders; if(o.digest) S.digestCfg=o.digest; if(o.digestLog) S.digestLog=o.digestLog; if(o.feed) S.feedState=o.feed; S.cfgDocs=o; S.loaded.config=true; done(); });
@@ -9973,7 +10019,7 @@ function partialBanner(){ let b=$('#partialbar'); if(!S.partial){ if(b) b.remove
 function computeRole(){
   const nm=(S.me.name||'').toLowerCase(), em=(S.me.email||'').toLowerCase();
   const inList=l=>(l||[]).some(p=>sameName(p.name,nm)||(em&&(p.email||'').toLowerCase()===em));
-  S.isStaff=!!(S.isOwnerish||S.relayRole==='admin'||inList(S.people.roles&&S.people.roles.staff)||S.mode==='memory');
+  S.isStaff=!!(S.isOwnerish||S.relayRole==='admin'||inList(S.people.roles&&S.people.roles.staff)||(S.mode==='memory'&&!S.tour));
 }
 function setupViewAs(){
   const w=$('#viewas-wrap'); if(!S.isStaff){ w.hidden=true; return; } w.hidden=false;
