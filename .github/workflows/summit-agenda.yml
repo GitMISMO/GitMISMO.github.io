@@ -2,7 +2,7 @@ name: Summit Agenda Feed (Summit Agenda page)
 
 # Reads Summit HQ's website agenda (General Sessions and Workshop running order, with speakers and their bios)
 # plus, once Summit HQ has the network entered, each summit's Wi-Fi (network, password, sponsor, note; CN-045)
-# and each meal's or break's menu once one is entered (CN-067),
+# and each meal's or break's menu once one is entered (CN-067), and each summit's lounges (CN-070),
 # and updates summit-agenda/agenda.json and the headshots in summit-agenda/photos/.
 # The Summit Agenda page reads that file. A summit appears only once "Show on the Website Agenda"
 # is on for it in Summit HQ; until then the page keeps what is typed on it.

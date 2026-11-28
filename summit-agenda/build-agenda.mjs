@@ -19,7 +19,11 @@
 // a line, up to 4,000 characters. Summit HQ sends it on each meal in grid (breakfast@<day>, reception-mon@mon,
 // reception-tue@tue, newcomer@mon) and on each Break in gs; it is copied in both block() and grid() and left out
 // when empty (MyMISMO then shows "The menu shows here once it's set with the hotel").
-// Published per summit: name, city, dates, gs, wk, grid and wifi.
+// Nov 27, 2026 (CN-070, for MyMISMO's Champions Lounge, CN-069): each summit can also carry "lounges":
+// [{ title, room, days: [YYYY-MM-DD], desc }], no times, which Summit HQ writes with the week's grid. title and room
+// up to 120 characters, desc up to 500, days only the YYYY-MM-DD strings; a lounge with no title is skipped, and
+// lounges is left out when empty or missing.
+// Published per summit: name, city, dates, gs, wk, grid, wifi and lounges.
 import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
@@ -108,6 +112,17 @@ function wifi(w) {
   return { network: str(w.network, 64), password: str(w.password, 64), sponsor: str(w.sponsor, 120), note: str(w.note, 160) };
 }
 
+const ymd = (v) => /^\d{4}-\d{2}-\d{2}$/.test(str(v));
+function lounges(list) {
+  if (!Array.isArray(list)) return null;
+  const out = [];
+  for (const l of list) {
+    if (!l || !str(l.title)) continue;
+    out.push({ title: str(l.title, 120), room: str(l.room, 120), days: (Array.isArray(l.days) ? l.days : []).filter(ymd).map((d) => str(d)), desc: str(l.desc, 500) });
+  }
+  return out.length ? out : null;
+}
+
 async function main() {
   if (!TOKEN) {
     console.log('::warning::No token yet. The SUMMIT_DATA_TOKEN or SPONSOR_DATA_TOKEN secret needs read access to GitMISMO/summit-hq-data. The current agenda is unchanged.');
@@ -124,9 +139,9 @@ async function main() {
   const summits = {};
   for (const [id, s] of Object.entries(src)) {
     if (!/^[A-Za-z0-9_-]+$/.test(id) || !s) continue;
-    const gs = await block(s.gs), wk = await block(s.wk), gr = grid(s.grid), wf = wifi(s.wifi);
+    const gs = await block(s.gs), wk = await block(s.wk), gr = grid(s.grid), wf = wifi(s.wifi), lg = lounges(s.lounges);
     if (!gs && !wk && !gr && !wf) continue;
-    summits[id] = { name: str(s.name, 160), city: str(s.city, 120), dates: str(s.dates, 80), ...(gs ? { gs } : {}), ...(wk ? { wk } : {}), ...(gr ? { grid: gr } : {}), ...(wf ? { wifi: wf } : {}) };
+    summits[id] = { name: str(s.name, 160), city: str(s.city, 120), dates: str(s.dates, 80), ...(gs ? { gs } : {}), ...(wk ? { wk } : {}), ...(gr ? { grid: gr } : {}), ...(wf ? { wifi: wf } : {}), ...(lg ? { lounges: lg } : {}) };
   }
   // headshots no longer on any agenda come down with it (Summit HQ keeps the originals)
   for (const f of fs.readdirSync(PHOTOS)) if (!wanted.has(f) && f !== '.gitkeep') fs.unlinkSync(path.join(PHOTOS, f));
@@ -137,7 +152,7 @@ async function main() {
   if (prev && same(prev, body)) { console.log('No change.'); return; }
   fs.writeFileSync(OUT, JSON.stringify({ updated: new Date().toISOString(), ...body }, null, 1) + '\n');
   const ids = Object.keys(summits);
-  console.log(ids.length ? ids.map((k) => `${k}: ${summits[k].gs ? summits[k].gs.sessions.length + ' General Sessions items' : 'no General Sessions'}, ${summits[k].wk ? summits[k].wk.sessions.length + ' Workshop items' : 'no Workshop'}, ${summits[k].grid ? summits[k].grid.sessions.length + ' Schedule sessions' : 'no Schedule'}, ${summits[k].wifi ? 'Wi-Fi ' + summits[k].wifi.network : 'no Wi-Fi'}`).join('\n') : 'No summit is on the website agenda yet (Show on the Website Agenda is off).');
+  console.log(ids.length ? ids.map((k) => `${k}: ${summits[k].gs ? summits[k].gs.sessions.length + ' General Sessions items' : 'no General Sessions'}, ${summits[k].wk ? summits[k].wk.sessions.length + ' Workshop items' : 'no Workshop'}, ${summits[k].grid ? summits[k].grid.sessions.length + ' Schedule sessions' : 'no Schedule'}, ${summits[k].wifi ? 'Wi-Fi ' + summits[k].wifi.network : 'no Wi-Fi'}, ${summits[k].lounges ? summits[k].lounges.length + ' lounges' : 'no lounges'}`).join('\n') : 'No summit is on the website agenda yet (Show on the Website Agenda is off).');
 }
 
 main().catch((e) => { console.error(e.message); process.exit(1); });
