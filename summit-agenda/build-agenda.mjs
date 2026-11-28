@@ -15,6 +15,10 @@
 // Nov 25, 2026 (CN-045, for MyMISMO's Summit Wi-Fi card): each summit can also carry "wifi":
 // { network, password, sponsor, note }, once Summit HQ has the network entered (left out until then). The Wi-Fi
 // is public on purpose: attendees need it. A summit with only wifi (no gs, wk or grid) is still published.
+// Nov 27, 2026 (CN-067, for MyMISMO's meal menus, CN-066): a session can also carry "menu", plain text with one item
+// a line, up to 4,000 characters. Summit HQ sends it on each meal in grid (breakfast@<day>, reception-mon@mon,
+// reception-tue@tue, newcomer@mon) and on each Break in gs; it is copied in both block() and grid() and left out
+// when empty (MyMISMO then shows "The menu shows here once it's set with the hotel").
 // Published per summit: name, city, dates, gs, wk, grid and wifi.
 import fs from 'node:fs';
 import path from 'node:path';
@@ -75,7 +79,8 @@ async function block(b) {
       if (!p || !str(p.name)) continue;
       people.push({ name: str(p.name, 120), title: str(p.title, 160), company: str(p.company, 160), role: str(p.role, 60), bio: str(p.bio, 5000), photo: await headshot(p) });
     }
-    sessions.push({ start: str(s.start, 20), end: str(s.end, 20), kind: str(s.kind, 60), title: str(s.title, 300), desc: str(s.desc), sponsor: str(s.sponsor, 160), brk: !!s.brk, people });
+    const menu = str(s.menu);
+    sessions.push({ start: str(s.start, 20), end: str(s.end, 20), kind: str(s.kind, 60), title: str(s.title, 300), desc: str(s.desc), sponsor: str(s.sponsor, 160), brk: !!s.brk, ...(menu ? { menu } : {}), people });
   }
   if (!sessions.length) return null;
   return { label: str(b.label, 80), day: str(b.day, 20), date: str(b.date, 40), room: str(b.room, 120), sessions };
@@ -92,7 +97,7 @@ function grid(g) {
     sessions.push({
       id: str(s.id, 120), day: DAYNAMES.has(str(s.day)) ? str(s.day) : '', date: /^\d{4}-\d{2}-\d{2}$/.test(str(s.date)) ? str(s.date) : '',
       start: hhmm(s.start), end: hhmm(s.end), type: str(s.type, 60), title: str(s.title, 300), room: str(s.room, 120),
-      desc: str(s.desc), sponsor: str(s.sponsor, 160), status,
+      desc: str(s.desc), sponsor: str(s.sponsor, 160), status, ...(str(s.menu) ? { menu: str(s.menu) } : {}),
     });
   }
   return sessions.length ? { updated: str(g.updated, 40), sessions } : null;
