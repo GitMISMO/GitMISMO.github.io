@@ -2191,7 +2191,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-27T22:58:52Z',fp:'fc526ef2'};
+window.__mmsBuild={at:'2026-11-28T01:16:59Z',fp:'6c816a73'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -5772,7 +5772,7 @@ function rvTrim(s,n){ s=String(s==null?'':s); return s.length>n?s.slice(0,n-1)+'
 function rvBuildReport(kind,t,files,findings,ai,ctx){
   const [rk,rl]=kind==='im'?rvImReadiness(findings,ai):rvReadiness(findings,ai);
   const rep={id:kind+'-'+t.id+'-'+Date.now().toString(36),kind,ticket:t.id,wr:t.wr,name:t.name,at:new Date().toISOString(),by:S.me.name||'',files:files.map(f=>f.name),boiler:ctx.boiler,
-    aiParts:(ai&&ai.parts)||null,readiness:rk,readinessLabel:rl,summary:((ai&&ai.summaries)||[]).join(' ')||'',aiNote:(ai&&(ai.skipped||ai.error||ai.note))||'',
+    aiParts:(ai&&ai.parts)||null,readiness:rk,readinessLabel:rl,summary:[...new Set(((ai&&ai.summaries)||[]).map(x=>String(x).trim()))].join(' ')||'',aiNote:(ai&&(ai.skipped||ai.error||ai.note))||'',
     findings:findings.slice(0,160).map(f=>({sev:f.sev,area:f.area,issue:rvTrim(f.issue,400),suggestion:rvTrim(f.suggestion,400),where:rvTrim(f.where,180),item:f.item||'',src:f.src,rule:f.rule||'',fb:f.fb||''}))};
   if(kind==='editor'){ rep.corrections=((ai&&ai.corrections)||[]).slice(0,80).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300),category:rvTrim(c.category,30)}));
     rep.recommendations=((ai&&ai.recommendations)||[]).slice(0,40).map(c=>({where:rvTrim(c.where,180),issue:rvTrim(c.issue,300),suggestion:rvTrim(c.suggestion,300),area:rvTrim(c.area||'',40)}));
@@ -5791,7 +5791,7 @@ function rvReportHtml(rep,forWord){
   const F=(rep.findings||[]).map((f,i)=>Object.assign({_k:'f'+i},f)), fx=F.filter(f=>f.sev==='fix'), rc=F.filter(f=>f.sev==='recommend');
   const title=rep.kind==='im'?'Reference Model QC Report':'AI Review Report';
   let h='<div class="rvr"><div class="rvr-h"><div class="rvr-k">'+e(title)+'</div><h2>'+e(rep.wr+' '+rep.name)+'</h2><div class="rvr-m">'+e(fmt(atDay(rep.at)))+' · '+e(rep.by||'')+' · '+e((rep.files||[]).join(', '))+(rep.kind==='editor'&&rep.types&&rep.types.length?' · Reviewed as: '+e(rep.types.map(x=>x.name+' ('+x.type+')').join(', ')):'')+(rep.kind==='editor'?' · Boilerplate checked against: '+e(RV_BP_LABEL[rep.boiler]||''):(rep.rm?' · Checked against the '+e(rep.rm):''))+'</div>'+
-    '<div class="rvr-score rv-'+e(rvShown(rep).k)+'"><b>'+e(rvShown(rep).l)+'</b> <span>'+fx.length+' '+rvShown(rep).fx+' · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial corrections':' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
+    '<div class="rvr-score rv-'+e(rvShown(rep).k)+'"><b>'+e(rvShown(rep).l)+'</b> <span>'+fx.length+' '+rvShown(rep).fx+' · '+(rc.length+(rep.recommendations||[]).length)+' recommended'+(rep.kind==='editor'?' · '+(rep.corrections||[]).length+' editorial correction'+((rep.corrections||[]).length===1?'':'s'):' · '+(rep.rows||[]).length+' rows IM may question')+'</span></div>'+
     (rvPassAll(rep)?'<p class="rvr-note"><b>Everyone passes the AI Review while the process is new.</b> The findings below are suggestions to make the work stronger before IM; nothing here holds the work request back.</p>':'')+(rep.kind!=='im'&&rep.decided?'<p class="rvr-note"><b>Choices submitted</b> '+e(fmt(atDay(rep.decided.at)))+' by '+e(rep.decided.by||'')+': '+e(rvDecSummary(rep.decided.counts))+'.</p>':'')+(rep.summary?'<p class="rvr-sum">'+e(rep.summary)+'</p>':'')+(rep.aiNote?'<p class="rvr-note">'+e(rep.aiNote)+'</p>':'')+
     '<p class="rvr-note">This report recommends; it doesn’t change the work product. '+(rep.kind==='editor'?'Editorial suggestions are judgment calls: the facilitator and workgroup decide.':'IM makes the final decision on every row.')+'</p></div>';
   const sec=(t2,body)=>body?'<h3>'+e(t2)+'</h3>'+body:'';
@@ -6450,7 +6450,7 @@ function desigRows(t){ const d=t.designation||{};
   return [['Comment Type',d.type],['Classification',t.classification],['License Usage',d.license],['Royalty Status',d.royalty],['Available To',d.availableTo]]; }
 function desigSetBy(t){ const H=(t.history||[]).filter(h=>/Director recommended|recommended designation|Designation approved|designation (was )?changed/i.test(h.text||'')); const h=H[H.length-1];
   const d=t.designation||{}; if(h) return (/Director recommended/.test(h.text)?'Set by '+byName(h.by):'Updated by '+byName(h.by))+' · '+fmt(atDay(h.at));
-  return d.auto?'Recommended automatically'+(d.basis?' from '+d.basis:''):''; }
+  return d.auto?'Recommended automatically'+(d.basis?': '+String(d.basis).replace(/^Same as /,'the same as '):''):''; }
 function desigSection(t){ const d=t.designation||{}, rows=desigRows(t), sub=t.sub||'';
   const vps=peopleFor('vps'), votes=d.vps||{}, approved=/Approved/.test(d.status||'');
   const state=approved?['good','Approved']:sub==='vps'?['info','Ready to designate']:sub==='discuss'?['warn','Needs discussion']:d.auto?['info','Recommended automatically']:['', 'Not set yet'];
@@ -7204,11 +7204,9 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
     for(const it of Object.values(items)){ if(it.status!=='decided'||it.hist||(it.test&&!(S.tickets[it.ticket]&&S.tickets[it.ticket].practice))) continue; const mine=S.imq[it.rep]; if(mine&&mine.status==='decided') continue;
       const d=await rGet(IMR,'rev-'+imrSafe(it.rep)); if(!d||!d.data) continue; const doc=d.data;
       /* several people have the MMS open: the first to claim it moves the work request, the others leave it */
-      const nq=Object.assign({},mine||{},{rep:it.rep,ticket:doc.ticket,wr:doc.wr,name:doc.name,status:'decided',decidedBy:it.decidedBy,decidedAt:it.decidedAt,agree:it.agree,counts:it.counts,pushed:true,home:S.me.name||'MMS',homeAt:new Date().toISOString()});
+      const nq=imHomeQ(it,doc,mine);
       if(!await mmsClaim('imqueue','imqueue/'+it.rep,c=>!!(c&&c.status==='decided'),nq)){ continue; }
-      S.imq[it.rep]=nq; S.imr[it.rep]=doc; await write(imColl(doc.ticket),it.rep,doc); await write('imqueue',it.rep,nq);
-      const t=doc.ticket?await freshTicket(doc.ticket):null;
-      try{ if(t) await imDecided(t,doc,it); }catch(e){ console.warn('im decision',e); const back=Object.assign({},mine||nq,{status:(mine&&mine.status)||'awaiting'}); delete back.home; S.imq[it.rep]=back; await write('imqueue',it.rep,back); } }
+      await imHome(it,doc,nq,mine); }
     /* a decision claimed by a page that never finished moving the work request (Nov 24: iLAD was approved in IM Review
        but stayed at IM Review): after 10 minutes a MISMO staff page brings it home again, once */
     for(const it of Object.values(items)){ try{ if(!S.isStaff||it.status!=='decided'||it.hist) continue; const mine=S.imq[it.rep]; if(!mine||mine.status!=='decided') continue;
@@ -7220,6 +7218,12 @@ async function imSync(){ if(imSyncing||S.mode!=='relay'||Date.now()-imSynced<600
       const d=await rGet(IMR,'rev-'+imrSafe(it.rep)); if(!d||!d.data) continue; const t=await freshTicket(it.ticket); if(t&&t.stage==='im') await imDecided(t,d.data,it); }catch(e){ console.warn('im decision retry',e); } }
     try{ await awgRetryPending(items); }catch(e){ console.warn('awg retry',e); }
   }catch(e){ console.warn('im sync',e); } finally{ imSyncing=false; } }
+/* IM's decision, brought home to the MMS (Nov 27, 2026: its own functions so the Work Request Journey's recorder plays the real thing) */
+function imHomeQ(it,doc,mine){ return Object.assign({},mine||{},{rep:it.rep,ticket:doc.ticket,wr:doc.wr,name:doc.name,status:'decided',decidedBy:it.decidedBy,decidedAt:it.decidedAt,agree:it.agree,counts:it.counts,pushed:true,home:S.me.name||'MMS',homeAt:new Date().toISOString()}); }
+async function imHome(it,doc,nq,mine){
+  S.imq[it.rep]=nq; S.imr[it.rep]=doc; await write(imColl(doc.ticket),it.rep,doc); await write('imqueue',it.rep,nq);
+  const t=doc.ticket?await freshTicket(doc.ticket):null;
+  try{ if(t) await imDecided(t,doc,it); }catch(e){ console.warn('im decision',e); const back=Object.assign({},mine||nq,{status:(mine&&mine.status)||'awaiting'}); delete back.home; S.imq[it.rep]=back; await write('imqueue',it.rep,back); } }
 const _imSend0=imSend;
 /* sending the Reference Model QC to IM is the facilitator's "send to IM": a work request still at AI Review moves to IM Review with it */
 /* one copy at IM at a time: sending again withdraws the earlier copy still waiting (after asking) */
@@ -9505,7 +9509,9 @@ async function rlDecide(rep,ids,d){ const t=S.tickets[rep.ticket]; if(!t||!rlCan
   ids.forEach(id=>{ if(d) rep.link.dec[id]={d,by,at}; else delete rep.link.dec[id]; });
   await rvSave(t,rep); const doc=rlApplyToDoc(rep); if(doc) await imSaveDoc(doc); }
 const _imSendRL=imSend;
-imSend=async function(t,rep){ const r=rep&&rep.link?rep:(S.reviews&&rep&&S.reviews[rep.id])||rep; if(r&&r.link){ const doc=rlApplyToDoc(r); if(doc) try{ await imSaveDoc(doc); }catch(e){} } return _imSendRL(t,rep); };
+/* the newest copy of the report: the Send to IM button on an open report holds the copy from when it opened, and the
+   MISMO Link fixes accepted since are on the newer one (Nov 27, 2026: they reached IM as "Not decided") */
+imSend=async function(t,rep){ const cur=S.reviews&&rep&&S.reviews[rep.id]; const r=cur&&cur.link?cur:rep&&rep.link?rep:cur||rep; if(r&&r.link){ const doc=rlApplyToDoc(r); if(doc) try{ await imSaveDoc(doc); }catch(e){} } return _imSendRL(t,rep); };
 
 /* ---------- the corrected form: the accepted fixes written into the Reference Model Changes tab ---------- */
 const rlCol=n=>{ let s=''; n++; while(n>0){ const m=(n-1)%26; s=String.fromCharCode(65+m)+s; n=Math.floor((n-1)/26); } return s; };
@@ -9775,17 +9781,26 @@ write=async function(coll,id,data,base){
    resources.mismo.org/mms/journey/ frames this MMS with made-up practice data (mms-door.js opens no door to the relay,
    so nothing real is read, saved or sent). The journey page loads each step's data and person here, moves to the view,
    panel and tab the step needs, and points at the real buttons. Only defined in tour mode. Its practice data also
-   carries __portal: what the IM Review and AWG Review portals hold (other systems), so the MMS shows Open in IM Review. */
+   carries __imr and __awgr: the files the IM Review and AWG Review portals hold (other systems). In tour mode the MMS
+   reads and writes those instead of the relay, so sending to IM, IM's decision coming home and AWG's all run as they do
+   for real, and the journey shows the portals themselves with the same files. */
 if(S.tour){
+  const PF={'im-review':'__imr','awg-review':'__awgr'};
+  const pq=()=>{ const I=Store.mem.__imr||{}, A=Store.mem.__awgr||{}; S.imPortalQ=(I.queue&&I.queue.items)||{}; S.awgPortalQ=(A.queue&&A.queue.items)||{}; if(A.config) S.awgCfg=Object.assign({},A.config); };
+  const _rGetT=rGet; rGet=async function(p,n){ const k=PF[p]; if(!k) return _rGetT(p,n); const F=Store.mem[k]||{}; return F[n]==null?null:{data:clone(F[n]),sha:'tour'}; };
+  const pUpd=k=>async function(n,fn){ const F=Store.mem[k]=Store.mem[k]||{}; const nx=fn(F[n]!=null?clone(F[n]):null); F[n]=nx; if(n==='queue'||n==='config') pq(); return nx; };
+  imrUpdate=pUpd('__imr'); awgUpdate=pUpd('__awgr');
+  /* Meeting Trackers (another system) keeps the portals' rosters and attendance; the practice data brings its own */
+  mtToPortals=async function(){};
   const fire=()=>Object.keys(Store.subs).forEach(c=>(Store.subs[c]||[]).forEach(cb=>{ try{ cb(clone(Store.mem[c]||{}),{}); }catch(e){} }));
   /* the journey's keys work while the MMS has the focus (opening a panel moves the focus into it) */
   document.addEventListener('keydown',e=>{ if(!['ArrowLeft','ArrowRight'].includes(e.key)||(e.target&&e.target.closest&&e.target.closest('input,textarea,select,[contenteditable]'))) return;
     try{ if(window.parent&&window.parent.__tourKey){ e.preventDefault(); window.parent.__tourKey(e.key); } }catch(x){} });
   window.__mmsTour={
-    S,
+    S, portals:pq,
     ready:()=>!!S.ready,
     /* one step's world: every collection, who is looking, and where */
-    load(o){ o=o||{}; if(o.today) window.__mmsTourToday=o.today; if(o.mem){ Store.mem=clone(o.mem); const P=Store.mem.__portal||{}; S.imPortalQ=P.im||{}; S.awgPortalQ=P.awg||{}; fire(); }
+    load(o){ o=o||{}; if(o.today) window.__mmsTourToday=o.today; if(o.mem){ Store.mem=clone(o.mem); pq(); S.rvfb=clone(Store.mem.rvfeedback||{}); fire(); }
       if(o.me) S.me=Object.assign({},o.me); S.viewAs=''; computeRole(); try{ renderWho(); }catch(e){}   /* the name in the top right is the step's person */
       const mr=$('#modal-root'); if(mr) mr.innerHTML='';
       if(S.panel) closePanel();
