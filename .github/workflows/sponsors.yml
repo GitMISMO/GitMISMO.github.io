@@ -8,6 +8,8 @@ name: Summit Sponsor Feed (Summit pages)
 # writes only when something changed, so a sponsor approved in the Portal shows within about 10 minutes.
 # Needs a token that can read GitMISMO/sponsorship-data: SPONSOR_DATA_TOKEN if set,
 # otherwise MMS_DATA_TOKEN.
+# It also writes sponsors/prospectus-app.json (which pages the MyMISMO phone prospectus shows),
+# copied from the Portal's Publish on MyMISMO switches (CN-072).
 
 on:
   schedule:
@@ -46,6 +48,7 @@ jobs:
             git config user.name "github-actions[bot]"
             git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
             git add sponsors/*-2027.json sponsors/logos
+            if [ -f sponsors/prospectus-app.json ]; then git add sponsors/prospectus-app.json; fi
             git commit -m "Summit sponsors: update from the Sponsorship Portal"
             git pull --rebase
             git push
