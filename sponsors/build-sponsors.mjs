@@ -163,6 +163,32 @@ async function syncLogos(docs) {
   console.log('Portal logos: ' + wrote + ' new or changed.');
 }
 
+// CN-072: the MyMISMO phone prospectus (resources.mismo.org/Sponsorship-Prospectus/app/) reads
+// /sponsors/prospectus-app.json to know which prospectus pages to show. The Portal's
+// "Publish on MyMISMO" switches live in sponsorship-data data/settings.json at docs.main.mymismo.pages.
+// Copy only the four page switches (never mymismo.changed, which has staff names). With no
+// mymismo settings yet, show only the 2027 Series (Winter) page.
+const APP_OUT = 'sponsors/prospectus-app.json';
+const APP_KEYS = ['series-winter', 'spring', 'fall', 'spring-fall'];
+async function writeProspectusApp() {
+  let src = null;
+  const r = await gh(DATA_DIR + '/settings.json', true);
+  if (r.ok) {
+    const s = JSON.parse(await r.text());
+    src = s && s.docs && s.docs.main && s.docs.main.mymismo && s.docs.main.mymismo.pages;
+  } else if (r.status !== 404) {
+    throw new Error('Could not read data/settings.json (' + r.status + ')');
+  }
+  const pages = {};
+  for (const k of APP_KEYS) pages[k] = src && typeof src === 'object' ? src[k] === true : k === 'series-winter';
+  let prev = null;
+  try { prev = JSON.parse(fs.readFileSync(APP_OUT, 'utf8')); } catch {}
+  if (prev && JSON.stringify(prev.pages) === JSON.stringify(pages)) { console.log('Prospectus app pages: no change.'); return; }
+  fs.mkdirSync('sponsors', { recursive: true });
+  fs.writeFileSync(APP_OUT, JSON.stringify({ pages, updated: new Date().toISOString() }, null, 1) + '\n');
+  console.log('Prospectus app pages: ' + JSON.stringify(pages));
+}
+
 async function main() {
   if (!TOKEN) { // not set up yet: leave the current file alone, don't fail the run
     console.log('::warning::No token yet. Add the SPONSOR_DATA_TOKEN repository secret (read access to GitMISMO/sponsorship-data). The current sponsors file is unchanged.');
@@ -173,6 +199,7 @@ async function main() {
   const docs = (await r.json()).docs || {};
   try { await syncLogos(docs); } catch (e) { console.log('::warning::Portal logos skipped: ' + e.message); }
   for (const S of SUMMITS) build(S, docs);
+  try { await writeProspectusApp(); } catch (e) { console.log('::warning::Prospectus app pages skipped: ' + e.message); }
 }
 
 function build(S, docs) {
