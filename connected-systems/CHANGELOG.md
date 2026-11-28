@@ -1,5 +1,6 @@
 # Connected Systems: Changes
 
+- **Nov 27, 2026** — A phone version: no left menu on a phone; a tab bar along the bottom (Map, Stories, On Its Own, Security and More, which holds every other page, Search and Dark Mode). The System Map fits the screen, and turning the phone sideways opens the whole map full screen: pinch to zoom, drag to move, double-tap to zoom, tap a box for its story (a side panel), Fit and Key buttons, Back to leave. Upright, Full Screen opens it too. The four headline numbers sit two by two. Help explains it.
 - **Nov 26, 2026** — Masthead matches the other MISMO tools (CN-053): Certification Management's measurements exactly (68px bar, the logo box and logo in the same spot, the thinner divider and the lighter name), with the left menu lined up under it. The older December hat is gone; the shared holiday look does December now.
 - **Nov 25, 2026** — The browser's Back button works (CN-033): it goes to the last page you were on and closes an open panel or list first; Forward goes again. It never undoes a change. Help says so too.
 - **Nov 25, 2026** — Browser tab icon now matches mismo.org (CN-030): the one shared icon at resources.mismo.org/assets/favicon-48x48.png instead of Team HQ's HQ icon.
