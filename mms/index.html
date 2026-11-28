@@ -2191,7 +2191,7 @@ p,.sub,.lede{text-wrap:pretty}
 
 
 <script>
-window.__mmsBuild={at:'2026-11-28T01:16:59Z',fp:'6c816a73'};
+window.__mmsBuild={at:'2026-11-28T02:52:55Z',fp:'08db3dca'};
 /* ================= System Health, part 1 (Nov 7, 2026) =================
    From the very first line: note every error the page hits, and how each outside service last answered
    (the email flow, the Files flow, the Initiative Hub, the website feed, the IM and AWG portals, AI review,
@@ -6201,7 +6201,7 @@ aiReview=function(t){ rvRun(t,'editor'); };
 /* ---------- on the work request ---------- */
 WH_IC.check='M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11';
 function rvCard(rep){ const F=rep.findings||[]; const fx=F.filter(f=>f.sev==='fix').length;
-  return '<button type="button" class="rv-card rv-'+esc(rvShown(rep).k)+'" data-rvopen="'+esc(rep.id)+'"><span class="rv-ck">'+esc(rep.kind==='im'?'Reference Model QC':'AI Review')+'</span><b>'+esc(rvShown(rep).l)+'</b><span class="rv-cm">'+fx+' '+rvShown(rep).fx+' · '+(rep.kind==='im'?(rep.rows||[]).length+' rows to check':(rep.corrections||[]).length+' corrections')+'</span><span class="rv-cd">'+esc(fmtS(atDay(rep.at)))+' · '+esc(firstName(rep.by||''))+'</span></button>'; }
+  return '<button type="button" class="rv-card rv-'+esc(rvShown(rep).k)+'" data-rvopen="'+esc(rep.id)+'"><span class="rv-ck">'+esc(rep.kind==='im'?'Reference Model QC':'AI Review')+'</span><b>'+esc(rvShown(rep).l)+'</b><span class="rv-cm">'+fx+' '+rvShown(rep).fx+' · '+(rep.kind==='im'?(rep.rows||[]).length+' rows to check':(rep.corrections||[]).length+' correction'+((rep.corrections||[]).length===1?'':'s'))+'</span><span class="rv-cd">'+esc(fmtS(atDay(rep.at)))+' · '+esc(firstName(rep.by||''))+'</span></button>'; }
 /* the Reference Model QC is sent to IM, so it is offered only once the work request is at AI Review or IM Review */
 function imReady(t){ return t&&t.state==='active'&&['aireview','im'].includes(t.stage)&&!t.split&&!t.rides; }
 function rvTabHtml(t){ rvEnsure(t); const L=rvFor(t), can=canAct(t)||S.isStaff, canIM=can&&imReady(t);
@@ -7251,7 +7251,7 @@ VIEWS.imreview=function(){ setTimeout(()=>{ if(S.view==='imreview') go('home'); 
 /* each work request shows IM's decisions on record, with a link to every row */
 function imDecHtml(t){ const L=Object.values(S.imPortalQ||{}).filter(q=>q.ticket===t.id&&q.status==='decided').sort((a,b)=>String(b.decidedAt).localeCompare(String(a.decidedAt)));
   if(!L.length) return ''; const c=q=>Object.entries(q.counts||{}).map(([d,n])=>n+' '+d.replace(/^Approved /,'').toLowerCase()).join(', ');
-  return '<div class="psec full imdec"><h4>IM Decisions<span class="sp muted" style="font-size:12px;font-weight:500">'+L.length+' on record</span></h4><div class="imdec-l">'+L.map(q=>'<a class="imdec-r" href="'+IMR_URL+'#/review/'+encodeURIComponent(q.rep)+'" target="_blank" rel="noopener"><span class="imdec-d">'+esc(fmtS(atDay(q.decidedAt)))+(String(q.decidedAt).slice(0,4)!==String(new Date().getFullYear())?' '+esc(String(q.decidedAt).slice(0,4)):'')+'</span><span class="imdec-m"><b>'+esc((q.rows||0)+' rows'+(q.resub?' · resubmission':''))+'</b><em>'+esc(c(q))+'</em></span><span class="imdec-go">Every row ↗</span></a>').join('')+'</div></div>'; }
+  return '<div class="psec full imdec"><h4>IM Decisions<span class="sp muted" style="font-size:12px;font-weight:500">'+L.length+' on record</span></h4><div class="imdec-l">'+L.map(q=>'<a class="imdec-r" href="'+IMR_URL+'#/review/'+encodeURIComponent(q.rep)+'" target="_blank" rel="noopener"><span class="imdec-d">'+esc(fmtS(atDay(q.decidedAt)))+(String(q.decidedAt).slice(0,4)!==String(new Date().getFullYear())?' '+esc(String(q.decidedAt).slice(0,4)):'')+'</span><span class="imdec-m"><b>'+esc((q.rows?q.rows+' rows':'Documentation')+(q.resub?' · resubmission':''))+'</b><em>'+esc(c(q))+'</em></span><span class="imdec-go">Every row ↗</span></a>').join('')+'</div></div>'; }
 const _renderPanelIMD=renderPanel;
 renderPanel=function(){ _renderPanelIMD(); const P=$('#panel'); if(!S.panel||String(S.panel).startsWith('arch:')) return; const t=S.tickets[S.panel]; if(!t) return; const pane=$('[data-wtab="rev"]',P); if(!pane||$('.imdec',pane)) return; const h=imDecHtml(t); if(h) pane.insertAdjacentHTML('afterbegin',h); };
 
@@ -9268,8 +9268,8 @@ async function trTidy(){ if(!S.isStaff||!S.canWrite||S.partial) return; const cu
   for(const [k,t] of all.filter(([k,t],i)=>i>=300||Date.parse(t.at||0)<cut)) try{ await Store.del('trash',k); delete S.trash[k]; }catch(e){} }
 async function trOpen(){ trEnsure();
   const L=Object.entries(S.trash||{}).filter(([k,t])=>t&&(t.coll==='outbox'||/^reviews-/.test(t.coll))).sort((a,b)=>String(b[1].at||'').localeCompare(String(a[1].at||'')));
-  const body=L.length?'<p class="muted" style="margin:0 0 10px;font-size:12.5px">Kept 60 days. Putting one back returns it to Notifications as it was; an email that hadn’t gone yet will send once email is on.</p><div class="tr-list">'+L.slice(0,60).map(([k,t])=>'<div class="tr-row"><div><b>'+esc(t.data.subject||(/^reviews-/.test(t.coll)?(t.data.kind==='im'?'Reference Model QC':'AI Review')+' report · '+(t.data.wr||'')+' · '+fmtS(atDay(t.data.at||'')):'(no subject)'))+'</b><div class="muted">'+esc(t.why)+(t.by?' by '+esc(t.by):'')+' · '+esc(hWhen(t.at))+'</div></div><button class="btn sm" type="button" data-trput="'+esc(k)+'">Put Back</button></div>').join('')+'</div>':'<p class="muted" style="margin:0">Nothing has been deleted in the last 60 days.</p>';
-  const p=modal({title:'Recently Deleted Emails',body,ok:'Done',cancel:'Close'});
+  const body=L.length?'<p class="muted" style="margin:0 0 10px;font-size:12.5px">Kept 60 days. Put Back returns an email to Notifications, or a review report to its work request, as it was. An email that hadn’t gone yet goes once it is back.</p><div class="tr-list">'+L.slice(0,60).map(([k,t])=>'<div class="tr-row"><div><b>'+esc(t.data.subject||(/^reviews-/.test(t.coll)?(t.data.kind==='im'?'Reference Model QC':'AI Review')+' report · '+(t.data.wr||'')+' · '+fmtS(atDay(t.data.at||'')):'(no subject)'))+'</b><div class="muted">'+esc(t.why)+(t.by?' by '+esc(t.by):'')+' · '+esc(hWhen(t.at))+'</div></div><button class="btn sm" type="button" data-trput="'+esc(k)+'">Put Back</button></div>').join('')+'</div>':'<p class="muted" style="margin:0">Nothing has been deleted in the last 60 days.</p>';
+  const p=modal({title:'Recently Deleted',body,ok:'Done',cancel:'Close'});
   $$('#modal-root [data-trput]').forEach(b=>b.onclick=async()=>{ b.disabled=true; const ok=await trRestore(b.dataset.trput); if(ok){ b.closest('.tr-row').remove(); toast('Put back'); renderAll(); } else b.disabled=false; });
   await p; }
 const _vOutboxTr=VIEWS.outbox;
@@ -9800,7 +9800,9 @@ if(S.tour){
     S, portals:pq,
     ready:()=>!!S.ready,
     /* one step's world: every collection, who is looking, and where */
-    load(o){ o=o||{}; if(o.today) window.__mmsTourToday=o.today; if(o.mem){ Store.mem=clone(o.mem); pq(); S.rvfb=clone(Store.mem.rvfeedback||{}); fire(); }
+    load(o){ o=o||{}; if(o.today) window.__mmsTourToday=o.today; if(o.mem){ Store.mem=clone(o.mem); pq(); S.rvfb=clone(Store.mem.rvfeedback||{}); fire();
+        /* the live MMS sends its emails through the email flow; the practice data has no flow, so say what the live page says (nothing is sent: the tour never presses Send) */
+        S.notify=Object.assign({},S.notify||{},{flowUrl:(S.notify&&S.notify.flowUrl)||'https://flow.tour/mail'}); }
       if(o.me) S.me=Object.assign({},o.me); S.viewAs=''; computeRole(); try{ renderWho(); }catch(e){}   /* the name in the top right is the step's person */
       const mr=$('#modal-root'); if(mr) mr.innerHTML='';
       if(S.panel) closePanel();
@@ -9820,6 +9822,8 @@ if(S.tour){
       return {to:ppl.map(p=>p.name+' <'+p.email+'>'),subject:t.wr+' '+t.name+': '+stageDef(to).name,html:typeof stageMailHtml==='function'?stageMailHtml(Object.assign({},t,{stage:to}),to,ppl):'',
         text:t.name+' ('+t.wr+') is now at '+stageDef(to).name+'.\n\nNext: '+(w.text||'')+(w.label?' ('+w.label+')':'')}; },
     whose:id=>{ const t=S.tickets[id]; return t?whoseMove(t):null; },
+    /* a work request's Due-Process Record, the page it opens in a new tab */
+    dprec:id=>{ const t=S.tickets[id]; return t&&typeof dpRecord==='function'?dpRecord(t):''; },
     /* a work request's newest review report (AI Review or Reference Model QC), as the Reviews tab opens it */
     report(id,kind){ const L=Object.values(S.reviews||{}).filter(r=>r&&r.ticket===id&&(!kind||r.kind===kind)).sort((a,b)=>String(b.at).localeCompare(String(a.at))); if(!L[0]) return false; rvShow(L[0]); return true; },
     /* the open dialog's fields, filled in for show (nothing is saved: the tour never presses Save) */
