@@ -690,7 +690,54 @@ em,i,cite,address,dfn{font-style:normal}
 
 /* phones: buttons big enough to tap on a call */
 @media(max-width:560px){.btn.sm,.racts .btn,.seg button,.dtools .btn{min-height:40px}.btn{min-height:40px}}
+.wc-nums b.wc-cat{font-size:15px;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--good)}
 </style>
+<script>
+/* Tour mode (Nov 27, 2026): the Work Request Journey (resources.mismo.org/mms/journey/) shows this page inside its own
+   page with made-up practice data it hands over. Only when this page is framed by a resources.mismo.org page that offers
+   that data (?tour=1). Then nothing real is read and nothing is saved or sent: the relay is a copy of the practice files
+   in this page, the date is the step's, and the browser's storage is never written (the shared sign-in also loads in
+   here, and on the tour's 2027 clock it would think the sign-in had run out and sign the person out everywhere). */
+(function(){ var PROJ='awg-review';
+  try{ var P=window.parent; if(P===window||!P.__tourPortal) return;
+    if(!(/[?&]tour=1(&|$)/.test(location.search)||location.href==='about:srcdoc')) return;
+    var T=P.__tourPortal(PROJ)||{}, F=JSON.parse(JSON.stringify(T.files||{}));
+    window.__tourMode=true;
+    try{ var SP=Storage.prototype; SP.setItem=function(){}; SP.removeItem=function(){}; SP.clear=function(){}; }catch(e){}
+    /* the tour's clock: the journey's (or, while recording, the recorder's) */
+    (function(){ var RD=Date; function now(){ var c=P.__tourClock; return c?c.base+(RD.now()-c.at):P.Date.now(); }
+      function FD(){ if(!new.target) return new RD(now()).toString(); var a=[].slice.call(arguments); return a.length?new (Function.prototype.bind.apply(RD,[null].concat(a)))():new RD(now()); }
+      FD.now=now; FD.parse=RD.parse; FD.UTC=RD.UTC; FD.prototype=RD.prototype; window.Date=FD; })();
+    /* the reviewer's "are you sure" questions are answered yes: the journey shows the step, it never really sends anything */
+    window.confirm=function(){ return true; };
+    try{ ['pushState','replaceState','back','forward','go'].forEach(function(k){ history[k]=function(){}; }); }catch(e){}
+    /* the relay, answered from the practice files; Claude, answered by the journey; anything else gets an empty answer */
+    var J=function(j,s){ return Promise.resolve(new Response(JSON.stringify(j),{status:s||200,headers:{'Content-Type':'application/json'}})); };
+    window.fetch=function(u,o){ u=String(u); var m=u.match(/\/(im-review|awg-review)\/data\/([^?#]+)/), meth=String((o&&o.method)||'GET').toUpperCase();
+      if(m){ var n=decodeURIComponent(m[2]);
+        if(meth==='PUT'){ var b={}; try{ b=JSON.parse(o.body); }catch(e){} F[n]=b.content; try{ P.__tourPortalSaved&&P.__tourPortalSaved(PROJ,n,JSON.parse(JSON.stringify(b.content))); }catch(e){} return J({ok:true,sha:'t'+RDn()}); }
+        if(!(n in F)||F[n]==null) return Promise.resolve(new Response('{}',{status:404})); return J({data:JSON.parse(JSON.stringify(F[n])),sha:'t'}); }
+      if(/\/(im-review|awg-review)\/ask/.test(u)){ var p=''; try{ p=JSON.parse(o.body).prompt||''; }catch(e){} return Promise.resolve(T.ask?T.ask(p):'').then(function(t){ return J({text:String(t||'')}); }); }
+      return J({}); };
+    var RDn=function(){ return String(Math.random()).slice(2,10); };
+    window.__tourRS={ token:function(){ return 'tour'; }, current:function(){ return T.me||{}; }, canEdit:function(){ return true; },
+      requireAccess:function(){ return Promise.resolve(T.role||'staff'); } };
+    document.documentElement.removeAttribute('data-rs-gate');
+    /* the journey's arrow keys work while this page has the focus */
+    document.addEventListener('keydown',function(e){ if(['ArrowLeft','ArrowRight'].indexOf(e.key)<0||(e.target&&e.target.closest&&e.target.closest('input,textarea,select,[contenteditable]'))) return;
+      try{ if(P.__tourKey){ e.preventDefault(); P.__tourKey(e.key); } }catch(x){} });
+    var X=function(){ return window.__imr||window.__awgr; };
+    /* what the journey drives: one step's files, who is looking, and where */
+    window.__portalTour={ project:PROJ, files:function(){ return JSON.parse(JSON.stringify(F)); },
+      ready:function(){ var x=X(); return !!(x&&x.S&&x.S.loaded); },
+      load:function(o){ o=o||{}; if(o.files) F=JSON.parse(JSON.stringify(o.files)); if(o.me) T.me=o.me; if(o.role) T.role=o.role; var x=X(); if(!x) return Promise.resolve(false);
+        x.S.docs={}; x.S.edit=null; x.S.callOpen=null; try{ var t=document.querySelector('.toast'); if(t) t.hidden=true; }catch(e){}
+        var h=o.hash==null?'':String(o.hash); if(location.hash.replace(/^#/,'')!==h.replace(/^#/,'')) location.hash=h;
+        return x.load(T.role||'staff').then(function(){ x.render(); window.scrollTo(0,0); return true; }); } };
+  }catch(e){ /* a page from elsewhere can't be read: not a tour */ }
+})();
+
+</script>
 <script src="/assets/session.js"></script>
 </head>
 <body>
@@ -781,7 +828,7 @@ function mismoHoliday(ymd){ const d=new Date(String(ymd).slice(0,10)+"T12:00:00"
 (function(){
 "use strict";
 const RELAY="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws", PROJECT="awg-review";
-const RS=()=>window.ResourcesSession||null, tok=()=>{ try{ return RS().token(); }catch(e){ return ""; } };
+const RS=()=>window.__tourRS||window.ResourcesSession||null, tok=()=>{ try{ return RS().token(); }catch(e){ return ""; } };
 const U=n=>RELAY+"/"+PROJECT+"/data/"+encodeURIComponent(n);
 const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>[...(r||document).querySelectorAll(s)];
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -929,24 +976,29 @@ function readForm(wb,fileName){
 /* ---------- the architecture checks the software can settle ---------- */
 const AREAS=["Breaking Change","Structure","Reuse","Relationship","Attribute","XPATH","MEG","Form"];
 const UPPER=v=>/^[A-Z][A-Z0-9_]*$/.test(String(v||"").trim());
+/* MISMO Link's format (the MMS's MISMO Link check, from its vendor's Corrected Draft, Nov 2026): container names are plain
+   words with spaces (Escrow Detail), only the XPATH uses capitals and underscores, and a data point row has no XPATH (its
+   container's row has it). So a container name is fine as ESCROW_DETAIL or as Escrow Detail, and a data point needs no
+   XPATH (Nov 27, 2026: every name the facilitator fixed for MISMO Link was flagged here as not UPPER_CASE). */
+const PLAIN=s=>/^[A-Z][A-Za-z0-9]*( [A-Z0-9][A-Za-z0-9]*)*$/.test(String(s||"").trim()), NAME_OK=s=>UPPER(s)||PLAIN(s), SNAKE=s=>String(s||"").trim().replace(/\s+/g,"_").toUpperCase();
 function rowFlags(r){ const F=[], ct=String(r.ct||"").toLowerCase(), tt=String(r.tt||"").toLowerCase(), add=/add/.test(ct), what=sx(r.tt)||"item";
   if(/delet|remov|deprecat/.test(ct)) F.push({a:"Breaking Change",t:"Removes or deprecates an existing "+what.toLowerCase()+". Check the deprecation path and what breaks for implementers."});
   else if(/renam/.test(ct)) F.push({a:"Breaking Change",t:"Renames an existing "+what.toLowerCase()+". Messages that use the old name stop validating."});
   else if(/move|relocat/.test(ct)) F.push({a:"Breaking Change",t:"Moves an existing "+what.toLowerCase()+" to a new location."});
   else if(/modif|chang|updat/.test(ct)&&!/definition/.test(ct)&&r.old) F.push({a:"Breaking Change",t:"Changes an existing "+what.toLowerCase()+" (was: "+String(r.old).slice(0,80)+"). Confirm it stays backward compatible."});
   if(/container/.test(tt)&&add) F.push({a:"Structure",t:"Adds a container"+(r.pc?" under "+r.pc:"")+". Check it fits the MEGs and the parent’s purpose."});
-  if(r.cn&&/container/.test(tt)&&!UPPER(r.cn)) F.push({a:"Structure",t:"The container name "+r.cn+" isn’t in UPPER_CASE with underscores.",hold:1});
-  if(r.pc&&!UPPER(r.pc)) F.push({a:"Structure",t:"The parent container "+r.pc+" isn’t in UPPER_CASE with underscores.",hold:1});
+  if(r.cn&&/container/.test(tt)&&!NAME_OK(r.cn)) F.push({a:"Structure",t:"The container name "+r.cn+" isn’t in UPPER_CASE with underscores or in plain words.",hold:1});
+  if(r.pc&&!NAME_OK(r.pc)) F.push({a:"Structure",t:"The parent container "+r.pc+" isn’t in UPPER_CASE with underscores or in plain words.",hold:1});
   if(r.alias) F.push({a:"Structure",t:"Uses an alias container ("+r.alias+")."});
   if(r.cg) F.push({a:"Structure",t:"Sits in a choice group ("+String(r.cg).slice(0,60)+")."});
-  if(/relationship/.test(tt)||r.rel||r.rf||r.rt){ if(!(r.rel&&r.rf&&r.rt)) F.push({a:"Relationship",t:"Relationship is missing its "+[!r.rf&&"From",!r.rel&&"verb phrase",!r.rt&&"To"].filter(Boolean).join(", ")+"."}); else if(!UPPER(r.rf)||!UPPER(r.rt)) F.push({a:"Relationship",t:"A relationship’s From and To should be container names in UPPER_CASE ("+r.rf+", "+r.rt+").",hold:1}); else F.push({a:"Relationship",t:"Adds a relationship: "+r.rf+" "+r.rel+" "+r.rt+"."}); }
+  if(/relationship/.test(tt)||r.rel||r.rf||r.rt){ if(!(r.rel&&r.rf&&r.rt)) F.push({a:"Relationship",t:"Relationship is missing its "+[!r.rf&&"From",!r.rel&&"verb phrase",!r.rt&&"To"].filter(Boolean).join(", ")+"."}); else if(!NAME_OK(r.rf)||!NAME_OK(r.rt)) F.push({a:"Relationship",t:"A relationship’s From and To should be container names ("+r.rf+", "+r.rt+").",hold:1}); else F.push({a:"Relationship",t:"Adds a relationship: "+r.rf+" "+r.rel+" "+r.rt+"."}); }
   if(/attribute/.test(tt)||r.at) F.push({a:"Attribute",t:"Adds or changes an attribute"+(r.at?" ("+r.at+")":"")+(r.aat?", association "+r.aat:"")+"."});
-  if(!r.xp&&add&&!/acronym|definition|enumeration|relationship/.test(tt+" "+ct)) F.push({a:"XPATH",t:"No Reference Model location (XPATH) given."});
+  if(!r.xp&&add&&!/acronym|definition|enumeration|relationship|data point/.test(tt+" "+ct)) F.push({a:"XPATH",t:"No Reference Model location (XPATH) given."});
   if(r.xp){ const x=String(r.xp).trim(); const steps=x.replace(/^\/+/,"").split("/").filter(Boolean); const leaf=/data point|enumeration|attribute/.test(tt);
     if(/\s/.test(x)) F.push({a:"XPATH",t:"The XPATH has spaces in it."});
     else if(steps.filter((s,i)=>!(leaf&&i===steps.length-1&&/^@?[A-Z][A-Za-z0-9]*[a-z][A-Za-z0-9]*$/.test(s.replace(/\[.*?\]/g,"")))).some(s=>!UPPER(s.replace(/\[.*?\]/g,"").replace(/^[a-z]+:/,"")))) F.push({a:"XPATH",t:"A container step in the XPATH isn’t in UPPER_CASE."});
     if(/[^:]\/\//.test(x)||/\/$/.test(x)) F.push({a:"XPATH",t:"The XPATH has an empty step (// or a trailing slash)."});
-    if(r.pc&&!new RegExp("(^|/)"+String(r.pc).replace(/[^A-Z0-9_]/gi,"")+"(/|\\[|$)").test(x)) F.push({a:"XPATH",t:"The XPATH doesn’t pass through the parent container "+r.pc+"."}); }
+    if(r.pc&&!new RegExp("(^|/)"+SNAKE(r.pc).replace(/[^A-Z0-9_]/gi,"")+"(/|\\[|$)").test(x)) F.push({a:"XPATH",t:"The XPATH doesn’t pass through the parent container "+r.pc+"."}); }
   if(/\bMEG\b/i.test((r.sc||"")+" "+(r.def||""))) F.push({a:"MEG",t:"Mentions a MEG. Check the MEG’s guidance is followed."});
   if(!r.ct||!r.tt) F.push({a:"Form",t:"Change Type or Change Target Type is blank."});
   return F; }
@@ -1026,7 +1078,8 @@ function ring(parts,center,sub){ const tot=parts.reduce((s,p)=>s+p.v,0), R=56, C
   return '<svg class="donut" viewBox="0 0 128 128" role="img" aria-label="'+esc(center+' '+sub)+'"><circle r="'+R+'" cx="64" cy="64" fill="none" stroke="rgba(255,255,255,.1)" stroke-width="9"/>'+segs+'</svg><div class="dn-c"><b data-count="'+(+String(center).replace(/\D/g,'')||0)+'">'+esc(center)+'</b><span>'+esc(sub)+'</span></div>'; }
 function agendaCard(q,i){ const n=q.rows||0, aw=q.awgRows||0, fl=q.flagged||0, E=estAWG(q), age=Math.floor((Date.now()-new Date(q.sentAt||Date.now()))/864e5);
   return '<a class="wc rise'+(q.status==="carried"?" warm":"")+'" style="--i:'+i+'" href="#/review/'+encodeURIComponent(q.rep)+'"><span class="wc-top"><span class="wr">'+esc(q.wr||"")+(q.wg?" · "+esc(q.wg):"")+'</span><span class="wc-age">'+(q.status==="carried"?"Carried from "+esc(fmtS(q.lastCall)):age<=0?"Added today":"Added "+ago(q.sentAt)+" ago")+'</span></span><b class="wc-n">'+esc(q.wrName||q.name||"")+'</b>'+
-    '<span class="wc-nums"><span><b data-count="'+n+'">'+n+'</b><em>rows</em></span><span><b data-count="'+aw+'">'+aw+'</b><em>marked AWG</em></span><span><b data-count="'+fl+'">'+fl+'</b><em>flagged</em></span><span class="wc-est" title="'+esc(E.tip)+'"><b>'+esc(fmtMin(E.min).replace(/^about/,"About"))+'</b> <em>to review</em></span></span>'+
+    /* a documentation submission (no Reference Model rows) says so, as IM Review does, instead of three zeros */
+    (!n&&q.fromIm?'<span class="wc-nums"><span><b data-count="'+(q.docs||[]).length+'">'+(q.docs||[]).length+'</b><em>documents to read</em></span><span><b class="wc-cat">Documentation</b><em>no Reference Model rows</em></span>':'<span class="wc-nums"><span><b data-count="'+n+'">'+n+'</b><em>rows</em></span><span><b data-count="'+aw+'">'+aw+'</b><em>marked AWG</em></span><span><b data-count="'+fl+'">'+fl+'</b><em>flagged</em></span>')+'<span class="wc-est" title="'+esc(E.tip)+'"><b>'+esc(fmtMin(E.min).replace(/^about/,"About"))+'</b> <em>to review</em></span></span>'+
     '<span class="wc-f">'+(q.rec?'The draft: '+rchip(q.rec):'No draft yet')+(q.fac&&q.fac.name?'<span class="wc-fac">'+esc(q.fac.name)+'</span>':'')+(q.test?' · <span class="tst">Test</span>':'')+'<span class="wc-go">Open ›</span></span></a>'; }
 function upCard(u,i){ const d=u.since?Math.max(0,-daysTo(u.since)):null; const sub=u.sub||String(u.stage||'').replace(/^At IM ·\s*/,'');
   return '<div class="up rise" style="--i:'+i+'" title="'+esc((u.wr||'')+' '+(u.name||''))+'"><span class="up-d"><b>'+(d!=null?d:esc(u.stageShort||'IM'))+'</b><em>'+(d!=null?(d===1?'day at IM':'days at IM'):'at IM')+'</em></span><span class="up-m"><span class="wr">'+esc(u.wr)+(u.wg?' · '+esc(u.wg):'')+'</span><b>'+esc(u.name)+'</b><em>'+esc([sub?sub.charAt(0).toUpperCase()+sub.slice(1):'',u.fac].filter(Boolean).join(' · '))+'</em></span></div>'; }
@@ -1158,7 +1211,7 @@ function desk(doc){ if(doc.hist) (doc.rows||[]).forEach(r=>{ if(!r.flags) r.flag
   return '<div class="dhead"><div class="t">'+backLink(decided?'#/decided':'#/',decided?'All Decisions':'The Agenda')+'<h1 style="margin-top:6px">'+esc((doc.wr?doc.wr+" ":"")+(doc.wrName||doc.name||""))+'</h1><div class="sub">'+[nwj([doc.wg,doc.at&&!doc.hist?(doc.fromIm?"From IM Review "+fmtD(doc.at):"Brought in "+fmtD(doc.at)+(doc.by?" by "+doc.by:"")):"",doc.category]),decided||doc.hist?'':'<span class="nw est" title="'+esc(E.tip)+'">'+esc(fmtMin(E.min))+' to review</span>'].filter(Boolean).join(' · ')+'</div>'+(doc.resub?'<div class="resub"><span class="pill">Resubmission'+(doc.resub.n?' '+esc(doc.resub.n):'')+'</span><span>'+nwj([doc.resub.first?'first submitted '+fmtD(doc.resub.first):'',doc.resub.date?'resubmitted '+fmtD(doc.resub.date):''])+'</span></div>':'')+'</div>'+
     '<div class="prog">'+(decided?ochip(doc.outcome)+'<span>'+esc(fmtD(doc.decidedAt))+'</span>':(q.status==="carried"?'<b>Carried</b><span>from '+esc(fmtS(q.lastCall))+'</span>':'<b>'+R.length+'</b><span>rows · '+awgR.length+' marked AWG</span>'))+'</div></div>'+
     (notHome(doc)?'<div class="card homeb" style="border-left:4px solid var(--warn)"><b>AWG’s '+(doc.status==="carried"?'call record':'decision')+' is saved, but it hasn’t reached the work request in the MMS yet.</b> '+(canEdit()?'<button type="button" class="btn sm pri" data-resend="1">Send to the MMS Again</button>':'<span class="muted">MISMO staff or the AWG chair and facilitator can send it on by opening this page.</span>')+'</div>':'')+
-    (doc.fromIm?'<div class="card fromim"><b>From IM Review.</b> <span class="muted">IM approved it '+esc(fmtD(doc.fromIm.decidedAt))+(doc.fromIm.decidedBy?' ('+esc(doc.fromIm.decidedBy)+')':'')+'. '+((doc.rows||[]).length)+' rows IM approved come here, with IM’s final wording'+(Object.entries(doc.fromIm.counts||{}).filter(x=>/Denied|Returned|Withdrawn/.test(x[0])&&x[1]).length?'; rows IM denied or returned stay behind':'')+'.</span></div>':'')+
+    (doc.fromIm?'<div class="card fromim"><b>From IM Review.</b> <span class="muted">IM approved it '+esc(fmtD(doc.fromIm.decidedAt))+(doc.fromIm.decidedBy?' ('+esc(doc.fromIm.decidedBy)+')':'')+'. '+((doc.rows||[]).length?((doc.rows||[]).length)+' rows IM approved come here, with IM’s final wording':'A documentation submission: no Reference Model rows, so AWG reviews its documents')+(Object.entries(doc.fromIm.counts||{}).filter(x=>/Denied|Returned|Withdrawn/.test(x[0])&&x[1]).length?'; rows IM denied or returned stay behind':'')+'.</span></div>':'')+
     (doc.test?'<div class="card tst-b"><b>Test submission.</b> Try anything here: record a call, carry it, decide it. Nothing is emailed, the draft doesn’t learn from it, and it doesn’t touch the work request in the MMS.</div>':'')+
     (doc.summary?'<div class="card summ"><span class="lbl">Submission Summary</span><p>'+esc(doc.summary)+'</p>'+(doc.artifacts||doc.structure?'<p class="muted">'+esc([doc.artifacts&&"Artifacts: "+doc.artifacts,doc.structure&&doc.structure+" rows on the Proposed Structure tab",doc.imOutcome&&"IM: "+doc.imOutcome+(doc.imDate?" "+fmtD(doc.imDate):"")].filter(Boolean).join(" · "))+'</p>':'')+'</div>':'')+
     docsHtml(q,doc,doc.rep)+earlierHtml(doc)+
