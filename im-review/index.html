@@ -653,6 +653,8 @@ em,i,cite,address,dfn{font-style:normal}
     window.__tourRS={ token:function(){ return 'tour'; }, current:function(){ return T.me||{}; }, canEdit:function(){ return true; },
       requireAccess:function(){ return Promise.resolve(T.role||'staff'); } };
     document.documentElement.removeAttribute('data-rs-gate');
+    /* the shared sign-in's own button: the person is signed in to the journey, and in here the practice person is */
+    try{ var st=document.createElement('style'); st.textContent='.rs-wrap,.rs-signin{display:none!important}'; document.head.appendChild(st); }catch(e){}
     /* the journey's arrow keys work while this page has the focus */
     document.addEventListener('keydown',function(e){ if(['ArrowLeft','ArrowRight'].indexOf(e.key)<0||(e.target&&e.target.closest&&e.target.closest('input,textarea,select,[contenteditable]'))) return;
       try{ if(P.__tourKey){ e.preventDefault(); P.__tourKey(e.key); } }catch(x){} });
