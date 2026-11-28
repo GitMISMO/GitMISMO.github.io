@@ -622,6 +622,52 @@ em,i,cite,address,dfn{font-style:normal}
 .card.docs .docs-add{margin-left:auto;cursor:pointer}
 .docs-up{font-size:12.5px;margin:-2px 0 10px}.docs-up.bad{color:var(--bad,#b3372c)}
 </style>
+<script>
+/* Tour mode (Nov 27, 2026): the Work Request Journey (resources.mismo.org/mms/journey/) shows this page inside its own
+   page with made-up practice data it hands over. Only when this page is framed by a resources.mismo.org page that offers
+   that data (?tour=1). Then nothing real is read and nothing is saved or sent: the relay is a copy of the practice files
+   in this page, the date is the step's, and the browser's storage is never written (the shared sign-in also loads in
+   here, and on the tour's 2027 clock it would think the sign-in had run out and sign the person out everywhere). */
+(function(){ var PROJ='im-review';
+  try{ var P=window.parent; if(P===window||!P.__tourPortal) return;
+    if(!(/[?&]tour=1(&|$)/.test(location.search)||location.href==='about:srcdoc')) return;
+    var T=P.__tourPortal(PROJ)||{}, F=JSON.parse(JSON.stringify(T.files||{}));
+    window.__tourMode=true;
+    try{ var SP=Storage.prototype; SP.setItem=function(){}; SP.removeItem=function(){}; SP.clear=function(){}; }catch(e){}
+    /* the tour's clock: the journey's (or, while recording, the recorder's) */
+    (function(){ var RD=Date; function now(){ var c=P.__tourClock; return c?c.base+(RD.now()-c.at):P.Date.now(); }
+      function FD(){ if(!new.target) return new RD(now()).toString(); var a=[].slice.call(arguments); return a.length?new (Function.prototype.bind.apply(RD,[null].concat(a)))():new RD(now()); }
+      FD.now=now; FD.parse=RD.parse; FD.UTC=RD.UTC; FD.prototype=RD.prototype; window.Date=FD; })();
+    /* the reviewer's "are you sure" questions are answered yes: the journey shows the step, it never really sends anything */
+    window.confirm=function(){ return true; };
+    try{ ['pushState','replaceState','back','forward','go'].forEach(function(k){ history[k]=function(){}; }); }catch(e){}
+    /* the relay, answered from the practice files; Claude, answered by the journey; anything else gets an empty answer */
+    var J=function(j,s){ return Promise.resolve(new Response(JSON.stringify(j),{status:s||200,headers:{'Content-Type':'application/json'}})); };
+    window.fetch=function(u,o){ u=String(u); var m=u.match(/\/(im-review|awg-review)\/data\/([^?#]+)/), meth=String((o&&o.method)||'GET').toUpperCase();
+      if(m){ var n=decodeURIComponent(m[2]);
+        if(meth==='PUT'){ var b={}; try{ b=JSON.parse(o.body); }catch(e){} F[n]=b.content; try{ P.__tourPortalSaved&&P.__tourPortalSaved(PROJ,n,JSON.parse(JSON.stringify(b.content))); }catch(e){} return J({ok:true,sha:'t'+RDn()}); }
+        if(!(n in F)||F[n]==null) return Promise.resolve(new Response('{}',{status:404})); return J({data:JSON.parse(JSON.stringify(F[n])),sha:'t'}); }
+      if(/\/(im-review|awg-review)\/ask/.test(u)){ var p=''; try{ p=JSON.parse(o.body).prompt||''; }catch(e){} return Promise.resolve(T.ask?T.ask(p):'').then(function(t){ return J({text:String(t||'')}); }); }
+      return J({}); };
+    var RDn=function(){ return String(Math.random()).slice(2,10); };
+    window.__tourRS={ token:function(){ return 'tour'; }, current:function(){ return T.me||{}; }, canEdit:function(){ return true; },
+      requireAccess:function(){ return Promise.resolve(T.role||'staff'); } };
+    document.documentElement.removeAttribute('data-rs-gate');
+    /* the journey's arrow keys work while this page has the focus */
+    document.addEventListener('keydown',function(e){ if(['ArrowLeft','ArrowRight'].indexOf(e.key)<0||(e.target&&e.target.closest&&e.target.closest('input,textarea,select,[contenteditable]'))) return;
+      try{ if(P.__tourKey){ e.preventDefault(); P.__tourKey(e.key); } }catch(x){} });
+    var X=function(){ return window.__imr||window.__awgr; };
+    /* what the journey drives: one step's files, who is looking, and where */
+    window.__portalTour={ project:PROJ, files:function(){ return JSON.parse(JSON.stringify(F)); },
+      ready:function(){ var x=X(); return !!(x&&x.S&&x.S.loaded); },
+      load:function(o){ o=o||{}; if(o.files) F=JSON.parse(JSON.stringify(o.files)); if(o.me) T.me=o.me; if(o.role) T.role=o.role; var x=X(); if(!x) return Promise.resolve(false);
+        x.S.docs={}; x.S.edit=null; x.S.callOpen=null; try{ var t=document.querySelector('.toast'); if(t) t.hidden=true; }catch(e){}
+        var h=o.hash==null?'':String(o.hash); if(location.hash.replace(/^#/,'')!==h.replace(/^#/,'')) location.hash=h;
+        return x.load(T.role||'staff').then(function(){ x.render(); window.scrollTo(0,0); return true; }); } };
+  }catch(e){ /* a page from elsewhere can't be read: not a tour */ }
+})();
+
+</script>
 <script src="/assets/session.js"></script>
 </head>
 <body>
@@ -697,7 +743,7 @@ em,i,cite,address,dfn{font-style:normal}
 (function(){
 "use strict";
 const RELAY="https://rgvdi67cg27o5kcmiytcqbqnrm0hmztx.lambda-url.us-east-1.on.aws", PROJECT="im-review";
-const RS=()=>window.ResourcesSession||null, tok=()=>{ try{ return RS().token(); }catch(e){ return ""; } };
+const RS=()=>window.__tourRS||window.ResourcesSession||null, tok=()=>{ try{ return RS().token(); }catch(e){ return ""; } };
 const U=n=>RELAY+"/"+PROJECT+"/data/"+encodeURIComponent(n);
 const $=(s,r)=>(r||document).querySelector(s), $$=(s,r)=>[...(r||document).querySelectorAll(s)];
 const esc=s=>String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -947,7 +993,12 @@ function histDesk(doc){ const R=doc.rows||[], F=S.filter==="all"?"all":"changed"
 S.rowPg={};
 /* ---------- the desk ---------- */
 /* the MMS says when Claude's read or the Reference Model check didn't run for this draft */
-function docWarn(doc){ if(!doc||doc.hist) return []; return [String(doc.aiNote||"").trim(),doc.rmLoaded===false&&!/reference model/i.test(String(doc.aiNote||""))?"The Reference Model check didn’t run, so rows already in the model or with a wrong XPATH can look clean.":""].filter(Boolean); }
+/* the QC's note says what it couldn't check. Two of its sentences are only information, not a check that didn't run
+   (Nov 27, 2026: every Reference Model QC carried the first, so every submission said "Check every row yourself" and
+   Agree with All Clean Rows was off): which Submission Form tabs it reads, and that Claude read every part */
+const INFO_NOTE=[/IM Submission Form: only the Face Page, Reference Model Changes and Proposed Structure tabs were reviewed; the other tabs were left out\.?/i,/Claude read all \d+ parts\.?/i];
+const noteOf=doc=>INFO_NOTE.reduce((s,re)=>s.replace(re,""),String(doc.aiNote||"")).replace(/\s+/g," ").trim();
+function docWarn(doc){ if(!doc||doc.hist) return []; const n=noteOf(doc); if(!(doc.rows||[]).length) return n?[n]:[];   /* a documentation submission has no rows for the Reference Model check to read */ return [n,doc.rmLoaded===false&&!/reference model/i.test(n)?"The Reference Model check didn’t run, so rows already in the model or with a wrong XPATH can look clean.":""].filter(Boolean); }
 function desk(doc){ if(doc.hist) return histDesk(doc); if(doc.status!=="decided"&&canReview()&&!tmOpen[doc.rep]) tmOpen[doc.rep]=new Date().toISOString();
   const W=docWarn(doc); if(W.length) (doc.rows||[]).forEach(r=>{ if(r.auto){ r.auto=false; r._autoOff=true; } });
   const R=doc.rows||[], decided=doc.status==="decided", q=S.queue[doc.rep]||{}, F=S.filter;
