@@ -91,3 +91,11 @@ People & Access would take it from people who have it on its own), so Team HQ pe
 - Nothing saves: the stand-in db refuses every save, and the key has no writable folder.
 - System Health and incoming-data warnings live in Team HQ's Connected Systems (the record's own data); the copy job's
   failures reach the Failure Watcher like every other GitHub job.
+
+## Phone (Nov 27, 2026)
+
+- The phone layer is the last script in build.py. `html.ph` is set when `(max-width:700px), (max-height:500px) and (max-width:1000px)` matches, `html.land` when wider than tall. On a phone the rail is hidden and `#mtab` (bottom tab bar) and `#msheet` (More: every page from the rail's own buttons, Search through `__deskFind`, Dark Mode through the rail's theme button) take its place; pages still change by clicking the rail's buttons, so Back (CN-033) and the hash work as on a computer.
+- Full-screen map (`html.mapmode`, `.cs-grid.mm-on`): opens on its own when a phone turns sideways on Overview (not again until it is turned upright, if you leave it), or from Full Screen. The map is fitted with a width on `.cs-mapin`; pinch, drag and double-tap set a CSS transform on it. A drag never counts as a tap on a box. The panel (a box's story) becomes a side drawer, or a bottom sheet upright. Both the sheet and the full-screen map are MismoBack layers.
+- The masthead stays the shared phone size (CN-053); only the Edit in Team HQ button is hidden on a phone.
+- The defs slice is now found by its opening line, like the CSS and the rail script, because the Accounting Desk's lines above it move.
+
